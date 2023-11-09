@@ -1,4 +1,4 @@
-part of 'lm_post_bloc.dart';
+part of 'post_bloc.dart';
 
 abstract class LMPostEvents extends Equatable {
   @override

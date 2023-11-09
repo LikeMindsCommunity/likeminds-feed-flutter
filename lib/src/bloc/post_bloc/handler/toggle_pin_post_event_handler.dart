@@ -1,4 +1,4 @@
-part of '../lm_post_bloc.dart';
+part of '../post_bloc.dart';
 
 togglePinPostEventHandler(
     TogglePinPost event, Emitter<LMPostState> emit) async {

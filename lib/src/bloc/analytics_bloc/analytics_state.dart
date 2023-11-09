@@ -1,4 +1,4 @@
-part of 'lm_analytics_bloc.dart';
+part of 'analytics_bloc.dart';
 
 abstract class LMAnalyticsState extends Equatable {
   const LMAnalyticsState();
