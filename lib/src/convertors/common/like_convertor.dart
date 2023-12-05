@@ -20,4 +20,23 @@ class LikeViewDataConvertor {
       userId: likeViewData.userId,
     );
   }
+
+  static LikeViewData fromCommentLike({required CommentLike commentLikeModel}) {
+    LikeViewDataBuilder likeViewDataBuilder = LikeViewDataBuilder();
+    likeViewDataBuilder
+      ..id(commentLikeModel.id)
+      ..userId(commentLikeModel.userId)
+      ..createdAt(commentLikeModel.createdAt)
+      ..updatedAt(commentLikeModel.updatedAt);
+    return likeViewDataBuilder.build();
+  }
+
+  static CommentLike toCommentLike(LikeViewData likeViewData) {
+    return CommentLike(
+      id: likeViewData.id,
+      createdAt: likeViewData.createdAt,
+      updatedAt: likeViewData.updatedAt,
+      userId: likeViewData.userId,
+    );
+  }
 }
