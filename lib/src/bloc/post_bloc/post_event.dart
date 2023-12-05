@@ -9,7 +9,7 @@ class CreateNewPost extends LMPostEvents {
   final List<MediaModel>? postMedia;
   final String postText;
   final User user;
-  final List<TopicUI> selectedTopics;
+  final List<TopicViewData> selectedTopics;
 
   CreateNewPost({
     this.postMedia,
@@ -23,7 +23,7 @@ class EditPost extends LMPostEvents {
   final List<Attachment>? attachments;
   final String postText;
   final String postId;
-  final List<TopicUI> selectedTopics;
+  final List<TopicViewData> selectedTopics;
 
   EditPost({
     required this.postText,
@@ -49,7 +49,7 @@ class DeletePost extends LMPostEvents {
 }
 
 class UpdatePost extends LMPostEvents {
-  final PostUI post;
+  final PostViewData post;
 
   UpdatePost({
     required this.post,

@@ -1,6 +1,6 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_bloc_fl/src/convertors/common/popup_menu_convertor.dart';
 import 'package:likeminds_feed_ui_fl/src/models/comment/comment_view_data.dart';
-import 'package:likeminds_feed_bloc_fl/convertors/common/popup_menu_convertor.dart';
 
 class CommentViewDataConvertor {
   static CommentViewData fromCommentReply(CommentReply comment) {

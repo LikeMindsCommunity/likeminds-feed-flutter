@@ -1,7 +1,7 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_bloc_fl/src/convertors/common/popup_menu_convertor.dart';
+import 'package:likeminds_feed_bloc_fl/src/convertors/helper/attachment/attachment_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:lm_feed_ui_example/convertors/common/popup_menu_convertor.dart';
-import 'package:lm_feed_ui_example/convertors/helper/attachment/attachment_convertor.dart';
 
 class PostViewDataConvertor {
   static PostViewData fromPost({required Post post}) {

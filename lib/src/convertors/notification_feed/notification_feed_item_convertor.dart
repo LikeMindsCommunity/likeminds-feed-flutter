@@ -1,6 +1,6 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_bloc_fl/src/convertors/notification_feed/activity_entity_convertor.dart';
 import 'package:likeminds_feed_ui_fl/src/models/notification_feed/notification_feed_item_view_data.dart';
-import 'package:lm_feed_ui_example/convertors/notification_feed/activity_entity_convertor.dart';
 
 class NotificationFeedItemViewDataConvertor {
   static NotificationFeedItemViewData fromNotificationFeedItem(

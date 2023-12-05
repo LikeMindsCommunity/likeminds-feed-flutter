@@ -1,7 +1,6 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_bloc_fl/src/convertors/sdk/sdk_client_info_convertor.dart';
 import 'package:likeminds_feed_ui_fl/src/models/helper/tagging/user_tag_view_model.dart';
-import 'package:lm_feed_ui_example/convertors/sdk/sdk_client_info_convertor.dart';
-
 class UserTagViewDataConvertor {
   static UserTagViewData fromUserTag(UserTag userTag) {
     UserTagViewDataBuilder userTagViewDataBuilder = UserTagViewDataBuilder();

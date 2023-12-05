@@ -73,7 +73,7 @@ newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
       );
     }
     List<Topic> postTopics =
-        event.selectedTopics.map((e) => e.toTopic()).toList();
+        event.selectedTopics.map((e) => TopicViewDataConvertor.toTopic(e)).toList();
     final AddPostRequest request = (AddPostRequestBuilder()
           ..text(event.postText)
           ..attachments(attachments)
@@ -86,12 +86,12 @@ newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
     if (response.success) {
       emit(
         NewPostUploaded(
-          postData: PostUI.fromPost(post: response.post!),
+          postData: PostViewDataConvertor.fromPost(post: response.post!),
           userData: response.user!,
           topics: (response.topics ?? <String, Topic>{}).map(
             (key, value) => MapEntry(
               key,
-              TopicUI.fromTopic(value),
+              TopicViewDataConvertor.fromTopic(value),
             ),
           ),
         ),

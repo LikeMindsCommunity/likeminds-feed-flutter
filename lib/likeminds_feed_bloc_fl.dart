@@ -7,8 +7,9 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 export 'src/bloc/post_bloc/post_bloc.dart';
 export 'src/services/media_service.dart';
 export 'src/constants/analytics/keys.dart';
+export 'src/convertors/model_convertor.dart';
 
-class LMFeedBloc{
+class LMFeedBloc {
   late final LMPostBloc lmPostBloc;
   late final LMFeedClient lmFeedClient;
   late final MediaService mediaService;
@@ -19,8 +20,10 @@ class LMFeedBloc{
 
   LMFeedBloc._();
 
-  void initialize({required LMFeedClient lmFeedClient, required MediaService mediaService}) {
-    this.lmFeedClient =  lmFeedClient;
+  void initialize(
+      {required LMFeedClient lmFeedClient,
+      required MediaService mediaService}) {
+    this.lmFeedClient = lmFeedClient;
     lmPostBloc = LMPostBloc();
     this.mediaService = mediaService;
   }
