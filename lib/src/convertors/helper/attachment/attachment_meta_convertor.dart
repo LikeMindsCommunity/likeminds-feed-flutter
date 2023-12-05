@@ -1,5 +1,5 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_bloc_fl/src/convertors/helper/og_tag_convertor.dart';
+import 'package:likeminds_feed_driver_fl/src/convertors/helper/og_tag_convertor.dart';
 import 'package:likeminds_feed_ui_fl/src/models/helper/attachment/attachment_meta_view_data.dart';
 
 class AttachmentMetaViewDataConvertor {

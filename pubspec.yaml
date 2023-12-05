@@ -1,10 +1,10 @@
-name: likeminds_feed_bloc_fl
+name: likeminds_feed_driver_fl
 description: A new Flutter package project.
 version: 0.0.1
 homepage:
 
 environment:
-  sdk: '>=3.1.5 <4.0.0'
+  sdk: ">=3.1.5 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
@@ -18,7 +18,8 @@ dev_dependencies:
   equatable: 2.0.5
   bloc: 8.1.2
   flutter_bloc: 8.1.3
-  likeminds_feed: 1.6.3
+  likeminds_feed: # 1.6.3
+    path: ../LikeMinds-Flutter-Feed-SDK
   simple_s3: 0.3.2
   overlay_support:
 

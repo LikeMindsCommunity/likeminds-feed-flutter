@@ -1,6 +1,6 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_bloc_fl/src/convertors/comment/comment_convertor.dart';
-import 'package:likeminds_feed_bloc_fl/src/convertors/helper/attachment/attachment_convertor.dart';
+import 'package:likeminds_feed_driver_fl/src/convertors/comment/comment_convertor.dart';
+import 'package:likeminds_feed_driver_fl/src/convertors/helper/attachment/attachment_convertor.dart';
 
 import 'package:likeminds_feed_ui_fl/src/models/notification_feed/activity_entity_view_data.dart';
 

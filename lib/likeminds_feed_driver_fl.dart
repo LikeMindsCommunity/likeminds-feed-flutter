@@ -1,7 +1,7 @@
-library likeminds_feed_bloc_fl;
+library likeminds_feed_driver_fl;
 
-import 'package:likeminds_feed_bloc_fl/src/bloc/post_bloc/post_bloc.dart';
-import 'package:likeminds_feed_bloc_fl/src/services/media_service.dart';
+import 'package:likeminds_feed_driver_fl/src/bloc/post_bloc/post_bloc.dart';
+import 'package:likeminds_feed_driver_fl/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 
 export 'src/bloc/post_bloc/post_bloc.dart';
