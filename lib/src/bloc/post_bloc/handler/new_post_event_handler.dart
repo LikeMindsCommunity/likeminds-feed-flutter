@@ -28,7 +28,7 @@ newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
               attachmentType: 4,
               attachmentMeta: AttachmentMeta(
                   url: media.ogTags!.url,
-                  ogTags: AttachmentMetaOgTags(
+                  ogTags: OgTags(
                     description: media.ogTags!.description,
                     image: media.ogTags!.image,
                     title: media.ogTags!.title,
@@ -72,8 +72,9 @@ newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
         ),
       );
     }
-    List<Topic> postTopics =
-        event.selectedTopics.map((e) => TopicViewDataConvertor.toTopic(e)).toList();
+    List<Topic> postTopics = event.selectedTopics
+        .map((e) => TopicViewDataConvertor.toTopic(e))
+        .toList();
     final AddPostRequest request = (AddPostRequestBuilder()
           ..text(event.postText)
           ..attachments(attachments)

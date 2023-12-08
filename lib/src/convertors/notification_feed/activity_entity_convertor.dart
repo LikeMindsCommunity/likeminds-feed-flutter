@@ -63,7 +63,7 @@ class ActivityEntityViewDataConvertor {
 
     if (activityEntityData.replies != null) {
       activityEntityViewDataBuilder.replies(activityEntityData.replies!
-          .map((e) => CommentViewDataConvertor.fromReply(e))
+          .map((e) => CommentViewDataConvertor.fromComment(e))
           .toList());
     }
 
@@ -95,7 +95,7 @@ class ActivityEntityViewDataConvertor {
       isEdited: activityEntityViewData.isEdited,
       isPinned: activityEntityViewData.isPinned,
       replies: activityEntityViewData.replies
-          ?.map((e) => CommentViewDataConvertor.toReply(e))
+          ?.map((e) => CommentViewDataConvertor.toComment(e))
           .toList(),
       text: activityEntityViewData.text,
       updatedAt: activityEntityViewData.updatedAt,

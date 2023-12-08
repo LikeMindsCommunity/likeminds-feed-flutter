@@ -16,7 +16,7 @@ class NotificationFeedItemViewDataConvertor {
 
     notificationFeedItemViewDataBuilder.actionOn(notificationFeedItem.actionOn);
 
-    notificationFeedItemViewDataBuilder.activityEntityData(
+    notificationFeedItemViewDataBuilder.activityEntityViewData(
         ActivityEntityViewDataConvertor.fromActivityEntity(
             notificationFeedItem.activityEntityData));
 
