@@ -1,10 +1,10 @@
 library likeminds_feed_bloc_fl;
 
-import 'package:likeminds_feed_bloc_fl/src/bloc/post_bloc/post_bloc.dart';
+import 'package:likeminds_feed_bloc_fl/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_bloc_fl/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 
-export 'src/bloc/post_bloc/post_bloc.dart';
+export 'src/bloc/post/post_bloc.dart';
 export 'src/services/media_service.dart';
 export 'src/constants/analytics/keys.dart';
 export 'src/convertors/model_convertor.dart';

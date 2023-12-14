@@ -72,8 +72,9 @@ newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
         ),
       );
     }
-    List<Topic> postTopics =
-        event.selectedTopics.map((e) => TopicViewDataConvertor.toTopic(e)).toList();
+    List<Topic> postTopics = event.selectedTopics
+        .map((e) => TopicViewDataConvertor.toTopic(e))
+        .toList();
     final AddPostRequest request = (AddPostRequestBuilder()
           ..text(event.postText)
           ..attachments(attachments)
