@@ -20,7 +20,7 @@ class CreateNewPost extends LMPostEvents {
 }
 
 class EditPost extends LMPostEvents {
-  final List<Attachment>? attachments;
+  final List<AttachmentViewData>? attachments;
   final String postText;
   final String postId;
   final List<TopicViewData> selectedTopics;

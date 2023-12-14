@@ -3,15 +3,15 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class TopicViewDataConvertor {
   static TopicViewData fromTopic(Topic topic) {
-    TopicViewDataBuilder topicViewDataBuilder = TopicViewDataBuilder();
+    TopicViewDataBuilder topicBuilder = TopicViewDataBuilder();
 
-    topicViewDataBuilder.name(topic.name);
+    topicBuilder.name(topic.name);
 
-    topicViewDataBuilder.id(topic.id);
+    topicBuilder.id(topic.id);
 
-    topicViewDataBuilder.isEnabled(topic.isEnabled);
+    topicBuilder.isEnabled(topic.isEnabled);
 
-    return topicViewDataBuilder.build();
+    return topicBuilder.build();
   }
 
   static Topic toTopic(TopicViewData topicViewData) {

@@ -5,8 +5,8 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 homepage:
 
 environment:
-  sdk: ">=3.1.5 <4.0.0"
-  flutter: ">=1.17.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: "<= 3.10.6"
 
 dependencies:
   flutter:
@@ -19,6 +19,7 @@ dependencies:
     path: ../LikeMinds-Flutter-Feed-SDK
   simple_s3: 0.3.2
   overlay_support:
+  video_player:
 
   likeminds_feed_ui_fl:
     path: ../LikeMinds-Flutter-Feed-UI

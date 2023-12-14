@@ -88,7 +88,8 @@ newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
       emit(
         NewPostUploaded(
           postData: PostViewDataConvertor.fromPost(post: response.post!),
-          userData: response.user!,
+          userData: (response.user ?? <String, User>{}).map((key, value) =>
+              MapEntry(key, UserViewDataConvertor.fromUser(value))),
           topics: (response.topics ?? <String, Topic>{}).map(
             (key, value) => MapEntry(
               key,

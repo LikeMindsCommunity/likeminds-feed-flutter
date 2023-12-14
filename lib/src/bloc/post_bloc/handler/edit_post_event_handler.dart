@@ -4,7 +4,9 @@ Future<void> editPostEventHandler(
     EditPost event, Emitter<LMPostState> emit) async {
   try {
     emit(EditPostUploading());
-    List<Attachment>? attachments = event.attachments;
+    List<Attachment>? attachments = event.attachments
+        ?.map((e) => AttachmentViewDataConvertor.toAttachment(e))
+        .toList();
     String postText = event.postText;
 
     var response =
@@ -17,8 +19,9 @@ Future<void> editPostEventHandler(
     if (response.success) {
       emit(
         EditPostUploaded(
-          postData:  PostViewDataConvertor.fromPost(post: response.post!),
-          userData: response.user!,
+          postData: PostViewDataConvertor.fromPost(post: response.post!),
+          userData: (response.user ?? <String, User>{}).map((key, value) =>
+              MapEntry(key, UserViewDataConvertor.fromUser(value))),
           topics: (response.topics ?? <String, Topic>{}).map(
             (key, value) => MapEntry(
               key,

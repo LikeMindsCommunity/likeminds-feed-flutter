@@ -20,7 +20,7 @@ class EditPostUploading extends LMPostState {}
 
 class NewPostUploaded extends LMPostState {
   final PostViewData postData;
-  final Map<String, User> userData;
+  final Map<String, UserViewData> userData;
   final Map<String, TopicViewData> topics;
 
   const NewPostUploaded({
@@ -32,7 +32,7 @@ class NewPostUploaded extends LMPostState {
 
 class EditPostUploaded extends LMPostState {
   final PostViewData postData;
-  final Map<String, User> userData;
+  final Map<String, UserViewData> userData;
   final Map<String, TopicViewData> topics;
 
   const EditPostUploaded({
