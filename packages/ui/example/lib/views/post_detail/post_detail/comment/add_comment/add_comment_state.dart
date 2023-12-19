@@ -11,12 +11,12 @@ class AddCommentInitial extends AddCommentState {}
 
 class AddCommentLoading extends AddCommentState {}
 
-class AddCommentSuccess extends AddCommentState {
+class LMAddCommentSuccessState extends AddCommentState {
   final AddCommentResponse addCommentResponse;
-  const AddCommentSuccess({required this.addCommentResponse});
+  const LMAddCommentSuccessState({required this.addCommentResponse});
 }
 
-class AddCommentError extends AddCommentState {
+class LMAddCommentErrorState extends AddCommentState {
   final String message;
-  const AddCommentError({required this.message});
+  const LMAddCommentErrorState({required this.message});
 }

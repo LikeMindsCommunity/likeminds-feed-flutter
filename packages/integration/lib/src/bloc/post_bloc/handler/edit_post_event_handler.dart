@@ -1,7 +1,6 @@
 part of '../post_bloc.dart';
 
-Future<void> editPostEventHandler(
-    EditPost event, Emitter<LMPostState> emit) async {
+void editPostEventHandler(EditPost event, Emitter<LMPostState> emit) async {
   try {
     emit(EditPostUploading());
     List<Attachment>? attachments = event.attachments

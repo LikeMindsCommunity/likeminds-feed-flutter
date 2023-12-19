@@ -1,64 +1,64 @@
 part of 'add_comment_reply_bloc.dart';
 
-abstract class AddCommentReplyEvent extends Equatable {
-  const AddCommentReplyEvent();
+abstract class LMCommentHandlerEvent extends Equatable {
+  const LMCommentHandlerEvent();
 
   @override
   List<Object> get props => [];
 }
 
 // Add Comment events
-class AddCommentReply extends AddCommentReplyEvent {
+class LMAddCommentReplyEvent extends LMCommentHandlerEvent {
   final AddCommentReplyRequest addCommentRequest;
-  const AddCommentReply({required this.addCommentRequest});
+  const LMAddCommentReplyEvent({required this.addCommentRequest});
 
   @override
   List<Object> get props => [addCommentRequest];
 }
 
-class DeleteComment extends AddCommentReplyEvent {
+class LMDeleteCommentEvent extends LMCommentHandlerEvent {
   final DeleteCommentRequest deleteCommentRequest;
-  const DeleteComment(this.deleteCommentRequest);
+  const LMDeleteCommentEvent(this.deleteCommentRequest);
 }
 
-class DeleteCommentReply extends AddCommentReplyEvent {
+class LMDeleteCommentReplyEvent extends LMCommentHandlerEvent {
   final DeleteCommentRequest deleteCommentReplyRequest;
-  const DeleteCommentReply(this.deleteCommentReplyRequest);
+  const LMDeleteCommentReplyEvent(this.deleteCommentReplyRequest);
 }
 
-class EditComment extends AddCommentReplyEvent {
+class LMEditCommentEvent extends LMCommentHandlerEvent {
   final EditCommentRequest editCommentRequest;
-  const EditComment({required this.editCommentRequest});
+  const LMEditCommentEvent({required this.editCommentRequest});
 
   @override
   List<Object> get props => [editCommentRequest];
 }
 
-class EditCommentCancel extends AddCommentReplyEvent {}
+class LMEditCommentCancelEvent extends LMCommentHandlerEvent {}
 
-class EditingComment extends AddCommentReplyEvent {
+class LMEditingCommentEvent extends LMCommentHandlerEvent {
   final String commentId;
   final String text;
 
-  const EditingComment({required this.commentId, required this.text});
+  const LMEditingCommentEvent({required this.commentId, required this.text});
 }
 
-class EditReply extends AddCommentReplyEvent {
+class LMEditReplyEvent extends LMCommentHandlerEvent {
   final EditCommentReplyRequest editCommentReplyRequest;
 
-  const EditReply({required this.editCommentReplyRequest});
+  const LMEditReplyEvent({required this.editCommentReplyRequest});
 
   @override
   List<Object> get props => [editCommentReplyRequest];
 }
 
-class EditReplyCancel extends AddCommentReplyEvent {}
+class LMEditReplyCancelEvent extends LMCommentHandlerEvent {}
 
-class EditingReply extends AddCommentReplyEvent {
+class LMEditingReplyEvent extends LMCommentHandlerEvent {
   final String commentId;
   final String text;
   final String replyId;
 
-  const EditingReply(
+  const LMEditingReplyEvent(
       {required this.commentId, required this.text, required this.replyId});
 }

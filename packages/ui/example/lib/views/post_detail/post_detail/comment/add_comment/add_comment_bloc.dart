@@ -12,7 +12,7 @@ part 'add_comment_state.dart';
 
 class AddCommentBloc extends Bloc<AddCommentEvent, AddCommentState> {
   AddCommentBloc() : super(AddCommentInitial()) {
-    on<AddComment>(
+    on<LMAddCommentEvent>(
       (event, emit) async {
         await _mapAddCommentToState(
           addCommentRequest: event.addCommentRequest,
@@ -29,7 +29,7 @@ class AddCommentBloc extends Bloc<AddCommentEvent, AddCommentState> {
     AddCommentResponse? response =
         await locator<LikeMindsService>().addComment(addCommentRequest);
     if (!response.success) {
-      emit(const AddCommentError(message: "No data found"));
+      emit(const LMAddCommentErrorState(message: "No data found"));
     } else {
       LMAnalytics.get().track(
         AnalyticsKeys.commentPosted,
@@ -37,7 +37,7 @@ class AddCommentBloc extends Bloc<AddCommentEvent, AddCommentState> {
           "post_id": addCommentRequest.postId,
         },
       );
-      emit(AddCommentSuccess(addCommentResponse: response));
+      emit(LMAddCommentSuccessState(addCommentResponse: response));
     }
   }
 }

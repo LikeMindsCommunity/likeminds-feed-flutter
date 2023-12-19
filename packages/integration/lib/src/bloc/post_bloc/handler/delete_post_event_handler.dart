@@ -1,6 +1,6 @@
 part of '../post_bloc.dart';
 
-deletePostEventHandler(DeletePost event, Emitter<LMPostState> emit) async {
+void deletePostEventHandler(DeletePost event, Emitter<LMPostState> emit) async {
   final response = await LMFeedBloc.get().lmFeedClient.deletePost(
         (DeletePostRequestBuilder()
               ..postId(event.postId)

@@ -8,9 +8,9 @@ abstract class AddCommentEvent extends Equatable {
 }
 
 // Add Comment events
-class AddComment extends AddCommentEvent {
+class LMAddCommentEvent extends AddCommentEvent {
   final AddCommentRequest addCommentRequest;
-  const AddComment({required this.addCommentRequest});
+  const LMAddCommentEvent({required this.addCommentRequest});
 
   @override
   List<Object> get props => [addCommentRequest];

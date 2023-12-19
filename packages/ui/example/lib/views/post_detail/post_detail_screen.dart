@@ -30,7 +30,7 @@ class PostDetailScreen extends StatefulWidget {
 class _PostDetailScreenState extends State<PostDetailScreen> {
   late final AllCommentsBloc _allCommentsBloc;
   late final AddCommentBloc _addCommentBloc;
-  late final AddCommentReplyBloc _addCommentReplyBloc;
+  late final LMCommentHandlerBloc _addCommentReplyBloc;
   final FocusNode focusNode = FocusNode();
   TextEditingController? _commentController;
   ValueNotifier<bool> rebuildButton = ValueNotifier(false);
@@ -86,7 +86,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             .build(),
         forLoadMore: false));
     _addCommentBloc = AddCommentBloc();
-    _addCommentReplyBloc = AddCommentReplyBloc();
+    _addCommentReplyBloc = LMCommentHandlerBloc();
     _addPaginationListener();
     if (focusNode.canRequestFocus) {
       focusNode.requestFocus();
@@ -182,7 +182,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     }
   }
 
-  void addCommentToList(AddCommentSuccess addCommentSuccess) {
+  void addCommentToList(LMAddCommentSuccessState LMAddCommentSuccessState) {
     List<CommentViewData>? commentItemList = _pagingController.itemList;
     commentItemList ??= [];
     if (commentItemList.length >= 10) {
@@ -192,28 +192,30 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     commentItemList.insert(
         0,
         CommentViewDataConvertor.fromComment(
-            addCommentSuccess.addCommentResponse.reply!));
+            LMAddCommentSuccessState.addCommentResponse.reply!));
     increaseCommentCount();
     rebuildPostWidget.value = !rebuildPostWidget.value;
   }
 
-  void updateCommentInList(EditCommentSuccess editCommentSuccess) {
+  void updateCommentInList(
+      LMEditCommentSuccessState LMEditCommentSuccessState) {
     List<CommentViewData>? commentItemList = _pagingController.itemList;
     commentItemList ??= [];
     int index = commentItemList.indexWhere((element) =>
-        element.id == editCommentSuccess.editCommentResponse.reply!.id);
+        element.id == LMEditCommentSuccessState.editCommentResponse.reply!.id);
     commentItemList[index] = CommentViewDataConvertor.fromComment(
-        editCommentSuccess.editCommentResponse.reply!);
+        LMEditCommentSuccessState.editCommentResponse.reply!);
     rebuildPostWidget.value = !rebuildPostWidget.value;
   }
 
-  addReplyToList(AddCommentReplySuccess addCommentReplySuccess) {
+  addReplyToList(LMAddCommentReplySuccessState LMAddCommentReplySuccessState) {
     List<CommentViewData>? commentItemList = _pagingController.itemList;
-    if (addCommentReplySuccess.addCommentResponse.reply!.parentComment !=
+    if (LMAddCommentReplySuccessState.addCommentResponse.reply!.parentComment !=
         null) {
       int index = commentItemList!.indexWhere((element) =>
           element.id ==
-          addCommentReplySuccess.addCommentResponse.reply!.parentComment!.id);
+          LMAddCommentReplySuccessState
+              .addCommentResponse.reply!.parentComment!.id);
       if (index != -1) {
         commentItemList[index].repliesCount =
             commentItemList[index].repliesCount + 1;
@@ -262,44 +264,44 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
           BlocProvider<AddCommentBloc>(
             create: (context) => _addCommentBloc,
           ),
-          BlocProvider<AddCommentReplyBloc>(
+          BlocProvider<LMCommentHandlerBloc>(
             create: (context) => _addCommentReplyBloc,
           ),
         ],
         child: Scaffold(
             resizeToAvoidBottomInset: true,
             bottomSheet: SafeArea(
-              child: BlocConsumer<AddCommentReplyBloc, AddCommentReplyState>(
+              child: BlocConsumer<LMCommentHandlerBloc, LMCommentHandlerState>(
                 bloc: _addCommentReplyBloc,
                 listener: (context, state) {
-                  if (state is CommentDeleted) {
+                  if (state is LMCommentDeletedState) {
                     removeCommentFromList(state.commentId);
                   }
-                  if (state is EditReplyLoading) {
+                  if (state is LMEditReplyLoadingState) {
                     deselectCommentToEdit();
                   }
-                  if (state is ReplyEditingStarted) {
+                  if (state is LMReplyEditingStartedState) {
                     selectCommentToEdit(
                         state.commentId, state.replyId, state.text);
                   }
-                  if (state is EditCommentLoading) {
+                  if (state is LMEditCommentLoadingState) {
                     deselectCommentToEdit();
                   }
-                  if (state is CommentEditingStarted) {
+                  if (state is LMCommentEditingStartedState) {
                     selectCommentToEdit(state.commentId, null, state.text);
                   }
-                  if (state is AddCommentReplySuccess) {
+                  if (state is LMAddCommentReplySuccessState) {
                     _commentController!.clear();
                     addReplyToList(state);
                     deselectCommentToReply();
                   }
-                  if (state is AddCommentReplyError) {
+                  if (state is LMAddCommentReplyErrorState) {
                     deselectCommentToReply();
                   }
-                  if (state is EditCommentSuccess) {
+                  if (state is LMEditCommentSuccessState) {
                     updateCommentInList(state);
                   }
-                  if (state is EditReplySuccess) {}
+                  if (state is LMEditReplySuccessState) {}
                 },
                 builder: (context, state) => Container(
                   decoration: BoxDecoration(
@@ -351,11 +353,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                           onTap: (active) {
                                             if (isEditing) {
                                               if (selectedReplyId != null) {
-                                                _addCommentReplyBloc
-                                                    .add(EditReplyCancel());
+                                                _addCommentReplyBloc.add(
+                                                    LMEditReplyCancelEvent());
                                               } else {
-                                                _addCommentReplyBloc
-                                                    .add(EditCommentCancel());
+                                                _addCommentReplyBloc.add(
+                                                    LMEditCommentCancelEvent());
                                               }
                                               deselectCommentToEdit();
                                             } else {

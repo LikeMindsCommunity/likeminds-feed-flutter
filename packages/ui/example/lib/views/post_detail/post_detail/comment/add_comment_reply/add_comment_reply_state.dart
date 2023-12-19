@@ -1,90 +1,91 @@
 part of 'add_comment_reply_bloc.dart';
 
-abstract class AddCommentReplyState extends Equatable {
-  const AddCommentReplyState();
+abstract class LMCommentHandlerState extends Equatable {
+  const LMCommentHandlerState();
 
   @override
   List<Object> get props => [];
 }
 
-class AddCommentReplyInitial extends AddCommentReplyState {}
+class LMCommentInitialState extends LMCommentHandlerState {}
 
-class AddCommentReplyLoading extends AddCommentReplyState {}
+class LMCommentLoadingState extends LMCommentHandlerState {}
 
-class AddCommentReplySuccess extends AddCommentReplyState {
+class LMAddCommentReplySuccessState extends LMCommentHandlerState {
   final AddCommentReplyResponse addCommentResponse;
-  const AddCommentReplySuccess({required this.addCommentResponse});
+  const LMAddCommentReplySuccessState({required this.addCommentResponse});
 }
 
-class AddCommentReplyError extends AddCommentReplyState {
+class LMAddCommentReplyErrorState extends LMCommentHandlerState {
   final String message;
-  const AddCommentReplyError({required this.message});
+  const LMAddCommentReplyErrorState({required this.message});
 }
 
-class CommentEditingStarted extends AddCommentReplyState {
+class LMCommentEditingStartedState extends LMCommentHandlerState {
   final String commentId;
   final String text;
 
-  const CommentEditingStarted({required this.commentId, required this.text});
+  const LMCommentEditingStartedState(
+      {required this.commentId, required this.text});
 }
 
-class EditCommentLoading extends AddCommentReplyState {}
+class LMEditCommentLoadingState extends LMCommentHandlerState {}
 
-class EditCommentCanceled extends AddCommentReplyState {}
+class LMEditCommentCanceledState extends LMCommentHandlerState {}
 
-class EditCommentSuccess extends AddCommentReplyState {
+class LMEditCommentSuccessState extends LMCommentHandlerState {
   final EditCommentResponse editCommentResponse;
 
-  const EditCommentSuccess({required this.editCommentResponse});
+  const LMEditCommentSuccessState({required this.editCommentResponse});
 }
 
-class EditCommentError extends AddCommentReplyState {
+class LMEditCommentErrorState extends LMCommentHandlerState {
   final String message;
-  const EditCommentError({required this.message});
+  const LMEditCommentErrorState({required this.message});
 }
 
-class ReplyEditingStarted extends AddCommentReplyState {
+class LMReplyEditingStartedState extends LMCommentHandlerState {
   final String commentId;
   final String text;
   final String replyId;
 
-  const ReplyEditingStarted(
+  const LMReplyEditingStartedState(
       {required this.commentId, required this.text, required this.replyId});
 }
 
-class EditReplyLoading extends AddCommentReplyState {}
+class LMEditReplyLoadingState extends LMCommentHandlerState {}
 
-class EditReplyCanceled extends AddCommentReplyState {}
+class LMEditReplyCanceledState extends LMCommentHandlerState {}
 
-class EditReplySuccess extends AddCommentReplyState {
+class LMEditReplySuccessState extends LMCommentHandlerState {
   final EditCommentReplyResponse editCommentReplyResponse;
 
-  const EditReplySuccess({required this.editCommentReplyResponse});
+  const LMEditReplySuccessState({required this.editCommentReplyResponse});
 }
 
-class EditReplyError extends AddCommentReplyState {
+class LMEditReplyErrorState extends LMCommentHandlerState {
   final String message;
-  const EditReplyError({required this.message});
+  const LMEditReplyErrorState({required this.message});
 }
 
-class CommentDeletionLoading extends AddCommentReplyState {}
+class LMCommentDeletionLoadingState extends LMCommentHandlerState {}
 
-class CommentDeleted extends AddCommentReplyState {
+class LMCommentDeletedState extends LMCommentHandlerState {
   final String commentId;
-  const CommentDeleted({
+  const LMCommentDeletedState({
     required this.commentId,
   });
 }
 
-class CommentDeleteError extends AddCommentReplyState {}
+class LMCommentDeleteErrorState extends LMCommentHandlerState {}
 
-class ReplyDeletionLoading extends AddCommentReplyState {}
+class LMReplyDeletionLoadingState extends LMCommentHandlerState {}
 
-class CommentReplyDeleted extends AddCommentReplyState {
+class LMCommentReplyDeletedState extends LMCommentHandlerState {
   final String replyId;
-  const CommentReplyDeleted({
+  const LMCommentReplyDeletedState({
     required this.replyId,
   });
 }
 
-class CommentReplyDeleteError extends AddCommentReplyState {}
+class LMCommentReplyDeleteErrorState extends LMCommentHandlerState {}

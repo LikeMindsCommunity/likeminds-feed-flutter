@@ -1,6 +1,6 @@
 part of '../post_bloc.dart';
 
-togglePinPostEventHandler(
+void togglePinPostEventHandler(
     TogglePinPost event, Emitter<LMPostState> emit) async {
   PinPostRequest request =
       (PinPostRequestBuilder()..postId(event.postId)).build();

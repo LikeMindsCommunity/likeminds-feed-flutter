@@ -12,10 +12,10 @@ part 'add_comment_reply_event.dart';
 
 part 'add_comment_reply_state.dart';
 
-class AddCommentReplyBloc
-    extends Bloc<AddCommentReplyEvent, AddCommentReplyState> {
-  AddCommentReplyBloc() : super(AddCommentReplyInitial()) {
-    on<AddCommentReply>(
+class LMCommentHandlerBloc
+    extends Bloc<LMCommentHandlerEvent, LMCommentHandlerState> {
+  LMCommentHandlerBloc() : super(LMCommentInitialState()) {
+    on<LMAddCommentReplyEvent>(
       (event, emit) async {
         await _mapAddCommentReplyToState(
           addCommentReplyRequest: event.addCommentRequest,
@@ -23,57 +23,57 @@ class AddCommentReplyBloc
         );
       },
     );
-    on<EditReplyCancel>(
+    on<LMEditReplyCancelEvent>(
       (event, emit) {
-        emit(EditReplyCanceled());
+        emit(LMEditReplyCanceledState());
       },
     );
-    on<EditingReply>((event, emit) {
+    on<LMEditingReplyEvent>((event, emit) {
       emit(
-        ReplyEditingStarted(
+        LMReplyEditingStartedState(
           commentId: event.commentId,
           text: event.text,
           replyId: event.replyId,
         ),
       );
     });
-    on<EditReply>((event, emit) async {
-      emit(EditReplyLoading());
+    on<LMEditReplyEvent>((event, emit) async {
+      emit(LMEditReplyLoadingState());
       EditCommentReplyResponse? response = await locator<LikeMindsService>()
           .editCommentReply(event.editCommentReplyRequest);
       if (!response.success) {
-        emit(const EditReplyError(message: "An error occurred"));
+        emit(const LMEditReplyErrorState(message: "An error occurred"));
       } else {
-        emit(EditReplySuccess(editCommentReplyResponse: response));
+        emit(LMEditReplySuccessState(editCommentReplyResponse: response));
       }
     });
-    on<EditCommentCancel>(
+    on<LMEditCommentCancelEvent>(
       (event, emit) {
-        emit(EditCommentCanceled());
+        emit(LMEditCommentCanceledState());
       },
     );
-    on<EditingComment>((event, emit) {
+    on<LMEditingCommentEvent>((event, emit) {
       emit(
-        CommentEditingStarted(
+        LMCommentEditingStartedState(
           commentId: event.commentId,
           text: event.text,
         ),
       );
     });
-    on<EditComment>((event, emit) async {
-      emit(EditCommentLoading());
+    on<LMEditCommentEvent>((event, emit) async {
+      emit(LMEditCommentLoadingState());
       EditCommentResponse? response = await locator<LikeMindsService>()
           .editComment(event.editCommentRequest);
       if (!response.success) {
-        emit(const EditCommentError(message: "An error occurred"));
+        emit(const LMEditCommentErrorState(message: "An error occurred"));
       } else {
-        emit(EditCommentSuccess(editCommentResponse: response));
+        emit(LMEditCommentSuccessState(editCommentResponse: response));
       }
     });
-    on<DeleteComment>(
+    on<LMDeleteCommentEvent>(
       (event, emit) async {
         try {
-          emit(CommentDeletionLoading());
+          emit(LMCommentDeletionLoadingState());
           final response = await locator<LikeMindsService>().deleteComment(
             event.deleteCommentRequest,
           );
@@ -84,7 +84,7 @@ class AddCommentReplyBloc
               duration: Toast.LENGTH_LONG,
             );
             emit(
-              CommentDeleted(
+              LMCommentDeletedState(
                 commentId: event.deleteCommentRequest.commentId,
               ),
             );
@@ -93,21 +93,21 @@ class AddCommentReplyBloc
               response.errorMessage ?? '',
               duration: Toast.LENGTH_LONG,
             );
-            emit(CommentDeleteError());
+            emit(LMCommentDeleteErrorState());
           }
         } catch (err) {
           toast(
             'An error occcurred while deleting comment',
             duration: Toast.LENGTH_LONG,
           );
-          emit(CommentDeleteError());
+          emit(LMCommentDeleteErrorState());
         }
       },
     );
-    on<DeleteCommentReply>(
+    on<LMDeleteCommentReplyEvent>(
       (event, emit) async {
         try {
-          emit(ReplyDeletionLoading());
+          emit(LMReplyDeletionLoadingState());
           final response = await locator<LikeMindsService>().deleteComment(
             event.deleteCommentReplyRequest,
           );
@@ -118,7 +118,7 @@ class AddCommentReplyBloc
               duration: Toast.LENGTH_LONG,
             );
             emit(
-              CommentReplyDeleted(
+              LMCommentReplyDeletedState(
                 replyId: event.deleteCommentReplyRequest.commentId,
               ),
             );
@@ -127,14 +127,14 @@ class AddCommentReplyBloc
               response.errorMessage ?? '',
               duration: Toast.LENGTH_LONG,
             );
-            emit(CommentDeleteError());
+            emit(LMCommentDeleteErrorState());
           }
         } catch (err) {
           toast(
             'An error occcurred while deleting reply',
             duration: Toast.LENGTH_LONG,
           );
-          emit(CommentDeleteError());
+          emit(LMCommentDeleteErrorState());
         }
       },
     );
@@ -142,12 +142,12 @@ class AddCommentReplyBloc
 
   FutureOr<void> _mapAddCommentReplyToState(
       {required AddCommentReplyRequest addCommentReplyRequest,
-      required Emitter<AddCommentReplyState> emit}) async {
-    emit(AddCommentReplyLoading());
+      required Emitter<LMCommentHandlerState> emit}) async {
+    emit(LMCommentLoadingState());
     AddCommentReplyResponse response = await locator<LikeMindsService>()
         .addCommentReply(addCommentReplyRequest);
     if (!response.success) {
-      emit(const AddCommentReplyError(message: "No data found"));
+      emit(const LMAddCommentReplyErrorState(message: "No data found"));
     } else {
       LMAnalytics.get().track(
         AnalyticsKeys.replyPosted,
@@ -156,7 +156,7 @@ class AddCommentReplyBloc
           "comment_id": addCommentReplyRequest.commentId,
         },
       );
-      emit(AddCommentReplySuccess(addCommentResponse: response));
+      emit(LMAddCommentReplySuccessState(addCommentResponse: response));
     }
   }
 }
