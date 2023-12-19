@@ -16,6 +16,10 @@ part 'handler/add_comment_event_handler.dart';
 part 'handler/edit_comment_event_handler.dart';
 part 'handler/delete_comment_event_handler.dart';
 
+/// [LMCommentHandlerBloc] handle all the comment related actions
+/// like add, edit, delete, etc.
+/// [LMCommentHandlerEvent] defines the events which are handled by this bloc.
+/// [LMCommentHandlerState] defines the states which are emitted by this bloc
 class LMCommentHandlerBloc
     extends Bloc<LMCommentHandlerEvent, LMCommentHandlerState> {
   static LMFeedBloc lmFeedBloc = LMFeedBloc.get();
@@ -23,20 +27,18 @@ class LMCommentHandlerBloc
     on<LMCommentActionEvent>(
       (event, emit) async {
         switch (event.commentMetaData.commentActionType) {
+          // Add comment
           case LMCommentActionType.add:
-            {
-              handleAddActionEvent(event, emit);
-              break;
-            }
+            handleAddActionEvent(event, emit);
+            break;
+          // Delete comment
           case LMCommentActionType.delete:
-            {
-              break;
-            }
+            handleDeleteActionEvent(event, emit);
+            break;
+          // Edit comment
           case LMCommentActionType.edit:
-            {
-              handleEditActionEvent(event, emit);
-              break;
-            }
+            handleEditActionEvent(event, emit);
+            break;
         }
       },
     );
