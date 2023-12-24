@@ -3,54 +3,46 @@ import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
+/// {@template post_widget}
 /// A widget that displays a post on the feed.
 /// Provide a header, footer, menu, media
 /// and content instance to customize the post.
-///
-class LMPostWidget extends StatefulWidget {
-  final LMPostHeader? header;
-  final LMPostFooter? footer;
-  final LMPostMenu? menu;
-  final LMPostMedia? media;
+/// {@endtemplate}
+class LMPostWidget extends StatelessWidget {
+  ///{@macro post_widget}
+  const LMPostWidget({
+    super.key,
+    required this.post,
+    required this.user,
+    required this.onPostTap,
+    required this.isFeed,
+    required this.onTagTap,
+    this.headerBuilder,
+    this.footerBuilder,
+    this.menuBuilder,
+    this.mediaBuilder,
+    this.contentBuilder,
+  });
+
+  final LMPostHeaderBuilder? headerBuilder;
+  final LMPostFooterBuilder? footerBuilder;
+  final LMPostMenuBuilder? menuBuilder;
+  final LMPostMediaBuilder? mediaBuilder;
+  final LMPostContentBuilder? contentBuilder;
 
   // Required variables
   final PostViewData post;
   final UserViewData user;
   final bool isFeed;
-  final Function() onTap;
+  final OnPostTap onPostTap;
   final Function(String) onTagTap;
-
-  const LMPostWidget({
-    super.key,
-    required this.post,
-    required this.user,
-    required this.onTap,
-    required this.isFeed,
-    required this.onTagTap,
-    this.header,
-    this.footer,
-    this.menu,
-    this.media,
-  });
-
-  @override
-  State<LMPostWidget> createState() => _LMPostWidgetState();
-}
-
-class _LMPostWidgetState extends State<LMPostWidget> {
-  // Internal variables
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     return InheritedPostProvider(
-      post: widget.post,
+      post: post,
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTap: () => onPostTap(context, post),
         child: Container(
           color: kWhiteColor,
           child: Padding(
@@ -62,22 +54,26 @@ class _LMPostWidgetState extends State<LMPostWidget> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                widget.header ??
-                    LMPostHeader(
-                      user: widget.user,
-                      isFeed: widget.isFeed,
-                    ),
-                LMPostContent(
-                  onTagTap: widget.onTagTap,
-                ),
-                widget.media == null
-                    ? widget.post.attachments != null &&
-                            widget.post.attachments!.isNotEmpty
-                        ? LMPostMedia(attachments: widget.post.attachments!)
+                headerBuilder != null
+                    ? headerBuilder!(context, post)
+                    : LMPostHeader(
+                        user: user,
+                        isFeed: isFeed,
+                      ),
+                contentBuilder != null
+                    ? contentBuilder!(context, post)
+                    : LMPostContent(
+                        onTagTap: onTagTap,
+                      ),
+                mediaBuilder == null
+                    ? post.attachments != null && post.attachments!.isNotEmpty
+                        ? LMPostMedia(attachments: post.attachments!)
                         : const SizedBox()
-                    : widget.media!,
+                    : mediaBuilder!(context, post),
                 const SizedBox(height: 18),
-                widget.footer ?? const LMPostFooter(),
+                footerBuilder != null
+                    ? footerBuilder!(context, post)
+                    : const LMPostFooter(),
               ],
             ),
           ),

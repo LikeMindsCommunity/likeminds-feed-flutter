@@ -23,6 +23,7 @@ export 'common/shimmer/feed_shimmer.dart';
 export 'common/shimmer/document_shimmer.dart';
 
 export 'common/profile_picture.dart';
+export 'common/user_tile.dart';
 
 export 'feed/bottom_sheet.dart';
 
@@ -36,3 +37,5 @@ export 'topic/topic_chip.dart';
 export 'topic/topic_feed_bar.dart';
 export 'topic/topic_feed_grid.dart';
 export 'topic/topic_tile.dart';
+
+export 'shimmer/user_tile_shimmer.dart';

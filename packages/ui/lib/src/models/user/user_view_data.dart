@@ -1,8 +1,16 @@
 import 'package:likeminds_feed_ui_fl/src/models/sdk/sdk_client_info_view_data.dart';
 
+/// {@template user_view_data}
+/// A data class to hold the user data.
+/// {@endtemplate}
 class UserViewData {
+  /// unique indentifier of the user
   int id;
+
+  /// name of the user
   String name;
+
+  /// image url of the user
   String imageUrl;
   bool? isGuest;
   bool? isDeleted;
@@ -11,13 +19,21 @@ class UserViewData {
   SDKClientInfoViewData? sdkClientInfo;
   int? updatedAt;
   bool? isOwner;
+
+  /// custom title of the user
+  /// eg: Community Manager
   String? customTitle;
+
+  /// date since the user is a member of the community
   String? memberSince;
   String? route;
   int? state;
+
+  /// community id of the community to which the user belongs
   int? communityId;
   int? createdAt;
 
+  /// {@macro user_view_data}
   UserViewData._({
     required this.id,
     required this.name,
@@ -38,6 +54,9 @@ class UserViewData {
   });
 }
 
+/// {@template user_view_data_builder}
+/// A builder class to build [UserViewData]
+/// {@endtemplate}
 class UserViewDataBuilder {
   int? _id;
   String? _name;
@@ -120,6 +139,7 @@ class UserViewDataBuilder {
     _createdAt = createdAt;
   }
 
+  /// {@macro user_view_data_builder}
   UserViewData build() {
     return UserViewData._(
       id: _id!,

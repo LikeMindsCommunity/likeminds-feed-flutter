@@ -15,20 +15,22 @@ import 'package:lm_feed_ui_example/views/post_detail/post_detail/comment/add_com
 import 'package:lm_feed_ui_example/views/post_detail/post_detail/comment/all_comments/all_comments_bloc.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-class PostDetailScreen extends StatefulWidget {
+class LMPostDetailScreen extends StatefulWidget {
   final String postId;
+  final LMPostWidgetBuilder? postBuilder;
 
-  const PostDetailScreen({
+  const LMPostDetailScreen({
     super.key,
     required this.postId,
+    this.postBuilder,
   });
 
   @override
-  State<PostDetailScreen> createState() => _PostDetailScreenState();
+  State<LMPostDetailScreen> createState() => _PostDetailScreenState();
 }
 
-class _PostDetailScreenState extends State<PostDetailScreen> {
-  late final AllCommentsBloc _allCommentsBloc;
+class _PostDetailScreenState extends State<LMPostDetailScreen> {
+  late final LMFetchCommentBloc _allCommentsBloc;
   late final AddCommentBloc _addCommentBloc;
   late final LMCommentHandlerBloc _addCommentReplyBloc;
   final FocusNode focusNode = FocusNode();
@@ -78,7 +80,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         },
       );
     }
-    _allCommentsBloc = AllCommentsBloc();
+    _allCommentsBloc = LMFetchCommentBloc();
     _allCommentsBloc.add(GetAllComments(
         postDetailRequest: (PostDetailRequestBuilder()
               ..postId(widget.postId)
@@ -182,7 +184,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     }
   }
 
-  void addCommentToList(LMAddCommentSuccessState LMAddCommentSuccessState) {
+  void addCommentToList(LMAddCommentSuccessState lmAddCommentSuccessState) {
     List<CommentViewData>? commentItemList = _pagingController.itemList;
     commentItemList ??= [];
     if (commentItemList.length >= 10) {
@@ -192,29 +194,29 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     commentItemList.insert(
         0,
         CommentViewDataConvertor.fromComment(
-            LMAddCommentSuccessState.addCommentResponse.reply!));
+            lmAddCommentSuccessState.addCommentResponse.reply!));
     increaseCommentCount();
     rebuildPostWidget.value = !rebuildPostWidget.value;
   }
 
   void updateCommentInList(
-      LMEditCommentSuccessState LMEditCommentSuccessState) {
+      LMEditCommentSuccessState lmEditCommentSuccessState) {
     List<CommentViewData>? commentItemList = _pagingController.itemList;
     commentItemList ??= [];
     int index = commentItemList.indexWhere((element) =>
-        element.id == LMEditCommentSuccessState.editCommentResponse.reply!.id);
+        element.id == lmEditCommentSuccessState.editCommentResponse.reply!.id);
     commentItemList[index] = CommentViewDataConvertor.fromComment(
-        LMEditCommentSuccessState.editCommentResponse.reply!);
+        lmEditCommentSuccessState.editCommentResponse.reply!);
     rebuildPostWidget.value = !rebuildPostWidget.value;
   }
 
-  addReplyToList(LMAddCommentReplySuccessState LMAddCommentReplySuccessState) {
+  addReplyToList(LMAddCommentReplySuccessState lmAddCommentReplySuccessState) {
     List<CommentViewData>? commentItemList = _pagingController.itemList;
-    if (LMAddCommentReplySuccessState.addCommentResponse.reply!.parentComment !=
+    if (lmAddCommentReplySuccessState.addCommentResponse.reply!.parentComment !=
         null) {
       int index = commentItemList!.indexWhere((element) =>
           element.id ==
-          LMAddCommentReplySuccessState
+          lmAddCommentReplySuccessState
               .addCommentResponse.reply!.parentComment!.id);
       if (index != -1) {
         commentItemList[index].repliesCount =
@@ -258,7 +260,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       },
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<AllCommentsBloc>(
+          BlocProvider<LMFetchCommentBloc>(
             create: (context) => _allCommentsBloc,
           ),
           BlocProvider<AddCommentBloc>(
@@ -445,7 +447,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               ),
               elevation: 2,
             ),
-            body: BlocConsumer<AllCommentsBloc, AllCommentsState>(
+            body: BlocConsumer<LMFetchCommentBloc, AllCommentsState>(
               listener: (context, state) {
                 if (state is AllCommentsLoaded) {
                   _page++;
@@ -513,7 +515,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                               postDetailResponse.users![
                                                   postDetailResponse
                                                       .post!.userId]!),
-                                          onTap: () {},
+                                          onPostTap: (context, postViewData) {},
                                         ),
                                 ),
                                 const SliverPadding(

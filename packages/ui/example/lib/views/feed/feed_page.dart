@@ -100,13 +100,13 @@ class _FeedScreenState extends State<FeedScreen> {
                       onTagTap: (String userId) {
                         locator<LikeMindsService>().routeToProfile(userId);
                       },
-                      onTap: () {
+                      onPostTap: (context, postViewData) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => BlocProvider<NewPostBloc>(
                               create: (context) => NewPostBloc(),
-                              child: PostDetailScreen(
+                              child: LMPostDetailScreen(
                                 postId: item.id,
                               ),
                             ),
@@ -162,17 +162,18 @@ class MyPostWidget extends LMPostWidget {
     super.key,
     required PostViewData post,
     required UserViewData user,
-    required Function() onTap,
+    required OnPostTap onPostTap,
     required bool isFeed,
     required Function(String) onTagTap,
   }) : super(
           post: post,
           user: user,
-          onTap: onTap,
+          onPostTap: onPostTap,
           isFeed: isFeed,
           onTagTap: onTagTap,
         );
 
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -181,7 +182,7 @@ class MyPostWidget extends LMPostWidget {
           post: post,
           isFeed: true,
           user: user,
-          onTap: onTap,
+          onPostTap: onPostTap,
           onTagTap: onTagTap,
           // refresh: refresh(),
         ),

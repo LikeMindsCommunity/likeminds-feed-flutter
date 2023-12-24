@@ -1,23 +1,49 @@
+import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/src/models/commons/popup_menu_view_data.dart';
 import 'package:likeminds_feed_ui_fl/src/models/helper/attachment/attachment_view_data.dart';
 
+/// {@template post_view_data}
+/// A data class to hold the post data.
+/// {@endtemplate}
 class PostViewData {
+  /// unique indentifier of the post
+  /// [required]
   final String id;
+
+  /// content of the post [nullable]
+  /// might contain tags and mentions
   String text;
+
+  /// topics of the post [nullable]
   List<String> topics;
+
+  /// attachments of the post [nullable]
+  /// can be of type image, video, file
   List<AttachmentViewData>? attachments;
+
+  /// community id of the community to which the post belongs
   final int communityId;
+
   bool isPinned;
+
+  /// user id of the user who created the post
   final String userId;
+
   int likeCount;
+
   int commentCount;
   bool isSaved;
   bool isLiked;
+
+  /// menu items to be displayed in the post menu
   List<PopUpMenuItemViewData> menuItems;
   final DateTime createdAt;
   DateTime updatedAt;
   bool isEdited;
 
+  List<CommentViewData> replies;
+
+  /// {@macro post_view_data}
   PostViewData._({
     required this.id,
     required this.text,
@@ -34,6 +60,7 @@ class PostViewData {
     required this.isLiked,
     required this.commentCount,
     required this.isEdited,
+    required this.replies,
   });
 }
 
@@ -53,6 +80,7 @@ class PostViewDataBuilder {
   DateTime? _createdAt;
   DateTime? _updatedAt;
   bool? _isEdited;
+  List<CommentViewData>? _replies;
 
   void id(String id) {
     _id = id;
@@ -114,6 +142,10 @@ class PostViewDataBuilder {
     _isEdited = isEdited;
   }
 
+  void replies(List<CommentViewData> replies) {
+    _replies = replies;
+  }
+
   PostViewData build() {
     return PostViewData._(
       id: _id!,
@@ -131,6 +163,7 @@ class PostViewDataBuilder {
       createdAt: _createdAt!,
       updatedAt: _updatedAt!,
       isEdited: _isEdited!,
+      replies: _replies!,
     );
   }
 }

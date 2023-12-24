@@ -10,10 +10,10 @@ import 'package:lm_feed_ui_example/services/service_locator.dart';
 part 'comment_replies_event.dart';
 part 'comment_replies_state.dart';
 
-class CommentRepliesBloc
+class LMFetchCommentReplyBloc
     extends Bloc<CommentRepliesEvent, CommentRepliesState> {
   LikeMindsService lmService = locator<LikeMindsService>();
-  CommentRepliesBloc() : super(CommentRepliesInitial()) {
+  LMFetchCommentReplyBloc() : super(CommentRepliesInitial()) {
     on<CommentRepliesEvent>((event, emit) async {
       if (event is GetCommentReplies) {
         await _mapGetCommentRepliesToState(

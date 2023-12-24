@@ -9,8 +9,8 @@ import 'package:lm_feed_ui_example/services/service_locator.dart';
 part 'all_comments_event.dart';
 part 'all_comments_state.dart';
 
-class AllCommentsBloc extends Bloc<AllCommentsEvent, AllCommentsState> {
-  AllCommentsBloc() : super(AllCommentsInitial()) {
+class LMFetchCommentBloc extends Bloc<AllCommentsEvent, AllCommentsState> {
+  LMFetchCommentBloc() : super(AllCommentsInitial()) {
     on<AllCommentsEvent>((event, emit) async {
       if (event is GetAllComments) {
         await _mapGetAllCommentsToState(
