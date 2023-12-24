@@ -25,7 +25,7 @@ class AnalyticsKeys {
   static const String likeListOpen = 'Like list open';
   static const String commentListOpen = 'Comment list open';
   static const String commentPosted = 'Comment posted';
-  static const String LMCommentDeletedState = 'Comment deleted';
+  static const String commentDeleted = 'Comment deleted';
   static const String commentReported = 'Comment reported';
   static const String replyPosted = 'Reply posted';
   static const String replyDeleted = 'Reply deleted';

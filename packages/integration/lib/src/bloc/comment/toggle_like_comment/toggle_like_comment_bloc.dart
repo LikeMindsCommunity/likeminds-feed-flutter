@@ -8,14 +8,14 @@ part 'toggle_like_comment_state.dart';
 
 class ToggleLikeCommentBloc
     extends Bloc<ToggleLikeCommentEvent, ToggleLikeCommentState> {
-  final LMFeedBloc lmFeedBloc = LMFeedBloc.get();
+  final LMFeedIntegration lmFeedIntegration = LMFeedIntegration.instance;
 
   ToggleLikeCommentBloc() : super(ToggleLikeCommentInitial()) {
     on<ToggleLikeComment>((event, emit) async {
       await _mapToggleLikeCommentToState(
         toggleLikeCommentRequest: event.toggleLikeCommentRequest,
         emit: emit,
-        lmFeedBloc: lmFeedBloc,
+        lmFeedIntegration: lmFeedIntegration,
       );
     });
   }
@@ -23,9 +23,9 @@ class ToggleLikeCommentBloc
   Future<void> _mapToggleLikeCommentToState(
       {required ToggleLikeCommentRequest toggleLikeCommentRequest,
       required Emitter<ToggleLikeCommentState> emit,
-      required LMFeedBloc lmFeedBloc}) async {
+      required LMFeedIntegration lmFeedIntegration}) async {
     emit(ToggleLikeCommentLoading());
-    ToggleLikeCommentResponse? response = await lmFeedBloc.lmFeedClient
+    ToggleLikeCommentResponse? response = await lmFeedIntegration.lmFeedClient
         .toggleLikeComment(toggleLikeCommentRequest);
 
     if (!response.success) {

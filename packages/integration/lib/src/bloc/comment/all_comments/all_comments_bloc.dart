@@ -8,16 +8,21 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 part 'all_comments_event.dart';
 part 'all_comments_state.dart';
 
-class AllCommentsBloc extends Bloc<AllCommentsEvent, AllCommentsState> {
-  AllCommentsBloc() : super(AllCommentsInitial()) {
-    LMFeedBloc lmFeedBloc = LMFeedBloc.get();
+class LMFetchCommentBloc extends Bloc<AllCommentsEvent, AllCommentsState> {
+  static LMFetchCommentBloc? _lmFetchCommentBloc;
+
+  static LMFetchCommentBloc get instance =>
+      _lmFetchCommentBloc ??= LMFetchCommentBloc._();
+
+  LMFetchCommentBloc._() : super(AllCommentsInitial()) {
+    LMFeedIntegration lmFeedIntegration = LMFeedIntegration.instance;
     on<AllCommentsEvent>((event, emit) async {
       if (event is GetAllComments) {
         await _mapGetAllCommentsToState(
           postDetailRequest: event.postDetailRequest,
           forLoadMore: event.forLoadMore,
           emit: emit,
-          lmFeedBloc: lmFeedBloc,
+          lmFeedIntegration: lmFeedIntegration,
         );
       }
     });
@@ -27,7 +32,7 @@ class AllCommentsBloc extends Bloc<AllCommentsEvent, AllCommentsState> {
       {required PostDetailRequest postDetailRequest,
       required bool forLoadMore,
       required Emitter<AllCommentsState> emit,
-      required LMFeedBloc lmFeedBloc}) async {
+      required LMFeedIntegration lmFeedIntegration}) async {
     // if (!hasReachedMax(state, forLoadMore)) {
     Map<String, User>? users = {};
     if (state is AllCommentsLoaded) {
@@ -39,7 +44,7 @@ class AllCommentsBloc extends Bloc<AllCommentsEvent, AllCommentsState> {
     }
 
     PostDetailResponse response =
-        await lmFeedBloc.lmFeedClient.getPostDetails(postDetailRequest);
+        await lmFeedIntegration.lmFeedClient.getPostDetails(postDetailRequest);
     if (!response.success) {
       emit(const AllCommentsError(message: "An error occurred"));
     } else {

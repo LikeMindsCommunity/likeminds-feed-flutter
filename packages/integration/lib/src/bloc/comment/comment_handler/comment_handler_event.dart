@@ -21,6 +21,14 @@ class LMCommentActionEvent extends LMCommentHandlerEvent {
   List<Object> get props => [commentActionRequest, commentMetaData];
 }
 
+class LMCommentOngoingEvent extends LMCommentHandlerEvent {
+  final LMCommentMetaData commentMetaData;
+
+  const LMCommentOngoingEvent({
+    required this.commentMetaData,
+  });
+}
+
 // This event is used to cancel the edit or reply flow
 // for both comment and replies to comments
 class LMCommentCancelEvent extends LMCommentHandlerEvent {

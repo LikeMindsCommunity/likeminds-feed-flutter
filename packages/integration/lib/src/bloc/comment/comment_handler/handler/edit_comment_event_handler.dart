@@ -1,5 +1,10 @@
 part of '../comment_handler_bloc.dart';
 
+/// {@template edit_comment_event_handler}
+/// [handleEditActionEvent] is used to handle the edit request
+/// for both comment and replies to comments
+/// [LMCommentActionEvent] is used to send the request to the handler
+/// {@endtemplate}
 void handleEditActionEvent(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) {
   // Notify the UI to change the view to Editing
@@ -15,12 +20,13 @@ void handleEditActionEvent(
 
 void _handleEditCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+
   EditCommentRequest editCommentRequest =
       event.commentActionRequest as EditCommentRequest;
 
-  EditCommentResponse response = await LMCommentHandlerBloc
-      .lmFeedBloc.lmFeedClient
-      .editComment(editCommentRequest);
+  EditCommentResponse response =
+      await lmFeedClient.editComment(editCommentRequest);
 
   if (!response.success) {
     emit(LMCommentErrorState(
@@ -37,12 +43,13 @@ void _handleEditCommentAction(
 
 void _handleEditReplyAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+
   EditCommentReplyRequest editCommentReplyRequest =
       event.commentActionRequest as EditCommentReplyRequest;
 
-  EditCommentReplyResponse response = await LMCommentHandlerBloc
-      .lmFeedBloc.lmFeedClient
-      .editCommentReply(editCommentReplyRequest);
+  EditCommentReplyResponse response =
+      await lmFeedClient.editCommentReply(editCommentReplyRequest);
 
   if (!response.success) {
     emit(LMCommentErrorState(

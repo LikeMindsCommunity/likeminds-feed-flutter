@@ -38,9 +38,8 @@ void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
           );
         } else {
           File mediaFile = media.mediaFile!;
-          final String? response = await LMFeedBloc.get()
-              .mediaService
-              .uploadFile(mediaFile, event.user.userUniqueId);
+          final String? response = await LMFeedIntegration.instance.mediaService
+              ?.uploadFile(mediaFile, event.user.userUniqueId);
           if (response != null) {
             attachments.add(
               Attachment(
@@ -82,7 +81,7 @@ void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
         .build();
 
     final AddPostResponse response =
-        await LMFeedBloc.get().lmFeedClient.addPost(request);
+        await LMFeedIntegration.instance.lmFeedClient.addPost(request);
 
     if (response.success) {
       emit(

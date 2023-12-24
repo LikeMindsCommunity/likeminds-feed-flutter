@@ -1,4 +1,5 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_driver_fl/src/convertors/comment/comment_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/common/popup_menu_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/helper/attachment/attachment_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
@@ -41,6 +42,11 @@ class PostViewDataConvertor {
 
     postViewDataBuilder.isEdited(post.isEdited);
 
+    postViewDataBuilder.replies(post.replies
+            ?.map((e) => CommentViewDataConvertor.fromComment(e))
+            .toList() ??
+        []);
+
     return postViewDataBuilder.build();
   }
 
@@ -65,6 +71,9 @@ class PostViewDataConvertor {
           .toList(),
       createdAt: postViewData.createdAt,
       updatedAt: postViewData.updatedAt,
+      replies: postViewData.replies
+          .map((e) => CommentViewDataConvertor.toComment(e))
+          .toList(),
     );
   }
 }

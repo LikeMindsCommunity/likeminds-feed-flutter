@@ -21,9 +21,11 @@ dependencies:
   overlay_support:
   video_player:
   path:
+  infinite_scroll_pagination:
+  shared_preferences:
 
   likeminds_feed_ui_fl:
-    path: ../../../LikeMinds-Flutter-Feed-UI
+    path: ../ui
 
 dev_dependencies:
   flutter_test:

@@ -6,7 +6,12 @@ part 'analytics_state.dart';
 part 'handler/fire_analytics_event_handler.dart';
 
 class LMAnalyticsBloc extends Bloc<LMAnalyticsEvent, LMAnalyticsState> {
-  LMAnalyticsBloc() : super(AnalyticsInitiated()) {
+  static LMAnalyticsBloc? _lmAnalyticsBloc;
+
+  static LMAnalyticsBloc get instance =>
+      _lmAnalyticsBloc ??= LMAnalyticsBloc._();
+
+  LMAnalyticsBloc._() : super(AnalyticsInitiated()) {
     on<FireAnalyticEvent>(fireAnalyticsEventHandler);
   }
 }

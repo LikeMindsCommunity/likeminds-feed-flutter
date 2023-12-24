@@ -1,7 +1,13 @@
 part of '../comment_handler_bloc.dart';
 
+/// {@template add_comment_event_handler}
+/// [handleAddActionEvent] is used to handle the add comment/reply event
+/// [LMCommentActionEvent] is used to send the request to the handler
+/// {@endtemplate}
 void handleAddActionEvent(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) {
+  // Check if the comment is a parent comment or a reply to a comment
+  // and call the respective handler
   if (event.commentMetaData.commentActionEntity == LMCommentType.parent) {
     _handleAddCommentAction(event, emit);
   } else if (event.commentMetaData.commentActionEntity == LMCommentType.reply) {
@@ -9,23 +15,27 @@ void handleAddActionEvent(
   }
 }
 
+// Add comment handler
+// This handler is used to add a new comment
+// to a post
 void _handleAddCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+
   AddCommentRequest addCommentRequest =
       event.commentActionRequest as AddCommentRequest;
 
   emit(LMCommentLoadingState(commentMetaData: event.commentMetaData));
 
-  AddCommentResponse? response = await LMCommentHandlerBloc
-      .lmFeedBloc.lmFeedClient
-      .addComment(addCommentRequest);
+  AddCommentResponse? response =
+      await lmFeedClient.addComment(addCommentRequest);
   if (!response.success) {
     emit(LMCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
-    LMCommentHandlerBloc.lmFeedBloc.lmAnalyticsBloc.add(FireAnalyticEvent(
+    LMAnalyticsBloc.instance.add(FireAnalyticEvent(
       eventName: AnalyticsKeys.commentPosted,
       eventProperties: {
         "post_id": addCommentRequest.postId,
@@ -39,8 +49,13 @@ void _handleAddCommentAction(
   }
 }
 
+// Add reply handler
+// This handler is used to add a new reply
+// to a comment
 void _handleAddReplyAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+
   AddCommentReplyRequest addCommentReplyRequest =
       event.commentActionRequest as AddCommentReplyRequest;
 
@@ -48,16 +63,15 @@ void _handleAddReplyAction(
     commentMetaData: event.commentMetaData,
   ));
 
-  AddCommentReplyResponse response = await LMCommentHandlerBloc
-      .lmFeedBloc.lmFeedClient
-      .addCommentReply(addCommentReplyRequest);
+  AddCommentReplyResponse response =
+      await lmFeedClient.addCommentReply(addCommentReplyRequest);
   if (!response.success) {
     emit(LMCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
-    LMCommentHandlerBloc.lmFeedBloc.lmAnalyticsBloc.add(FireAnalyticEvent(
+    LMAnalyticsBloc.instance.add(FireAnalyticEvent(
       eventName: AnalyticsKeys.replyPosted,
       eventProperties: {
         "post_id": addCommentReplyRequest.postId,

@@ -7,28 +7,28 @@ import 'package:likeminds_feed_driver_fl/src/bloc/routing_bloc/routing_bloc.dart
 import 'package:likeminds_feed_driver_fl/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 
-class LMFeedBloc {
-  late final LMPostBloc lmPostBloc;
+export 'package:likeminds_feed_driver_fl/src/views/views.dart';
+
+class LMFeedIntegration {
   late final LMFeedClient lmFeedClient;
-  late final MediaService mediaService;
-  late final LMRoutingBloc lmRoutingBloc;
-  late final LMProfileBloc lmProfileBloc;
-  late final LMAnalyticsBloc lmAnalyticsBloc;
+  late final MediaService? mediaService;
 
-  static LMFeedBloc? _instance;
+  static LMFeedIntegration? _instance;
 
-  static LMFeedBloc get() => _instance ??= LMFeedBloc._();
+  static LMFeedIntegration get instance => _instance ??= LMFeedIntegration._();
 
-  LMFeedBloc._();
+  LMFeedIntegration._();
 
   void initialize(
-      {required LMFeedClient lmFeedClient,
-      required MediaService mediaService}) {
+      {required LMFeedClient lmFeedClient, MediaService? mediaService}) {
     this.lmFeedClient = lmFeedClient;
-    lmPostBloc = LMPostBloc();
     this.mediaService = mediaService;
-    lmRoutingBloc = LMRoutingBloc();
-    lmProfileBloc = LMProfileBloc();
-    lmAnalyticsBloc = LMAnalyticsBloc();
+  }
+
+  Future<void> closeBlocs() async {
+    await LMPostBloc.instance.close();
+    await LMRoutingBloc.instance.close();
+    await LMProfileBloc.instance.close();
+    await LMAnalyticsBloc.instance.close();
   }
 }

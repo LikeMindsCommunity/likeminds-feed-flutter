@@ -1,12 +1,12 @@
 part of '../post_bloc.dart';
 
 void deletePostEventHandler(DeletePost event, Emitter<LMPostState> emit) async {
-  final response = await LMFeedBloc.get().lmFeedClient.deletePost(
-        (DeletePostRequestBuilder()
-              ..postId(event.postId)
-              ..deleteReason(event.reason))
-            .build(),
-      );
+  final response = await LMFeedIntegration.instance.lmFeedClient.deletePost(
+    (DeletePostRequestBuilder()
+          ..postId(event.postId)
+          ..deleteReason(event.reason))
+        .build(),
+  );
 
   if (response.success) {
     toast(

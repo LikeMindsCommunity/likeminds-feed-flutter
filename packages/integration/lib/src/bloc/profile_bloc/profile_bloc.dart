@@ -15,7 +15,11 @@ part 'event_handler/route_to_company_profile_event_handler.dart';
 part 'event_handler/route_to_user_profile_event_handler.dart';
 
 class LMProfileBloc extends Bloc<LMProfileEvent, LMProfileState> {
-  LMProfileBloc() : super(LMProfileStateInit()) {
+  static LMProfileBloc? _lmProfileBloc;
+
+  static LMProfileBloc get instance => _lmProfileBloc ??= LMProfileBloc._();
+
+  LMProfileBloc._() : super(LMProfileStateInit()) {
     on<LoginRequired>(handleLoginRequiredEvent);
     on<Logout>(handleLogoutEvent);
     on<RouteToCompanyProfile>(handleRouteToCompanyProfileEvent);

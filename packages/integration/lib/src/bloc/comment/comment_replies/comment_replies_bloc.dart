@@ -8,17 +8,22 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 part 'comment_replies_event.dart';
 part 'comment_replies_state.dart';
 
-class CommentRepliesBloc
+class LMFetchCommentReplyBloc
     extends Bloc<CommentRepliesEvent, CommentRepliesState> {
-  LMFeedBloc lmFeedBloc = LMFeedBloc.get();
-  CommentRepliesBloc() : super(CommentRepliesInitial()) {
+  static LMFetchCommentReplyBloc? _instance;
+
+  static LMFetchCommentReplyBloc get instance =>
+      _instance ??= LMFetchCommentReplyBloc._();
+
+  LMFeedIntegration lmFeedIntegration = LMFeedIntegration.instance;
+  LMFetchCommentReplyBloc._() : super(CommentRepliesInitial()) {
     on<CommentRepliesEvent>((event, emit) async {
       if (event is GetCommentReplies) {
         await _mapGetCommentRepliesToState(
           commentDetailRequest: event.commentDetailRequest,
           forLoadMore: event.forLoadMore,
           emit: emit,
-          lmFeedBloc: lmFeedBloc,
+          lmFeedIntegration: lmFeedIntegration,
         );
       }
     });
@@ -33,7 +38,7 @@ class CommentRepliesBloc
       {required GetCommentRequest commentDetailRequest,
       required bool forLoadMore,
       required Emitter<CommentRepliesState> emit,
-      required LMFeedBloc lmFeedBloc}) async {
+      required LMFeedIntegration lmFeedIntegration}) async {
     // if (!hasReachedMax(state, forLoadMore)) {
     Map<String, User> users = {};
     List<Comment> comments = [];
@@ -53,7 +58,7 @@ class CommentRepliesBloc
     }
 
     GetCommentResponse response =
-        await lmFeedBloc.lmFeedClient.getComment(commentDetailRequest);
+        await lmFeedIntegration.lmFeedClient.getComment(commentDetailRequest);
     if (!response.success) {
       emit(const CommentRepliesError(message: "An error occurred"));
     } else {

@@ -1,12 +1,9 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/analytics_bloc/analytics_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/constants/analytics/keys.dart';
+import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 part 'comment_handler_event.dart';
@@ -15,6 +12,7 @@ part 'helper/comment_meta.dart';
 part 'handler/add_comment_event_handler.dart';
 part 'handler/edit_comment_event_handler.dart';
 part 'handler/delete_comment_event_handler.dart';
+part 'handler/ongoing_comment_event.dart';
 
 /// [LMCommentHandlerBloc] handle all the comment related actions
 /// like add, edit, delete, etc.
@@ -22,8 +20,12 @@ part 'handler/delete_comment_event_handler.dart';
 /// [LMCommentHandlerState] defines the states which are emitted by this bloc
 class LMCommentHandlerBloc
     extends Bloc<LMCommentHandlerEvent, LMCommentHandlerState> {
-  static LMFeedBloc lmFeedBloc = LMFeedBloc.get();
-  LMCommentHandlerBloc() : super(LMCommentInitialState()) {
+  static LMCommentHandlerBloc? _lmCommentHandlerBloc;
+
+  static LMCommentHandlerBloc get instance =>
+      _lmCommentHandlerBloc ??= LMCommentHandlerBloc._();
+
+  LMCommentHandlerBloc._() : super(LMCommentInitialState()) {
     on<LMCommentActionEvent>(
       (event, emit) async {
         switch (event.commentMetaData.commentActionType) {

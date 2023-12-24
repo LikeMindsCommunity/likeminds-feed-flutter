@@ -8,8 +8,8 @@ void editPostEventHandler(EditPost event, Emitter<LMPostState> emit) async {
         .toList();
     String postText = event.postText;
 
-    var response =
-        await LMFeedBloc.get().lmFeedClient.editPost((EditPostRequestBuilder()
+    var response = await LMFeedIntegration.instance.lmFeedClient
+        .editPost((EditPostRequestBuilder()
               ..attachments(attachments ?? [])
               ..postId(event.postId)
               ..postText(postText))

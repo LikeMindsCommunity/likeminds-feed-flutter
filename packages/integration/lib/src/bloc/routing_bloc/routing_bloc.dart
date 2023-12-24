@@ -9,7 +9,11 @@ part 'handler/share_post_event_handler.dart';
 part 'handler/post_notification_event_handler.dart';
 
 class LMRoutingBloc extends Bloc<LMRoutingEvent, LMRoutingState> {
-  LMRoutingBloc() : super(LMRoutingStateInit()) {
+  static LMRoutingBloc? _lmRoutingBloc;
+
+  static LMRoutingBloc get instance => _lmRoutingBloc ??= LMRoutingBloc._();
+
+  LMRoutingBloc._() : super(LMRoutingStateInit()) {
     on<HandleSharedPostEvent>(sharePostEventHandler);
     on<HandlePostNotificationEvent>(postNotificationEventHandler);
   }

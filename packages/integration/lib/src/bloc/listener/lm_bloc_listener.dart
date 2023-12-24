@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/analytics_bloc/analytics_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/profile_bloc/profile_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/routing_bloc/routing_bloc.dart';
@@ -33,20 +32,19 @@ class _LMBlocListenerState extends State<LMBlocListener> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedBloc lmFeedBloc = LMFeedBloc.get();
     return MultiBlocListener(
       listeners: [
         BlocListener(
           listener: widget.profileListener,
-          bloc: lmFeedBloc.lmProfileBloc,
+          bloc: LMProfileBloc.instance,
         ),
         BlocListener(
           listener: widget.analyticsListener,
-          bloc: lmFeedBloc.lmAnalyticsBloc,
+          bloc: LMAnalyticsBloc.instance,
         ),
         BlocListener(
           listener: widget.routingListener,
-          bloc: lmFeedBloc.lmRoutingBloc,
+          bloc: LMRoutingBloc.instance,
         ),
       ],
       child: widget.child,

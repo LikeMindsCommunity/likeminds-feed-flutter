@@ -51,13 +51,14 @@ class UniversalFeedBloc extends Bloc<UniversalFeedEvent, UniversalFeedState> {
       selectedTopics =
           event.topics!.map((e) => TopicViewDataConvertor.toTopic(e)).toList();
     }
-    GetFeedResponse? response = await LMFeedBloc.get().lmFeedClient.getFeed(
-          (GetFeedRequestBuilder()
-                ..page(offset)
-                ..topics(selectedTopics)
-                ..pageSize(10))
-              .build(),
-        );
+    GetFeedResponse? response =
+        await LMFeedIntegration.instance.lmFeedClient.getFeed(
+      (GetFeedRequestBuilder()
+            ..page(offset)
+            ..topics(selectedTopics)
+            ..pageSize(10))
+          .build(),
+    );
 
     if (response == null) {
       emit(const UniversalFeedError(

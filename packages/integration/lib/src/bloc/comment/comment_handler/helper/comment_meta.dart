@@ -28,10 +28,10 @@ class LMCommentMetaData {
   // 2 for reply of reply, and so on)
   final int level;
   // [ID] of the comment on which the action is being performed [REQUIRED]
-  final int commentId;
+  final String commentId;
   // [ID] of the reply if the action is being performed on a reply
   // [REQUIRED] in case the action is being performed on a reply
-  final int? replyId;
+  final String? replyId;
 
   const LMCommentMetaData._({
     required this.commentActionEntity,
@@ -46,8 +46,8 @@ class LMCommentMetaDataBuilder {
   LMCommentType? _commentActionEntity;
   LMCommentActionType? _commentActionType;
   int? _level;
-  int? _commentId;
-  int? _replyId;
+  String? _commentId;
+  String? _replyId;
 
   void commentActionEntity(LMCommentType commentActionEntity) {
     _commentActionEntity = commentActionEntity;
@@ -61,11 +61,11 @@ class LMCommentMetaDataBuilder {
     _level = level;
   }
 
-  void commentId(int commentId) {
+  void commentId(String commentId) {
     _commentId = commentId;
   }
 
-  void replyId(int replyId) {
+  void replyId(String replyId) {
     _replyId = replyId;
   }
 
