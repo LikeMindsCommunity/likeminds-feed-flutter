@@ -2,21 +2,21 @@ import 'dart:io';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-enum MediaType { video, image, document, link, widget }
+enum LMMediaType { video, image, document, link, widget }
 
-class MediaModel {
+class LMMediaModel {
   // defines the type of media
-  MediaType mediaType;
+  LMMediaType mediaType;
   // one of mediaFile or link must be provided
   File? mediaFile; // Photo Video or Document File
   String? link; // Photo Video, Document or Link Preview URL
   int? duration; // required for video url
   String? format; // required for documents
   int? size; // required for documents
-  OgTagsViewData? ogTags; // required for links (attachment type 4)
+  LMOgTagsViewData? ogTags; // required for links (attachment type 4)
   Map<String, dynamic>? widgetsMeta; //required for widgets (attachment type 5)
 
-  MediaModel({
+  LMMediaModel({
     required this.mediaType,
     this.mediaFile,
     this.link,
@@ -29,15 +29,15 @@ class MediaModel {
 
   // convert
   int mapMediaTypeToInt() {
-    if (mediaType == MediaType.image) {
+    if (mediaType == LMMediaType.image) {
       return 1;
-    } else if (mediaType == MediaType.video) {
+    } else if (mediaType == LMMediaType.video) {
       return 2;
-    } else if (mediaType == MediaType.document) {
+    } else if (mediaType == LMMediaType.document) {
       return 3;
-    } else if (mediaType == MediaType.link) {
+    } else if (mediaType == LMMediaType.link) {
       return 4;
-    } else if (mediaType == MediaType.widget) {
+    } else if (mediaType == LMMediaType.widget) {
       return 5;
     } else {
       throw 'no valid media type provided';
@@ -45,17 +45,17 @@ class MediaModel {
   }
 }
 
-MediaType mapIntToMediaType(int attachmentType) {
+LMMediaType mapIntToMediaType(int attachmentType) {
   if (attachmentType == 1) {
-    return MediaType.image;
+    return LMMediaType.image;
   } else if (attachmentType == 2) {
-    return MediaType.video;
+    return LMMediaType.video;
   } else if (attachmentType == 3) {
-    return MediaType.document;
+    return LMMediaType.document;
   } else if (attachmentType == 4) {
-    return MediaType.link;
+    return LMMediaType.link;
   } else if (attachmentType == 5) {
-    return MediaType.widget;
+    return LMMediaType.widget;
   } else {
     throw 'no valid media type provided';
   }

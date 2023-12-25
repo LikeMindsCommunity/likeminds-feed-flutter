@@ -9,7 +9,7 @@ import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 // Icon is displayed only if the tile is selected
 class LMTopicTile extends StatelessWidget {
   // Action to perform after tapping on the tile, required
-  final Function(TopicViewData) onTap;
+  final Function(LMTopicViewData) onTap;
   // Alignment of the row of the tile, defaults to
   // MainAxisAlignment.spaceBetween
   final MainAxisAlignment? tileRowAlignment;
@@ -25,8 +25,8 @@ class LMTopicTile extends StatelessWidget {
   final bool isSelected;
   // Text to be displayed in the tile, required
   final LMTextView text;
-  // [TopicViewData], consists id, topic and isEnabled boolean, required
-  final TopicViewData topic;
+  // [LMTopicViewData], consists id, topic and isEnabled boolean, required
+  final LMTopicViewData topic;
 
   const LMTopicTile({
     Key? key,

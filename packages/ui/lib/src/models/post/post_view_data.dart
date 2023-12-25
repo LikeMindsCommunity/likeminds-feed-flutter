@@ -1,11 +1,9 @@
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/models/commons/popup_menu_view_data.dart';
-import 'package:likeminds_feed_ui_fl/src/models/helper/attachment/attachment_view_data.dart';
 
 /// {@template post_view_data}
 /// A data class to hold the post data.
 /// {@endtemplate}
-class PostViewData {
+class LMPostViewData {
   /// unique indentifier of the post
   /// [required]
   final String id;
@@ -19,7 +17,7 @@ class PostViewData {
 
   /// attachments of the post [nullable]
   /// can be of type image, video, file
-  List<AttachmentViewData>? attachments;
+  List<LMAttachmentViewData>? attachments;
 
   /// community id of the community to which the post belongs
   final int communityId;
@@ -36,15 +34,15 @@ class PostViewData {
   bool isLiked;
 
   /// menu items to be displayed in the post menu
-  List<PopUpMenuItemViewData> menuItems;
+  List<LMPopUpMenuItemViewData> menuItems;
   final DateTime createdAt;
   DateTime updatedAt;
   bool isEdited;
 
-  List<CommentViewData> replies;
+  List<LMCommentViewData> replies;
 
   /// {@macro post_view_data}
-  PostViewData._({
+  LMPostViewData._({
     required this.id,
     required this.text,
     required this.attachments,
@@ -64,11 +62,11 @@ class PostViewData {
   });
 }
 
-class PostViewDataBuilder {
+class LMPostViewDataBuilder {
   String? _id;
   String? _text;
   List<String>? _topics;
-  List<AttachmentViewData>? _attachments;
+  List<LMAttachmentViewData>? _attachments;
   int? _communityId;
   bool? _isPinned;
   String? _userId;
@@ -76,11 +74,11 @@ class PostViewDataBuilder {
   int? _commentCount;
   bool? _isSaved;
   bool? _isLiked;
-  List<PopUpMenuItemViewData>? _menuItems;
+  List<LMPopUpMenuItemViewData>? _menuItems;
   DateTime? _createdAt;
   DateTime? _updatedAt;
   bool? _isEdited;
-  List<CommentViewData>? _replies;
+  List<LMCommentViewData>? _replies;
 
   void id(String id) {
     _id = id;
@@ -94,7 +92,7 @@ class PostViewDataBuilder {
     _topics = topics;
   }
 
-  void attachments(List<AttachmentViewData> attachments) {
+  void attachments(List<LMAttachmentViewData> attachments) {
     _attachments = attachments;
   }
 
@@ -126,7 +124,7 @@ class PostViewDataBuilder {
     _isLiked = isLiked;
   }
 
-  void menuItems(List<PopUpMenuItemViewData> menuItems) {
+  void menuItems(List<LMPopUpMenuItemViewData> menuItems) {
     _menuItems = menuItems;
   }
 
@@ -142,12 +140,12 @@ class PostViewDataBuilder {
     _isEdited = isEdited;
   }
 
-  void replies(List<CommentViewData> replies) {
+  void replies(List<LMCommentViewData> replies) {
     _replies = replies;
   }
 
-  PostViewData build() {
-    return PostViewData._(
+  LMPostViewData build() {
+    return LMPostViewData._(
       id: _id!,
       text: _text!,
       topics: _topics!,

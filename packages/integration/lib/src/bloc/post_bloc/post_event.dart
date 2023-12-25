@@ -6,10 +6,10 @@ abstract class LMPostEvents extends Equatable {
 }
 
 class CreateNewPost extends LMPostEvents {
-  final List<MediaModel>? postMedia;
+  final List<LMMediaModel>? postMedia;
   final String postText;
   final User user;
-  final List<TopicViewData> selectedTopics;
+  final List<LMTopicViewData> selectedTopics;
 
   CreateNewPost({
     this.postMedia,
@@ -20,10 +20,10 @@ class CreateNewPost extends LMPostEvents {
 }
 
 class EditPost extends LMPostEvents {
-  final List<AttachmentViewData>? attachments;
+  final List<LMAttachmentViewData>? attachments;
   final String postText;
   final String postId;
-  final List<TopicViewData> selectedTopics;
+  final List<LMTopicViewData> selectedTopics;
 
   EditPost({
     required this.postText,
@@ -49,7 +49,7 @@ class DeletePost extends LMPostEvents {
 }
 
 class UpdatePost extends LMPostEvents {
-  final PostViewData post;
+  final LMPostViewData post;
 
   UpdatePost({
     required this.post,

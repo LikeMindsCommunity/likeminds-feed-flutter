@@ -52,15 +52,15 @@ class LMPostDetailScreen extends StatefulWidget {
 }
 
 class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
-  final PagingController<int, CommentViewData> _pagingController =
+  final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
   PostDetailScreenHandler? _postDetailScreenHandler;
-  Future<PostViewData?>? getPostData;
-  UserViewData currentUser = UserViewDataConvertor.fromUser(
+  Future<LMPostViewData?>? getPostData;
+  LMUserViewData currentUser = UserViewDataConvertor.fromUser(
       UserLocalPreference.instance.fetchUserData());
 
   bool right = true;
-  List<UserTagViewData> userTags = [];
+  List<LMUserTagViewData> userTags = [];
 
   @override
   void initState() {
@@ -85,12 +85,12 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<PostViewData?>(
+    return FutureBuilder<LMPostViewData?>(
         future: getPostData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done &&
               snapshot.hasData) {
-            PostViewData postData = snapshot.data!;
+            LMPostViewData postData = snapshot.data!;
             return Scaffold(
                 resizeToAvoidBottomInset: true,
                 backgroundColor: LMThemeData.kWhiteColor,
@@ -376,11 +376,11 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                     .commetListPagingController,
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
-                                builderDelegate:
-                                    PagedChildBuilderDelegate<CommentViewData>(
-                                        itemBuilder:
-                                            (context, commentViewData, index) {
-                                  UserViewData userViewData;
+                                builderDelegate: PagedChildBuilderDelegate<
+                                        LMCommentViewData>(
+                                    itemBuilder:
+                                        (context, commentViewData, index) {
+                                  LMUserViewData userViewData;
                                   if (!_postDetailScreenHandler!.users
                                       .containsKey(commentViewData.userId)) {
                                     return const SizedBox.shrink();

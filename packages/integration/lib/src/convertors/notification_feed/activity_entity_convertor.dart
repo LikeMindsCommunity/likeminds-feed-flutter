@@ -4,10 +4,10 @@ import 'package:likeminds_feed_driver_fl/src/convertors/helper/attachment/attach
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class ActivityEntityViewDataConvertor {
-  static ActivityEntityViewData fromActivityEntity(
+  static LMActivityEntityViewData fromActivityEntity(
       ActivityEntityData activityEntityData) {
-    ActivityEntityViewDataBuilder activityEntityViewDataBuilder =
-        ActivityEntityViewDataBuilder();
+    LMActivityEntityViewDataBuilder activityEntityViewDataBuilder =
+        LMActivityEntityViewDataBuilder();
 
     activityEntityViewDataBuilder.id(activityEntityData.id);
 
@@ -76,7 +76,7 @@ class ActivityEntityViewDataConvertor {
   }
 
   static ActivityEntityData toActivityEntity(
-      ActivityEntityViewData activityEntityViewData) {
+      LMActivityEntityViewData activityEntityViewData) {
     return ActivityEntityData(
       id: activityEntityViewData.id,
       attachments: activityEntityViewData.attachments

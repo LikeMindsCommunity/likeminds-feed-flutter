@@ -1,6 +1,6 @@
 import 'package:likeminds_feed_ui_fl/src/models/commons/popup_menu_view_data.dart';
 
-class CommentViewData {
+class LMCommentViewData {
   String id;
   String userId;
   String text;
@@ -8,16 +8,16 @@ class CommentViewData {
   int likesCount;
   bool isEdited;
   int repliesCount;
-  CommentViewData? parentComment;
-  List<PopUpMenuItemViewData> menuItems;
+  LMCommentViewData? parentComment;
+  List<LMPopUpMenuItemViewData> menuItems;
   DateTime createdAt;
   DateTime updatedAt;
   bool isLiked;
-  List<CommentViewData>? replies;
+  List<LMCommentViewData>? replies;
   String uuid;
   String? tempId;
 
-  CommentViewData._({
+  LMCommentViewData._({
     required this.id,
     required this.userId,
     required this.text,
@@ -36,7 +36,7 @@ class CommentViewData {
   });
 }
 
-class CommentViewDataBuilder {
+class LMCommentViewDataBuilder {
   String? _id;
   String? _userId;
   String? _text;
@@ -44,14 +44,14 @@ class CommentViewDataBuilder {
   int? _likesCount;
   bool? _isEdited;
   int? _repliesCount;
-  CommentViewData? _parentComment;
-  List<PopUpMenuItemViewData>? _menuItems;
+  LMCommentViewData? _parentComment;
+  List<LMPopUpMenuItemViewData>? _menuItems;
   DateTime? _createdAt;
   DateTime? _updatedAt;
   bool? _isLiked;
   String? _uuid;
   String? _tempId;
-  List<CommentViewData>? _replies;
+  List<LMCommentViewData>? _replies;
 
   void id(String id) {
     _id = id;
@@ -81,11 +81,11 @@ class CommentViewDataBuilder {
     _repliesCount = repliesCount;
   }
 
-  void parentComment(CommentViewData? parentComment) {
+  void parentComment(LMCommentViewData? parentComment) {
     _parentComment = parentComment;
   }
 
-  void menuItems(List<PopUpMenuItemViewData> menuItems) {
+  void menuItems(List<LMPopUpMenuItemViewData> menuItems) {
     _menuItems = menuItems;
   }
 
@@ -109,12 +109,12 @@ class CommentViewDataBuilder {
     _tempId = tempId;
   }
 
-  void replies(List<CommentViewData> replies) {
+  void replies(List<LMCommentViewData> replies) {
     _replies = replies;
   }
 
-  CommentViewData build() {
-    return CommentViewData._(
+  LMCommentViewData build() {
+    return LMCommentViewData._(
       id: _id!,
       userId: _userId!,
       text: _text!,

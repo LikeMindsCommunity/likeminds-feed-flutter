@@ -66,7 +66,7 @@
 //   final ValueNotifier _rebuildAppBar = ValueNotifier(false);
 
 //   // to control paging on FeedRoom View
-//   final PagingController<int, PostViewData> _pagingController =
+//   final PagingController<int, LMPostViewData> _pagingController =
 //       PagingController(firstPageKey: 1);
 
 //   final ValueNotifier postSomethingNotifier = ValueNotifier(false);
@@ -168,8 +168,8 @@
 //   void updatePagingControllers(Object? state) {
 //     if (state is UniversalFeedLoaded) {
 //       _pageFeed++;
-//       List<PostViewData> listOfPosts =
-//           state.feed.posts.map((e) => PostViewData.fromPost(post: e)).toList();
+//       List<LMPostViewData> listOfPosts =
+//           state.feed.posts.map((e) => LMPostViewData.fromPost(post: e)).toList();
 //       if (state.feed.posts.length < 10) {
 //         _pagingController.appendLastPage(listOfPosts);
 //       } else {
@@ -500,7 +500,7 @@
 //   final User user;
 //   final UniversalFeedBloc universalFeedBloc;
 //   final GetFeedResponse feedResponse;
-//   final PagingController<int, PostViewData> feedRoomPagingController;
+//   final PagingController<int, LMPostViewData> feedRoomPagingController;
 //   final ScrollController scrollController;
 //   final VoidCallback onRefresh;
 //   final VoidCallback openTopicBottomSheet;
@@ -528,9 +528,9 @@
 //   final ValueNotifier postSomethingNotifier = ValueNotifier(false);
 //   bool right = true;
 
-//   Widget getLoaderThumbnail(MediaModel? media) {
+//   Widget getLoaderThumbnail(LMMediaModel? media) {
 //     if (media != null) {
-//       if (media.mediaType == MediaType.image) {
+//       if (media.mediaType == LMMediaType.image) {
 //         return Container(
 //           height: 50,
 //           width: 50,
@@ -544,7 +544,7 @@
 //             boxFit: BoxFit.contain,
 //           ),
 //         );
-//       } else if (media.mediaType == MediaType.document) {
+//       } else if (media.mediaType == LMMediaType.document) {
 //         return const LMIcon(
 //           type: LMIconType.svg,
 //           assetPath: kAssetDocPDFIcon,
@@ -613,7 +613,7 @@
 //             bloc: newPostBloc,
 //             listener: (prev, curr) {
 //               if (curr is PostDeleted) {
-//                 List<PostViewData>? feedRoomItemList =
+//                 List<LMPostViewData>? feedRoomItemList =
 //                     widget.feedRoomPagingController.itemList;
 //                 feedRoomItemList?.removeWhere((item) => item.id == curr.postId);
 //                 widget.feedRoomPagingController.itemList = feedRoomItemList;
@@ -632,10 +632,10 @@
 //                 postUploading.value = false;
 //               }
 //               if (curr is NewPostUploaded) {
-//                 PostViewData? item = curr.postData;
+//                 LMPostViewData? item = curr.postData;
 //                 int length =
 //                     widget.feedRoomPagingController.itemList?.length ?? 0;
-//                 List<PostViewData> feedRoomItemList =
+//                 List<LMPostViewData> feedRoomItemList =
 //                     widget.feedRoomPagingController.itemList ?? [];
 //                 for (int i = 0; i < feedRoomItemList.length; i++) {
 //                   if (!feedRoomItemList[i].isPinned) {
@@ -658,8 +658,8 @@
 //                 rebuildPostWidget.value = !rebuildPostWidget.value;
 //               }
 //               if (curr is EditPostUploaded) {
-//                 PostViewData? item = curr.postData;
-//                 List<PostViewData>? feedRoomItemList =
+//                 LMPostViewData? item = curr.postData;
+//                 List<LMPostViewData>? feedRoomItemList =
 //                     widget.feedRoomPagingController.itemList;
 //                 int index = feedRoomItemList
 //                         ?.indexWhere((element) => element.id == item.id) ??
@@ -681,7 +681,7 @@
 //                 );
 //               }
 //               if (curr is PostUpdateState) {
-//                 List<PostViewData>? feedRoomItemList =
+//                 List<LMPostViewData>? feedRoomItemList =
 //                     widget.feedRoomPagingController.itemList;
 //                 int index = feedRoomItemList
 //                         ?.indexWhere((element) => element.id == curr.post.id) ??
@@ -771,12 +771,12 @@
 //                   child: ValueListenableBuilder(
 //                     valueListenable: rebuildPostWidget,
 //                     builder: (context, _, __) {
-//                       return PagedListView<int, PostViewData>(
+//                       return PagedListView<int, LMPostViewData>(
 //                         pagingController: widget.feedRoomPagingController,
 //                         scrollController: _controller,
 //                         padding: EdgeInsets.zero,
 //                         builderDelegate:
-//                             PagedChildBuilderDelegate<PostViewData>(
+//                             PagedChildBuilderDelegate<LMPostViewData>(
 //                           noItemsFoundIndicatorBuilder: (context) {
 //                             if (widget.universalFeedBloc.state
 //                                     is UniversalFeedLoaded &&
@@ -948,7 +948,7 @@
 //                                   isFeed: true,
 //                                   refresh: (bool isDeleted) async {
 //                                     if (isDeleted) {
-//                                       List<PostViewData>? feedRoomItemList =
+//                                       List<LMPostViewData>? feedRoomItemList =
 //                                           widget.feedRoomPagingController
 //                                               .itemList;
 //                                       feedRoomItemList?.removeAt(index);

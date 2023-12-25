@@ -160,8 +160,8 @@ class _FeedScreenState extends State<FeedScreen> {
 class MyPostWidget extends LMPostWidget {
   const MyPostWidget({
     super.key,
-    required PostViewData post,
-    required UserViewData user,
+    required LMPostViewData post,
+    required LMUserViewData user,
     required OnPostTap onPostTap,
     required bool isFeed,
     required Function(String) onTagTap,

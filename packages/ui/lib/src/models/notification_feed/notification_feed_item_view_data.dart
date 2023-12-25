@@ -1,11 +1,11 @@
 import 'package:likeminds_feed_ui_fl/src/models/notification_feed/activity_entity_view_data.dart';
 
-class NotificationFeedItemViewData {
+class LMNotificationFeedItemViewData {
   String id;
   int action;
   List<String> actionBy;
   String actionOn;
-  ActivityEntityViewData activityEntityData;
+  LMActivityEntityViewData activityEntityData;
   String activityText;
   String? cta;
   int createdAt;
@@ -15,7 +15,7 @@ class NotificationFeedItemViewData {
   bool isRead;
   int updatedAt;
 
-  NotificationFeedItemViewData._({
+  LMNotificationFeedItemViewData._({
     required this.id,
     required this.action,
     required this.actionBy,
@@ -32,12 +32,12 @@ class NotificationFeedItemViewData {
   });
 }
 
-class NotificationFeedItemViewDataBuilder {
+class LMNotificationFeedItemViewDataBuilder {
   String? _id;
   int? _action;
   List<String>? _actionBy;
   String? _actionOn;
-  ActivityEntityViewData? _activityEntityData;
+  LMActivityEntityViewData? _activityEntityData;
   String? _activityText;
   String? _cta;
   int? _createdAt;
@@ -63,7 +63,7 @@ class NotificationFeedItemViewDataBuilder {
     _actionOn = actionOn;
   }
 
-  void activityEntityViewData(ActivityEntityViewData activityEntityData) {
+  void activityEntityViewData(LMActivityEntityViewData activityEntityData) {
     _activityEntityData = activityEntityData;
   }
 
@@ -99,8 +99,8 @@ class NotificationFeedItemViewDataBuilder {
     _updatedAt = updatedAt;
   }
 
-  NotificationFeedItemViewData build() {
-    return NotificationFeedItemViewData._(
+  LMNotificationFeedItemViewData build() {
+    return LMNotificationFeedItemViewData._(
       id: _id!,
       action: _action!,
       actionBy: _actionBy!,

@@ -11,10 +11,10 @@ class UniversalFeedInitial extends UniversalFeedState {
 }
 
 class UniversalFeedLoaded extends UniversalFeedState {
-  final List<PostViewData> posts;
-  final Map<String, UserViewData> users;
-  final Map<String, WidgetViewData> widgets;
-  final Map<String, TopicViewData> topics;
+  final List<LMPostViewData> posts;
+  final Map<String, LMUserViewData> users;
+  final Map<String, LMWidgetViewData> widgets;
+  final Map<String, LMTopicViewData> topics;
 
   const UniversalFeedLoaded({
     required this.topics,
@@ -33,10 +33,10 @@ class UniversalFeedLoading extends UniversalFeedState {
 }
 
 class PaginatedUniversalFeedLoading extends UniversalFeedState {
-  final List<PostViewData> posts;
-  final Map<String, UserViewData> users;
-  final Map<String, WidgetViewData> widgets;
-  final Map<String, TopicViewData> topics;
+  final List<LMPostViewData> posts;
+  final Map<String, LMUserViewData> users;
+  final Map<String, LMWidgetViewData> widgets;
+  final Map<String, LMTopicViewData> topics;
 
   const PaginatedUniversalFeedLoading({
     required this.topics,

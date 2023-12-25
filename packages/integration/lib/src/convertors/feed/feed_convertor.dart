@@ -3,8 +3,10 @@ import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class FeedViewDataConvertor {
-  static FeedRoomViewData fromFeedRoomModel({required FeedRoom feedRoomModel}) {
-    FeedRoomViewDataBuilder feedRoomViewDataBuilder = FeedRoomViewDataBuilder();
+  static LMFeedRoomViewData fromFeedRoomModel(
+      {required FeedRoom feedRoomModel}) {
+    LMFeedRoomViewDataBuilder feedRoomViewDataBuilder =
+        LMFeedRoomViewDataBuilder();
     feedRoomViewDataBuilder
       ..id(feedRoomModel.id)
       ..title(feedRoomModel.title)
@@ -156,7 +158,7 @@ class FeedViewDataConvertor {
     return feedRoomViewDataBuilder.build();
   }
 
-  static FeedRoom toFeedRoom(FeedRoomViewData feedRoomViewData) {
+  static FeedRoom toFeedRoom(LMFeedRoomViewData feedRoomViewData) {
     return FeedRoom(
       id: feedRoomViewData.id,
       title: feedRoomViewData.title,

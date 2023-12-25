@@ -7,7 +7,7 @@ import 'package:likeminds_feed_driver_fl/src/convertors/common/like_convertor.da
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LikesScreenHandler {
-  late PagingController<int, LikeViewData> _pagingController;
+  late PagingController<int, LMLikeViewData> _pagingController;
   late String postId;
   late String? commentId;
   int? totalLikesCount;
@@ -20,11 +20,12 @@ class LikesScreenHandler {
 
   LikesScreenHandler._();
 
-  PagingController<int, LikeViewData> get pagingController => _pagingController;
+  PagingController<int, LMLikeViewData> get pagingController =>
+      _pagingController;
 
   void initialise(
       {required String postId, String? commentId, int pageSize = 20}) {
-    _pagingController = PagingController<int, LikeViewData>(firstPageKey: 1);
+    _pagingController = PagingController<int, LMLikeViewData>(firstPageKey: 1);
     this.postId = postId;
     this.commentId = commentId;
     this.pageSize = pageSize;

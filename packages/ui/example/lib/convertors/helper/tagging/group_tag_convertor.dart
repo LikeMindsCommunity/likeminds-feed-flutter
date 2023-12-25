@@ -2,8 +2,9 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class GroupTagViewDataConvertor {
-  static GroupTagViewData fromGroupTag(GroupTag groupTag) {
-    GroupTagViewDataBuilder groupTagViewDataBuilder = GroupTagViewDataBuilder();
+  static LMGroupTagViewData fromGroupTag(GroupTag groupTag) {
+    LMGroupTagViewDataBuilder groupTagViewDataBuilder =
+        LMGroupTagViewDataBuilder();
 
     if (groupTag.description != null) {
       groupTagViewDataBuilder.description(groupTag.description!);
@@ -28,7 +29,7 @@ class GroupTagViewDataConvertor {
     return groupTagViewDataBuilder.build();
   }
 
-  static GroupTag toGroupTag(GroupTagViewData groupTagViewData) {
+  static GroupTag toGroupTag(LMGroupTagViewData groupTagViewData) {
     return GroupTag(
       description: groupTagViewData.description,
       imageUrl: groupTagViewData.imageUrl,

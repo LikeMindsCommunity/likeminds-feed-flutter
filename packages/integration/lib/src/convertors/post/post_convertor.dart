@@ -5,8 +5,8 @@ import 'package:likeminds_feed_driver_fl/src/convertors/helper/attachment/attach
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class PostViewDataConvertor {
-  static PostViewData fromPost({required Post post}) {
-    PostViewDataBuilder postViewDataBuilder = PostViewDataBuilder();
+  static LMPostViewData fromPost({required Post post}) {
+    LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
 
     postViewDataBuilder.id(post.id);
 
@@ -52,7 +52,7 @@ class PostViewDataConvertor {
     return postViewDataBuilder.build();
   }
 
-  static Post toPost(PostViewData postViewData) {
+  static Post toPost(LMPostViewData postViewData) {
     return Post(
       id: postViewData.id,
       isEdited: postViewData.isEdited,

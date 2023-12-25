@@ -2,11 +2,11 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class PopupMenuItemConvertor {
-  static PopUpMenuItemViewData fromPopUpMenuItemModel({
+  static LMPopUpMenuItemViewData fromPopUpMenuItemModel({
     required PopupMenuItemModel item,
   }) {
-    PopUpMenuItemViewDataBuilder popUpMenuItemViewDataBuilder =
-        PopUpMenuItemViewDataBuilder();
+    LMPopUpMenuItemViewDataBuilder popUpMenuItemViewDataBuilder =
+        LMPopUpMenuItemViewDataBuilder();
     popUpMenuItemViewDataBuilder
       ..title(item.title)
       ..id(item.id);
@@ -14,7 +14,7 @@ class PopupMenuItemConvertor {
   }
 
   static PopupMenuItemModel toPopUpMenuItemModel(
-      PopUpMenuItemViewData popUpMenuItemViewData) {
+      LMPopUpMenuItemViewData popUpMenuItemViewData) {
     return PopupMenuItemModel(
       title: popUpMenuItemViewData.title,
       id: popUpMenuItemViewData.id,

@@ -3,8 +3,9 @@ import 'package:likeminds_feed_driver_fl/src/convertors/sdk/sdk_client_info_conv
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class UserTagViewDataConvertor {
-  static UserTagViewData fromUserTag(UserTag userTag) {
-    UserTagViewDataBuilder userTagViewDataBuilder = UserTagViewDataBuilder();
+  static LMUserTagViewData fromUserTag(UserTag userTag) {
+    LMUserTagViewDataBuilder userTagViewDataBuilder =
+        LMUserTagViewDataBuilder();
 
     if (userTag.name != null) {
       userTagViewDataBuilder.name(userTag.name!);
@@ -39,7 +40,7 @@ class UserTagViewDataConvertor {
     return userTagViewDataBuilder.build();
   }
 
-  static UserTag toUserTag(UserTagViewData userTagViewData) {
+  static UserTag toUserTag(LMUserTagViewData userTagViewData) {
     return UserTag(
       name: userTagViewData.name,
       imageUrl: userTagViewData.imageUrl,

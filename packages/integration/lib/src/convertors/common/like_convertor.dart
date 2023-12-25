@@ -2,8 +2,8 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LikeViewDataConvertor {
-  static LikeViewData fromLike({required Like likeModel}) {
-    LikeViewDataBuilder likeViewDataBuilder = LikeViewDataBuilder();
+  static LMLikeViewData fromLike({required Like likeModel}) {
+    LMLikeViewDataBuilder likeViewDataBuilder = LMLikeViewDataBuilder();
     likeViewDataBuilder
       ..id(likeModel.id)
       ..userId(likeModel.userId)
@@ -12,7 +12,7 @@ class LikeViewDataConvertor {
     return likeViewDataBuilder.build();
   }
 
-  static Like toLike(LikeViewData likeViewData) {
+  static Like toLike(LMLikeViewData likeViewData) {
     return Like(
       id: likeViewData.id,
       createdAt: likeViewData.createdAt,

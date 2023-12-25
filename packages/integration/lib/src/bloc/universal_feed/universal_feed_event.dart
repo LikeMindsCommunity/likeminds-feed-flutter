@@ -6,7 +6,7 @@ abstract class UniversalFeedEvent extends Equatable {
 
 class GetUniversalFeed extends UniversalFeedEvent {
   final int offset;
-  final List<TopicViewData>? topics;
+  final List<LMTopicViewData>? topics;
   const GetUniversalFeed({required this.offset, this.topics});
   @override
   List<Object?> get props => [offset, topics];

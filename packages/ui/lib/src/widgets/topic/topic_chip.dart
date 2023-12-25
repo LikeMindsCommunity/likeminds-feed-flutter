@@ -13,9 +13,9 @@ import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 */
 class LMTopicChip extends StatelessWidget {
   // Action to perform after tapping on the topic chip
-  final Function(TopicViewData)? onIconTap;
+  final Function(LMTopicViewData)? onIconTap;
   // Required parameters
-  final TopicViewData topic;
+  final LMTopicViewData topic;
   // background color of the topic chip defaults to transparent
   final Color? backgroundColor;
   // border color of the topic chip defaults to null

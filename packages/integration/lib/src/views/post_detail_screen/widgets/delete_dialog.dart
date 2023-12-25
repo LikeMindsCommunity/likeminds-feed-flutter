@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMDeleteConfirmationDialog extends StatelessWidget {
@@ -48,7 +47,7 @@ class LMDeleteConfirmationDialog extends StatelessWidget {
             Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
             LMThemeData.kVerticalPaddingLarge,
             Text(content),
-            user!.userUniqueId == userId
+            user.userUniqueId == userId
                 ? const SizedBox.shrink()
                 : isCm
                     ? LMThemeData.kVerticalPaddingLarge

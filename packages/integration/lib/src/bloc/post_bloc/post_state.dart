@@ -11,7 +11,7 @@ class NewPostInitiate extends LMPostState {}
 
 class NewPostUploading extends LMPostState {
   final Stream<double> progress;
-  final MediaModel? thumbnailMedia;
+  final LMMediaModel? thumbnailMedia;
 
   const NewPostUploading({required this.progress, this.thumbnailMedia});
 }
@@ -19,9 +19,9 @@ class NewPostUploading extends LMPostState {
 class EditPostUploading extends LMPostState {}
 
 class NewPostUploaded extends LMPostState {
-  final PostViewData postData;
-  final Map<String, UserViewData> userData;
-  final Map<String, TopicViewData> topics;
+  final LMPostViewData postData;
+  final Map<String, LMUserViewData> userData;
+  final Map<String, LMTopicViewData> topics;
 
   const NewPostUploaded({
     required this.postData,
@@ -31,9 +31,9 @@ class NewPostUploaded extends LMPostState {
 }
 
 class EditPostUploaded extends LMPostState {
-  final PostViewData postData;
-  final Map<String, UserViewData> userData;
-  final Map<String, TopicViewData> topics;
+  final LMPostViewData postData;
+  final Map<String, LMUserViewData> userData;
+  final Map<String, LMTopicViewData> topics;
 
   const EditPostUploaded({
     required this.postData,
@@ -67,7 +67,7 @@ class PostDeleted extends LMPostState {
 }
 
 class PostUpdateState extends LMPostState {
-  final PostViewData post;
+  final LMPostViewData post;
 
   const PostUpdateState({required this.post});
 

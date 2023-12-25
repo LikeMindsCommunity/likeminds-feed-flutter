@@ -3,8 +3,9 @@ import 'package:likeminds_feed_driver_fl/src/convertors/common/popup_menu_conver
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class CommentViewDataConvertor {
-  static CommentViewData fromComment(Comment comment) {
-    CommentViewDataBuilder commentViewDataBuilder = CommentViewDataBuilder();
+  static LMCommentViewData fromComment(Comment comment) {
+    LMCommentViewDataBuilder commentViewDataBuilder =
+        LMCommentViewDataBuilder();
     commentViewDataBuilder
       ..id(comment.id)
       ..userId(comment.userId)
@@ -27,7 +28,7 @@ class CommentViewDataConvertor {
     return commentViewDataBuilder.build();
   }
 
-  static Comment toComment(CommentViewData commentViewData) {
+  static Comment toComment(LMCommentViewData commentViewData) {
     return Comment(
       userId: commentViewData.userId,
       text: commentViewData.text,

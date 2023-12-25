@@ -1,15 +1,15 @@
 import 'package:likeminds_feed_ui_fl/src/models/sdk/sdk_client_info_view_data.dart';
 
-class UserTagViewData {
+class LMUserTagViewData {
   String? name;
   String? imageUrl;
   String? customTitle;
   int? id;
   bool? isGuest;
   String? userUniqueId;
-  SDKClientInfoViewData? sdkClientInfo;
+  LMSDKClientInfoViewData? sdkClientInfo;
 
-  UserTagViewData._({
+  LMUserTagViewData._({
     this.name,
     this.imageUrl,
     this.customTitle,
@@ -20,14 +20,14 @@ class UserTagViewData {
   });
 }
 
-class UserTagViewDataBuilder {
+class LMUserTagViewDataBuilder {
   String? _name;
   String? _imageUrl;
   String? _customTitle;
   int? _id;
   bool? _isGuest;
   String? _userUniqueId;
-  SDKClientInfoViewData? _sdkClientInfo;
+  LMSDKClientInfoViewData? _sdkClientInfo;
 
   void name(String name) {
     _name = name;
@@ -53,12 +53,12 @@ class UserTagViewDataBuilder {
     _userUniqueId = userUniqueId;
   }
 
-  void sdkClientInfo(SDKClientInfoViewData sdkClientInfo) {
+  void sdkClientInfo(LMSDKClientInfoViewData sdkClientInfo) {
     _sdkClientInfo = sdkClientInfo;
   }
 
-  UserTagViewData build() {
-    return UserTagViewData._(
+  LMUserTagViewData build() {
+    return LMUserTagViewData._(
       name: _name,
       imageUrl: _imageUrl,
       customTitle: _customTitle,

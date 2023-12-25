@@ -5,10 +5,10 @@ import 'package:lm_feed_ui_example/convertors/comment/comment_convertor.dart';
 import 'package:lm_feed_ui_example/convertors/helper/attachment/attachment_convertor.dart';
 
 class ActivityEntityViewDataConvertor {
-  static ActivityEntityViewData fromActivityEntity(
+  static LMActivityEntityViewData fromActivityEntity(
       ActivityEntityData activityEntityData) {
-    ActivityEntityViewDataBuilder activityEntityViewDataBuilder =
-        ActivityEntityViewDataBuilder();
+    LMActivityEntityViewDataBuilder activityEntityViewDataBuilder =
+        LMActivityEntityViewDataBuilder();
 
     activityEntityViewDataBuilder.id(activityEntityData.id);
 
@@ -77,7 +77,7 @@ class ActivityEntityViewDataConvertor {
   }
 
   static ActivityEntityData toActivityEntity(
-      ActivityEntityViewData activityEntityViewData) {
+      LMActivityEntityViewData activityEntityViewData) {
     return ActivityEntityData(
       id: activityEntityViewData.id,
       attachments: activityEntityViewData.attachments

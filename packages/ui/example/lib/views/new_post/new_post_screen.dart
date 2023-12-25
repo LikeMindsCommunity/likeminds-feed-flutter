@@ -30,7 +30,7 @@ import 'package:lm_feed_ui_example/views/new_post/new_post/new_post_bloc.dart';
 
 class NewPostScreen extends StatefulWidget {
   final String? populatePostText;
-  final List<MediaModel>? populatePostMedia;
+  final List<LMMediaModel>? populatePostMedia;
 
   const NewPostScreen({
     super.key,
@@ -50,7 +50,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   // Size? screenSize;
   // bool isUploading = false;
   late final User user;
-  // List<MediaModel> postMedia = [];
+  // List<LMMediaModel> postMedia = [];
   // List<FeedRoom> feedRoomIds = []; // list of feedroom for post
   // ValueNotifier<bool> rebuildFeedRoomSelectTab = ValueNotifier(false);
 
@@ -59,7 +59,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   bool isDocumentPost = false; // flag for document or media post
   bool isMediaPost = false;
   String previewLink = '';
-  MediaModel? linkModel;
+  LMMediaModel? linkModel;
   bool showLinkPreview =
       true; // if set to false link preview should not be displayed
   Timer? _debounce;
@@ -79,7 +79,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
     // if (widget.populatePostMedia != null &&
     //     widget.populatePostMedia!.isNotEmpty) {
     //   postMedia.addAll(widget.populatePostMedia!.map((e) => e));
-    //   if (postMedia[0].mediaType == MediaType.document) {
+    //   if (postMedia[0].mediaType == LMMediaType.document) {
     //     isDocumentPost = true;
     //     isMediaPost = false;
     //   } else {
@@ -107,9 +107,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
   // // this function initiliases postMedia list
   // // with photos/videos picked by the user
-  // void setPickedMediaFiles(List<MediaModel> pickedMediaFiles) {
+  // void setPickedMediaFiles(List<LMMediaModel> pickedMediaFiles) {
   //   if (postMedia.isEmpty) {
-  //     postMedia = <MediaModel>[...pickedMediaFiles];
+  //     postMedia = <LMMediaModel>[...pickedMediaFiles];
   //   } else {
   //     postMedia.addAll(pickedMediaFiles);
   //   }
@@ -196,8 +196,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
   //         await locator<LikeMindsService>().decodeUrl(request);
   //     if (response.success == true) {
   //       OgTags? responseTags = response.ogTags;
-  //       linkModel = MediaModel(
-  //         mediaType: MediaType.link,
+  //       linkModel = LMMediaModel(
+  //         mediaType: LMMediaType.link,
   //         link: previewLink,
   //         ogTags: AttachmentMetaOgTags(
   //           description: responseTags!.description,
@@ -529,7 +529,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                         //     ],
                         //   ),
                         // if (postMedia.isNotEmpty)
-                        //   postMedia.first.mediaType == MediaType.document
+                        //   postMedia.first.mediaType == LMMediaType.document
                         //       ? getPostDocument(screenSize!.width)
                         //       : Container(
                         //           padding: const EdgeInsets.only(
@@ -635,7 +635,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
 //   final Function(bool uploadResponse) onUploaded;
 //   final Function() uploading;
 //   final Function() preUploadCheck;
-//   final Function(List<MediaModel>)
+//   final Function(List<LMMediaModel>)
 //       postMedia; // only return in List<File> format
 
 //   const AddAssetsButton({
@@ -749,9 +749,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
 //           aspectRatio: 1,
 //           files: list.map((e) => File(e.path)).toList(),
 //           callBack: (List<File> images) {
-//             List<MediaModel> mediaFiles = images
-//                 .map((e) => MediaModel(
-//                     mediaFile: File(e.path), mediaType: MediaType.image))
+//             List<LMMediaModel> mediaFiles = images
+//                 .map((e) => LMMediaModel(
+//                     mediaFile: File(e.path), mediaType: LMMediaType.image))
 //                 .toList();
 //             postMedia(mediaFiles);
 //             onUploaded(true);
@@ -791,7 +791,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
 //           onUploaded(false);
 //           return;
 //         }
-//         List<MediaModel> videoFiles = [];
+//         List<LMMediaModel> videoFiles = [];
 //         for (var pickedFile in pickedFiles.files) {
 //           if (getFileSizeInDouble(pickedFile.size) > 100) {
 //             toast(
@@ -806,8 +806,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
 //                 VideoPlayerController.file(video);
 //             await controller.initialize();
 //             Duration videoDuration = controller.value.duration;
-//             MediaModel videoFile = MediaModel(
-//                 mediaType: MediaType.video,
+//             LMMediaModel videoFile = LMMediaModel(
+//                 mediaType: LMMediaType.video,
 //                 mediaFile: video,
 //                 duration: videoDuration.inSeconds);
 
@@ -863,10 +863,10 @@ class _NewPostScreenState extends State<NewPostScreen> {
 //             return;
 //           }
 //         }
-//         List<MediaModel> attachedFiles = [];
+//         List<LMMediaModel> attachedFiles = [];
 //         attachedFiles = pickedFiles.files
-//             .map((e) => MediaModel(
-//                 mediaType: MediaType.document,
+//             .map((e) => LMMediaModel(
+//                 mediaType: LMMediaType.document,
 //                 mediaFile: File(e.path!),
 //                 format: e.extension,
 //                 size: e.size))

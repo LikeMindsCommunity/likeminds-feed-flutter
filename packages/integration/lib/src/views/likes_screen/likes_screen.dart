@@ -23,7 +23,7 @@ class LikesScreen extends StatefulWidget {
 }
 
 class _LikesScreenState extends State<LikesScreen> {
-  Map<String, UserViewData> userData = {};
+  Map<String, LMUserViewData> userData = {};
   late LikesScreenHandler handler;
 
   @override
@@ -80,10 +80,10 @@ class _LikesScreenState extends State<LikesScreen> {
           ),
           LMThemeData.kVerticalPaddingLarge,
           Expanded(
-            child: PagedListView<int, LikeViewData>(
+            child: PagedListView<int, LMLikeViewData>(
               padding: EdgeInsets.zero,
               pagingController: handler.pagingController,
-              builderDelegate: PagedChildBuilderDelegate<LikeViewData>(
+              builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
                 noMoreItemsIndicatorBuilder: (context) => const SizedBox(
                   height: 20,
                 ),
@@ -137,7 +137,7 @@ class _LikesScreenState extends State<LikesScreen> {
 }
 
 class LikesTile extends StatelessWidget {
-  final UserViewData? user;
+  final LMUserViewData? user;
   const LikesTile({super.key, required this.user});
 
   @override

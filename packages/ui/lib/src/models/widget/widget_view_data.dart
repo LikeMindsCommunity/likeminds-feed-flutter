@@ -1,4 +1,4 @@
-class WidgetViewData {
+class LMWidgetViewData {
   final String id;
   Map<String, dynamic>? lmMeta;
   int createdAt;
@@ -7,7 +7,7 @@ class WidgetViewData {
   String parentEntityType;
   int updatedAt;
 
-  WidgetViewData._({
+  LMWidgetViewData._({
     required this.id,
     this.lmMeta,
     required this.createdAt,
@@ -18,7 +18,7 @@ class WidgetViewData {
   });
 }
 
-class WidgetViewDataBuilder {
+class LMWidgetViewDataBuilder {
   String? _id;
   Map<String, dynamic>? _lmMeta;
   int? _createdAt;
@@ -55,8 +55,8 @@ class WidgetViewDataBuilder {
     _updatedAt = updatedAt;
   }
 
-  WidgetViewData build() {
-    return WidgetViewData._(
+  LMWidgetViewData build() {
+    return LMWidgetViewData._(
       id: _id!,
       lmMeta: _lmMeta,
       createdAt: _createdAt!,

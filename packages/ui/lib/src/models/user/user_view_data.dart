@@ -3,7 +3,7 @@ import 'package:likeminds_feed_ui_fl/src/models/sdk/sdk_client_info_view_data.da
 /// {@template user_view_data}
 /// A data class to hold the user data.
 /// {@endtemplate}
-class UserViewData {
+class LMUserViewData {
   /// unique indentifier of the user
   int id;
 
@@ -16,7 +16,7 @@ class UserViewData {
   bool? isDeleted;
   String userUniqueId;
   String? organisationName;
-  SDKClientInfoViewData? sdkClientInfo;
+  LMSDKClientInfoViewData? sdkClientInfo;
   int? updatedAt;
   bool? isOwner;
 
@@ -34,7 +34,7 @@ class UserViewData {
   int? createdAt;
 
   /// {@macro user_view_data}
-  UserViewData._({
+  LMUserViewData._({
     required this.id,
     required this.name,
     required this.imageUrl,
@@ -55,9 +55,9 @@ class UserViewData {
 }
 
 /// {@template user_view_data_builder}
-/// A builder class to build [UserViewData]
+/// A builder class to build [LMUserViewData]
 /// {@endtemplate}
-class UserViewDataBuilder {
+class LMUserViewDataBuilder {
   int? _id;
   String? _name;
   String? _imageUrl;
@@ -65,7 +65,7 @@ class UserViewDataBuilder {
   bool? _isDeleted;
   String? _userUniqueId;
   String? _organisationName;
-  SDKClientInfoViewData? _sdkClientInfo;
+  LMSDKClientInfoViewData? _sdkClientInfo;
   int? _updatedAt;
   bool? _isOwner;
   String? _customTitle;
@@ -103,7 +103,7 @@ class UserViewDataBuilder {
     _organisationName = organisationName;
   }
 
-  void sdkClientInfo(SDKClientInfoViewData sdkClientInfo) {
+  void sdkClientInfo(LMSDKClientInfoViewData sdkClientInfo) {
     _sdkClientInfo = sdkClientInfo;
   }
 
@@ -140,8 +140,8 @@ class UserViewDataBuilder {
   }
 
   /// {@macro user_view_data_builder}
-  UserViewData build() {
-    return UserViewData._(
+  LMUserViewData build() {
+    return LMUserViewData._(
       id: _id!,
       name: _name!,
       imageUrl: _imageUrl!,

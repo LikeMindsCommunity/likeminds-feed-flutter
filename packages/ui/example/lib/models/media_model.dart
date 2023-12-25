@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:likeminds_feed/likeminds_feed.dart';
 
-enum MediaType { video, image, document, link }
+enum LMMediaType { video, image, document, link }
 
-class MediaModel {
+class LMMediaModel {
   // defines the type of media
-  MediaType mediaType;
+  LMMediaType mediaType;
   // one of mediaFile or link must be provided
   File? mediaFile; // Photo Video or Document File
   String? link; // Photo Video, Document or Link Preview URL
@@ -15,7 +15,7 @@ class MediaModel {
   int? size; // required for documents
   OgTags? ogTags; // required for links (attachment type 4)
 
-  MediaModel({
+  LMMediaModel({
     required this.mediaType,
     this.mediaFile,
     this.link,
@@ -27,13 +27,13 @@ class MediaModel {
 
   // convert
   int mapMediaTypeToInt() {
-    if (mediaType == MediaType.image) {
+    if (mediaType == LMMediaType.image) {
       return 1;
-    } else if (mediaType == MediaType.video) {
+    } else if (mediaType == LMMediaType.video) {
       return 2;
-    } else if (mediaType == MediaType.document) {
+    } else if (mediaType == LMMediaType.document) {
       return 3;
-    } else if (mediaType == MediaType.link) {
+    } else if (mediaType == LMMediaType.link) {
       return 4;
     } else {
       throw 'no valid media type provided';

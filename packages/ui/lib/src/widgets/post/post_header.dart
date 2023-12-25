@@ -35,7 +35,7 @@ class LMPostHeader extends StatelessWidget {
 
   final bool isFeed;
 
-  final UserViewData user;
+  final LMUserViewData user;
 
   @override
   Widget build(BuildContext context) {

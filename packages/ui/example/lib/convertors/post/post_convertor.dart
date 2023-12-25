@@ -4,8 +4,8 @@ import 'package:lm_feed_ui_example/convertors/common/popup_menu_convertor.dart';
 import 'package:lm_feed_ui_example/convertors/helper/attachment/attachment_convertor.dart';
 
 class PostViewDataConvertor {
-  static PostViewData fromPost({required Post post}) {
-    PostViewDataBuilder postViewDataBuilder = PostViewDataBuilder();
+  static LMPostViewData fromPost({required Post post}) {
+    LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
 
     postViewDataBuilder.id(post.id);
 
@@ -44,7 +44,7 @@ class PostViewDataConvertor {
     return postViewDataBuilder.build();
   }
 
-  static Post toPost(PostViewData postViewData) {
+  static Post toPost(LMPostViewData postViewData) {
     return Post(
       id: postViewData.id,
       isEdited: postViewData.isEdited,

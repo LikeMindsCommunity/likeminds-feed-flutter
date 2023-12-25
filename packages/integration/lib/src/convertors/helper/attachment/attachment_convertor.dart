@@ -4,11 +4,11 @@ import 'package:likeminds_feed_driver_fl/src/convertors/helper/og_tag_convertor.
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class AttachmentViewDataConvertor {
-  static AttachmentViewData fromAttachment({
+  static LMAttachmentViewData fromAttachment({
     required Attachment attachment,
   }) {
-    AttachmentViewDataBuilder attachmentViewDataBuilder =
-        AttachmentViewDataBuilder();
+    LMAttachmentViewDataBuilder attachmentViewDataBuilder =
+        LMAttachmentViewDataBuilder();
 
     attachmentViewDataBuilder.attachmentType(attachment.attachmentType);
     attachmentViewDataBuilder.attachmentMeta(
@@ -18,7 +18,7 @@ class AttachmentViewDataConvertor {
     return attachmentViewDataBuilder.build();
   }
 
-  static Attachment toAttachment(AttachmentViewData attachmentViewData) {
+  static Attachment toAttachment(LMAttachmentViewData attachmentViewData) {
     return Attachment(
       attachmentType: attachmentViewData.attachmentType,
       attachmentMeta: AttachmentMeta(

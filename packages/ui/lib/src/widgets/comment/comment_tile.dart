@@ -25,8 +25,8 @@ class LMCommentTile extends StatefulWidget {
     this.linkStyle,
   });
 
-  final UserViewData user;
-  final CommentViewData comment;
+  final LMUserViewData user;
+  final LMCommentViewData comment;
 
   final TextStyle? textStyle;
   final TextStyle? linkStyle;

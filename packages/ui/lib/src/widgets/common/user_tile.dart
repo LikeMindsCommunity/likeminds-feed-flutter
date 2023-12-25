@@ -4,7 +4,7 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 class LMUserTile extends StatelessWidget {
-  final UserViewData user;
+  final LMUserViewData user;
   final LMProfilePicture? profilePicture;
   final LMTextView? titleText;
   final LMTextView? subText;

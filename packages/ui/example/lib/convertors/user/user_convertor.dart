@@ -3,8 +3,8 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:lm_feed_ui_example/convertors/sdk/sdk_client_info_convertor.dart';
 
 class UserViewDataConvertor {
-  static UserViewData fromUser(User user) {
-    UserViewDataBuilder userViewDataBuilder = UserViewDataBuilder();
+  static LMUserViewData fromUser(User user) {
+    LMUserViewDataBuilder userViewDataBuilder = LMUserViewDataBuilder();
 
     userViewDataBuilder.id(user.id);
 
@@ -58,7 +58,7 @@ class UserViewDataConvertor {
     return userViewDataBuilder.build();
   }
 
-  static User toUser(UserViewData userViewData) {
+  static User toUser(LMUserViewData userViewData) {
     return User(
       id: userViewData.id,
       name: userViewData.name,

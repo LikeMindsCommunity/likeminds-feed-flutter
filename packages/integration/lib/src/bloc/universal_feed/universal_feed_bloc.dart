@@ -27,9 +27,9 @@ class UniversalFeedBloc extends Bloc<UniversalFeedEvent, UniversalFeedState> {
       {required GetUniversalFeed event,
       required int offset,
       required Emitter<UniversalFeedState> emit}) async {
-    Map<String, UserViewData> users = {};
-    Map<String, TopicViewData> topics = {};
-    Map<String, WidgetViewData> widgets = {};
+    Map<String, LMUserViewData> users = {};
+    Map<String, LMTopicViewData> topics = {};
+    Map<String, LMWidgetViewData> widgets = {};
 
     if (state is UniversalFeedLoaded) {
       UniversalFeedLoaded prevState = state as UniversalFeedLoaded;

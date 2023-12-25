@@ -2,7 +2,7 @@ part of '../post_bloc.dart';
 
 void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
   try {
-    List<MediaModel>? postMedia = event.postMedia;
+    List<LMMediaModel>? postMedia = event.postMedia;
     List<Attachment> attachments = [];
     int index = 0;
 
@@ -16,13 +16,13 @@ void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
           progress: progress.stream,
           thumbnailMedia: postMedia.isEmpty
               ? null
-              : postMedia[0].mediaType == MediaType.link
+              : postMedia[0].mediaType == LMMediaType.link
                   ? null
                   : postMedia[0],
         ),
       );
       for (final media in postMedia) {
-        if (media.mediaType == MediaType.link) {
+        if (media.mediaType == LMMediaType.link) {
           attachments.add(
             Attachment(
               attachmentType: 4,
@@ -46,13 +46,13 @@ void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
                 attachmentType: media.mapMediaTypeToInt(),
                 attachmentMeta: AttachmentMeta(
                     url: response,
-                    size: media.mediaType == MediaType.document
+                    size: media.mediaType == LMMediaType.document
                         ? media.size
                         : null,
-                    format: media.mediaType == MediaType.document
+                    format: media.mediaType == LMMediaType.document
                         ? media.format
                         : null,
-                    duration: media.mediaType == MediaType.video
+                    duration: media.mediaType == LMMediaType.video
                         ? media.duration
                         : null),
               ),

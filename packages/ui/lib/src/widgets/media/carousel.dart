@@ -7,7 +7,7 @@ import 'package:likeminds_feed_ui_fl/src/widgets/media/video.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 class LMCarousel extends StatefulWidget {
-  final List<AttachmentViewData> attachments;
+  final List<LMAttachmentViewData> attachments;
   final Function(VideoController)? initialiseVideoController;
 
   final double? height;

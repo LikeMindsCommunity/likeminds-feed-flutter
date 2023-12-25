@@ -31,8 +31,8 @@ class LMPostWidget extends StatelessWidget {
   final LMPostContentBuilder? contentBuilder;
 
   // Required variables
-  final PostViewData post;
-  final UserViewData user;
+  final LMPostViewData post;
+  final LMUserViewData user;
   final bool isFeed;
   final OnPostTap onPostTap;
   final Function(String) onTagTap;
@@ -92,7 +92,7 @@ class InheritedPostProvider extends InheritedWidget {
 
   @override
   final Widget child;
-  final PostViewData post;
+  final LMPostViewData post;
 
   static InheritedPostProvider? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<InheritedPostProvider>();

@@ -1,18 +1,18 @@
 import 'package:likeminds_feed_ui_fl/src/models/helper/og_tags_view_data.dart';
 
-class AttachmentMetaViewData {
+class LMAttachmentMetaViewData {
   final String? url;
   final String? format;
   final int? size;
   final int? duration;
   final int? pageCount;
-  final OgTagsViewData? ogTags;
+  final LMOgTagsViewData? ogTags;
   final double? height;
   final double? width;
   final double? aspectRatio;
   final Map<String, dynamic>? meta;
 
-  AttachmentMetaViewData._({
+  LMAttachmentMetaViewData._({
     this.url,
     this.format,
     this.size,
@@ -26,13 +26,13 @@ class AttachmentMetaViewData {
   });
 }
 
-class AttachmentMetaViewDataBuilder {
+class LMAttachmentMetaViewDataBuilder {
   String? _url;
   String? _format;
   int? _size;
   int? _duration;
   int? _pageCount;
-  OgTagsViewData? _ogTags;
+  LMOgTagsViewData? _ogTags;
   double? _height;
   double? _width;
   double? _aspectRatio;
@@ -58,7 +58,7 @@ class AttachmentMetaViewDataBuilder {
     _pageCount = pageCount;
   }
 
-  void ogTags(OgTagsViewData ogTags) {
+  void ogTags(LMOgTagsViewData ogTags) {
     _ogTags = ogTags;
   }
 
@@ -78,8 +78,8 @@ class AttachmentMetaViewDataBuilder {
     _meta = meta;
   }
 
-  AttachmentMetaViewData build() {
-    return AttachmentMetaViewData._(
+  LMAttachmentMetaViewData build() {
+    return LMAttachmentMetaViewData._(
       url: _url,
       format: _format,
       size: _size,

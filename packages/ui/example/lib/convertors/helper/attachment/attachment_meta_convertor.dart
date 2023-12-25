@@ -3,10 +3,10 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:lm_feed_ui_example/convertors/helper/og_tag_convertor.dart';
 
 class AttachmentMetaViewDataConvertor {
-  static AttachmentMetaViewData attachmentMeta(
+  static LMAttachmentMetaViewData attachmentMeta(
       {required AttachmentMeta attachmentMeta}) {
-    AttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
-        AttachmentMetaViewDataBuilder();
+    LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
+        LMAttachmentMetaViewDataBuilder();
     if (attachmentMeta.url != null) {
       attachmentMetaViewDataBuilder.url(attachmentMeta.url!);
     }
@@ -44,7 +44,7 @@ class AttachmentMetaViewDataConvertor {
   }
 
   static AttachmentMeta toAttachmentMeta(
-      AttachmentMetaViewData attachmentMetaViewData) {
+      LMAttachmentMetaViewData attachmentMetaViewData) {
     return AttachmentMeta(
       url: attachmentMetaViewData.url,
       format: attachmentMetaViewData.format,

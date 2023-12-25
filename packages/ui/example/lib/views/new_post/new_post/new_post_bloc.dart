@@ -19,7 +19,7 @@ class NewPostBloc extends Bloc<NewPostEvents, NewPostState> {
     on<NewPostEvents>((event, emit) async {
       if (event is CreateNewPost) {
         try {
-          List<MediaModel>? postMedia = event.postMedia;
+          List<LMMediaModel>? postMedia = event.postMedia;
           User user = UserLocalPreference.instance.fetchUserData();
           int imageCount = 0;
           int videoCount = 0;
@@ -38,13 +38,13 @@ class NewPostBloc extends Bloc<NewPostEvents, NewPostState> {
                 progress: progress.stream,
                 thumbnailMedia: postMedia.isEmpty
                     ? null
-                    : postMedia[0].mediaType == MediaType.link
+                    : postMedia[0].mediaType == LMMediaType.link
                         ? null
                         : postMedia[0],
               ),
             );
             for (final media in postMedia) {
-              if (media.mediaType == MediaType.link) {
+              if (media.mediaType == LMMediaType.link) {
                 attachments.add(
                   Attachment(
                     attachmentType: 4,
@@ -68,13 +68,13 @@ class NewPostBloc extends Bloc<NewPostEvents, NewPostState> {
                     attachmentType: media.mapMediaTypeToInt(),
                     attachmentMeta: AttachmentMeta(
                         url: response,
-                        size: media.mediaType == MediaType.document
+                        size: media.mediaType == LMMediaType.document
                             ? media.size
                             : null,
-                        format: media.mediaType == MediaType.document
+                        format: media.mediaType == LMMediaType.document
                             ? media.format
                             : null,
-                        duration: media.mediaType == MediaType.video
+                        duration: media.mediaType == LMMediaType.video
                             ? media.duration
                             : null),
                   ));

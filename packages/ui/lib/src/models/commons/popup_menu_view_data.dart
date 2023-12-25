@@ -1,14 +1,14 @@
-class PopUpMenuItemViewData {
+class LMPopUpMenuItemViewData {
   final String title;
   final int id;
 
-  PopUpMenuItemViewData._({
+  LMPopUpMenuItemViewData._({
     required this.title,
     required this.id,
   });
 }
 
-class PopUpMenuItemViewDataBuilder {
+class LMPopUpMenuItemViewDataBuilder {
   String? _title;
   int? _id;
 
@@ -20,8 +20,8 @@ class PopUpMenuItemViewDataBuilder {
     _id = id;
   }
 
-  PopUpMenuItemViewData build() {
-    return PopUpMenuItemViewData._(
+  LMPopUpMenuItemViewData build() {
+    return LMPopUpMenuItemViewData._(
       title: _title!,
       id: _id!,
     );

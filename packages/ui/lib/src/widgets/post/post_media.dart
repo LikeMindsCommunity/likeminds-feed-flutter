@@ -25,7 +25,7 @@ class LMPostMedia extends StatefulWidget {
     this.onError,
   });
 
-  final List<AttachmentViewData> attachments;
+  final List<LMAttachmentViewData> attachments;
   final Function(VideoController)? initialiseVideoController;
   final Widget? documentIcon;
   final double? borderRadius;
@@ -49,7 +49,7 @@ class LMPostMedia extends StatefulWidget {
 }
 
 class _LMPostMediaState extends State<LMPostMedia> {
-  List<AttachmentViewData>? attachments;
+  List<LMAttachmentViewData>? attachments;
   late Size screenSize;
 
   void initialiseAttachments() {

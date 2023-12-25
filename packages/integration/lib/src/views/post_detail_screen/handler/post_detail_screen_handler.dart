@@ -4,13 +4,12 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_handler/comment_handler_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class PostDetailScreenHandler {
-  final Map<String, UserViewData> users = {};
-  final PagingController<int, CommentViewData> commetListPagingController;
+  final Map<String, LMUserViewData> users = {};
+  final PagingController<int, LMCommentViewData> commetListPagingController;
   final String postId;
   late final LMCommentHandlerBloc commentHandlerBloc;
   late final FocusNode focusNode;
@@ -23,7 +22,7 @@ class PostDetailScreenHandler {
     focusNode = FocusNode();
   }
 
-  Future<PostViewData?> fetchCommentListWithPage(int page) async {
+  Future<LMPostViewData?> fetchCommentListWithPage(int page) async {
     PostDetailRequest postDetailRequest = (PostDetailRequestBuilder()
           ..postId(postId)
           ..page(page))
@@ -37,10 +36,10 @@ class PostDetailScreenHandler {
         {});
 
     if (response.success) {
-      final PostViewData postViewData =
+      final LMPostViewData postViewData =
           PostViewDataConvertor.fromPost(post: response.post!);
 
-      final List<CommentViewData> commentList = postViewData.replies;
+      final List<LMCommentViewData> commentList = postViewData.replies;
 
       addCommentListToController(commentList, 2);
 
@@ -56,17 +55,17 @@ class PostDetailScreenHandler {
   }
 
   void addCommentListToController(
-      List<CommentViewData> commentList, int nextPageKey) {
+      List<LMCommentViewData> commentList, int nextPageKey) {
     commetListPagingController.appendPage(commentList, nextPageKey);
   }
 
   void addCommentListPaginationListener() {
     commetListPagingController.addPageRequestListener((pageKey) async {
-      final PostViewData? response = await fetchCommentListWithPage(pageKey);
+      final LMPostViewData? response = await fetchCommentListWithPage(pageKey);
 
       if (response != null) {
-        final PostViewData postViewData = response;
-        final List<CommentViewData> commentList = postViewData.replies;
+        final LMPostViewData postViewData = response;
+        final List<LMCommentViewData> commentList = postViewData.replies;
 
         final isLastPage = commentList.length < 10;
         if (isLastPage) {
@@ -109,7 +108,7 @@ class PostDetailScreenHandler {
               AddCommentResponse response = commentSuccessState
                   .commentActionResponse as AddCommentResponse;
 
-              CommentViewData commentViewData =
+              LMCommentViewData commentViewData =
                   CommentViewDataConvertor.fromComment(response.reply!);
 
               addCommentToController(commentViewData);
@@ -117,7 +116,7 @@ class PostDetailScreenHandler {
               EditCommentResponse response = commentSuccessState
                   .commentActionResponse as EditCommentResponse;
 
-              CommentViewData commentViewData =
+              LMCommentViewData commentViewData =
                   CommentViewDataConvertor.fromComment(response.reply!);
 
               updateCommentInController(commentViewData);
@@ -131,13 +130,13 @@ class PostDetailScreenHandler {
               AddCommentReplyResponse response = commentSuccessState
                   .commentActionResponse as AddCommentReplyResponse;
 
-              CommentViewData commentViewData =
+              LMCommentViewData commentViewData =
                   CommentViewDataConvertor.fromComment(response.reply!);
             } else {
               EditCommentReplyResponse response = commentSuccessState
                   .commentActionResponse as EditCommentReplyResponse;
 
-              CommentViewData commentViewData =
+              LMCommentViewData commentViewData =
                   CommentViewDataConvertor.fromComment(response.reply!);
             }
           }
@@ -147,7 +146,7 @@ class PostDetailScreenHandler {
     }
   }
 
-  void addCommentToController(CommentViewData commentViewData) {
+  void addCommentToController(LMCommentViewData commentViewData) {
     commetListPagingController.itemList?.insert(0, commentViewData);
   }
 
@@ -156,7 +155,7 @@ class PostDetailScreenHandler {
         ?.removeWhere((element) => element.id == commentId);
   }
 
-  void updateCommentInController(CommentViewData commentViewData) {
+  void updateCommentInController(LMCommentViewData commentViewData) {
     final index = commetListPagingController.itemList
         ?.indexWhere((element) => element.id == commentViewData.id);
     if (index != null && index >= 0) {

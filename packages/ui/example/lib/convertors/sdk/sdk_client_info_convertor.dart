@@ -2,9 +2,10 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class SDKClientInfoViewDataConvertor {
-  static SDKClientInfoViewData fromSDKClientInfo(SDKClientInfo sdkClientInfo) {
-    SDKClientInfoViewDataBuilder sdkClientInfoViewDataBuilder =
-        SDKClientInfoViewDataBuilder();
+  static LMSDKClientInfoViewData fromSDKClientInfo(
+      SDKClientInfo sdkClientInfo) {
+    LMSDKClientInfoViewDataBuilder sdkClientInfoViewDataBuilder =
+        LMSDKClientInfoViewDataBuilder();
 
     sdkClientInfoViewDataBuilder.community(sdkClientInfo.community);
 
@@ -16,7 +17,7 @@ class SDKClientInfoViewDataConvertor {
   }
 
   static SDKClientInfo toSDKClientInfo(
-      SDKClientInfoViewData sdkClientInfoViewData) {
+      LMSDKClientInfoViewData sdkClientInfoViewData) {
     return SDKClientInfo(
       community: sdkClientInfoViewData.community,
       user: sdkClientInfoViewData.user,

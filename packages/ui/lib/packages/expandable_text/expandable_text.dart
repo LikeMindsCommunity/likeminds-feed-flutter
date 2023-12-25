@@ -245,7 +245,7 @@ class ExpandableTextState extends State<ExpandableText>
           if (!_expanded) {
             var response =
                 TaggingHelper.convertRouteToTagAndUserMap(widget.text);
-            List<UserTagViewData> userTags = response['userTags'];
+            List<LMUserTagViewData> userTags = response['userTags'];
             resultText = response['text'];
             // final lineCount = textPainter.computeLineMetrics().length;
             final nCount = '\n'.allMatches(resultText).length + 1;

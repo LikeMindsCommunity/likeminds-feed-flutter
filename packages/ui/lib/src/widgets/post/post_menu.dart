@@ -17,7 +17,7 @@ class LMPostMenu extends StatelessWidget {
 
   final Map<int, LMTextView>? children;
   final LMIcon? menuIcon;
-  final List<PopUpMenuItemViewData> menuItems;
+  final List<LMPopUpMenuItemViewData> menuItems;
   final bool isFeed;
   final Function(int)? onSelected;
   final Set<int> removeItemIds;

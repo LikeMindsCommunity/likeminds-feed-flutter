@@ -3,10 +3,10 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:lm_feed_ui_example/convertors/notification_feed/activity_entity_convertor.dart';
 
 class NotificationFeedItemViewDataConvertor {
-  static NotificationFeedItemViewData fromNotificationFeedItem(
+  static LMNotificationFeedItemViewData fromNotificationFeedItem(
       NotificationFeedItem notificationFeedItem) {
-    NotificationFeedItemViewDataBuilder notificationFeedItemViewDataBuilder =
-        NotificationFeedItemViewDataBuilder();
+    LMNotificationFeedItemViewDataBuilder notificationFeedItemViewDataBuilder =
+        LMNotificationFeedItemViewDataBuilder();
 
     notificationFeedItemViewDataBuilder.id(notificationFeedItem.id);
 
@@ -49,7 +49,7 @@ class NotificationFeedItemViewDataConvertor {
   }
 
   static NotificationFeedItem toNotificationFeedItem(
-      NotificationFeedItemViewData notificationFeedItemViewData) {
+      LMNotificationFeedItemViewData notificationFeedItemViewData) {
     return NotificationFeedItem(
       id: notificationFeedItemViewData.id,
       action: notificationFeedItemViewData.action,

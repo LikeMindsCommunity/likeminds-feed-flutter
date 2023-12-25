@@ -13,7 +13,7 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 class TaggingAheadTextField extends StatefulWidget {
   final bool isDown;
   final FocusNode focusNode;
-  final Function(UserTagViewData) onTagSelected;
+  final Function(LMUserTagViewData) onTagSelected;
   final TextEditingController controller;
   final InputDecoration? decoration;
   final Function(String)? onChange;
@@ -90,7 +90,7 @@ class _TaggingAheadTextFieldState extends State<TaggingAheadTextField> {
 
   TextEditingController? get controller => _controller;
 
-  FutureOr<Iterable<UserTagViewData>> _getSuggestions(String query) async {
+  FutureOr<Iterable<LMUserTagViewData>> _getSuggestions(String query) async {
     String currentText = query;
     try {
       if (currentText.isEmpty) {
@@ -126,7 +126,7 @@ class _TaggingAheadTextFieldState extends State<TaggingAheadTextField> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      child: TypeAheadField<UserTagViewData>(
+      child: TypeAheadField<LMUserTagViewData>(
         onTagTap: (p) {},
         suggestionsBoxController: _suggestionsBoxController,
         suggestionsBoxDecoration: SuggestionsBoxDecoration(

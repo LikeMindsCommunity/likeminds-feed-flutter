@@ -38,7 +38,7 @@ class _PostDetailScreenState extends State<LMPostDetailScreen> {
   ValueNotifier<bool> rebuildButton = ValueNotifier(false);
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   ValueNotifier<bool> rebuildReplyWidget = ValueNotifier(false);
-  final PagingController<int, CommentViewData> _pagingController =
+  final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
   Post? postData;
   User currentUser = UserLocalPreference.instance.fetchUserData();
@@ -185,7 +185,7 @@ class _PostDetailScreenState extends State<LMPostDetailScreen> {
   }
 
   void addCommentToList(LMAddCommentSuccessState lmAddCommentSuccessState) {
-    List<CommentViewData>? commentItemList = _pagingController.itemList;
+    List<LMCommentViewData>? commentItemList = _pagingController.itemList;
     commentItemList ??= [];
     if (commentItemList.length >= 10) {
       commentItemList.removeAt(9);
@@ -201,7 +201,7 @@ class _PostDetailScreenState extends State<LMPostDetailScreen> {
 
   void updateCommentInList(
       LMEditCommentSuccessState lmEditCommentSuccessState) {
-    List<CommentViewData>? commentItemList = _pagingController.itemList;
+    List<LMCommentViewData>? commentItemList = _pagingController.itemList;
     commentItemList ??= [];
     int index = commentItemList.indexWhere((element) =>
         element.id == lmEditCommentSuccessState.editCommentResponse.reply!.id);
@@ -211,7 +211,7 @@ class _PostDetailScreenState extends State<LMPostDetailScreen> {
   }
 
   addReplyToList(LMAddCommentReplySuccessState lmAddCommentReplySuccessState) {
-    List<CommentViewData>? commentItemList = _pagingController.itemList;
+    List<LMCommentViewData>? commentItemList = _pagingController.itemList;
     if (lmAddCommentReplySuccessState.addCommentResponse.reply!.parentComment !=
         null) {
       int index = commentItemList!.indexWhere((element) =>
@@ -227,7 +227,7 @@ class _PostDetailScreenState extends State<LMPostDetailScreen> {
   }
 
   void removeCommentFromList(String commentId) {
-    List<CommentViewData>? commentItemList = _pagingController.itemList;
+    List<LMCommentViewData>? commentItemList = _pagingController.itemList;
     int index =
         commentItemList!.indexWhere((element) => element.id == commentId);
     if (index != -1) {
@@ -458,7 +458,7 @@ class _PostDetailScreenState extends State<LMPostDetailScreen> {
                             ?.map(
                                 (e) => CommentViewDataConvertor.fromComment(e))
                             .toList() ??
-                        <CommentViewData>[]);
+                        <LMCommentViewData>[]);
                   } else {
                     _pagingController.appendPage(
                         state.postDetails.post!.replies!
