@@ -19,6 +19,7 @@ class CommentViewDataConvertor {
       ..updatedAt(DateTime.fromMillisecondsSinceEpoch(comment.updatedAt))
       ..isLiked(comment.isLiked)
       ..isEdited(comment.isEdited)
+      ..uuid(comment.uuid)
       ..parentComment(comment.parentComment != null
           ? CommentViewDataConvertor.fromComment(comment.parentComment!)
           : null);

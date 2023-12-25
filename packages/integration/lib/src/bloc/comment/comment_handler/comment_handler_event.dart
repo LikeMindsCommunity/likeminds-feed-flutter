@@ -31,12 +31,4 @@ class LMCommentOngoingEvent extends LMCommentHandlerEvent {
 
 // This event is used to cancel the edit or reply flow
 // for both comment and replies to comments
-class LMCommentCancelEvent extends LMCommentHandlerEvent {
-  final LMCommentType commentActionEntity;
-  final LMCommentActionType commentActionType;
-
-  const LMCommentCancelEvent({
-    required this.commentActionEntity,
-    required this.commentActionType,
-  });
-}
+class LMCommentCancelEvent extends LMCommentHandlerEvent {}

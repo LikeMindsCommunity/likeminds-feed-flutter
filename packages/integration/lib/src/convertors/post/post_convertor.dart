@@ -47,6 +47,8 @@ class PostViewDataConvertor {
             .toList() ??
         []);
 
+    postViewDataBuilder.commentCount(post.commentCount);
+
     return postViewDataBuilder.build();
   }
 

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -5,11 +8,16 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/analytics_bloc/analytics_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_handler/comment_handler_bloc.dart';
+import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/post_action_id.dart';
+import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
+import 'package:likeminds_feed_driver_fl/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/handler/post_detail_screen_handler.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 /// {@template post_detail_screen}
 /// A screen that displays a post in detail
@@ -48,6 +56,11 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
       PagingController(firstPageKey: 1);
   PostDetailScreenHandler? _postDetailScreenHandler;
   Future<PostViewData?>? getPostData;
+  UserViewData currentUser = UserViewDataConvertor.fromUser(
+      UserLocalPreference.instance.fetchUserData());
+
+  bool right = true;
+  List<UserTagViewData> userTags = [];
 
   @override
   void initState() {
@@ -55,6 +68,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
     _postDetailScreenHandler =
         PostDetailScreenHandler(_pagingController, widget.postId);
     getPostData = _postDetailScreenHandler!.fetchCommentListWithPage(1);
+    right = _postDetailScreenHandler!.checkCommentRights();
   }
 
   @override
@@ -79,16 +93,245 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             PostViewData postData = snapshot.data!;
             return Scaffold(
                 resizeToAvoidBottomInset: true,
+                backgroundColor: LMThemeData.kWhiteColor,
+                bottomSheet: SafeArea(
+                  child:
+                      BlocBuilder<LMCommentHandlerBloc, LMCommentHandlerState>(
+                    bloc: _postDetailScreenHandler!.commentHandlerBloc,
+                    builder: (context, state) => Container(
+                      decoration: BoxDecoration(
+                        color: LMThemeData.kWhiteColor,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, -5),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          LMThemeData.kVerticalPaddingMedium,
+                          state is LMCommentActionOngoingState
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  child: Row(
+                                    children: [
+                                      LMTextView(
+                                        text: state.commentMetaData
+                                                    .commentActionType ==
+                                                LMCommentActionType.edit
+                                            ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'}"
+                                            : "Replying to",
+                                        textStyle: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: LMThemeData.kGrey1Color,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 8,
+                                      ),
+                                      state.commentMetaData.commentActionType ==
+                                              LMCommentActionType.edit
+                                          ? const SizedBox()
+                                          : LMTextView(
+                                              text: state
+                                                  .commentMetaData.user!.name,
+                                              textStyle: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: LMThemeData.kLinkColor,
+                                              ),
+                                            ),
+                                      const Spacer(),
+                                      LMIconButton(
+                                        onTap: (active) {
+                                          _postDetailScreenHandler!
+                                              .commentHandlerBloc
+                                              .add(LMCommentCancelEvent());
+                                        },
+                                        icon: const LMIcon(
+                                          type: LMIconType.icon,
+                                          icon: Icons.close,
+                                          color: LMThemeData.kGreyColor,
+                                          size: 24,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                          Container(
+                            decoration: BoxDecoration(
+                                color:
+                                    LMThemeData.kPrimaryColor.withOpacity(0.04),
+                                borderRadius: BorderRadius.circular(24)),
+                            margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.all(3.0),
+                            child: Row(
+                              children: [
+                                LMProfilePicture(
+                                  fallbackText: currentUser.name,
+                                  imageUrl: currentUser.imageUrl,
+                                  backgroundColor: LMThemeData.kPrimaryColor,
+                                  onTap: () {
+                                    if (currentUser.sdkClientInfo != null) {
+                                      LMFeedIntegration.instance.lmFeedClient
+                                          .routeToProfile(currentUser
+                                              .sdkClientInfo!.userUniqueId);
+                                    }
+                                  },
+                                  size: 36,
+                                ),
+                                Expanded(
+                                  child: TaggingAheadTextField(
+                                    isDown: false,
+                                    maxLines: 5,
+                                    onTagSelected: (tag) {
+                                      userTags.add(tag);
+                                    },
+                                    controller: _postDetailScreenHandler!
+                                        .commentController,
+                                    decoration: InputDecoration(
+                                      enabled: right,
+                                      border: InputBorder.none,
+                                      hintText: right
+                                          ? 'Write a comment'
+                                          : "You do not have permission to comment.",
+                                    ),
+                                    focusNode:
+                                        _postDetailScreenHandler!.focusNode,
+                                    onChange: (String p0) {},
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: !right
+                                      ? null
+                                      : state is LMCommentLoadingState
+                                          ? const SizedBox(
+                                              height: 15,
+                                              width: 15,
+                                              child: LMLoader(
+                                                color:
+                                                    LMThemeData.kPrimaryColor,
+                                              ),
+                                            )
+                                          : LMTextButton(
+                                              height: 18,
+                                              text: const LMTextView(
+                                                text: "Post",
+                                                textAlign: TextAlign.center,
+                                                textStyle: TextStyle(
+                                                  fontSize: 12.5,
+                                                  color:
+                                                      LMThemeData.kPrimaryColor,
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                _postDetailScreenHandler!
+                                                    .closeOnScreenKeyboard();
+                                                String commentText =
+                                                    TaggingHelper.encodeString(
+                                                  _postDetailScreenHandler!
+                                                      .commentController.text,
+                                                  userTags,
+                                                );
+                                                commentText =
+                                                    commentText.trim();
+                                                if (commentText.isEmpty) {
+                                                  toast(
+                                                      "Please write something to post");
+
+                                                  return;
+                                                }
+
+                                                _postDetailScreenHandler!.users
+                                                    .putIfAbsent(
+                                                        currentUser
+                                                            .userUniqueId,
+                                                        () => currentUser);
+
+                                                AddCommentRequest
+                                                    addCommentRequest =
+                                                    (AddCommentRequestBuilder()
+                                                          ..postId(
+                                                              widget.postId)
+                                                          ..text(commentText))
+                                                        .build();
+
+                                                LMCommentMetaData
+                                                    commentMetaData =
+                                                    (LMCommentMetaDataBuilder()
+                                                          ..commentActionEntity(
+                                                              LMCommentType
+                                                                  .parent)
+                                                          ..level(0)
+                                                          ..commentActionType(
+                                                              LMCommentActionType
+                                                                  .add))
+                                                        .build();
+
+                                                _postDetailScreenHandler!
+                                                    .commentHandlerBloc
+                                                    .add(LMCommentActionEvent(
+                                                        commentActionRequest:
+                                                            addCommentRequest,
+                                                        commentMetaData:
+                                                            commentMetaData));
+
+                                                _postDetailScreenHandler!
+                                                    .closeOnScreenKeyboard();
+                                                _postDetailScreenHandler!
+                                                    .commentController
+                                                    .clear();
+                                              },
+                                            ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          LMThemeData.kVerticalPaddingLarge,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 appBar: widget.appBarBuilder == null
-                    ? AppBar()
+                    ? AppBar(
+                        leading: LMIconButton(
+                          icon: LMIcon(
+                            type: LMIconType.icon,
+                            icon: Platform.isAndroid
+                                ? Icons.arrow_back
+                                : CupertinoIcons.chevron_back,
+                            color: LMThemeData.kPrimaryColor,
+                            size: 28,
+                          ),
+                          onTap: (active) {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        backgroundColor: LMThemeData.kWhiteColor,
+                        bottomOpacity: 1.0,
+                        title: const LMTextView(
+                          text: "Comments",
+                          textStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: LMThemeData.kHeadingColor,
+                          ),
+                        ),
+                        elevation: 1,
+                        centerTitle: Platform.isAndroid ? false : true,
+                      )
                     : widget.appBarBuilder!(context, postData),
                 body: CustomScrollView(
                   slivers: [
-                    const SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: 20,
-                      ),
-                    ),
                     SliverToBoxAdapter(
                       child: widget.postBuilder == null
                           ? LMPostWidget(
@@ -147,6 +390,42 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                   return LMCommentTile(
                                     user: userViewData,
                                     comment: commentViewData,
+                                    profilePicture: LMProfilePicture(
+                                      backgroundColor:
+                                          LMThemeData.kPrimaryColor,
+                                      fallbackText: _postDetailScreenHandler!
+                                          .users[commentViewData.userId]!.name,
+                                      onTap: () {
+                                        if (_postDetailScreenHandler!
+                                                .users[commentViewData.userId]!
+                                                .sdkClientInfo !=
+                                            null) {
+                                          LMFeedIntegration
+                                              .instance.lmFeedClient
+                                              .routeToProfile(
+                                                  _postDetailScreenHandler!
+                                                      .users[commentViewData
+                                                          .userId]!
+                                                      .sdkClientInfo!
+                                                      .userUniqueId);
+                                        }
+                                      },
+                                      imageUrl: _postDetailScreenHandler!
+                                          .users[commentViewData.userId]!
+                                          .imageUrl,
+                                      size: 36,
+                                    ),
+                                    subtitleText: LMTextView(
+                                      text:
+                                          "@${_postDetailScreenHandler!.users[commentViewData.userId]!.name.toLowerCase().split(' ').join()} · ", //${timeago.format(item.createdAt)}",
+                                      textStyle: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: LMThemeData.kSecondaryColor700,
+                                      ),
+                                    ),
+                                    actionsPadding:
+                                        const EdgeInsets.only(left: 48),
                                     onMenuTap: (id) {
                                       if (id == commentDeleteId) {
                                         // Delete post
@@ -262,7 +541,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             return Scaffold(
               body: Center(
                 child: Text(
-                  'Error loading post',
+                  '${snapshot.error}',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),

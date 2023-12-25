@@ -13,6 +13,7 @@ enum LMCommentActionType {
   add,
   edit,
   delete,
+  replying,
 }
 
 // [LMCommentMetaData] defines the metadata of the comment
@@ -28,10 +29,12 @@ class LMCommentMetaData {
   // 2 for reply of reply, and so on)
   final int level;
   // [ID] of the comment on which the action is being performed [REQUIRED]
-  final String commentId;
+  final String? commentId;
   // [ID] of the reply if the action is being performed on a reply
   // [REQUIRED] in case the action is being performed on a reply
   final String? replyId;
+  // [User] data in case the action is being performed on a reply
+  final User? user;
 
   const LMCommentMetaData._({
     required this.commentActionEntity,
@@ -39,6 +42,7 @@ class LMCommentMetaData {
     required this.level,
     required this.commentId,
     this.replyId,
+    this.user,
   });
 }
 
@@ -48,6 +52,7 @@ class LMCommentMetaDataBuilder {
   int? _level;
   String? _commentId;
   String? _replyId;
+  User? _user;
 
   void commentActionEntity(LMCommentType commentActionEntity) {
     _commentActionEntity = commentActionEntity;
@@ -69,13 +74,18 @@ class LMCommentMetaDataBuilder {
     _replyId = replyId;
   }
 
+  void user(User user) {
+    user = user;
+  }
+
   LMCommentMetaData build() {
     return LMCommentMetaData._(
       commentActionEntity: _commentActionEntity!,
       commentActionType: _commentActionType!,
       level: _level!,
-      commentId: _commentId!,
+      commentId: _commentId,
       replyId: _replyId,
+      user: _user,
     );
   }
 }

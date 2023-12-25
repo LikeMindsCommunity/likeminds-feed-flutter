@@ -64,10 +64,4 @@ class LMCommentActionOngoingState extends LMCommentHandlerState {
   List<Object> get props => [commentMetaData];
 }
 
-class LMCommentCanceledState extends LMCommentHandlerState {
-  final LMCommentMetaData lmCommentMetaData;
-
-  const LMCommentCanceledState({
-    required this.lmCommentMetaData,
-  });
-}
+class LMCommentCanceledState extends LMCommentHandlerState {}

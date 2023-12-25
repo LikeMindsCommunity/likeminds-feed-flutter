@@ -6,8 +6,10 @@ import 'package:likeminds_feed_driver_fl/src/bloc/profile_bloc/profile_bloc.dart
 import 'package:likeminds_feed_driver_fl/src/bloc/routing_bloc/routing_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 
 export 'package:likeminds_feed_driver_fl/src/views/views.dart';
+export 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 
 class LMFeedIntegration {
   late final LMFeedClient lmFeedClient;
@@ -30,5 +32,27 @@ class LMFeedIntegration {
     await LMRoutingBloc.instance.close();
     await LMProfileBloc.instance.close();
     await LMAnalyticsBloc.instance.close();
+  }
+
+  Future<InitiateUserResponse> initiateUser(InitiateUserRequest request) async {
+    return lmFeedClient.initiateUser(request)
+      ..then((value) async {
+        if (value.success) {
+          await UserLocalPreference.instance
+              .setUserDataFromInitiateUserResponse(value);
+        }
+        return value;
+      });
+  }
+
+  Future<MemberStateResponse> getMemberState() async {
+    return lmFeedClient.getMemberState()
+      ..then((value) async {
+        if (value.success) {
+          await UserLocalPreference.instance
+              .storeMemberRightsFromMemberStateResponse(value);
+        }
+        return value;
+      });
   }
 }

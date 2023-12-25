@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_handler/comment_handler_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
+import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -11,10 +13,14 @@ class PostDetailScreenHandler {
   final PagingController<int, CommentViewData> commetListPagingController;
   final String postId;
   late final LMCommentHandlerBloc commentHandlerBloc;
+  late final FocusNode focusNode;
+  late final TextEditingController commentController;
 
   PostDetailScreenHandler(this.commetListPagingController, this.postId) {
     commentHandlerBloc = LMCommentHandlerBloc.instance;
     addCommentListPaginationListener();
+    commentController = TextEditingController();
+    focusNode = FocusNode();
   }
 
   Future<PostViewData?> fetchCommentListWithPage(int page) async {
@@ -44,8 +50,9 @@ class PostDetailScreenHandler {
         response.errorMessage ?? 'An error occurred',
         duration: Toast.LENGTH_LONG,
       );
+
+      return null;
     }
-    return null;
   }
 
   void addCommentListToController(
@@ -72,6 +79,16 @@ class PostDetailScreenHandler {
     });
   }
 
+  bool checkCommentRights() {
+    final MemberStateResponse memberStateResponse =
+        UserLocalPreference.instance.fetchMemberRights();
+    if (!memberStateResponse.success || memberStateResponse.state == 1) {
+      return true;
+    }
+    bool memberRights = UserLocalPreference.instance.fetchMemberRight(10);
+    return memberRights;
+  }
+
   void handleBlocChanges(LMCommentHandlerState state) {
     switch (state.runtimeType) {
       case LMCommentActionOngoingState:
@@ -86,7 +103,7 @@ class PostDetailScreenHandler {
               LMCommentType.parent) {
             if (commentSuccessState.commentMetaData.commentActionType ==
                 LMCommentActionType.delete) {
-              deleteCommentFromController(state.commentMetaData.commentId);
+              deleteCommentFromController(state.commentMetaData.commentId!);
             } else if (commentSuccessState.commentMetaData.commentActionType ==
                 LMCommentActionType.add) {
               AddCommentResponse response = commentSuccessState
@@ -144,6 +161,22 @@ class PostDetailScreenHandler {
         ?.indexWhere((element) => element.id == commentViewData.id);
     if (index != null && index >= 0) {
       commetListPagingController.itemList![index] = commentViewData;
+    }
+  }
+
+  void openOnScreenKeyboard() {
+    if (focusNode.canRequestFocus) {
+      focusNode.requestFocus();
+      if (commentController.text.isNotEmpty) {
+        commentController.selection = TextSelection.fromPosition(
+            TextPosition(offset: commentController.text.length));
+      }
+    }
+  }
+
+  void closeOnScreenKeyboard() {
+    if (focusNode.hasFocus) {
+      focusNode.unfocus();
     }
   }
 }

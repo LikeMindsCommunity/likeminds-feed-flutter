@@ -23,6 +23,10 @@ dependencies:
   path:
   infinite_scroll_pagination:
   shared_preferences:
+  dotenv: ^4.2.0
+
+  flutter_typeahead_mm:
+    path: lib/packages/flutter_typeahead-4.3.7
 
   likeminds_feed_ui_fl:
     path: ../ui

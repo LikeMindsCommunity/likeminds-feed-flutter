@@ -13,6 +13,7 @@ part 'handler/add_comment_event_handler.dart';
 part 'handler/edit_comment_event_handler.dart';
 part 'handler/delete_comment_event_handler.dart';
 part 'handler/ongoing_comment_event.dart';
+part 'handler/cancel_comment_event_handler.dart';
 
 /// [LMCommentHandlerBloc] handle all the comment related actions
 /// like add, edit, delete, etc.
@@ -41,8 +42,14 @@ class LMCommentHandlerBloc
           case LMCommentActionType.edit:
             handleEditActionEvent(event, emit);
             break;
+          default:
+            break;
         }
       },
     );
+    on<LMCommentOngoingEvent>(
+        (event, emit) => handleOngoingCommentEvent(event, emit));
+    on<LMCommentCancelEvent>(
+        (event, emit) => handleCancelCommentEvent(event, emit));
   }
 }

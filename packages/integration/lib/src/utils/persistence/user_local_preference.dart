@@ -29,11 +29,10 @@ class UserLocalPreference {
     await _sharedPreferences!.setString(_userKey, userString);
   }
 
-  User? fetchUserData() {
+  User fetchUserData() {
     String? userDataString = _sharedPreferences!.getString(_userKey);
-    if (userDataString == null) return null;
 
-    Map<String, dynamic> userData = jsonDecode(userDataString);
+    Map<String, dynamic> userData = jsonDecode(userDataString!);
     return User.fromEntity(UserEntity.fromJson(userData));
   }
 
