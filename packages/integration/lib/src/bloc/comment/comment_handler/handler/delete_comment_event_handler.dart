@@ -5,12 +5,12 @@ part of '../comment_handler_bloc.dart';
 /// for both comment and replies to comments
 /// [LMCommentActionEvent] is used to send the request to the handler
 /// {@endtemplate}
-void handleDeleteActionEvent(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) {
-  _handleDeleteCommentAction(event, emit);
+Future<void> handleDeleteActionEvent(
+    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  await _handleDeleteCommentAction(event, emit);
 }
 
-void _handleDeleteCommentAction(
+Future<void> _handleDeleteCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 

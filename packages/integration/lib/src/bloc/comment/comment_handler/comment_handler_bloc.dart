@@ -32,15 +32,15 @@ class LMCommentHandlerBloc
         switch (event.commentMetaData.commentActionType) {
           // Add comment
           case LMCommentActionType.add:
-            handleAddActionEvent(event, emit);
+            await handleAddActionEvent(event, emit);
             break;
           // Delete comment
           case LMCommentActionType.delete:
-            handleDeleteActionEvent(event, emit);
+            await handleDeleteActionEvent(event, emit);
             break;
           // Edit comment
           case LMCommentActionType.edit:
-            handleEditActionEvent(event, emit);
+            await handleEditActionEvent(event, emit);
             break;
           default:
             break;

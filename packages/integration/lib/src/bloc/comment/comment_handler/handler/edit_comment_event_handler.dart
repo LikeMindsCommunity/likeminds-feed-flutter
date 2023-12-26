@@ -5,20 +5,20 @@ part of '../comment_handler_bloc.dart';
 /// for both comment and replies to comments
 /// [LMCommentActionEvent] is used to send the request to the handler
 /// {@endtemplate}
-void handleEditActionEvent(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) {
+Future<void> handleEditActionEvent(
+    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   // Notify the UI to change the view to Editing
   emit(LMCommentActionOngoingState(commentMetaData: event.commentMetaData));
 
   // Check if the comment is a parent comment or a reply to a comment
   if (event.commentMetaData.commentActionEntity == LMCommentType.parent) {
-    _handleEditCommentAction(event, emit);
+    await _handleEditCommentAction(event, emit);
   } else if (event.commentMetaData.commentActionEntity == LMCommentType.reply) {
-    _handleEditReplyAction(event, emit);
+    await _handleEditReplyAction(event, emit);
   }
 }
 
-void _handleEditCommentAction(
+Future<void> _handleEditCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 
@@ -41,7 +41,7 @@ void _handleEditCommentAction(
   }
 }
 
-void _handleEditReplyAction(
+Future<void> _handleEditReplyAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 
@@ -58,8 +58,8 @@ void _handleEditReplyAction(
     ));
   } else {
     emit(LMCommentSuccessState(
-      commentActionResponse: response,
       commentMetaData: event.commentMetaData,
+      commentActionResponse: response,
     ));
   }
 }

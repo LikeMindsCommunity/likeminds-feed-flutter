@@ -92,56 +92,72 @@ class PostDetailScreenHandler {
     switch (state.runtimeType) {
       case LMCommentActionOngoingState:
         break;
+      case const (LMCommentSuccessState<AddCommentResponse>):
+        {
+          final LMCommentSuccessState commentSuccessState =
+              state as LMCommentSuccessState;
+          AddCommentResponse response =
+              commentSuccessState.commentActionResponse as AddCommentResponse;
 
-      case LMCommentSuccessState:
+          LMCommentViewData commentViewData =
+              CommentViewDataConvertor.fromComment(response.reply!);
+
+          addCommentToController(commentViewData);
+
+          break;
+        }
+      case const (LMCommentSuccessState<EditCommentResponse>):
+        {
+          final LMCommentSuccessState commentSuccessState =
+              state as LMCommentSuccessState;
+
+          EditCommentResponse response =
+              commentSuccessState.commentActionResponse as EditCommentResponse;
+
+          LMCommentViewData commentViewData =
+              CommentViewDataConvertor.fromComment(response.reply!);
+
+          updateCommentInController(commentViewData);
+          break;
+        }
+      case const (LMCommentSuccessState<DeleteCommentResponse>):
         {
           final LMCommentSuccessState commentSuccessState =
               state as LMCommentSuccessState;
 
           if (commentSuccessState.commentMetaData.commentActionEntity ==
               LMCommentType.parent) {
-            if (commentSuccessState.commentMetaData.commentActionType ==
-                LMCommentActionType.delete) {
-              deleteCommentFromController(state.commentMetaData.commentId!);
-            } else if (commentSuccessState.commentMetaData.commentActionType ==
-                LMCommentActionType.add) {
-              AddCommentResponse response = commentSuccessState
-                  .commentActionResponse as AddCommentResponse;
-
-              LMCommentViewData commentViewData =
-                  CommentViewDataConvertor.fromComment(response.reply!);
-
-              addCommentToController(commentViewData);
-            } else {
-              EditCommentResponse response = commentSuccessState
-                  .commentActionResponse as EditCommentResponse;
-
-              LMCommentViewData commentViewData =
-                  CommentViewDataConvertor.fromComment(response.reply!);
-
-              updateCommentInController(commentViewData);
-            }
-          } else {
-            // TODO: handle reply action handling
-            if (commentSuccessState.commentMetaData.commentActionType ==
-                LMCommentActionType.delete) {
-            } else if (commentSuccessState.commentMetaData.commentActionType ==
-                LMCommentActionType.add) {
-              AddCommentReplyResponse response = commentSuccessState
-                  .commentActionResponse as AddCommentReplyResponse;
-
-              LMCommentViewData commentViewData =
-                  CommentViewDataConvertor.fromComment(response.reply!);
-            } else {
-              EditCommentReplyResponse response = commentSuccessState
-                  .commentActionResponse as EditCommentReplyResponse;
-
-              LMCommentViewData commentViewData =
-                  CommentViewDataConvertor.fromComment(response.reply!);
-            }
-          }
+            deleteCommentFromController(
+                commentSuccessState.commentMetaData.commentId!);
+          } else {}
 
           break;
+        }
+      case const (LMCommentSuccessState<AddCommentReplyResponse>,):
+        {
+          final LMCommentSuccessState commentSuccessState =
+              state as LMCommentSuccessState;
+
+          AddCommentReplyResponse response = commentSuccessState
+              .commentActionResponse as AddCommentReplyResponse;
+
+          LMCommentViewData commentViewData =
+              CommentViewDataConvertor.fromComment(response.reply!);
+
+          // TODO: handle add reply action handling
+
+          break;
+        }
+      case const (LMCommentSuccessState<EditCommentReplyResponse>):
+        {
+          final LMCommentSuccessState commentSuccessState =
+              state as LMCommentSuccessState;
+
+          EditCommentReplyResponse response = commentSuccessState
+              .commentActionResponse as EditCommentReplyResponse;
+
+          LMCommentViewData commentViewData =
+              CommentViewDataConvertor.fromComment(response.reply!);
         }
     }
   }

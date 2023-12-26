@@ -7,15 +7,19 @@ abstract class LMCommentHandlerEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LMCommentActionEvent extends LMCommentHandlerEvent {
-  final Object commentActionRequest;
+class LMCommentActionEvent<Response extends Object>
+    extends LMCommentHandlerEvent {
+  final Response commentActionRequest;
   final LMCommentMetaData commentMetaData;
 
-  LMCommentActionEvent({
+  const LMCommentActionEvent({
     required this.commentActionRequest,
     required this.commentMetaData,
-  }) : assert(commentActionRequest.runtimeType == AddCommentRequest ||
-            commentActionRequest.runtimeType == AddCommentReplyRequest);
+  }) : assert(commentActionRequest is AddCommentRequest ||
+            commentActionRequest is AddCommentReplyRequest ||
+            commentActionRequest is EditCommentRequest ||
+            commentActionRequest is EditCommentReplyRequest ||
+            commentActionRequest is DeleteCommentRequest);
 
   @override
   List<Object> get props => [commentActionRequest, commentMetaData];

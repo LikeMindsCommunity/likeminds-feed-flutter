@@ -4,21 +4,21 @@ part of '../comment_handler_bloc.dart';
 /// [handleAddActionEvent] is used to handle the add comment/reply event
 /// [LMCommentActionEvent] is used to send the request to the handler
 /// {@endtemplate}
-void handleAddActionEvent(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) {
+Future<void> handleAddActionEvent(
+    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   // Check if the comment is a parent comment or a reply to a comment
   // and call the respective handler
   if (event.commentMetaData.commentActionEntity == LMCommentType.parent) {
-    _handleAddCommentAction(event, emit);
+    await _handleAddCommentAction(event, emit);
   } else if (event.commentMetaData.commentActionEntity == LMCommentType.reply) {
-    _handleAddReplyAction(event, emit);
+    await _handleAddReplyAction(event, emit);
   }
 }
 
 // Add comment handler
 // This handler is used to add a new comment
 // to a post
-void _handleAddCommentAction(
+Future<void> _handleAddCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 
@@ -52,7 +52,7 @@ void _handleAddCommentAction(
 // Add reply handler
 // This handler is used to add a new reply
 // to a comment
-void _handleAddReplyAction(
+Future<void> _handleAddReplyAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 

@@ -47,29 +47,32 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: Scaffold(
-        body: FutureBuilder(
-            future: initiateUser,
-            builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data!.success) {
-                return const LMPostDetailScreen(
-                    postId: "653388f3068a0ec51a176827");
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator.adaptive(),
-                );
-              } else {
-                return const Center(
-                  child: Text("Nothing"),
-                );
-              }
-            }),
+    return OverlaySupport.global(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: Scaffold(
+          body: FutureBuilder(
+              future: initiateUser,
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data!.success) {
+                  return const LMPostDetailScreen(
+                      postId: "653388f3068a0ec51a176827");
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  );
+                } else {
+                  return const Center(
+                    child: Text("Nothing"),
+                  );
+                }
+              }),
+        ),
       ),
     );
   }
