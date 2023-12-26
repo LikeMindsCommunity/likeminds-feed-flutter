@@ -6,16 +6,15 @@ Future<dynamic> showLoaderDialog(
   String? defaultActionText,
   String? cancelActionText,
 }) {
-  
-
-
   return showDialog(
     context: context,
     barrierDismissible: false,
     useRootNavigator: true,
     builder: (context) => AlertDialog(
       backgroundColor: Colors.white.withOpacity(0.8),
-      title: const Center(child: CircularProgressIndicator(),),
+      title: const Center(
+        child: CircularProgressIndicator(),
+      ),
       content: Text(
         title,
         textAlign: TextAlign.center,

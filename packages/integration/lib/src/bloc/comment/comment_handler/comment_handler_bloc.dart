@@ -4,6 +4,7 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/analytics_bloc/analytics_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
+import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 part 'comment_handler_event.dart';
@@ -31,7 +32,7 @@ class LMCommentHandlerBloc
       (event, emit) async {
         switch (event.commentMetaData.commentActionType) {
           // Add comment
-          case LMCommentActionType.add:
+          case (LMCommentActionType.add || LMCommentActionType.replying):
             await handleAddActionEvent(event, emit);
             break;
           // Delete comment

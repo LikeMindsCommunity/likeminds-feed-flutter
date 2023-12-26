@@ -8,9 +8,10 @@ Future<void> handleAddActionEvent(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   // Check if the comment is a parent comment or a reply to a comment
   // and call the respective handler
-  if (event.commentMetaData.commentActionEntity == LMCommentType.parent) {
+  if (event.commentMetaData.commentActionType == LMCommentActionType.add) {
     await _handleAddCommentAction(event, emit);
-  } else if (event.commentMetaData.commentActionEntity == LMCommentType.reply) {
+  } else if (event.commentMetaData.commentActionType ==
+      LMCommentActionType.replying) {
     await _handleAddReplyAction(event, emit);
   }
 }

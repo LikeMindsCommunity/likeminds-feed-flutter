@@ -165,12 +165,16 @@ class MyPostWidget extends LMPostWidget {
     required OnPostTap onPostTap,
     required bool isFeed,
     required Function(String) onTagTap,
+    final List<BoxShadow>? boxShadow,
+    final BorderRadiusGeometry? borderRadius,
   }) : super(
           post: post,
           user: user,
           onPostTap: onPostTap,
           isFeed: isFeed,
           onTagTap: onTagTap,
+          borderRadius: borderRadius,
+          boxShadow: boxShadow,
         );
 
   @override

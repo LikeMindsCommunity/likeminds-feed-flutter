@@ -55,7 +55,6 @@ class _TaggingAheadTextFieldState extends State<TaggingAheadTextField> {
   @override
   void dispose() {
     _controller.dispose();
-    _focusNode!.dispose();
     _scrollController.dispose();
     _suggestionsBoxController.close();
     super.dispose();

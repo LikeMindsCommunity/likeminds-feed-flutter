@@ -33,8 +33,8 @@ class LMCommentMetaData {
   // [ID] of the reply if the action is being performed on a reply
   // [REQUIRED] in case the action is being performed on a reply
   final String? replyId;
-  // [User] data in case the action is being performed on a reply
-  final User? user;
+  // [LMUserViewData] data in case the action is being performed on a reply
+  final LMUserViewData? user;
 
   const LMCommentMetaData._({
     required this.commentActionEntity,
@@ -52,7 +52,7 @@ class LMCommentMetaDataBuilder {
   int? _level;
   String? _commentId;
   String? _replyId;
-  User? _user;
+  LMUserViewData? _user;
 
   void commentActionEntity(LMCommentType commentActionEntity) {
     _commentActionEntity = commentActionEntity;
@@ -74,8 +74,8 @@ class LMCommentMetaDataBuilder {
     _replyId = replyId;
   }
 
-  void user(User user) {
-    user = user;
+  void user(LMUserViewData user) {
+    _user = user;
   }
 
   LMCommentMetaData build() {

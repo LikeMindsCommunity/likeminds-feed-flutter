@@ -22,6 +22,8 @@ class LMPostWidget extends StatelessWidget {
     this.menuBuilder,
     this.mediaBuilder,
     this.contentBuilder,
+    this.boxShadow,
+    this.borderRadius,
   });
 
   final LMPostHeaderBuilder? headerBuilder;
@@ -29,6 +31,10 @@ class LMPostWidget extends StatelessWidget {
   final LMPostMenuBuilder? menuBuilder;
   final LMPostMediaBuilder? mediaBuilder;
   final LMPostContentBuilder? contentBuilder;
+
+  // Styling variables
+  final List<BoxShadow>? boxShadow;
+  final BorderRadiusGeometry? borderRadius;
 
   // Required variables
   final LMPostViewData post;
@@ -44,7 +50,11 @@ class LMPostWidget extends StatelessWidget {
       child: GestureDetector(
         onTap: () => onPostTap(context, post),
         child: Container(
-          color: kWhiteColor,
+          decoration: BoxDecoration(
+            color: kWhiteColor,
+            borderRadius: borderRadius,
+            boxShadow: boxShadow,
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
               vertical: 18,

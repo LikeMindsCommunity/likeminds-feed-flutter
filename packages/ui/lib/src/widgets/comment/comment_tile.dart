@@ -23,6 +23,8 @@ class LMCommentTile extends StatefulWidget {
     this.menu,
     this.textStyle,
     this.linkStyle,
+    this.boxShadow,
+    this.padding,
   });
 
   final LMUserViewData user;
@@ -43,6 +45,8 @@ class LMCommentTile extends StatefulWidget {
   final BorderRadius? borderRadius;
   final double? width;
   final Widget? menu;
+  final List<BoxShadow>? boxShadow;
+  final EdgeInsets? padding;
 
   @override
   State<LMCommentTile> createState() => _LMCommentTileState();
@@ -56,50 +60,48 @@ class _LMCommentTileState extends State<LMCommentTile> {
       decoration: BoxDecoration(
         color: widget.backgroundColor ?? kWhiteColor,
         borderRadius: widget.borderRadius,
+        boxShadow: widget.boxShadow,
       ),
       margin: widget.margin,
       width: widget.width,
-      padding: const EdgeInsets.all(kPaddingLarge),
+      padding: widget.padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                widget.profilePicture ?? const SizedBox(),
-                kHorizontalPaddingLarge,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: widget.width != null ? widget.width! * 0.6 : null,
-                      child: widget.titleText ??
-                          LMTextView(
-                            text: widget.user.name,
-                            textStyle: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            maxLines: 1,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              widget.profilePicture ?? const SizedBox(),
+              kHorizontalPaddingLarge,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: widget.width != null ? widget.width! * 0.6 : null,
+                    child: widget.titleText ??
+                        LMTextView(
+                          text: widget.user.name,
+                          textStyle: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
                           ),
-                    ),
-                    widget.subtitleText != null
-                        ? kVerticalPaddingSmall
-                        : const SizedBox(),
-                    widget.subtitleText ?? const SizedBox(),
-                  ],
-                ),
-                const Spacer(),
-                widget.menu ??
-                    LMPostMenu(
-                      isFeed: false,
-                      menuItems: widget.comment.menuItems,
-                      onSelected: widget.onMenuTap,
-                    ),
-              ],
-            ),
+                          maxLines: 1,
+                        ),
+                  ),
+                  widget.subtitleText != null
+                      ? kVerticalPaddingSmall
+                      : const SizedBox(),
+                  widget.subtitleText ?? const SizedBox(),
+                ],
+              ),
+              const Spacer(),
+              widget.menu ??
+                  LMPostMenu(
+                    isFeed: false,
+                    menuItems: widget.comment.menuItems,
+                    onSelected: widget.onMenuTap,
+                  ),
+            ],
           ),
           kVerticalPaddingMedium,
           Container(

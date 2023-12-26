@@ -10,6 +10,7 @@ import 'package:likeminds_feed_driver_fl/src/bloc/analytics_bloc/analytics_bloc.
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_handler/comment_handler_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
+import 'package:likeminds_feed_driver_fl/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/tagging/tagging_textfield_ta.dart';
@@ -56,10 +57,12 @@ class LMPostDetailScreen extends StatefulWidget {
 class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
+  ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   PostDetailScreenHandler? _postDetailScreenHandler;
   Future<LMPostViewData?>? getPostData;
   LMUserViewData currentUser = UserViewDataConvertor.fromUser(
       UserLocalPreference.instance.fetchUserData());
+  LMPostViewData? postData;
 
   bool right = true;
   List<LMUserTagViewData> userTags = [];
@@ -69,7 +72,12 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
     super.initState();
     _postDetailScreenHandler =
         PostDetailScreenHandler(_pagingController, widget.postId);
-    getPostData = _postDetailScreenHandler!.fetchCommentListWithPage(1);
+    getPostData =
+        _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
+      postData = value;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
+      return value;
+    });
     right = _postDetailScreenHandler!.checkCommentRights();
   }
 
@@ -81,206 +89,298 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
       _pagingController.refresh();
       _postDetailScreenHandler =
           PostDetailScreenHandler(_pagingController, widget.postId);
-      getPostData = _postDetailScreenHandler!.fetchCommentListWithPage(1);
+      getPostData =
+          _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
+        postData = value;
+        rebuildPostWidget.value = !rebuildPostWidget.value;
+        return value;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<LMPostViewData?>(
-        future: getPostData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              snapshot.hasData) {
-            LMPostViewData postData = snapshot.data!;
-            return Scaffold(
-                resizeToAvoidBottomInset: true,
-                backgroundColor: LMThemeData.kWhiteColor,
-                bottomSheet: widget.bottomTextFieldBuilder != null
-                    ? widget.bottomTextFieldBuilder!(context, postData)
-                    : SafeArea(
-                        child: BlocBuilder<LMCommentHandlerBloc,
-                            LMCommentHandlerState>(
-                          bloc: _postDetailScreenHandler!.commentHandlerBloc,
-                          builder: (context, state) => Container(
-                            decoration: BoxDecoration(
-                              color: LMThemeData.kWhiteColor,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, -5),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                LMThemeData.kVerticalPaddingMedium,
-                                state is LMCommentActionOngoingState
-                                    ? Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16, vertical: 8),
-                                        child: Row(
-                                          children: [
-                                            LMTextView(
-                                              text: state.commentMetaData
+    return RefreshIndicator(
+      onRefresh: () {
+        _pagingController.itemList?.clear();
+        _pagingController.refresh();
+        return Future.value();
+      },
+      child: FutureBuilder<LMPostViewData?>(
+          future: getPostData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.hasData) {
+              return Scaffold(
+                  resizeToAvoidBottomInset: true,
+                  backgroundColor: LMThemeData.kWhiteColor,
+                  bottomSheet: widget.bottomTextFieldBuilder != null
+                      ? widget.bottomTextFieldBuilder!(context, postData!)
+                      : SafeArea(
+                          child: BlocBuilder<LMCommentHandlerBloc,
+                              LMCommentHandlerState>(
+                            bloc: _postDetailScreenHandler!.commentHandlerBloc,
+                            builder: (context, state) => Container(
+                              decoration: BoxDecoration(
+                                color: LMThemeData.kWhiteColor,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, -5),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  LMThemeData.kVerticalPaddingMedium,
+                                  state is LMCommentActionOngoingState
+                                      ? Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 8),
+                                          child: Row(
+                                            children: [
+                                              LMTextView(
+                                                text: state.commentMetaData
+                                                            .commentActionType ==
+                                                        LMCommentActionType.edit
+                                                    ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'}"
+                                                    : "Replying to",
+                                                textStyle: const TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color:
+                                                      LMThemeData.kGrey1Color,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 8,
+                                              ),
+                                              state.commentMetaData
                                                           .commentActionType ==
                                                       LMCommentActionType.edit
-                                                  ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'}"
-                                                  : "Replying to",
-                                              textStyle: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                color: LMThemeData.kGrey1Color,
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 8,
-                                            ),
-                                            state.commentMetaData
-                                                        .commentActionType ==
-                                                    LMCommentActionType.edit
-                                                ? const SizedBox()
-                                                : LMTextView(
-                                                    text: state.commentMetaData
-                                                        .user!.name,
-                                                    textStyle: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: LMThemeData
-                                                          .kLinkColor,
+                                                  ? const SizedBox()
+                                                  : LMTextView(
+                                                      text: state
+                                                          .commentMetaData
+                                                          .user!
+                                                          .name,
+                                                      textStyle:
+                                                          const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: LMThemeData
+                                                            .kLinkColor,
+                                                      ),
                                                     ),
-                                                  ),
-                                            const Spacer(),
-                                            LMIconButton(
-                                              onTap: (active) {
-                                                _postDetailScreenHandler!
-                                                    .commentHandlerBloc
-                                                    .add(
-                                                        LMCommentCancelEvent());
-                                              },
-                                              icon: const LMIcon(
-                                                type: LMIconType.icon,
-                                                icon: Icons.close,
-                                                color: LMThemeData.kGreyColor,
-                                                size: 24,
+                                              const Spacer(),
+                                              LMIconButton(
+                                                onTap: (active) {
+                                                  _postDetailScreenHandler!
+                                                      .commentHandlerBloc
+                                                      .add(
+                                                          LMCommentCancelEvent());
+                                                },
+                                                icon: const LMIcon(
+                                                  type: LMIconType.icon,
+                                                  icon: Icons.close,
+                                                  color: LMThemeData.kGreyColor,
+                                                  size: 24,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : const SizedBox.shrink(),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: LMThemeData.kPrimaryColor
-                                          .withOpacity(0.04),
-                                      borderRadius: BorderRadius.circular(24)),
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  padding: const EdgeInsets.all(3.0),
-                                  child: Row(
-                                    children: [
-                                      LMProfilePicture(
-                                        fallbackText: currentUser.name,
-                                        imageUrl: currentUser.imageUrl,
-                                        backgroundColor:
-                                            LMThemeData.kPrimaryColor,
-                                        onTap: () {
-                                          if (currentUser.sdkClientInfo !=
-                                              null) {
-                                            LMFeedIntegration
-                                                .instance.lmFeedClient
-                                                .routeToProfile(currentUser
-                                                    .sdkClientInfo!
-                                                    .userUniqueId);
-                                          }
-                                        },
-                                        size: 36,
-                                      ),
-                                      Expanded(
-                                        child: TaggingAheadTextField(
-                                          isDown: false,
-                                          maxLines: 5,
-                                          onTagSelected: (tag) {
-                                            userTags.add(tag);
-                                          },
-                                          controller: _postDetailScreenHandler!
-                                              .commentController,
-                                          decoration: InputDecoration(
-                                            enabled: right,
-                                            border: InputBorder.none,
-                                            hintText: right
-                                                ? 'Write a comment'
-                                                : "You do not have permission to comment.",
+                                            ],
                                           ),
-                                          focusNode: _postDetailScreenHandler!
-                                              .focusNode,
-                                          onChange: (String p0) {},
+                                        )
+                                      : const SizedBox.shrink(),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: LMThemeData.kPrimaryColor
+                                            .withOpacity(0.04),
+                                        borderRadius:
+                                            BorderRadius.circular(24)),
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    padding: const EdgeInsets.all(3.0),
+                                    child: Row(
+                                      children: [
+                                        LMProfilePicture(
+                                          fallbackText: currentUser.name,
+                                          imageUrl: currentUser.imageUrl,
+                                          backgroundColor:
+                                              LMThemeData.kPrimaryColor,
+                                          onTap: () {
+                                            if (currentUser.sdkClientInfo !=
+                                                null) {
+                                              LMFeedIntegration
+                                                  .instance.lmFeedClient
+                                                  .routeToProfile(currentUser
+                                                      .sdkClientInfo!
+                                                      .userUniqueId);
+                                            }
+                                          },
+                                          size: 36,
                                         ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0),
-                                        child: !right
-                                            ? null
-                                            : state is LMCommentLoadingState
-                                                ? const SizedBox(
-                                                    height: 15,
-                                                    width: 15,
-                                                    child: LMLoader(
-                                                      color: LMThemeData
-                                                          .kPrimaryColor,
-                                                    ),
-                                                  )
-                                                : LMTextButton(
-                                                    height: 18,
-                                                    text: const LMTextView(
-                                                      text: "Post",
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      textStyle: TextStyle(
-                                                        fontSize: 12.5,
+                                        Expanded(
+                                          child: TaggingAheadTextField(
+                                            isDown: false,
+                                            maxLines: 5,
+                                            onTagSelected: (tag) {
+                                              userTags.add(tag);
+                                            },
+                                            controller:
+                                                _postDetailScreenHandler!
+                                                    .commentController,
+                                            decoration: InputDecoration(
+                                              enabled: right,
+                                              border: InputBorder.none,
+                                              hintText: right
+                                                  ? 'Write a comment'
+                                                  : "You do not have permission to comment.",
+                                            ),
+                                            focusNode: _postDetailScreenHandler!
+                                                .focusNode,
+                                            onChange: (String p0) {},
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8.0),
+                                          child: !right
+                                              ? null
+                                              : state is LMCommentLoadingState
+                                                  ? const SizedBox(
+                                                      height: 15,
+                                                      width: 15,
+                                                      child: LMLoader(
                                                         color: LMThemeData
                                                             .kPrimaryColor,
                                                       ),
-                                                    ),
-                                                    onTap: () {
-                                                      _postDetailScreenHandler!
-                                                          .closeOnScreenKeyboard();
-                                                      String commentText =
-                                                          TaggingHelper
-                                                              .encodeString(
+                                                    )
+                                                  : LMTextButton(
+                                                      height: 18,
+                                                      text: const LMTextView(
+                                                        text: "Post",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        textStyle: TextStyle(
+                                                          fontSize: 12.5,
+                                                          color: LMThemeData
+                                                              .kPrimaryColor,
+                                                        ),
+                                                      ),
+                                                      onTap: () {
                                                         _postDetailScreenHandler!
-                                                            .commentController
-                                                            .text,
-                                                        userTags,
-                                                      );
-                                                      commentText =
-                                                          commentText.trim();
-                                                      if (commentText.isEmpty) {
-                                                        toast(
-                                                            "Please write something to post");
+                                                            .closeOnScreenKeyboard();
+                                                        String commentText =
+                                                            TaggingHelper
+                                                                .encodeString(
+                                                          _postDetailScreenHandler!
+                                                              .commentController
+                                                              .text,
+                                                          userTags,
+                                                        );
+                                                        commentText =
+                                                            commentText.trim();
+                                                        if (commentText
+                                                            .isEmpty) {
+                                                          toast(
+                                                              "Please write something to post");
 
-                                                        return;
-                                                      }
+                                                          return;
+                                                        }
 
-                                                      _postDetailScreenHandler!
-                                                          .users
-                                                          .putIfAbsent(
-                                                              currentUser
-                                                                  .userUniqueId,
-                                                              () =>
-                                                                  currentUser);
+                                                        _postDetailScreenHandler!
+                                                            .users
+                                                            .putIfAbsent(
+                                                                currentUser
+                                                                    .userUniqueId,
+                                                                () =>
+                                                                    currentUser);
 
-                                                      if (state
-                                                          is LMCommentActionOngoingState) {
                                                         if (state
-                                                                .commentMetaData
-                                                                .commentActionType ==
-                                                            LMCommentActionType
-                                                                .edit) {
+                                                            is LMCommentActionOngoingState) {
+                                                          if (state
+                                                                  .commentMetaData
+                                                                  .commentActionType ==
+                                                              LMCommentActionType
+                                                                  .edit) {
+                                                            LMCommentMetaData
+                                                                commentMetaData =
+                                                                (LMCommentMetaDataBuilder()
+                                                                      ..commentActionEntity(
+                                                                          LMCommentType
+                                                                              .parent)
+                                                                      ..level(0)
+                                                                      ..commentId(state
+                                                                          .commentMetaData
+                                                                          .commentId!)
+                                                                      ..commentActionType(
+                                                                          LMCommentActionType
+                                                                              .edit))
+                                                                    .build();
+                                                            EditCommentRequest
+                                                                editCommentRequest =
+                                                                (EditCommentRequestBuilder()
+                                                                      ..postId(
+                                                                          widget
+                                                                              .postId)
+                                                                      ..commentId(state
+                                                                          .commentMetaData
+                                                                          .commentId!)
+                                                                      ..text(
+                                                                          commentText))
+                                                                    .build();
+
+                                                            _postDetailScreenHandler!
+                                                                .commentHandlerBloc
+                                                                .add(LMCommentActionEvent(
+                                                                    commentActionRequest:
+                                                                        editCommentRequest,
+                                                                    commentMetaData:
+                                                                        commentMetaData));
+                                                          } else if (state
+                                                                  .commentMetaData
+                                                                  .commentActionType ==
+                                                              LMCommentActionType
+                                                                  .replying) {
+                                                            LMCommentMetaData
+                                                                commentMetaData =
+                                                                (LMCommentMetaDataBuilder()
+                                                                      ..commentActionEntity(
+                                                                          LMCommentType
+                                                                              .parent)
+                                                                      ..level(0)
+                                                                      ..commentId(state
+                                                                          .commentMetaData
+                                                                          .commentId!)
+                                                                      ..commentActionType(
+                                                                          LMCommentActionType
+                                                                              .replying))
+                                                                    .build();
+                                                            AddCommentReplyRequest
+                                                                addReplyRequest =
+                                                                (AddCommentReplyRequestBuilder()
+                                                                      ..postId(
+                                                                          widget
+                                                                              .postId)
+                                                                      ..text(
+                                                                          commentText)
+                                                                      ..commentId(state
+                                                                          .commentMetaData
+                                                                          .commentId!))
+                                                                    .build();
+
+                                                            _postDetailScreenHandler!
+                                                                .commentHandlerBloc
+                                                                .add(LMCommentActionEvent(
+                                                                    commentActionRequest:
+                                                                        addReplyRequest,
+                                                                    commentMetaData:
+                                                                        commentMetaData));
+                                                          }
+                                                        } else {
                                                           LMCommentMetaData
                                                               commentMetaData =
                                                               (LMCommentMetaDataBuilder()
@@ -288,21 +388,15 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                         LMCommentType
                                                                             .parent)
                                                                     ..level(0)
-                                                                    ..commentId(state
-                                                                        .commentMetaData
-                                                                        .commentId!)
                                                                     ..commentActionType(
                                                                         LMCommentActionType
-                                                                            .edit))
+                                                                            .add))
                                                                   .build();
-                                                          EditCommentRequest
-                                                              editCommentRequest =
-                                                              (EditCommentRequestBuilder()
+                                                          AddCommentRequest
+                                                              addCommentRequest =
+                                                              (AddCommentRequestBuilder()
                                                                     ..postId(widget
                                                                         .postId)
-                                                                    ..commentId(state
-                                                                        .commentMetaData
-                                                                        .commentId!)
                                                                     ..text(
                                                                         commentText))
                                                                   .build();
@@ -311,344 +405,499 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                               .commentHandlerBloc
                                                               .add(LMCommentActionEvent(
                                                                   commentActionRequest:
-                                                                      editCommentRequest,
-                                                                  commentMetaData:
-                                                                      commentMetaData));
-                                                        } else if (state
-                                                                .commentMetaData
-                                                                .commentActionType ==
-                                                            LMCommentActionType
-                                                                .replying) {
-                                                          LMCommentMetaData
-                                                              commentMetaData =
-                                                              (LMCommentMetaDataBuilder()
-                                                                    ..commentActionEntity(
-                                                                        LMCommentType
-                                                                            .parent)
-                                                                    ..level(0)
-                                                                    ..commentId(state
-                                                                        .commentMetaData
-                                                                        .commentId!)
-                                                                    ..commentActionType(
-                                                                        LMCommentActionType
-                                                                            .replying))
-                                                                  .build();
-                                                          AddCommentReplyRequest
-                                                              addReplyRequest =
-                                                              (AddCommentReplyRequestBuilder()
-                                                                    ..postId(widget
-                                                                        .postId)
-                                                                    ..text(
-                                                                        commentText)
-                                                                    ..commentId(state
-                                                                        .commentMetaData
-                                                                        .commentId!))
-                                                                  .build();
-
-                                                          _postDetailScreenHandler!
-                                                              .commentHandlerBloc
-                                                              .add(LMCommentActionEvent(
-                                                                  commentActionRequest:
-                                                                      addReplyRequest,
+                                                                      addCommentRequest,
                                                                   commentMetaData:
                                                                       commentMetaData));
                                                         }
-                                                      } else {
+
+                                                        _postDetailScreenHandler!
+                                                            .closeOnScreenKeyboard();
+                                                        _postDetailScreenHandler!
+                                                            .commentController
+                                                            .clear();
+                                                      },
+                                                    ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  LMThemeData.kVerticalPaddingLarge,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                  appBar: widget.appBarBuilder == null
+                      ? AppBar(
+                          leading: LMIconButton(
+                            icon: LMIcon(
+                              type: LMIconType.icon,
+                              icon: Platform.isAndroid
+                                  ? Icons.arrow_back
+                                  : CupertinoIcons.chevron_back,
+                              size: 28,
+                            ),
+                            onTap: (active) {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          backgroundColor: LMThemeData.kWhiteColor,
+                          elevation: 1,
+                          title: const LMTextView(
+                            text: "Comments",
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: LMThemeData.kHeadingColor,
+                            ),
+                          ),
+                          centerTitle: Platform.isAndroid ? false : true,
+                        )
+                      : widget.appBarBuilder!(context, postData!),
+                  body: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: widget.postBuilder == null
+                            ? LMPostWidget(
+                                post: postData!,
+                                user: _postDetailScreenHandler!
+                                    .users[postData!.userId]!,
+                                onPostTap: (context, post) {},
+                                isFeed: false,
+                                onTagTap: (tag) {},
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x19000000),
+                                    blurRadius: 5,
+                                    offset: Offset(1, 1),
+                                    spreadRadius: 0,
+                                  )
+                                ],
+                              )
+                            : widget.postBuilder!(context, postData!),
+                      ),
+                      const SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 16,
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0x19000000),
+                                blurRadius: 5,
+                                offset: Offset(1, 1),
+                                spreadRadius: 0,
+                              )
+                            ],
+                          ),
+                          child: BlocConsumer<LMCommentHandlerBloc,
+                                  LMCommentHandlerState>(
+                              bloc:
+                                  _postDetailScreenHandler!.commentHandlerBloc,
+                              listener: (context, state) {
+                                _postDetailScreenHandler!
+                                    .handleBlocChanges(state);
+                              },
+                              builder: (context, state) {
+                                return ValueListenableBuilder(
+                                    valueListenable: rebuildPostWidget,
+                                    builder: (context, _, __) {
+                                      return PagedListView.separated(
+                                          pagingController:
+                                              _postDetailScreenHandler!
+                                                  .commetListPagingController,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          builderDelegate:
+                                              PagedChildBuilderDelegate<
+                                                      LMCommentViewData>(
+                                                  itemBuilder: (context,
+                                                      commentViewData, index) {
+                                            LMUserViewData userViewData;
+                                            if (!_postDetailScreenHandler!.users
+                                                .containsKey(
+                                                    commentViewData.userId)) {
+                                              return const SizedBox.shrink();
+                                            }
+                                            userViewData =
+                                                _postDetailScreenHandler!.users[
+                                                    commentViewData.userId]!;
+                                            return LMCommentTile(
+                                              user: userViewData,
+                                              comment: commentViewData,
+                                              padding:
+                                                  const EdgeInsets.all(16.0),
+                                              profilePicture: LMProfilePicture(
+                                                backgroundColor:
+                                                    LMThemeData.kPrimaryColor,
+                                                fallbackText:
+                                                    _postDetailScreenHandler!
+                                                        .users[commentViewData
+                                                            .userId]!
+                                                        .name,
+                                                onTap: () {
+                                                  if (_postDetailScreenHandler!
+                                                          .users[commentViewData
+                                                              .userId]!
+                                                          .sdkClientInfo !=
+                                                      null) {
+                                                    LMFeedIntegration
+                                                        .instance.lmFeedClient
+                                                        .routeToProfile(
+                                                            _postDetailScreenHandler!
+                                                                .users[
+                                                                    commentViewData
+                                                                        .userId]!
+                                                                .sdkClientInfo!
+                                                                .userUniqueId);
+                                                  }
+                                                },
+                                                imageUrl:
+                                                    _postDetailScreenHandler!
+                                                        .users[commentViewData
+                                                            .userId]!
+                                                        .imageUrl,
+                                                size: 36,
+                                              ),
+                                              subtitleText: LMTextView(
+                                                text:
+                                                    "@${_postDetailScreenHandler!.users[commentViewData.userId]!.name.toLowerCase().split(' ').join()} · ", //${timeago.format(commentViewData.createdAt)}",
+                                                textStyle: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: LMThemeData
+                                                      .kSecondaryColor700,
+                                                ),
+                                              ),
+                                              commentActions: [
+                                                LMTextButton(
+                                                  margin: 10,
+                                                  text: LMTextView(
+                                                    text: commentViewData
+                                                                .likesCount ==
+                                                            0
+                                                        ? "Like"
+                                                        : commentViewData
+                                                                    .likesCount ==
+                                                                1
+                                                            ? "1 Like"
+                                                            : "${commentViewData.likesCount} Likes",
+                                                    textStyle: const TextStyle(
+                                                        color: LMThemeData
+                                                            .kSecondaryColor700,
+                                                        fontSize: 12),
+                                                  ),
+                                                  activeText: LMTextView(
+                                                    text: commentViewData
+                                                                .likesCount ==
+                                                            0
+                                                        ? "Like"
+                                                        : commentViewData
+                                                                    .likesCount ==
+                                                                1
+                                                            ? "1 Like"
+                                                            : "${commentViewData.likesCount} Likes",
+                                                    textStyle: const TextStyle(
+                                                        color: LMThemeData
+                                                            .kPrimaryColor,
+                                                        fontSize: 12),
+                                                  ),
+                                                  onTap: () async {
+                                                    commentViewData.likesCount =
+                                                        commentViewData.isLiked
+                                                            ? commentViewData
+                                                                    .likesCount -
+                                                                1
+                                                            : commentViewData
+                                                                    .likesCount +
+                                                                1;
+                                                    commentViewData.isLiked =
+                                                        !commentViewData
+                                                            .isLiked;
+                                                    rebuildPostWidget.value =
+                                                        !rebuildPostWidget
+                                                            .value;
+
+                                                    ToggleLikeCommentRequest
+                                                        toggleLikeCommentRequest =
+                                                        (ToggleLikeCommentRequestBuilder()
+                                                              ..commentId(
+                                                                  commentViewData
+                                                                      .id)
+                                                              ..postId(widget
+                                                                  .postId))
+                                                            .build();
+
+                                                    final ToggleLikeCommentResponse
+                                                        response =
+                                                        await LMFeedIntegration
+                                                            .instance
+                                                            .lmFeedClient
+                                                            .likeComment(
+                                                                toggleLikeCommentRequest);
+
+                                                    if (!response.success) {
+                                                      commentViewData
+                                                          .likesCount = commentViewData
+                                                              .isLiked
+                                                          ? commentViewData
+                                                                  .likesCount -
+                                                              1
+                                                          : commentViewData
+                                                                  .likesCount +
+                                                              1;
+                                                      commentViewData.isLiked =
+                                                          !commentViewData
+                                                              .isLiked;
+
+                                                      rebuildPostWidget.value =
+                                                          !rebuildPostWidget
+                                                              .value;
+                                                    }
+                                                  },
+                                                  icon: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: kAssetLikeIcon,
+                                                    size: 20,
+                                                  ),
+                                                  activeIcon: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath:
+                                                        kAssetLikeFilledIcon,
+                                                    size: 20,
+                                                  ),
+                                                  isActive:
+                                                      commentViewData.isLiked,
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Row(
+                                                  children: [
+                                                    LMTextButton(
+                                                      margin: 10,
+                                                      text: const LMTextView(
+                                                          text: "Reply",
+                                                          textStyle: TextStyle(
+                                                            fontSize: 12,
+                                                          )),
+                                                      onTap: () {
                                                         LMCommentMetaData
                                                             commentMetaData =
                                                             (LMCommentMetaDataBuilder()
                                                                   ..commentActionEntity(
                                                                       LMCommentType
                                                                           .parent)
-                                                                  ..level(0)
                                                                   ..commentActionType(
                                                                       LMCommentActionType
-                                                                          .add))
-                                                                .build();
-                                                        AddCommentRequest
-                                                            addCommentRequest =
-                                                            (AddCommentRequestBuilder()
-                                                                  ..postId(widget
-                                                                      .postId)
-                                                                  ..text(
-                                                                      commentText))
+                                                                          .replying)
+                                                                  ..level(0)
+                                                                  ..user(_postDetailScreenHandler!
+                                                                          .users[
+                                                                      commentViewData
+                                                                          .userId]!)
+                                                                  ..commentId(
+                                                                      commentViewData
+                                                                          .id))
                                                                 .build();
 
                                                         _postDetailScreenHandler!
                                                             .commentHandlerBloc
-                                                            .add(LMCommentActionEvent(
-                                                                commentActionRequest:
-                                                                    addCommentRequest,
+                                                            .add(LMCommentOngoingEvent(
                                                                 commentMetaData:
                                                                     commentMetaData));
-                                                      }
-
-                                                      _postDetailScreenHandler!
-                                                          .closeOnScreenKeyboard();
-                                                      _postDetailScreenHandler!
-                                                          .commentController
-                                                          .clear();
-                                                    },
-                                                  ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                LMThemeData.kVerticalPaddingLarge,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                appBar: widget.appBarBuilder == null
-                    ? AppBar(
-                        leading: LMIconButton(
-                          icon: LMIcon(
-                            type: LMIconType.icon,
-                            icon: Platform.isAndroid
-                                ? Icons.arrow_back
-                                : CupertinoIcons.chevron_back,
-                            color: LMThemeData.kPrimaryColor,
-                            size: 28,
-                          ),
-                          onTap: (active) {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        backgroundColor: LMThemeData.kWhiteColor,
-                        bottomOpacity: 1.0,
-                        title: const LMTextView(
-                          text: "Comments",
-                          textStyle: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                            color: LMThemeData.kHeadingColor,
-                          ),
-                        ),
-                        elevation: 1,
-                        centerTitle: Platform.isAndroid ? false : true,
-                      )
-                    : widget.appBarBuilder!(context, postData),
-                body: CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: widget.postBuilder == null
-                          ? LMPostWidget(
-                              post: postData,
-                              user: _postDetailScreenHandler!
-                                  .users[postData.userId]!,
-                              onPostTap: (context, post) {},
-                              isFeed: false,
-                              onTagTap: (tag) {},
-                            )
-                          : widget.postBuilder!(context, postData),
-                    ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: 20,
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'Comments',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                    ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: 20,
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: BlocConsumer<LMCommentHandlerBloc,
-                              LMCommentHandlerState>(
-                          bloc: _postDetailScreenHandler!.commentHandlerBloc,
-                          listener: (context, state) {
-                            _postDetailScreenHandler!.handleBlocChanges(state);
-                          },
-                          builder: (context, state) {
-                            return PagedListView.separated(
-                                pagingController: _postDetailScreenHandler!
-                                    .commetListPagingController,
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                builderDelegate: PagedChildBuilderDelegate<
-                                        LMCommentViewData>(
-                                    itemBuilder:
-                                        (context, commentViewData, index) {
-                                  LMUserViewData userViewData;
-                                  if (!_postDetailScreenHandler!.users
-                                      .containsKey(commentViewData.userId)) {
-                                    return const SizedBox.shrink();
-                                  }
-                                  userViewData = _postDetailScreenHandler!
-                                      .users[commentViewData.userId]!;
-                                  return LMCommentTile(
-                                    user: userViewData,
-                                    comment: commentViewData,
-                                    profilePicture: LMProfilePicture(
-                                      backgroundColor:
-                                          LMThemeData.kPrimaryColor,
-                                      fallbackText: _postDetailScreenHandler!
-                                          .users[commentViewData.userId]!.name,
-                                      onTap: () {
-                                        if (_postDetailScreenHandler!
-                                                .users[commentViewData.userId]!
-                                                .sdkClientInfo !=
-                                            null) {
-                                          LMFeedIntegration
-                                              .instance.lmFeedClient
-                                              .routeToProfile(
-                                                  _postDetailScreenHandler!
-                                                      .users[commentViewData
-                                                          .userId]!
-                                                      .sdkClientInfo!
-                                                      .userUniqueId);
-                                        }
-                                      },
-                                      imageUrl: _postDetailScreenHandler!
-                                          .users[commentViewData.userId]!
-                                          .imageUrl,
-                                      size: 36,
-                                    ),
-                                    subtitleText: LMTextView(
-                                      text:
-                                          "@${_postDetailScreenHandler!.users[commentViewData.userId]!.name.toLowerCase().split(' ').join()} · ", //${timeago.format(item.createdAt)}",
-                                      textStyle: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: LMThemeData.kSecondaryColor700,
-                                      ),
-                                    ),
-                                    actionsPadding:
-                                        const EdgeInsets.only(left: 48),
-                                    onMenuTap: (id) {
-                                      if (id == commentDeleteId) {
-                                        // Delete post
-                                        showDialog(
-                                            context: context,
-                                            builder: (childContext) =>
-                                                LMDeleteConfirmationDialog(
-                                                  title: 'Delete Comment',
-                                                  userId:
-                                                      commentViewData.userId,
-                                                  content:
-                                                      'Are you sure you want to delete this post. This action can not be reversed.',
-                                                  action:
-                                                      (String reason) async {
-                                                    Navigator.of(childContext)
-                                                        .pop();
-
-                                                    LMAnalyticsBloc.instance
-                                                        .add(FireAnalyticEvent(
-                                                      eventName: AnalyticsKeys
-                                                          .commentDeleted,
-                                                      eventProperties: {
-                                                        "post_id":
-                                                            widget.postId,
-                                                        "comment_id":
-                                                            commentViewData.id,
                                                       },
-                                                    ));
+                                                      icon: const LMIcon(
+                                                        type: LMIconType.svg,
+                                                        assetPath:
+                                                            kAssetCommentIcon,
+                                                        size: 20,
+                                                      ),
+                                                    ),
+                                                    LMThemeData
+                                                        .kHorizontalPaddingMedium,
+                                                    commentViewData
+                                                                .repliesCount >
+                                                            0
+                                                        ? LMTextButton(
+                                                            onTap: () {
+                                                              // TODO: hade reply hadling
+                                                              // if (!replyShown) {
+                                                              //   _commentRepliesBloc.add(
+                                                              //       GetCommentReplies(
+                                                              //           commentDetailRequest:
+                                                              //               (GetCommentRequestBuilder()
+                                                              //                     ..commentId(
+                                                              //                         commentViewData.id)
+                                                              //                     ..postId(
+                                                              //                         widget.postId)
+                                                              //                     ..page(
+                                                              //                         1))
+                                                              //                   .build(),
+                                                              //           forLoadMore:
+                                                              //               true));
+                                                              //   replyShown = true;
+                                                              //}
+                                                            },
+                                                            text: LMTextView(
+                                                              text:
+                                                                  "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
+                                                              textStyle:
+                                                                  const TextStyle(
+                                                                color: LMThemeData
+                                                                    .kPrimaryColor,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : const SizedBox()
+                                                  ],
+                                                ),
+                                              ],
+                                              actionsPadding:
+                                                  const EdgeInsets.only(
+                                                      left: 48),
+                                              onMenuTap: (id) {
+                                                if (id == commentDeleteId) {
+                                                  // Delete post
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (childContext) =>
+                                                          LMDeleteConfirmationDialog(
+                                                            title:
+                                                                'Delete Comment',
+                                                            userId:
+                                                                commentViewData
+                                                                    .userId,
+                                                            content:
+                                                                'Are you sure you want to delete this post. This action can not be reversed.',
+                                                            action: (String
+                                                                reason) async {
+                                                              Navigator.of(
+                                                                      childContext)
+                                                                  .pop();
 
-                                                    DeleteCommentRequest
-                                                        deleteCommentRequest =
-                                                        (DeleteCommentRequestBuilder()
-                                                              ..postId(
-                                                                  widget.postId)
-                                                              ..commentId(
-                                                                  commentViewData
-                                                                      .id)
-                                                              ..reason(reason
-                                                                      .isEmpty
-                                                                  ? "Reason for deletion"
-                                                                  : reason))
-                                                            .build();
+                                                              LMAnalyticsBloc
+                                                                  .instance
+                                                                  .add(
+                                                                      FireAnalyticEvent(
+                                                                eventName:
+                                                                    AnalyticsKeys
+                                                                        .commentDeleted,
+                                                                eventProperties: {
+                                                                  "post_id":
+                                                                      widget
+                                                                          .postId,
+                                                                  "comment_id":
+                                                                      commentViewData
+                                                                          .id,
+                                                                },
+                                                              ));
 
-                                                    LMCommentMetaData
-                                                        commentMetaData =
-                                                        (LMCommentMetaDataBuilder()
-                                                              ..commentActionEntity(
-                                                                  LMCommentType
-                                                                      .parent)
-                                                              ..commentActionType(
-                                                                  LMCommentActionType
-                                                                      .delete)
-                                                              ..level(0)
-                                                              ..commentId(
-                                                                  commentViewData
-                                                                      .id))
-                                                            .build();
+                                                              DeleteCommentRequest
+                                                                  deleteCommentRequest =
+                                                                  (DeleteCommentRequestBuilder()
+                                                                        ..postId(
+                                                                            widget.postId)
+                                                                        ..commentId(
+                                                                            commentViewData.id)
+                                                                        ..reason(reason.isEmpty
+                                                                            ? "Reason for deletion"
+                                                                            : reason))
+                                                                      .build();
 
-                                                    _postDetailScreenHandler!
-                                                        .commentHandlerBloc
-                                                        .add(LMCommentActionEvent(
-                                                            commentActionRequest:
-                                                                deleteCommentRequest,
-                                                            commentMetaData:
-                                                                commentMetaData));
-                                                  },
-                                                  actionText: 'Delete',
-                                                ));
-                                      } else if (id == commentEditId) {
-                                        debugPrint('Editing functionality');
-                                        LMCommentMetaData commentMetaData =
-                                            (LMCommentMetaDataBuilder()
-                                                  ..commentActionEntity(
-                                                      LMCommentType.parent)
-                                                  ..commentActionType(
-                                                      LMCommentActionType.edit)
-                                                  ..level(0)
-                                                  ..commentId(
-                                                      commentViewData.id))
-                                                .build();
+                                                              LMCommentMetaData
+                                                                  commentMetaData =
+                                                                  (LMCommentMetaDataBuilder()
+                                                                        ..commentActionEntity(
+                                                                            LMCommentType.parent)
+                                                                        ..commentActionType(
+                                                                            LMCommentActionType.delete)
+                                                                        ..level(
+                                                                            0)
+                                                                        ..commentId(
+                                                                            commentViewData.id))
+                                                                      .build();
 
-                                        _postDetailScreenHandler!
-                                            .commentHandlerBloc
-                                            .add(LMCommentOngoingEvent(
-                                                commentMetaData:
-                                                    commentMetaData));
-                                      }
-                                    },
-                                    onTagTap: (String userId) {
-                                      LMFeedIntegration.instance.lmFeedClient
-                                          .routeToProfile(userId);
-                                    },
-                                  );
-                                }),
-                                padding: EdgeInsets.zero,
-                                separatorBuilder: (context, index) =>
-                                    const Divider(thickness: 0.2));
-                          }),
-                    ),
-                    const SliverToBoxAdapter(
-                      child: SizedBox(
-                        height: 100,
+                                                              _postDetailScreenHandler!
+                                                                  .commentHandlerBloc
+                                                                  .add(LMCommentActionEvent(
+                                                                      commentActionRequest:
+                                                                          deleteCommentRequest,
+                                                                      commentMetaData:
+                                                                          commentMetaData));
+                                                            },
+                                                            actionText:
+                                                                'Delete',
+                                                          ));
+                                                } else if (id ==
+                                                    commentEditId) {
+                                                  debugPrint(
+                                                      'Editing functionality');
+                                                  LMCommentMetaData
+                                                      commentMetaData =
+                                                      (LMCommentMetaDataBuilder()
+                                                            ..commentActionEntity(
+                                                                LMCommentType
+                                                                    .parent)
+                                                            ..commentActionType(
+                                                                LMCommentActionType
+                                                                    .edit)
+                                                            ..level(0)
+                                                            ..commentId(
+                                                                commentViewData
+                                                                    .id))
+                                                          .build();
+
+                                                  _postDetailScreenHandler!
+                                                      .commentHandlerBloc
+                                                      .add(LMCommentOngoingEvent(
+                                                          commentMetaData:
+                                                              commentMetaData));
+                                                }
+                                              },
+                                              onTagTap: (String userId) {
+                                                LMFeedIntegration
+                                                    .instance.lmFeedClient
+                                                    .routeToProfile(userId);
+                                              },
+                                            );
+                                          }),
+                                          padding: EdgeInsets.zero,
+                                          separatorBuilder: (context, index) =>
+                                              const Divider(
+                                                  thickness: 0.2, height: 0));
+                                    });
+                              }),
+                        ),
                       ),
-                    ),
-                  ],
-                ));
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Scaffold(
-              body: Center(
-                child: Text(
-                  '${snapshot.error}',
-                  style: Theme.of(context).textTheme.titleLarge,
+                      const SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: 100,
+                        ),
+                      ),
+                    ],
+                  ));
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator.adaptive(),
                 ),
-              ),
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
-        });
+              );
+            } else if (snapshot.hasError) {
+              return Scaffold(
+                body: Center(
+                  child: Text(
+                    '${snapshot.error}',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          }),
+    );
   }
 }

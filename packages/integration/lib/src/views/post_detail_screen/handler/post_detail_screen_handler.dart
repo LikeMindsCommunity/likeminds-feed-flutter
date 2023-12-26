@@ -41,7 +41,7 @@ class PostDetailScreenHandler {
 
       final List<LMCommentViewData> commentList = postViewData.replies;
 
-      addCommentListToController(commentList, 2);
+      addCommentListToController(commentList, page + 1);
 
       return postViewData;
     } else {
@@ -56,25 +56,17 @@ class PostDetailScreenHandler {
 
   void addCommentListToController(
       List<LMCommentViewData> commentList, int nextPageKey) {
-    commetListPagingController.appendPage(commentList, nextPageKey);
+    final isLastPage = commentList.length < 10;
+    if (isLastPage) {
+      commetListPagingController.appendLastPage(commentList);
+    } else {
+      commetListPagingController.appendPage(commentList, nextPageKey);
+    }
   }
 
   void addCommentListPaginationListener() {
     commetListPagingController.addPageRequestListener((pageKey) async {
-      final LMPostViewData? response = await fetchCommentListWithPage(pageKey);
-
-      if (response != null) {
-        final LMPostViewData postViewData = response;
-        final List<LMCommentViewData> commentList = postViewData.replies;
-
-        final isLastPage = commentList.length < 10;
-        if (isLastPage) {
-          commetListPagingController.appendLastPage(commentList);
-        } else {
-          final nextPageKey = pageKey + 1;
-          commetListPagingController.appendPage(commentList, nextPageKey);
-        }
-      }
+      await fetchCommentListWithPage(pageKey);
     });
   }
 
@@ -133,7 +125,7 @@ class PostDetailScreenHandler {
 
           break;
         }
-      case const (LMCommentSuccessState<AddCommentReplyResponse>,):
+      case const (LMCommentSuccessState<AddCommentReplyResponse>):
         {
           final LMCommentSuccessState commentSuccessState =
               state as LMCommentSuccessState;
@@ -144,7 +136,10 @@ class PostDetailScreenHandler {
           LMCommentViewData commentViewData =
               CommentViewDataConvertor.fromComment(response.reply!);
 
-          // TODO: handle add reply action handling
+          if (response.reply!.parentComment != null) {
+            updateCommentInController(CommentViewDataConvertor.fromComment(
+                response.reply!.parentComment!));
+          }
 
           break;
         }
