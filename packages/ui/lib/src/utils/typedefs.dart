@@ -67,7 +67,7 @@ typedef LMPostAppBarBuilder = PreferredSizeWidget Function(
 /// {@template post_comment_builder}
 /// Builder function to build the post comment.
 /// must return a widget,
-/// takes in [BuildContext] and [LMCommentViewData] as params.
+/// takes in [BuildContext], [LMUserViewData] and [LMCommentViewData] as params.
 /// {@endtemplate}
-typedef LMPostCommentBuilder = Widget Function(
-    BuildContext context, LMCommentViewData comment);
+typedef LMPostCommentBuilder = Widget Function(BuildContext context,
+    LMCommentViewData comment, LMUserViewData userViewData);
