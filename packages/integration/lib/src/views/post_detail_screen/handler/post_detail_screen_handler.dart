@@ -14,6 +14,7 @@ class PostDetailScreenHandler {
   late final LMCommentHandlerBloc commentHandlerBloc;
   late final FocusNode focusNode;
   late final TextEditingController commentController;
+  final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
 
   PostDetailScreenHandler(this.commetListPagingController, this.postId) {
     commentHandlerBloc = LMCommentHandlerBloc.instance;
@@ -95,7 +96,6 @@ class PostDetailScreenHandler {
               CommentViewDataConvertor.fromComment(response.reply!);
 
           addCommentToController(commentViewData);
-
           break;
         }
       case const (LMCommentSuccessState<EditCommentResponse>):
@@ -121,8 +121,16 @@ class PostDetailScreenHandler {
               LMCommentType.parent) {
             deleteCommentFromController(
                 commentSuccessState.commentMetaData.commentId!);
-          } else {}
-
+          } else {
+            LMCommentViewData? commentViewData =
+                commetListPagingController.itemList?.firstWhere((element) =>
+                    element.id ==
+                    commentSuccessState.commentMetaData.commentId);
+            if (commentViewData != null) {
+              updateCommentInController(commentViewData);
+            }
+          }
+          rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
       case const (LMCommentSuccessState<AddCommentReplyResponse>):
@@ -140,7 +148,7 @@ class PostDetailScreenHandler {
             updateCommentInController(CommentViewDataConvertor.fromComment(
                 response.reply!.parentComment!));
           }
-
+          rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
       case const (LMCommentSuccessState<EditCommentReplyResponse>):
@@ -153,6 +161,8 @@ class PostDetailScreenHandler {
 
           LMCommentViewData commentViewData =
               CommentViewDataConvertor.fromComment(response.reply!);
+
+          rebuildPostWidget.value = !rebuildPostWidget.value;
         }
     }
   }

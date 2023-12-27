@@ -67,12 +67,13 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
       PagingController(firstPageKey: 1);
   final LMFetchCommentReplyBloc _commentRepliesBloc =
       LMFetchCommentReplyBloc.instance;
-  ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   PostDetailScreenHandler? _postDetailScreenHandler;
   Future<LMPostViewData?>? getPostData;
   LMUserViewData currentUser = UserViewDataConvertor.fromUser(
       UserLocalPreference.instance.fetchUserData());
   LMPostViewData? postData;
+  String? commentIdReplyId;
+  bool replyShown = false;
 
   bool right = true;
   List<LMUserTagViewData> userTags = [];
@@ -85,7 +86,8 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
     getPostData =
         _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
       postData = value;
-      rebuildPostWidget.value = !rebuildPostWidget.value;
+      _postDetailScreenHandler!.rebuildPostWidget.value =
+          !_postDetailScreenHandler!.rebuildPostWidget.value;
       return value;
     });
     right = _postDetailScreenHandler!.checkCommentRights();
@@ -102,7 +104,8 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
       getPostData =
           _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
         postData = value;
-        rebuildPostWidget.value = !rebuildPostWidget.value;
+        _postDetailScreenHandler!.rebuildPostWidget.value =
+            !_postDetailScreenHandler!.rebuildPostWidget.value;
         return value;
       });
     }
@@ -365,7 +368,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                   commentMetaData =
                                                                   (LMCommentMetaDataBuilder()
                                                                         ..commentActionEntity(
-                                                                            LMCommentType.parent)
+                                                                            LMCommentType.reply)
                                                                         ..level(
                                                                             0)
                                                                         ..commentId(state
@@ -474,131 +477,151 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                       slivers: [
                         SliverToBoxAdapter(
                           child: widget.postBuilder == null
-                              ? LMPostWidget(
-                                  post: postData!,
-                                  user: _postDetailScreenHandler!
-                                      .users[postData!.userId]!,
-                                  onPostTap: (context, post) {},
-                                  isFeed: false,
-                                  onTagTap: (tag) {},
-                                  footerBuilder: (context, post) {
-                                    return LMPostFooter(
-                                      alignment: LMAlignment.centre,
-                                      children: [
-                                        LMTextButton(
-                                          text: const LMTextView(text: "Like"),
-                                          margin: 0,
-                                          activeText: const LMTextView(
-                                            text: "Like",
-                                            textStyle: TextStyle(
-                                              color: LMThemeData.primary500,
+                              ? ValueListenableBuilder(
+                                  valueListenable: _postDetailScreenHandler!
+                                      .rebuildPostWidget,
+                                  builder: (context, _, __) {
+                                    return LMPostWidget(
+                                      post: postData!,
+                                      user: _postDetailScreenHandler!
+                                          .users[postData!.userId]!,
+                                      onPostTap: (context, post) {},
+                                      isFeed: false,
+                                      onTagTap: (tag) {},
+                                      footerBuilder: (context, post) {
+                                        return LMPostFooter(
+                                          alignment: LMAlignment.centre,
+                                          children: [
+                                            LMTextButton(
+                                              text: const LMTextView(
+                                                  text: "Like"),
+                                              margin: 0,
+                                              activeText: const LMTextView(
+                                                text: "Like",
+                                                textStyle: TextStyle(
+                                                  color: LMThemeData.primary500,
+                                                ),
+                                              ),
+                                              onTap: () async {
+                                                if (postData!.isLiked) {
+                                                  postData!.likeCount -= 1;
+                                                  postData!.isLiked = false;
+                                                } else {
+                                                  postData!.likeCount += 1;
+                                                  postData!.isLiked = true;
+                                                }
+
+                                                _postDetailScreenHandler!
+                                                        .rebuildPostWidget
+                                                        .value =
+                                                    !_postDetailScreenHandler!
+                                                        .rebuildPostWidget
+                                                        .value;
+
+                                                final response =
+                                                    await LMFeedIntegration
+                                                        .instance.lmFeedClient
+                                                        .likePost(
+                                                            (LikePostRequestBuilder()
+                                                                  ..postId(
+                                                                      postData!
+                                                                          .id))
+                                                                .build());
+
+                                                if (!response.success) {
+                                                  toast(
+                                                    response.errorMessage ??
+                                                        "There was an error liking the post",
+                                                    duration: Toast.LENGTH_LONG,
+                                                  );
+
+                                                  if (postData!.isLiked) {
+                                                    postData!.likeCount -= 1;
+                                                    postData!.isLiked = false;
+                                                  } else {
+                                                    postData!.likeCount += 1;
+                                                    postData!.isLiked = true;
+                                                  }
+
+                                                  _postDetailScreenHandler!
+                                                          .rebuildPostWidget
+                                                          .value =
+                                                      !_postDetailScreenHandler!
+                                                          .rebuildPostWidget
+                                                          .value;
+                                                } else {
+                                                  LMPostBloc.instance.add(
+                                                    UpdatePost(
+                                                      post: postData!,
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              icon: const LMIcon(
+                                                type: LMIconType.icon,
+                                                icon: Icons
+                                                    .thumb_up_off_alt_outlined,
+                                                color: LMThemeData
+                                                    .kSecondaryColor700,
+                                                size: 20,
+                                                boxPadding: 6,
+                                              ),
+                                              activeIcon: const LMIcon(
+                                                type: LMIconType.icon,
+                                                icon: Icons.thumb_up,
+                                                size: 20,
+                                                boxPadding: 6,
+                                                color:
+                                                    LMThemeData.kPrimaryColor,
+                                              ),
+                                              isActive: postData!.isLiked,
                                             ),
-                                          ),
-                                          onTap: () async {
-                                            if (postData!.isLiked) {
-                                              postData!.likeCount -= 1;
-                                              postData!.isLiked = false;
-                                            } else {
-                                              postData!.likeCount += 1;
-                                              postData!.isLiked = true;
-                                            }
-
-                                            rebuildPostWidget.value =
-                                                !rebuildPostWidget.value;
-
-                                            final response =
-                                                await LMFeedIntegration
-                                                    .instance.lmFeedClient
-                                                    .likePost(
-                                                        (LikePostRequestBuilder()
-                                                              ..postId(
-                                                                  postData!.id))
-                                                            .build());
-
-                                            if (!response.success) {
-                                              toast(
-                                                response.errorMessage ??
-                                                    "There was an error liking the post",
-                                                duration: Toast.LENGTH_LONG,
-                                              );
-
-                                              if (postData!.isLiked) {
-                                                postData!.likeCount -= 1;
-                                                postData!.isLiked = false;
-                                              } else {
-                                                postData!.likeCount += 1;
-                                                postData!.isLiked = true;
-                                              }
-
-                                              rebuildPostWidget.value =
-                                                  !rebuildPostWidget.value;
-                                            } else {
-                                              LMPostBloc.instance.add(
-                                                UpdatePost(
-                                                  post: postData!,
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          icon: const LMIcon(
-                                            type: LMIconType.icon,
-                                            icon:
-                                                Icons.thumb_up_off_alt_outlined,
-                                            color:
-                                                LMThemeData.kSecondaryColor700,
-                                            size: 20,
-                                            boxPadding: 6,
-                                          ),
-                                          activeIcon: const LMIcon(
-                                            type: LMIconType.icon,
-                                            icon: Icons.thumb_up,
-                                            size: 20,
-                                            boxPadding: 6,
-                                            color: LMThemeData.kPrimaryColor,
-                                          ),
-                                          isActive: postData!.isLiked,
-                                        ),
-                                        const Spacer(),
-                                        LMTextButton(
-                                          text:
-                                              const LMTextView(text: "Comment"),
-                                          margin: 0,
-                                          onTap: () {
-                                            if (widget.isFeed) {
-                                              LMAnalyticsBloc.instance.add(
-                                                  FireAnalyticEvent(
-                                                      eventName: AnalyticsKeys
-                                                          .commentListOpen,
-                                                      eventProperties: {
-                                                    'postId': postData!.id,
-                                                  }));
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      LMPostDetailScreen(
-                                                    postId: postData!.id,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          icon: const LMIcon(
-                                            type: LMIconType.svg,
-                                            assetPath: kAssetCommentIcon,
-                                            color:
-                                                LMThemeData.kSecondaryColor700,
-                                            size: 20,
-                                            boxPadding: 6,
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        LMTextButton(
-                                          text: const LMTextView(text: "Share"),
-                                          margin: 0,
-                                          onTap: () {
-                                            String? postType =
-                                                postData!.attachments == null ||
+                                            const Spacer(),
+                                            LMTextButton(
+                                              text: const LMTextView(
+                                                  text: "Comment"),
+                                              margin: 0,
+                                              onTap: () {
+                                                if (widget.isFeed) {
+                                                  LMAnalyticsBloc.instance.add(
+                                                      FireAnalyticEvent(
+                                                          eventName: AnalyticsKeys
+                                                              .commentListOpen,
+                                                          eventProperties: {
+                                                        'postId': postData!.id,
+                                                      }));
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          LMPostDetailScreen(
+                                                        postId: postData!.id,
+                                                      ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  _postDetailScreenHandler!
+                                                      .openOnScreenKeyboard();
+                                                }
+                                              },
+                                              icon: const LMIcon(
+                                                type: LMIconType.icon,
+                                                icon: Icons.comment_outlined,
+                                                color: LMThemeData
+                                                    .kSecondaryColor700,
+                                                size: 20,
+                                                boxPadding: 6,
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            LMTextButton(
+                                              text: const LMTextView(
+                                                  text: "Share"),
+                                              margin: 0,
+                                              onTap: () {
+                                                String? postType = postData!
+                                                                .attachments ==
+                                                            null ||
                                                         postData!.attachments!
                                                             .isEmpty
                                                     ? 'text'
@@ -608,44 +631,45 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                             .attachmentType ??
                                                         0);
 
-                                            LMAnalyticsBloc.instance
-                                                .add(FireAnalyticEvent(
-                                              eventName:
-                                                  AnalyticsKeys.postShared,
-                                              eventProperties: {
-                                                "post_id": postData!.id,
-                                                "post_type": postType,
-                                                "user_id":
-                                                    currentUser.userUniqueId,
+                                                LMAnalyticsBloc.instance
+                                                    .add(FireAnalyticEvent(
+                                                  eventName:
+                                                      AnalyticsKeys.postShared,
+                                                  eventProperties: {
+                                                    "post_id": postData!.id,
+                                                    "post_type": postType,
+                                                    "user_id": currentUser
+                                                        .userUniqueId,
+                                                  },
+                                                ));
+                                                // TODO: Add Share Post logic
+                                                //SharePost().sharePost(postData!.id);
                                               },
-                                            ));
-                                            // TODO: Add Share Post logic
-                                            //SharePost().sharePost(postData!.id);
-                                          },
-                                          icon: const LMIcon(
-                                            type: LMIconType.svg,
-                                            assetPath: kAssetShareIcon,
-                                            color:
-                                                LMThemeData.kSecondaryColor700,
-                                            size: 20,
-                                            boxPadding: 6,
-                                          ),
-                                        ),
-                                      ],
-                                      // children: [
+                                              icon: const LMIcon(
+                                                type: LMIconType.icon,
+                                                icon: Icons.share,
+                                                color: LMThemeData
+                                                    .kSecondaryColor700,
+                                                size: 20,
+                                                boxPadding: 6,
+                                              ),
+                                            ),
+                                          ],
+                                          // children: [
 
-                                      // ],
+                                          // ],
+                                        );
+                                      },
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Color(0x19000000),
+                                          blurRadius: 5,
+                                          offset: Offset(1, 1),
+                                          spreadRadius: 0,
+                                        )
+                                      ],
                                     );
-                                  },
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0x19000000),
-                                      blurRadius: 5,
-                                      offset: Offset(1, 1),
-                                      spreadRadius: 0,
-                                    )
-                                  ],
-                                )
+                                  })
                               : widget.postBuilder!(context, postData!),
                         ),
                         const SliverToBoxAdapter(
@@ -666,32 +690,45 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                 )
                               ],
                             ),
-                            child: BlocConsumer<LMCommentHandlerBloc,
-                                    LMCommentHandlerState>(
-                                bloc: _postDetailScreenHandler!
-                                    .commentHandlerBloc,
-                                listener: (context, state) {
-                                  _postDetailScreenHandler!
-                                      .handleBlocChanges(state);
-                                },
-                                builder: (context, state) {
-                                  return ValueListenableBuilder(
-                                      valueListenable: rebuildPostWidget,
-                                      builder: (context, _, __) {
-                                        return PagedListView.separated(
-                                            pagingController:
-                                                _postDetailScreenHandler!
-                                                    .commetListPagingController,
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            shrinkWrap: true,
-                                            builderDelegate:
-                                                PagedChildBuilderDelegate<
+                            child:
+                                BlocConsumer<LMCommentHandlerBloc,
+                                        LMCommentHandlerState>(
+                                    bloc: _postDetailScreenHandler!
+                                        .commentHandlerBloc,
+                                    listener: (context, state) {
+                                      _postDetailScreenHandler!
+                                          .handleBlocChanges(state);
+                                    },
+                                    builder: (context, state) {
+                                      return ValueListenableBuilder(
+                                          valueListenable:
+                                              _postDetailScreenHandler!
+                                                  .rebuildPostWidget,
+                                          builder: (context, _, __) {
+                                            return PagedListView.separated(
+                                                pagingController:
+                                                    _postDetailScreenHandler!
+                                                        .commetListPagingController,
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                shrinkWrap: true,
+                                                builderDelegate: PagedChildBuilderDelegate<
                                                         LMCommentViewData>(
-                                                    noMoreItemsIndicatorBuilder:
-                                                        (context) =>
-                                                            const SizedBox(
-                                                                height: 75),
+                                                    firstPageProgressIndicatorBuilder:
+                                                        (context) {
+                                                      return Container(
+                                                        color: LMThemeData
+                                                            .kWhiteColor,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(20.0),
+                                                        child: const Center(
+                                                          child:
+                                                              CircularProgressIndicator
+                                                                  .adaptive(),
+                                                        ),
+                                                      );
+                                                    },
                                                     noItemsFoundIndicatorBuilder:
                                                         (context) =>
                                                             const LMEmptyCommentWidget(),
@@ -713,8 +750,8 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                   .users[
                                                               commentViewData
                                                                   .userId]!;
-                                                      bool replyShown = false;
-                                                      return Container(
+
+                                                      return SizedBox(
                                                         child: Column(
                                                           children: [
                                                             LMCommentTile(
@@ -817,9 +854,11 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                             .isLiked =
                                                                         !commentViewData
                                                                             .isLiked;
-                                                                    rebuildPostWidget
+                                                                    _postDetailScreenHandler!
+                                                                            .rebuildPostWidget
                                                                             .value =
-                                                                        !rebuildPostWidget
+                                                                        !_postDetailScreenHandler!
+                                                                            .rebuildPostWidget
                                                                             .value;
 
                                                                     ToggleLikeCommentRequest
@@ -850,28 +889,30 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                           !commentViewData
                                                                               .isLiked;
 
-                                                                      rebuildPostWidget
+                                                                      _postDetailScreenHandler!
+                                                                              .rebuildPostWidget
                                                                               .value =
-                                                                          !rebuildPostWidget
+                                                                          !_postDetailScreenHandler!
+                                                                              .rebuildPostWidget
                                                                               .value;
                                                                     }
                                                                   },
                                                                   icon:
                                                                       const LMIcon(
-                                                                    type:
-                                                                        LMIconType
-                                                                            .svg,
-                                                                    assetPath:
-                                                                        kAssetLikeIcon,
+                                                                    type: LMIconType
+                                                                        .icon,
+                                                                    icon: Icons
+                                                                        .thumb_up_alt_outlined,
                                                                     size: 20,
                                                                   ),
                                                                   activeIcon:
                                                                       const LMIcon(
-                                                                    type:
-                                                                        LMIconType
-                                                                            .svg,
-                                                                    assetPath:
-                                                                        kAssetLikeFilledIcon,
+                                                                    type: LMIconType
+                                                                        .icon,
+                                                                    color: LMThemeData
+                                                                        .kPrimaryColor,
+                                                                    icon: Icons
+                                                                        .thumb_up_alt_rounded,
                                                                     size: 20,
                                                                   ),
                                                                   isActive:
@@ -906,13 +947,16 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                         _postDetailScreenHandler!
                                                                             .commentHandlerBloc
                                                                             .add(LMCommentOngoingEvent(commentMetaData: commentMetaData));
+
+                                                                        _postDetailScreenHandler!
+                                                                            .openOnScreenKeyboard();
                                                                       },
                                                                       icon:
                                                                           const LMIcon(
                                                                         type: LMIconType
-                                                                            .svg,
-                                                                        assetPath:
-                                                                            kAssetCommentIcon,
+                                                                            .icon,
+                                                                        icon: Icons
+                                                                            .comment_outlined,
                                                                         size:
                                                                             20,
                                                                       ),
@@ -924,7 +968,14 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                         ? LMTextButton(
                                                                             onTap:
                                                                                 () {
-                                                                              if (!replyShown) {
+                                                                              if (replyShown && commentIdReplyId != null && commentIdReplyId == commentViewData.id) {
+                                                                                _commentRepliesBloc.add(ClearCommentReplies());
+                                                                                replyShown = false;
+                                                                                commentIdReplyId = null;
+                                                                              } else if (replyShown && commentIdReplyId != null && commentIdReplyId != commentViewData.id) {
+                                                                                _commentRepliesBloc.add(ClearCommentReplies());
+                                                                                replyShown = true;
+                                                                                commentIdReplyId = commentViewData.id;
                                                                                 _commentRepliesBloc.add(GetCommentReplies(
                                                                                     commentDetailRequest: (GetCommentRequestBuilder()
                                                                                           ..commentId(commentViewData.id)
@@ -932,11 +983,18 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                                           ..page(1))
                                                                                         .build(),
                                                                                     forLoadMore: true));
-                                                                                replyShown = true;
                                                                               } else {
-                                                                                _commentRepliesBloc.add(ClearCommentReplies());
-                                                                                replyShown = false;
+                                                                                replyShown = true;
+                                                                                commentIdReplyId = commentViewData.id;
+                                                                                _commentRepliesBloc.add(GetCommentReplies(
+                                                                                    commentDetailRequest: (GetCommentRequestBuilder()
+                                                                                          ..commentId(commentViewData.id)
+                                                                                          ..postId(widget.postId)
+                                                                                          ..page(1))
+                                                                                        .build(),
+                                                                                    forLoadMore: true));
                                                                               }
+                                                                              _postDetailScreenHandler!.rebuildPostWidget.value = !_postDetailScreenHandler!.rebuildPostWidget.value;
                                                                             },
                                                                             text:
                                                                                 LMTextView(
@@ -1024,31 +1082,39 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                         userId);
                                                               },
                                                             ),
-                                                            LMCommentReplyWidget(
-                                                              refresh: () {
-                                                                _pagingController
-                                                                    .refresh();
-                                                              },
-                                                              postId:
-                                                                  widget.postId,
-                                                              reply:
-                                                                  commentViewData,
-                                                              user: _postDetailScreenHandler!
-                                                                      .users[
-                                                                  commentViewData
-                                                                      .userId]!,
-                                                            ),
+                                                            (replyShown &&
+                                                                    commentIdReplyId ==
+                                                                        commentViewData
+                                                                            .id)
+                                                                ? LMCommentReplyWidget(
+                                                                    refresh:
+                                                                        () {
+                                                                      _pagingController
+                                                                          .refresh();
+                                                                    },
+                                                                    postId: widget
+                                                                        .postId,
+                                                                    reply:
+                                                                        commentViewData,
+                                                                    user: _postDetailScreenHandler!
+                                                                            .users[
+                                                                        commentViewData
+                                                                            .userId]!,
+                                                                  )
+                                                                : const SizedBox
+                                                                    .shrink()
                                                           ],
                                                         ),
                                                       );
                                                     }),
-                                            padding: EdgeInsets.zero,
-                                            separatorBuilder: (context,
-                                                    index) =>
-                                                const Divider(
-                                                    thickness: 0.2, height: 0));
-                                      });
-                                }),
+                                                padding: EdgeInsets.zero,
+                                                separatorBuilder:
+                                                    (context, index) =>
+                                                        const Divider(
+                                                            thickness: 0.2,
+                                                            height: 0));
+                                          });
+                                    }),
                           ),
                         ),
                         const SliverToBoxAdapter(
