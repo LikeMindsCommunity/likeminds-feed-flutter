@@ -14,39 +14,45 @@
       "name": "flutter_feed_bloc (profile mode)",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "profile"
+      "flutterMode": "profile",
+      "args": ["--dart-define", "DEBUG=true"]
     },
     {
       "name": "flutter_feed_bloc (release mode)",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "args": ["--dart-define", "DEBUG=true"]
     },
     {
       "name": "example",
       "cwd": "example",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "args": ["--dart-define", "DEBUG=true"]
     },
     {
       "name": "example (profile mode)",
       "cwd": "example",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "profile"
+      "flutterMode": "profile",
+      "args": ["--dart-define", "DEBUG=true"]
     },
     {
       "name": "example (release mode)",
       "cwd": "example",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "args": ["--dart-define", "DEBUG=true"]
     },
     {
       "name": "integration",
       "cwd": "packages/integration",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "args": ["--dart-define", "DEBUG=true"]
     },
     {
       "name": "integration (profile mode)",

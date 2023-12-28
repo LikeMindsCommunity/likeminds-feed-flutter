@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/analytics_bloc/analytics_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/profile_bloc/profile_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/routing_bloc/routing_bloc.dart';
+import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
+import 'package:likeminds_feed_driver_fl/src/bloc/profile/profile_bloc.dart';
+import 'package:likeminds_feed_driver_fl/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/simple_bloc_observer.dart';
 
 class LMBlocListener extends StatefulWidget {
