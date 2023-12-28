@@ -16,8 +16,8 @@ import 'package:likeminds_feed_driver_fl/src/utils/constants/post_action_id.dart
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/widgets/comment/comment_reply_widget.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/widgets/comment/default_empty_comment_widget.dart';
+import 'package:likeminds_feed_driver_fl/src/views/post/widgets/comment/comment_reply_widget.dart';
+import 'package:likeminds_feed_driver_fl/src/views/post/widgets/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post/handler/post_detail_screen_handler.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
