@@ -1,7 +1,7 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class PopupMenuItemConvertor {
+class LMPopupMenuItemConvertor {
   static LMPopUpMenuItemViewData fromPopUpMenuItemModel({
     required PopupMenuItemModel item,
   }) {

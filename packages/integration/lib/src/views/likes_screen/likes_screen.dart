@@ -5,13 +5,13 @@ import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/views/likes_screen/handler/likes_screen_handler.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class LikesScreen extends StatefulWidget {
+class LMLikesScreen extends StatefulWidget {
   static const String route = "/likes_screen";
   final String postId;
   final bool isCommentLikes;
   final String? commentId;
 
-  const LikesScreen({
+  const LMLikesScreen({
     super.key,
     this.isCommentLikes = false,
     required this.postId,
@@ -19,17 +19,17 @@ class LikesScreen extends StatefulWidget {
   });
 
   @override
-  State<LikesScreen> createState() => _LikesScreenState();
+  State<LMLikesScreen> createState() => _LikesScreenState();
 }
 
-class _LikesScreenState extends State<LikesScreen> {
+class _LikesScreenState extends State<LMLikesScreen> {
   Map<String, LMUserViewData> userData = {};
-  late LikesScreenHandler handler;
+  late LMLikesScreenHandler handler;
 
   @override
   void initState() {
     super.initState();
-    handler = LikesScreenHandler.instance;
+    handler = LMLikesScreenHandler.instance;
     handler.initialise(postId: widget.postId, commentId: widget.commentId);
   }
 

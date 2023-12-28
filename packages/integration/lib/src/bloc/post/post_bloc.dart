@@ -26,11 +26,11 @@ class LMPostBloc extends Bloc<LMPostEvents, LMPostState> {
 
   static LMPostBloc get instance => _lmPostBloc ??= LMPostBloc._();
 
-  LMPostBloc._() : super(NewPostInitiate()) {
-    on<CreateNewPost>(newPostEventHandler);
-    on<EditPost>(editPostEventHandler);
-    on<DeletePost>(deletePostEventHandler);
-    on<UpdatePost>(updatePostEventHandler);
-    on<TogglePinPost>(togglePinPostEventHandler);
+  LMPostBloc._() : super(LMNewPostInitiate()) {
+    on<LMCreateNewPost>(newPostEventHandler);
+    on<LMEditPost>(editPostEventHandler);
+    on<LMDeletePost>(deletePostEventHandler);
+    on<LMUpdatePost>(updatePostEventHandler);
+    on<LMTogglePinPost>(togglePinPostEventHandler);
   }
 }

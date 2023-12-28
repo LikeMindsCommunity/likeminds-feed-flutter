@@ -7,7 +7,7 @@ import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-class PostDetailScreenHandler {
+class LMPostDetailScreenHandler {
   final Map<String, LMUserViewData> users = {};
   final PagingController<int, LMCommentViewData> commetListPagingController;
   final String postId;
@@ -16,7 +16,7 @@ class PostDetailScreenHandler {
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
 
-  PostDetailScreenHandler(this.commetListPagingController, this.postId) {
+  LMPostDetailScreenHandler(this.commetListPagingController, this.postId) {
     commentHandlerBloc = LMCommentHandlerBloc.instance;
     addCommentListPaginationListener();
     commentController = TextEditingController();
@@ -33,12 +33,12 @@ class PostDetailScreenHandler {
         .getPostDetails(postDetailRequest);
 
     users.addAll(response.users?.map((key, value) =>
-            MapEntry(key, UserViewDataConvertor.fromUser(value))) ??
+            MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
         {});
 
     if (response.success) {
       final LMPostViewData postViewData =
-          PostViewDataConvertor.fromPost(post: response.post!);
+          LMPostViewDataConvertor.fromPost(post: response.post!);
 
       final List<LMCommentViewData> commentList = postViewData.replies;
 
@@ -73,11 +73,11 @@ class PostDetailScreenHandler {
 
   bool checkCommentRights() {
     final MemberStateResponse memberStateResponse =
-        UserLocalPreference.instance.fetchMemberRights();
+        LMUserLocalPreference.instance.fetchMemberRights();
     if (!memberStateResponse.success || memberStateResponse.state == 1) {
       return true;
     }
-    bool memberRights = UserLocalPreference.instance.fetchMemberRight(10);
+    bool memberRights = LMUserLocalPreference.instance.fetchMemberRight(10);
     return memberRights;
   }
 
@@ -93,7 +93,7 @@ class PostDetailScreenHandler {
               commentSuccessState.commentActionResponse as AddCommentResponse;
 
           LMCommentViewData commentViewData =
-              CommentViewDataConvertor.fromComment(response.reply!);
+              LMCommentViewDataConvertor.fromComment(response.reply!);
 
           addCommentToController(commentViewData);
           break;
@@ -107,7 +107,7 @@ class PostDetailScreenHandler {
               commentSuccessState.commentActionResponse as EditCommentResponse;
 
           LMCommentViewData commentViewData =
-              CommentViewDataConvertor.fromComment(response.reply!);
+              LMCommentViewDataConvertor.fromComment(response.reply!);
 
           updateCommentInController(commentViewData);
           break;
@@ -142,25 +142,21 @@ class PostDetailScreenHandler {
               .commentActionResponse as AddCommentReplyResponse;
 
           LMCommentViewData commentViewData =
-              CommentViewDataConvertor.fromComment(response.reply!);
+              LMCommentViewDataConvertor.fromComment(response.reply!);
 
           if (response.reply!.parentComment != null) {
-            updateCommentInController(CommentViewDataConvertor.fromComment(
-                response.reply!.parentComment!));
+            updateCommentInController(commentViewData.parentComment!);
           }
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
       case const (LMCommentSuccessState<EditCommentReplyResponse>):
         {
-          final LMCommentSuccessState commentSuccessState =
-              state as LMCommentSuccessState;
+          // final LMCommentSuccessState commentSuccessState =
+          //     state as LMCommentSuccessState;
 
-          EditCommentReplyResponse response = commentSuccessState
-              .commentActionResponse as EditCommentReplyResponse;
-
-          LMCommentViewData commentViewData =
-              CommentViewDataConvertor.fromComment(response.reply!);
+          // EditCommentReplyResponse response = commentSuccessState
+          //     .commentActionResponse as EditCommentReplyResponse;
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }

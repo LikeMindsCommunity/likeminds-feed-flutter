@@ -1,6 +1,7 @@
 part of '../post_bloc.dart';
 
-void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
+void newPostEventHandler(
+    LMCreateNewPost event, Emitter<LMPostState> emit) async {
   try {
     List<LMMediaModel>? postMedia = event.postMedia;
     List<Attachment> attachments = [];
@@ -12,7 +13,7 @@ void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
     // Upload post media to s3 and add links as Attachments
     if (postMedia != null && postMedia.isNotEmpty) {
       emit(
-        NewPostUploading(
+        LMNewPostUploading(
           progress: progress.stream,
           thumbnailMedia: postMedia.isEmpty
               ? null
@@ -66,13 +67,13 @@ void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
       // For counting the no of attachments
     } else {
       emit(
-        NewPostUploading(
+        LMNewPostUploading(
           progress: progress.stream,
         ),
       );
     }
     List<Topic> postTopics = event.selectedTopics
-        .map((e) => TopicViewDataConvertor.toTopic(e))
+        .map((e) => LMTopicViewDataConvertor.toTopic(e))
         .toList();
     final AddPostRequest request = (AddPostRequestBuilder()
           ..text(event.postText)
@@ -85,23 +86,23 @@ void newPostEventHandler(CreateNewPost event, Emitter<LMPostState> emit) async {
 
     if (response.success) {
       emit(
-        NewPostUploaded(
-          postData: PostViewDataConvertor.fromPost(post: response.post!),
+        LMNewPostUploaded(
+          postData: LMPostViewDataConvertor.fromPost(post: response.post!),
           userData: (response.user ?? <String, User>{}).map((key, value) =>
-              MapEntry(key, UserViewDataConvertor.fromUser(value))),
+              MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
           topics: (response.topics ?? <String, Topic>{}).map(
             (key, value) => MapEntry(
               key,
-              TopicViewDataConvertor.fromTopic(value),
+              LMTopicViewDataConvertor.fromTopic(value),
             ),
           ),
         ),
       );
     } else {
-      emit(NewPostError(message: response.errorMessage!));
+      emit(LMNewPostError(message: response.errorMessage!));
     }
   } catch (err) {
-    emit(const NewPostError(message: 'An error occurred'));
+    emit(const LMNewPostError(message: 'An error occurred'));
     debugPrint(err.toString());
   }
 }

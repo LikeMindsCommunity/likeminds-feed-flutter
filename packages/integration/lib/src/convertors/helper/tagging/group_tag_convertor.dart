@@ -1,7 +1,7 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class GroupTagViewDataConvertor {
+class LMGroupTagViewDataConvertor {
   static LMGroupTagViewData fromGroupTag(GroupTag groupTag) {
     LMGroupTagViewDataBuilder groupTagViewDataBuilder =
         LMGroupTagViewDataBuilder();

@@ -9,23 +9,23 @@ abstract class LMProfileState extends Equatable {
 
 class LMProfileStateInit extends LMProfileState {}
 
-class RouteToUserProfileState extends LMProfileState {
+class LMRouteToUserProfileState extends LMProfileState {
   final String userUniqueId;
 
-  const RouteToUserProfileState({required this.userUniqueId});
+  const LMRouteToUserProfileState({required this.userUniqueId});
 
   @override
   List<Object> get props => [userUniqueId];
 }
 
-class LoginRequiredState extends LMProfileState {}
+class LMLoginRequiredState extends LMProfileState {}
 
-class LogoutState extends LMProfileState {}
+class LMLogoutState extends LMProfileState {}
 
-class RouteToCompanyProfileState extends LMProfileState {
+class LMRouteToCompanyProfileState extends LMProfileState {
   final String companyId;
 
-  const RouteToCompanyProfileState({required this.companyId});
+  const LMRouteToCompanyProfileState({required this.companyId});
 
   @override
   List<Object> get props => [companyId];

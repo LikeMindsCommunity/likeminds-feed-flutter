@@ -4,7 +4,7 @@ import 'package:likeminds_feed_driver_fl/src/convertors/common/popup_menu_conver
 import 'package:likeminds_feed_driver_fl/src/convertors/helper/attachment/attachment_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class PostViewDataConvertor {
+class LMPostViewDataConvertor {
   static LMPostViewData fromPost({required Post post}) {
     LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
 
@@ -16,7 +16,8 @@ class PostViewDataConvertor {
 
     if (post.attachments != null) {
       postViewDataBuilder.attachments(post.attachments!
-          .map((e) => AttachmentViewDataConvertor.fromAttachment(attachment: e))
+          .map((e) =>
+              LMAttachmentViewDataConvertor.fromAttachment(attachment: e))
           .toList());
     }
 
@@ -33,7 +34,7 @@ class PostViewDataConvertor {
     postViewDataBuilder.isLiked(post.isLiked);
 
     postViewDataBuilder.menuItems(post.menuItems
-        .map((e) => PopupMenuItemConvertor.fromPopUpMenuItemModel(item: e))
+        .map((e) => LMPopupMenuItemConvertor.fromPopUpMenuItemModel(item: e))
         .toList());
 
     postViewDataBuilder.createdAt(post.createdAt);
@@ -43,7 +44,7 @@ class PostViewDataConvertor {
     postViewDataBuilder.isEdited(post.isEdited);
 
     postViewDataBuilder.replies(post.replies
-            ?.map((e) => CommentViewDataConvertor.fromComment(e))
+            ?.map((e) => LMCommentViewDataConvertor.fromComment(e))
             .toList() ??
         []);
 
@@ -58,7 +59,7 @@ class PostViewDataConvertor {
       isEdited: postViewData.isEdited,
       text: postViewData.text,
       attachments: postViewData.attachments
-          ?.map((e) => AttachmentViewDataConvertor.toAttachment(e))
+          ?.map((e) => LMAttachmentViewDataConvertor.toAttachment(e))
           .toList(),
       communityId: postViewData.communityId,
       isPinned: postViewData.isPinned,
@@ -69,12 +70,12 @@ class PostViewDataConvertor {
       isSaved: postViewData.isSaved,
       isLiked: postViewData.isLiked,
       menuItems: postViewData.menuItems
-          .map((e) => PopupMenuItemConvertor.toPopUpMenuItemModel(e))
+          .map((e) => LMPopupMenuItemConvertor.toPopUpMenuItemModel(e))
           .toList(),
       createdAt: postViewData.createdAt,
       updatedAt: postViewData.updatedAt,
       replies: postViewData.replies
-          .map((e) => CommentViewDataConvertor.toComment(e))
+          .map((e) => LMCommentViewDataConvertor.toComment(e))
           .toList(),
     );
   }

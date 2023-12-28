@@ -2,7 +2,7 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/helper/og_tag_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class AttachmentMetaViewDataConvertor {
+class LMAttachmentMetaViewDataConvertor {
   static LMAttachmentMetaViewData attachmentMeta(
       {required AttachmentMeta attachmentMeta}) {
     LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
@@ -25,7 +25,7 @@ class AttachmentMetaViewDataConvertor {
     }
     if (attachmentMeta.ogTags != null) {
       attachmentMetaViewDataBuilder.ogTags(
-          OgTagsViewDataConvertor.fromAttachmentsMetaOgTags(
+          LMOgTagsViewDataConvertor.fromAttachmentsMetaOgTags(
               attachmentMeta.ogTags!));
     }
     if (attachmentMeta.aspectRatio != null) {
@@ -53,7 +53,7 @@ class AttachmentMetaViewDataConvertor {
       duration: attachmentMetaViewData.duration,
       pageCount: attachmentMetaViewData.pageCount,
       ogTags: attachmentMetaViewData.ogTags != null
-          ? OgTagsViewDataConvertor.toAttachmentMetaOgTags(
+          ? LMOgTagsViewDataConvertor.toAttachmentMetaOgTags(
               attachmentMetaViewData.ogTags!)
           : null,
       aspectRatio: attachmentMetaViewData.aspectRatio,

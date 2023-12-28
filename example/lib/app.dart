@@ -18,7 +18,6 @@ class _LMSampleAppState extends State<LMSampleApp> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     var env = DotEnv(includePlatformEnvironment: true)..load();
 

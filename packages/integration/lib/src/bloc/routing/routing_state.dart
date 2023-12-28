@@ -9,19 +9,19 @@ abstract class LMRoutingState extends Equatable {
 
 class LMRoutingStateInit extends LMRoutingState {}
 
-class OpenSharedPost  extends LMRoutingState {
+class LMOpenSharedPost extends LMRoutingState {
   final String postId;
 
-  const OpenSharedPost({required this.postId});
+  const LMOpenSharedPost({required this.postId});
 
   @override
   List<Object> get props => [postId];
 }
 
-class OpenPostNotification extends LMRoutingState {
+class LMOpenPostNotification extends LMRoutingState {
   final String postId;
 
-  const OpenPostNotification({required this.postId});
+  const LMOpenPostNotification({required this.postId});
 
   @override
   List<Object> get props => [postId];

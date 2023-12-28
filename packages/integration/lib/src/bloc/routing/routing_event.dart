@@ -9,19 +9,19 @@ abstract class LMRoutingEvent extends Equatable {
 
 class LMRoutingEventInit extends LMRoutingEvent {}
 
-class HandleSharedPostEvent extends LMRoutingEvent {
+class LMHandleSharedPostEvent extends LMRoutingEvent {
   final String postId;
 
-  const HandleSharedPostEvent({required this.postId});
+  const LMHandleSharedPostEvent({required this.postId});
 
   @override
   List<Object> get props => [postId];
 }
 
-class HandlePostNotificationEvent extends LMRoutingEvent {
+class LMHandlePostNotificationEvent extends LMRoutingEvent {
   final String postId;
 
-  const HandlePostNotificationEvent({required this.postId});
+  const LMHandlePostNotificationEvent({required this.postId});
 
   @override
   List<Object> get props => [postId];

@@ -5,15 +5,15 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserLocalPreference {
+class LMUserLocalPreference {
   SharedPreferences? _sharedPreferences;
 
-  static UserLocalPreference? _instance;
+  static LMUserLocalPreference? _instance;
 
-  static UserLocalPreference get instance =>
-      _instance ??= UserLocalPreference._();
+  static LMUserLocalPreference get instance =>
+      _instance ??= LMUserLocalPreference._();
 
-  UserLocalPreference._();
+  LMUserLocalPreference._();
 
   final String _userKey = 'user';
   final String _memberStateKey = 'isCm';
@@ -86,14 +86,14 @@ class UserLocalPreference {
   Future<void> setUserDataFromInitiateUserResponse(
       InitiateUserResponse response) async {
     if (response.success) {
-      await UserLocalPreference.instance.storeUserData(response.user!);
+      await LMUserLocalPreference.instance.storeUserData(response.user!);
     }
   }
 
   Future<void> storeMemberRightsFromMemberStateResponse(
       MemberStateResponse response) async {
     if (response.success) {
-      await UserLocalPreference.instance.storeMemberRights(response);
+      await LMUserLocalPreference.instance.storeMemberRights(response);
     }
   }
 

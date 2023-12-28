@@ -1,7 +1,7 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class TopicViewDataConvertor {
+class LMTopicViewDataConvertor {
   static LMTopicViewData fromTopic(Topic topic) {
     LMTopicViewDataBuilder topicBuilder = LMTopicViewDataBuilder();
 

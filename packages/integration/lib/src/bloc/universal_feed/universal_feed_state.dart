@@ -1,22 +1,22 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'universal_feed_bloc.dart';
 
-abstract class UniversalFeedState extends Equatable {
-  const UniversalFeedState();
+abstract class LMUniversalFeedState extends Equatable {
+  const LMUniversalFeedState();
 }
 
-class UniversalFeedInitial extends UniversalFeedState {
+class LMUniversalFeedInitial extends LMUniversalFeedState {
   @override
   List<Object?> get props => [];
 }
 
-class UniversalFeedLoaded extends UniversalFeedState {
+class LMUniversalFeedLoaded extends LMUniversalFeedState {
   final List<LMPostViewData> posts;
   final Map<String, LMUserViewData> users;
   final Map<String, LMWidgetViewData> widgets;
   final Map<String, LMTopicViewData> topics;
 
-  const UniversalFeedLoaded({
+  const LMUniversalFeedLoaded({
     required this.topics,
     required this.posts,
     required this.users,
@@ -27,18 +27,18 @@ class UniversalFeedLoaded extends UniversalFeedState {
   List<Object?> get props => [posts, users, widgets, topics];
 }
 
-class UniversalFeedLoading extends UniversalFeedState {
+class LMUniversalFeedLoading extends LMUniversalFeedState {
   @override
   List<Object?> get props => [];
 }
 
-class PaginatedUniversalFeedLoading extends UniversalFeedState {
+class LMPaginatedUniversalFeedLoading extends LMUniversalFeedState {
   final List<LMPostViewData> posts;
   final Map<String, LMUserViewData> users;
   final Map<String, LMWidgetViewData> widgets;
   final Map<String, LMTopicViewData> topics;
 
-  const PaginatedUniversalFeedLoading({
+  const LMPaginatedUniversalFeedLoading({
     required this.topics,
     required this.posts,
     required this.users,
@@ -48,10 +48,10 @@ class PaginatedUniversalFeedLoading extends UniversalFeedState {
   List<Object?> get props => [posts, users, widgets, topics];
 }
 
-class UniversalFeedError extends UniversalFeedState {
+class LMUniversalFeedError extends LMUniversalFeedState {
   final String message;
 
-  const UniversalFeedError({
+  const LMUniversalFeedError({
     required this.message,
   });
 

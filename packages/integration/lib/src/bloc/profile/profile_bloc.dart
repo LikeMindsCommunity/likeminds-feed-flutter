@@ -20,9 +20,9 @@ class LMProfileBloc extends Bloc<LMProfileEvent, LMProfileState> {
   static LMProfileBloc get instance => _lmProfileBloc ??= LMProfileBloc._();
 
   LMProfileBloc._() : super(LMProfileStateInit()) {
-    on<LoginRequired>(handleLoginRequiredEvent);
-    on<Logout>(handleLogoutEvent);
-    on<RouteToCompanyProfile>(handleRouteToCompanyProfileEvent);
-    on<RouteToUserProfile>(handleRouteToUserProfileEvent);
+    on<LMLoginRequired>(handleLMLoginRequiredEvent);
+    on<LMLogout>(handleLMLogoutEvent);
+    on<LMRouteToCompanyProfile>(handleLMRouteToCompanyProfileEvent);
+    on<LMRouteToUserProfile>(handleLMRouteToUserProfileEvent);
   }
 }

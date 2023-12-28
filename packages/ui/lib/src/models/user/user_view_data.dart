@@ -1,6 +1,6 @@
 import 'package:likeminds_feed_ui_fl/src/models/sdk/sdk_client_info_view_data.dart';
 
-/// {@template user_view_data}
+/// {@template lm_user_view_data}
 /// A data class to hold the user data.
 /// {@endtemplate}
 class LMUserViewData {

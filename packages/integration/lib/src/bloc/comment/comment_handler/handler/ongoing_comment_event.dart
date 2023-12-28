@@ -8,5 +8,6 @@ part of '../comment_handler_bloc.dart';
 void handleOngoingCommentEvent(
         LMCommentOngoingEvent event, Emitter<LMCommentHandlerState> emit) =>
     emit(
+      // @{macro lm_ongoing_comment_state}
       LMCommentActionOngoingState(commentMetaData: event.commentMetaData),
     );

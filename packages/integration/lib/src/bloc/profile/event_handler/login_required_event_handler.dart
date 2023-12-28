@@ -1,4 +1,5 @@
 part of '../profile_bloc.dart';
 
-handleLoginRequiredEvent(LoginRequired event, Emitter<LMProfileState> emit) =>
-    emit(LoginRequiredState());
+void handleLMLoginRequiredEvent(
+        LMLoginRequired event, Emitter<LMProfileState> emit) =>
+    emit(LMLoginRequiredState());

@@ -53,11 +53,11 @@
 //   bool topicVisible = true;
 
 //   // bloc to handle universal feed
-//   late final UniversalFeedBloc _feedBloc; // bloc to fetch the feedroom data
-//   bool isCm = UserLocalPreference.instance
+//   late final LMUniversalFeedBloc _feedBloc; // bloc to fetch the feedroom data
+//   bool isCm = LMUserLocalPreference.instance
 //       .fetchMemberState(); // whether the logged in user is a community manager or not
 
-//   User user = UserLocalPreference.instance.fetchUserData();
+//   User user = LMUserLocalPreference.instance.fetchUserData();
 
 //   // future to get the unread notification count
 //   late Future<GetUnreadNotificationCountResponse> getUnreadNotificationCount;
@@ -83,20 +83,20 @@
 //             ..pageSize(20))
 //           .build(),
 //     );
-//     Bloc.observer = SimpleBlocObserver();
-//     _feedBloc = UniversalFeedBloc();
-//     _feedBloc.add(GetUniversalFeed(offset: 1, topics: selectedTopics));
+//     Bloc.observer = LMSimpleBlocObserver();
+//     _feedBloc = LMUniversalFeedBloc();
+//     _feedBloc.add(LMGetUniversalFeed(offset: 1, topics: selectedTopics));
 //     _controller.addListener(_scrollListener);
 //     userPostingRights = checkPostCreationRights();
 //   }
 
 //   bool checkPostCreationRights() {
 //     final MemberStateResponse memberStateResponse =
-//         UserLocalPreference.instance.fetchMemberRights();
+//         LMUserLocalPreference.instance.fetchMemberRights();
 //     if (!memberStateResponse.success || memberStateResponse.state == 1) {
 //       return true;
 //     }
-//     final memberRights = UserLocalPreference.instance.fetchMemberRight(9);
+//     final memberRights = LMUserLocalPreference.instance.fetchMemberRight(9);
 //     return memberRights;
 //   }
 
@@ -124,7 +124,7 @@
 //     rebuildTopicFeed.value = !rebuildTopicFeed.value;
 //     clearPagingController();
 //     _feedBloc.add(
-//       GetUniversalFeed(
+//       LMGetUniversalFeed(
 //         offset: 1,
 //         topics: selectedTopics,
 //       ),
@@ -153,7 +153,7 @@
 //     _pagingController.addPageRequestListener(
 //       (pageKey) {
 //         _feedBloc.add(
-//           GetUniversalFeed(
+//           LMGetUniversalFeed(
 //             offset: pageKey,
 //             topics: selectedTopics,
 //           ),
@@ -166,7 +166,7 @@
 
 //   // This function updates the paging controller based on the state changes
 //   void updatePagingControllers(Object? state) {
-//     if (state is UniversalFeedLoaded) {
+//     if (state is LMUniversalFeedLoaded) {
 //       _pageFeed++;
 //       List<LMPostViewData> listOfPosts =
 //           state.feed.posts.map((e) => LMPostViewData.fromPost(post: e)).toList();
@@ -440,20 +440,20 @@
 //                 bloc: _feedBloc,
 //                 buildWhen: (prev, curr) {
 //                   // Prevents changin the state while paginating the feed
-//                   if (prev is UniversalFeedLoaded &&
-//                       (curr is PaginatedUniversalFeedLoading ||
-//                           curr is UniversalFeedLoading)) {
+//                   if (prev is LMUniversalFeedLoaded &&
+//                       (curr is LMPaginatedUniversalFeedLoading ||
+//                           curr is LMUniversalFeedLoading)) {
 //                     return false;
 //                   }
 //                   return true;
 //                 },
 //                 listener: (context, state) => updatePagingControllers(state),
 //                 builder: ((context, state) {
-//                   if (state is UniversalFeedLoaded) {
+//                   if (state is LMUniversalFeedLoaded) {
 //                     // Log the event in the analytics
 //                     return FeedRoomView(
 //                       isCm: isCm,
-//                       universalFeedBloc: _feedBloc,
+//                       LMUniversalFeedBloc: _feedBloc,
 //                       feedResponse: state.feed,
 //                       feedRoomPagingController: _pagingController,
 //                       user: user,
@@ -461,7 +461,7 @@
 //                       scrollController: _controller,
 //                       openTopicBottomSheet: showTopicSelectSheet,
 //                     );
-//                   } else if (state is UniversalFeedError) {
+//                   } else if (state is LMUniversalFeedError) {
 //                     return FeedRoomErrorView(message: state.message);
 //                   }
 //                   return const Scaffold(
@@ -498,7 +498,7 @@
 // class FeedRoomView extends StatefulWidget {
 //   final bool isCm;
 //   final User user;
-//   final UniversalFeedBloc universalFeedBloc;
+//   final LMUniversalFeedBloc LMUniversalFeedBloc;
 //   final GetFeedResponse feedResponse;
 //   final PagingController<int, LMPostViewData> feedRoomPagingController;
 //   final ScrollController scrollController;
@@ -508,7 +508,7 @@
 //   const FeedRoomView({
 //     super.key,
 //     required this.isCm,
-//     required this.universalFeedBloc,
+//     required this.LMUniversalFeedBloc,
 //     required this.feedResponse,
 //     required this.feedRoomPagingController,
 //     required this.user,
@@ -562,11 +562,11 @@
 
 //   bool checkPostCreationRights() {
 //     final MemberStateResponse memberStateResponse =
-//         UserLocalPreference.instance.fetchMemberRights();
+//         LMUserLocalPreference.instance.fetchMemberRights();
 //     if (!memberStateResponse.success || memberStateResponse.state == 1) {
 //       return true;
 //     }
-//     final memberRights = UserLocalPreference.instance.fetchMemberRight(9);
+//     final memberRights = LMUserLocalPreference.instance.fetchMemberRight(9);
 //     return memberRights;
 //   }
 
@@ -576,9 +576,9 @@
 //   void initState() {
 //     super.initState();
 //     LMAnalytics.get()
-//         .track(AnalyticsKeys.feedOpened, {'feed_type': "universal_feed"});
-//     locator<LMFeedIntegration>().lmAnalyticsBloc.add(FireAnalyticEvent(
-//         eventName: AnalyticsKeys.feedOpened,
+//         .track(LMAnalyticsKeys.feedOpened, {'feed_type': "universal_feed"});
+//     locator<LMFeedIntegration>().lmAnalyticsBloc.add(LMFireAnalyticsEvent(
+//         eventName: LMAnalyticsKeys.feedOpened,
 //         eventProperties: const {'feed_type': "universal_feed"}));
 //     _controller = widget.scrollController..addListener(_scrollListener);
 //     right = checkPostCreationRights();
@@ -612,26 +612,26 @@
 //           BlocConsumer<LMPostBloc, LMPostState>(
 //             bloc: newPostBloc,
 //             listener: (prev, curr) {
-//               if (curr is PostDeleted) {
+//               if (curr is LMPostDeleted) {
 //                 List<LMPostViewData>? feedRoomItemList =
 //                     widget.feedRoomPagingController.itemList;
 //                 feedRoomItemList?.removeWhere((item) => item.id == curr.postId);
 //                 widget.feedRoomPagingController.itemList = feedRoomItemList;
 //                 rebuildPostWidget.value = !rebuildPostWidget.value;
 //               }
-//               if (curr is NewPostUploading || curr is EditPostUploading) {
+//               if (curr is LMNewPostUploading || curr is LMEditPostUploading) {
 //                 // if current state is uploading
 //                 // change postUploading flag to true
 //                 // to block new post creation
 //                 postUploading.value = true;
 //               }
-//               if (prev is NewPostUploading || prev is EditPostUploading) {
+//               if (prev is LMNewPostUploading || prev is LMEditPostUploading) {
 //                 // if state has changed from uploading
 //                 // change postUploading flag to false
 //                 // to allow new post creation
 //                 postUploading.value = false;
 //               }
-//               if (curr is NewPostUploaded) {
+//               if (curr is LMNewPostUploaded) {
 //                 LMPostViewData? item = curr.postData;
 //                 int length =
 //                     widget.feedRoomPagingController.itemList?.length ?? 0;
@@ -657,7 +657,7 @@
 //                 postUploading.value = false;
 //                 rebuildPostWidget.value = !rebuildPostWidget.value;
 //               }
-//               if (curr is EditPostUploaded) {
+//               if (curr is LMEditPostUploaded) {
 //                 LMPostViewData? item = curr.postData;
 //                 List<LMPostViewData>? feedRoomItemList =
 //                     widget.feedRoomPagingController.itemList;
@@ -673,14 +673,14 @@
 //                 postUploading.value = false;
 //                 rebuildPostWidget.value = !rebuildPostWidget.value;
 //               }
-//               if (curr is NewPostError) {
+//               if (curr is LMNewPostError) {
 //                 postUploading.value = false;
 //                 toast(
 //                   curr.message,
 //                   duration: Toast.LENGTH_LONG,
 //                 );
 //               }
-//               if (curr is PostUpdateState) {
+//               if (curr is LMPostUpdateState) {
 //                 List<LMPostViewData>? feedRoomItemList =
 //                     widget.feedRoomPagingController.itemList;
 //                 int index = feedRoomItemList
@@ -693,7 +693,7 @@
 //               }
 //             },
 //             builder: (context, state) {
-//               if (state is EditPostUploading) {
+//               if (state is LMEditPostUploading) {
 //                 return Container(
 //                   height: 60,
 //                   color: LMThemeData.kWhiteColor,
@@ -722,7 +722,7 @@
 //                   ),
 //                 );
 //               }
-//               if (state is NewPostUploading) {
+//               if (state is LMNewPostUploading) {
 //                 return Container(
 //                   height: 60,
 //                   color: LMThemeData.kWhiteColor,
@@ -778,10 +778,10 @@
 //                         builderDelegate:
 //                             PagedChildBuilderDelegate<LMPostViewData>(
 //                           noItemsFoundIndicatorBuilder: (context) {
-//                             if (widget.universalFeedBloc.state
-//                                     is UniversalFeedLoaded &&
-//                                 (widget.universalFeedBloc.state
-//                                         as UniversalFeedLoaded)
+//                             if (widget.LMUniversalFeedBloc.state
+//                                     is LMUniversalFeedLoaded &&
+//                                 (widget.LMUniversalFeedBloc.state
+//                                         as LMUniversalFeedLoaded)
 //                                     .topics
 //                                     .isNotEmpty) {
 //                               return Center(
@@ -880,13 +880,13 @@
 //                                         ? () {
 //                                             if (!postUploading.value) {
 //                                               LMAnalytics.get().track(
-//                                                   AnalyticsKeys
+//                                                   LMAnalyticsKeys
 //                                                       .postCreationStarted,
 //                                                   {});
 //                                               locator<LMFeedIntegration>()
 //                                                   .lmAnalyticsBloc
-//                                                   .add(FireAnalyticEvent(
-//                                                       eventName: AnalyticsKeys
+//                                                   .add(LMFireAnalyticsEvent(
+//                                                       eventName: LMAnalyticsKeys
 //                                                           .postCreationStarted,
 //                                                       eventProperties: const {}));
 
@@ -925,14 +925,14 @@
 //                                   user: widget.feedResponse.users[item.userId]!,
 //                                   onTap: () {
 //                                     LMAnalytics.get()
-//                                         .track(AnalyticsKeys.commentListOpen, {
+//                                         .track(LMAnalyticsKeys.commentListOpen, {
 //                                       'postId': item.id,
 //                                     });
 //                                     locator<LMFeedIntegration>()
 //                                         .lmAnalyticsBloc
-//                                         .add(FireAnalyticEvent(
+//                                         .add(LMFireAnalyticsEvent(
 //                                             eventName:
-//                                                 AnalyticsKeys.commentListOpen,
+//                                                 LMAnalyticsKeys.commentListOpen,
 //                                             eventProperties: {
 //                                               'postId': item.id,
 //                                             }));
@@ -1008,11 +1008,11 @@
 //                       ? () {
 //                           if (!postUploading.value) {
 //                             LMAnalytics.get()
-//                                 .track(AnalyticsKeys.postCreationStarted, {});
+//                                 .track(LMAnalyticsKeys.postCreationStarted, {});
 //                             locator<LMFeedIntegration>().lmAnalyticsBloc.add(
-//                                 FireAnalyticEvent(
+//                                 LMFireAnalyticsEvent(
 //                                     eventName:
-//                                         AnalyticsKeys.postCreationStarted,
+//                                         LMAnalyticsKeys.postCreationStarted,
 //                                     eventProperties: const {}));
 //                             Navigator.push(
 //                               context,

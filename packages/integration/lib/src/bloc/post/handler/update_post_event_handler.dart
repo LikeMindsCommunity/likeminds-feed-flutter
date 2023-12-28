@@ -1,4 +1,4 @@
 part of '../post_bloc.dart';
 
-void updatePostEventHandler(UpdatePost event, Emitter<LMPostState> emit) =>
-    emit(PostUpdateState(post: event.post));
+void updatePostEventHandler(LMUpdatePost event, Emitter<LMPostState> emit) =>
+    emit(LMPostUpdateState(post: event.post));

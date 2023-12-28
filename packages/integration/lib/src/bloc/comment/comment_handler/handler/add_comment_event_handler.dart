@@ -21,28 +21,45 @@ Future<void> handleAddActionEvent(
 // to a post
 Future<void> _handleAddCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  // Get the instance of the LMFeedClient
+  // to make the API call
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 
+  // AddCommentRequest is the request to be sent to the server
+  // to add a new comment
+  // It contains the [postId] and [comment] to be added to the post
   AddCommentRequest addCommentRequest =
       event.commentActionRequest as AddCommentRequest;
 
+  // Emit the loading state
+  // to show the loading indicator
   emit(LMCommentLoadingState(commentMetaData: event.commentMetaData));
 
+  // Make the API call to add the comment using the LMFeedClient and send
+  // the [addCommentRequest] as the request and wait for the response
   AddCommentResponse? response =
       await lmFeedClient.addComment(addCommentRequest);
+
+  // Check if the response is successful or not
   if (!response.success) {
+    // If the response is not successful then emit the error state
     emit(LMCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
-    LMAnalyticsBloc.instance.add(FireAnalyticEvent(
-      eventName: AnalyticsKeys.commentPosted,
+    // Fire the analytics event for comment posted
+    // and send the [postId] and [commentId] as the parameters
+    LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+      eventName: LMAnalyticsKeys.commentPosted,
       eventProperties: {
         "post_id": addCommentRequest.postId,
         "comment_id": response.reply?.id,
       },
     ));
+    // If the response is successful then emit the success state
+    // and send the [response] and [commentMetaData] as the parameters
+    // to the state
     emit(LMCommentSuccessState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
@@ -55,25 +72,41 @@ Future<void> _handleAddCommentAction(
 // to a comment
 Future<void> _handleAddReplyAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  // Get the instance of the LMFeedClient
+  // to make the API call
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 
+  // AddCommentReplyRequest is the request to be sent to the server
+  // to add a new reply
+  // It contains the [postId], [commentId] and [reply] to be added to the post
+  // [commentId] is the id of the comment to which the reply is to be added
   AddCommentReplyRequest addCommentReplyRequest =
       event.commentActionRequest as AddCommentReplyRequest;
 
+  // Emit the loading state
+  // to show the loading indicator
   emit(LMCommentLoadingState(
     commentMetaData: event.commentMetaData,
   ));
 
+  // Make the API call to add the reply using the LMFeedClient and send
+  // the [addCommentReplyRequest] as the request and wait for the response
+  // AddCommentReplyResponse is the response received from the server
   AddCommentReplyResponse response =
       await lmFeedClient.addCommentReply(addCommentReplyRequest);
+
+  // Check if the response is successful or not
   if (!response.success) {
+    // If the response is not successful then emit the error state
     emit(LMCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
-    LMAnalyticsBloc.instance.add(FireAnalyticEvent(
-      eventName: AnalyticsKeys.replyPosted,
+    // Fire the analytics event for reply posted
+    // and send the [postId], [commentId] and [commentReplyId] as the parameters
+    LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+      eventName: LMAnalyticsKeys.replyPosted,
       eventProperties: {
         "post_id": addCommentReplyRequest.postId,
         "comment_id": addCommentReplyRequest.commentId,
@@ -82,6 +115,9 @@ Future<void> _handleAddReplyAction(
         // "user_id": event.userId,
       },
     ));
+    // If the response is successful then emit the success state
+    // and send the [response] and [commentMetaData] as the parameters
+    //  to the state
     emit(LMCommentSuccessState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,

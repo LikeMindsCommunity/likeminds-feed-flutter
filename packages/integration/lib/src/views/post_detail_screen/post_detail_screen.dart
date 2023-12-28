@@ -12,7 +12,6 @@ import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_replies/commen
 import 'package:likeminds_feed_driver_fl/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/post/post_utils.dart';
@@ -67,10 +66,10 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
       PagingController(firstPageKey: 1);
   final LMFetchCommentReplyBloc _commentRepliesBloc =
       LMFetchCommentReplyBloc.instance;
-  PostDetailScreenHandler? _postDetailScreenHandler;
+  LMPostDetailScreenHandler? _postDetailScreenHandler;
   Future<LMPostViewData?>? getPostData;
-  LMUserViewData currentUser = UserViewDataConvertor.fromUser(
-      UserLocalPreference.instance.fetchUserData());
+  LMUserViewData currentUser = LMUserViewDataConvertor.fromUser(
+      LMUserLocalPreference.instance.fetchUserData());
   LMPostViewData? postData;
   String? commentIdReplyId;
   bool replyShown = false;
@@ -82,7 +81,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
   void initState() {
     super.initState();
     _postDetailScreenHandler =
-        PostDetailScreenHandler(_pagingController, widget.postId);
+        LMPostDetailScreenHandler(_pagingController, widget.postId);
     getPostData =
         _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
       postData = value;
@@ -100,7 +99,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
       _pagingController.itemList?.clear();
       _pagingController.refresh();
       _postDetailScreenHandler =
-          PostDetailScreenHandler(_pagingController, widget.postId);
+          LMPostDetailScreenHandler(_pagingController, widget.postId);
       getPostData =
           _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
         postData = value;
@@ -119,7 +118,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
         onRefresh: () {
           _pagingController.itemList?.clear();
           _pagingController.refresh();
-          _commentRepliesBloc.add(ClearCommentReplies());
+          _commentRepliesBloc.add(LMClearCommentReplies());
           return Future.value();
         },
         child: FutureBuilder<LMPostViewData?>(
@@ -242,7 +241,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                             size: 36,
                                           ),
                                           Expanded(
-                                            child: TaggingAheadTextField(
+                                            child: LMTaggingAheadTextField(
                                               isDown: false,
                                               maxLines: 5,
                                               onTagSelected: (tag) {
@@ -294,7 +293,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                           _postDetailScreenHandler!
                                                               .closeOnScreenKeyboard();
                                                           String commentText =
-                                                              TaggingHelper
+                                                              LMTaggingHelper
                                                                   .encodeString(
                                                             _postDetailScreenHandler!
                                                                 .commentController
@@ -551,7 +550,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                           .value;
                                                 } else {
                                                   LMPostBloc.instance.add(
-                                                    UpdatePost(
+                                                    LMUpdatePost(
                                                       post: postData!,
                                                     ),
                                                   );
@@ -584,9 +583,10 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                               onTap: () {
                                                 if (widget.isFeed) {
                                                   LMAnalyticsBloc.instance.add(
-                                                      FireAnalyticEvent(
-                                                          eventName: AnalyticsKeys
-                                                              .commentListOpen,
+                                                      LMFireAnalyticsEvent(
+                                                          eventName:
+                                                              LMAnalyticsKeys
+                                                                  .commentListOpen,
                                                           eventProperties: {
                                                         'postId': postData!.id,
                                                       }));
@@ -632,9 +632,9 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                         0);
 
                                                 LMAnalyticsBloc.instance
-                                                    .add(FireAnalyticEvent(
-                                                  eventName:
-                                                      AnalyticsKeys.postShared,
+                                                    .add(LMFireAnalyticsEvent(
+                                                  eventName: LMAnalyticsKeys
+                                                      .postShared,
                                                   eventProperties: {
                                                     "post_id": postData!.id,
                                                     "post_type": postType,
@@ -969,14 +969,14 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                             onTap:
                                                                                 () {
                                                                               if (replyShown && commentIdReplyId != null && commentIdReplyId == commentViewData.id) {
-                                                                                _commentRepliesBloc.add(ClearCommentReplies());
+                                                                                _commentRepliesBloc.add(LMClearCommentReplies());
                                                                                 replyShown = false;
                                                                                 commentIdReplyId = null;
                                                                               } else if (replyShown && commentIdReplyId != null && commentIdReplyId != commentViewData.id) {
-                                                                                _commentRepliesBloc.add(ClearCommentReplies());
+                                                                                _commentRepliesBloc.add(LMClearCommentReplies());
                                                                                 replyShown = true;
                                                                                 commentIdReplyId = commentViewData.id;
-                                                                                _commentRepliesBloc.add(GetCommentReplies(
+                                                                                _commentRepliesBloc.add(LMGetCommentReplies(
                                                                                     commentDetailRequest: (GetCommentRequestBuilder()
                                                                                           ..commentId(commentViewData.id)
                                                                                           ..postId(widget.postId)
@@ -986,7 +986,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                               } else {
                                                                                 replyShown = true;
                                                                                 commentIdReplyId = commentViewData.id;
-                                                                                _commentRepliesBloc.add(GetCommentReplies(
+                                                                                _commentRepliesBloc.add(LMGetCommentReplies(
                                                                                     commentDetailRequest: (GetCommentRequestBuilder()
                                                                                           ..commentId(commentViewData.id)
                                                                                           ..postId(widget.postId)
@@ -1028,8 +1028,8 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                                 action: (String reason) async {
                                                                                   Navigator.of(childContext).pop();
 
-                                                                                  LMAnalyticsBloc.instance.add(FireAnalyticEvent(
-                                                                                    eventName: AnalyticsKeys.commentDeleted,
+                                                                                  LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+                                                                                    eventName: LMAnalyticsKeys.commentDeleted,
                                                                                     eventProperties: {
                                                                                       "post_id": widget.postId,
                                                                                       "comment_id": commentViewData.id,

@@ -14,7 +14,7 @@ class LMRoutingBloc extends Bloc<LMRoutingEvent, LMRoutingState> {
   static LMRoutingBloc get instance => _lmRoutingBloc ??= LMRoutingBloc._();
 
   LMRoutingBloc._() : super(LMRoutingStateInit()) {
-    on<HandleSharedPostEvent>(sharePostEventHandler);
-    on<HandlePostNotificationEvent>(postNotificationEventHandler);
+    on<LMHandleSharedPostEvent>(sharePostEventHandler);
+    on<LMHandlePostNotificationEvent>(postNotificationEventHandler);
   }
 }

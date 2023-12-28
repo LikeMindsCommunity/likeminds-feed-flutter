@@ -1,10 +1,10 @@
 part of '../post_bloc.dart';
 
-void editPostEventHandler(EditPost event, Emitter<LMPostState> emit) async {
+void editPostEventHandler(LMEditPost event, Emitter<LMPostState> emit) async {
   try {
-    emit(EditPostUploading());
+    emit(LMEditPostUploading());
     List<Attachment>? attachments = event.attachments
-        ?.map((e) => AttachmentViewDataConvertor.toAttachment(e))
+        ?.map((e) => LMAttachmentViewDataConvertor.toAttachment(e))
         .toList();
     String postText = event.postText;
 
@@ -17,28 +17,28 @@ void editPostEventHandler(EditPost event, Emitter<LMPostState> emit) async {
 
     if (response.success) {
       emit(
-        EditPostUploaded(
-          postData: PostViewDataConvertor.fromPost(post: response.post!),
+        LMEditPostUploaded(
+          postData: LMPostViewDataConvertor.fromPost(post: response.post!),
           userData: (response.user ?? <String, User>{}).map((key, value) =>
-              MapEntry(key, UserViewDataConvertor.fromUser(value))),
+              MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
           topics: (response.topics ?? <String, Topic>{}).map(
             (key, value) => MapEntry(
               key,
-              TopicViewDataConvertor.fromTopic(value),
+              LMTopicViewDataConvertor.fromTopic(value),
             ),
           ),
         ),
       );
     } else {
       emit(
-        NewPostError(
+        LMNewPostError(
           message: response.errorMessage!,
         ),
       );
     }
   } catch (err) {
     emit(
-      const NewPostError(
+      const LMNewPostError(
         message: 'An error occurred while saving the post',
       ),
     );

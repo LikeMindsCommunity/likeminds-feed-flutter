@@ -10,7 +10,7 @@ import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class TaggingAheadTextField extends StatefulWidget {
+class LMTaggingAheadTextField extends StatefulWidget {
   final bool isDown;
   final FocusNode focusNode;
   final Function(LMUserTagViewData) onTagSelected;
@@ -20,7 +20,7 @@ class TaggingAheadTextField extends StatefulWidget {
   final int? maxLines;
   final int minLines;
 
-  const TaggingAheadTextField({
+  const LMTaggingAheadTextField({
     super.key,
     required this.isDown,
     required this.onTagSelected,
@@ -33,10 +33,10 @@ class TaggingAheadTextField extends StatefulWidget {
   });
 
   @override
-  State<TaggingAheadTextField> createState() => _TaggingAheadTextFieldState();
+  State<LMTaggingAheadTextField> createState() => _TaggingAheadTextFieldState();
 }
 
-class _TaggingAheadTextFieldState extends State<TaggingAheadTextField> {
+class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
   late final TextEditingController _controller;
   FocusNode? _focusNode;
   final ScrollController _scrollController = ScrollController();
@@ -109,7 +109,7 @@ class _TaggingAheadTextFieldState extends State<TaggingAheadTextField> {
             taggingData.members!.isNotEmpty) {
           userTags = taggingData.members!.map((e) => e).toList();
           return userTags
-              .map((e) => UserTagViewDataConvertor.fromUserTag(e))
+              .map((e) => LMUserTagViewDataConvertor.fromUserTag(e))
               .toList();
         }
         return const Iterable.empty();
@@ -229,8 +229,8 @@ class _TaggingAheadTextFieldState extends State<TaggingAheadTextField> {
             tagValue = '';
             textValue = _controller.value.text;
 
-            LMAnalyticsBloc.instance.add(FireAnalyticEvent(
-              eventName: AnalyticsKeys.userTaggedInPost,
+            LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+              eventName: LMAnalyticsKeys.userTaggedInPost,
               eventProperties: {
                 'tagged_user_id': suggestion.sdkClientInfo?.userUniqueId,
                 'tagged_user_count': tagCount,

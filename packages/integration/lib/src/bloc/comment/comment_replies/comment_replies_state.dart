@@ -1,20 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'comment_replies_bloc.dart';
 
-abstract class CommentRepliesState extends Equatable {
-  const CommentRepliesState();
+abstract class LMCommentRepliesState extends Equatable {
+  const LMCommentRepliesState();
 }
 
-class CommentRepliesInitial extends CommentRepliesState {
+class LMCommentRepliesInitial extends LMCommentRepliesState {
   @override
   List<Object?> get props => [];
 }
 
-class CommentRepliesLoaded extends CommentRepliesState {
+class LMCommentRepliesLoaded extends LMCommentRepliesState {
   final GetCommentResponse commentDetails;
   final String commentId;
 
-  const CommentRepliesLoaded({
+  const LMCommentRepliesLoaded({
     required this.commentDetails,
     required this.commentId,
   });
@@ -23,10 +23,10 @@ class CommentRepliesLoaded extends CommentRepliesState {
   List<Object?> get props => [commentDetails];
 }
 
-class CommentRepliesLoading extends CommentRepliesState {
+class LMCommentRepliesLoading extends LMCommentRepliesState {
   final String commentId;
 
-  const CommentRepliesLoading({
+  const LMCommentRepliesLoading({
     required this.commentId,
   });
 
@@ -34,11 +34,11 @@ class CommentRepliesLoading extends CommentRepliesState {
   List<Object?> get props => [];
 }
 
-class PaginatedCommentRepliesLoading extends CommentRepliesState {
+class LMPaginatedCommentRepliesLoading extends LMCommentRepliesState {
   final GetCommentResponse prevCommentDetails;
   final String commentId;
 
-  const PaginatedCommentRepliesLoading({
+  const LMPaginatedCommentRepliesLoading({
     required this.prevCommentDetails,
     required this.commentId,
   });
@@ -46,10 +46,10 @@ class PaginatedCommentRepliesLoading extends CommentRepliesState {
   List<Object?> get props => [];
 }
 
-class CommentRepliesError extends CommentRepliesState {
+class LMCommentRepliesError extends LMCommentRepliesState {
   final String message;
 
-  const CommentRepliesError({
+  const LMCommentRepliesError({
     required this.message,
   });
 
@@ -57,7 +57,7 @@ class CommentRepliesError extends CommentRepliesState {
   List<Object?> get props => [message];
 }
 
-class ClearedCommentReplies extends CommentRepliesState {
+class LMClearedCommentReplies extends LMCommentRepliesState {
   final int time = DateTime.now().millisecondsSinceEpoch;
   @override
   List<Object?> get props => [time];

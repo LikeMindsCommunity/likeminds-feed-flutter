@@ -1,4 +1,4 @@
-class AnalyticsKeys {
+class LMAnalyticsKeys {
   static const String notificationPageOpened = 'Notification page opened';
   static const String notificationRemoved = 'Notification removed';
   static const String notificationMuted = 'Notification muted';

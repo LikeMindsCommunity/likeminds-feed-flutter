@@ -4,13 +4,13 @@ import 'package:path/path.dart' as path;
 
 import 'package:simple_s3/simple_s3.dart';
 
-class MediaService {
+class LMMediaService {
   late final String _bucketName;
   late final String _poolId;
   final _region = AWSRegions.apSouth1;
   final SimpleS3 _s3Client = SimpleS3();
 
-  MediaService({required String bucketName, required String poolId}) {
+  LMMediaService({required String bucketName, required String poolId}) {
     _bucketName = bucketName;
     _poolId = poolId;
   }

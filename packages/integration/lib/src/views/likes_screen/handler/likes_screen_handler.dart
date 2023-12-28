@@ -6,19 +6,19 @@ import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart
 import 'package:likeminds_feed_driver_fl/src/convertors/common/like_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class LikesScreenHandler {
+class LMLikesScreenHandler {
   late PagingController<int, LMLikeViewData> _pagingController;
   late String postId;
   late String? commentId;
   int? totalLikesCount;
   late final int pageSize;
 
-  static LikesScreenHandler? _likesScreenHandler;
+  static LMLikesScreenHandler? _likesScreenHandler;
 
-  static LikesScreenHandler get instance =>
-      _likesScreenHandler ??= LikesScreenHandler._();
+  static LMLikesScreenHandler get instance =>
+      _likesScreenHandler ??= LMLikesScreenHandler._();
 
-  LikesScreenHandler._();
+  LMLikesScreenHandler._();
 
   PagingController<int, LMLikeViewData> get pagingController =>
       _pagingController;
@@ -43,8 +43,8 @@ class LikesScreenHandler {
 
   // Analytics event logging for Like Screen
   void logLikeListEvent(totalLikes) {
-    LMAnalyticsBloc.instance.add(FireAnalyticEvent(
-      eventName: AnalyticsKeys.likeListOpen,
+    LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+      eventName: LMAnalyticsKeys.likeListOpen,
       eventProperties: {
         "post_id": postId,
         "total_likes": totalLikes,
@@ -71,7 +71,7 @@ class LikesScreenHandler {
     if (response.success) {
       _pagingController.appendPage(
           response.likes
-                  ?.map((e) => LikeViewDataConvertor.fromLike(likeModel: e))
+                  ?.map((e) => LMLikeViewDataConvertor.fromLike(likeModel: e))
                   .toList() ??
               [],
           pageKey);
@@ -93,7 +93,7 @@ class LikesScreenHandler {
     if (response.success) {
       _pagingController.appendPage(
           response.commentLikes
-                  ?.map((e) => LikeViewDataConvertor.fromLike(likeModel: e))
+                  ?.map((e) => LMLikeViewDataConvertor.fromLike(likeModel: e))
                   .toList() ??
               [],
           pageKey);

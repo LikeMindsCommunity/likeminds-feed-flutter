@@ -2,7 +2,7 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/common/popup_menu_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class CommentViewDataConvertor {
+class LMCommentViewDataConvertor {
   static LMCommentViewData fromComment(Comment comment) {
     LMCommentViewDataBuilder commentViewDataBuilder =
         LMCommentViewDataBuilder();
@@ -14,7 +14,7 @@ class CommentViewDataConvertor {
       ..likesCount(comment.likesCount)
       ..repliesCount(comment.repliesCount)
       ..menuItems(comment.menuItems
-          .map((e) => PopupMenuItemConvertor.fromPopUpMenuItemModel(item: e))
+          .map((e) => LMPopupMenuItemConvertor.fromPopUpMenuItemModel(item: e))
           .toList())
       ..createdAt(DateTime.fromMillisecondsSinceEpoch(comment.createdAt))
       ..updatedAt(DateTime.fromMillisecondsSinceEpoch(comment.updatedAt))
@@ -22,7 +22,7 @@ class CommentViewDataConvertor {
       ..isEdited(comment.isEdited)
       ..uuid(comment.uuid)
       ..parentComment(comment.parentComment != null
-          ? CommentViewDataConvertor.fromComment(comment.parentComment!)
+          ? LMCommentViewDataConvertor.fromComment(comment.parentComment!)
           : null);
 
     return commentViewDataBuilder.build();
@@ -36,18 +36,18 @@ class CommentViewDataConvertor {
       likesCount: commentViewData.likesCount,
       repliesCount: commentViewData.repliesCount,
       menuItems: commentViewData.menuItems
-          .map((e) => PopupMenuItemConvertor.toPopUpMenuItemModel(e))
+          .map((e) => LMPopupMenuItemConvertor.toPopUpMenuItemModel(e))
           .toList(),
       createdAt: commentViewData.createdAt.millisecondsSinceEpoch,
       updatedAt: commentViewData.updatedAt.millisecondsSinceEpoch,
       isLiked: commentViewData.isLiked,
       id: commentViewData.id,
       parentComment: commentViewData.parentComment != null
-          ? CommentViewDataConvertor.toComment(commentViewData.parentComment!)
+          ? LMCommentViewDataConvertor.toComment(commentViewData.parentComment!)
           : null,
       isEdited: commentViewData.isEdited,
       replies: commentViewData.replies
-          ?.map((e) => CommentViewDataConvertor.toComment(e))
+          ?.map((e) => LMCommentViewDataConvertor.toComment(e))
           .toList(),
       uuid: commentViewData.uuid,
       tempId: commentViewData.tempId,

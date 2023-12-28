@@ -3,7 +3,7 @@ import 'package:likeminds_feed_driver_fl/src/convertors/comment/comment_converto
 import 'package:likeminds_feed_driver_fl/src/convertors/helper/attachment/attachment_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class ActivityEntityViewDataConvertor {
+class LMActivityEntityViewDataConvertor {
   static LMActivityEntityViewData fromActivityEntity(
       ActivityEntityData activityEntityData) {
     LMActivityEntityViewDataBuilder activityEntityViewDataBuilder =
@@ -13,7 +13,8 @@ class ActivityEntityViewDataConvertor {
 
     if (activityEntityData.attachments != null) {
       activityEntityViewDataBuilder.attachments(activityEntityData.attachments!
-          .map((e) => AttachmentViewDataConvertor.fromAttachment(attachment: e))
+          .map((e) =>
+              LMAttachmentViewDataConvertor.fromAttachment(attachment: e))
           .toList());
     }
 
@@ -62,7 +63,7 @@ class ActivityEntityViewDataConvertor {
 
     if (activityEntityData.replies != null) {
       activityEntityViewDataBuilder.replies(activityEntityData.replies!
-          .map((e) => CommentViewDataConvertor.fromComment(e))
+          .map((e) => LMCommentViewDataConvertor.fromComment(e))
           .toList());
     }
 
@@ -80,7 +81,7 @@ class ActivityEntityViewDataConvertor {
     return ActivityEntityData(
       id: activityEntityViewData.id,
       attachments: activityEntityViewData.attachments
-          ?.map((e) => AttachmentViewDataConvertor.toAttachment(e))
+          ?.map((e) => LMAttachmentViewDataConvertor.toAttachment(e))
           .toList(),
       chatroomId: activityEntityViewData.chatroomId,
       communityId: activityEntityViewData.communityId,
@@ -94,7 +95,7 @@ class ActivityEntityViewDataConvertor {
       isEdited: activityEntityViewData.isEdited,
       isPinned: activityEntityViewData.isPinned,
       replies: activityEntityViewData.replies
-          ?.map((e) => CommentViewDataConvertor.toComment(e))
+          ?.map((e) => LMCommentViewDataConvertor.toComment(e))
           .toList(),
       text: activityEntityViewData.text,
       updatedAt: activityEntityViewData.updatedAt,

@@ -84,26 +84,27 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
     return BlocConsumer(
       bloc: _commentRepliesBloc,
       buildWhen: (previous, current) {
-        if (current is CommentRepliesLoaded && current.commentId != reply!.id) {
-          return false;
-        }
-        if (current is PaginatedCommentRepliesLoading &&
+        if (current is LMCommentRepliesLoaded &&
             current.commentId != reply!.id) {
           return false;
         }
-        if (current is CommentRepliesLoading &&
+        if (current is LMPaginatedCommentRepliesLoading &&
+            current.commentId != reply!.id) {
+          return false;
+        }
+        if (current is LMCommentRepliesLoading &&
             current.commentId != widget.reply.id) {
           return false;
         }
         return true;
       },
       builder: ((context, state) {
-        if (state is ClearedCommentReplies) {
+        if (state is LMClearedCommentReplies) {
           replies = [];
           users = {};
           return const SizedBox();
         }
-        if (state is CommentRepliesLoading) {
+        if (state is LMCommentRepliesLoading) {
           if (state.commentId == widget.reply.id) {
             return const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
@@ -119,10 +120,11 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
             );
           }
         }
-        if (state is CommentRepliesLoaded ||
-            state is PaginatedCommentRepliesLoading) {
-          if ((state is CommentRepliesLoaded && state.commentId != reply!.id) ||
-              (state is PaginatedCommentRepliesLoading &&
+        if (state is LMCommentRepliesLoaded ||
+            state is LMPaginatedCommentRepliesLoading) {
+          if ((state is LMCommentRepliesLoaded &&
+                  state.commentId != reply!.id) ||
+              (state is LMPaginatedCommentRepliesLoading &&
                   state.commentId != reply!.id)) {
             return const SizedBox();
           }
@@ -144,7 +146,7 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                     if (response.reply!.parentComment!.id == widget.reply.id) {
                       replies.insert(
                           0,
-                          CommentViewDataConvertor.fromComment(
+                          LMCommentViewDataConvertor.fromComment(
                               response.reply!));
                     }
                   }
@@ -164,8 +166,8 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                     int index = replies.indexWhere(
                         (element) => element.id == response.reply!.id);
                     if (index != -1) {
-                      replies[index] =
-                          CommentViewDataConvertor.fromComment(response.reply!);
+                      replies[index] = LMCommentViewDataConvertor.fromComment(
+                          response.reply!);
                     }
                   }
                   break;
@@ -178,8 +180,6 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                           LMCommentActionType.delete &&
                       state.commentMetaData.commentActionEntity ==
                           LMCommentType.reply) {
-                    DeleteCommentResponse response =
-                        state.commentActionResponse;
                     replies.removeWhere((element) =>
                         element.id == state.commentMetaData.replyId);
                     reply!.repliesCount -= 1;
@@ -403,7 +403,7 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                       TextButton(
                         onPressed: () {
                           page++;
-                          _commentRepliesBloc!.add(GetCommentReplies(
+                          _commentRepliesBloc!.add(LMGetCommentReplies(
                               commentDetailRequest: (GetCommentRequestBuilder()
                                     ..commentId(reply!.id)
                                     ..page(page)
@@ -435,21 +435,21 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
         );
       }),
       listener: (context, state) {
-        if (state is CommentRepliesLoaded) {
+        if (state is LMCommentRepliesLoaded) {
           replies = state.commentDetails.postReplies!.replies
-                  ?.map((e) => CommentViewDataConvertor.fromComment(e))
+                  ?.map((e) => LMCommentViewDataConvertor.fromComment(e))
                   .toList() ??
               [];
           users = state.commentDetails.users!.map((key, value) =>
-              MapEntry(key, UserViewDataConvertor.fromUser(value)));
+              MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
           users.putIfAbsent(user.userUniqueId, () => user);
-        } else if (state is PaginatedCommentRepliesLoading) {
+        } else if (state is LMPaginatedCommentRepliesLoading) {
           replies = state.prevCommentDetails.postReplies!.replies
-                  ?.map((e) => CommentViewDataConvertor.fromComment(e))
+                  ?.map((e) => LMCommentViewDataConvertor.fromComment(e))
                   .toList() ??
               [];
           users = state.prevCommentDetails.users!.map((key, value) =>
-              MapEntry(key, UserViewDataConvertor.fromUser(value)));
+              MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
           users.putIfAbsent(user.userUniqueId, () => user);
         }
         replyCount = replies.length;

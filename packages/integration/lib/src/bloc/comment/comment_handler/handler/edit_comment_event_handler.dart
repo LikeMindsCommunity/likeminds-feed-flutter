@@ -18,22 +18,36 @@ Future<void> handleEditActionEvent(
   }
 }
 
+// Edit comment handler
 Future<void> _handleEditCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  // Get the instance of the LMFeedClient
+  // to make the API call
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 
+  // EditCommentRequest is the request to be sent to the server
+  // to edit a comment
+  // It contains the [postId] and [commentId] to be edited from the post
+  // and the [comment] to be updated
   EditCommentRequest editCommentRequest =
       event.commentActionRequest as EditCommentRequest;
 
+  // Call editComment API to edit the comment
+  // and wait for the response
   EditCommentResponse response =
       await lmFeedClient.editComment(editCommentRequest);
 
+  // Check if the response is success or not
   if (!response.success) {
+    // If the response is not success then notify the UI
+    // to change the view to Error
     emit(LMCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
+    // If the response is success then notify the UI
+    //to change the view to Success
     emit(LMCommentSuccessState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
@@ -41,22 +55,36 @@ Future<void> _handleEditCommentAction(
   }
 }
 
+// Edit reply handler
 Future<void> _handleEditReplyAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  // Get the instance of the LMFeedClient
+  // to make the API call
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 
+  // EditCommentReplyRequest is the request to be sent to the server
+  // to edit a reply
+  // It contains the [postId] and [commentId] to be edited from the post
+  // and the [comment] to be updated
   EditCommentReplyRequest editCommentReplyRequest =
       event.commentActionRequest as EditCommentReplyRequest;
 
+  // Call editCommentReply API to edit the reply
+  // and wait for the response
   EditCommentReplyResponse response =
       await lmFeedClient.editCommentReply(editCommentReplyRequest);
 
+  // Check if the response is success or not
   if (!response.success) {
+    // If the response is not success then notify the UI
+    // to change the view to Error
     emit(LMCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
+    // If the response is success then notify the UI
+    // to change the view to Success
     emit(LMCommentSuccessState(
       commentMetaData: event.commentMetaData,
       commentActionResponse: response,

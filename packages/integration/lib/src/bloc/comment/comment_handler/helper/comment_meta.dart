@@ -1,14 +1,22 @@
 part of '../comment_handler_bloc.dart';
 
-// [LMCommentType] defines the entity on which the
-// action is being performed [COMMENT] or [REPLY]
+/// {@template lm_comment_type}
+/// LMCommentType defines the entity on which the
+/// action is being performed [parent] or [reply]
+/// {@endtemplate}
 enum LMCommentType {
   parent,
   reply,
 }
 
-// [LMCommentActionType] defines the type of
-// action being performed [add], [edit], [delete]
+/// {@template lm_comment_action_type}
+/// LMCommentActionType defines the type of
+/// action being performed [LMCommentActionType.add],
+/// [LMCommentActionType.edit], [LMCommentActionType.delete],
+/// [LMCommentActionType.replying].
+/// while adding a reply to an existing comment always
+/// select [LMCommentActionType.replying]
+/// {@endtemplate}
 enum LMCommentActionType {
   add,
   edit,
@@ -16,14 +24,18 @@ enum LMCommentActionType {
   replying,
 }
 
-// [LMCommentMetaData] defines the metadata of the comment
-// which is being added, edited or deleted
+/// {@template lm_comment_meta_data}
+/// [LMCommentMetaData] defines the metadata of the comment
+/// which is being added, edited or deleted
+/// {@endtemplate}
 class LMCommentMetaData {
   // [LMCommentType] defines the entity on which
   // the action is being performed (comment or reply)
+  // {@macro lm_comment_type}
   final LMCommentType commentActionEntity;
   // [LMCommentActionType] defines the type of
   // action being performed [add], [edit], [delete]
+  // {@macro lm_comment_action_type}
   final LMCommentActionType commentActionType;
   // Defines the level of the comment (0 for parent, 1 for reply,
   // 2 for reply of reply, and so on)
@@ -34,8 +46,10 @@ class LMCommentMetaData {
   // [REQUIRED] in case the action is being performed on a reply
   final String? replyId;
   // [LMUserViewData] data in case the action is being performed on a reply
+  // @{macro lm_user_view_data}
   final LMUserViewData? user;
 
+  /// {@macro lm_comment_meta_data}
   const LMCommentMetaData._({
     required this.commentActionEntity,
     required this.commentActionType,
@@ -46,8 +60,13 @@ class LMCommentMetaData {
   });
 }
 
+/// {@template lm_comment_meta_data_builder}
+/// LMCommentMetaDataBuilder is a builder class for LMCommentMetaData
+/// {@endtemplate}
 class LMCommentMetaDataBuilder {
+  // @{macro lm_comment_type}
   LMCommentType? _commentActionEntity;
+  // @{macro lm_comment_action_type}
   LMCommentActionType? _commentActionType;
   int? _level;
   String? _commentId;

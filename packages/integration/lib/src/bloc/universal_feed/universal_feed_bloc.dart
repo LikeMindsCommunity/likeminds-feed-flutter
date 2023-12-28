@@ -12,44 +12,46 @@ part 'universal_feed_event.dart';
 
 part 'universal_feed_state.dart';
 
-class UniversalFeedBloc extends Bloc<UniversalFeedEvent, UniversalFeedState> {
+class LMUniversalFeedBloc
+    extends Bloc<LMUniversalFeedEvent, LMUniversalFeedState> {
   // final FeedApi feedApi;
-  UniversalFeedBloc() : super(UniversalFeedInitial()) {
-    on<UniversalFeedEvent>((event, emit) async {
-      if (event is GetUniversalFeed) {
-        await _mapGetUniversalFeedToState(
+  LMUniversalFeedBloc() : super(LMUniversalFeedInitial()) {
+    on<LMUniversalFeedEvent>((event, emit) async {
+      if (event is LMGetUniversalFeed) {
+        await _mapLMGetUniversalFeedToState(
             event: event, offset: event.offset, emit: emit);
       }
     });
   }
 
-  FutureOr<void> _mapGetUniversalFeedToState(
-      {required GetUniversalFeed event,
+  FutureOr<void> _mapLMGetUniversalFeedToState(
+      {required LMGetUniversalFeed event,
       required int offset,
-      required Emitter<UniversalFeedState> emit}) async {
+      required Emitter<LMUniversalFeedState> emit}) async {
     Map<String, LMUserViewData> users = {};
     Map<String, LMTopicViewData> topics = {};
     Map<String, LMWidgetViewData> widgets = {};
 
-    if (state is UniversalFeedLoaded) {
-      UniversalFeedLoaded prevState = state as UniversalFeedLoaded;
+    if (state is LMUniversalFeedLoaded) {
+      LMUniversalFeedLoaded prevState = state as LMUniversalFeedLoaded;
       users = prevState.users;
       topics = prevState.topics;
       widgets = prevState.widgets;
-      emit(PaginatedUniversalFeedLoading(
+      emit(LMPaginatedUniversalFeedLoading(
         posts: prevState.posts,
         users: prevState.users,
         widgets: prevState.widgets,
         topics: prevState.topics,
       ));
     } else {
-      emit(UniversalFeedLoading());
+      emit(LMUniversalFeedLoading());
     }
     List<Topic> selectedTopics = [];
 
     if (event.topics != null && event.topics!.isNotEmpty) {
-      selectedTopics =
-          event.topics!.map((e) => TopicViewDataConvertor.toTopic(e)).toList();
+      selectedTopics = event.topics!
+          .map((e) => LMTopicViewDataConvertor.toTopic(e))
+          .toList();
     }
     GetFeedResponse? response =
         await LMFeedIntegration.instance.lmFeedClient.getFeed(
@@ -61,19 +63,19 @@ class UniversalFeedBloc extends Bloc<UniversalFeedEvent, UniversalFeedState> {
     );
 
     if (response == null) {
-      emit(const UniversalFeedError(
+      emit(const LMUniversalFeedError(
           message: "An error occurred, please check your network connection"));
     } else {
       users.addAll(response.users.map((key, value) =>
-          MapEntry(key, UserViewDataConvertor.fromUser(value))));
+          MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
       topics.addAll(response.topics.map((key, value) =>
-          MapEntry(key, TopicViewDataConvertor.fromTopic(value))));
+          MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
 
       emit(
-        UniversalFeedLoaded(
+        LMUniversalFeedLoaded(
           topics: topics,
           posts: response.posts
-              .map((e) => PostViewDataConvertor.fromPost(post: e))
+              .map((e) => LMPostViewDataConvertor.fromPost(post: e))
               .toList(),
           users: users,
           widgets: widgets,

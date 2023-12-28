@@ -5,13 +5,13 @@ abstract class LMPostEvents extends Equatable {
   List<Object> get props => [];
 }
 
-class CreateNewPost extends LMPostEvents {
+class LMCreateNewPost extends LMPostEvents {
   final List<LMMediaModel>? postMedia;
   final String postText;
   final User user;
   final List<LMTopicViewData> selectedTopics;
 
-  CreateNewPost({
+  LMCreateNewPost({
     this.postMedia,
     required this.user,
     required this.postText,
@@ -19,13 +19,13 @@ class CreateNewPost extends LMPostEvents {
   });
 }
 
-class EditPost extends LMPostEvents {
+class LMEditPost extends LMPostEvents {
   final List<LMAttachmentViewData>? attachments;
   final String postText;
   final String postId;
   final List<LMTopicViewData> selectedTopics;
 
-  EditPost({
+  LMEditPost({
     required this.postText,
     this.attachments,
     required this.postId,
@@ -33,12 +33,12 @@ class EditPost extends LMPostEvents {
   });
 }
 
-class DeletePost extends LMPostEvents {
+class LMDeletePost extends LMPostEvents {
   final String postId;
   final String reason;
   final int? feedRoomId;
 
-  DeletePost({
+  LMDeletePost({
     required this.postId,
     required this.reason,
     this.feedRoomId,
@@ -48,10 +48,10 @@ class DeletePost extends LMPostEvents {
   List<Object> get props => [postId, reason];
 }
 
-class UpdatePost extends LMPostEvents {
+class LMUpdatePost extends LMPostEvents {
   final LMPostViewData post;
 
-  UpdatePost({
+  LMUpdatePost({
     required this.post,
   });
 
@@ -59,11 +59,11 @@ class UpdatePost extends LMPostEvents {
   List<Object> get props => [post];
 }
 
-class TogglePinPost extends LMPostEvents {
+class LMTogglePinPost extends LMPostEvents {
   final String postId;
   final bool isPinned;
 
-  TogglePinPost({
+  LMTogglePinPost({
     required this.postId,
     required this.isPinned,
   });

@@ -1,7 +1,7 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class SDKClientInfoViewDataConvertor {
+class LMSDKClientInfoViewDataConvertor {
   static LMSDKClientInfoViewData fromSDKClientInfo(
       SDKClientInfo sdkClientInfo) {
     LMSDKClientInfoViewDataBuilder sdkClientInfoViewDataBuilder =

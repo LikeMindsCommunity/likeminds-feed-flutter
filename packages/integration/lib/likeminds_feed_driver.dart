@@ -13,7 +13,7 @@ export 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_prefer
 
 class LMFeedIntegration {
   late final LMFeedClient lmFeedClient;
-  late final MediaService? mediaService;
+  late final LMMediaService? mediaService;
 
   static LMFeedIntegration? _instance;
 
@@ -22,7 +22,7 @@ class LMFeedIntegration {
   LMFeedIntegration._();
 
   void initialize(
-      {required LMFeedClient lmFeedClient, MediaService? mediaService}) {
+      {required LMFeedClient lmFeedClient, LMMediaService? mediaService}) {
     this.lmFeedClient = lmFeedClient;
     this.mediaService = mediaService;
   }
@@ -38,7 +38,7 @@ class LMFeedIntegration {
     return lmFeedClient.initiateUser(request)
       ..then((value) async {
         if (value.success) {
-          await UserLocalPreference.instance
+          await LMUserLocalPreference.instance
               .setUserDataFromInitiateUserResponse(value);
         }
         return value;
@@ -49,7 +49,7 @@ class LMFeedIntegration {
     return lmFeedClient.getMemberState()
       ..then((value) async {
         if (value.success) {
-          await UserLocalPreference.instance
+          await LMUserLocalPreference.instance
               .storeMemberRightsFromMemberStateResponse(value);
         }
         return value;

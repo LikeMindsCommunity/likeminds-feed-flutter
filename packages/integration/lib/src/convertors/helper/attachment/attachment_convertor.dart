@@ -3,7 +3,7 @@ import 'package:likeminds_feed_driver_fl/src/convertors/helper/attachment/attach
 import 'package:likeminds_feed_driver_fl/src/convertors/helper/og_tag_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class AttachmentViewDataConvertor {
+class LMAttachmentViewDataConvertor {
   static LMAttachmentViewData fromAttachment({
     required Attachment attachment,
   }) {
@@ -12,7 +12,7 @@ class AttachmentViewDataConvertor {
 
     attachmentViewDataBuilder.attachmentType(attachment.attachmentType);
     attachmentViewDataBuilder.attachmentMeta(
-        AttachmentMetaViewDataConvertor.attachmentMeta(
+        LMAttachmentMetaViewDataConvertor.attachmentMeta(
             attachmentMeta: attachment.attachmentMeta));
 
     return attachmentViewDataBuilder.build();
@@ -28,7 +28,7 @@ class AttachmentViewDataConvertor {
         duration: attachmentViewData.attachmentMeta.duration,
         pageCount: attachmentViewData.attachmentMeta.pageCount,
         ogTags: attachmentViewData.attachmentMeta.ogTags != null
-            ? OgTagsViewDataConvertor.toAttachmentMetaOgTags(
+            ? LMOgTagsViewDataConvertor.toAttachmentMetaOgTags(
                 attachmentViewData.attachmentMeta.ogTags!)
             : null,
         aspectRatio: attachmentViewData.attachmentMeta.aspectRatio,

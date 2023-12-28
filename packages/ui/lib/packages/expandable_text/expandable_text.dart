@@ -244,7 +244,7 @@ class ExpandableTextState extends State<ExpandableText>
           String resultText;
           if (!_expanded) {
             var response =
-                TaggingHelper.convertRouteToTagAndUserMap(widget.text);
+                LMTaggingHelper.convertRouteToTagAndUserMap(widget.text);
             List<LMUserTagViewData> userTags = response['userTags'];
             resultText = response['text'];
             // final lineCount = textPainter.computeLineMetrics().length;
@@ -255,7 +255,7 @@ class ExpandableTextState extends State<ExpandableText>
               resultText = resultText.substring(0, max(endOffset, 0));
             }
 
-            resultText = TaggingHelper.encodeString(resultText, userTags);
+            resultText = LMTaggingHelper.encodeString(resultText, userTags);
           } else {
             resultText = widget.text;
           }
@@ -425,7 +425,7 @@ class ExpandableTextState extends State<ExpandableText>
         }
         // Add a TextSpan for the URL
         textSpans.add(TextSpan(
-          text: isTag ? TaggingHelper.decodeString(link).keys.first : link,
+          text: isTag ? LMTaggingHelper.decodeString(link).keys.first : link,
           style: widget.linkStyle ?? const TextStyle(color: kPrimaryColor),
           recognizer: TapGestureRecognizer()
             ..onTap = () async {
@@ -447,10 +447,10 @@ class ExpandableTextState extends State<ExpandableText>
                 }
               } else {
                 widget.onTagTap(
-                  TaggingHelper.decodeString(link).values.first,
+                  LMTaggingHelper.decodeString(link).values.first,
                 );
-                // TaggingHelper.routeToProfile(
-                //   TaggingHelper.decodeString(link).values.first,
+                // LMTaggingHelper.routeToProfile(
+                //   LMTaggingHelper.decodeString(link).values.first,
                 // );
               }
             },

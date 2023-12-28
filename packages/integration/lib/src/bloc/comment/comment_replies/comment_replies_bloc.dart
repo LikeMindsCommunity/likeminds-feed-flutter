@@ -8,17 +8,20 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 part 'comment_replies_event.dart';
 part 'comment_replies_state.dart';
 
+/// {@template lm_fetch_comment_reply_bloc}
+/// [LMFetchCommentReplyBloc] fetches the replies for a comment
+/// {@endtemplate}
 class LMFetchCommentReplyBloc
-    extends Bloc<CommentRepliesEvent, CommentRepliesState> {
+    extends Bloc<LMCommentRepliesEvent, LMCommentRepliesState> {
   static LMFetchCommentReplyBloc? _instance;
 
   static LMFetchCommentReplyBloc get instance =>
       _instance ??= LMFetchCommentReplyBloc._();
 
   LMFeedIntegration lmFeedIntegration = LMFeedIntegration.instance;
-  LMFetchCommentReplyBloc._() : super(CommentRepliesInitial()) {
-    on<CommentRepliesEvent>((event, emit) async {
-      if (event is GetCommentReplies) {
+  LMFetchCommentReplyBloc._() : super(LMCommentRepliesInitial()) {
+    on<LMCommentRepliesEvent>((event, emit) async {
+      if (event is LMGetCommentReplies) {
         await _mapGetCommentRepliesToState(
           commentDetailRequest: event.commentDetailRequest,
           forLoadMore: event.forLoadMore,
@@ -27,9 +30,9 @@ class LMFetchCommentReplyBloc
         );
       }
     });
-    on<ClearCommentReplies>(
+    on<LMClearCommentReplies>(
       (event, emit) {
-        emit(ClearedCommentReplies());
+        emit(LMClearedCommentReplies());
       },
     );
   }
@@ -37,34 +40,37 @@ class LMFetchCommentReplyBloc
   FutureOr<void> _mapGetCommentRepliesToState(
       {required GetCommentRequest commentDetailRequest,
       required bool forLoadMore,
-      required Emitter<CommentRepliesState> emit,
+      required Emitter<LMCommentRepliesState> emit,
       required LMFeedIntegration lmFeedIntegration}) async {
     // if (!hasReachedMax(state, forLoadMore)) {
     Map<String, User> users = {};
     List<Comment> comments = [];
-    if (state is CommentRepliesLoaded &&
+    if (state is LMCommentRepliesLoaded &&
         forLoadMore &&
         commentDetailRequest.commentId ==
-            (state as CommentRepliesLoaded).commentId) {
-      comments =
-          (state as CommentRepliesLoaded).commentDetails.postReplies!.replies ??
-              [];
-      users = (state as CommentRepliesLoaded).commentDetails.users!;
-      emit(PaginatedCommentRepliesLoading(
+            (state as LMCommentRepliesLoaded).commentId) {
+      comments = (state as LMCommentRepliesLoaded)
+              .commentDetails
+              .postReplies!
+              .replies ??
+          [];
+      users = (state as LMCommentRepliesLoaded).commentDetails.users!;
+      emit(LMPaginatedCommentRepliesLoading(
           commentId: commentDetailRequest.commentId,
-          prevCommentDetails: (state as CommentRepliesLoaded).commentDetails));
+          prevCommentDetails:
+              (state as LMCommentRepliesLoaded).commentDetails));
     } else {
-      emit(CommentRepliesLoading(commentId: commentDetailRequest.commentId));
+      emit(LMCommentRepliesLoading(commentId: commentDetailRequest.commentId));
     }
 
     GetCommentResponse response =
         await lmFeedIntegration.lmFeedClient.getComment(commentDetailRequest);
     if (!response.success) {
-      emit(const CommentRepliesError(message: "An error occurred"));
+      emit(const LMCommentRepliesError(message: "An error occurred"));
     } else {
       response.postReplies!.replies?.insertAll(0, comments);
       response.users!.addAll(users);
-      emit(CommentRepliesLoaded(
+      emit(LMCommentRepliesLoaded(
         commentDetails: response,
         commentId: commentDetailRequest.commentId,
       ));

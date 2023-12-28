@@ -7,22 +7,20 @@ abstract class LMProfileEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class ProfileEventInit extends LMProfileEvent {
+class LMProfileEventInit extends LMProfileEvent {}
 
-}
-
-class RouteToUserProfile extends LMProfileEvent {
+class LMRouteToUserProfile extends LMProfileEvent {
   final String userUniqueId;
 
-  const RouteToUserProfile({required this.userUniqueId});
+  const LMRouteToUserProfile({required this.userUniqueId});
 }
 
-class RouteToCompanyProfile extends LMProfileEvent {
+class LMRouteToCompanyProfile extends LMProfileEvent {
   final String companyId;
 
-  const RouteToCompanyProfile({required this.companyId});
+  const LMRouteToCompanyProfile({required this.companyId});
 }
 
-class LoginRequired extends LMProfileEvent {}
+class LMLoginRequired extends LMProfileEvent {}
 
-class Logout extends LMProfileEvent {}
+class LMLogout extends LMProfileEvent {}

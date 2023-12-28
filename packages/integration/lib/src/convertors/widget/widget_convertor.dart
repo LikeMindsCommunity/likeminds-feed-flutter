@@ -1,7 +1,7 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class WidgetViewDataConvertor {
+class LMWidgetViewDataConvertor {
   static LMWidgetViewData fromWidgetModel(WidgetModel data) {
     LMWidgetViewDataBuilder widgetViewDataBuilder = LMWidgetViewDataBuilder();
 

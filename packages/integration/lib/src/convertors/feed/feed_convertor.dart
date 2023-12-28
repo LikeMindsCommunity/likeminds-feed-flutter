@@ -2,7 +2,7 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class FeedViewDataConvertor {
+class LMFeedViewDataConvertor {
   static LMFeedRoomViewData fromFeedRoomModel(
       {required FeedRoom feedRoomModel}) {
     LMFeedRoomViewDataBuilder feedRoomViewDataBuilder =
@@ -13,7 +13,7 @@ class FeedViewDataConvertor {
       ..header(feedRoomModel.header)
       ..date(feedRoomModel.date)
       ..state(feedRoomModel.state)
-      ..member(UserViewDataConvertor.fromUser(feedRoomModel.member))
+      ..member(LMUserViewDataConvertor.fromUser(feedRoomModel.member))
       ..communityId(feedRoomModel.communityId)
       ..participantsCount(feedRoomModel.participantsCount);
 
@@ -198,7 +198,7 @@ class FeedViewDataConvertor {
       participantsCount: feedRoomViewData.participantsCount,
       memberId: feedRoomViewData.memberId,
       access: feedRoomViewData.access,
-      member: UserViewDataConvertor.toUser(feedRoomViewData.member),
+      member: LMUserViewDataConvertor.toUser(feedRoomViewData.member),
       cohorts: feedRoomViewData.cohorts,
       coHosts: feedRoomViewData.coHosts,
     );

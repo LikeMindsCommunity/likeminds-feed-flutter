@@ -2,7 +2,7 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/sdk/sdk_client_info_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class UserTagViewDataConvertor {
+class LMUserTagViewDataConvertor {
   static LMUserTagViewData fromUserTag(UserTag userTag) {
     LMUserTagViewDataBuilder userTagViewDataBuilder =
         LMUserTagViewDataBuilder();
@@ -33,7 +33,7 @@ class UserTagViewDataConvertor {
 
     if (userTag.sdkClientInfo != null) {
       userTagViewDataBuilder.sdkClientInfo(
-          SDKClientInfoViewDataConvertor.fromSDKClientInfo(
+          LMSDKClientInfoViewDataConvertor.fromSDKClientInfo(
               userTag.sdkClientInfo!));
     }
 
@@ -49,7 +49,7 @@ class UserTagViewDataConvertor {
       isGuest: userTagViewData.isGuest,
       userUniqueId: userTagViewData.userUniqueId,
       sdkClientInfo: userTagViewData.sdkClientInfo != null
-          ? SDKClientInfoViewDataConvertor.toSDKClientInfo(
+          ? LMSDKClientInfoViewDataConvertor.toSDKClientInfo(
               userTagViewData.sdkClientInfo!)
           : null,
     );

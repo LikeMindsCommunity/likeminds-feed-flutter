@@ -7,90 +7,90 @@ abstract class LMPostState extends Equatable {
   List<Object> get props => [];
 }
 
-class NewPostInitiate extends LMPostState {}
+class LMNewPostInitiate extends LMPostState {}
 
-class NewPostUploading extends LMPostState {
+class LMNewPostUploading extends LMPostState {
   final Stream<double> progress;
   final LMMediaModel? thumbnailMedia;
 
-  const NewPostUploading({required this.progress, this.thumbnailMedia});
+  const LMNewPostUploading({required this.progress, this.thumbnailMedia});
 }
 
-class EditPostUploading extends LMPostState {}
+class LMEditPostUploading extends LMPostState {}
 
-class NewPostUploaded extends LMPostState {
+class LMNewPostUploaded extends LMPostState {
   final LMPostViewData postData;
   final Map<String, LMUserViewData> userData;
   final Map<String, LMTopicViewData> topics;
 
-  const NewPostUploaded({
+  const LMNewPostUploaded({
     required this.postData,
     required this.userData,
     required this.topics,
   });
 }
 
-class EditPostUploaded extends LMPostState {
+class LMEditPostUploaded extends LMPostState {
   final LMPostViewData postData;
   final Map<String, LMUserViewData> userData;
   final Map<String, LMTopicViewData> topics;
 
-  const EditPostUploaded({
+  const LMEditPostUploaded({
     required this.postData,
     required this.userData,
     required this.topics,
   });
 }
 
-class NewPostError extends LMPostState {
+class LMNewPostError extends LMPostState {
   final String message;
 
-  const NewPostError({required this.message});
+  const LMNewPostError({required this.message});
 }
 
-class PostDeletionError extends LMPostState {
+class LMPostDeletionError extends LMPostState {
   final String message;
 
-  const PostDeletionError({required this.message});
+  const LMPostDeletionError({required this.message});
 
   @override
   List<Object> get props => [message];
 }
 
-class PostDeleted extends LMPostState {
+class LMPostDeleted extends LMPostState {
   final String postId;
 
-  const PostDeleted({required this.postId});
+  const LMPostDeleted({required this.postId});
 
   @override
   List<Object> get props => [postId];
 }
 
-class PostUpdateState extends LMPostState {
+class LMPostUpdateState extends LMPostState {
   final LMPostViewData post;
 
-  const PostUpdateState({required this.post});
+  const LMPostUpdateState({required this.post});
 
   @override
   List<Object> get props => [post];
 }
 
-class PostPinnedState extends LMPostState {
+class LMPostPinnedState extends LMPostState {
   final String postId;
   final bool isPinned;
 
-  const PostPinnedState({required this.postId, required this.isPinned});
+  const LMPostPinnedState({required this.postId, required this.isPinned});
 
   @override
   List<Object> get props => [postId, isPinned];
 }
 
-class PostPinError extends LMPostState {
+class LMPostPinError extends LMPostState {
   final String message;
   final bool isPinned;
   final String postId;
 
-  const PostPinError({
+  const LMPostPinError({
     required this.message,
     required this.isPinned,
     required this.postId,

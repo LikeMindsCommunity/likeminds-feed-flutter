@@ -12,9 +12,13 @@ Future<void> handleDeleteActionEvent(
 
 Future<void> _handleDeleteCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+  // Get the instance of the LMFeedClient
+  // to make the API call
   LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
 
-  //
+  // DeleteCommentRequest is the request to be sent to the server
+  // to delete a comment
+  // It contains the [postId] and [commentId] to be deleted from the post
   DeleteCommentRequest deleteCommentRequest =
       event.commentActionRequest as DeleteCommentRequest;
 
@@ -25,20 +29,22 @@ Future<void> _handleDeleteCommentAction(
     ));
 
     // Call deleteComment API to delete the comment
+    // and wait for the response
     final response = await lmFeedClient.deleteComment(
       deleteCommentRequest,
     );
 
     // Check if the response is success or not
     if (response.success) {
+      // Show the toast message for comment deleted
       toast(
         'Comment Deleted',
         duration: Toast.LENGTH_LONG,
       );
 
       // Fire the analytic event for comment deleted
-      LMAnalyticsBloc.instance.add(FireAnalyticEvent(
-        eventName: AnalyticsKeys.commentDeleted,
+      LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+        eventName: LMAnalyticsKeys.commentDeleted,
         eventProperties: {
           "post_id": deleteCommentRequest.postId,
           "comment_id": deleteCommentRequest.commentId,

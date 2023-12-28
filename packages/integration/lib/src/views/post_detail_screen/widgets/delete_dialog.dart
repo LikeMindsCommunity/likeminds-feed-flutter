@@ -26,8 +26,8 @@ class LMDeleteConfirmationDialog extends StatelessWidget {
     bool boolVarLoading = false;
     ValueNotifier<bool> rebuildReasonBox = ValueNotifier(false);
     DeleteReason? reasonForDeletion;
-    bool isCm = UserLocalPreference.instance.fetchMemberState();
-    User? user = UserLocalPreference.instance.fetchUserData();
+    bool isCm = LMUserLocalPreference.instance.fetchMemberState();
+    User? user = LMUserLocalPreference.instance.fetchUserData();
 
     return Dialog(
       shape: RoundedRectangleBorder(

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart';
 
-class SSCustomMessages implements LookupMessages {
+class LMCustomMessages implements LookupMessages {
   @override
   String prefixAgo() => '';
   @override
