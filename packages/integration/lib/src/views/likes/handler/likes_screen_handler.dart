@@ -1,7 +1,7 @@
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
+import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/common/like_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
@@ -67,7 +67,7 @@ class LMLikesScreenHandler {
           ..postId(postId))
         .build();
     GetPostLikesResponse response =
-        await LMFeedIntegration.instance.lmFeedClient.getPostLikes(request);
+        await LMFeedCore.instance.lmFeedClient.getPostLikes(request);
     if (response.success) {
       _pagingController.appendPage(
           response.likes
@@ -89,7 +89,7 @@ class LMLikesScreenHandler {
         .build();
 
     GetCommentLikesResponse response =
-        await LMFeedIntegration.instance.lmFeedClient.getCommentLikes(request);
+        await LMFeedCore.instance.lmFeedClient.getCommentLikes(request);
     if (response.success) {
       _pagingController.appendPage(
           response.commentLikes

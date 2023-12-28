@@ -11,20 +11,21 @@ import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_prefer
 export 'package:likeminds_feed_driver_fl/src/views/views.dart';
 export 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 
-class LMFeedIntegration {
+class LMFeedCore {
   late final LMFeedClient lmFeedClient;
   late final LMMediaService? mediaService;
 
-  static LMFeedIntegration? _instance;
+  static LMFeedCore? _instance;
 
-  static LMFeedIntegration get instance => _instance ??= LMFeedIntegration._();
+  static LMFeedCore get instance => _instance ??= LMFeedCore._();
 
-  LMFeedIntegration._();
+  static LMFeedClient get client => instance.lmFeedClient;
 
-  void initialize(
-      {required LMFeedClient lmFeedClient, LMMediaService? mediaService}) {
+  LMFeedCore._();
+
+  void initialize({required LMFeedClient lmFeedClient}) {
     this.lmFeedClient = lmFeedClient;
-    this.mediaService = mediaService;
+    mediaService = mediaService;
   }
 
   Future<void> closeBlocs() async {

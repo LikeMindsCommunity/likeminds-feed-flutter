@@ -40,7 +40,7 @@ class _LMBlocListenerState extends State<LMBlocListener> {
   @override
   void initState() {
     super.initState();
-    Bloc.observer = LMSimpleBlocObserver();
+    Bloc.observer = LMBlocObserver();
   }
 
   @override

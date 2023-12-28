@@ -1,5 +1,27 @@
 import 'package:flutter/material.dart';
 
+class LMFeedTheme extends InheritedWidget {
+  const LMFeedTheme({super.key, required this.theme, required super.child});
+
+  final ThemeData theme;
+
+  @override
+  bool updateShouldNotify(covariant LMFeedTheme oldWidget) {
+    return theme != oldWidget.theme;
+  }
+
+  static ThemeData of(BuildContext context) {
+    final lmTheme = context.dependOnInheritedWidgetOfExactType<LMFeedTheme>();
+
+    assert(
+      lmTheme != null,
+      'You must have a StreamChatTheme widget at the top of your widget tree',
+    );
+
+    return lmTheme!.theme;
+  }
+}
+
 const Color kPrimaryColor = Color.fromARGB(255, 6, 92, 193);
 const Color kBackgroundColor = Color(0xffF5F5F5);
 const Color kWhiteColor = Color(0xffFFFFFF);

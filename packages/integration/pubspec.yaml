@@ -18,13 +18,18 @@ dependencies:
   likeminds_feed: # 1.6.3
     path: ../../../LikeMinds-Flutter-Feed-SDK
   simple_s3: 0.3.2
-  overlay_support:
-  video_player:
-  path:
-  infinite_scroll_pagination:
-  shared_preferences:
+  overlay_support: any
+  video_player: any
+  path: any
+  infinite_scroll_pagination: any
+  shared_preferences: any
   dotenv: ^4.2.0
   collection:
+  permission_handler: any
+  file_picker: any
+  device_info_plus: any
+  http: any
+  custom_pop_up_menu: any
 
   flutter_typeahead_mm:
     path: lib/packages/flutter_typeahead-4.3.7

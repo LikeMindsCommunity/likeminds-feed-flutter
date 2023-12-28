@@ -579,6 +579,9 @@
 //         .track(LMAnalyticsKeys.feedOpened, {'feed_type': "universal_feed"});
 //     locator<LMFeedIntegration>().lmAnalyticsBloc.add(LMFireAnalyticsEvent(
 //         eventName: LMAnalyticsKeys.feedOpened,
+//         .track(AnalyticsKeys.feedOpened, {'feed_type': "universal_feed"});
+//     locator<LMFeedCore>().lmAnalyticsBloc.add(FireAnalyticEvent(
+//         eventName: AnalyticsKeys.feedOpened,
 //         eventProperties: const {'feed_type': "universal_feed"}));
 //     _controller = widget.scrollController..addListener(_scrollListener);
 //     right = checkPostCreationRights();
@@ -603,7 +606,7 @@
 
 //   @override
 //   Widget build(BuildContext context) {
-//     LMPostBloc newPostBloc = locator<LMFeedIntegration>().lmPostBloc;
+//     LMPostBloc newPostBloc = locator<LMFeedCore>().lmPostBloc;
 //     final ThemeData theme = LMThemeData.suraasaTheme;
 //     return Scaffold(
 //       backgroundColor: LMThemeData.kBackgroundColor,
@@ -883,7 +886,7 @@
 //                                                   LMAnalyticsKeys
 //                                                       .postCreationStarted,
 //                                                   {});
-//                                               locator<LMFeedIntegration>()
+//                                               locator<LMFeedCore>()
 //                                                   .lmAnalyticsBloc
 //                                                   .add(LMFireAnalyticsEvent(
 //                                                       eventName: LMAnalyticsKeys
@@ -928,7 +931,7 @@
 //                                         .track(LMAnalyticsKeys.commentListOpen, {
 //                                       'postId': item.id,
 //                                     });
-//                                     locator<LMFeedIntegration>()
+//                                     locator<LMFeedCore>()
 //                                         .lmAnalyticsBloc
 //                                         .add(LMFireAnalyticsEvent(
 //                                             eventName:
@@ -1011,6 +1014,9 @@
 //                                 .track(LMAnalyticsKeys.postCreationStarted, {});
 //                             locator<LMFeedIntegration>().lmAnalyticsBloc.add(
 //                                 LMFireAnalyticsEvent(
+//                                 .track(AnalyticsKeys.postCreationStarted, {});
+//                             locator<LMFeedCore>().lmAnalyticsBloc.add(
+//                                 FireAnalyticEvent(
 //                                     eventName:
 //                                         LMAnalyticsKeys.postCreationStarted,
 //                                     eventProperties: const {}));

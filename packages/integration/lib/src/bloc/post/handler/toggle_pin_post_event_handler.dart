@@ -6,7 +6,7 @@ void togglePinPostEventHandler(
       (PinPostRequestBuilder()..postId(event.postId)).build();
 
   PinPostResponse response =
-      await LMFeedIntegration.instance.lmFeedClient.pinPost(request);
+      await LMFeedCore.instance.lmFeedClient.pinPost(request);
 
   if (response.success) {
     toast(event.isPinned ? "Post pinned" : "Post unpinned",

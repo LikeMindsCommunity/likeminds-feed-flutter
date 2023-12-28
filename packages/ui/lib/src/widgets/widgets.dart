@@ -24,6 +24,7 @@ export 'common/shimmer/document_shimmer.dart';
 
 export 'common/profile_picture.dart';
 export 'common/user_tile.dart';
+export 'common/appbar.dart';
 
 export 'feed/bottom_sheet.dart';
 

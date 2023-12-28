@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
+import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 
 class LMTaggingHelper {
@@ -73,7 +73,7 @@ class LMTaggingHelper {
   }
 
   static void routeToProfile(String userId) {
-    LMFeedIntegration.instance.lmFeedClient.routeToProfile(userId);
+    LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
   }
 
   static String convertRouteToTag(String text, {bool withTilde = true}) {

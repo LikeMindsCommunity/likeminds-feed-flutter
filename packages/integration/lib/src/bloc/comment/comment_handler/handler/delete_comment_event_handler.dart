@@ -14,7 +14,7 @@ Future<void> _handleDeleteCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
-  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+  LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
 
   // DeleteCommentRequest is the request to be sent to the server
   // to delete a comment

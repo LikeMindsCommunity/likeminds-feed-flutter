@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
+import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_handler/comment_handler_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_replies/comment_replies_bloc.dart';
@@ -16,10 +16,10 @@ import 'package:likeminds_feed_driver_fl/src/utils/constants/post_action_id.dart
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/handler/post_detail_screen_handler.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/widgets/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/widgets/comment/default_empty_comment_widget.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/widgets/delete_dialog.dart';
+import 'package:likeminds_feed_driver_fl/src/views/post/handler/post_detail_screen_handler.dart';
+import 'package:likeminds_feed_driver_fl/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -231,8 +231,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                             onTap: () {
                                               if (currentUser.sdkClientInfo !=
                                                   null) {
-                                                LMFeedIntegration
-                                                    .instance.lmFeedClient
+                                                LMFeedCore.instance.lmFeedClient
                                                     .routeToProfile(currentUser
                                                         .sdkClientInfo!
                                                         .userUniqueId);
@@ -517,15 +516,13 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                         .rebuildPostWidget
                                                         .value;
 
-                                                final response =
-                                                    await LMFeedIntegration
-                                                        .instance.lmFeedClient
-                                                        .likePost(
-                                                            (LikePostRequestBuilder()
-                                                                  ..postId(
-                                                                      postData!
-                                                                          .id))
-                                                                .build());
+                                                final response = await LMFeedCore
+                                                    .instance.lmFeedClient
+                                                    .likePost(
+                                                        (LikePostRequestBuilder()
+                                                              ..postId(
+                                                                  postData!.id))
+                                                            .build());
 
                                                 if (!response.success) {
                                                   toast(
@@ -779,7 +776,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                               commentViewData.userId]!
                                                                           .sdkClientInfo !=
                                                                       null) {
-                                                                    LMFeedIntegration
+                                                                    LMFeedCore
                                                                         .instance
                                                                         .lmFeedClient
                                                                         .routeToProfile(_postDetailScreenHandler!
@@ -870,7 +867,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
 
                                                                     final ToggleLikeCommentResponse
                                                                         response =
-                                                                        await LMFeedIntegration
+                                                                        await LMFeedCore
                                                                             .instance
                                                                             .lmFeedClient
                                                                             .likeComment(toggleLikeCommentRequest);
@@ -1075,7 +1072,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                               },
                                                               onTagTap: (String
                                                                   userId) {
-                                                                LMFeedIntegration
+                                                                LMFeedCore
                                                                     .instance
                                                                     .lmFeedClient
                                                                     .routeToProfile(

@@ -23,7 +23,7 @@ Future<void> _handleAddCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
-  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+  LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
 
   // AddCommentRequest is the request to be sent to the server
   // to add a new comment
@@ -74,7 +74,7 @@ Future<void> _handleAddReplyAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
-  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+  LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
 
   // AddCommentReplyRequest is the request to be sent to the server
   // to add a new reply

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
+import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -67,7 +67,7 @@ class LMDeleteConfirmationDialog extends StatelessWidget {
                                         rebuildReasonBox.value =
                                             !rebuildReasonBox.value;
                                         GetDeleteReasonResponse response =
-                                            await LMFeedIntegration
+                                            await LMFeedCore
                                                 .instance.lmFeedClient
                                                 .getReportTags(
                                                     ((GetDeleteReasonRequestBuilder()

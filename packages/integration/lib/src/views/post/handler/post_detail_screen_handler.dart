@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
+import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_handler/comment_handler_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
@@ -29,7 +29,7 @@ class LMPostDetailScreenHandler {
           ..page(page))
         .build();
 
-    final response = await LMFeedIntegration.instance.lmFeedClient
+    final response = await LMFeedCore.instance.lmFeedClient
         .getPostDetails(postDetailRequest);
 
     users.addAll(response.users?.map((key, value) =>

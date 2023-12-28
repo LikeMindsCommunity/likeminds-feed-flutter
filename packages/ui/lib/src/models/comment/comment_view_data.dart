@@ -4,7 +4,7 @@ class LMCommentViewData {
   String id;
   String userId;
   String text;
-  int? level;
+  int level;
   int likesCount;
   bool isEdited;
   int repliesCount;
@@ -21,7 +21,7 @@ class LMCommentViewData {
     required this.id,
     required this.userId,
     required this.text,
-    this.level,
+    required this.level,
     required this.likesCount,
     required this.repliesCount,
     required this.menuItems,
@@ -65,7 +65,7 @@ class LMCommentViewDataBuilder {
     _text = text;
   }
 
-  void level(int? level) {
+  void level(int level) {
     _level = level;
   }
 
@@ -118,7 +118,7 @@ class LMCommentViewDataBuilder {
       id: _id!,
       userId: _userId!,
       text: _text!,
-      level: _level,
+      level: _level!,
       likesCount: _likesCount!,
       isEdited: _isEdited!,
       repliesCount: _repliesCount!,

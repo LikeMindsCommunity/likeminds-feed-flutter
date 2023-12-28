@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
+import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_handler/comment_handler_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_replies/comment_replies_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/comment/comment_convertor.dart';
@@ -9,7 +9,7 @@ import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart
 import 'package:likeminds_feed_driver_fl/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post_detail_screen/widgets/delete_dialog.dart';
+import 'package:likeminds_feed_driver_fl/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -221,7 +221,7 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                         return LMReplyTile(
                             comment: commentViewData,
                             onTagTap: (String userId) {
-                              LMFeedIntegration.instance.lmFeedClient
+                              LMFeedCore.instance.lmFeedClient
                                   .routeToProfile(userId);
                             },
                             user: user,
@@ -231,7 +231,7 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                               fallbackText: user.name,
                               onTap: () {
                                 if (user.sdkClientInfo != null) {
-                                  LMFeedIntegration.instance.lmFeedClient
+                                  LMFeedCore.instance.lmFeedClient
                                       .routeToProfile(
                                           user.sdkClientInfo!.userUniqueId);
                                 }
@@ -359,8 +359,7 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                                           .build();
 
                                   ToggleLikeCommentResponse response =
-                                      await LMFeedIntegration
-                                          .instance.lmFeedClient
+                                      await LMFeedCore.instance.lmFeedClient
                                           .toggleLikeComment(request);
 
                                   if (!response.success) {

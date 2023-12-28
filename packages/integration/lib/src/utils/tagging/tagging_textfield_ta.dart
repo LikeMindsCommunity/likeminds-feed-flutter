@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
+import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/packages/flutter_typeahead-4.3.7/lib/flutter_typeahead.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/helper/tagging/user_tag_convertor.dart';
@@ -71,7 +71,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
           _scrollController.position.maxScrollExtent) {
         page++;
         final taggingData =
-            await LMFeedIntegration.instance.lmFeedClient.getTaggingList(
+            await LMFeedCore.instance.lmFeedClient.getTaggingList(
           request: (GetTaggingListRequestBuilder()
                 ..page(page)
                 ..pageSize(fixedSize))
@@ -97,7 +97,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       } else if (!tagComplete && currentText.contains('@')) {
         String tag = tagValue.substring(1).replaceAll(' ', '');
         final taggingData =
-            await LMFeedIntegration.instance.lmFeedClient.getTaggingList(
+            await LMFeedCore.instance.lmFeedClient.getTaggingList(
           request: (GetTaggingListRequestBuilder()
                 ..page(1)
                 ..pageSize(fixedSize)

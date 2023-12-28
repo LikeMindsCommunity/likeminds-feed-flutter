@@ -23,7 +23,7 @@ Future<void> _handleEditCommentAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
-  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+  LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
 
   // EditCommentRequest is the request to be sent to the server
   // to edit a comment
@@ -60,7 +60,7 @@ Future<void> _handleEditReplyAction(
     LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
-  LMFeedClient lmFeedClient = LMFeedIntegration.instance.lmFeedClient;
+  LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
 
   // EditCommentReplyRequest is the request to be sent to the server
   // to edit a reply

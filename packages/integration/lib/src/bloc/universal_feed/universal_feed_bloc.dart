@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_driver.dart';
+import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/post/post_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/post/topic_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart';
@@ -53,8 +53,7 @@ class LMUniversalFeedBloc
           .map((e) => LMTopicViewDataConvertor.toTopic(e))
           .toList();
     }
-    GetFeedResponse? response =
-        await LMFeedIntegration.instance.lmFeedClient.getFeed(
+    GetFeedResponse? response = await LMFeedCore.instance.lmFeedClient.getFeed(
       (GetFeedRequestBuilder()
             ..page(offset)
             ..topics(selectedTopics)

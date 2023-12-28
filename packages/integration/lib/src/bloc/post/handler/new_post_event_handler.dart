@@ -39,7 +39,7 @@ void newPostEventHandler(
           );
         } else {
           File mediaFile = media.mediaFile!;
-          final String? response = await LMFeedIntegration.instance.mediaService
+          final String? response = await LMFeedCore.instance.mediaService
               ?.uploadFile(mediaFile, event.user.userUniqueId);
           if (response != null) {
             attachments.add(
@@ -82,7 +82,7 @@ void newPostEventHandler(
         .build();
 
     final AddPostResponse response =
-        await LMFeedIntegration.instance.lmFeedClient.addPost(request);
+        await LMFeedCore.instance.lmFeedClient.addPost(request);
 
     if (response.success) {
       emit(
