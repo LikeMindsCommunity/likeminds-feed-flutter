@@ -23,9 +23,12 @@ class LMFeedCore {
 
   LMFeedCore._();
 
-  void initialize({required LMFeedClient lmFeedClient}) {
+  void initialize({
+    required LMFeedClient lmFeedClient,
+  }) async {
     this.lmFeedClient = lmFeedClient;
     mediaService = mediaService;
+    await LMUserLocalPreference.instance.initialize();
   }
 
   Future<void> closeBlocs() async {

@@ -5,14 +5,20 @@ sealed class LMComposeState {}
 
 final class LMComposeInitial extends LMComposeState {}
 
-class LMComposeAddedImage extends LMComposeEvent {}
+class LMComposeFetchedTopics extends LMComposeState {
+  final List<LMTopicViewData> topics;
 
-class LMComposeAddedVideo extends LMComposeEvent {}
+  LMComposeFetchedTopics({required this.topics});
+}
 
-class LMComposeAddedDocument extends LMComposeEvent {}
+class LMComposeAddedImage extends LMComposeState {}
 
-class LMComposeRemovedImage extends LMComposeEvent {}
+class LMComposeAddedVideo extends LMComposeState {}
 
-class LMComposeRemovedVideo extends LMComposeEvent {}
+class LMComposeAddedDocument extends LMComposeState {}
 
-class LMComposeRemovedDocument extends LMComposeEvent {}
+class LMComposeRemovedImage extends LMComposeState {}
+
+class LMComposeRemovedVideo extends LMComposeState {}
+
+class LMComposeRemovedDocument extends LMComposeState {}

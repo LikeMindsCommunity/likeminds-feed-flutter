@@ -18,6 +18,8 @@ dependencies:
     path: ../packages/integration
   likeminds_feed: # 1.6.3
     path: ../../LikeMinds-Flutter-Feed-SDK
+  likeminds_feed_ui_fl:
+    path: ../packages/ui
 
 dev_dependencies:
   flutter_test:

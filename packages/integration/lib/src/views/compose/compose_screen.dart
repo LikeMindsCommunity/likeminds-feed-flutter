@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
+import 'package:likeminds_feed_driver_fl/src/bloc/compose/compose_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/post/post_bloc.dart';
+import 'package:likeminds_feed_driver_fl/src/widgets/lists/topic_list.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LMPostComposeScreen extends StatefulWidget {
@@ -17,6 +23,7 @@ class LMPostComposeScreen extends StatefulWidget {
     this.composeDiscardDialogBuilder,
     this.composeAppBarBuilder,
     this.composeContentBuilder,
+    this.composeTopicSelectorBuilder,
     //Default values for additional variables
     this.composeSystemOverlayStyle = SystemUiOverlayStyle.dark,
     this.composeHint = "Write something here..",
@@ -36,32 +43,72 @@ class LMPostComposeScreen extends StatefulWidget {
   /// The hint text shown to a user while inputting text for post
   final String composeHint;
 
+  ///@{template}
+  /// Feature booleans to enable/disable features on the fly
+  /// [bool] to enable/disable image upload
   final bool enableImages;
+
+  /// [bool] to enable/disable documents upload
   final bool enableDocuments;
+
+  /// [bool] to enable/disable videos upload
   final bool enableVideos;
+
+  /// [bool] to enable/disable tagging feature
   final bool enableTagging;
+
+  /// [bool] to enable/disable topic selection
   final bool enableTopics;
+
+  /// [bool] to enable/disable link previews
   final bool enableLinkPreviews;
 
   final Function(BuildContext context)? composeDiscardDialogBuilder;
   final Widget Function()? composeAppBarBuilder;
   final Widget Function()? composeContentBuilder;
+  final Widget Function(List<LMTopicViewData>)? composeTopicSelectorBuilder;
 
   @override
   State<LMPostComposeScreen> createState() => _LMPostComposeScreenState();
 }
 
 class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
+  /// Required blocs and data for basic functionality, or state management
   final User user = LMUserLocalPreference.instance.fetchUserData();
   final LMPostBloc bloc = LMPostBloc.instance;
+  final LMComposeBloc composeBloc = LMComposeBloc.instance;
 
+  /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
   final CustomPopupMenuController _controllerPopUp =
       CustomPopupMenuController();
+  Timer? _debounce;
 
-  // final List<LMMediaModel>? postMedia;
-  // final List<LMTopicViewData>? postTopics;
+  /// Lists to maintain throughout the screen for sending/receiving data
+  List<LMMediaModel> postMedia = [];
+  List<UserTag> userTags = [];
+  List<LMTopicViewData> selectedTopics = [];
+
+  /// Value notifiers to rebuild small widgets throughout the screen
+  /// Rather than handling state management from complex classes
+  ValueNotifier<bool> rebuildLinkPreview = ValueNotifier(false);
+  ValueNotifier<bool> rebuildTopicFloatingButton = ValueNotifier(false);
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    composeBloc.add(LMComposeFetchTopics());
+    if (_focusNode.canRequestFocus) {
+      _focusNode.requestFocus();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +121,20 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
         child: AnnotatedRegion<SystemUiOverlayStyle>(
           value: widget.composeSystemOverlayStyle,
           child: Scaffold(
+            bottomSheet: _defMediaPicker(),
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 64.0, left: 16.0),
+              child: BlocBuilder<LMComposeBloc, LMComposeState>(
+                builder: (context, state) {
+                  if (state is LMComposeFetchedTopics) {
+                    return widget.composeTopicSelectorBuilder
+                            ?.call(state.topics) ??
+                        _defTopicSelector(state.topics);
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
             body: SafeArea(
               child: Column(
                 children: [
@@ -194,5 +255,83 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
 
   Widget _defContentInput() {
     return Container();
+  }
+
+  Widget _defMediaPicker() {
+    return PreferredSize(
+      preferredSize: Size(MediaQuery.of(context).size.width, 64),
+      child: Container(),
+    );
+  }
+
+  Widget _defTopicSelector(List<LMTopicViewData> topics) {
+    return ValueListenableBuilder(
+        valueListenable: rebuildTopicFloatingButton,
+        builder: (context, _, __) {
+          return GestureDetector(
+            onTap: () async {
+              if (_focusNode.hasFocus) {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                currentFocus.unfocus();
+                await Future.delayed(const Duration(milliseconds: 500));
+              }
+              _controllerPopUp.showMenu();
+            },
+            child: AbsorbPointer(
+              child: CustomPopupMenu(
+                controller: _controllerPopUp,
+                showArrow: false,
+                horizontalMargin: 16.0,
+                pressType: PressType.singleClick,
+                menuBuilder: () => LMTopicList(
+                    selectedTopics: selectedTopics,
+                    isEnabled: true,
+                    onTopicSelected: (updatedTopics, tappedTopic) {
+                      if (selectedTopics.isEmpty) {
+                        selectedTopics.add(tappedTopic);
+                      } else {
+                        if (selectedTopics.first.id == tappedTopic.id) {
+                          selectedTopics.clear();
+                        } else {
+                          selectedTopics.clear();
+                          selectedTopics.add(tappedTopic);
+                        }
+                      }
+                      _controllerPopUp.hideMenu();
+                      rebuildTopicFloatingButton.value =
+                          !rebuildTopicFloatingButton.value;
+                    }),
+                child: Container(
+                  height: 36,
+                  alignment: Alignment.bottomLeft,
+                  margin: const EdgeInsets.only(left: 16.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(500),
+                    color: kWhiteColor,
+                    border: Border.all(
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                  child: LMTopicChip(
+                    topic: selectedTopics.isEmpty
+                        ? (LMTopicViewDataBuilder()
+                              ..id("0")
+                              ..isEnabled(true)
+                              ..name("Topic"))
+                            .build()
+                        : selectedTopics.first,
+                    textStyle: const TextStyle(color: kPrimaryColor),
+                    icon: const LMIcon(
+                      type: LMIconType.icon,
+                      icon: CupertinoIcons.chevron_down,
+                      size: 16,
+                      color: kPrimaryColor,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
   }
 }
