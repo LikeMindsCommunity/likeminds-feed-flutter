@@ -15,6 +15,7 @@ class LMPostDetailScreenHandler {
   late final FocusNode focusNode;
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
+  Map<String, LMTopicViewData> topics = {};
 
   LMPostDetailScreenHandler(this.commetListPagingController, this.postId) {
     commentHandlerBloc = LMCommentHandlerBloc.instance;
@@ -32,11 +33,13 @@ class LMPostDetailScreenHandler {
     final response = await LMFeedCore.instance.lmFeedClient
         .getPostDetails(postDetailRequest);
 
-    users.addAll(response.users?.map((key, value) =>
-            MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
-        {});
-
     if (response.success) {
+      users.addAll(response.users!.map((key, value) =>
+          MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
+
+      topics.addAll(response.topics!.map((key, value) =>
+          MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
+
       final LMPostViewData postViewData =
           LMPostViewDataConvertor.fromPost(post: response.post!);
 

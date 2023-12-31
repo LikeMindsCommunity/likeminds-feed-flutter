@@ -10,7 +10,7 @@ class LMCommentViewDataConvertor {
       ..id(comment.id)
       ..userId(comment.userId)
       ..text(comment.text)
-      ..level(comment.level)
+      ..level(comment.level ?? 0)
       ..likesCount(comment.likesCount)
       ..repliesCount(comment.repliesCount)
       ..menuItems(comment.menuItems

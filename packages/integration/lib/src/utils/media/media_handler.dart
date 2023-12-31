@@ -7,7 +7,6 @@ import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/media/media_utils.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';

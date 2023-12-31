@@ -483,6 +483,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                       post: postData!,
                                       user: _postDetailScreenHandler!
                                           .users[postData!.userId]!,
+                                      topics: _postDetailScreenHandler!.topics,
                                       onPostTap: (context, post) {},
                                       isFeed: false,
                                       onTagTap: (tag) {},

@@ -29,6 +29,14 @@ typedef LMPostFooterBuilder = Widget Function(
 typedef LMPostMenuBuilder = Widget Function(
     BuildContext context, LMPostViewData post);
 
+/// {@template post_topic_builder}
+/// Builder function to build the topic widget.
+/// must return a widget, takes in [BuildContext]
+/// and [LMTopicViewData] as params
+/// {@endtemplate}
+typedef LMPostTopicBuilder = Widget Function(
+    BuildContext context, LMTopicViewData topic);
+
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params

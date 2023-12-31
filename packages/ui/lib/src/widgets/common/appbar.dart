@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
-class LMAppBar extends StatelessWidget {
+class LMAppBar extends StatelessWidget implements PreferredSizeWidget {
   const LMAppBar({
     super.key,
     this.leading,
@@ -15,6 +14,7 @@ class LMAppBar extends StatelessWidget {
     this.margin,
     this.padding,
     this.height,
+    this.width,
   });
 
   final Widget? leading;
@@ -24,6 +24,7 @@ class LMAppBar extends StatelessWidget {
   final Function? backButtonCallback;
 
   final double? height;
+  final double? width;
   final Color? backgroundColor;
   final Border? border;
   final EdgeInsets? padding;
@@ -31,12 +32,16 @@ class LMAppBar extends StatelessWidget {
   final MainAxisAlignment? mainAxisAlignment;
 
   @override
+  Size get preferredSize => Size(width ?? 0, height ?? 0);
+
+  @override
   Widget build(BuildContext context) {
     final theme = LMFeedTheme.of(context);
-    return Padding(
-      padding: margin ?? EdgeInsets.zero,
-      child: SizedBox(
-        height: height ?? 64,
+    final Size screenSize = MediaQuery.of(context).size;
+    return PreferredSize(
+      preferredSize: Size(width ?? screenSize.width, height ?? 64),
+      child: Padding(
+        padding: margin ?? EdgeInsets.zero,
         child: Container(
           decoration: BoxDecoration(
             color: backgroundColor ?? kWhiteColor,

@@ -80,8 +80,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
               future: initiateUser,
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.success) {
-                  return const LMPostDetailScreen(
-                      postId: "653388f3068a0ec51a176827");
+                  return const LMFeedScreen();
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
                   return const Center(

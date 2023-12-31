@@ -7,6 +7,7 @@ import 'package:likeminds_feed_driver_fl/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
+import 'package:media_kit/media_kit.dart';
 
 export 'package:likeminds_feed_driver_fl/src/views/views.dart';
 export 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
@@ -23,11 +24,13 @@ class LMFeedCore {
 
   LMFeedCore._();
 
-  void initialize({
+  Future<void> initialize({
     required LMFeedClient lmFeedClient,
   }) async {
     this.lmFeedClient = lmFeedClient;
-    mediaService = mediaService;
+    mediaService = LMMediaService(bucketName: "", poolId: "");
+    await LMUserLocalPreference.instance.initialize();
+    MediaKit.ensureInitialized();
     await LMUserLocalPreference.instance.initialize();
   }
 

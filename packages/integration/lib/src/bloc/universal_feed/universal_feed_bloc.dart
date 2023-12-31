@@ -18,15 +18,13 @@ class LMUniversalFeedBloc
   LMUniversalFeedBloc() : super(LMUniversalFeedInitial()) {
     on<LMUniversalFeedEvent>((event, emit) async {
       if (event is LMGetUniversalFeed) {
-        await _mapLMGetUniversalFeedToState(
-            event: event, offset: event.offset, emit: emit);
+        await _mapLMGetUniversalFeedToState(event: event, emit: emit);
       }
     });
   }
 
   FutureOr<void> _mapLMGetUniversalFeedToState(
       {required LMGetUniversalFeed event,
-      required int offset,
       required Emitter<LMUniversalFeedState> emit}) async {
     Map<String, LMUserViewData> users = {};
     Map<String, LMTopicViewData> topics = {};
@@ -55,7 +53,7 @@ class LMUniversalFeedBloc
     }
     GetFeedResponse? response = await LMFeedCore.instance.lmFeedClient.getFeed(
       (GetFeedRequestBuilder()
-            ..page(offset)
+            ..page(event.offset)
             ..topics(selectedTopics)
             ..pageSize(10))
           .build(),
