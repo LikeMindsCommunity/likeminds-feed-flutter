@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 /// {@template post_widget}
 /// A widget that displays a post on the feed.
@@ -47,7 +46,7 @@ class LMPostWidget extends StatefulWidget {
   final LMUserViewData user;
   final Map<String, LMTopicViewData> topics;
   final bool isFeed;
-  final OnPostTap onPostTap;
+  final LMOnPostTap onPostTap;
   final Function(String) onTagTap;
 
   final Function(bool isLiked)? onLikeTap;
@@ -65,6 +64,29 @@ class _LMPostWidgetState extends State<LMPostWidget> {
   bool? isPinned;
   ValueNotifier<bool> rebuildLikeWidget = ValueNotifier(false);
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
+  LMPostMetaData? postMetaData;
+
+  @override
+  void initState() {
+    super.initState();
+    postMetaData = (LMPostMetaDataBuilder()
+          ..postViewData(widget.post)
+          ..users({widget.post.userId: widget.user})
+          ..topics(widget.topics))
+        .build();
+  }
+
+  @override
+  void didUpdateWidget(covariant LMPostWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.post.id != widget.post.id) {
+      postMetaData = (LMPostMetaDataBuilder()
+            ..postViewData(widget.post)
+            ..users({widget.post.userId: widget.user})
+            ..topics(widget.topics))
+          .build();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,38 +100,52 @@ class _LMPostWidgetState extends State<LMPostWidget> {
             borderRadius: widget.borderRadius,
             boxShadow: widget.boxShadow,
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 18,
-              horizontal: 16,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                widget.headerBuilder != null
-                    ? widget.headerBuilder!(context, widget.post)
-                    : LMPostHeader(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              widget.headerBuilder != null
+                  ? widget.headerBuilder!(context, widget.post)
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                      child: LMPostHeader(
                         user: widget.user,
                         isFeed: widget.isFeed,
                       ),
-                widget.contentBuilder != null
-                    ? widget.contentBuilder!(context, widget.post)
-                    : LMPostContent(
+                    ),
+              widget.contentBuilder != null
+                  ? widget.contentBuilder!(context, postMetaData!)
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                      child: LMPostContent(
                         onTagTap: widget.onTagTap,
                       ),
-                widget.mediaBuilder == null
-                    ? widget.post.attachments != null &&
-                            widget.post.attachments!.isNotEmpty
-                        ? LMPostMedia(attachments: widget.post.attachments!)
-                        : const SizedBox()
-                    : widget.mediaBuilder!(context, widget.post),
-                const SizedBox(height: 18),
-                widget.footerBuilder != null
-                    ? widget.footerBuilder!(context, widget.post)
-                    : const LMPostFooter(),
-              ],
-            ),
+                    ),
+              widget.post.attachments != null &&
+                      widget.post.attachments!.isNotEmpty
+                  ? widget.mediaBuilder == null
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
+                          child: LMPostMedia(
+                              attachments: widget.post.attachments!),
+                        )
+                      : widget.mediaBuilder!(context, postMetaData!)
+                  : const SizedBox(),
+              const SizedBox(height: 18),
+              widget.footerBuilder != null
+                  ? widget.footerBuilder!(context, postMetaData!)
+                  : const Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                      child: LMPostFooter()),
+            ],
           ),
         ),
       ),

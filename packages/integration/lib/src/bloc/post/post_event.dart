@@ -56,7 +56,7 @@ class LMUpdatePost extends LMPostEvents {
   });
 
   @override
-  List<Object> get props => [post];
+  List<Object> get props => [post, DateTime.now().millisecondsSinceEpoch];
 }
 
 class LMTogglePinPost extends LMPostEvents {

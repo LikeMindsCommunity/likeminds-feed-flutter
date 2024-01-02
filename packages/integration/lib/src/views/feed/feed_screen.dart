@@ -5,10 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/universal_feed/universal_feed_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/assets_constants.dart';
@@ -35,10 +32,12 @@ class LMFeedScreen extends StatefulWidget {
     this.noNewPageWidgetBuilder,
     this.enablePostCreation = true,
     this.enableTopicFiltering = true,
+    this.showCustomWidget = false,
   });
 
   //Builder for appbar
   final LMAppBar? appBar;
+  final bool showCustomWidget;
 
   //Callback for activity
 
@@ -267,7 +266,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = LMThemeData.suraasaTheme;
+    ThemeData theme = LMThemeData.theme;
     return Scaffold(
       backgroundColor: LMThemeData.kWhiteColor,
       appBar: widget.appBar ??
@@ -300,20 +299,24 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         child: Column(
           children: [
             LMThemeData.kVerticalPaddingLarge,
-            ValueListenableBuilder(
-              valueListenable: postSomethingNotifier,
-              builder: (context, _, __) {
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 160),
-                  height: iconContainerHeight,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: const BoxDecoration(),
-                  child: PostSomething(
-                    enabled: userPostingRights,
-                  ),
-                );
-              },
-            ),
+            widget.showCustomWidget
+                ? ValueListenableBuilder(
+                    valueListenable: postSomethingNotifier,
+                    builder: (context, _, __) {
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 160),
+                        height: iconContainerHeight,
+                        clipBehavior: Clip.hardEdge,
+                        decoration: const BoxDecoration(),
+                        child: widget.customWidgetBuilder == null
+                            ? PostSomething(
+                                enabled: userPostingRights,
+                              )
+                            : widget.customWidgetBuilder!(context),
+                      );
+                    },
+                  )
+                : const SizedBox(),
             ValueListenableBuilder(
               valueListenable: rebuildTopicFeed,
               builder: (context, _, __) {
@@ -487,6 +490,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   onRefresh: refresh,
                   scrollController: _controller,
                   openTopicBottomSheet: showTopicSelectSheet,
+                  postBuilder: widget.postBuilder,
                 ),
               ),
             ),
@@ -494,19 +498,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         ),
       ),
     );
-  }
-}
-
-class FeedRoomErrorView extends StatelessWidget {
-  final String message;
-
-  const FeedRoomErrorView({super.key, required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: LMThemeData.kBackgroundColor,
-        body: Center(child: Text(message)));
   }
 }
 
@@ -521,6 +512,7 @@ class FeedRoomView extends StatefulWidget {
   final ScrollController scrollController;
   final VoidCallback onRefresh;
   final VoidCallback openTopicBottomSheet;
+  final LMPostWidgetBuilder? postBuilder;
 
   const FeedRoomView({
     super.key,
@@ -534,6 +526,7 @@ class FeedRoomView extends StatefulWidget {
     required this.users,
     required this.widgets,
     required this.topics,
+    this.postBuilder,
   });
 
   @override
@@ -546,6 +539,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   ScrollController? _controller;
   final ValueNotifier postSomethingNotifier = ValueNotifier(false);
   bool right = true;
+  LMPostMetaDataBuilder? postMetaDataBuilder;
 
   Widget getLoaderThumbnail(LMMediaModel? media) {
     if (media != null) {
@@ -599,6 +593,10 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         eventProperties: {'feed_type': "universal_feed"}));
     _controller = widget.scrollController..addListener(_scrollListener);
     right = checkPostCreationRights();
+    postMetaDataBuilder = (LMPostMetaDataBuilder()
+      ..users(widget.users)
+      ..topics(widget.topics)
+      ..widgets({}));
   }
 
   void _scrollListener() {
@@ -621,9 +619,9 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   @override
   Widget build(BuildContext context) {
     LMPostBloc newPostBloc = LMPostBloc.instance;
-    final ThemeData theme = LMThemeData.suraasaTheme;
+    final ThemeData theme = LMThemeData.theme;
     return Scaffold(
-      backgroundColor: LMThemeData.kBackgroundColor,
+      backgroundColor: LMThemeData.theme.colorScheme.background,
       body: Column(
         children: [
           BlocConsumer<LMPostBloc, LMPostState>(
@@ -711,7 +709,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               if (state is LMEditPostUploading) {
                 return Container(
                   height: 60,
-                  color: LMThemeData.kWhiteColor,
+                  color: LMThemeData.theme.colorScheme.background,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: const Row(
@@ -928,30 +926,55 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                             return Column(
                               children: [
                                 const SizedBox(height: 8),
-                                LMPostWidget(
-                                    post: item,
-                                    topics: widget.topics,
-                                    user: widget.users[item.userId]!,
-                                    onPostTap: (context, post) {
-                                      LMAnalyticsBloc.instance.add(
-                                          LMFireAnalyticsEvent(
-                                              eventName: LMAnalyticsKeys
-                                                  .commentListOpen,
-                                              eventProperties: {
-                                            'postId': item.id,
-                                          }));
-                                      Navigator.push(
+                                widget.postBuilder != null
+                                    ? widget.postBuilder!(
                                         context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              LMPostDetailScreen(
-                                            postId: post.id,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    isFeed: false,
-                                    onTagTap: (String userId) {}),
+                                        (postMetaDataBuilder!
+                                              ..postViewData(item))
+                                            .build())
+                                    : LMPostWidget(
+                                        post: item,
+                                        topics: widget.topics,
+                                        user: widget.users[item.userId]!,
+                                        onPostTap: (context, post) {
+                                          LMAnalyticsBloc.instance.add(
+                                              LMFireAnalyticsEvent(
+                                                  eventName: LMAnalyticsKeys
+                                                      .commentListOpen,
+                                                  eventProperties: {
+                                                'postId': item.id,
+                                              }));
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LMPostDetailScreen(
+                                                postId: post.id,
+                                                postBuilder:
+                                                    widget.postBuilder == null
+                                                        ? null
+                                                        : (context, post) {
+                                                            postMetaDataBuilder!
+                                                                .postViewData(post
+                                                                    .postViewData);
+
+                                                            postMetaDataBuilder!
+                                                                .source(LMPostSource
+                                                                    .postDetail);
+
+                                                            return widget
+                                                                    .postBuilder!(
+                                                                context,
+                                                                postMetaDataBuilder!
+                                                                    .build());
+                                                          },
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        isFeed: false,
+                                        onTagTap: (String userId) {}),
+                                const SizedBox(height: 8),
                               ],
                             );
                           },
@@ -969,59 +992,51 @@ class _FeedRoomViewState extends State<FeedRoomView> {
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
-          return widget.feedRoomPagingController.itemList == null ||
-                  widget.feedRoomPagingController.itemList!.isEmpty
-              ? const SizedBox()
-              : LMTextButton(
-                  height: 44,
-                  width: 153,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                  borderRadius: 28,
-                  backgroundColor: right
-                      ? theme.colorScheme.primary
-                      : LMThemeData.kGrey3Color,
-                  placement: LMIconPlacement.end,
-                  text: LMTextView(
-                    text: "Create Post",
-                    textStyle: TextStyle(
-                      color: theme.colorScheme.onPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  margin: 5,
-                  icon: LMIcon(
-                    type: LMIconType.icon,
-                    icon: Icons.add,
-                    fit: BoxFit.cover,
-                    size: 18,
-                    color: theme.colorScheme.onPrimary,
-                  ),
-                  onTap: right
-                      ? () {
-                          if (!postUploading.value) {
-                            LMAnalyticsBloc.instance.add(
-                                const LMFireAnalyticsEvent(
-                                    eventName:
-                                        LMAnalyticsKeys.postCreationStarted,
-                                    eventProperties: {}));
-                            // TODO: Navigate to NewPostScreen
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => const NewPostScreen(),
-                            //   ),
-                            // );
-                          } else {
-                            toast(
-                              'A post is already uploading.',
-                              duration: Toast.LENGTH_LONG,
-                            );
-                          }
-                        }
-                      : () =>
-                          toast("You do not have permission to create a post"),
-                );
+          return LMTextButton(
+            height: 44,
+            width: 153,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            borderRadius: 28,
+            backgroundColor:
+                right ? theme.colorScheme.primary : LMThemeData.kGrey3Color,
+            placement: LMIconPlacement.end,
+            text: LMTextView(
+              text: "Create Post",
+              textStyle: TextStyle(
+                color: theme.colorScheme.onPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            margin: 5,
+            icon: LMIcon(
+              type: LMIconType.icon,
+              icon: Icons.add,
+              fit: BoxFit.cover,
+              size: 18,
+              color: theme.colorScheme.onPrimary,
+            ),
+            onTap: right
+                ? () {
+                    if (!postUploading.value) {
+                      LMAnalyticsBloc.instance.add(const LMFireAnalyticsEvent(
+                          eventName: LMAnalyticsKeys.postCreationStarted,
+                          eventProperties: {}));
+                      // TODO: Navigate to NewPostScreen
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => const NewPostScreen(),
+                      //   ),
+                      // );
+                    } else {
+                      toast(
+                        'A post is already uploading.',
+                        duration: Toast.LENGTH_LONG,
+                      );
+                    }
+                  }
+                : () => toast("You do not have permission to create a post"),
+          );
         },
       ),
     );

@@ -104,7 +104,7 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    ThemeData theme = LMThemeData.suraasaTheme;
+    ThemeData theme = LMThemeData.theme;
     return Container(
       width: screenSize.width,
       constraints: BoxConstraints(

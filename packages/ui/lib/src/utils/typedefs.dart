@@ -19,7 +19,7 @@ typedef LMPostHeaderBuilder = Widget Function(
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMPostFooterBuilder = Widget Function(
-    BuildContext context, LMPostViewData post);
+    BuildContext context, LMPostMetaData post);
 
 /// {@template post_menu_builder}
 /// Builder function to build the post widget.
@@ -27,7 +27,7 @@ typedef LMPostFooterBuilder = Widget Function(
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMPostMenuBuilder = Widget Function(
-    BuildContext context, LMPostViewData post);
+    BuildContext context, LMPostMetaData post);
 
 /// {@template post_topic_builder}
 /// Builder function to build the topic widget.
@@ -35,33 +35,33 @@ typedef LMPostMenuBuilder = Widget Function(
 /// and [LMTopicViewData] as params
 /// {@endtemplate}
 typedef LMPostTopicBuilder = Widget Function(
-    BuildContext context, LMTopicViewData topic);
+    BuildContext context, LMPostMetaData topic);
 
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMPostMediaBuilder = Widget Function(
-    BuildContext context, LMPostViewData post);
+    BuildContext context, LMPostMetaData post);
 
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMPostContentBuilder = Widget Function(
-    BuildContext context, LMPostViewData post);
+    BuildContext context, LMPostMetaData post);
 
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMPostWidgetBuilder = Widget Function(
-    BuildContext context, LMPostViewData post);
+    BuildContext context, LMPostMetaData post);
 
 ///{@template post_callback}
 /// A callback to handle interactions with the post.
 /// {@endtemplate}
-typedef OnPostTap = void Function(
+typedef LMOnPostTap = void Function(
     BuildContext context, LMPostViewData activity);
 
 ///{@template post_appbar_builder}

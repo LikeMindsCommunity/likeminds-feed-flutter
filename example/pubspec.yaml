@@ -13,6 +13,7 @@ dependencies:
 
   overlay_support: any
   cupertino_icons: ^1.0.2
+  flutter_svg:
   dotenv: ^4.2.0
   likeminds_feed_driver_fl:
     path: ../packages/integration
@@ -29,3 +30,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # To add assets to your package, add an assets section, like this:
+  assets:
+    - assets/
+    - assets/icons/

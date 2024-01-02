@@ -1,15 +1,19 @@
 library likeminds_feed_driver_fl;
 
+import 'package:flutter/material.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 import 'package:media_kit/media_kit.dart';
 
 export 'package:likeminds_feed_driver_fl/src/views/views.dart';
+export 'package:likeminds_feed_driver_fl/src/utils/constants/constants.dart';
+export 'package:likeminds_feed_driver_fl/src/bloc/lm_bloc.dart';
 export 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 
 class LMFeedCore {
@@ -26,12 +30,16 @@ class LMFeedCore {
 
   Future<void> initialize({
     required LMFeedClient lmFeedClient,
+    ThemeData? theme,
   }) async {
     this.lmFeedClient = lmFeedClient;
     mediaService = LMMediaService(bucketName: "", poolId: "");
     await LMUserLocalPreference.instance.initialize();
     MediaKit.ensureInitialized();
     await LMUserLocalPreference.instance.initialize();
+    if (theme != null) {
+      LMThemeData.instance.setTheme = theme;
+    }
   }
 
   Future<void> closeBlocs() async {

@@ -171,7 +171,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         keepSuggestionsOnSuggestionSelected: true,
         itemBuilder: (context, opt) {
           return Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: Colors.white,
               border: Border(
                 bottom: BorderSide(

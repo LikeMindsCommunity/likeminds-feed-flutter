@@ -10,8 +10,17 @@ import 'package:overlay_support/overlay_support.dart';
 
 class PostSomething extends StatelessWidget {
   final bool enabled;
+  final Color? borderColor;
+  final Color? backgroundColor;
+  final Color? primaryColor;
 
-  const PostSomething({Key? key, required this.enabled}) : super(key: key);
+  const PostSomething({
+    Key? key,
+    required this.enabled,
+    this.borderColor,
+    this.backgroundColor,
+    this.primaryColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,16 +48,17 @@ class PostSomething extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50.0),
+            color: backgroundColor,
             border: Border.all(
               width: 1,
-              color: LMThemeData.onSurface,
+              color: borderColor ?? LMThemeData.onSurface,
             ),
           ),
           child: Row(
             children: <Widget>[
               LMProfilePicture(
                 fallbackText: user.name,
-                backgroundColor: LMThemeData.kPrimaryColor,
+                backgroundColor: LMThemeData.theme.primaryColor,
                 imageUrl: user.imageUrl,
                 boxShape: BoxShape.circle,
                 onTap: () {

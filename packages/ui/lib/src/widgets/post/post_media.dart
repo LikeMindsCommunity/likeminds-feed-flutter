@@ -132,7 +132,7 @@ class _LMPostMediaState extends State<LMPostMedia> {
 
     return Align(
       child: SizedBox(
-        width: screenSize.width - 32,
+        width: widget.width ?? screenSize.width - 32,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

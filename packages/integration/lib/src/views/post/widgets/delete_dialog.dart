@@ -229,8 +229,8 @@ class LMDeleteConfirmationDialog extends StatelessWidget {
                                         ),
                                         Icon(
                                           Icons.arrow_drop_down,
-                                          color: LMThemeData.suraasaTheme
-                                              .colorScheme.onSecondary,
+                                          color: LMThemeData
+                                              .theme.colorScheme.onSecondary,
                                         )
                                       ],
                                     )),

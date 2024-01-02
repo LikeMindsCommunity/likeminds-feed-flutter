@@ -70,7 +70,7 @@ class _LMCarouselState extends State<LMCarousel> {
       if (e.attachmentType == 1) {
         return Container(
           color: Colors.black,
-          width: MediaQuery.of(context).size.width,
+          width: widget.width ?? MediaQuery.of(context).size.width,
           child: Center(
             child: widget.imageItem ??
                 LMImage(
@@ -88,7 +88,7 @@ class _LMCarouselState extends State<LMCarousel> {
       } else if ((e.attachmentType == 2)) {
         return Container(
           color: Colors.black,
-          width: MediaQuery.of(context).size.width,
+          width: widget.width ?? MediaQuery.of(context).size.width,
           child: widget.videoItem ??
               LMVideo(
                 initialiseVideoController: widget.initialiseVideoController,
@@ -112,6 +112,7 @@ class _LMCarouselState extends State<LMCarousel> {
   Widget build(BuildContext context) {
     mapAttachmentsToWidget();
     return Container(
+      width: widget.width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
         border: Border.all(

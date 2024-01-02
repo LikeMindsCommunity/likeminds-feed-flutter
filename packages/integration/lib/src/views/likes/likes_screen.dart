@@ -198,7 +198,7 @@ class DeletedLikesTile extends StatelessWidget {
           text: 'Deleted User',
           textStyle: TextStyle(
             fontSize: LMThemeData.kFontMedium,
-            color: LMThemeData.suraasaTheme.colorScheme.onSecondary,
+            color: LMThemeData.theme.colorScheme.onSecondary,
           ),
         )
       ],

@@ -333,8 +333,8 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                                           ? "1 Like"
                                           : "${commentViewData.likesCount} Likes",
                                   textStyle: TextStyle(
-                                    color: LMThemeData
-                                        .suraasaTheme.colorScheme.primary,
+                                    color:
+                                        LMThemeData.theme.colorScheme.primary,
                                     fontSize: 12,
                                   ),
                                 ),

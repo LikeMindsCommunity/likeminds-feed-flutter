@@ -16,6 +16,7 @@ class LMPostDetailScreenHandler {
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   Map<String, LMTopicViewData> topics = {};
+  LMPostMetaData? postMetaData;
 
   LMPostDetailScreenHandler(this.commetListPagingController, this.postId) {
     commentHandlerBloc = LMCommentHandlerBloc.instance;
@@ -42,6 +43,13 @@ class LMPostDetailScreenHandler {
 
       final LMPostViewData postViewData =
           LMPostViewDataConvertor.fromPost(post: response.post!);
+
+      postMetaData ??= (LMPostMetaDataBuilder()
+            ..postViewData(postViewData)
+            ..users(users)
+            ..topics(topics)
+            ..widgets({}))
+          .build();
 
       final List<LMCommentViewData> commentList = postViewData.replies;
 

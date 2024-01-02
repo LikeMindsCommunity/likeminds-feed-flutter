@@ -2,6 +2,8 @@ import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
+import 'package:likeminds_feed_example/constants/theme.dart';
+import 'package:likeminds_feed_example/feed/post_widget.dart';
 import 'package:likeminds_feed_example/globals.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -46,41 +48,30 @@ class _LMSampleAppState extends State<LMSampleApp> {
         debugShowCheckedModeBanner: true,
         navigatorKey: rootNavigatorKey,
         scaffoldMessengerKey: rootScaffoldMessengerKey,
-        theme: ThemeData(
-          useMaterial3: true,
-          primaryColor: Colors.deepPurple,
-          inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            outlineBorder: const BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-            activeIndicatorBorder: const BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.deepPurple,
-                width: 2,
-              ),
-            ),
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.deepPurple,
-                width: 2,
-              ),
-            ),
-          ),
-        ),
+        theme: clientTheme,
         home: Scaffold(
           body: FutureBuilder(
               future: initiateUser,
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.success) {
-                  return const LMFeedScreen();
+                  return FutureBuilder(
+                      future: memberState,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData && snapshot.data!.success) {
+                          return const LMFeedScreen(
+                            postBuilder: clientPostWidgetBuilder,
+                          );
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          );
+                        } else {
+                          return const Center(
+                            child: Text("An error occurred"),
+                          );
+                        }
+                      });
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
                   return const Center(

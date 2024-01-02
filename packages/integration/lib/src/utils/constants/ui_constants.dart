@@ -57,12 +57,23 @@ class LMThemeData {
   static const SizedBox kVerticalPaddingMedium =
       SizedBox(height: kPaddingMedium);
 
-  static final ThemeData suraasaTheme = ThemeData(
+  ThemeData _theme = ThemeData(
     colorScheme: ColorScheme.fromSeed(
       seedColor: LMThemeData.kPrimaryColor,
       primary: LMThemeData.kPrimaryColor,
       secondary: LMThemeData.primary500,
       onSecondary: LMThemeData.kSecondaryColor700,
+      background: LMThemeData.kBackgroundColor,
     ),
   );
+
+  LMThemeData._();
+
+  static LMThemeData get instance => _instance ??= LMThemeData._();
+
+  static LMThemeData? _instance;
+
+  set setTheme(ThemeData clientTheme) => _theme = clientTheme;
+
+  static ThemeData get theme => instance._theme;
 }
