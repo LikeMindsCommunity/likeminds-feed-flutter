@@ -15,7 +15,7 @@ class LMFeedTheme extends InheritedWidget {
 
     assert(
       lmTheme != null,
-      'You must have a StreamChatTheme widget at the top of your widget tree',
+      'You must have a LMFeedTheme widget at the top of your widget tree',
     );
 
     return lmTheme!.theme;

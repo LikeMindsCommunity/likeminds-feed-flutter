@@ -51,108 +51,108 @@ Widget clientPostWidgetBuilder(
           width: screenSize.width,
         );
       },
-      footerBuilder: (context, post) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: LMPostFooter(
-            children: [
-              LMButton(
-                text: LMTextView(
-                    text:
-                        getPostLikesText(postMetaData.postViewData.likeCount)),
-                margin: 0,
-                onTap: () async {
-                  if (post.postViewData.isLiked) {
-                    postMetaData.postViewData.likeCount =
-                        postMetaData.postViewData.likeCount - 1;
-                  } else {
-                    postMetaData.postViewData.likeCount =
-                        postMetaData.postViewData.likeCount + 1;
-                  }
-                  postMetaData.postViewData.isLiked =
-                      !postMetaData.postViewData.isLiked;
-                  LMPostBloc.instance
-                      .add(LMUpdatePost(post: postMetaData.postViewData));
-                },
-                icon: const LMIcon(
-                  type: LMIconType.svg,
-                  assetPath: clientLikeUnfilled,
-                  size: 24,
-                  boxPadding: 6,
-                ),
-                activeIcon: const LMIcon(
-                  type: LMIconType.svg,
-                  assetPath: clientLikeFilled,
-                  color: Colors.red,
-                  size: 24,
-                  boxPadding: 6,
-                ),
-                isActive: postMetaData.postViewData.isLiked,
-              ),
-              const SizedBox(width: 6),
-              LMButton(
-                text: LMTextView(
-                    text: getPostCommentButtonText(
-                        postMetaData.postViewData.commentCount)),
-                margin: 0,
-                onTap: () {
-                  if (postMetaData.source == LMPostSource.feed) {
-                    LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-                        eventName: LMAnalyticsKeys.commentListOpen,
-                        eventProperties: {
-                          'postId': postMetaData.postViewData.id,
-                        }));
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LMPostDetailScreen(
-                          postId: post.postViewData.id,
-                          isFeed: false,
-                          postBuilder: (context, post) {
-                            return clientPostWidgetBuilder(
-                                context, postMetaData);
-                          },
-                        ),
-                      ),
-                    );
-                  }
-                },
-                icon: const LMIcon(
-                  type: LMIconType.svg,
-                  assetPath: clientComment,
-                  size: 20,
-                  boxPadding: 6,
-                ),
-              ),
-              const Spacer(),
-              LMIconButton(
-                onTap: (_) {
-                  // String? postType = postDetails!.attachments == null ||
-                  //         postDetails!.attachments!.isEmpty
-                  //     ? 'text'
-                  //     : getPostType(
-                  //         postDetails!.attachments?.first.attachmentType ?? 0);
+      // footerBuilder: (context, post) {
+      //   return Padding(
+      //     padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      //     child: LMPostFooter(
+      //       children: [
+      //         LMTextButton(
+      //           text: LMTextView(
+      //               text:
+      //                   getPostLikesText(postMetaData.postViewData.likeCount)),
+      //           margin: 0,
+      //           onTap: () async {
+      //             if (post.postViewData.isLiked) {
+      //               postMetaData.postViewData.likeCount =
+      //                   postMetaData.postViewData.likeCount - 1;
+      //             } else {
+      //               postMetaData.postViewData.likeCount =
+      //                   postMetaData.postViewData.likeCount + 1;
+      //             }
+      //             postMetaData.postViewData.isLiked =
+      //                 !postMetaData.postViewData.isLiked;
+      //             LMPostBloc.instance
+      //                 .add(LMUpdatePost(post: postMetaData.postViewData));
+      //           },
+      //           icon: const LMIcon(
+      //             type: LMIconType.svg,
+      //             assetPath: clientLikeUnfilled,
+      //             size: 24,
+      //             boxPadding: 6,
+      //           ),
+      //           activeIcon: const LMIcon(
+      //             type: LMIconType.svg,
+      //             assetPath: clientLikeFilled,
+      //             color: Colors.red,
+      //             size: 24,
+      //             boxPadding: 6,
+      //           ),
+      //           isActive: postMetaData.postViewData.isLiked,
+      //         ),
+      //         const SizedBox(width: 6),
+      //         LMTextButton(
+      //           text: LMTextView(
+      //               text: getPostCommentButtonText(
+      //                   postMetaData.postViewData.commentCount)),
+      //           margin: 0,
+      //           onTap: () {
+      //             if (postMetaData.source == LMPostSource.feed) {
+      //               LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+      //                   eventName: LMAnalyticsKeys.commentListOpen,
+      //                   eventProperties: {
+      //                     'postId': postMetaData.postViewData.id,
+      //                   }));
+      //               Navigator.push(
+      //                 context,
+      //                 MaterialPageRoute(
+      //                   builder: (context) => LMPostDetailScreen(
+      //                     postId: post.postViewData.id,
+      //                     isFeed: false,
+      //                     postBuilder: (context, post) {
+      //                       return clientPostWidgetBuilder(
+      //                           context, postMetaData);
+      //                     },
+      //                   ),
+      //                 ),
+      //               );
+      //             }
+      //           },
+      //           icon: const LMIcon(
+      //             type: LMIconType.svg,
+      //             assetPath: clientComment,
+      //             size: 20,
+      //             boxPadding: 6,
+      //           ),
+      //         ),
+      //         const Spacer(),
+      //         LMIconButton(
+      //           onTap: (_) {
+      //             // String? postType = postDetails!.attachments == null ||
+      //             //         postDetails!.attachments!.isEmpty
+      //             //     ? 'text'
+      //             //     : getPostType(
+      //             //         postDetails!.attachments?.first.attachmentType ?? 0);
 
-                  // LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-                  //   eventName: LMAnalyticsKeys.postShared,
-                  //   eventProperties: {
-                  //     "post_id": postMetaData.postViewData.id,
-                  //     "post_type": postType,
-                  //     "user_id": user.userUniqueId,
-                  //   },
-                  // ));
-                  // SharePost().sharePost(postMetaData.postViewData.id);
-                },
-                icon: const LMIcon(
-                  type: LMIconType.svg,
-                  assetPath: clientShare,
-                  size: 20,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+      //             // LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+      //             //   eventName: LMAnalyticsKeys.postShared,
+      //             //   eventProperties: {
+      //             //     "post_id": postMetaData.postViewData.id,
+      //             //     "post_type": postType,
+      //             //     "user_id": user.userUniqueId,
+      //             //   },
+      //             // ));
+      //             // SharePost().sharePost(postMetaData.postViewData.id);
+      //           },
+      //           icon: const LMIcon(
+      //             type: LMIconType.svg,
+      //             assetPath: clientShare,
+      //             size: 20,
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   );
+      // },
     ),
   );
 }
@@ -167,7 +167,7 @@ Widget clientPostWidgetBuilder(
 //     comment: commentViewData,
 //     onTagTap: (String userId) {},
 //     commentActions: [
-//       LMButton(
+//       LMTextButton(
 //         margin: 10,
 //         text: LMTextView(
 //           text: commentViewData.likesCount == 0
@@ -228,7 +228,7 @@ Widget clientPostWidgetBuilder(
 //       const SizedBox(width: 12),
 //       Row(
 //         children: [
-//           LMButton(
+//           LMTextButton(
 //             margin: 10,
 //             text: const LMTextView(
 //                 text: "Reply",
@@ -258,7 +258,7 @@ Widget clientPostWidgetBuilder(
 //           ),
 //           LMThemeData.kHorizontalPaddingMedium,
 //           commentViewData.repliesCount > 0
-//               ? LMButton(
+//               ? LMTextButton(
 //                   onTap: () {
 //                     if (replyShown &&
 //                         commentIdReplyId != null &&

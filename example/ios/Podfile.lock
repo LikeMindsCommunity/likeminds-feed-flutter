@@ -193,7 +193,7 @@ SPEC CHECKSUMS:
   path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
-  realm: 47ac5a3c8e1944b6fe9d1cf067ed772a181c0886
+  realm: 54fd2259bb0c43cafcc8aff1ade9623dc4430a73
   screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
   SDWebImage: a81bbb3ba4ea5f810f4069c68727cb118467a04a
   shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
@@ -207,4 +207,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: a57f30d18f102dd3ce366b1d62a55ecbef2158e5
 
-COCOAPODS: 1.14.2
+COCOAPODS: 1.12.1
