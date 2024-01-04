@@ -5,6 +5,8 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_example/constants/theme.dart';
 import 'package:likeminds_feed_example/feed/post_widget.dart';
 import 'package:likeminds_feed_example/globals.dart';
+import 'package:likeminds_feed_example/theme.dart';
+import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMSampleApp extends StatefulWidget {

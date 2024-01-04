@@ -113,32 +113,34 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () {
-          widget.composeDiscardDialogBuilder?.call(context) ??
-              _showDefaultDiscardDialog(context);
-          return Future.value(false);
-        },
-        child: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: widget.composeSystemOverlayStyle,
-          child: Scaffold(
-            bottomSheet: _defMediaPicker(),
-            floatingActionButton: Padding(
-              padding: const EdgeInsets.only(bottom: 64.0, left: 16.0),
-              child: BlocBuilder<LMComposeBloc, LMComposeState>(
-                builder: (context, state) {
-                  if (state is LMComposeFetchedTopics) {
-                    return widget.composeTopicSelectorBuilder
-                            ?.call(state.topics) ??
-                        _defTopicSelector(state.topics);
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
+      onWillPop: () {
+        widget.composeDiscardDialogBuilder?.call(context) ??
+            _showDefaultDiscardDialog(context);
+        return Future.value(false);
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: widget.composeSystemOverlayStyle,
+        child: Scaffold(
+          backgroundColor: kWhiteColor,
+          bottomSheet: _defMediaPicker(),
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
+            child: BlocBuilder<LMComposeBloc, LMComposeState>(
+              bloc: composeBloc,
+              builder: (context, state) {
+                if (state is LMComposeFetchedTopics) {
+                  return widget.composeTopicSelectorBuilder
+                          ?.call(state.topics) ??
+                      _defTopicSelector(state.topics);
+                }
+                return const SizedBox.shrink();
+              },
             ),
-            body: SafeArea(
+          ),
+          body: SafeArea(
+            child: Container(
               child: Column(
                 children: [
-                  const SizedBox(height: 18),
                   widget.composeAppBarBuilder?.call() ?? _defAppBar(),
                   const SizedBox(height: 18),
                   widget.composeContentBuilder?.call() ?? _defContentInput(),
@@ -146,7 +148,9 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   _showDefaultDiscardDialog(BuildContext context) {
@@ -258,80 +262,87 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
   }
 
   Widget _defMediaPicker() {
-    return PreferredSize(
-      preferredSize: Size(MediaQuery.of(context).size.width, 64),
-      child: Container(),
+    return Container(
+      color: Colors.red,
+      height: 72,
     );
   }
 
   Widget _defTopicSelector(List<LMTopicViewData> topics) {
-    return ValueListenableBuilder(
-        valueListenable: rebuildTopicFloatingButton,
-        builder: (context, _, __) {
-          return GestureDetector(
-            onTap: () async {
-              if (_focusNode.hasFocus) {
-                FocusScopeNode currentFocus = FocusScope.of(context);
-                currentFocus.unfocus();
-                await Future.delayed(const Duration(milliseconds: 500));
-              }
-              _controllerPopUp.showMenu();
-            },
-            child: AbsorbPointer(
-              child: CustomPopupMenu(
-                controller: _controllerPopUp,
-                showArrow: false,
-                horizontalMargin: 16.0,
-                pressType: PressType.singleClick,
-                menuBuilder: () => LMTopicList(
-                    selectedTopics: selectedTopics,
-                    isEnabled: true,
-                    onTopicSelected: (updatedTopics, tappedTopic) {
-                      if (selectedTopics.isEmpty) {
-                        selectedTopics.add(tappedTopic);
-                      } else {
-                        if (selectedTopics.first.id == tappedTopic.id) {
-                          selectedTopics.clear();
-                        } else {
-                          selectedTopics.clear();
-                          selectedTopics.add(tappedTopic);
-                        }
-                      }
-                      _controllerPopUp.hideMenu();
-                      rebuildTopicFloatingButton.value =
-                          !rebuildTopicFloatingButton.value;
-                    }),
-                child: Container(
-                  height: 36,
-                  alignment: Alignment.bottomLeft,
-                  margin: const EdgeInsets.only(left: 16.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(500),
-                    color: kWhiteColor,
-                    border: Border.all(
-                      color: kPrimaryColor,
+    return Row(
+      children: [
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: ValueListenableBuilder(
+              valueListenable: rebuildTopicFloatingButton,
+              builder: (context, _, __) {
+                return GestureDetector(
+                  onTap: () async {
+                    if (_focusNode.hasFocus) {
+                      FocusScopeNode currentFocus = FocusScope.of(context);
+                      currentFocus.unfocus();
+                      await Future.delayed(const Duration(milliseconds: 500));
+                    }
+                    _controllerPopUp.showMenu();
+                  },
+                  child: AbsorbPointer(
+                    child: CustomPopupMenu(
+                      controller: _controllerPopUp,
+                      showArrow: false,
+                      horizontalMargin: 16.0,
+                      pressType: PressType.singleClick,
+                      menuBuilder: () => LMTopicList(
+                          selectedTopics: selectedTopics,
+                          isEnabled: true,
+                          onTopicSelected: (updatedTopics, tappedTopic) {
+                            if (selectedTopics.isEmpty) {
+                              selectedTopics.add(tappedTopic);
+                            } else {
+                              if (selectedTopics.first.id == tappedTopic.id) {
+                                selectedTopics.clear();
+                              } else {
+                                selectedTopics.clear();
+                                selectedTopics.add(tappedTopic);
+                              }
+                            }
+                            _controllerPopUp.hideMenu();
+                            rebuildTopicFloatingButton.value =
+                                !rebuildTopicFloatingButton.value;
+                          }),
+                      child: Container(
+                        height: 36,
+                        alignment: Alignment.bottomLeft,
+                        margin: const EdgeInsets.only(left: 16.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(500),
+                          color: kWhiteColor,
+                          border: Border.all(
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                        child: LMTopicChip(
+                          topic: selectedTopics.isEmpty
+                              ? (LMTopicViewDataBuilder()
+                                    ..id("0")
+                                    ..isEnabled(true)
+                                    ..name("Topic"))
+                                  .build()
+                              : selectedTopics.first,
+                          textStyle: const TextStyle(color: kPrimaryColor),
+                          icon: const LMIcon(
+                            type: LMIconType.icon,
+                            icon: CupertinoIcons.chevron_down,
+                            size: 16,
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  child: LMTopicChip(
-                    topic: selectedTopics.isEmpty
-                        ? (LMTopicViewDataBuilder()
-                              ..id("0")
-                              ..isEnabled(true)
-                              ..name("Topic"))
-                            .build()
-                        : selectedTopics.first,
-                    textStyle: const TextStyle(color: kPrimaryColor),
-                    icon: const LMIcon(
-                      type: LMIconType.icon,
-                      icon: CupertinoIcons.chevron_down,
-                      size: 16,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-        });
+                );
+              }),
+        ),
+      ],
+    );
   }
 }

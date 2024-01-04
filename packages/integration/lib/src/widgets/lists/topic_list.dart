@@ -98,7 +98,7 @@ class _LMTopicListState extends State<LMTopicList> {
     Size screenSize = MediaQuery.of(context).size;
     ThemeData theme = LMFeedTheme.of(context);
     return Container(
-      width: min(screenSize.width, 265),
+      width: min(screenSize.width, 120),
       constraints: const BoxConstraints(maxHeight: 250),
       decoration: BoxDecoration(
         color: kWhiteColor,

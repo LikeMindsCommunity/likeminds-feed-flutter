@@ -18,7 +18,7 @@ export 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_prefer
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
-  late final LMMediaService? mediaService;
+  late final LMMediaService? media;
 
   static LMFeedCore? _instance;
 
@@ -33,7 +33,7 @@ class LMFeedCore {
     ThemeData? theme,
   }) async {
     this.lmFeedClient = lmFeedClient;
-    mediaService = LMMediaService(bucketName: "", poolId: "");
+    media = LMMediaService(bucketName: "", poolId: "");
     await LMUserLocalPreference.instance.initialize();
     MediaKit.ensureInitialized();
     await LMUserLocalPreference.instance.initialize();

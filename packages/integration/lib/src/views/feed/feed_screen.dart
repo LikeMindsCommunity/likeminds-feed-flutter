@@ -252,7 +252,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           topRight: Radius.circular(28.0),
         ),
       ),
-      enableDrag: false,
+      enableDrag: true,
       clipBehavior: Clip.hardEdge,
       builder: (context) => LMTopicBottomSheet(
         key: GlobalKey(),
