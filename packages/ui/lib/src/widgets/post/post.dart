@@ -13,7 +13,7 @@ class LMPostWidget extends StatefulWidget {
     super.key,
     required this.post,
     required this.user,
-    required this.onPostTap,
+    this.onPostTap,
     required this.isFeed,
     required this.onTagTap,
     this.headerBuilder,
@@ -46,7 +46,7 @@ class LMPostWidget extends StatefulWidget {
   final LMUserViewData user;
   final Map<String, LMTopicViewData> topics;
   final bool isFeed;
-  final LMOnPostTap onPostTap;
+  final LMOnPostTap? onPostTap;
   final Function(String) onTagTap;
 
   final Function(bool isLiked)? onLikeTap;
@@ -65,6 +65,8 @@ class _LMPostWidgetState extends State<LMPostWidget> {
   ValueNotifier<bool> rebuildLikeWidget = ValueNotifier(false);
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   LMPostMetaData? postMetaData;
+
+  onPostTap() {}
 
   @override
   void initState() {
@@ -93,7 +95,10 @@ class _LMPostWidgetState extends State<LMPostWidget> {
     return InheritedPostProvider(
       post: widget.post,
       child: GestureDetector(
-        onTap: () => widget.onPostTap(context, widget.post),
+        onTap: () {
+          widget.onPostTap?.call(context, postMetaData!.postViewData);
+          onPostTap();
+        },
         child: Container(
           decoration: BoxDecoration(
             color: kWhiteColor,

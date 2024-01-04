@@ -131,7 +131,7 @@ class _LMReplyTileState extends State<LMReplyTile> {
             child: Row(
               children: widget.commentActions ??
                   [
-                    LMTextButton(
+                    LMButton(
                       onTap: () {},
                       text: const LMTextView(
                         text: 'Like',

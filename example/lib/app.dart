@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_example/constants/theme.dart';
-import 'package:likeminds_feed_example/feed/post_widget.dart';
 import 'package:likeminds_feed_example/globals.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -58,9 +57,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
                       future: memberState,
                       builder: (context, snapshot) {
                         if (snapshot.hasData && snapshot.data!.success) {
-                          return const LMFeedScreen(
-                            postBuilder: clientPostWidgetBuilder,
-                          );
+                          return const LMFeedScreen();
                         } else if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return const Center(

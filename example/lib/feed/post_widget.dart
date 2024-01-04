@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_example/constants/svg_icons.dart';
 import 'package:likeminds_feed_example/helper/text/post_text_helper.dart';
@@ -57,7 +56,7 @@ Widget clientPostWidgetBuilder(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: LMPostFooter(
             children: [
-              LMTextButton(
+              LMButton(
                 text: LMTextView(
                     text:
                         getPostLikesText(postMetaData.postViewData.likeCount)),
@@ -91,7 +90,7 @@ Widget clientPostWidgetBuilder(
                 isActive: postMetaData.postViewData.isLiked,
               ),
               const SizedBox(width: 6),
-              LMTextButton(
+              LMButton(
                 text: LMTextView(
                     text: getPostCommentButtonText(
                         postMetaData.postViewData.commentCount)),
@@ -158,212 +157,212 @@ Widget clientPostWidgetBuilder(
   );
 }
 
-Widget clientCommentWidgetBuilder(
-    BuildContext context,
-    LMPostViewData postViewData,
-    LMCommentViewData commentViewData,
-    LMUserViewData user) {
-  return LMCommentTile(
-    user: user,
-    comment: commentViewData,
-    onTagTap: (String userId) {},
-    commentActions: [
-      LMTextButton(
-        margin: 10,
-        text: LMTextView(
-          text: commentViewData.likesCount == 0
-              ? "Like"
-              : commentViewData.likesCount == 1
-                  ? "1 Like"
-                  : "${commentViewData.likesCount} Likes",
-          textStyle: const TextStyle(
-              color: LMThemeData.kSecondaryColor700, fontSize: 12),
-        ),
-        activeText: LMTextView(
-          text: commentViewData.likesCount == 0
-              ? "Like"
-              : commentViewData.likesCount == 1
-                  ? "1 Like"
-                  : "${commentViewData.likesCount} Likes",
-          textStyle: TextStyle(color: LMThemeData.kPrimaryColor, fontSize: 12),
-        ),
-        onTap: () async {
-          commentViewData.likesCount = commentViewData.isLiked
-              ? commentViewData.likesCount - 1
-              : commentViewData.likesCount + 1;
-          commentViewData.isLiked = !commentViewData.isLiked;
+// Widget clientCommentWidgetBuilder(
+//     BuildContext context,
+//     LMPostViewData postViewData,
+//     LMCommentViewData commentViewData,
+//     LMUserViewData user) {
+//   return LMCommentTile(
+//     user: user,
+//     comment: commentViewData,
+//     onTagTap: (String userId) {},
+//     commentActions: [
+//       LMButton(
+//         margin: 10,
+//         text: LMTextView(
+//           text: commentViewData.likesCount == 0
+//               ? "Like"
+//               : commentViewData.likesCount == 1
+//                   ? "1 Like"
+//                   : "${commentViewData.likesCount} Likes",
+//           textStyle: const TextStyle(
+//               color: LMThemeData.kSecondaryColor700, fontSize: 12),
+//         ),
+//         activeText: LMTextView(
+//           text: commentViewData.likesCount == 0
+//               ? "Like"
+//               : commentViewData.likesCount == 1
+//                   ? "1 Like"
+//                   : "${commentViewData.likesCount} Likes",
+//           textStyle: TextStyle(color: LMThemeData.kPrimaryColor, fontSize: 12),
+//         ),
+//         onTap: () async {
+//           commentViewData.likesCount = commentViewData.isLiked
+//               ? commentViewData.likesCount - 1
+//               : commentViewData.likesCount + 1;
+//           commentViewData.isLiked = !commentViewData.isLiked;
 
-          ToggleLikeCommentRequest toggleLikeCommentRequest =
-              (ToggleLikeCommentRequestBuilder()
-                    ..commentId(commentViewData.id)
-                    ..postId(postViewData.id))
-                  .build();
+//           ToggleLikeCommentRequest toggleLikeCommentRequest =
+//               (ToggleLikeCommentRequestBuilder()
+//                     ..commentId(commentViewData.id)
+//                     ..postId(postViewData.id))
+//                   .build();
 
-          final ToggleLikeCommentResponse response = await LMFeedCore
-              .instance.lmFeedClient
-              .likeComment(toggleLikeCommentRequest);
+//           final ToggleLikeCommentResponse response = await LMFeedCore
+//               .instance.lmFeedClient
+//               .likeComment(toggleLikeCommentRequest);
 
-          if (!response.success) {
-            commentViewData.likesCount = commentViewData.isLiked
-                ? commentViewData.likesCount - 1
-                : commentViewData.likesCount + 1;
-            commentViewData.isLiked = !commentViewData.isLiked;
+//           if (!response.success) {
+//             commentViewData.likesCount = commentViewData.isLiked
+//                 ? commentViewData.likesCount - 1
+//                 : commentViewData.likesCount + 1;
+//             commentViewData.isLiked = !commentViewData.isLiked;
 
-            _postDetailScreenHandler!.rebuildPostWidget.value =
-                !_postDetailScreenHandler!.rebuildPostWidget.value;
-          }
-        },
-        icon: const LMIcon(
-          type: LMIconType.icon,
-          icon: Icons.thumb_up_alt_outlined,
-          size: 20,
-        ),
-        activeIcon: const LMIcon(
-          type: LMIconType.svg,
-          color: Colors.red,
-          assetPath: clientLikeFilled,
-          size: 20,
-        ),
-        isActive: commentViewData.isLiked,
-      ),
-      const SizedBox(width: 12),
-      Row(
-        children: [
-          LMTextButton(
-            margin: 10,
-            text: const LMTextView(
-                text: "Reply",
-                textStyle: TextStyle(
-                  fontSize: 12,
-                )),
-            onTap: () {
-              LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-                    ..commentActionEntity(LMCommentType.parent)
-                    ..commentActionType(LMCommentActionType.replying)
-                    ..level(0)
-                    ..user(_postDetailScreenHandler!
-                        .users[commentViewData.userId]!)
-                    ..commentId(commentViewData.id))
-                  .build();
+//             _postDetailScreenHandler!.rebuildPostWidget.value =
+//                 !_postDetailScreenHandler!.rebuildPostWidget.value;
+//           }
+//         },
+//         icon: const LMIcon(
+//           type: LMIconType.icon,
+//           icon: Icons.thumb_up_alt_outlined,
+//           size: 20,
+//         ),
+//         activeIcon: const LMIcon(
+//           type: LMIconType.svg,
+//           color: Colors.red,
+//           assetPath: clientLikeFilled,
+//           size: 20,
+//         ),
+//         isActive: commentViewData.isLiked,
+//       ),
+//       const SizedBox(width: 12),
+//       Row(
+//         children: [
+//           LMButton(
+//             margin: 10,
+//             text: const LMTextView(
+//                 text: "Reply",
+//                 textStyle: TextStyle(
+//                   fontSize: 12,
+//                 )),
+//             onTap: () {
+//               LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
+//                     ..commentActionEntity(LMCommentType.parent)
+//                     ..commentActionType(LMCommentActionType.replying)
+//                     ..level(0)
+//                     ..user(_postDetailScreenHandler!
+//                         .users[commentViewData.userId]!)
+//                     ..commentId(commentViewData.id))
+//                   .build();
 
-              _postDetailScreenHandler!.commentHandlerBloc
-                  .add(LMCommentOngoingEvent(commentMetaData: commentMetaData));
+//               _postDetailScreenHandler!.commentHandlerBloc
+//                   .add(LMCommentOngoingEvent(commentMetaData: commentMetaData));
 
-              _postDetailScreenHandler!.openOnScreenKeyboard();
-            },
-            icon: const LMIcon(
-              type: LMIconType.icon,
-              icon: Icons.comment_outlined,
-              size: 20,
-            ),
-          ),
-          LMThemeData.kHorizontalPaddingMedium,
-          commentViewData.repliesCount > 0
-              ? LMTextButton(
-                  onTap: () {
-                    if (replyShown &&
-                        commentIdReplyId != null &&
-                        commentIdReplyId == commentViewData.id) {
-                      _commentRepliesBloc.add(LMClearCommentReplies());
-                      replyShown = false;
-                      commentIdReplyId = null;
-                    } else if (replyShown &&
-                        commentIdReplyId != null &&
-                        commentIdReplyId != commentViewData.id) {
-                      _commentRepliesBloc.add(LMClearCommentReplies());
-                      replyShown = true;
-                      commentIdReplyId = commentViewData.id;
-                      _commentRepliesBloc.add(LMGetCommentReplies(
-                          commentDetailRequest: (GetCommentRequestBuilder()
-                                ..commentId(commentViewData.id)
-                                ..postId(widget.postId)
-                                ..page(1))
-                              .build(),
-                          forLoadMore: true));
-                    } else {
-                      replyShown = true;
-                      commentIdReplyId = commentViewData.id;
-                      _commentRepliesBloc.add(LMGetCommentReplies(
-                          commentDetailRequest: (GetCommentRequestBuilder()
-                                ..commentId(commentViewData.id)
-                                ..postId(widget.postId)
-                                ..page(1))
-                              .build(),
-                          forLoadMore: true));
-                    }
-                    _postDetailScreenHandler!.rebuildPostWidget.value =
-                        !_postDetailScreenHandler!.rebuildPostWidget.value;
-                  },
-                  text: LMTextView(
-                    text:
-                        "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
-                    textStyle: const TextStyle(
-                      color: LMThemeData.kPrimaryColor,
-                    ),
-                  ),
-                )
-              : const SizedBox(),
-        ],
-      ),
-    ],
-    actionsPadding: const EdgeInsets.only(left: 48),
-    onMenuTap: (id) {
-      if (id == commentDeleteId) {
-        // Delete post
-        showDialog(
-            context: context,
-            builder: (childContext) => LMDeleteConfirmationDialog(
-                  title: 'Delete Comment',
-                  userId: commentViewData.userId,
-                  content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
-                  action: (String reason) async {
-                    Navigator.of(childContext).pop();
+//               _postDetailScreenHandler!.openOnScreenKeyboard();
+//             },
+//             icon: const LMIcon(
+//               type: LMIconType.icon,
+//               icon: Icons.comment_outlined,
+//               size: 20,
+//             ),
+//           ),
+//           LMThemeData.kHorizontalPaddingMedium,
+//           commentViewData.repliesCount > 0
+//               ? LMButton(
+//                   onTap: () {
+//                     if (replyShown &&
+//                         commentIdReplyId != null &&
+//                         commentIdReplyId == commentViewData.id) {
+//                       _commentRepliesBloc.add(LMClearCommentReplies());
+//                       replyShown = false;
+//                       commentIdReplyId = null;
+//                     } else if (replyShown &&
+//                         commentIdReplyId != null &&
+//                         commentIdReplyId != commentViewData.id) {
+//                       _commentRepliesBloc.add(LMClearCommentReplies());
+//                       replyShown = true;
+//                       commentIdReplyId = commentViewData.id;
+//                       _commentRepliesBloc.add(LMGetCommentReplies(
+//                           commentDetailRequest: (GetCommentRequestBuilder()
+//                                 ..commentId(commentViewData.id)
+//                                 ..postId(widget.postId)
+//                                 ..page(1))
+//                               .build(),
+//                           forLoadMore: true));
+//                     } else {
+//                       replyShown = true;
+//                       commentIdReplyId = commentViewData.id;
+//                       _commentRepliesBloc.add(LMGetCommentReplies(
+//                           commentDetailRequest: (GetCommentRequestBuilder()
+//                                 ..commentId(commentViewData.id)
+//                                 ..postId(widget.postId)
+//                                 ..page(1))
+//                               .build(),
+//                           forLoadMore: true));
+//                     }
+//                     _postDetailScreenHandler!.rebuildPostWidget.value =
+//                         !_postDetailScreenHandler!.rebuildPostWidget.value;
+//                   },
+//                   text: LMTextView(
+//                     text:
+//                         "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
+//                     textStyle: const TextStyle(
+//                       color: LMThemeData.kPrimaryColor,
+//                     ),
+//                   ),
+//                 )
+//               : const SizedBox(),
+//         ],
+//       ),
+//     ],
+//     actionsPadding: const EdgeInsets.only(left: 48),
+//     onMenuTap: (id) {
+//       if (id == commentDeleteId) {
+//         // Delete post
+//         showDialog(
+//             context: context,
+//             builder: (childContext) => LMDeleteConfirmationDialog(
+//                   title: 'Delete Comment',
+//                   userId: commentViewData.userId,
+//                   content:
+//                       'Are you sure you want to delete this post. This action can not be reversed.',
+//                   action: (String reason) async {
+//                     Navigator.of(childContext).pop();
 
-                    LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-                      eventName: LMAnalyticsKeys.commentDeleted,
-                      eventProperties: {
-                        "post_id": widget.postId,
-                        "comment_id": commentViewData.id,
-                      },
-                    ));
+//                     LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+//                       eventName: LMAnalyticsKeys.commentDeleted,
+//                       eventProperties: {
+//                         "post_id": widget.postId,
+//                         "comment_id": commentViewData.id,
+//                       },
+//                     ));
 
-                    DeleteCommentRequest deleteCommentRequest =
-                        (DeleteCommentRequestBuilder()
-                              ..postId(widget.postId)
-                              ..commentId(commentViewData.id)
-                              ..reason(reason.isEmpty
-                                  ? "Reason for deletion"
-                                  : reason))
-                            .build();
+//                     DeleteCommentRequest deleteCommentRequest =
+//                         (DeleteCommentRequestBuilder()
+//                               ..postId(widget.postId)
+//                               ..commentId(commentViewData.id)
+//                               ..reason(reason.isEmpty
+//                                   ? "Reason for deletion"
+//                                   : reason))
+//                             .build();
 
-                    LMCommentMetaData commentMetaData =
-                        (LMCommentMetaDataBuilder()
-                              ..commentActionEntity(LMCommentType.parent)
-                              ..commentActionType(LMCommentActionType.delete)
-                              ..level(0)
-                              ..commentId(commentViewData.id))
-                            .build();
+//                     LMCommentMetaData commentMetaData =
+//                         (LMCommentMetaDataBuilder()
+//                               ..commentActionEntity(LMCommentType.parent)
+//                               ..commentActionType(LMCommentActionType.delete)
+//                               ..level(0)
+//                               ..commentId(commentViewData.id))
+//                             .build();
 
-                    _postDetailScreenHandler!.commentHandlerBloc.add(
-                        LMCommentActionEvent(
-                            commentActionRequest: deleteCommentRequest,
-                            commentMetaData: commentMetaData));
-                  },
-                  actionText: 'Delete',
-                ));
-      } else if (id == commentEditId) {
-        debugPrint('Editing functionality');
-        LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-              ..commentActionEntity(LMCommentType.parent)
-              ..commentActionType(LMCommentActionType.edit)
-              ..level(0)
-              ..commentId(commentViewData.id))
-            .build();
+//                     _postDetailScreenHandler!.commentHandlerBloc.add(
+//                         LMCommentActionEvent(
+//                             commentActionRequest: deleteCommentRequest,
+//                             commentMetaData: commentMetaData));
+//                   },
+//                   actionText: 'Delete',
+//                 ));
+//       } else if (id == commentEditId) {
+//         debugPrint('Editing functionality');
+//         LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
+//               ..commentActionEntity(LMCommentType.parent)
+//               ..commentActionType(LMCommentActionType.edit)
+//               ..level(0)
+//               ..commentId(commentViewData.id))
+//             .build();
 
-        _postDetailScreenHandler!.commentHandlerBloc
-            .add(LMCommentOngoingEvent(commentMetaData: commentMetaData));
-      }
-    },
-  );
-}
+//         _postDetailScreenHandler!.commentHandlerBloc
+//             .add(LMCommentOngoingEvent(commentMetaData: commentMetaData));
+//       }
+//     },
+//   );
+// }

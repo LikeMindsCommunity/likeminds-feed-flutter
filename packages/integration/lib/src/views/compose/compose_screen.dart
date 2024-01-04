@@ -185,7 +185,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
         horizontal: 12.0,
         vertical: 4.0,
       ),
-      leading: LMTextButton(
+      leading: LMButton(
         text: LMTextView(
           text: "Cancel",
           textStyle: TextStyle(color: theme.colorScheme.primary),
@@ -200,7 +200,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
           color: kGrey1Color,
         ),
       ),
-      trailing: LMTextButton(
+      trailing: LMButton(
         text: LMTextView(
           text: "Post",
           textStyle: TextStyle(

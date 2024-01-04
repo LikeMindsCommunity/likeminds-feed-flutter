@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 // This widget is used to display a text button
-// The [LMTextButton] can be customized by passing in the required parameters
-class LMTextButton extends StatefulWidget {
-  const LMTextButton({
+// The [LMButton] can be customized by passing in the required parameters
+class LMButton extends StatefulWidget {
+  const LMButton({
     super.key,
     this.icon,
-    required this.text,
+    this.text,
     required this.onTap,
     this.activeIcon,
     this.activeText,
@@ -29,7 +29,7 @@ class LMTextButton extends StatefulWidget {
   // Icon to be displayed in the button
   final LMIcon? icon;
   // Text to be displayed in the button, [LMTextView] only
-  final LMTextView text;
+  final LMTextView? text;
   // Action to perform after tapping on the button
   final Function() onTap;
   // Icon to be displayed in the button if the button is active
@@ -51,10 +51,10 @@ class LMTextButton extends StatefulWidget {
   final MainAxisAlignment? mainAxisAlignment;
 
   @override
-  State<LMTextButton> createState() => _LMTextButtonState();
+  State<LMButton> createState() => _LMButtonState();
 }
 
-class _LMTextButtonState extends State<LMTextButton> {
+class _LMButtonState extends State<LMButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -84,7 +84,9 @@ class _LMTextButtonState extends State<LMTextButton> {
                     ? SizedBox(width: widget.margin ?? 8)
                     : const SizedBox()
                 : const SizedBox(),
-            widget.isActive ? widget.activeText ?? widget.text : widget.text,
+            widget.isActive
+                ? widget.activeText ?? widget.text ?? const SizedBox()
+                : widget.text ?? const SizedBox(),
             widget.placement == LMIconPlacement.end
                 ? (widget.icon != null || widget.activeIcon != null)
                     ? SizedBox(width: widget.margin ?? 8)

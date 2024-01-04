@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';

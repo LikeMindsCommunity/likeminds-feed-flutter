@@ -7,7 +7,6 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/analytics/keys.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/typedefs.dart';
@@ -816,7 +815,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        LMTextButton(
+                                        LMButton(
                                           borderRadius: 48,
                                           height: 40,
                                           border: Border.all(
@@ -868,7 +867,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                           fontWeight: FontWeight.w300,
                                           color: LMThemeData.kGrey2Color)),
                                   const SizedBox(height: 28),
-                                  LMTextButton(
+                                  LMButton(
                                     borderRadius: 28,
                                     height: 44,
                                     width: 153,
@@ -926,54 +925,18 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                             return Column(
                               children: [
                                 const SizedBox(height: 8),
-                                widget.postBuilder != null
-                                    ? widget.postBuilder!(
+                                widget.postBuilder?.call(
                                         context,
                                         (postMetaDataBuilder!
                                               ..postViewData(item))
-                                            .build())
-                                    : LMPostWidget(
-                                        post: item,
-                                        topics: widget.topics,
-                                        user: widget.users[item.userId]!,
-                                        onPostTap: (context, post) {
-                                          LMAnalyticsBloc.instance.add(
-                                              LMFireAnalyticsEvent(
-                                                  eventName: LMAnalyticsKeys
-                                                      .commentListOpen,
-                                                  eventProperties: {
-                                                'postId': item.id,
-                                              }));
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  LMPostDetailScreen(
-                                                postId: post.id,
-                                                postBuilder:
-                                                    widget.postBuilder == null
-                                                        ? null
-                                                        : (context, post) {
-                                                            postMetaDataBuilder!
-                                                                .postViewData(post
-                                                                    .postViewData);
-
-                                                            postMetaDataBuilder!
-                                                                .source(LMPostSource
-                                                                    .postDetail);
-
-                                                            return widget
-                                                                    .postBuilder!(
-                                                                context,
-                                                                postMetaDataBuilder!
-                                                                    .build());
-                                                          },
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        isFeed: false,
-                                        onTagTap: (String userId) {}),
+                                            .build()) ??
+                                    LMPostWidget(
+                                      post: item,
+                                      topics: widget.topics,
+                                      user: widget.users[item.userId]!,
+                                      isFeed: false,
+                                      onTagTap: (String userId) {},
+                                    ),
                                 const SizedBox(height: 8),
                               ],
                             );
@@ -992,7 +955,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
-          return LMTextButton(
+          return LMButton(
             height: 44,
             width: 153,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),

@@ -132,7 +132,7 @@ class _LMCommentTileState extends State<LMCommentTile> {
             child: Row(
               children: widget.commentActions ??
                   [
-                    LMTextButton(
+                    LMButton(
                       onTap: () {},
                       text: const LMTextView(
                         text: 'Like',
@@ -163,7 +163,7 @@ class _LMCommentTileState extends State<LMCommentTile> {
                       ),
                     ),
                     kHorizontalPaddingMedium,
-                    LMTextButton(
+                    LMButton(
                       onTap: () {},
                       text: const LMTextView(
                         text: 'Reply',

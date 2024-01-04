@@ -261,7 +261,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                           .kPrimaryColor,
                                                     ),
                                                   )
-                                                : LMTextButton(
+                                                : LMButton(
                                                     height: 18,
                                                     text: const LMTextView(
                                                       text: "Post",
@@ -479,7 +479,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                           return LMPostFooter(
                                             alignment: LMAlignment.centre,
                                             children: [
-                                              LMTextButton(
+                                              LMButton(
                                                 text: const LMTextView(
                                                     text: "Like"),
                                                 margin: 0,
@@ -565,7 +565,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                 isActive: postData!.isLiked,
                                               ),
                                               const Spacer(),
-                                              LMTextButton(
+                                              LMButton(
                                                 text: const LMTextView(
                                                     text: "Comment"),
                                                 margin: 0,
@@ -604,7 +604,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                 ),
                                               ),
                                               const Spacer(),
-                                              LMTextButton(
+                                              LMButton(
                                                 text: const LMTextView(
                                                     text: "Share"),
                                                 margin: 0,
@@ -759,7 +759,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                               ),
                                             ),
                                             commentActions: [
-                                              LMTextButton(
+                                              LMButton(
                                                 margin: 10,
                                                 text: LMTextView(
                                                   text: commentViewData
@@ -867,7 +867,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                               const SizedBox(width: 12),
                                               Row(
                                                 children: [
-                                                  LMTextButton(
+                                                  LMButton(
                                                     margin: 10,
                                                     text: const LMTextView(
                                                         text: "Reply",
@@ -914,7 +914,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                       .kHorizontalPaddingMedium,
                                                   commentViewData.repliesCount >
                                                           0
-                                                      ? LMTextButton(
+                                                      ? LMButton(
                                                           onTap: () {
                                                             if (replyShown &&
                                                                 commentIdReplyId !=

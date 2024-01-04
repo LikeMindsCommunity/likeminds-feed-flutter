@@ -317,7 +317,7 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                             },
                             commentActions: [
                               const SizedBox(width: 48),
-                              LMTextButton(
+                              LMButton(
                                 text: LMTextView(
                                   text: commentViewData.likesCount == 0
                                       ? "Like"
