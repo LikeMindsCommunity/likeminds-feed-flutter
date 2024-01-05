@@ -143,14 +143,18 @@ class _LMReplyTileState extends State<LMReplyTile> {
                       icon: const LMIcon(
                         type: LMIconType.icon,
                         icon: Icons.favorite_outline,
-                        color: kGrey2Color,
-                        size: 16,
+                        iconStyle: LMIconStyle(
+                          color: kGrey2Color,
+                          size: 16,
+                        ),
                       ),
                       activeIcon: const LMIcon(
                         icon: Icons.favorite,
                         type: LMIconType.icon,
-                        size: 16,
-                        color: kPrimaryColor,
+                        iconStyle: LMIconStyle(
+                          size: 16,
+                          color: kPrimaryColor,
+                        ),
                       ),
                     ),
                     const Spacer(),

@@ -377,15 +377,19 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                                 icon: const LMIcon(
                                   type: LMIconType.icon,
                                   icon: Icons.thumb_up_alt_outlined,
-                                  color: LMThemeData.appBlack,
-                                  size: 20,
+                                  iconStyle: LMIconStyle(
+                                    color: LMThemeData.appBlack,
+                                    size: 20,
+                                  ),
                                 ),
                                 activeIcon: const LMIcon(
                                   type: LMIconType.icon,
                                   icon: Icons.thumb_up_alt_rounded,
-                                  color: LMThemeData.kPrimaryColor,
+                                  iconStyle: LMIconStyle(
+                                    size: 20,
+                                    color: LMThemeData.kPrimaryColor,
+                                  ),
                                   assetPath: kAssetLikeFilledIcon,
-                                  size: 20,
                                 ),
                                 isActive: commentViewData.isLiked,
                               ),

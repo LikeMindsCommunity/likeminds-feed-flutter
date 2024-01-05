@@ -117,8 +117,10 @@ class _LMDocumentState extends State<LMDocument> {
                           const LMIcon(
                             type: LMIconType.icon,
                             icon: Icons.picture_as_pdf,
-                            size: 24,
-                            color: Colors.red,
+                            iconStyle: LMIconStyle(
+                              size: 24,
+                              color: Colors.red,
+                            ),
                           ),
                     ),
                     kHorizontalPaddingLarge,

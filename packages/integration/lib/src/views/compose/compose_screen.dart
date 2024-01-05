@@ -7,8 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/compose/compose_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/widgets/lists/topic_list.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
@@ -138,14 +136,12 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
             ),
           ),
           body: SafeArea(
-            child: Container(
-              child: Column(
-                children: [
-                  widget.composeAppBarBuilder?.call() ?? _defAppBar(),
-                  const SizedBox(height: 18),
-                  widget.composeContentBuilder?.call() ?? _defContentInput(),
-                ],
-              ),
+            child: Column(
+              children: [
+                widget.composeAppBarBuilder?.call() ?? _defAppBar(),
+                const SizedBox(height: 18),
+                widget.composeContentBuilder?.call() ?? _defContentInput(),
+              ],
             ),
           ),
         ),
@@ -214,8 +210,10 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
           ),
         ),
         width: 48,
-        borderRadius: 6,
-        backgroundColor: theme.colorScheme.primary,
+        style: LMButtonStyle(
+          backgroundColor: theme.colorScheme.primary,
+          borderRadius: 6,
+        ),
         onTap: () {
           _focusNode.unfocus();
 
@@ -332,8 +330,10 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
                           icon: const LMIcon(
                             type: LMIconType.icon,
                             icon: CupertinoIcons.chevron_down,
-                            size: 16,
-                            color: kPrimaryColor,
+                            iconStyle: LMIconStyle(
+                              size: 16,
+                              color: kPrimaryColor,
+                            ),
                           ),
                         ),
                       ),

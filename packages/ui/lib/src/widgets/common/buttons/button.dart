@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+export 'package:likeminds_feed_ui_fl/src/widgets/common/buttons/style/button_style.dart';
 
 // This widget is used to display a text button
 // The [LMButton] can be customized by passing in the required parameters
-class LMButton extends StatefulWidget {
+class LMButton extends StatelessWidget {
   const LMButton({
     super.key,
     this.icon,
     this.text,
-    required this.onTap,
+    this.onTap,
     this.activeIcon,
     this.activeText,
-    this.backgroundColor,
-    this.borderRadius = 4,
     this.height,
     this.width,
     this.margin,
     this.isActive = false,
     this.padding,
-    this.border,
     this.placement = LMIconPlacement.start,
     this.mainAxisAlignment,
+    this.style,
   });
 
   // Required parameters, defines whether the button is active or disabled
@@ -31,7 +30,7 @@ class LMButton extends StatefulWidget {
   // Text to be displayed in the button, [LMTextView] only
   final LMTextView? text;
   // Action to perform after tapping on the button
-  final Function() onTap;
+  final Function()? onTap;
   // Icon to be displayed in the button if the button is active
   final LMIcon? activeIcon;
   // Text to be displayed in the button if the button is active,
@@ -39,67 +38,83 @@ class LMButton extends StatefulWidget {
   final LMTextView? activeText;
   // Padding of the button, defaults to zero
   final EdgeInsets? padding;
-  // Background color of the button, defaults to transparent
-  final Color? backgroundColor;
-  // Border radius of the button, required
-  final double borderRadius;
   final double? height;
   final double? width;
-  final Border? border;
   // Placement of the icon in the button, required
   final LMIconPlacement placement;
   final MainAxisAlignment? mainAxisAlignment;
 
-  @override
-  State<LMButton> createState() => _LMButtonState();
-}
+  final LMButtonStyle? style;
 
-class _LMButtonState extends State<LMButton> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        widget.onTap();
-      },
+    return InkWell(
+      onTap: onTap,
+      onHover: style?.onHover,
+      splashColor: style?.splashColor,
+      focusColor: style?.focusColor,
+      hoverColor: style?.hoverColor,
+      enableFeedback: style?.enableFeedback,
       child: Container(
-        height: widget.height ?? 32,
-        width: widget.width,
-        padding: widget.padding ?? EdgeInsets.zero,
+        height: height ?? 32,
+        width: width,
+        padding: padding ?? EdgeInsets.zero,
         decoration: BoxDecoration(
-          color: widget.backgroundColor ?? Colors.transparent,
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          border: widget.border,
+          color: style?.backgroundColor ?? Colors.transparent,
+          borderRadius: style?.borderRadius == null
+              ? null
+              : BorderRadius.circular(style!.borderRadius!),
+          border: style?.border,
         ),
         child: Row(
-          mainAxisAlignment:
-              widget.mainAxisAlignment ?? MainAxisAlignment.center,
+          mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
           children: [
-            widget.placement == LMIconPlacement.start
-                ? widget.isActive
-                    ? widget.activeIcon ?? const SizedBox()
-                    : widget.icon ?? const SizedBox()
+            placement == LMIconPlacement.start
+                ? isActive
+                    ? activeIcon ?? const SizedBox()
+                    : icon ?? const SizedBox()
                 : const SizedBox(),
-            widget.placement == LMIconPlacement.start
-                ? (widget.icon != null || widget.activeIcon != null)
-                    ? SizedBox(width: widget.margin ?? 8)
+            placement == LMIconPlacement.start
+                ? (icon != null || activeIcon != null)
+                    ? SizedBox(width: margin ?? 8)
                     : const SizedBox()
                 : const SizedBox(),
-            widget.isActive
-                ? widget.activeText ?? widget.text ?? const SizedBox()
-                : widget.text ?? const SizedBox(),
-            widget.placement == LMIconPlacement.end
-                ? (widget.icon != null || widget.activeIcon != null)
-                    ? SizedBox(width: widget.margin ?? 8)
+            (style?.showText ?? true)
+                ? isActive
+                    ? activeText ?? text ?? const SizedBox()
+                    : text ?? const SizedBox()
+                : const SizedBox.shrink(),
+            placement == LMIconPlacement.end
+                ? (icon != null || activeIcon != null)
+                    ? SizedBox(width: margin ?? 8)
                     : const SizedBox()
                 : const SizedBox(),
-            widget.placement == LMIconPlacement.end
-                ? widget.isActive
-                    ? widget.activeIcon ?? const SizedBox()
-                    : widget.icon ?? const SizedBox()
+            placement == LMIconPlacement.end
+                ? isActive
+                    ? activeIcon ?? const SizedBox()
+                    : icon ?? const SizedBox()
                 : const SizedBox(),
           ],
         ),
       ),
+    );
+  }
+
+  LMButton copyWith(LMButton button) {
+    return LMButton(
+      icon: button.icon ?? icon,
+      text: button.text ?? text,
+      onTap: button.onTap ?? onTap,
+      activeIcon: button.activeIcon ?? activeIcon,
+      activeText: button.activeText ?? activeText,
+      height: button.height ?? height,
+      width: button.width ?? width,
+      margin: button.margin ?? margin,
+      isActive: button.isActive,
+      padding: button.padding ?? padding,
+      placement: button.placement,
+      mainAxisAlignment: button.mainAxisAlignment ?? mainAxisAlignment,
+      style: button.style ?? style,
     );
   }
 }

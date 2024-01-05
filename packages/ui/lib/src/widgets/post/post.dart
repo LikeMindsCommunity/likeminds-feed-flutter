@@ -92,7 +92,6 @@ class _LMPostWidgetState extends State<LMPostWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final lmPostFooter = widget.footerBuilder!.call(context, postMetaData!);
     return InheritedPostProvider(
       post: widget.post,
       child: GestureDetector(
@@ -146,8 +145,8 @@ class _LMPostWidgetState extends State<LMPostWidget> {
               const SizedBox(height: 18),
               widget.footerBuilder != null
                   ? widget.footerBuilder!(context, postMetaData!)
-                  : const Padding(
-                      padding: EdgeInsets.symmetric(
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
                       child: LMPostFooter(),

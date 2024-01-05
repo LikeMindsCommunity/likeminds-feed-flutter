@@ -68,8 +68,10 @@ class _LMImageState extends State<LMImage> {
                           LMIcon(
                             type: LMIconType.icon,
                             icon: Icons.error_outline,
-                            size: 24,
-                            color: kGrey3Color,
+                            iconStyle: LMIconStyle(
+                              size: 24,
+                              color: kGrey3Color,
+                            ),
                           ),
                           SizedBox(height: 24),
                           Text(

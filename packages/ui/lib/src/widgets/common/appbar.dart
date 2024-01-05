@@ -66,7 +66,9 @@ class LMAppBar extends StatelessWidget implements PreferredSizeWidget {
                     icon: LMIcon(
                       type: LMIconType.icon,
                       icon: Icons.chevron_left,
-                      color: theme.colorScheme.primary,
+                      iconStyle: LMIconStyle(
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
                     onTap: (b) {
                       backButtonCallback?.call() ?? Navigator.of(context).pop();

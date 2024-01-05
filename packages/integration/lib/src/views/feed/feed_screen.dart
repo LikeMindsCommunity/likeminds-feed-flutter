@@ -362,8 +362,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                             icon: const LMIcon(
                                               type: LMIconType.icon,
                                               icon: CupertinoIcons.chevron_down,
-                                              size: 16,
-                                              color: LMThemeData.appBlack,
+                                              iconStyle: LMIconStyle(
+                                                size: 16,
+                                                color: LMThemeData.appBlack,
+                                              ),
                                             ),
                                           )
                                         : selectedTopics.length == 1
@@ -391,9 +393,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                   type: LMIconType.icon,
                                                   icon: CupertinoIcons
                                                       .chevron_down,
-                                                  size: 16,
-                                                  color:
-                                                      LMThemeData.kWhiteColor,
+                                                  iconStyle: LMIconStyle(
+                                                    size: 16,
+                                                    color:
+                                                        LMThemeData.kWhiteColor,
+                                                  ),
                                                 ),
                                               )
                                             : LMTopicChip(
@@ -454,9 +458,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                       type: LMIconType.icon,
                                                       icon: CupertinoIcons
                                                           .chevron_down,
-                                                      size: 16,
-                                                      color: LMThemeData
-                                                          .kWhiteColor,
+                                                      iconStyle: LMIconStyle(
+                                                        size: 16,
+                                                        color: LMThemeData
+                                                            .kWhiteColor,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -560,9 +566,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         return const LMIcon(
           type: LMIconType.svg,
           assetPath: kAssetDocPDFIcon,
-          color: Colors.red,
-          size: 35,
-          boxPadding: 0,
+          iconStyle: LMIconStyle(
+            color: Colors.red,
+            size: 35,
+            boxPadding: 0,
+          ),
         );
       } else {
         return const SizedBox.shrink();
@@ -816,12 +824,14 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                           MainAxisAlignment.center,
                                       children: [
                                         LMButton(
-                                          borderRadius: 48,
-                                          height: 40,
-                                          border: Border.all(
-                                            color: LMThemeData.primary500,
-                                            width: 2,
+                                          style: LMButtonStyle(
+                                            borderRadius: 48,
+                                            border: Border.all(
+                                              color: LMThemeData.primary500,
+                                              width: 2,
+                                            ),
                                           ),
+                                          height: 40,
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 8, horizontal: 12),
                                           text: const LMTextView(
@@ -849,7 +859,9 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                   const LMIcon(
                                     type: LMIconType.icon,
                                     icon: Icons.post_add,
-                                    size: 48,
+                                    iconStyle: LMIconStyle(
+                                      size: 48,
+                                    ),
                                   ),
                                   const SizedBox(height: 12),
                                   const LMTextView(
@@ -868,12 +880,15 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                           color: LMThemeData.kGrey2Color)),
                                   const SizedBox(height: 28),
                                   LMButton(
-                                    borderRadius: 28,
+                                    style: LMButtonStyle(
+                                      borderRadius: 28,
+                                      backgroundColor:
+                                          theme.colorScheme.primary,
+                                    ),
                                     height: 44,
                                     width: 153,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 12, horizontal: 20),
-                                    backgroundColor: theme.colorScheme.primary,
                                     text: LMTextView(
                                       text: "Create Post",
                                       textStyle: TextStyle(
@@ -885,8 +900,10 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                     icon: LMIcon(
                                       type: LMIconType.icon,
                                       icon: Icons.add,
-                                      size: 18,
-                                      color: theme.colorScheme.onPrimary,
+                                      iconStyle: LMIconStyle(
+                                        size: 18,
+                                        color: theme.colorScheme.onPrimary,
+                                      ),
                                     ),
                                     onTap: right
                                         ? () {
@@ -959,9 +976,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             height: 44,
             width: 153,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            borderRadius: 28,
-            backgroundColor:
-                right ? theme.colorScheme.primary : LMThemeData.kGrey3Color,
+            style: LMButtonStyle(
+              borderRadius: 28,
+              backgroundColor:
+                  right ? theme.colorScheme.primary : LMThemeData.kGrey3Color,
+            ),
             placement: LMIconPlacement.end,
             text: LMTextView(
               text: "Create Post",
@@ -974,9 +993,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             icon: LMIcon(
               type: LMIconType.icon,
               icon: Icons.add,
-              fit: BoxFit.cover,
-              size: 18,
-              color: theme.colorScheme.onPrimary,
+              iconStyle: LMIconStyle(
+                fit: BoxFit.cover,
+                size: 18,
+                color: theme.colorScheme.onPrimary,
+              ),
             ),
             onTap: right
                 ? () {

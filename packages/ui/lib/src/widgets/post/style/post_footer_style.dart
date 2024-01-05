@@ -1,15 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/buttons/style/button_style.dart';
 
 class LMPostFooterStyle {
-  LMButtonStyle? likeButtonStyle;
-  LMButtonStyle? commentButtonStyle;
-  LMButtonStyle? shareButtonStyle;
-  LMButtonStyle? saveButtonStyle;
-
-  Color? activeColor;
-  Color? inactiveColor;
-
   bool? showSaveButton;
   bool? showLikeButton;
   bool? showCommentButton;
@@ -18,16 +9,20 @@ class LMPostFooterStyle {
   MainAxisAlignment alignment;
 
   LMPostFooterStyle({
-    this.likeButtonStyle,
-    this.commentButtonStyle,
-    this.shareButtonStyle,
-    this.saveButtonStyle,
-    this.activeColor,
-    this.inactiveColor,
     this.showSaveButton,
     this.showLikeButton,
     this.showCommentButton,
     this.showShareButton,
     this.alignment = MainAxisAlignment.start,
   });
+
+  LMPostFooterStyle copyWith(LMPostFooterStyle style) {
+    return LMPostFooterStyle(
+      showSaveButton: style.showSaveButton ?? showSaveButton,
+      showLikeButton: style.showLikeButton ?? showLikeButton,
+      showCommentButton: style.showCommentButton ?? showCommentButton,
+      showShareButton: style.showShareButton ?? showShareButton,
+      alignment: style.alignment,
+    );
+  }
 }

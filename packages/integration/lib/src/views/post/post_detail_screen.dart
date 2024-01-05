@@ -9,7 +9,6 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post/widgets/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post/widgets/comment/default_empty_comment_widget.dart';
@@ -199,8 +198,10 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                               icon: const LMIcon(
                                                 type: LMIconType.icon,
                                                 icon: Icons.close,
-                                                color: LMThemeData.kGreyColor,
-                                                size: 24,
+                                                iconStyle: LMIconStyle(
+                                                  color: LMThemeData.kGreyColor,
+                                                  size: 24,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -442,8 +443,10 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                             icon: Platform.isAndroid
                                 ? Icons.arrow_back
                                 : CupertinoIcons.chevron_back,
-                            size: 28,
-                            color: LMThemeData.appBlack,
+                            iconStyle: const LMIconStyle(
+                              size: 28,
+                              color: LMThemeData.appBlack,
+                            ),
                           ),
                           onTap: (active) {
                             Navigator.pop(context);
@@ -480,7 +483,8 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                           .users[postData!.userId]!,
                                       topics: _postDetailScreenHandler!.topics,
                                       onPostTap: (context, post) {
-                                        print("Post in detail screen tapped");
+                                        debugPrint(
+                                            "Post in detail screen tapped");
                                         widget.onPostTap?.call();
                                       },
                                       isFeed: false,
@@ -866,15 +870,19 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                   type: LMIconType.icon,
                                                   icon: Icons
                                                       .thumb_up_alt_outlined,
-                                                  size: 20,
+                                                  iconStyle: LMIconStyle(
+                                                    size: 20,
+                                                  ),
                                                 ),
                                                 activeIcon: const LMIcon(
                                                   type: LMIconType.icon,
-                                                  color:
-                                                      LMThemeData.kPrimaryColor,
+                                                  iconStyle: LMIconStyle(
+                                                    color: LMThemeData
+                                                        .kPrimaryColor,
+                                                    size: 20,
+                                                  ),
                                                   icon: Icons
                                                       .thumb_up_alt_rounded,
-                                                  size: 20,
                                                 ),
                                                 isActive:
                                                     commentViewData.isLiked,
@@ -922,7 +930,9 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                       type: LMIconType.icon,
                                                       icon: Icons
                                                           .comment_outlined,
-                                                      size: 20,
+                                                      iconStyle: LMIconStyle(
+                                                        size: 20,
+                                                      ),
                                                     ),
                                                   ),
                                                   LMThemeData
