@@ -10,59 +10,51 @@ enum LMAlignment { left, centre, right }
 /// i.e. user image, name, time, menu button
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
-typedef LMPostHeaderBuilder = Widget Function(
-    BuildContext context, LMPostViewData post);
+typedef LMPostHeaderBuilder = Widget Function(BuildContext, LMPostHeader);
 
 /// {@template post_footer_builder}
 /// Builder function to build the post footer.
 /// i.e. like, comment, share, save buttons
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
-typedef LMPostFooterBuilder = LMPostFooter Function(
-    BuildContext context, LMPostMetaData post);
+typedef LMPostFooterBuilder = LMPostFooter Function(BuildContext, LMPostFooter);
 
 /// {@template post_menu_builder}
 /// Builder function to build the post widget.
 /// i.e. edit, delete, report, pin etc.
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
-typedef LMPostMenuBuilder = Widget Function(
-    BuildContext context, LMPostMetaData post);
+typedef LMPostMenuBuilder = Widget Function(BuildContext, LMPostMenu);
 
 /// {@template post_topic_builder}
 /// Builder function to build the topic widget.
 /// must return a widget, takes in [BuildContext]
 /// and [LMTopicViewData] as params
 /// {@endtemplate}
-typedef LMPostTopicBuilder = Widget Function(
-    BuildContext context, LMPostMetaData topic);
+typedef LMPostTopicBuilder = Widget Function(BuildContext, LMPostMetaData);
 
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
-typedef LMPostMediaBuilder = Widget Function(
-    BuildContext context, LMPostMetaData post);
+typedef LMPostMediaBuilder = Widget Function(BuildContext, LMPostMedia);
 
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
-typedef LMPostContentBuilder = Widget Function(
-    BuildContext context, LMPostMetaData post);
+typedef LMPostContentBuilder = Widget Function(BuildContext, LMPostContent);
 
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
-typedef LMPostWidgetBuilder = Widget Function(
-    BuildContext context, LMPostMetaData post);
+typedef LMPostWidgetBuilder = Widget Function(BuildContext, LMPostWidget);
 
 ///{@template post_callback}
 /// A callback to handle interactions with the post.
 /// {@endtemplate}
-typedef LMOnPostTap = void Function(
-    BuildContext context, LMPostViewData activity);
+typedef LMOnPostTap = void Function(BuildContext, LMPostMetaData);
 
 ///{@template post_appbar_builder}
 /// Builder function to build the post appbar.
@@ -70,12 +62,11 @@ typedef LMOnPostTap = void Function(
 /// takes in [BuildContext] and [LMPostViewData] as params.
 /// {@endtemplate}
 typedef LMPostAppBarBuilder = PreferredSizeWidget Function(
-    BuildContext context, LMPostViewData post);
+    BuildContext, LMAppBar);
 
 /// {@template post_comment_builder}
 /// Builder function to build the post comment.
 /// must return a widget,
 /// takes in [BuildContext], [LMUserViewData] and [LMCommentViewData] as params.
 /// {@endtemplate}
-typedef LMPostCommentBuilder = Widget Function(BuildContext context,
-    LMCommentViewData comment, LMUserViewData userViewData);
+typedef LMPostCommentBuilder = Widget Function(BuildContext, LMCommentTile);

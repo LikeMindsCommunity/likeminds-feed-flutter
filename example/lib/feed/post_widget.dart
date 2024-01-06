@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-Widget clientPostWidgetBuilder(
-    BuildContext context, LMPostMetaData postMetaData) {
+Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
   Size screenSize = MediaQuery.of(context).size;
   return Container(
     decoration: BoxDecoration(
@@ -16,141 +15,10 @@ Widget clientPostWidgetBuilder(
         ),
       ],
     ),
-    child: LMPostWidget(
-      post: postMetaData.postViewData,
-      user: postMetaData.users[postMetaData.postViewData.userId]!,
-      onPostTap: (context, postViewData) {
-        if (postMetaData.source == LMPostSource.feed) {
-          LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-              eventName: LMAnalyticsKeys.commentListOpen,
-              eventProperties: {
-                'postId': postMetaData.postViewData.id,
-              }));
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LMPostDetailScreen(
-                postId: postMetaData.postViewData.id,
-                isFeed: false,
-                postBuilder: (context, post) {
-                  return clientPostWidgetBuilder(context, post);
-                },
-              ),
-            ),
-          );
-        }
+    child: postWidget.copyWith(
+      footerBuilder: (context, postFooter) {
+        return postFooter;
       },
-      isFeed: true,
-      onTagTap: (String userId) {},
-      topics: postMetaData.topics,
-      mediaBuilder: (context, post) {
-        return LMPostMedia(
-          attachments: postMetaData.postViewData.attachments!,
-          width: screenSize.width,
-        );
-      },
-      // footerBuilder: (context, post) {
-      //   return Padding(
-      //     padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      //     child: LMPostFooter(
-      //       children: [
-      //         LMTextButton(
-      //           text: LMTextView(
-      //               text:
-      //                   getPostLikesText(postMetaData.postViewData.likeCount)),
-      //           margin: 0,
-      //           onTap: () async {
-      //             if (post.postViewData.isLiked) {
-      //               postMetaData.postViewData.likeCount =
-      //                   postMetaData.postViewData.likeCount - 1;
-      //             } else {
-      //               postMetaData.postViewData.likeCount =
-      //                   postMetaData.postViewData.likeCount + 1;
-      //             }
-      //             postMetaData.postViewData.isLiked =
-      //                 !postMetaData.postViewData.isLiked;
-      //             LMPostBloc.instance
-      //                 .add(LMUpdatePost(post: postMetaData.postViewData));
-      //           },
-      //           icon: const LMIcon(
-      //             type: LMIconType.svg,
-      //             assetPath: clientLikeUnfilled,
-      //             size: 24,
-      //             boxPadding: 6,
-      //           ),
-      //           activeIcon: const LMIcon(
-      //             type: LMIconType.svg,
-      //             assetPath: clientLikeFilled,
-      //             color: Colors.red,
-      //             size: 24,
-      //             boxPadding: 6,
-      //           ),
-      //           isActive: postMetaData.postViewData.isLiked,
-      //         ),
-      //         const SizedBox(width: 6),
-      //         LMTextButton(
-      //           text: LMTextView(
-      //               text: getPostCommentButtonText(
-      //                   postMetaData.postViewData.commentCount)),
-      //           margin: 0,
-      //           onTap: () {
-      //             if (postMetaData.source == LMPostSource.feed) {
-      //               LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-      //                   eventName: LMAnalyticsKeys.commentListOpen,
-      //                   eventProperties: {
-      //                     'postId': postMetaData.postViewData.id,
-      //                   }));
-      //               Navigator.push(
-      //                 context,
-      //                 MaterialPageRoute(
-      //                   builder: (context) => LMPostDetailScreen(
-      //                     postId: post.postViewData.id,
-      //                     isFeed: false,
-      //                     postBuilder: (context, post) {
-      //                       return clientPostWidgetBuilder(
-      //                           context, postMetaData);
-      //                     },
-      //                   ),
-      //                 ),
-      //               );
-      //             }
-      //           },
-      //           icon: const LMIcon(
-      //             type: LMIconType.svg,
-      //             assetPath: clientComment,
-      //             size: 20,
-      //             boxPadding: 6,
-      //           ),
-      //         ),
-      //         const Spacer(),
-      //         LMIconButton(
-      //           onTap: (_) {
-      //             // String? postType = postDetails!.attachments == null ||
-      //             //         postDetails!.attachments!.isEmpty
-      //             //     ? 'text'
-      //             //     : getPostType(
-      //             //         postDetails!.attachments?.first.attachmentType ?? 0);
-
-      //             // LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-      //             //   eventName: LMAnalyticsKeys.postShared,
-      //             //   eventProperties: {
-      //             //     "post_id": postMetaData.postViewData.id,
-      //             //     "post_type": postType,
-      //             //     "user_id": user.userUniqueId,
-      //             //   },
-      //             // ));
-      //             // SharePost().sharePost(postMetaData.postViewData.id);
-      //           },
-      //           icon: const LMIcon(
-      //             type: LMIconType.svg,
-      //             assetPath: clientShare,
-      //             size: 20,
-      //           ),
-      //         ),
-      //       ],
-      //     ),
-      //   );
-      // },
     ),
   );
 }

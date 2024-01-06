@@ -942,18 +942,9 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                             return Column(
                               children: [
                                 const SizedBox(height: 8),
-                                widget.postBuilder?.call(
-                                        context,
-                                        (postMetaDataBuilder!
-                                              ..postViewData(item))
-                                            .build()) ??
-                                    LMPostWidget(
-                                      post: item,
-                                      topics: widget.topics,
-                                      user: widget.users[item.userId]!,
-                                      isFeed: false,
-                                      onTagTap: (String userId) {},
-                                    ),
+                                widget.postBuilder
+                                        ?.call(context, defPostWidget(item)) ??
+                                    defPostWidget(item),
                                 const SizedBox(height: 8),
                               ],
                             );
@@ -1023,6 +1014,16 @@ class _FeedRoomViewState extends State<FeedRoomView> {
           );
         },
       ),
+    );
+  }
+
+  LMPostWidget defPostWidget(LMPostViewData post) {
+    return LMPostWidget(
+      post: post,
+      topics: widget.topics,
+      user: widget.users[post.userId]!,
+      isFeed: false,
+      onTagTap: (String userId) {},
     );
   }
 }

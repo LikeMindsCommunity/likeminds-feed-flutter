@@ -20,18 +20,21 @@ class LMPostFooter extends StatelessWidget {
   final Widget Function(LMButton)? saveButtonBuilder;
   final Widget Function(LMButton)? shareButtonBuilder;
 
-  final _footerChildren = const <Widget>[];
+  final _footerChildren = <Widget>[];
 
   @override
   Widget build(BuildContext context) {
     _populateButtonList();
     return Row(
-      mainAxisAlignment: postFooterStyle?.alignment ?? MainAxisAlignment.start,
+      mainAxisAlignment:
+          postFooterStyle?.alignment ?? MainAxisAlignment.spaceBetween,
       children: _footerChildren,
     );
   }
 
   void _populateButtonList() {
+    _footerChildren.clear();
+
     if (postFooterStyle == null) {
       _footerChildren.addAll([
         defLikeButton,
@@ -98,4 +101,23 @@ class LMPostFooter extends StatelessWidget {
     onTap: () {},
     icon: LMIcon.share(),
   );
+
+  LMButton copyWith(LMButton button) {
+    return LMButton(
+      text: button.text ?? defLikeButton.text,
+      margin: button.margin ?? defLikeButton.margin,
+      onTap: button.onTap ?? defLikeButton.onTap,
+      icon: button.icon ?? defLikeButton.icon,
+      activeIcon: button.activeIcon ?? defLikeButton.activeIcon,
+      activeText: button.activeText ?? defLikeButton.activeText,
+      height: button.height ?? defLikeButton.height,
+      width: button.width ?? defLikeButton.width,
+      padding: button.padding ?? defLikeButton.padding,
+      placement: button.placement,
+      mainAxisAlignment:
+          button.mainAxisAlignment ?? defLikeButton.mainAxisAlignment,
+      style: button.style ?? defLikeButton.style,
+      isActive: button.isActive,
+    );
+  }
 }

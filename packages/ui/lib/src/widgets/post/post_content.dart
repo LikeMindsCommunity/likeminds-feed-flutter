@@ -53,4 +53,18 @@ class LMPostContent extends StatelessWidget {
       style: textStyle ?? Theme.of(context).textTheme.bodyMedium,
     );
   }
+
+  LMPostContent copyWith(LMPostContent content) {
+    return LMPostContent(
+      text: content.text ?? text,
+      visibleLines: content.visibleLines ?? visibleLines,
+      textStyle: content.textStyle ?? textStyle,
+      linkStyle: content.linkStyle ?? linkStyle,
+      animation: content.animation ?? animation,
+      expandTextStyle: content.expandTextStyle ?? expandTextStyle,
+      expandText: content.expandText ?? expandText,
+      onTagTap: content.onTagTap,
+      expanded: content.expanded,
+    );
+  }
 }

@@ -55,6 +55,46 @@ class LMPostWidget extends StatefulWidget {
 
   @override
   State<LMPostWidget> createState() => _LMPostWidgetState();
+
+  LMPostWidget copyWith({
+    LMPostHeaderBuilder? headerBuilder,
+    LMPostFooterBuilder? footerBuilder,
+    LMPostTopicBuilder? topicBuilder,
+    LMPostMenuBuilder? menuBuilder,
+    LMPostMediaBuilder? mediaBuilder,
+    LMPostContentBuilder? contentBuilder,
+    List<BoxShadow>? boxShadow,
+    BorderRadiusGeometry? borderRadius,
+    LMPostViewData? post,
+    LMUserViewData? user,
+    Map<String, LMTopicViewData>? topics,
+    bool? isFeed,
+    LMOnPostTap? onPostTap,
+    Function(String)? onTagTap,
+    Function(bool isLiked)? onLikeTap,
+    Function(bool isPinned)? onPinTap,
+    Function(bool isSaved)? onSaveTap,
+  }) {
+    return LMPostWidget(
+      headerBuilder: headerBuilder ?? this.headerBuilder,
+      footerBuilder: footerBuilder ?? this.footerBuilder,
+      topicBuilder: topicBuilder ?? this.topicBuilder,
+      menuBuilder: menuBuilder ?? this.menuBuilder,
+      mediaBuilder: mediaBuilder ?? this.mediaBuilder,
+      contentBuilder: contentBuilder ?? this.contentBuilder,
+      boxShadow: boxShadow ?? this.boxShadow,
+      borderRadius: borderRadius ?? this.borderRadius,
+      post: post ?? this.post,
+      user: user ?? this.user,
+      topics: topics ?? this.topics,
+      isFeed: isFeed ?? this.isFeed,
+      onPostTap: onPostTap ?? this.onPostTap,
+      onTagTap: onTagTap ?? this.onTagTap,
+      onLikeTap: onLikeTap ?? this.onLikeTap,
+      onPinTap: onPinTap ?? this.onPinTap,
+      onSaveTap: onSaveTap ?? this.onSaveTap,
+    );
+  }
 }
 
 class _LMPostWidgetState extends State<LMPostWidget> {
@@ -96,7 +136,7 @@ class _LMPostWidgetState extends State<LMPostWidget> {
       post: widget.post,
       child: GestureDetector(
         onTap: () {
-          widget.onPostTap?.call(context, postMetaData!.postViewData);
+          widget.onPostTap?.call(context, postMetaData!);
           onPostTap();
         },
         child: Container(
@@ -110,25 +150,20 @@ class _LMPostWidgetState extends State<LMPostWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               widget.headerBuilder != null
-                  ? widget.headerBuilder!(context, widget.post)
+                  ? widget.headerBuilder!(context, defPostHeader())
                   : Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
-                      child: LMPostHeader(
-                        user: widget.user,
-                        isFeed: widget.isFeed,
-                      ),
+                      child: defPostHeader(),
                     ),
               widget.contentBuilder != null
-                  ? widget.contentBuilder!(context, postMetaData!)
+                  ? widget.contentBuilder!(context, defContentWidget())
                   : Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
-                      child: LMPostContent(
-                        onTagTap: widget.onTagTap,
-                      ),
+                      child: defContentWidget(),
                     ),
               widget.post.attachments != null &&
                       widget.post.attachments!.isNotEmpty
@@ -137,24 +172,46 @@ class _LMPostWidgetState extends State<LMPostWidget> {
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                           ),
-                          child: LMPostMedia(
-                              attachments: widget.post.attachments!),
+                          child: defPostMedia(),
                         )
-                      : widget.mediaBuilder!(context, postMetaData!)
+                      : widget.mediaBuilder!(context, defPostMedia())
                   : const SizedBox(),
               const SizedBox(height: 18),
               widget.footerBuilder != null
-                  ? widget.footerBuilder!(context, postMetaData!)
+                  ? widget.footerBuilder!(context, defFooterWidget())
                   : Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
-                      child: LMPostFooter(),
+                      child: defFooterWidget(),
                     ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  LMPostContent defContentWidget() {
+    return LMPostContent(
+      onTagTap: widget.onTagTap,
+    );
+  }
+
+  LMPostFooter defFooterWidget() {
+    return LMPostFooter();
+  }
+
+  LMPostHeader defPostHeader() {
+    return LMPostHeader(
+      user: widget.user,
+      isFeed: widget.isFeed,
+    );
+  }
+
+  LMPostMedia defPostMedia() {
+    return LMPostMedia(
+      attachments: widget.post.attachments!,
     );
   }
 }

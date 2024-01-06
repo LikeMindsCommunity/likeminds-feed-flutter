@@ -226,4 +226,22 @@ class LMPostHeader extends StatelessWidget {
       ),
     );
   }
+
+  LMPostHeader copyWith(LMPostHeader header) {
+    return LMPostHeader(
+      user: header.user,
+      imageSize: header.imageSize ?? imageSize,
+      titleText: header.titleText ?? titleText,
+      subText: header.subText ?? subText,
+      editedText: header.editedText ?? editedText,
+      menu: header.menu ?? menu,
+      createdAt: header.createdAt ?? createdAt,
+      onProfileTap: header.onProfileTap ?? onProfileTap,
+      isFeed: header.isFeed,
+      fallbackTextStyle: header.fallbackTextStyle ?? fallbackTextStyle,
+      customTitle: header.customTitle ?? customTitle,
+      showCustomTitle: header.showCustomTitle ?? showCustomTitle,
+      profilePicture: header.profilePicture ?? profilePicture,
+    );
+  }
 }
