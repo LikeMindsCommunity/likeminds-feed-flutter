@@ -1,58 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 import 'package:flutter_svg/svg.dart';
 
-enum LMIconType { icon, svg, png }
-
-class LMIcon extends StatelessWidget {
+/// A simple icon widget to be used throughout the feed
+/// Represents three types of icons - icon, png, svg
+/// Provides customisability through [LMFeedIconStyle]
+class LMFeedIcon extends StatelessWidget {
+  /// enum describing the type of icon to be shown
   final LMIconType type;
-  final IconData? icon;
-  // path to svg or png/jpeg
-  final String? assetPath;
-  // not required if the type is png
-  final Color? color;
-  final double? size;
-  final double? boxSize;
-  final double? boxBorder;
-  final double? boxBorderRadius;
-  final double? boxPadding;
-  final Color? backgroundColor;
-  final BoxFit? fit;
 
-  const LMIcon({
+  /// if [LMIconType.icon] then pass icon of type [IconData]
+  final IconData? icon;
+
+  /// if [LMIconType.png] or [LMIconType.svg] then pass path of icon [String]
+  final String? assetPath;
+
+  /// style class for styling the icon [LMFeedIconStyle]
+  final LMFeedIconStyle? style;
+
+  /// either the icon [IconData] or asset path [String] must be provided
+  const LMFeedIcon({
     super.key,
     required this.type,
     this.assetPath,
     this.icon,
-    this.backgroundColor,
-    this.color,
-    this.size,
-    this.boxSize,
-    this.boxBorder,
-    this.boxBorderRadius,
-    this.boxPadding,
-    this.fit,
-  });
+    this.style,
+  }) : assert(icon != null || assetPath != null);
 
-  getIconWidget() {
+  getIconWidget(LMFeedIconStyle style) {
     switch (type) {
       case LMIconType.icon:
-        return Icon(icon, color: color, size: size?.abs() ?? 24);
+        return Icon(
+          icon,
+          color: style.color,
+          size: style.size?.abs() ?? 24,
+        );
       case LMIconType.svg:
         return SizedBox(
-          width: size?.abs() ?? 24,
-          height: size?.abs() ?? 24,
+          width: style.size?.abs() ?? 24,
+          height: style.size?.abs() ?? 24,
           child: SvgPicture.asset(
             assetPath!,
-            colorFilter: color == null
+            colorFilter: style.color == null
                 ? null
-                : ColorFilter.mode(color!, BlendMode.srcATop),
-            fit: fit ?? BoxFit.contain,
+                : ColorFilter.mode(
+                    style.color!,
+                    BlendMode.srcATop,
+                  ),
+            fit: style.fit ?? BoxFit.contain,
           ),
         );
       case LMIconType.png:
         return SizedBox(
-          width: size?.abs() ?? 24,
-          height: size?.abs() ?? 24,
+          width: style.size?.abs() ?? 24,
+          height: style.size?.abs() ?? 24,
           child: Image.asset(
             assetPath!,
             fit: BoxFit.contain,
@@ -63,9 +64,67 @@ class LMIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inStyle = style ?? LMFeedIconStyle.basic();
     return Container(
-      margin: EdgeInsets.all(boxPadding?.abs() ?? 0),
-      child: Center(child: getIconWidget()),
+      padding: EdgeInsets.all(
+        inStyle.boxPadding?.abs() ?? 0,
+      ),
+      decoration: BoxDecoration(
+        color: inStyle.backgroundColor,
+        borderRadius: BorderRadius.all(
+          Radius.circular(inStyle.boxBorderRadius ?? 0),
+        ),
+      ),
+      child: Center(
+        child: getIconWidget(inStyle),
+      ),
+    );
+  }
+}
+
+class LMFeedIconStyle {
+  /// color of the icon, not applicable on [LMIconType.png]
+  final Color? color;
+
+  /// square size of the icon
+  final double? size;
+
+  /// square size of the box surrounding the icon
+  final double? boxSize;
+
+  /// weight of the border around the box
+  final double? boxBorder;
+
+  /// radius of the box around the icon
+  final double? boxBorderRadius;
+
+  /// padding around icon with respect to the box
+  final double? boxPadding;
+
+  /// color of the box, or background color of icon
+  final Color? backgroundColor;
+
+  /// fit inside the box for icon
+  final BoxFit? fit;
+
+  const LMFeedIconStyle({
+    this.color,
+    this.size,
+    this.boxSize,
+    this.boxBorder,
+    this.boxBorderRadius,
+    this.boxPadding,
+    this.backgroundColor,
+    this.fit,
+  });
+
+  factory LMFeedIconStyle.basic() {
+    return const LMFeedIconStyle(
+      color: Colors.black,
+      size: 28,
+      boxSize: 36,
+      boxPadding: 8,
+      fit: BoxFit.contain,
     );
   }
 }
