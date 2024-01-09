@@ -1,48 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-export 'package:likeminds_feed_ui_fl/src/widgets/common/icon/style/icon_style.dart';
-
-enum LMIconType { icon, svg, png }
-
-class LMIcon extends StatelessWidget {
+/// A simple icon widget to be used throughout the feed
+/// Represents three types of icons - icon, png, svg
+/// Provides customisability through [LMFeedIconStyle]
+class LMFeedIcon extends StatelessWidget {
+  /// enum describing the type of icon to be shown
   final LMIconType type;
-  final IconData? icon;
-  // path to svg or png/jpeg
-  final String? assetPath;
-  // not required if the type is png
-  final LMIconStyle? iconStyle;
 
-  const LMIcon({
+  /// if [LMIconType.icon] then pass icon of type [IconData]
+  final IconData? icon;
+
+  /// if [LMIconType.png] or [LMIconType.svg] then pass path of icon [String]
+  final String? assetPath;
+
+  /// style class for styling the icon [LMFeedIconStyle]
+  final LMFeedIconStyle? style;
+
+  /// either the icon [IconData] or asset path [String] must be provided
+  const LMFeedIcon({
     super.key,
     required this.type,
     this.assetPath,
     this.icon,
-    this.iconStyle,
-  });
+    this.style,
+  }) : assert(icon != null || assetPath != null);
 
-  getIconWidget() {
+  getIconWidget(LMFeedIconStyle style) {
     switch (type) {
       case LMIconType.icon:
-        return Icon(icon,
-            color: iconStyle?.color, size: iconStyle?.size?.abs() ?? 24);
+        return Icon(
+          icon,
+          color: style.color,
+          size: style.size?.abs() ?? 24,
+        );
       case LMIconType.svg:
         return SizedBox(
-          width: iconStyle?.size?.abs() ?? 24,
-          height: iconStyle?.size?.abs() ?? 24,
+          width: style.size?.abs() ?? 24,
+          height: style.size?.abs() ?? 24,
           child: SvgPicture.asset(
             assetPath!,
-            colorFilter: iconStyle?.color == null
+            colorFilter: style.color == null
                 ? null
-                : ColorFilter.mode(iconStyle!.color!, BlendMode.srcATop),
-            fit: iconStyle?.fit ?? BoxFit.contain,
+                : ColorFilter.mode(
+                    style.color!,
+                    BlendMode.srcATop,
+                  ),
+            fit: style.fit ?? BoxFit.contain,
           ),
         );
       case LMIconType.png:
         return SizedBox(
-          width: iconStyle?.size?.abs() ?? 24,
-          height: iconStyle?.size?.abs() ?? 24,
+          width: style.size?.abs() ?? 24,
+          height: style.size?.abs() ?? 24,
           child: Image.asset(
             assetPath!,
             fit: BoxFit.contain,
@@ -53,66 +64,67 @@ class LMIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inStyle = style ?? LMFeedIconStyle.basic();
     return Container(
-      margin: EdgeInsets.all(iconStyle?.boxPadding?.abs() ?? 0),
-      child: Center(child: getIconWidget()),
+      padding: EdgeInsets.all(
+        inStyle.boxPadding?.abs() ?? 0,
+      ),
+      decoration: BoxDecoration(
+        color: inStyle.backgroundColor,
+        borderRadius: BorderRadius.all(
+          Radius.circular(inStyle.boxBorderRadius ?? 0),
+        ),
+      ),
+      child: Center(
+        child: getIconWidget(inStyle),
+      ),
     );
   }
+}
 
-  LMIcon copyWith(LMIcon icon) {
-    return LMIcon(
-      type: icon.type,
-      icon: icon.icon ?? this.icon,
-      assetPath: icon.assetPath ?? assetPath,
-      iconStyle: iconStyle?.copyWith(icon.iconStyle!) ?? iconStyle,
-    );
-  }
+class LMFeedIconStyle {
+  /// color of the icon, not applicable on [LMIconType.png]
+  final Color? color;
 
-  factory LMIcon.likeActive() {
-    return LMIcon(
-      type: LMIconType.svg,
-      assetPath: lmLikeActiveSvg,
-      iconStyle: LMIconStyle.activePreset(),
-    );
-  }
+  /// square size of the icon
+  final double? size;
 
-  factory LMIcon.likeInActive() {
-    return LMIcon(
-      type: LMIconType.svg,
-      assetPath: lmLikeInActiveSvg,
-      iconStyle: LMIconStyle.inActivePreset(),
-    );
-  }
+  /// square size of the box surrounding the icon
+  final double? boxSize;
 
-  factory LMIcon.comment() {
-    return LMIcon(
-      type: LMIconType.svg,
-      assetPath: lmCommentSvg,
-      iconStyle: LMIconStyle.inActivePreset(),
-    );
-  }
+  /// weight of the border around the box
+  final double? boxBorder;
 
-  factory LMIcon.share() {
-    return LMIcon(
-      type: LMIconType.svg,
-      assetPath: lmShareSvg,
-      iconStyle: LMIconStyle.inActivePreset(),
-    );
-  }
+  /// radius of the box around the icon
+  final double? boxBorderRadius;
 
-  factory LMIcon.saveActive() {
-    return LMIcon(
-      type: LMIconType.svg,
-      assetPath: lmSaveActiveSvg,
-      iconStyle: LMIconStyle.activePreset(),
-    );
-  }
+  /// padding around icon with respect to the box
+  final double? boxPadding;
 
-  factory LMIcon.saveInActive() {
-    return LMIcon(
-      type: LMIconType.svg,
-      assetPath: lmSaveInactiveSvg,
-      iconStyle: LMIconStyle.inActivePreset(),
+  /// color of the box, or background color of icon
+  final Color? backgroundColor;
+
+  /// fit inside the box for icon
+  final BoxFit? fit;
+
+  const LMFeedIconStyle({
+    this.color,
+    this.size,
+    this.boxSize,
+    this.boxBorder,
+    this.boxBorderRadius,
+    this.boxPadding,
+    this.backgroundColor,
+    this.fit,
+  });
+
+  factory LMFeedIconStyle.basic() {
+    return const LMFeedIconStyle(
+      color: Colors.black,
+      size: 28,
+      boxSize: 36,
+      boxPadding: 8,
+      fit: BoxFit.contain,
     );
   }
 }

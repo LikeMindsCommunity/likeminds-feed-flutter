@@ -1,98 +1,100 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-export 'package:likeminds_feed_ui_fl/src/widgets/common/buttons/style/button_style.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
+import 'package:likeminds_feed_ui_fl/src/widgets/common/commons.dart';
 
 // This widget is used to display a text button
 // The [LMButton] can be customized by passing in the required parameters
-class LMButton extends StatelessWidget {
-  const LMButton({
+class LMFeedButton extends StatefulWidget {
+  const LMFeedButton({
     super.key,
     this.icon,
     this.text,
-    this.onTap,
+    required this.onTap,
     this.activeIcon,
     this.activeText,
-    this.height,
-    this.width,
-    this.margin,
     this.isActive = false,
-    this.padding,
-    this.placement = LMIconPlacement.start,
-    this.mainAxisAlignment,
     this.style,
   });
 
-  // Required parameters, defines whether the button is active or disabled
+  /// Required parameter, defines whether the button is active or disabled
   final bool isActive;
-  final double? margin;
-  // Icon to be displayed in the button
-  final LMIcon? icon;
-  // Text to be displayed in the button, [LMTextView] only
-  final LMTextView? text;
-  // Action to perform after tapping on the button
-  final Function()? onTap;
-  // Icon to be displayed in the button if the button is active
-  final LMIcon? activeIcon;
-  // Text to be displayed in the button if the button is active,
-  // [LMTextView] only
-  final LMTextView? activeText;
-  // Padding of the button, defaults to zero
-  final EdgeInsets? padding;
-  final double? height;
-  final double? width;
-  // Placement of the icon in the button, required
-  final LMIconPlacement placement;
-  final MainAxisAlignment? mainAxisAlignment;
 
-  final LMButtonStyle? style;
+  /// style class to customise the look and feel of the button
+  final LMFeedButtonStyle? style;
+
+  /// Icon to be displayed in the button
+  final LMFeedIcon? icon;
+
+  /// Text to be displayed in the button
+  final LMFeedText? text;
+
+  /// Action to perform after tapping on the button
+  final Function() onTap;
+
+  /// Icon to be displayed in the button if the button is active
+  final LMFeedIcon? activeIcon;
+
+  /// Text to be displayed in the button if the button is active
+  final LMFeedText? activeText;
+
+  @override
+  State<LMFeedButton> createState() => _LMButtonState();
+}
+
+class _LMButtonState extends State<LMFeedButton> {
+  bool _active = false;
+
+  @override
+  void initState() {
+    _active = widget.isActive;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      onHover: style?.onHover,
-      splashColor: style?.splashColor,
-      focusColor: style?.focusColor,
-      hoverColor: style?.hoverColor,
-      enableFeedback: style?.enableFeedback,
+    final inStyle = widget.style ?? LMFeedButtonStyle.basic();
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _active = !_active;
+        });
+        widget.onTap();
+      },
       child: Container(
-        height: height ?? 32,
-        width: width,
-        padding: padding ?? EdgeInsets.zero,
+        height: inStyle.height ?? 32,
+        width: inStyle.width,
+        padding: inStyle.padding ?? EdgeInsets.zero,
         decoration: BoxDecoration(
-          color: style?.backgroundColor ?? Colors.transparent,
-          borderRadius: style?.borderRadius == null
-              ? null
-              : BorderRadius.circular(style!.borderRadius!),
-          border: style?.border,
+          color: inStyle.backgroundColor,
+          borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 0),
+          border: inStyle.border,
         ),
         child: Row(
-          mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
+          mainAxisAlignment:
+              inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
           children: [
-            placement == LMIconPlacement.start
-                ? isActive
-                    ? activeIcon ?? const SizedBox()
-                    : icon ?? const SizedBox()
+            inStyle.placement == LMIconPlacement.start
+                ? widget.isActive
+                    ? widget.activeIcon ?? const SizedBox()
+                    : widget.icon ?? const SizedBox()
                 : const SizedBox(),
-            placement == LMIconPlacement.start
-                ? (icon != null || activeIcon != null)
-                    ? SizedBox(width: margin ?? 8)
+            inStyle.placement == LMIconPlacement.start
+                ? (widget.icon != null || widget.activeIcon != null)
+                    ? SizedBox(width: inStyle.margin ?? 8)
                     : const SizedBox()
                 : const SizedBox(),
-            (style?.showText ?? true)
-                ? isActive
-                    ? activeText ?? text ?? const SizedBox()
-                    : text ?? const SizedBox()
-                : const SizedBox.shrink(),
-            placement == LMIconPlacement.end
-                ? (icon != null || activeIcon != null)
-                    ? SizedBox(width: margin ?? 8)
+            widget.isActive
+                ? widget.activeText ?? widget.text ?? const SizedBox()
+                : widget.text ?? const SizedBox(),
+            inStyle.placement == LMIconPlacement.end
+                ? (widget.icon != null || widget.activeIcon != null)
+                    ? SizedBox(width: inStyle.margin ?? 8)
                     : const SizedBox()
                 : const SizedBox(),
-            placement == LMIconPlacement.end
-                ? isActive
-                    ? activeIcon ?? const SizedBox()
-                    : icon ?? const SizedBox()
+            inStyle.placement == LMIconPlacement.end
+                ? widget.isActive
+                    ? widget.activeIcon ?? const SizedBox()
+                    : widget.icon ?? const SizedBox()
                 : const SizedBox(),
           ],
         ),
@@ -100,21 +102,69 @@ class LMButton extends StatelessWidget {
     );
   }
 
-  LMButton copyWith(LMButton button) {
-    return LMButton(
-      icon: button.icon ?? icon,
-      text: button.text ?? text,
-      onTap: button.onTap ?? onTap,
-      activeIcon: button.activeIcon ?? activeIcon,
-      activeText: button.activeText ?? activeText,
-      height: button.height ?? height,
-      width: button.width ?? width,
-      margin: button.margin ?? margin,
-      isActive: button.isActive,
-      padding: button.padding ?? padding,
-      placement: button.placement,
-      mainAxisAlignment: button.mainAxisAlignment ?? mainAxisAlignment,
-      style: button.style ?? style,
+  Widget _defText() {
+    return const LMFeedText(text: "Button");
+  }
+
+  Widget _defIcon() {
+    return const LMFeedIcon(
+      type: LMIconType.icon,
+      icon: Icons.done_all,
+    );
+  }
+}
+
+class LMFeedButtonStyle {
+  /// padding of the button, defaults to zero
+  final EdgeInsets? padding;
+
+  /// background color of the button, defaults to transparent
+  final Color? backgroundColor;
+
+  /// border radius of the button container
+  final double? borderRadius;
+
+  /// height of the button
+  final double? height;
+
+  /// width of the button
+  final double? width;
+
+  /// border of the button
+  final Border? border;
+
+  /// placement of the icon in the button
+  final LMIconPlacement? placement;
+
+  /// axis alignment for setting button's icon and text spacing
+  final MainAxisAlignment? mainAxisAlignment;
+
+  /// margin between the text and icon
+  final double? margin;
+
+  const LMFeedButtonStyle({
+    this.padding,
+    this.backgroundColor,
+    this.border,
+    this.borderRadius,
+    this.height,
+    this.width,
+    this.placement,
+    this.margin,
+    this.mainAxisAlignment,
+  });
+
+  factory LMFeedButtonStyle.basic() {
+    return LMFeedButtonStyle(
+      padding: const EdgeInsets.all(4),
+      backgroundColor: Colors.transparent,
+      border: Border.all(color: Colors.blue),
+      borderRadius: 8,
+      height: 42,
+      width: 72,
+      placement: LMIconPlacement.start,
+      margin: 4,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     );
   }
 }

@@ -6,8 +6,8 @@ import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 class LMUserTile extends StatelessWidget {
   final LMUserViewData user;
   final LMProfilePicture? profilePicture;
-  final LMTextView? titleText;
-  final LMTextView? subText;
+  final LMFeedText? titleText;
+  final LMFeedText? subText;
   final double? imageSize;
   final Function onTap;
 
@@ -39,12 +39,14 @@ class LMUserTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               titleText ??
-                  LMTextView(
+                  LMFeedText(
                     text: user.name,
-                    textStyle: const TextStyle(
-                      fontSize: kFontMedium,
-                      color: kGrey1Color,
-                      fontWeight: FontWeight.w500,
+                    style: const LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        fontSize: kFontMedium,
+                        color: kGrey1Color,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
               kVerticalPaddingMedium,

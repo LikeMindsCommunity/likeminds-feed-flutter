@@ -15,16 +15,15 @@ export 'common/icon/icon.dart';
 
 export 'common/extras/loader.dart';
 
-export 'common/text/text_view.dart';
-export 'common/text/text_input.dart';
+export 'common/text/text.dart';
 
 export 'common/shimmer/post_shimmer.dart';
 export 'common/shimmer/feed_shimmer.dart';
 export 'common/shimmer/document_shimmer.dart';
 
-export 'common/profile_picture.dart';
-export 'common/user_tile.dart';
-export 'common/appbar.dart';
+export 'common/profile/profile_picture.dart';
+export 'common/profile/user_tile.dart';
+export 'common/extras/appbar.dart';
 
 export 'feed/bottom_sheet.dart';
 
