@@ -9,19 +9,19 @@ part 'comment_replies_event.dart';
 part 'comment_replies_state.dart';
 
 /// {@template lm_fetch_comment_reply_bloc}
-/// [LMFetchCommentReplyBloc] fetches the replies for a comment
+/// [LMFeedFetchCommentReplyBloc] fetches the replies for a comment
 /// {@endtemplate}
-class LMFetchCommentReplyBloc
-    extends Bloc<LMCommentRepliesEvent, LMCommentRepliesState> {
-  static LMFetchCommentReplyBloc? _instance;
+class LMFeedFetchCommentReplyBloc
+    extends Bloc<LMFeedCommentRepliesEvent, LMFeedCommentRepliesState> {
+  static LMFeedFetchCommentReplyBloc? _instance;
 
-  static LMFetchCommentReplyBloc get instance =>
-      _instance ??= LMFetchCommentReplyBloc._();
+  static LMFeedFetchCommentReplyBloc get instance =>
+      _instance ??= LMFeedFetchCommentReplyBloc._();
 
   LMFeedCore lmFeedIntegration = LMFeedCore.instance;
-  LMFetchCommentReplyBloc._() : super(LMCommentRepliesInitial()) {
-    on<LMCommentRepliesEvent>((event, emit) async {
-      if (event is LMGetCommentReplies) {
+  LMFeedFetchCommentReplyBloc._() : super(LMFeedCommentRepliesInitialState()) {
+    on<LMFeedCommentRepliesEvent>((event, emit) async {
+      if (event is LMFeedGetCommentRepliesEvent) {
         await _mapGetCommentRepliesToState(
             commentDetailRequest: event.commentDetailRequest,
             forLoadMore: event.forLoadMore,
@@ -29,9 +29,9 @@ class LMFetchCommentReplyBloc
             lmFeedIntegration: lmFeedIntegration);
       }
     });
-    on<LMClearCommentReplies>(
+    on<LMFeedClearCommentRepliesEvent>(
       (event, emit) {
-        emit(LMClearedCommentReplies());
+        emit(LMFeedClearedCommentRepliesState());
       },
     );
   }
@@ -39,37 +39,38 @@ class LMFetchCommentReplyBloc
   FutureOr<void> _mapGetCommentRepliesToState(
       {required GetCommentRequest commentDetailRequest,
       required bool forLoadMore,
-      required Emitter<LMCommentRepliesState> emit,
+      required Emitter<LMFeedCommentRepliesState> emit,
       required LMFeedCore lmFeedIntegration}) async {
     // if (!hasReachedMax(state, forLoadMore)) {
     Map<String, User> users = {};
     List<Comment> comments = [];
-    if (state is LMCommentRepliesLoaded &&
+    if (state is LMFeedCommentRepliesLoadedState &&
         forLoadMore &&
         commentDetailRequest.commentId ==
-            (state as LMCommentRepliesLoaded).commentId) {
-      comments = (state as LMCommentRepliesLoaded)
+            (state as LMFeedCommentRepliesLoadedState).commentId) {
+      comments = (state as LMFeedCommentRepliesLoadedState)
               .commentDetails
               .postReplies!
               .replies ??
           [];
-      users = (state as LMCommentRepliesLoaded).commentDetails.users!;
-      emit(LMPaginatedCommentRepliesLoading(
+      users = (state as LMFeedCommentRepliesLoadedState).commentDetails.users!;
+      emit(LMFeedPaginatedCommentRepliesLoadingState(
           commentId: commentDetailRequest.commentId,
           prevCommentDetails:
-              (state as LMCommentRepliesLoaded).commentDetails));
+              (state as LMFeedCommentRepliesLoadedState).commentDetails));
     } else {
-      emit(LMCommentRepliesLoading(commentId: commentDetailRequest.commentId));
+      emit(LMFeedCommentRepliesLoadingState(
+          commentId: commentDetailRequest.commentId));
     }
 
     GetCommentResponse response =
         await lmFeedIntegration.lmFeedClient.getComment(commentDetailRequest);
     if (!response.success) {
-      emit(const LMCommentRepliesError(message: "An error occurred"));
+      emit(const LMFeedCommentRepliesErrorState(message: "An error occurred"));
     } else {
       response.postReplies!.replies?.insertAll(0, comments);
       response.users!.addAll(users);
-      emit(LMCommentRepliesLoaded(
+      emit(LMFeedCommentRepliesLoadedState(
         commentDetails: response,
         commentId: commentDetailRequest.commentId,
       ));

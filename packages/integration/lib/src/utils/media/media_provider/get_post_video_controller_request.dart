@@ -1,13 +1,13 @@
 part of 'media_provider.dart';
 
-enum LMVideoSourceType { network, file }
+enum LMFeedVideoSourceType { network, file }
 
-class LMGetPostVideoControllerRequest {
+class LMFeedGetPostVideoControllerRequest {
   final String postId;
   final String videoSource;
-  final LMVideoSourceType videoType;
+  final LMFeedVideoSourceType videoType;
 
-  const LMGetPostVideoControllerRequest._(
+  const LMFeedGetPostVideoControllerRequest._(
       {required this.postId,
       required this.videoSource,
       required this.videoType});

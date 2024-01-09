@@ -1,17 +1,17 @@
 part of 'post_bloc.dart';
 
-abstract class LMPostEvents extends Equatable {
+abstract class LMFeedPostEvents extends Equatable {
   @override
   List<Object> get props => [];
 }
 
-class LMCreateNewPost extends LMPostEvents {
+class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
   final List<LMMediaModel>? postMedia;
   final String postText;
   final User user;
   final List<LMTopicViewData> selectedTopics;
 
-  LMCreateNewPost({
+  LMFeedCreateNewPostEvent({
     this.postMedia,
     required this.user,
     required this.postText,
@@ -19,13 +19,13 @@ class LMCreateNewPost extends LMPostEvents {
   });
 }
 
-class LMEditPost extends LMPostEvents {
+class LMFeedEditPostEvent extends LMFeedPostEvents {
   final List<LMAttachmentViewData>? attachments;
   final String postText;
   final String postId;
   final List<LMTopicViewData> selectedTopics;
 
-  LMEditPost({
+  LMFeedEditPostEvent({
     required this.postText,
     this.attachments,
     required this.postId,
@@ -33,12 +33,12 @@ class LMEditPost extends LMPostEvents {
   });
 }
 
-class LMDeletePost extends LMPostEvents {
+class LMFeedDeletePostEvent extends LMFeedPostEvents {
   final String postId;
   final String reason;
   final int? feedRoomId;
 
-  LMDeletePost({
+  LMFeedDeletePostEvent({
     required this.postId,
     required this.reason,
     this.feedRoomId,
@@ -48,10 +48,10 @@ class LMDeletePost extends LMPostEvents {
   List<Object> get props => [postId, reason];
 }
 
-class LMUpdatePost extends LMPostEvents {
+class LMFeedUpdatePostEvent extends LMFeedPostEvents {
   final LMPostViewData post;
 
-  LMUpdatePost({
+  LMFeedUpdatePostEvent({
     required this.post,
   });
 
@@ -59,11 +59,11 @@ class LMUpdatePost extends LMPostEvents {
   List<Object> get props => [post, DateTime.now().millisecondsSinceEpoch];
 }
 
-class LMTogglePinPost extends LMPostEvents {
+class LMFeedTogglePinPostEvent extends LMFeedPostEvents {
   final String postId;
   final bool isPinned;
 
-  LMTogglePinPost({
+  LMFeedTogglePinPostEvent({
     required this.postId,
     required this.isPinned,
   });

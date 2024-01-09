@@ -10,21 +10,21 @@ import 'package:likeminds_feed_driver_fl/src/utils/typedefs.dart';
 /// This is the main class that needs to be initialized before using the SDK.
 /// LMBlocListener is a wrapper class that wraps the child widget with MultiBlocListener.
 /// This class is responsible for listening to the following blocs:
-/// 1. LMAnalyticsBloc
+/// 1. LMFeedAnalyticsBloc
 /// 2. LMRoutingBloc
 /// 3. LMProfileBloc
 /// {@endtemplate}
-class LMBlocListener extends StatefulWidget {
+class LMFeedBlocListener extends StatefulWidget {
   final Widget child;
   // {@macro lm_analytics_bloc_listener}
-  final LMAnalyticsBlocListener analyticsListener;
+  final LMFeedAnalyticsBlocListener analyticsListener;
   // {@macro lm_routing_bloc_listener}
-  final LMRoutingBlocListener routingListener;
+  final LMFeedRoutingBlocListener routingListener;
   // {@macro lm_profile_bloc_listener}
-  final LMProfileBlocListener profileListener;
+  final LMFeedProfileBlocListener profileListener;
 
   /// {@macro lm_bloc_listener}
-  const LMBlocListener({
+  const LMFeedBlocListener({
     super.key,
     required this.child,
     required this.analyticsListener,
@@ -33,14 +33,14 @@ class LMBlocListener extends StatefulWidget {
   });
 
   @override
-  State<LMBlocListener> createState() => _LMBlocListenerState();
+  State<LMFeedBlocListener> createState() => _LMFeedBlocListenerState();
 }
 
-class _LMBlocListenerState extends State<LMBlocListener> {
+class _LMFeedBlocListenerState extends State<LMFeedBlocListener> {
   @override
   void initState() {
     super.initState();
-    Bloc.observer = LMBlocObserver();
+    Bloc.observer = LMFeedBlocObserver();
   }
 
   @override
@@ -49,15 +49,15 @@ class _LMBlocListenerState extends State<LMBlocListener> {
       listeners: [
         BlocListener(
           listener: widget.profileListener,
-          bloc: LMProfileBloc.instance,
+          bloc: LMFeedProfileBloc.instance,
         ),
         BlocListener(
           listener: widget.analyticsListener,
-          bloc: LMAnalyticsBloc.instance,
+          bloc: LMFeedAnalyticsBloc.instance,
         ),
         BlocListener(
           listener: widget.routingListener,
-          bloc: LMRoutingBloc.instance,
+          bloc: LMFeedRoutingBloc.instance,
         ),
       ],
       child: widget.child,

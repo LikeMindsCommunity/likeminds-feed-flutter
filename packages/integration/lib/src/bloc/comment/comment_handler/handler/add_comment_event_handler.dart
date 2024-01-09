@@ -2,16 +2,16 @@ part of '../comment_handler_bloc.dart';
 
 /// {@template add_comment_event_handler}
 /// [handleAddActionEvent] is used to handle the add comment/reply event
-/// [LMCommentActionEvent] is used to send the request to the handler
+/// [LMFeedCommentActionEvent] is used to send the request to the handler
 /// {@endtemplate}
-Future<void> handleAddActionEvent(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+Future<void> handleAddActionEvent(LMFeedCommentActionEvent event,
+    Emitter<LMFeedCommentHandlerState> emit) async {
   // Check if the comment is a parent comment or a reply to a comment
   // and call the respective handler
-  if (event.commentMetaData.commentActionType == LMCommentActionType.add) {
+  if (event.commentMetaData.commentActionType == LMFeedCommentActionType.add) {
     await _handleAddCommentAction(event, emit);
   } else if (event.commentMetaData.commentActionType ==
-      LMCommentActionType.replying) {
+      LMFeedCommentActionType.replying) {
     await _handleAddReplyAction(event, emit);
   }
 }
@@ -19,8 +19,8 @@ Future<void> handleAddActionEvent(
 // Add comment handler
 // This handler is used to add a new comment
 // to a post
-Future<void> _handleAddCommentAction(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+Future<void> _handleAddCommentAction(LMFeedCommentActionEvent event,
+    Emitter<LMFeedCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
   LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
@@ -33,7 +33,7 @@ Future<void> _handleAddCommentAction(
 
   // Emit the loading state
   // to show the loading indicator
-  emit(LMCommentLoadingState(commentMetaData: event.commentMetaData));
+  emit(LMFeedCommentLoadingState(commentMetaData: event.commentMetaData));
 
   // Make the API call to add the comment using the LMFeedClient and send
   // the [addCommentRequest] as the request and wait for the response
@@ -43,15 +43,15 @@ Future<void> _handleAddCommentAction(
   // Check if the response is successful or not
   if (!response.success) {
     // If the response is not successful then emit the error state
-    emit(LMCommentErrorState(
+    emit(LMFeedCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
     // Fire the analytics event for comment posted
     // and send the [postId] and [commentId] as the parameters
-    LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-      eventName: LMAnalyticsKeys.commentPosted,
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+      eventName: LMFeedAnalyticsKeys.commentPosted,
       eventProperties: {
         "post_id": addCommentRequest.postId,
         "comment_id": response.reply?.id,
@@ -60,7 +60,7 @@ Future<void> _handleAddCommentAction(
     // If the response is successful then emit the success state
     // and send the [response] and [commentMetaData] as the parameters
     // to the state
-    emit(LMCommentSuccessState(
+    emit(LMFeedCommentSuccessState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
@@ -70,8 +70,8 @@ Future<void> _handleAddCommentAction(
 // Add reply handler
 // This handler is used to add a new reply
 // to a comment
-Future<void> _handleAddReplyAction(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+Future<void> _handleAddReplyAction(LMFeedCommentActionEvent event,
+    Emitter<LMFeedCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
   LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
@@ -85,7 +85,7 @@ Future<void> _handleAddReplyAction(
 
   // Emit the loading state
   // to show the loading indicator
-  emit(LMCommentLoadingState(
+  emit(LMFeedCommentLoadingState(
     commentMetaData: event.commentMetaData,
   ));
 
@@ -98,15 +98,15 @@ Future<void> _handleAddReplyAction(
   // Check if the response is successful or not
   if (!response.success) {
     // If the response is not successful then emit the error state
-    emit(LMCommentErrorState(
+    emit(LMFeedCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
     // Fire the analytics event for reply posted
     // and send the [postId], [commentId] and [commentReplyId] as the parameters
-    LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-      eventName: LMAnalyticsKeys.replyPosted,
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+      eventName: LMFeedAnalyticsKeys.replyPosted,
       eventProperties: {
         "post_id": addCommentReplyRequest.postId,
         "comment_id": addCommentReplyRequest.commentId,
@@ -118,7 +118,7 @@ Future<void> _handleAddReplyAction(
     // If the response is successful then emit the success state
     // and send the [response] and [commentMetaData] as the parameters
     //  to the state
-    emit(LMCommentSuccessState(
+    emit(LMFeedCommentSuccessState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));

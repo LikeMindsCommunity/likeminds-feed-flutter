@@ -3,8 +3,8 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class LMPostMedia extends StatefulWidget {
-  const LMPostMedia({
+class LMFeedPostMedia extends StatefulWidget {
+  const LMFeedPostMedia({
     super.key,
     required this.attachments,
     this.documentIcon,
@@ -45,10 +45,10 @@ class LMPostMedia extends StatefulWidget {
   final Color? carouselInactiveIndicatorColor;
 
   @override
-  State<LMPostMedia> createState() => _LMPostMediaState();
+  State<LMFeedPostMedia> createState() => _LMPostMediaState();
 
-  LMPostMedia copyWith(LMPostMedia postMedia) {
-    return LMPostMedia(
+  LMFeedPostMedia copyWith(LMFeedPostMedia postMedia) {
+    return LMFeedPostMedia(
       attachments: postMedia.attachments,
       documentIcon: postMedia.documentIcon ?? documentIcon,
       width: postMedia.width ?? width,
@@ -74,7 +74,7 @@ class LMPostMedia extends StatefulWidget {
   }
 }
 
-class _LMPostMediaState extends State<LMPostMedia> {
+class _LMPostMediaState extends State<LMFeedPostMedia> {
   List<LMAttachmentViewData>? attachments;
   late Size screenSize;
 
@@ -90,7 +90,7 @@ class _LMPostMediaState extends State<LMPostMedia> {
   }
 
   @override
-  void didUpdateWidget(LMPostMedia oldWidget) {
+  void didUpdateWidget(LMFeedPostMedia oldWidget) {
     super.didUpdateWidget(oldWidget);
     initialiseAttachments();
   }
@@ -107,7 +107,7 @@ class _LMPostMediaState extends State<LMPostMedia> {
       /// we need to call the method 'getDocumentList'
       return getPostDocuments();
     } else if (attachments!.first.attachmentType == 4) {
-      return LMLinkPreview(
+      return LMFeedLinkPreview(
         attachment: attachments![0],
         borderRadius: widget.borderRadius,
         backgroundColor: widget.backgroundColor,
@@ -118,7 +118,7 @@ class _LMPostMediaState extends State<LMPostMedia> {
         onError: widget.onError,
       );
     } else {
-      return LMCarousel(
+      return LMFeedCarousel(
         initialiseVideoController: widget.initialiseVideoController,
         attachments: attachments!,
         borderRadius: widget.borderRadius,
@@ -139,7 +139,7 @@ class _LMPostMediaState extends State<LMPostMedia> {
 
     documents = attachments!
         .map(
-          (e) => LMDocument(
+          (e) => LMFeedDocument(
             // document: e,
             size: PostHelper.getFileSizeString(bytes: e.attachmentMeta.size!),
             documentUrl: e.attachmentMeta.url,

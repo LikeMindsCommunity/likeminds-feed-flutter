@@ -3,9 +3,9 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 // This widget is used to display a topic feed bar
-// A [LMTopicFeedBar] displays a list of selected topics
-// The [LMTopicFeedBar] can be customized by passing in the required parameters
-class LMTopicFeedBar extends StatelessWidget {
+// A [LMFeedTopicFeedBar] displays a list of selected topics
+// The [LMFeedTopicFeedBar] can be customized by passing in the required parameters
+class LMFeedTopicFeedBar extends StatelessWidget {
   // Required parameters
   // List of selected topic [pass empty list if no topic is selected]
   final List<LMTopicViewData> selectedTopics;
@@ -40,7 +40,7 @@ class LMTopicFeedBar extends StatelessWidget {
   // LMIconPlacement.end places the icon after the text
   final LMIconPlacement iconPlacement;
 
-  const LMTopicFeedBar({
+  const LMFeedTopicFeedBar({
     Key? key,
     required this.selectedTopics,
     this.backgroundColor,
@@ -86,7 +86,7 @@ class LMTopicFeedBar extends StatelessWidget {
                         trailingIcon != null) {
                       return Container(
                         color: Colors.transparent,
-                        child: LMTopicChip(
+                        child: LMFeedTopicChip(
                           padding: chipPadding,
                           topic: (LMTopicViewDataBuilder()
                                 ..id("-1")
@@ -108,7 +108,7 @@ class LMTopicFeedBar extends StatelessWidget {
                     }
                     return Container(
                       color: Colors.transparent,
-                      child: LMTopicChip(
+                      child: LMFeedTopicChip(
                         padding: chipPadding,
                         topic: selectedTopics[index],
                         onIconTap: onIconTap,

@@ -7,12 +7,12 @@ import 'package:likeminds_feed_driver_fl/src/convertors/post/topic_convertor.dar
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class LMTopicBottomSheet extends StatefulWidget {
+class LMFeedTopicBottomSheet extends StatefulWidget {
   final List<LMTopicViewData> selectedTopics;
   final Function(List<LMTopicViewData>, LMTopicViewData) onTopicSelected;
   final bool? isEnabled;
 
-  const LMTopicBottomSheet({
+  const LMFeedTopicBottomSheet({
     Key? key,
     required this.selectedTopics,
     required this.onTopicSelected,
@@ -20,10 +20,10 @@ class LMTopicBottomSheet extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LMTopicBottomSheet> createState() => _TopicBottomSheetState();
+  State<LMFeedTopicBottomSheet> createState() => _TopicBottomSheetState();
 }
 
-class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
+class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
   List<LMTopicViewData> selectedTopics = [];
   bool paginationComplete = false;
   ScrollController controller = ScrollController();
@@ -38,7 +38,7 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
         ..name("All Topics"))
       .build();
   final int pageSize = 100;
-  LMTopicBloc topicBloc = LMTopicBloc();
+  LMFeedTopicBloc topicBloc = LMFeedTopicBloc();
   bool isSearching = false;
   ValueNotifier<bool> rebuildTopicsScreen = ValueNotifier<bool>(false);
   PagingController<int, LMTopicViewData> topicsPagingController =
@@ -59,7 +59,7 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
     }
     topicsPagingController.itemList = selectedTopics;
     topicBloc.add(
-      LMGetTopic(
+      LMFeedGetTopicEvent(
         getTopicFeedRequest: (GetTopicsRequestBuilder()
               ..page(_page)
               ..isEnabled(widget.isEnabled)
@@ -84,7 +84,7 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
     if (controller.position.atEdge) {
       bool isTop = controller.position.pixels == 0;
       if (!isTop) {
-        topicBloc.add(LMGetTopic(
+        topicBloc.add(LMFeedGetTopicEvent(
           getTopicFeedRequest: (GetTopicsRequestBuilder()
                 ..page(_page)
                 ..isEnabled(widget.isEnabled)
@@ -127,16 +127,16 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
           ),
           const SizedBox(height: 24),
           Expanded(
-            child: BlocConsumer<LMTopicBloc, LMTopicState>(
+            child: BlocConsumer<LMFeedTopicBloc, LMFeedTopicState>(
               bloc: topicBloc,
               buildWhen: (previous, current) {
-                if (_page > 1 && current is LMTopicLoading) {
+                if (_page > 1 && current is LMFeedTopicLoadingState) {
                   return false;
                 }
                 return true;
               },
               listener: (context, state) {
-                if (state is LMTopicLoaded) {
+                if (state is LMFeedTopicLoadedState) {
                   _page++;
                   if (state.getTopicFeedResponse.topics!.isEmpty) {
                     topicsPagingController.appendLastPage([]);
@@ -150,20 +150,20 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
                       _page,
                     );
                   }
-                } else if (state is LMTopicError) {
+                } else if (state is LMFeedTopicErrorState) {
                   topicsPagingController.error = state.errorMessage;
                 }
               },
               builder: (context, state) {
-                if (state is LMTopicLoading) {
+                if (state is LMFeedTopicLoadingState) {
                   return const Center(
-                    child: LMLoader(
+                    child: LMFeedLoader(
                       color: LMThemeData.kPrimaryColor,
                     ),
                   );
                 }
 
-                if (state is LMTopicLoaded) {
+                if (state is LMFeedTopicLoadedState) {
                   return ValueListenableBuilder(
                       valueListenable: rebuildTopicsScreen,
                       builder: (context, _, __) {
@@ -257,7 +257,7 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
                           ],
                         );
                       });
-                } else if (state is LMTopicError) {
+                } else if (state is LMFeedTopicErrorState) {
                   return Center(
                     child: Text(state.errorMessage),
                   );

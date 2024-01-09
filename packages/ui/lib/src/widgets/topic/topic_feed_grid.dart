@@ -3,9 +3,9 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 // This widget is used to display a topic grid
-// A [LMTopicFeedGrid] displays a grid of selected topics
-// The [LMTopicFeedGrid] can be customized by passing in the required parameters
-class LMTopicFeedGrid extends StatelessWidget {
+// A [LMFeedTopicFeedGrid] displays a grid of selected topics
+// The [LMFeedTopicFeedGrid] can be customized by passing in the required parameters
+class LMFeedTopicFeedGrid extends StatelessWidget {
   // Required parameters
   // Text color of the topic chip
   final Color textColor;
@@ -42,7 +42,7 @@ class LMTopicFeedGrid extends StatelessWidget {
   // LMIconPlacement.end places the icon after the text
   final LMIconPlacement iconPlacement;
 
-  const LMTopicFeedGrid({
+  const LMFeedTopicFeedGrid({
     Key? key,
     required this.selectedTopics,
     this.backgroundColor,

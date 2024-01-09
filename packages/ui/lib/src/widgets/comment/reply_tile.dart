@@ -3,8 +3,8 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 
-class LMReplyTile extends StatefulWidget {
-  const LMReplyTile({
+class LMFeedReplyTile extends StatefulWidget {
+  const LMFeedReplyTile({
     super.key,
     required this.user,
     required this.comment,
@@ -29,7 +29,7 @@ class LMReplyTile extends StatefulWidget {
 
   final TextStyle? textStyle;
   final TextStyle? linkStyle;
-  final LMProfilePicture? profilePicture;
+  final LMFeedProfilePicture? profilePicture;
   final LMFeedText? titleText;
   final LMFeedText? subtitleText;
   final List<Widget>? commentActions;
@@ -43,10 +43,10 @@ class LMReplyTile extends StatefulWidget {
   final Widget? menu;
 
   @override
-  State<LMReplyTile> createState() => _LMReplyTileState();
+  State<LMFeedReplyTile> createState() => _LMReplyTileState();
 }
 
-class _LMReplyTileState extends State<LMReplyTile> {
+class _LMReplyTileState extends State<LMFeedReplyTile> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -145,7 +145,7 @@ class _LMReplyTileState extends State<LMReplyTile> {
                         ),
                       ),
                       icon: const LMFeedIcon(
-                        type: LMIconType.icon,
+                        type: LMFeedIconType.icon,
                         icon: Icons.favorite_outline,
                         style: LMFeedIconStyle(
                           color: kGrey2Color,
@@ -154,7 +154,7 @@ class _LMReplyTileState extends State<LMReplyTile> {
                       ),
                       activeIcon: const LMFeedIcon(
                         icon: Icons.favorite,
-                        type: LMIconType.icon,
+                        type: LMFeedIconType.icon,
                         style: LMFeedIconStyle(
                           size: 16,
                           color: kPrimaryColor,

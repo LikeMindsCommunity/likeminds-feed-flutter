@@ -1,4 +1,4 @@
 part of '../routing_bloc.dart';
 
-void postNotificationEventHandler(
-    LMHandlePostNotificationEvent event, Emitter<LMRoutingState> emit) {}
+void postNotificationEventHandler(LMFeedHandlePostNotificationEvent event,
+    Emitter<LMFeedRoutingState> emit) {}

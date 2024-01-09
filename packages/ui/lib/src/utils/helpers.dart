@@ -6,7 +6,7 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/packages/linkify/linkify.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
-class LMTaggingHelper {
+class LMFeedTaggingHelper {
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
   static const String notificationTagRoute =
       r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>';
@@ -179,7 +179,7 @@ class LMTaggingHelper {
       // Add a TextSpan for the URL
       textSpans.add(
         TextSpan(
-          text: LMTaggingHelper.decodeNotificationString(link!).keys.first,
+          text: LMFeedTaggingHelper.decodeNotificationString(link!).keys.first,
           style: const TextStyle(
             wordSpacing: 1.5,
             fontWeight: FontWeight.bold,
@@ -204,7 +204,7 @@ class LMTaggingHelper {
 }
 
 List<String> extractLinkFromString(String text) {
-  RegExp exp = RegExp(LMTaggingHelper.linkRoute);
+  RegExp exp = RegExp(LMFeedTaggingHelper.linkRoute);
   Iterable<RegExpMatch> matches = exp.allMatches(text);
   List<String> links = [];
   for (var match in matches) {

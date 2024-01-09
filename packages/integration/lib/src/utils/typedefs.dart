@@ -4,31 +4,31 @@ import 'package:likeminds_feed_driver_fl/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/routing/routing_bloc.dart';
 
 /// {@template lm_analytics_bloc_listener}
-/// State changes listener function for [LMAnalyticsBloc]
-/// takes [BuildContext] and [LMAnalyticsState] as parameters
+/// State changes listener function for [LMFeedAnalyticsBloc]
+/// takes [BuildContext] and [LMFeedAnalyticsState] as parameters
 /// and returns [Widget]
 /// {@endtemplate}
-typedef LMAnalyticsBlocListener = Widget Function(
-    BuildContext context, LMAnalyticsState state);
+typedef LMFeedAnalyticsBlocListener = Widget Function(
+    BuildContext context, LMFeedAnalyticsState state);
 
 /// {@template lm_routing_bloc_listener}
-/// State changes listener function for [LMRoutingBloc]
-/// takes [BuildContext] and [LMRoutingState] as parameters
+/// State changes listener function for [LMFeedRoutingBloc]
+/// takes [BuildContext] and [LMFeedRoutingState] as parameters
 /// and returns [Widget]
 /// {@endtemplate}
-typedef LMRoutingBlocListener = Widget Function(
-    BuildContext context, LMRoutingState state);
+typedef LMFeedRoutingBlocListener = Widget Function(
+    BuildContext context, LMFeedRoutingState state);
 
 /// {@template lm_profile_bloc_listener}
-/// State changes listener function for [LMProfileBloc]
-/// takes [BuildContext] and [LMProfileState] as parameters
+/// State changes listener function for [LMFeedProfileBloc]
+/// takes [BuildContext] and [LMFeedProfileState] as parameters
 /// and returns [Widget]
 /// {@endtemplate}
-typedef LMProfileBlocListener = Widget Function(
-    BuildContext context, LMProfileState state);
+typedef LMFeedProfileBlocListener = Widget Function(
+    BuildContext context, LMFeedProfileState state);
 
 /// {@template context_widget_builder}
 /// Widget builder function for [BuildContext]
 /// Takes [BuildContext] as parameter and returns [Widget]
 /// {@endtemplate}
-typedef LMContextWidgetBuilder = Widget Function(BuildContext context);
+typedef LMFeedContextWidgetBuilder = Widget Function(BuildContext context);

@@ -3,24 +3,25 @@ part of '../comment_handler_bloc.dart';
 /// {@template edit_comment_event_handler}
 /// [handleEditActionEvent] is used to handle the edit request
 /// for both comment and replies to comments
-/// [LMCommentActionEvent] is used to send the request to the handler
+/// [LMFeedCommentActionEvent] is used to send the request to the handler
 /// {@endtemplate}
-Future<void> handleEditActionEvent(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+Future<void> handleEditActionEvent(LMFeedCommentActionEvent event,
+    Emitter<LMFeedCommentHandlerState> emit) async {
   // Notify the UI to change the view to Editing
-  emit(LMCommentActionOngoingState(commentMetaData: event.commentMetaData));
+  emit(LMFeedCommentActionOngoingState(commentMetaData: event.commentMetaData));
 
   // Check if the comment is a parent comment or a reply to a comment
-  if (event.commentMetaData.commentActionEntity == LMCommentType.parent) {
+  if (event.commentMetaData.commentActionEntity == LMFeedCommentType.parent) {
     await _handleEditCommentAction(event, emit);
-  } else if (event.commentMetaData.commentActionEntity == LMCommentType.reply) {
+  } else if (event.commentMetaData.commentActionEntity ==
+      LMFeedCommentType.reply) {
     await _handleEditReplyAction(event, emit);
   }
 }
 
 // Edit comment handler
-Future<void> _handleEditCommentAction(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+Future<void> _handleEditCommentAction(LMFeedCommentActionEvent event,
+    Emitter<LMFeedCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
   LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
@@ -41,14 +42,14 @@ Future<void> _handleEditCommentAction(
   if (!response.success) {
     // If the response is not success then notify the UI
     // to change the view to Error
-    emit(LMCommentErrorState(
+    emit(LMFeedCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
     // If the response is success then notify the UI
     //to change the view to Success
-    emit(LMCommentSuccessState(
+    emit(LMFeedCommentSuccessState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
@@ -56,8 +57,8 @@ Future<void> _handleEditCommentAction(
 }
 
 // Edit reply handler
-Future<void> _handleEditReplyAction(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+Future<void> _handleEditReplyAction(LMFeedCommentActionEvent event,
+    Emitter<LMFeedCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
   LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
@@ -78,14 +79,14 @@ Future<void> _handleEditReplyAction(
   if (!response.success) {
     // If the response is not success then notify the UI
     // to change the view to Error
-    emit(LMCommentErrorState(
+    emit(LMFeedCommentErrorState(
       commentActionResponse: response,
       commentMetaData: event.commentMetaData,
     ));
   } else {
     // If the response is success then notify the UI
     // to change the view to Success
-    emit(LMCommentSuccessState(
+    emit(LMFeedCommentSuccessState(
       commentMetaData: event.commentMetaData,
       commentActionResponse: response,
     ));

@@ -1,4 +1,4 @@
-class LMAnalyticsKeysDep {
+class LMFeedAnalyticsKeysDep {
   static const String notificationPageOpened = 'notification_page_opened';
   static const String notificationRemoved = 'notification_removed';
   static const String notificationMuted = 'notification_muted';

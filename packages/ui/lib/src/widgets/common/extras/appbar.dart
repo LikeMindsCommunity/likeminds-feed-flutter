@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/enums.dart';
 
-class LMAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const LMAppBar({
+class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const LMFeedAppBar({
     super.key,
     this.leading,
     this.trailing,
@@ -65,7 +65,7 @@ class LMAppBar extends StatelessWidget implements PreferredSizeWidget {
               leading ??
                   LMFeedButton(
                     icon: LMFeedIcon(
-                      type: LMIconType.icon,
+                      type: LMFeedIconType.icon,
                       icon: Icons.chevron_left,
                       style: LMFeedIconStyle(
                         color: theme.colorScheme.primary,
@@ -86,8 +86,8 @@ class LMAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  LMAppBar copyWith(LMAppBar appBar) {
-    return LMAppBar(
+  LMFeedAppBar copyWith(LMFeedAppBar appBar) {
+    return LMFeedAppBar(
       leading: appBar.leading ?? leading,
       trailing: appBar.trailing ?? trailing,
       title: appBar.title ?? title,

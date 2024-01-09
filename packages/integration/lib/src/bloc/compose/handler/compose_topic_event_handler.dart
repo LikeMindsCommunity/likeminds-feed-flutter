@@ -5,9 +5,9 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/post/topic_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-void composeFetchTopicHandler(
-  LMComposeEvent event,
-  Emitter<LMComposeState> emit,
+Future<void> composeFetchTopicHandler(
+  LMFeedComposeFetchTopicsEvent event,
+  Emitter<LMFeedComposeState> emit,
 ) async {
   try {
     final GetTopicsResponse response =
@@ -20,7 +20,7 @@ void composeFetchTopicHandler(
       final List<LMTopicViewData> topics = response.topics!
           .map((e) => LMTopicViewDataConvertor.fromTopic(e))
           .toList();
-      emit(LMComposeFetchedTopics(topics: topics));
+      emit(LMFeedComposeFetchedTopicsState(topics: topics));
     }
   } catch (e) {
     debugPrint(e.toString());

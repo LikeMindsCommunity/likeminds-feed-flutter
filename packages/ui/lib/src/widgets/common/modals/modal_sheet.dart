@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class LMModalSheet extends StatelessWidget {
-  const LMModalSheet({super.key});
+class LMFeedModalSheet extends StatelessWidget {
+  const LMFeedModalSheet({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,47 +1,49 @@
 part of 'routing_bloc.dart';
 
-abstract class LMRoutingState extends Equatable {
-  const LMRoutingState();
+abstract class LMFeedRoutingState extends Equatable {
+  const LMFeedRoutingState();
 
   @override
   List<Object> get props => [];
 }
 
-class LMRoutingStateInit extends LMRoutingState {}
+class LMFeedRoutingStateInitState extends LMFeedRoutingState {}
 
-class LMOpenSharedPost extends LMRoutingState {
+class LMFeedOpenSharedPostState extends LMFeedRoutingState {
   final String postId;
 
-  const LMOpenSharedPost({required this.postId});
+  const LMFeedOpenSharedPostState({required this.postId});
 
   @override
   List<Object> get props => [postId];
 }
 
-class LMOpenPostNotification extends LMRoutingState {
+class LMFeedOpenPostNotificationState extends LMFeedRoutingState {
   final String postId;
 
-  const LMOpenPostNotification({required this.postId});
+  const LMFeedOpenPostNotificationState({required this.postId});
 
   @override
   List<Object> get props => [postId];
 }
 
-class ErrorSharedPost extends LMRoutingState {
+class LMFeedErrorSharedPostState extends LMFeedRoutingState {
   final String message;
   final String postId;
 
-  const ErrorSharedPost({required this.message, required this.postId});
+  const LMFeedErrorSharedPostState(
+      {required this.message, required this.postId});
 
   @override
   List<Object> get props => [message];
 }
 
-class ErrorPostNotification extends LMRoutingState {
+class LMFeedErrorPostNotificationState extends LMFeedRoutingState {
   final String message;
   final String postId;
 
-  const ErrorPostNotification({required this.message, required this.postId});
+  const LMFeedErrorPostNotificationState(
+      {required this.message, required this.postId});
 
   @override
   List<Object> get props => [message];

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 
-class LMEmptyCommentWidget extends StatelessWidget {
-  const LMEmptyCommentWidget({super.key});
+class LMFeedEmptyCommentWidget extends StatelessWidget {
+  const LMFeedEmptyCommentWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

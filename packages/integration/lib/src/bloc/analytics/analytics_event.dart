@@ -1,28 +1,28 @@
 part of 'analytics_bloc.dart';
 
 /// {@template lm_analytics_event}
-/// LMAnalyticsEvent defines the events which are handled by LMAnalyticsBloc.
+/// LMFeedAnalyticsEvent defines the events which are handled by LMFeedAnalyticsBloc.
 /// {@endtemplate}
-abstract class LMAnalyticsEvent extends Equatable {
+abstract class LMFeedAnalyticsEvent extends Equatable {
   /// {@macro lm_analytics_event}
-  const LMAnalyticsEvent();
+  const LMFeedAnalyticsEvent();
 
   @override
   List<Object> get props => [];
 }
 
 /// {@template lm_init_analytic_event}
-/// LMInitAnalyticsEvent defines the event to initiate LMAnalyticsBloc.
+/// LMFeedInitAnalyticsEvent defines the event to initiate LMFeedAnalyticsBloc.
 /// {@endtemplate}
-class LMInitAnalyticsEvent extends LMAnalyticsEvent {}
+class LMFeedInitAnalyticsEvent extends LMFeedAnalyticsEvent {}
 
 /// {@template lm_fire_analytic_event}
-/// LMFireAnalyticsEvent defines the event to fire an analytics event.
+/// LMFeedFireAnalyticsEvent defines the event to fire an analytics event.
 /// [eventName] of type String defines the name of the event to be fired.
 /// [eventProperties] of type Map<String, dynamic> defines the properties
 /// of the event to be fired.
 /// {@endtemplate}
-class LMFireAnalyticsEvent extends LMAnalyticsEvent {
+class LMFeedFireAnalyticsEvent extends LMFeedAnalyticsEvent {
   // Name of the event to be fired
   // i.e. post_liked, etc.
   final String eventName;
@@ -31,7 +31,7 @@ class LMFireAnalyticsEvent extends LMAnalyticsEvent {
   final Map<String, dynamic> eventProperties;
 
   /// {@macro lm_fire_analytic_event}
-  const LMFireAnalyticsEvent({
+  const LMFeedFireAnalyticsEvent({
     required this.eventName,
     required this.eventProperties,
   });

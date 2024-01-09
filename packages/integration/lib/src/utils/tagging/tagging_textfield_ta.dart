@@ -187,7 +187,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
                   children: [
                     AbsorbPointer(
                       absorbing: true,
-                      child: LMProfilePicture(
+                      child: LMFeedProfilePicture(
                         fallbackText: opt.name!,
                         backgroundColor: LMThemeData.kPrimaryColor,
                         imageUrl: opt.imageUrl!,
@@ -228,8 +228,8 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
             tagValue = '';
             textValue = _controller.value.text;
 
-            LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-              eventName: LMAnalyticsKeys.userTaggedInPost,
+            LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+              eventName: LMFeedAnalyticsKeys.userTaggedInPost,
               eventProperties: {
                 'tagged_user_id': suggestion.sdkClientInfo?.userUniqueId,
                 'tagged_user_count': tagCount,

@@ -1,13 +1,13 @@
 part of 'universal_feed_bloc.dart';
 
-abstract class LMUniversalFeedEvent extends Equatable {
-  const LMUniversalFeedEvent();
+abstract class LMFeedEvent extends Equatable {
+  const LMFeedEvent();
 }
 
-class LMGetUniversalFeed extends LMUniversalFeedEvent {
+class LMFeedGetUniversalFeedEvent extends LMFeedEvent {
   final int offset;
   final List<LMTopicViewData>? topics;
-  const LMGetUniversalFeed({required this.offset, this.topics});
+  const LMFeedGetUniversalFeedEvent({required this.offset, this.topics});
   @override
   List<Object?> get props => [offset, topics];
 }

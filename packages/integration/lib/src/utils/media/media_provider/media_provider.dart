@@ -9,18 +9,18 @@ part 'get_post_video_controller_request.dart';
 /// post with videos.
 /// It also manages the lifecycle of the video controllers.
 /// Any Controller that goes out of scope is disposed by the LMVideoProvider.
-class LMVideoProvider {
+class LMFeedVideoProvider {
   /// Map of postId to VideoPlayerController
   /// This map holds all the video controllers that are currently in use.
   /// The video controllers are disposed when they are removed from this map.
   /// This map is also used to check if a video controller is already in use.
   final Map<String, VideoPlayerController> _videoControllers = {};
 
-  static LMVideoProvider? _instance;
+  static LMFeedVideoProvider? _instance;
 
-  static LMVideoProvider get() => _instance ??= LMVideoProvider._();
+  static LMFeedVideoProvider get() => _instance ??= LMFeedVideoProvider._();
 
-  LMVideoProvider._();
+  LMFeedVideoProvider._();
 
   /// Returns a VideoPlayerController for the given postId.
   /// If a controller is already in use for the given postId, then the same
@@ -32,7 +32,7 @@ class LMVideoProvider {
   /// The video controller must be disposed and removed from the map.
   /// when not in use anymore using [clearPostController] method
   Future<VideoPlayerController> getPostVideoController(
-      LMGetPostVideoControllerRequest request) async {
+      LMFeedGetPostVideoControllerRequest request) async {
     String postId = request.postId;
     if (_videoControllers.containsKey(postId)) {
       return _videoControllers[postId]!;
@@ -59,12 +59,12 @@ class LMVideoProvider {
   /// If the video source type is network, then the video source is a url.
   /// If the video source type is file, then the video source is a file path.
   Future<VideoPlayerController> initialisePostVideoController(
-      LMGetPostVideoControllerRequest request) async {
+      LMFeedGetPostVideoControllerRequest request) async {
     VideoPlayerController controller;
 
     // initialise the controller based on the video source type
     // network or file
-    if (request.videoType == LMVideoSourceType.network) {
+    if (request.videoType == LMFeedVideoSourceType.network) {
       // if the video source type is network, then the video source is a url
       controller =
           VideoPlayerController.networkUrl(Uri.parse(request.videoSource));

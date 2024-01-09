@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class LMDialog extends StatelessWidget {
-  const LMDialog({super.key});
+class LMFeedDialog extends StatelessWidget {
+  const LMFeedDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

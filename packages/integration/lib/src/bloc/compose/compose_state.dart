@@ -1,24 +1,24 @@
 part of 'compose_bloc.dart';
 
 @immutable
-sealed class LMComposeState {}
+sealed class LMFeedComposeState {}
 
-final class LMComposeInitial extends LMComposeState {}
+final class LMFeedComposeInitialState extends LMFeedComposeState {}
 
-class LMComposeFetchedTopics extends LMComposeState {
+class LMFeedComposeFetchedTopicsState extends LMFeedComposeState {
   final List<LMTopicViewData> topics;
 
-  LMComposeFetchedTopics({required this.topics});
+  LMFeedComposeFetchedTopicsState({required this.topics});
 }
 
-class LMComposeAddedImage extends LMComposeState {}
+class LMFeedComposeAddedImageState extends LMFeedComposeState {}
 
-class LMComposeAddedVideo extends LMComposeState {}
+class LMFeedComposeAddedVideoState extends LMFeedComposeState {}
 
-class LMComposeAddedDocument extends LMComposeState {}
+class LMFeedComposeAddedDocumentState extends LMFeedComposeState {}
 
-class LMComposeRemovedImage extends LMComposeState {}
+class LMFeedComposeRemovedImageState extends LMFeedComposeState {}
 
-class LMComposeRemovedVideo extends LMComposeState {}
+class LMFeedComposeRemovedVideoState extends LMFeedComposeState {}
 
-class LMComposeRemovedDocument extends LMComposeState {}
+class LMFeedComposeRemovedDocumentState extends LMFeedComposeState {}

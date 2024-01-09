@@ -108,7 +108,7 @@ class _LMButtonState extends State<LMFeedButton> {
 
   Widget _defIcon() {
     return const LMFeedIcon(
-      type: LMIconType.icon,
+      type: LMFeedIconType.icon,
       icon: Icons.done_all,
     );
   }

@@ -9,12 +9,12 @@ import 'package:likeminds_feed_driver_fl/src/bloc/topic/topic_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class LMTopicList extends StatefulWidget {
+class LMFeedTopicList extends StatefulWidget {
   final List<LMTopicViewData> selectedTopics;
   final Function(List<LMTopicViewData>, LMTopicViewData) onTopicSelected;
   final bool? isEnabled;
 
-  const LMTopicList({
+  const LMFeedTopicList({
     super.key,
     required this.selectedTopics,
     required this.onTopicSelected,
@@ -22,10 +22,10 @@ class LMTopicList extends StatefulWidget {
   });
 
   @override
-  State<LMTopicList> createState() => _LMTopicListState();
+  State<LMFeedTopicList> createState() => _LMFeedTopicListState();
 }
 
-class _LMTopicListState extends State<LMTopicList> {
+class _LMFeedTopicListState extends State<LMFeedTopicList> {
   List<LMTopicViewData> selectedTopics = [];
   bool paginationComplete = false;
   ScrollController controller = ScrollController();
@@ -36,7 +36,7 @@ class _LMTopicListState extends State<LMTopicList> {
         ..name("All Topics"))
       .build();
   final int pageSize = 100;
-  LMTopicBloc topicBloc = LMTopicBloc();
+  LMFeedTopicBloc topicBloc = LMFeedTopicBloc();
   bool isSearching = false;
   ValueNotifier<bool> rebuildTopicsScreen = ValueNotifier<bool>(false);
   PagingController<int, LMTopicViewData> topicsPagingController =
@@ -57,7 +57,7 @@ class _LMTopicListState extends State<LMTopicList> {
     }
     topicsPagingController.itemList = selectedTopics;
     topicBloc.add(
-      LMGetTopic(
+      LMFeedGetTopicEvent(
         getTopicFeedRequest: (GetTopicsRequestBuilder()
               ..page(_page)
               ..isEnabled(widget.isEnabled)
@@ -80,7 +80,7 @@ class _LMTopicListState extends State<LMTopicList> {
         if (controller.position.atEdge) {
           bool isTop = controller.position.pixels == 0;
           if (!isTop) {
-            topicBloc.add(LMGetTopic(
+            topicBloc.add(LMFeedGetTopicEvent(
               getTopicFeedRequest: (GetTopicsRequestBuilder()
                     ..page(_page)
                     ..isEnabled(widget.isEnabled)
@@ -106,16 +106,16 @@ class _LMTopicListState extends State<LMTopicList> {
       ),
       margin: const EdgeInsets.only(top: 32),
       padding: const EdgeInsets.all(8.0),
-      child: BlocConsumer<LMTopicBloc, LMTopicState>(
+      child: BlocConsumer<LMFeedTopicBloc, LMFeedTopicState>(
         bloc: topicBloc,
         buildWhen: (previous, current) {
-          if (current is LMTopicLoading && _page != 1) {
+          if (current is LMFeedTopicLoadingState && _page != 1) {
             return false;
           }
           return true;
         },
         listener: (context, state) {
-          if (state is LMTopicLoaded) {
+          if (state is LMFeedTopicLoadedState) {
             _page++;
             if (state.getTopicFeedResponse.topics!.isEmpty) {
               topicsPagingController.appendLastPage([]);
@@ -129,20 +129,20 @@ class _LMTopicListState extends State<LMTopicList> {
                 _page,
               );
             }
-          } else if (state is LMTopicError) {
+          } else if (state is LMFeedTopicErrorState) {
             topicsPagingController.error = state.errorMessage;
           }
         },
         builder: (context, state) {
-          if (state is LMTopicLoading) {
+          if (state is LMFeedTopicLoadingState) {
             return const Center(
-              child: LMLoader(
+              child: LMFeedLoader(
                 color: kPrimaryColor,
               ),
             );
           }
 
-          if (state is LMTopicLoaded) {
+          if (state is LMFeedTopicLoadedState) {
             return ValueListenableBuilder(
                 valueListenable: rebuildTopicsScreen,
                 builder: (context, _, __) {
@@ -217,7 +217,7 @@ class _LMTopicListState extends State<LMTopicList> {
                     ],
                   );
                 });
-          } else if (state is LMTopicError) {
+          } else if (state is LMFeedTopicErrorState) {
             return const Center(
               child: Text("Unable to fetch topics, Please try again later"),
             );

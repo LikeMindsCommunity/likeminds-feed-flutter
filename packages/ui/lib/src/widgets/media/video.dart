@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:visibility_aware_state/visibility_aware_state.dart';
@@ -11,10 +10,10 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart'
     as media_kit_video_controls;
 
-class LMVideo extends StatefulWidget {
-  // late final LMVideo? _instance;
+class LMFeedVideo extends StatefulWidget {
+  // late final LMFeedVideo? _instance;
 
-  const LMVideo({
+  const LMFeedVideo({
     super.key,
     this.videoUrl,
     this.videoFile,
@@ -78,10 +77,10 @@ class LMVideo extends StatefulWidget {
   final bool? allowMuting;
 
   @override
-  State<LMVideo> createState() => _LMVideoState();
+  State<LMFeedVideo> createState() => _LMVideoState();
 }
 
-class _LMVideoState extends VisibilityAwareState<LMVideo> {
+class _LMVideoState extends VisibilityAwareState<LMFeedVideo> {
   ValueNotifier<bool> rebuildOverlay = ValueNotifier(false);
   bool _onTouch = true;
   bool initialiseOverlay = false;
@@ -103,7 +102,7 @@ class _LMVideoState extends VisibilityAwareState<LMVideo> {
   }
 
   @override
-  void didUpdateWidget(LMVideo oldWidget) {
+  void didUpdateWidget(LMFeedVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
     initialiseController = initialiseControllers();
   }
@@ -226,7 +225,7 @@ class _LMVideoState extends VisibilityAwareState<LMVideo> {
                                   valueListenable: isMuted,
                                   builder: (context, isMuted, __) {
                                     return LMFeedIcon(
-                                      type: LMIconType.icon,
+                                      type: LMFeedIconType.icon,
                                       style: const LMFeedIconStyle(
                                         color: kWhiteColor,
                                       ),

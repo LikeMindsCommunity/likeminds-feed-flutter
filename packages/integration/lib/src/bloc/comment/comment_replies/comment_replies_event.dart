@@ -1,21 +1,21 @@
 part of 'comment_replies_bloc.dart';
 
-abstract class LMCommentRepliesEvent extends Equatable {
-  const LMCommentRepliesEvent();
+abstract class LMFeedCommentRepliesEvent extends Equatable {
+  const LMFeedCommentRepliesEvent();
 }
 
-class LMGetCommentReplies extends LMCommentRepliesEvent {
+class LMFeedGetCommentRepliesEvent extends LMFeedCommentRepliesEvent {
   final GetCommentRequest commentDetailRequest;
 
   final bool forLoadMore;
-  const LMGetCommentReplies(
+  const LMFeedGetCommentRepliesEvent(
       {required this.commentDetailRequest, required this.forLoadMore});
 
   @override
   List<Object?> get props => [commentDetailRequest, forLoadMore];
 }
 
-class LMClearCommentReplies extends LMCommentRepliesEvent {
+class LMFeedClearCommentRepliesEvent extends LMFeedCommentRepliesEvent {
   final int time = DateTime.now().millisecondsSinceEpoch;
   @override
   List<Object?> get props => [time];

@@ -7,12 +7,12 @@ import 'package:flutter_svg/svg.dart';
 /// Provides customisability through [LMFeedIconStyle]
 class LMFeedIcon extends StatelessWidget {
   /// enum describing the type of icon to be shown
-  final LMIconType type;
+  final LMFeedIconType type;
 
-  /// if [LMIconType.icon] then pass icon of type [IconData]
+  /// if [LMFeedIconType.icon] then pass icon of type [IconData]
   final IconData? icon;
 
-  /// if [LMIconType.png] or [LMIconType.svg] then pass path of icon [String]
+  /// if [LMFeedIconType.png] or [LMFeedIconType.svg] then pass path of icon [String]
   final String? assetPath;
 
   /// style class for styling the icon [LMFeedIconStyle]
@@ -29,13 +29,13 @@ class LMFeedIcon extends StatelessWidget {
 
   getIconWidget(LMFeedIconStyle style) {
     switch (type) {
-      case LMIconType.icon:
+      case LMFeedIconType.icon:
         return Icon(
           icon,
           color: style.color,
           size: style.size?.abs() ?? 24,
         );
-      case LMIconType.svg:
+      case LMFeedIconType.svg:
         return SizedBox(
           width: style.size?.abs() ?? 24,
           height: style.size?.abs() ?? 24,
@@ -50,7 +50,7 @@ class LMFeedIcon extends StatelessWidget {
             fit: style.fit ?? BoxFit.contain,
           ),
         );
-      case LMIconType.png:
+      case LMFeedIconType.png:
         return SizedBox(
           width: style.size?.abs() ?? 24,
           height: style.size?.abs() ?? 24,
@@ -83,7 +83,7 @@ class LMFeedIcon extends StatelessWidget {
 }
 
 class LMFeedIconStyle {
-  /// color of the icon, not applicable on [LMIconType.png]
+  /// color of the icon, not applicable on [LMFeedIconType.png]
   final Color? color;
 
   /// square size of the icon

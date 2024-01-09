@@ -7,19 +7,19 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 part 'topic_event.dart';
 part 'topic_state.dart';
 
-class LMTopicBloc extends Bloc<LMTopicEvent, LMTopicState> {
-  LMTopicBloc() : super(LMTopicInitial()) {
-    on<LMTopicEvent>((event, emit) async {
-      if (event is LMInitTopicEvent) {
-        emit(LMTopicLoading());
-      } else if (event is LMGetTopic) {
-        emit(LMTopicLoading());
+class LMFeedTopicBloc extends Bloc<LMFeedTopicEvent, LMFeedTopicState> {
+  LMFeedTopicBloc() : super(LMFeedTopicInitialState()) {
+    on<LMFeedTopicEvent>((event, emit) async {
+      if (event is LMFeedInitTopicEvent) {
+        emit(LMFeedTopicLoadingState());
+      } else if (event is LMFeedGetTopicEvent) {
+        emit(LMFeedTopicLoadingState());
         GetTopicsResponse response =
             await LMFeedCore.client.getTopics(event.getTopicFeedRequest);
         if (response.success) {
-          emit(LMTopicLoaded(response));
+          emit(LMFeedTopicLoadedState(response));
         } else {
-          emit(LMTopicError(response.errorMessage!));
+          emit(LMFeedTopicErrorState(response.errorMessage!));
         }
       }
     });

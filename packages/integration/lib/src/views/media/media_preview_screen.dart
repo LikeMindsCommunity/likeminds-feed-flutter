@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 
-class LMMediaPreviewScreen extends StatefulWidget {
-  const LMMediaPreviewScreen({super.key});
+class LMFeedMediaPreviewScreen extends StatefulWidget {
+  const LMFeedMediaPreviewScreen({super.key});
 
   @override
-  State<LMMediaPreviewScreen> createState() => _LMMediaPreviewScreenState();
+  State<LMFeedMediaPreviewScreen> createState() =>
+      _LMFeedMediaPreviewScreenState();
 }
 
-class _LMMediaPreviewScreenState extends State<LMMediaPreviewScreen> {
+class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     return const Placeholder();

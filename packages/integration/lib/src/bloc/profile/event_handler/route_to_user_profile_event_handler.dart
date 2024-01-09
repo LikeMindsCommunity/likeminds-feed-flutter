@@ -1,7 +1,7 @@
 part of '../profile_bloc.dart';
 
 void handleLMRouteToUserProfileEvent(
-    LMRouteToUserProfile event, Emitter<LMProfileState> emit) {
+    LMFeedRouteToUserProfileEvent event, Emitter<LMFeedProfileState> emit) {
   debugPrint("LM User ID caught in callback : ${event.userUniqueId}");
-  emit(LMRouteToUserProfileState(userUniqueId: event.userUniqueId));
+  emit(LMFeedRouteToUserProfileState(userUniqueId: event.userUniqueId));
 }

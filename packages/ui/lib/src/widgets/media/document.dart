@@ -1,12 +1,11 @@
 import 'dart:io';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 
-class LMDocument extends StatefulWidget {
-  const LMDocument({
+class LMFeedDocument extends StatefulWidget {
+  const LMFeedDocument({
     super.key,
     this.onTap,
     this.documentFile,
@@ -51,10 +50,10 @@ class LMDocument extends StatefulWidget {
   final Color? backgroundColor;
 
   @override
-  State<LMDocument> createState() => _LMDocumentState();
+  State<LMFeedDocument> createState() => _LMDocumentState();
 }
 
-class _LMDocumentState extends State<LMDocument> {
+class _LMDocumentState extends State<LMFeedDocument> {
   String? _fileName;
   String? _fileExtension;
   String? _fileSize;
@@ -115,7 +114,7 @@ class _LMDocumentState extends State<LMDocument> {
                       alignment: Alignment.center,
                       child: widget.documentIcon ??
                           const LMFeedIcon(
-                            type: LMIconType.icon,
+                            type: LMFeedIconType.icon,
                             icon: Icons.picture_as_pdf,
                             style: LMFeedIconStyle(
                               size: 24,
@@ -176,7 +175,8 @@ class _LMDocumentState extends State<LMDocument> {
                         ? LMFeedButton(
                             icon: widget.removeIcon ??
                                 const LMFeedIcon(
-                                    type: LMIconType.icon, icon: Icons.close),
+                                    type: LMFeedIconType.icon,
+                                    icon: Icons.close),
                             onTap: () {
                               if (widget.onRemove != null) {
                                 widget.onRemove!();
@@ -189,7 +189,7 @@ class _LMDocumentState extends State<LMDocument> {
               ),
             );
           } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LMDocumentShimmer();
+            return const LMFeedDocumentShimmer();
           } else {
             return const SizedBox.shrink();
           }

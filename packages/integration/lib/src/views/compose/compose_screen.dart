@@ -10,12 +10,12 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/widgets/lists/topic_list.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class LMPostComposeScreen extends StatefulWidget {
+class LMFeedPostComposeScreen extends StatefulWidget {
   //Builder for appbar
   //Builder for content
   //Builder for media preview
   //Builder for bottom bar for buttons
-  const LMPostComposeScreen({
+  const LMFeedPostComposeScreen({
     super.key,
     //Widget builder functions for customizations
     this.composeDiscardDialogBuilder,
@@ -33,7 +33,7 @@ class LMPostComposeScreen extends StatefulWidget {
     this.enableVideos = true,
   });
 
-  /// The [SystemUiOVerlayStyle] for the [LMPostComposeScreen]
+  /// The [SystemUiOVerlayStyle] for the [LMFeedPostComposeScreen]
   /// to support changing light and dark style of overall system
   /// elements in accordance to the screen's background
   final SystemUiOverlayStyle composeSystemOverlayStyle;
@@ -67,14 +67,15 @@ class LMPostComposeScreen extends StatefulWidget {
   final Widget Function(List<LMTopicViewData>)? composeTopicSelectorBuilder;
 
   @override
-  State<LMPostComposeScreen> createState() => _LMPostComposeScreenState();
+  State<LMFeedPostComposeScreen> createState() =>
+      _LMFeedPostComposeScreenState();
 }
 
-class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
+class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
   /// Required blocs and data for basic functionality, or state management
-  final User user = LMUserLocalPreference.instance.fetchUserData();
-  final LMPostBloc bloc = LMPostBloc.instance;
-  final LMComposeBloc composeBloc = LMComposeBloc.instance;
+  final User user = LMFeedUserLocalPreference.instance.fetchUserData();
+  final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
+  final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
 
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
@@ -102,7 +103,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
   @override
   void initState() {
     super.initState();
-    composeBloc.add(LMComposeFetchTopics());
+    composeBloc.add(LMFeedComposeFetchTopicsEvent());
     if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
     }
@@ -123,10 +124,10 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
           bottomSheet: _defMediaPicker(),
           floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
-            child: BlocBuilder<LMComposeBloc, LMComposeState>(
+            child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
               bloc: composeBloc,
               builder: (context, state) {
-                if (state is LMComposeFetchedTopics) {
+                if (state is LMFeedComposeFetchedTopicsState) {
                   return widget.composeTopicSelectorBuilder
                           ?.call(state.topics) ??
                       _defTopicSelector(state.topics);
@@ -177,7 +178,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
 
   Widget _defAppBar() {
     final theme = LMFeedTheme.of(context);
-    return LMAppBar(
+    return LMFeedAppBar(
       backgroundColor: kWhiteColor,
       height: 56,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -295,7 +296,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
                       showArrow: false,
                       horizontalMargin: 16.0,
                       pressType: PressType.singleClick,
-                      menuBuilder: () => LMTopicList(
+                      menuBuilder: () => LMFeedTopicList(
                           selectedTopics: selectedTopics,
                           isEnabled: true,
                           onTopicSelected: (updatedTopics, tappedTopic) {
@@ -324,7 +325,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
                             color: kPrimaryColor,
                           ),
                         ),
-                        child: LMTopicChip(
+                        child: LMFeedTopicChip(
                           topic: selectedTopics.isEmpty
                               ? (LMTopicViewDataBuilder()
                                     ..id("0")
@@ -333,10 +334,10 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
                                   .build()
                               : selectedTopics.first,
                           textStyle: const TextStyle(color: kPrimaryColor),
-                          icon: LMFeedIcon(
-                            type: LMIconType.icon,
+                          icon: const LMFeedIcon(
+                            type: LMFeedIconType.icon,
                             icon: CupertinoIcons.chevron_down,
-                            style: const LMFeedIconStyle(
+                            style: LMFeedIconStyle(
                               size: 16,
                               color: kPrimaryColor,
                             ),

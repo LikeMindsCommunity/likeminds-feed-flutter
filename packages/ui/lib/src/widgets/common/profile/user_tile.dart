@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
-class LMUserTile extends StatelessWidget {
+class LMFeedUserTile extends StatelessWidget {
   final LMUserViewData user;
-  final LMProfilePicture? profilePicture;
+  final LMFeedProfilePicture? profilePicture;
   final LMFeedText? titleText;
   final LMFeedText? subText;
   final double? imageSize;
   final Function onTap;
 
-  const LMUserTile({
+  const LMFeedUserTile({
     Key? key,
     this.titleText,
     this.imageSize,
@@ -26,7 +25,7 @@ class LMUserTile extends StatelessWidget {
     return Row(
       children: [
         profilePicture ??
-            LMProfilePicture(
+            LMFeedProfilePicture(
               size: imageSize ?? 50,
               backgroundColor: kPrimaryColor,
               fallbackText: user.name,

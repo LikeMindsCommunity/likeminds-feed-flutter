@@ -8,7 +8,7 @@ void main() async {
   LMFeedClient lmFeedClient = (LMFeedClientBuilder()
         ..apiKey("6b51af13-ce28-444b-a571-53a3fb125444"))
       .build();
-  await LMUserLocalPreference.instance.initialize();
+  await LMFeedUserLocalPreference.instance.initialize();
   LMFeedCore.instance.initialize(
     lmFeedClient: lmFeedClient,
   );

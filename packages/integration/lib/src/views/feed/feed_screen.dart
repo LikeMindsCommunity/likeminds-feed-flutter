@@ -35,13 +35,13 @@ class LMFeedScreen extends StatefulWidget {
   });
 
   //Builder for appbar
-  final LMAppBar? appBar;
+  final LMFeedAppBar? appBar;
   final bool showCustomWidget;
 
   //Callback for activity
 
   //Builder for custom widget on top
-  final LMContextWidgetBuilder? customWidgetBuilder;
+  final LMFeedContextWidgetBuilder? customWidgetBuilder;
   //Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
@@ -50,21 +50,21 @@ class LMFeedScreen extends StatefulWidget {
 
   // Builder for post item
   // {@macro post_widget_builder}
-  final LMPostWidgetBuilder? postBuilder;
+  final LMFeedPostWidgetBuilder? postBuilder;
   // Floating action button
   // i.e. new post button
   final Widget? floatingActionButton;
   // {@macro context_widget_builder}
   // Builder for empty feed view
-  final LMContextWidgetBuilder? emptyFeedViewBuilder;
+  final LMFeedContextWidgetBuilder? emptyFeedViewBuilder;
   // Builder for first page loader when no post are there
-  final LMContextWidgetBuilder? firstPageLoaderBuilder;
+  final LMFeedContextWidgetBuilder? firstPageLoaderBuilder;
   // Builder for pagination loader when more post are there
-  final LMContextWidgetBuilder? paginationLoaderBuilder;
+  final LMFeedContextWidgetBuilder? paginationLoaderBuilder;
   // Builder for error view when error occurs
-  final LMContextWidgetBuilder? feedErrorViewBuilder;
+  final LMFeedContextWidgetBuilder? feedErrorViewBuilder;
   // Builder for widget when no more post are there
-  final LMContextWidgetBuilder? noNewPageWidgetBuilder;
+  final LMFeedContextWidgetBuilder? noNewPageWidgetBuilder;
 
   final bool enablePostCreation;
   final bool enableTopicFiltering;
@@ -99,12 +99,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   Map<String, LMWidgetViewData> widgets = {};
 
   // bloc to handle universal feed
-  late final LMUniversalFeedBloc _feedBloc; // bloc to fetch the feedroom data
-  bool isCm = LMUserLocalPreference.instance
+  late final LMFeedBloc _feedBloc; // bloc to fetch the feedroom data
+  bool isCm = LMFeedUserLocalPreference.instance
       .fetchMemberState(); // whether the logged in user is a community manager or not
 
   LMUserViewData user = LMUserViewDataConvertor.fromUser(
-      LMUserLocalPreference.instance.fetchUserData());
+      LMFeedUserLocalPreference.instance.fetchUserData());
 
   // future to get the unread notification count
   late Future<GetUnreadNotificationCountResponse> getUnreadNotificationCount;
@@ -130,20 +130,21 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ..pageSize(20))
           .build(),
     );
-    Bloc.observer = LMBlocObserver();
-    _feedBloc = LMUniversalFeedBloc();
-    _feedBloc.add(LMGetUniversalFeed(offset: 1, topics: selectedTopics));
+    Bloc.observer = LMFeedBlocObserver();
+    _feedBloc = LMFeedBloc();
+    _feedBloc
+        .add(LMFeedGetUniversalFeedEvent(offset: 1, topics: selectedTopics));
     _controller.addListener(_scrollListener);
     userPostingRights = checkPostCreationRights();
   }
 
   bool checkPostCreationRights() {
     final MemberStateResponse memberStateResponse =
-        LMUserLocalPreference.instance.fetchMemberRights();
+        LMFeedUserLocalPreference.instance.fetchMemberRights();
     if (!memberStateResponse.success || memberStateResponse.state == 1) {
       return true;
     }
-    final memberRights = LMUserLocalPreference.instance.fetchMemberRight(9);
+    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
     return memberRights;
   }
 
@@ -171,7 +172,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     rebuildTopicFeed.value = !rebuildTopicFeed.value;
     clearPagingController();
     _feedBloc.add(
-      LMGetUniversalFeed(
+      LMFeedGetUniversalFeedEvent(
         offset: 1,
         topics: selectedTopics,
       ),
@@ -200,7 +201,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     _pagingController.addPageRequestListener(
       (pageKey) {
         _feedBloc.add(
-          LMGetUniversalFeed(
+          LMFeedGetUniversalFeedEvent(
             offset: pageKey,
             topics: selectedTopics,
           ),
@@ -213,7 +214,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   // This function updates the paging controller based on the state changes
   void updatePagingControllers(Object? state) {
-    if (state is LMUniversalFeedLoaded) {
+    if (state is LMFeedUniversalFeedLoadedState) {
       _pageFeed++;
       List<LMPostViewData> listOfPosts = state.posts;
 
@@ -253,7 +254,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       ),
       enableDrag: true,
       clipBehavior: Clip.hardEdge,
-      builder: (context) => LMTopicBottomSheet(
+      builder: (context) => LMFeedTopicBottomSheet(
         key: GlobalKey(),
         selectedTopics: selectedTopics,
         onTopicSelected: (updatedTopics, tappedTopic) {
@@ -310,7 +311,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         clipBehavior: Clip.hardEdge,
                         decoration: const BoxDecoration(),
                         child: widget.customWidgetBuilder == null
-                            ? PostSomething(
+                            ? LMFeedPostSomething(
                                 enabled: userPostingRights,
                               )
                             : widget.customWidgetBuilder!(context),
@@ -344,7 +345,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                 child: Row(
                                   children: [
                                     selectedTopics.isEmpty
-                                        ? LMTopicChip(
+                                        ? LMFeedTopicChip(
                                             topic: (LMTopicViewDataBuilder()
                                                   ..id("0")
                                                   ..isEnabled(true)
@@ -361,17 +362,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 12.0,
                                                 vertical: 4.0),
-                                            icon: LMFeedIcon(
-                                              type: LMIconType.icon,
+                                            icon: const LMFeedIcon(
+                                              type: LMFeedIconType.icon,
                                               icon: CupertinoIcons.chevron_down,
-                                              style: const LMFeedIconStyle(
+                                              style: LMFeedIconStyle(
                                                 size: 16,
                                                 color: LMThemeData.appBlack,
                                               ),
                                             ),
                                           )
                                         : selectedTopics.length == 1
-                                            ? LMTopicChip(
+                                            ? LMFeedTopicChip(
                                                 topic: (LMTopicViewDataBuilder()
                                                       ..id(selectedTopics
                                                           .first.id)
@@ -391,18 +392,18 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 12.0,
                                                         vertical: 4.0),
-                                                icon: LMFeedIcon(
-                                                  type: LMIconType.icon,
+                                                icon: const LMFeedIcon(
+                                                  type: LMFeedIconType.icon,
                                                   icon: CupertinoIcons
                                                       .chevron_down,
-                                                  style: const LMFeedIconStyle(
+                                                  style: LMFeedIconStyle(
                                                     size: 16,
                                                     color:
                                                         LMThemeData.kWhiteColor,
                                                   ),
                                                 ),
                                               )
-                                            : LMTopicChip(
+                                            : LMFeedTopicChip(
                                                 topic: (LMTopicViewDataBuilder()
                                                       ..id("0")
                                                       ..isEnabled(true)
@@ -459,12 +460,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                     ),
                                                     LMThemeData
                                                         .kHorizontalPaddingSmall,
-                                                    LMFeedIcon(
-                                                      type: LMIconType.icon,
+                                                    const LMFeedIcon(
+                                                      type: LMFeedIconType.icon,
                                                       icon: CupertinoIcons
                                                           .chevron_down,
-                                                      style:
-                                                          const LMFeedIconStyle(
+                                                      style: LMFeedIconStyle(
                                                         size: 16,
                                                         color: LMThemeData
                                                             .kWhiteColor,
@@ -515,7 +515,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 class FeedRoomView extends StatefulWidget {
   final bool isCm;
   final LMUserViewData user;
-  final LMUniversalFeedBloc universalFeedBloc;
+  final LMFeedBloc universalFeedBloc;
   final Map<String, LMUserViewData> users;
   final Map<String, LMWidgetViewData> widgets;
   final Map<String, LMTopicViewData> topics;
@@ -523,7 +523,7 @@ class FeedRoomView extends StatefulWidget {
   final ScrollController scrollController;
   final VoidCallback onRefresh;
   final VoidCallback openTopicBottomSheet;
-  final LMPostWidgetBuilder? postBuilder;
+  final LMFeedPostWidgetBuilder? postBuilder;
 
   const FeedRoomView({
     super.key,
@@ -562,16 +562,16 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             color: Colors.black,
             borderRadius: BorderRadius.circular(6.0),
           ),
-          child: LMImage(
+          child: LMFeedImage(
             imageFile: media.mediaFile!,
             boxFit: BoxFit.contain,
           ),
         );
       } else if (media.mediaType == LMMediaType.document) {
-        return LMFeedIcon(
-          type: LMIconType.svg,
+        return const LMFeedIcon(
+          type: LMFeedIconType.svg,
           assetPath: kAssetDocPDFIcon,
-          style: const LMFeedIconStyle(
+          style: LMFeedIconStyle(
             color: Colors.red,
             size: 35,
             boxPadding: 0,
@@ -587,11 +587,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
 
   bool checkPostCreationRights() {
     final MemberStateResponse memberStateResponse =
-        LMUserLocalPreference.instance.fetchMemberRights();
+        LMFeedUserLocalPreference.instance.fetchMemberRights();
     if (!memberStateResponse.success || memberStateResponse.state == 1) {
       return true;
     }
-    final memberRights = LMUserLocalPreference.instance.fetchMemberRight(9);
+    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
     return memberRights;
   }
 
@@ -600,8 +600,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   @override
   void initState() {
     super.initState();
-    LMAnalyticsBloc.instance.add(const LMFireAnalyticsEvent(
-        eventName: LMAnalyticsKeys.feedOpened,
+    LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.feedOpened,
         eventProperties: {'feed_type': "universal_feed"}));
     _controller = widget.scrollController..addListener(_scrollListener);
     right = checkPostCreationRights();
@@ -626,35 +626,37 @@ class _FeedRoomViewState extends State<FeedRoomView> {
 
   @override
   Widget build(BuildContext context) {
-    LMPostBloc newPostBloc = LMPostBloc.instance;
+    LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
     final ThemeData theme = LMThemeData.theme;
     return Scaffold(
       backgroundColor: LMThemeData.theme.colorScheme.background,
       body: Column(
         children: [
-          BlocConsumer<LMPostBloc, LMPostState>(
+          BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
             bloc: newPostBloc,
             listener: (prev, curr) {
-              if (curr is LMPostDeleted) {
+              if (curr is LMFeedPostDeletedState) {
                 List<LMPostViewData>? feedRoomItemList =
                     widget.feedRoomPagingController.itemList;
                 feedRoomItemList?.removeWhere((item) => item.id == curr.postId);
                 widget.feedRoomPagingController.itemList = feedRoomItemList;
                 rebuildPostWidget.value = !rebuildPostWidget.value;
               }
-              if (curr is LMNewPostUploading || curr is LMEditPostUploading) {
+              if (curr is LMFeedNewPostUploadingState ||
+                  curr is LMFeedEditPostUploadingState) {
                 // if current state is uploading
                 // change postUploading flag to true
                 // to block new post creation
                 postUploading.value = true;
               }
-              if (prev is LMNewPostUploading || prev is LMEditPostUploading) {
+              if (prev is LMFeedNewPostUploadingState ||
+                  prev is LMFeedEditPostUploadingState) {
                 // if state has changed from uploading
                 // change postUploading flag to false
                 // to allow new post creation
                 postUploading.value = false;
               }
-              if (curr is LMNewPostUploaded) {
+              if (curr is LMFeedNewPostUploadedState) {
                 LMPostViewData? item = curr.postData;
                 int length =
                     widget.feedRoomPagingController.itemList?.length ?? 0;
@@ -679,7 +681,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                 postUploading.value = false;
                 rebuildPostWidget.value = !rebuildPostWidget.value;
               }
-              if (curr is LMEditPostUploaded) {
+              if (curr is LMFeedEditPostUploadedState) {
                 LMPostViewData? item = curr.postData;
                 List<LMPostViewData>? feedRoomItemList =
                     widget.feedRoomPagingController.itemList;
@@ -694,14 +696,14 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                 postUploading.value = false;
                 rebuildPostWidget.value = !rebuildPostWidget.value;
               }
-              if (curr is LMNewPostError) {
+              if (curr is LMFeedNewPostErrorState) {
                 postUploading.value = false;
                 toast(
                   curr.message,
                   duration: Toast.LENGTH_LONG,
                 );
               }
-              if (curr is LMPostUpdateState) {
+              if (curr is LMFeedPostUpdateState) {
                 List<LMPostViewData>? feedRoomItemList =
                     widget.feedRoomPagingController.itemList;
                 int index = feedRoomItemList
@@ -714,7 +716,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               }
             },
             builder: (context, state) {
-              if (state is LMEditPostUploading) {
+              if (state is LMFeedEditPostUploadingState) {
                 return Container(
                   height: 60,
                   color: LMThemeData.theme.colorScheme.background,
@@ -743,7 +745,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                   ),
                 );
               }
-              if (state is LMNewPostUploading) {
+              if (state is LMFeedNewPostUploadingState) {
                 return Container(
                   height: 60,
                   color: LMThemeData.kWhiteColor,
@@ -800,9 +802,9 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                             PagedChildBuilderDelegate<LMPostViewData>(
                           noItemsFoundIndicatorBuilder: (context) {
                             if (widget.universalFeedBloc.state
-                                    is LMUniversalFeedLoaded &&
+                                    is LMFeedUniversalFeedLoadedState &&
                                 (widget.universalFeedBloc.state
-                                        as LMUniversalFeedLoaded)
+                                        as LMFeedUniversalFeedLoadedState)
                                     .topics
                                     .isNotEmpty) {
                               return Center(
@@ -861,10 +863,10 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  LMFeedIcon(
-                                    type: LMIconType.icon,
+                                  const LMFeedIcon(
+                                    type: LMFeedIconType.icon,
                                     icon: Icons.post_add,
-                                    style: const LMFeedIconStyle(
+                                    style: LMFeedIconStyle(
                                       size: 48,
                                     ),
                                   ),
@@ -910,7 +912,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                       ),
                                     ),
                                     icon: LMFeedIcon(
-                                      type: LMIconType.icon,
+                                      type: LMFeedIconType.icon,
                                       icon: Icons.add,
                                       style: LMFeedIconStyle(
                                         size: 18,
@@ -920,10 +922,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                     onTap: right
                                         ? () {
                                             if (!postUploading.value) {
-                                              LMAnalyticsBloc.instance.add(
-                                                  const LMFireAnalyticsEvent(
-                                                      eventName: LMAnalyticsKeys
-                                                          .postCreationStarted,
+                                              LMFeedAnalyticsBloc.instance.add(
+                                                  const LMFeedFireAnalyticsEvent(
+                                                      eventName:
+                                                          LMFeedAnalyticsKeys
+                                                              .postCreationStarted,
                                                       eventProperties: {}));
                                               // TODO: Navigate to NewPostScreen
                                               // Navigator.push(
@@ -954,8 +957,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                             return Column(
                               children: [
                                 const SizedBox(height: 8),
-                                widget.postBuilder
-                                        ?.call(context, defPostWidget(item)) ??
+                                widget.postBuilder?.call(
+                                        context, defPostWidget(item), item) ??
                                     defPostWidget(item),
                                 const SizedBox(height: 8),
                               ],
@@ -996,7 +999,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               ),
             ),
             icon: LMFeedIcon(
-              type: LMIconType.icon,
+              type: LMFeedIconType.icon,
               icon: Icons.add,
               style: LMFeedIconStyle(
                 fit: BoxFit.cover,
@@ -1007,9 +1010,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             onTap: right
                 ? () {
                     if (!postUploading.value) {
-                      LMAnalyticsBloc.instance.add(const LMFireAnalyticsEvent(
-                          eventName: LMAnalyticsKeys.postCreationStarted,
-                          eventProperties: {}));
+                      LMFeedAnalyticsBloc.instance.add(
+                          const LMFeedFireAnalyticsEvent(
+                              eventName:
+                                  LMFeedAnalyticsKeys.postCreationStarted,
+                              eventProperties: {}));
                       // TODO: Navigate to NewPostScreen
                       // Navigator.push(
                       //   context,
@@ -1031,8 +1036,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
     );
   }
 
-  LMPostWidget defPostWidget(LMPostViewData post) {
-    return LMPostWidget(
+  LMFeedPostWidget defPostWidget(LMPostViewData post) {
+    return LMFeedPostWidget(
       post: post,
       topics: widget.topics,
       user: widget.users[post.userId]!,

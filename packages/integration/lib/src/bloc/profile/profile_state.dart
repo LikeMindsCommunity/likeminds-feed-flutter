@@ -1,31 +1,31 @@
 part of 'profile_bloc.dart';
 
-abstract class LMProfileState extends Equatable {
-  const LMProfileState();
+abstract class LMFeedProfileState extends Equatable {
+  const LMFeedProfileState();
 
   @override
   List<Object> get props => [];
 }
 
-class LMProfileStateInit extends LMProfileState {}
+class LMFeedProfileStateInitState extends LMFeedProfileState {}
 
-class LMRouteToUserProfileState extends LMProfileState {
+class LMFeedRouteToUserProfileState extends LMFeedProfileState {
   final String userUniqueId;
 
-  const LMRouteToUserProfileState({required this.userUniqueId});
+  const LMFeedRouteToUserProfileState({required this.userUniqueId});
 
   @override
   List<Object> get props => [userUniqueId];
 }
 
-class LMLoginRequiredState extends LMProfileState {}
+class LMFeedLoginRequiredState extends LMFeedProfileState {}
 
-class LMLogoutState extends LMProfileState {}
+class LMFeedLogoutState extends LMFeedProfileState {}
 
-class LMRouteToCompanyProfileState extends LMProfileState {
+class LMFeedRouteToCompanyProfileState extends LMFeedProfileState {
   final String companyId;
 
-  const LMRouteToCompanyProfileState({required this.companyId});
+  const LMFeedRouteToCompanyProfileState({required this.companyId});
 
   @override
   List<Object> get props => [companyId];

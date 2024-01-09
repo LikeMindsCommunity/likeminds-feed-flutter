@@ -18,7 +18,7 @@ export 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_prefer
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
-  late final LMMediaService? media;
+  late final LMFeedMediaService? media;
 
   static LMFeedCore? _instance;
 
@@ -33,27 +33,27 @@ class LMFeedCore {
     ThemeData? theme,
   }) async {
     this.lmFeedClient = lmFeedClient;
-    media = LMMediaService(bucketName: "", poolId: "");
-    await LMUserLocalPreference.instance.initialize();
+    media = LMFeedMediaService(bucketName: "", poolId: "");
+    await LMFeedUserLocalPreference.instance.initialize();
     MediaKit.ensureInitialized();
-    await LMUserLocalPreference.instance.initialize();
+    await LMFeedUserLocalPreference.instance.initialize();
     if (theme != null) {
       LMThemeData.instance.setTheme = theme;
     }
   }
 
   Future<void> closeBlocs() async {
-    await LMPostBloc.instance.close();
-    await LMRoutingBloc.instance.close();
-    await LMProfileBloc.instance.close();
-    await LMAnalyticsBloc.instance.close();
+    await LMFeedPostBloc.instance.close();
+    await LMFeedRoutingBloc.instance.close();
+    await LMFeedProfileBloc.instance.close();
+    await LMFeedAnalyticsBloc.instance.close();
   }
 
   Future<InitiateUserResponse> initiateUser(InitiateUserRequest request) async {
     return lmFeedClient.initiateUser(request)
       ..then((value) async {
         if (value.success) {
-          await LMUserLocalPreference.instance
+          await LMFeedUserLocalPreference.instance
               .setUserDataFromInitiateUserResponse(value);
         }
         return value;
@@ -64,7 +64,7 @@ class LMFeedCore {
     return lmFeedClient.getMemberState()
       ..then((value) async {
         if (value.success) {
-          await LMUserLocalPreference.instance
+          await LMFeedUserLocalPreference.instance
               .storeMemberRightsFromMemberStateResponse(value);
         }
         return value;

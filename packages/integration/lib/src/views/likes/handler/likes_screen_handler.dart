@@ -41,8 +41,8 @@ class LMLikesScreenHandler {
 
   // Analytics event logging for Like Screen
   void logLikeListEvent(totalLikes) {
-    LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-      eventName: LMAnalyticsKeys.likeListOpen,
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+      eventName: LMFeedAnalyticsKeys.likeListOpen,
       eventProperties: {
         "post_id": postId,
         "total_likes": totalLikes,

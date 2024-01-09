@@ -6,13 +6,13 @@ import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-class PostSomething extends StatelessWidget {
+class LMFeedPostSomething extends StatelessWidget {
   final bool enabled;
   final Color? borderColor;
   final Color? backgroundColor;
   final Color? primaryColor;
 
-  const PostSomething({
+  const LMFeedPostSomething({
     Key? key,
     required this.enabled,
     this.borderColor,
@@ -22,13 +22,13 @@ class PostSomething extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    User user = LMUserLocalPreference.instance.fetchUserData();
+    User user = LMFeedUserLocalPreference.instance.fetchUserData();
     Size screenSize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: enabled
           ? () {
-              LMAnalyticsBloc.instance.add(const LMFireAnalyticsEvent(
-                eventName: LMAnalyticsKeys.postCreationStarted,
+              LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
+                eventName: LMFeedAnalyticsKeys.postCreationStarted,
                 eventProperties: {},
               ));
               //TODO: Navigate to NewPostScreen
@@ -54,7 +54,7 @@ class PostSomething extends StatelessWidget {
           ),
           child: Row(
             children: <Widget>[
-              LMProfilePicture(
+              LMFeedProfilePicture(
                 fallbackText: user.name,
                 backgroundColor: LMThemeData.theme.primaryColor,
                 imageUrl: user.imageUrl,

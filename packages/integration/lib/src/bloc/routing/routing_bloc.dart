@@ -8,13 +8,14 @@ part 'routing_state.dart';
 part 'handler/share_post_event_handler.dart';
 part 'handler/post_notification_event_handler.dart';
 
-class LMRoutingBloc extends Bloc<LMRoutingEvent, LMRoutingState> {
-  static LMRoutingBloc? _lmRoutingBloc;
+class LMFeedRoutingBloc extends Bloc<LMFeedRoutingEvent, LMFeedRoutingState> {
+  static LMFeedRoutingBloc? _lmRoutingBloc;
 
-  static LMRoutingBloc get instance => _lmRoutingBloc ??= LMRoutingBloc._();
+  static LMFeedRoutingBloc get instance =>
+      _lmRoutingBloc ??= LMFeedRoutingBloc._();
 
-  LMRoutingBloc._() : super(LMRoutingStateInit()) {
-    on<LMHandleSharedPostEvent>(sharePostEventHandler);
-    on<LMHandlePostNotificationEvent>(postNotificationEventHandler);
+  LMFeedRoutingBloc._() : super(LMFeedRoutingStateInitState()) {
+    on<LMFeedHandleSharedPostEvent>(sharePostEventHandler);
+    on<LMFeedHandlePostNotificationEvent>(postNotificationEventHandler);
   }
 }

@@ -14,15 +14,16 @@ part 'event_handler/route_to_company_profile_event_handler.dart';
 
 part 'event_handler/route_to_user_profile_event_handler.dart';
 
-class LMProfileBloc extends Bloc<LMProfileEvent, LMProfileState> {
-  static LMProfileBloc? _lmProfileBloc;
+class LMFeedProfileBloc extends Bloc<LMFeedProfileEvent, LMFeedProfileState> {
+  static LMFeedProfileBloc? _lmProfileBloc;
 
-  static LMProfileBloc get instance => _lmProfileBloc ??= LMProfileBloc._();
+  static LMFeedProfileBloc get instance =>
+      _lmProfileBloc ??= LMFeedProfileBloc._();
 
-  LMProfileBloc._() : super(LMProfileStateInit()) {
-    on<LMLoginRequired>(handleLMLoginRequiredEvent);
-    on<LMLogout>(handleLMLogoutEvent);
-    on<LMRouteToCompanyProfile>(handleLMRouteToCompanyProfileEvent);
-    on<LMRouteToUserProfile>(handleLMRouteToUserProfileEvent);
+  LMFeedProfileBloc._() : super(LMFeedProfileStateInitState()) {
+    on<LMFeedLoginRequiredEvent>(handleLMLoginRequiredEvent);
+    on<LMFeedLogoutEvent>(handleLMLogoutEvent);
+    on<LMFeedRouteToCompanyProfileEvent>(handleLMRouteToCompanyProfileEvent);
+    on<LMFeedRouteToUserProfileEvent>(handleLMRouteToUserProfileEvent);
   }
 }

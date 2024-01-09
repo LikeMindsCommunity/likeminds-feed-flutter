@@ -1,7 +1,7 @@
 part of '../post_bloc.dart';
 
 void deletePostEventHandler(
-    LMDeletePost event, Emitter<LMPostState> emit) async {
+    LMFeedDeletePostEvent event, Emitter<LMFeedPostState> emit) async {
   final response = await LMFeedCore.instance.lmFeedClient.deletePost(
     (DeletePostRequestBuilder()
           ..postId(event.postId)
@@ -14,13 +14,13 @@ void deletePostEventHandler(
       'Post Deleted',
       duration: Toast.LENGTH_LONG,
     );
-    emit(LMPostDeleted(postId: event.postId));
+    emit(LMFeedPostDeletedState(postId: event.postId));
   } else {
     toast(
       response.errorMessage ?? 'An error occurred',
       duration: Toast.LENGTH_LONG,
     );
-    emit(LMPostDeletionError(
+    emit(LMFeedPostDeletionErrorState(
         message: response.errorMessage ?? 'An error occurred'));
   }
 }

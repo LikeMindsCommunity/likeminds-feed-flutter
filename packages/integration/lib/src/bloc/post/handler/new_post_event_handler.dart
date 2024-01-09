@@ -1,7 +1,7 @@
 part of '../post_bloc.dart';
 
 void newPostEventHandler(
-    LMCreateNewPost event, Emitter<LMPostState> emit) async {
+    LMFeedCreateNewPostEvent event, Emitter<LMFeedPostState> emit) async {
   try {
     List<LMMediaModel>? postMedia = event.postMedia;
     List<Attachment> attachments = [];
@@ -13,7 +13,7 @@ void newPostEventHandler(
     // Upload post media to s3 and add links as Attachments
     if (postMedia != null && postMedia.isNotEmpty) {
       emit(
-        LMNewPostUploading(
+        LMFeedNewPostUploadingState(
           progress: progress.stream,
           thumbnailMedia: postMedia.isEmpty
               ? null
@@ -67,7 +67,7 @@ void newPostEventHandler(
       // For counting the no of attachments
     } else {
       emit(
-        LMNewPostUploading(
+        LMFeedNewPostUploadingState(
           progress: progress.stream,
         ),
       );
@@ -86,7 +86,7 @@ void newPostEventHandler(
 
     if (response.success) {
       emit(
-        LMNewPostUploaded(
+        LMFeedNewPostUploadedState(
           postData: LMPostViewDataConvertor.fromPost(post: response.post!),
           userData: (response.user ?? <String, User>{}).map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
@@ -99,10 +99,10 @@ void newPostEventHandler(
         ),
       );
     } else {
-      emit(LMNewPostError(message: response.errorMessage!));
+      emit(LMFeedNewPostErrorState(message: response.errorMessage!));
     }
   } catch (err) {
-    emit(const LMNewPostError(message: 'An error occurred'));
+    emit(const LMFeedNewPostErrorState(message: 'An error occurred'));
     debugPrint(err.toString());
   }
 }

@@ -7,15 +7,15 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 /// Provide a header, footer, menu, media
 /// and content instance to customize the post.
 /// {@endtemplate}
-class LMPostWidget extends StatefulWidget {
+class LMFeedPostWidget extends StatefulWidget {
   ///{@macro post_widget}
-  const LMPostWidget({
+  const LMFeedPostWidget({
     super.key,
     required this.post,
     required this.user,
     this.onPostTap,
     required this.isFeed,
-    required this.onTagTap,
+    this.onTagTap,
     this.headerBuilder,
     this.footerBuilder,
     this.menuBuilder,
@@ -31,14 +31,25 @@ class LMPostWidget extends StatefulWidget {
     this.padding,
     this.margin,
     this.childrenSpacing,
+    this.header,
+    this.footer,
+    this.menu,
+    this.content,
+    this.media,
   });
 
-  final LMPostHeaderBuilder? headerBuilder;
-  final LMPostFooterBuilder? footerBuilder;
-  final LMPostTopicBuilder? topicBuilder;
-  final LMPostMenuBuilder? menuBuilder;
-  final LMPostMediaBuilder? mediaBuilder;
-  final LMPostContentBuilder? contentBuilder;
+  final LMFeedPostHeaderBuilder? headerBuilder;
+  final LMFeedPostFooterBuilder? footerBuilder;
+  final LMFeedPostTopicBuilder? topicBuilder;
+  final LMFeedPostMenuBuilder? menuBuilder;
+  final LMFeedPostMediaBuilder? mediaBuilder;
+  final LMFeedPostContentBuilder? contentBuilder;
+
+  final LMFeedPostHeader? header;
+  final LMFeedPostFooter? footer;
+  final LMFeedMenu? menu;
+  final LMFeedPostMedia? media;
+  final LMFeedPostContent? content;
 
   // Styling variables
   final List<BoxShadow>? boxShadow;
@@ -51,8 +62,8 @@ class LMPostWidget extends StatefulWidget {
   final LMUserViewData user;
   final Map<String, LMTopicViewData> topics;
   final bool isFeed;
-  final LMOnPostTap? onPostTap;
-  final Function(String) onTagTap;
+  final LMFeedOnPostTap? onPostTap;
+  final Function(String)? onTagTap;
   final double? childrenSpacing;
 
   final Function(bool isLiked)? onLikeTap;
@@ -60,22 +71,22 @@ class LMPostWidget extends StatefulWidget {
   final Function(bool isSaved)? onSaveTap;
 
   @override
-  State<LMPostWidget> createState() => _LMPostWidgetState();
+  State<LMFeedPostWidget> createState() => _LMPostWidgetState();
 
-  LMPostWidget copyWith({
-    LMPostHeaderBuilder? headerBuilder,
-    LMPostFooterBuilder? footerBuilder,
-    LMPostTopicBuilder? topicBuilder,
-    LMPostMenuBuilder? menuBuilder,
-    LMPostMediaBuilder? mediaBuilder,
-    LMPostContentBuilder? contentBuilder,
+  LMFeedPostWidget copyWith({
+    LMFeedPostHeaderBuilder? headerBuilder,
+    LMFeedPostFooterBuilder? footerBuilder,
+    LMFeedPostTopicBuilder? topicBuilder,
+    LMFeedPostMenuBuilder? menuBuilder,
+    LMFeedPostMediaBuilder? mediaBuilder,
+    LMFeedPostContentBuilder? contentBuilder,
     List<BoxShadow>? boxShadow,
     BorderRadiusGeometry? borderRadius,
     LMPostViewData? post,
     LMUserViewData? user,
     Map<String, LMTopicViewData>? topics,
     bool? isFeed,
-    LMOnPostTap? onPostTap,
+    LMFeedOnPostTap? onPostTap,
     Function(String)? onTagTap,
     Function(bool isLiked)? onLikeTap,
     Function(bool isPinned)? onPinTap,
@@ -84,7 +95,7 @@ class LMPostWidget extends StatefulWidget {
     EdgeInsetsGeometry? margin,
     double? childrenSpacing,
   }) {
-    return LMPostWidget(
+    return LMFeedPostWidget(
       headerBuilder: headerBuilder ?? this.headerBuilder,
       footerBuilder: footerBuilder ?? this.footerBuilder,
       topicBuilder: topicBuilder ?? this.topicBuilder,
@@ -109,7 +120,7 @@ class LMPostWidget extends StatefulWidget {
   }
 }
 
-class _LMPostWidgetState extends State<LMPostWidget> {
+class _LMPostWidgetState extends State<LMFeedPostWidget> {
   int postLikes = 0;
   int comments = 0;
   bool? isLiked;
@@ -125,7 +136,7 @@ class _LMPostWidgetState extends State<LMPostWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant LMPostWidget oldWidget) {
+  void didUpdateWidget(covariant LMFeedPostWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.post.id != widget.post.id) {}
   }
@@ -151,14 +162,16 @@ class _LMPostWidgetState extends State<LMPostWidget> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              widget.headerBuilder?.call(context, _defPostHeader()) ??
+              widget.headerBuilder
+                      ?.call(context, _defPostHeader(), widget.post) ??
                   Padding(
                     padding: EdgeInsets.only(
                       bottom: widget.childrenSpacing ?? 0,
                     ),
                     child: _defPostHeader(),
                   ),
-              widget.contentBuilder?.call(context, _defContentWidget()) ??
+              widget.contentBuilder
+                      ?.call(context, _defContentWidget(), widget.post) ??
                   Padding(
                     padding: EdgeInsets.only(
                       bottom: widget.childrenSpacing ?? 0,
@@ -167,7 +180,8 @@ class _LMPostWidgetState extends State<LMPostWidget> {
                   ),
               widget.post.attachments != null &&
                       widget.post.attachments!.isNotEmpty
-                  ? widget.mediaBuilder?.call(context, _defPostMedia()) ??
+                  ? widget.mediaBuilder
+                          ?.call(context, _defPostMedia(), widget.post) ??
                       Padding(
                         padding: EdgeInsets.only(
                           bottom: widget.childrenSpacing ?? 0,
@@ -176,7 +190,8 @@ class _LMPostWidgetState extends State<LMPostWidget> {
                       )
                   : const SizedBox(),
               const SizedBox(height: 18),
-              widget.footerBuilder?.call(context, _defFooterWidget()) ??
+              widget.footerBuilder
+                      ?.call(context, _defFooterWidget(), widget.post) ??
                   Padding(
                     padding: EdgeInsets.only(
                       bottom: widget.childrenSpacing ?? 0,
@@ -190,8 +205,8 @@ class _LMPostWidgetState extends State<LMPostWidget> {
     );
   }
 
-  LMPostContent _defContentWidget() {
-    return LMPostContent(
+  LMFeedPostContent _defContentWidget() {
+    return LMFeedPostContent(
       onTagTap: widget.onTagTap,
     );
   }
@@ -204,11 +219,12 @@ class _LMPostWidgetState extends State<LMPostWidget> {
     return LMFeedPostHeader(
       user: widget.user,
       isFeed: widget.isFeed,
+      postViewData: widget.post,
     );
   }
 
-  LMPostMedia _defPostMedia() {
-    return LMPostMedia(
+  LMFeedPostMedia _defPostMedia() {
+    return LMFeedPostMedia(
       attachments: widget.post.attachments!,
     );
   }

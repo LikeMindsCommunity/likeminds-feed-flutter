@@ -12,7 +12,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 
-class LMMediaHandler {
+class LMFeedMediaPermissionHandler {
   static Future<bool> handlePermissions(int mediaType) async {
     if (Platform.isAndroid) {
       PermissionStatus permissionStatus;
@@ -113,7 +113,7 @@ class LMMediaHandler {
       }
 
       CommunityConfigurations config =
-          await LMUserLocalPreference.instance.getCommunityConfigurations();
+          await LMFeedUserLocalPreference.instance.getCommunityConfigurations();
       if (config.value == null || config.value!["max_video_size"] == null) {
         final configResponse =
             await LMFeedCore.instance.lmFeedClient.getCommunityConfigurations();

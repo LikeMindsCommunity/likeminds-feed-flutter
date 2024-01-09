@@ -1,18 +1,18 @@
 part of 'comment_handler_bloc.dart';
 
 /// {@template lm_comment_handler_event}
-/// LMCommentHandlerEvent defines the event handled by LMCommentHandlerBloc.
+/// LMFeedCommentHandlerEvent defines the event handled by LMFeedCommentHandlerBloc.
 /// {@endtemplate}
-abstract class LMCommentHandlerEvent extends Equatable {
+abstract class LMFeedCommentHandlerEvent extends Equatable {
   /// {@macro lm_comment_handler_event}
-  const LMCommentHandlerEvent();
+  const LMFeedCommentHandlerEvent();
 
   @override
   List<Object> get props => [];
 }
 
 /// {@template lm_comment_action_event}
-/// LMCommentActionEvent defines the event to handle comment related actions
+/// LMFeedCommentActionEvent defines the event to handle comment related actions
 /// like add, edit, delete, etc.
 /// [commentActionRequest] of type Response defines the request to be sent
 /// to the server. It can be of type AddCommentRequest, AddCommentReplyRequest,
@@ -22,12 +22,12 @@ abstract class LMCommentHandlerEvent extends Equatable {
 /// comment/reply on which the action is to be performed.
 ///
 /// {@endtemplate}
-class LMCommentActionEvent<Response extends Object>
-    extends LMCommentHandlerEvent {
+class LMFeedCommentActionEvent<Response extends Object>
+    extends LMFeedCommentHandlerEvent {
   final Response commentActionRequest;
   final LMCommentMetaData commentMetaData;
 
-  const LMCommentActionEvent({
+  const LMFeedCommentActionEvent({
     required this.commentActionRequest,
     required this.commentMetaData,
   }) : assert(commentActionRequest is AddCommentRequest ||
@@ -41,22 +41,22 @@ class LMCommentActionEvent<Response extends Object>
 }
 
 /// {@template lm_comment_ongoing_event}
-/// LMCommentOngoingEvent defines the event to handle the ongoing comment
+/// LMFeedCommentOngoingEvent defines the event to handle the ongoing comment
 /// i.e. A user is editing a comment/reply or replying to a existing comment
 /// [commentMetaData] of type LMCommentMetaData defines the metadata of the
 /// comment/reply on which the action is to be performed.
 /// {@endtemplate}
-class LMCommentOngoingEvent extends LMCommentHandlerEvent {
+class LMFeedCommentOngoingEvent extends LMFeedCommentHandlerEvent {
   final LMCommentMetaData commentMetaData;
 
-  const LMCommentOngoingEvent({
+  const LMFeedCommentOngoingEvent({
     required this.commentMetaData,
   });
 }
 
 /// {@template lm_comment_cancel_event}
-/// LMCommentCancelEvent defines the event to handle the cancel comment
+/// LMFeedCommentCancelEvent defines the event to handle the cancel comment
 /// i.e. A user has cancelled editing a comment/reply or
 /// replying to a existing comment
 /// {@endtemplate}
-class LMCommentCancelEvent extends LMCommentHandlerEvent {}
+class LMFeedCommentCancelEvent extends LMFeedCommentHandlerEvent {}

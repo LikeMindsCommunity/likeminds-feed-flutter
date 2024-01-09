@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_feed_ui_fl/src/widgets/post/post.dart';
 
-class LMPostContent extends StatelessWidget {
-  const LMPostContent({
+class LMFeedPostContent extends StatelessWidget {
+  const LMFeedPostContent({
     super.key,
     this.text,
-    required this.onTagTap,
+    this.onTagTap,
     this.expanded = false,
     this.style = const LMFeedPostContentStyle(),
   });
 
   final String? text;
 
-  final Function(String) onTagTap;
+  final Function(String)? onTagTap;
   final bool expanded;
 
   final LMFeedPostContentStyle style;
@@ -29,7 +29,9 @@ class LMPostContent extends StatelessWidget {
       margin: style.margin,
       child: ExpandableText(
         text ?? postDetails!.text,
-        onTagTap: onTagTap,
+        onTagTap: (String userId) {
+          onTagTap?.call(userId);
+        },
         expandText: style.expandText ?? "see more",
         animation: style.animation ?? true,
         maxLines: style.visibleLines ?? 4,
@@ -51,8 +53,8 @@ class LMPostContent extends StatelessWidget {
     );
   }
 
-  LMPostContent copyWith(LMPostContent content) {
-    return LMPostContent(
+  LMFeedPostContent copyWith(LMFeedPostContent content) {
+    return LMFeedPostContent(
       text: content.text ?? text,
       onTagTap: content.onTagTap,
       expanded: content.expanded,

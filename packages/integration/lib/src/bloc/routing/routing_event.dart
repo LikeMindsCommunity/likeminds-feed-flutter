@@ -1,27 +1,27 @@
 part of 'routing_bloc.dart';
 
-abstract class LMRoutingEvent extends Equatable {
-  const LMRoutingEvent();
+abstract class LMFeedRoutingEvent extends Equatable {
+  const LMFeedRoutingEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class LMRoutingEventInit extends LMRoutingEvent {}
+class LMFeedRoutingEventInitState extends LMFeedRoutingEvent {}
 
-class LMHandleSharedPostEvent extends LMRoutingEvent {
+class LMFeedHandleSharedPostEvent extends LMFeedRoutingEvent {
   final String postId;
 
-  const LMHandleSharedPostEvent({required this.postId});
+  const LMFeedHandleSharedPostEvent({required this.postId});
 
   @override
   List<Object> get props => [postId];
 }
 
-class LMHandlePostNotificationEvent extends LMRoutingEvent {
+class LMFeedHandlePostNotificationEvent extends LMFeedRoutingEvent {
   final String postId;
 
-  const LMHandlePostNotificationEvent({required this.postId});
+  const LMFeedHandlePostNotificationEvent({required this.postId});
 
   @override
   List<Object> get props => [postId];

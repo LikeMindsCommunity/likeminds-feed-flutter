@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 import 'package:shimmer/shimmer.dart';
 
-class UserTileShimmer extends StatelessWidget {
-  const UserTileShimmer({super.key});
+class LMFeedUserTileShimmer extends StatelessWidget {
+  const LMFeedUserTileShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {

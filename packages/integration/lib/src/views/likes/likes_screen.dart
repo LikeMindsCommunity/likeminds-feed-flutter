@@ -5,13 +5,13 @@ import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/views/likes/handler/likes_screen_handler.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class LMLikesScreen extends StatefulWidget {
+class LMFeedLikesScreen extends StatefulWidget {
   static const String route = "/likes_screen";
   final String postId;
   final bool isCommentLikes;
   final String? commentId;
 
-  const LMLikesScreen({
+  const LMFeedLikesScreen({
     super.key,
     this.isCommentLikes = false,
     required this.postId,
@@ -19,10 +19,10 @@ class LMLikesScreen extends StatefulWidget {
   });
 
   @override
-  State<LMLikesScreen> createState() => _LikesScreenState();
+  State<LMFeedLikesScreen> createState() => _LikesScreenState();
 }
 
-class _LikesScreenState extends State<LMLikesScreen> {
+class _LikesScreenState extends State<LMFeedLikesScreen> {
   Map<String, LMUserViewData> userData = {};
   late LMLikesScreenHandler handler;
 
@@ -118,7 +118,7 @@ class _LikesScreenState extends State<LMLikesScreen> {
                     child: ListView.builder(
                         itemCount: 5,
                         itemBuilder: (context, index) =>
-                            const UserTileShimmer()),
+                            const LMFeedUserTileShimmer()),
                   ),
                 ),
                 newPageProgressIndicatorBuilder: (context) => const Padding(
@@ -148,7 +148,7 @@ class LikesTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 20.0),
         child: user!.isDeleted != null && user!.isDeleted!
             ? const DeletedLikesTile()
-            : LMUserTile(
+            : LMFeedUserTile(
                 user: user!,
                 onTap: () {},
                 titleText: LMFeedText(

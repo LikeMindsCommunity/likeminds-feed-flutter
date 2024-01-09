@@ -1,96 +1,97 @@
 part of 'post_bloc.dart';
 
-abstract class LMPostState extends Equatable {
-  const LMPostState();
+abstract class LMFeedPostState extends Equatable {
+  const LMFeedPostState();
 
   @override
   List<Object> get props => [];
 }
 
-class LMNewPostInitiate extends LMPostState {}
+class LMFeedNewPostInitiateState extends LMFeedPostState {}
 
-class LMNewPostUploading extends LMPostState {
+class LMFeedNewPostUploadingState extends LMFeedPostState {
   final Stream<double> progress;
   final LMMediaModel? thumbnailMedia;
 
-  const LMNewPostUploading({required this.progress, this.thumbnailMedia});
+  const LMFeedNewPostUploadingState(
+      {required this.progress, this.thumbnailMedia});
 }
 
-class LMEditPostUploading extends LMPostState {}
+class LMFeedEditPostUploadingState extends LMFeedPostState {}
 
-class LMNewPostUploaded extends LMPostState {
+class LMFeedNewPostUploadedState extends LMFeedPostState {
   final LMPostViewData postData;
   final Map<String, LMUserViewData> userData;
   final Map<String, LMTopicViewData> topics;
 
-  const LMNewPostUploaded({
+  const LMFeedNewPostUploadedState({
     required this.postData,
     required this.userData,
     required this.topics,
   });
 }
 
-class LMEditPostUploaded extends LMPostState {
+class LMFeedEditPostUploadedState extends LMFeedPostState {
   final LMPostViewData postData;
   final Map<String, LMUserViewData> userData;
   final Map<String, LMTopicViewData> topics;
 
-  const LMEditPostUploaded({
+  const LMFeedEditPostUploadedState({
     required this.postData,
     required this.userData,
     required this.topics,
   });
 }
 
-class LMNewPostError extends LMPostState {
+class LMFeedNewPostErrorState extends LMFeedPostState {
   final String message;
 
-  const LMNewPostError({required this.message});
+  const LMFeedNewPostErrorState({required this.message});
 }
 
-class LMPostDeletionError extends LMPostState {
+class LMFeedPostDeletionErrorState extends LMFeedPostState {
   final String message;
 
-  const LMPostDeletionError({required this.message});
+  const LMFeedPostDeletionErrorState({required this.message});
 
   @override
   List<Object> get props => [message];
 }
 
-class LMPostDeleted extends LMPostState {
+class LMFeedPostDeletedState extends LMFeedPostState {
   final String postId;
 
-  const LMPostDeleted({required this.postId});
+  const LMFeedPostDeletedState({required this.postId});
 
   @override
   List<Object> get props => [postId];
 }
 
-class LMPostUpdateState extends LMPostState {
+class LMFeedPostUpdateState extends LMFeedPostState {
   final LMPostViewData post;
 
-  const LMPostUpdateState({required this.post});
+  const LMFeedPostUpdateState({required this.post});
 
   @override
   List<Object> get props => [post];
 }
 
-class LMPostPinnedState extends LMPostState {
+class LMFeedPostPinnedState extends LMFeedPostState {
   final String postId;
   final bool isPinned;
 
-  const LMPostPinnedState({required this.postId, required this.isPinned});
+  const LMFeedPostPinnedState({required this.postId, required this.isPinned});
 
   @override
   List<Object> get props => [postId, isPinned];
 }
 
-class LMPostPinError extends LMPostState {
+class LMFeedPostPinErrorState extends LMFeedPostState {
   final String message;
   final bool isPinned;
   final String postId;
 
-  const LMPostPinError({
+  const LMFeedPostPinErrorState({
     required this.message,
     required this.isPinned,
     required this.postId,

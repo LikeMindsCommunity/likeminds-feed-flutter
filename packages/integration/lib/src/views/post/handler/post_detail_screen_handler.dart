@@ -6,18 +6,18 @@ import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-class LMPostDetailScreenHandler {
+class LMFeedPostDetailScreenHandler {
   final Map<String, LMUserViewData> users = {};
   final PagingController<int, LMCommentViewData> commetListPagingController;
   final String postId;
-  late final LMCommentHandlerBloc commentHandlerBloc;
+  late final LMFeedCommentHandlerBloc commentHandlerBloc;
   late final FocusNode focusNode;
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   Map<String, LMTopicViewData> topics = {};
 
-  LMPostDetailScreenHandler(this.commetListPagingController, this.postId) {
-    commentHandlerBloc = LMCommentHandlerBloc.instance;
+  LMFeedPostDetailScreenHandler(this.commetListPagingController, this.postId) {
+    commentHandlerBloc = LMFeedCommentHandlerBloc.instance;
     addCommentListPaginationListener();
     commentController = TextEditingController();
     focusNode = FocusNode();
@@ -75,22 +75,22 @@ class LMPostDetailScreenHandler {
 
   bool checkCommentRights() {
     final MemberStateResponse memberStateResponse =
-        LMUserLocalPreference.instance.fetchMemberRights();
+        LMFeedUserLocalPreference.instance.fetchMemberRights();
     if (!memberStateResponse.success || memberStateResponse.state == 1) {
       return true;
     }
-    bool memberRights = LMUserLocalPreference.instance.fetchMemberRight(10);
+    bool memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(10);
     return memberRights;
   }
 
-  void handleBlocChanges(LMCommentHandlerState state) {
+  void handleBlocChanges(LMFeedCommentHandlerState state) {
     switch (state.runtimeType) {
-      case LMCommentActionOngoingState:
+      case LMFeedCommentActionOngoingState:
         break;
-      case const (LMCommentSuccessState<AddCommentResponse>):
+      case const (LMFeedCommentSuccessState<AddCommentResponse>):
         {
-          final LMCommentSuccessState commentSuccessState =
-              state as LMCommentSuccessState;
+          final LMFeedCommentSuccessState commentSuccessState =
+              state as LMFeedCommentSuccessState;
           AddCommentResponse response =
               commentSuccessState.commentActionResponse as AddCommentResponse;
 
@@ -100,10 +100,10 @@ class LMPostDetailScreenHandler {
           addCommentToController(commentViewData);
           break;
         }
-      case const (LMCommentSuccessState<EditCommentResponse>):
+      case const (LMFeedCommentSuccessState<EditCommentResponse>):
         {
-          final LMCommentSuccessState commentSuccessState =
-              state as LMCommentSuccessState;
+          final LMFeedCommentSuccessState commentSuccessState =
+              state as LMFeedCommentSuccessState;
 
           EditCommentResponse response =
               commentSuccessState.commentActionResponse as EditCommentResponse;
@@ -114,13 +114,13 @@ class LMPostDetailScreenHandler {
           updateCommentInController(commentViewData);
           break;
         }
-      case const (LMCommentSuccessState<DeleteCommentResponse>):
+      case const (LMFeedCommentSuccessState<DeleteCommentResponse>):
         {
-          final LMCommentSuccessState commentSuccessState =
-              state as LMCommentSuccessState;
+          final LMFeedCommentSuccessState commentSuccessState =
+              state as LMFeedCommentSuccessState;
 
           if (commentSuccessState.commentMetaData.commentActionEntity ==
-              LMCommentType.parent) {
+              LMFeedCommentType.parent) {
             deleteCommentFromController(
                 commentSuccessState.commentMetaData.commentId!);
           } else {
@@ -135,10 +135,10 @@ class LMPostDetailScreenHandler {
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
-      case const (LMCommentSuccessState<AddCommentReplyResponse>):
+      case const (LMFeedCommentSuccessState<AddCommentReplyResponse>):
         {
-          final LMCommentSuccessState commentSuccessState =
-              state as LMCommentSuccessState;
+          final LMFeedCommentSuccessState commentSuccessState =
+              state as LMFeedCommentSuccessState;
 
           AddCommentReplyResponse response = commentSuccessState
               .commentActionResponse as AddCommentReplyResponse;
@@ -152,10 +152,10 @@ class LMPostDetailScreenHandler {
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
-      case const (LMCommentSuccessState<EditCommentReplyResponse>):
+      case const (LMFeedCommentSuccessState<EditCommentReplyResponse>):
         {
-          // final LMCommentSuccessState commentSuccessState =
-          //     state as LMCommentSuccessState;
+          // final LMFeedCommentSuccessState commentSuccessState =
+          //     state as LMFeedCommentSuccessState;
 
           // EditCommentReplyResponse response = commentSuccessState
           //     .commentActionResponse as EditCommentReplyResponse;

@@ -1,22 +1,27 @@
 part of 'compose_bloc.dart';
 
 @immutable
-sealed class LMComposeEvent {}
+sealed class LMFeedComposeEvent extends Equatable {
+  const LMFeedComposeEvent();
 
-class LMComposeFetchTopics extends LMComposeEvent {}
+  @override
+  List<Object?> get props => [];
+}
 
-class LMComposeAddImage extends LMComposeEvent {}
+class LMFeedComposeFetchTopicsEvent extends LMFeedComposeEvent {}
 
-class LMComposeAddVideo extends LMComposeEvent {}
+class LMFeedComposeAddImageEvent extends LMFeedComposeEvent {}
 
-class LMComposeAddDocument extends LMComposeEvent {}
+class LMFeedComposeAddVideoEvent extends LMFeedComposeEvent {}
 
-class LMComposeAddLinkPreview extends LMComposeEvent {}
+class LMFeedComposeAddDocumentEvent extends LMFeedComposeEvent {}
 
-class LMComposeRemoveImage extends LMComposeEvent {}
+class LMFeedComposeAddLinkPreviewEvent extends LMFeedComposeEvent {}
 
-class LMComposeRemoveVideo extends LMComposeEvent {}
+class LMFeedComposeRemoveImageEvent extends LMFeedComposeEvent {}
 
-class LMComposeRemoveDocument extends LMComposeEvent {}
+class LMFeedComposeRemoveVideoEvent extends LMFeedComposeEvent {}
 
-class LMComposeRemoveLinkPreview extends LMComposeEvent {}
+class LMFeedComposeRemoveDocumentEvent extends LMFeedComposeEvent {}
+
+class LMFeedComposeRemoveLinkPreviewEvent extends LMFeedComposeEvent {}

@@ -3,15 +3,15 @@ part of '../comment_handler_bloc.dart';
 /// {@template delete_comment_event_handler}
 /// [handleDeleteActionEvent] is used to handle the delete action event
 /// for both comment and replies to comments
-/// [LMCommentActionEvent] is used to send the request to the handler
+/// [LMFeedCommentActionEvent] is used to send the request to the handler
 /// {@endtemplate}
-Future<void> handleDeleteActionEvent(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+Future<void> handleDeleteActionEvent(LMFeedCommentActionEvent event,
+    Emitter<LMFeedCommentHandlerState> emit) async {
   await _handleDeleteCommentAction(event, emit);
 }
 
-Future<void> _handleDeleteCommentAction(
-    LMCommentActionEvent event, Emitter<LMCommentHandlerState> emit) async {
+Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
+    Emitter<LMFeedCommentHandlerState> emit) async {
   // Get the instance of the LMFeedClient
   // to make the API call
   LMFeedClient lmFeedClient = LMFeedCore.instance.lmFeedClient;
@@ -24,7 +24,7 @@ Future<void> _handleDeleteCommentAction(
 
   try {
     // Notify the UI to change the view to Loading
-    emit(LMCommentLoadingState(
+    emit(LMFeedCommentLoadingState(
       commentMetaData: event.commentMetaData,
     ));
 
@@ -43,8 +43,8 @@ Future<void> _handleDeleteCommentAction(
       );
 
       // Fire the analytic event for comment deleted
-      LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
-        eventName: LMAnalyticsKeys.commentDeleted,
+      LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.commentDeleted,
         eventProperties: {
           "post_id": deleteCommentRequest.postId,
           "comment_id": deleteCommentRequest.commentId,
@@ -54,7 +54,7 @@ Future<void> _handleDeleteCommentAction(
       // and remove the comment from the UI
       // and update the comment count
       emit(
-        LMCommentSuccessState(
+        LMFeedCommentSuccessState(
           commentActionResponse: response,
           commentMetaData: event.commentMetaData,
         ),
@@ -66,7 +66,7 @@ Future<void> _handleDeleteCommentAction(
         response.errorMessage ?? '',
         duration: Toast.LENGTH_LONG,
       );
-      emit(LMCommentErrorState(
+      emit(LMFeedCommentErrorState(
         commentActionResponse: response,
         commentMetaData: event.commentMetaData,
       ));

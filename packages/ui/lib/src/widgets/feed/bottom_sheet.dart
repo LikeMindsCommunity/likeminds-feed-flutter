@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-class LMBottomSheet extends StatefulWidget {
+class LMFeedBottomSheet extends StatefulWidget {
   final LMFeedText? title;
   final Alignment? titleAlignment;
   final Color? backgroundColor;
@@ -16,7 +16,7 @@ class LMBottomSheet extends StatefulWidget {
   final Widget? dragBar;
   final Color? dragBarColor;
 
-  const LMBottomSheet({
+  const LMFeedBottomSheet({
     Key? key,
     required this.children,
     this.title,
@@ -33,10 +33,10 @@ class LMBottomSheet extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LMBottomSheet> createState() => _LMBottomSheetState();
+  State<LMFeedBottomSheet> createState() => _LMBottomSheetState();
 }
 
-class _LMBottomSheetState extends State<LMBottomSheet> {
+class _LMBottomSheetState extends State<LMFeedBottomSheet> {
   @override
   void initState() {
     super.initState();

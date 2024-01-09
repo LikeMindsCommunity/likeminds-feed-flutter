@@ -1,22 +1,22 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'universal_feed_bloc.dart';
 
-abstract class LMUniversalFeedState extends Equatable {
-  const LMUniversalFeedState();
+abstract class LMFeedState extends Equatable {
+  const LMFeedState();
 }
 
-class LMUniversalFeedInitial extends LMUniversalFeedState {
+class LMFeedInitialState extends LMFeedState {
   @override
   List<Object?> get props => [];
 }
 
-class LMUniversalFeedLoaded extends LMUniversalFeedState {
+class LMFeedUniversalFeedLoadedState extends LMFeedState {
   final List<LMPostViewData> posts;
   final Map<String, LMUserViewData> users;
   final Map<String, LMWidgetViewData> widgets;
   final Map<String, LMTopicViewData> topics;
 
-  const LMUniversalFeedLoaded({
+  const LMFeedUniversalFeedLoadedState({
     required this.topics,
     required this.posts,
     required this.users,
@@ -27,18 +27,18 @@ class LMUniversalFeedLoaded extends LMUniversalFeedState {
   List<Object?> get props => [posts, users, widgets, topics];
 }
 
-class LMUniversalFeedLoading extends LMUniversalFeedState {
+class LMFeedUniversalFeedLoadingState extends LMFeedState {
   @override
   List<Object?> get props => [];
 }
 
-class LMPaginatedUniversalFeedLoading extends LMUniversalFeedState {
+class LMFeedPaginatedUniversalFeedLoadingState extends LMFeedState {
   final List<LMPostViewData> posts;
   final Map<String, LMUserViewData> users;
   final Map<String, LMWidgetViewData> widgets;
   final Map<String, LMTopicViewData> topics;
 
-  const LMPaginatedUniversalFeedLoading({
+  const LMFeedPaginatedUniversalFeedLoadingState({
     required this.topics,
     required this.posts,
     required this.users,
@@ -48,10 +48,10 @@ class LMPaginatedUniversalFeedLoading extends LMUniversalFeedState {
   List<Object?> get props => [posts, users, widgets, topics];
 }
 
-class LMUniversalFeedError extends LMUniversalFeedState {
+class LMFeedUniversalFeedErrorState extends LMFeedState {
   final String message;
 
-  const LMUniversalFeedError({
+  const LMFeedUniversalFeedErrorState({
     required this.message,
   });
 

@@ -5,11 +5,11 @@ import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 /*
 * Topic chip widget
 * This widget is used to display link preview
-* A [LMLinkPreview] displays link heading, description and URL
-* The [LMLinkPreview] can be customized by passing in the required parameters
+* A [LMFeedLinkPreview] displays link heading, description and URL
+* The [LMFeedLinkPreview] can be customized by passing in the required parameters
 */
-class LMLinkPreview extends StatelessWidget {
-  const LMLinkPreview({
+class LMFeedLinkPreview extends StatelessWidget {
+  const LMFeedLinkPreview({
     super.key,
     this.attachment,
     this.linkModel,
@@ -96,7 +96,7 @@ class LMLinkPreview extends StatelessWidget {
           children: <Widget>[
             checkNullMedia()
                 ? const SizedBox.shrink()
-                : LMImage(
+                : LMFeedImage(
                     width: width,
                     height: 150,
                     borderRadius: borderRadius,

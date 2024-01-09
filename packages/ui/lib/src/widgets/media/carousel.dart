@@ -6,7 +6,7 @@ import 'package:likeminds_feed_ui_fl/src/widgets/media/image.dart';
 import 'package:likeminds_feed_ui_fl/src/widgets/media/video.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
-class LMCarousel extends StatefulWidget {
+class LMFeedCarousel extends StatefulWidget {
   final List<LMAttachmentViewData> attachments;
   final Function(VideoController)? initialiseVideoController;
 
@@ -21,13 +21,13 @@ class LMCarousel extends StatefulWidget {
   final Widget? activeIndicator;
   final Widget? inactiveIndicator;
 
-  final LMImage? imageItem;
-  final LMVideo? videoItem;
+  final LMFeedImage? imageItem;
+  final LMFeedVideo? videoItem;
   final Widget? errorWidget;
   final BoxFit? boxFit;
   final Function(String, StackTrace)? onError;
 
-  const LMCarousel({
+  const LMFeedCarousel({
     Key? key,
     required this.attachments,
     this.height,
@@ -48,10 +48,10 @@ class LMCarousel extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<LMCarousel> createState() => _LMCarouselState();
+  State<LMFeedCarousel> createState() => _LMCarouselState();
 }
 
-class _LMCarouselState extends State<LMCarousel> {
+class _LMCarouselState extends State<LMFeedCarousel> {
   final ValueNotifier<bool> rebuildCurr = ValueNotifier(false);
   List<Widget> mediaWidgets = [];
   int currPosition = 0;
@@ -73,7 +73,7 @@ class _LMCarouselState extends State<LMCarousel> {
           width: widget.width ?? MediaQuery.of(context).size.width,
           child: Center(
             child: widget.imageItem ??
-                LMImage(
+                LMFeedImage(
                   imageUrl: e.attachmentMeta.url,
                   height: widget.height,
                   width: widget.width,
@@ -90,7 +90,7 @@ class _LMCarouselState extends State<LMCarousel> {
           color: Colors.black,
           width: widget.width ?? MediaQuery.of(context).size.width,
           child: widget.videoItem ??
-              LMVideo(
+              LMFeedVideo(
                 initialiseVideoController: widget.initialiseVideoController,
                 videoUrl: e.attachmentMeta.url,
                 width: widget.width,

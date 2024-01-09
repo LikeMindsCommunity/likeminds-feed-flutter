@@ -1,26 +1,26 @@
 part of 'profile_bloc.dart';
 
-abstract class LMProfileEvent extends Equatable {
-  const LMProfileEvent();
+abstract class LMFeedProfileEvent extends Equatable {
+  const LMFeedProfileEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class LMProfileEventInit extends LMProfileEvent {}
+class LMFeedProfileEventInitEvent extends LMFeedProfileEvent {}
 
-class LMRouteToUserProfile extends LMProfileEvent {
+class LMFeedRouteToUserProfileEvent extends LMFeedProfileEvent {
   final String userUniqueId;
 
-  const LMRouteToUserProfile({required this.userUniqueId});
+  const LMFeedRouteToUserProfileEvent({required this.userUniqueId});
 }
 
-class LMRouteToCompanyProfile extends LMProfileEvent {
+class LMFeedRouteToCompanyProfileEvent extends LMFeedProfileEvent {
   final String companyId;
 
-  const LMRouteToCompanyProfile({required this.companyId});
+  const LMFeedRouteToCompanyProfileEvent({required this.companyId});
 }
 
-class LMLoginRequired extends LMProfileEvent {}
+class LMFeedLoginRequiredEvent extends LMFeedProfileEvent {}
 
-class LMLogout extends LMProfileEvent {}
+class LMFeedLogoutEvent extends LMFeedProfileEvent {}

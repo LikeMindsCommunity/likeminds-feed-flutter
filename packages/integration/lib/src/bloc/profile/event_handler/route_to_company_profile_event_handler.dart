@@ -1,7 +1,7 @@
 part of '../profile_bloc.dart';
 
 void handleLMRouteToCompanyProfileEvent(
-    LMRouteToCompanyProfile event, Emitter<LMProfileState> emit) {
+    LMFeedRouteToCompanyProfileEvent event, Emitter<LMFeedProfileState> emit) {
   debugPrint("Company ID caught in callback : ${event.companyId}");
-  emit(LMRouteToCompanyProfileState(companyId: event.companyId));
+  emit(LMFeedRouteToCompanyProfileState(companyId: event.companyId));
 }

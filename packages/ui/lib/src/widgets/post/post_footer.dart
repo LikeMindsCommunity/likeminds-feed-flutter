@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 
 class LMFeedPostFooter extends StatelessWidget {
   LMFeedPostFooter({
@@ -72,11 +71,11 @@ class LMFeedPostFooter extends StatelessWidget {
     ),
     onTap: () {},
     icon: const LMFeedIcon(
-      type: LMIconType.svg,
+      type: LMFeedIconType.svg,
       assetPath: lmLikeInActiveSvg,
     ),
     activeIcon: const LMFeedIcon(
-      type: LMIconType.svg,
+      type: LMFeedIconType.svg,
       assetPath: lmLikeActiveSvg,
     ),
   );
@@ -88,7 +87,7 @@ class LMFeedPostFooter extends StatelessWidget {
     ),
     onTap: () {},
     icon: const LMFeedIcon(
-      type: LMIconType.svg,
+      type: LMFeedIconType.svg,
       assetPath: lmCommentSvg,
     ),
   );
@@ -100,11 +99,11 @@ class LMFeedPostFooter extends StatelessWidget {
     ),
     onTap: () {},
     icon: const LMFeedIcon(
-      type: LMIconType.svg,
+      type: LMFeedIconType.svg,
       assetPath: lmSaveInactiveSvg,
     ),
     activeIcon: const LMFeedIcon(
-      type: LMIconType.svg,
+      type: LMFeedIconType.svg,
       assetPath: lmSaveActiveSvg,
     ),
   );
@@ -116,7 +115,7 @@ class LMFeedPostFooter extends StatelessWidget {
     ),
     onTap: () {},
     icon: const LMFeedIcon(
-      type: LMIconType.svg,
+      type: LMFeedIconType.svg,
       assetPath: lmShareSvg,
     ),
   );

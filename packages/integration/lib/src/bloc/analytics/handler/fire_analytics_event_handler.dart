@@ -7,8 +7,8 @@ part of '../analytics_bloc.dart';
 /// of the event to be fired.
 /// {@endtemplate}
 fireAnalyticsEventHandler(
-    LMFireAnalyticsEvent event, Emitter<LMAnalyticsState> emit) async {
-  emit(LMAnalyticsEventFired(
+    LMFeedFireAnalyticsEvent event, Emitter<LMFeedAnalyticsState> emit) async {
+  emit(LMFeedAnalyticsEventFired(
     eventName: event.eventName,
     eventProperties: event.eventProperties,
   ));

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LMBlocObserver extends BlocObserver {
+class LMFeedBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object? event) {
     debugPrint("LMBlocObserver event - $event");

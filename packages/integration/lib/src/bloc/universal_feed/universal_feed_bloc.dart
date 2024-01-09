@@ -12,37 +12,37 @@ part 'universal_feed_event.dart';
 
 part 'universal_feed_state.dart';
 
-class LMUniversalFeedBloc
-    extends Bloc<LMUniversalFeedEvent, LMUniversalFeedState> {
+class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
   // final FeedApi feedApi;
-  LMUniversalFeedBloc() : super(LMUniversalFeedInitial()) {
-    on<LMUniversalFeedEvent>((event, emit) async {
-      if (event is LMGetUniversalFeed) {
+  LMFeedBloc() : super(LMFeedInitialState()) {
+    on<LMFeedEvent>((event, emit) async {
+      if (event is LMFeedGetUniversalFeedEvent) {
         await _mapLMGetUniversalFeedToState(event: event, emit: emit);
       }
     });
   }
 
   FutureOr<void> _mapLMGetUniversalFeedToState(
-      {required LMGetUniversalFeed event,
-      required Emitter<LMUniversalFeedState> emit}) async {
+      {required LMFeedGetUniversalFeedEvent event,
+      required Emitter<LMFeedState> emit}) async {
     Map<String, LMUserViewData> users = {};
     Map<String, LMTopicViewData> topics = {};
     Map<String, LMWidgetViewData> widgets = {};
 
-    if (state is LMUniversalFeedLoaded) {
-      LMUniversalFeedLoaded prevState = state as LMUniversalFeedLoaded;
+    if (state is LMFeedUniversalFeedLoadedState) {
+      LMFeedUniversalFeedLoadedState prevState =
+          state as LMFeedUniversalFeedLoadedState;
       users = prevState.users;
       topics = prevState.topics;
       widgets = prevState.widgets;
-      emit(LMPaginatedUniversalFeedLoading(
+      emit(LMFeedPaginatedUniversalFeedLoadingState(
         posts: prevState.posts,
         users: prevState.users,
         widgets: prevState.widgets,
         topics: prevState.topics,
       ));
     } else {
-      emit(LMUniversalFeedLoading());
+      emit(LMFeedUniversalFeedLoadingState());
     }
     List<Topic> selectedTopics = [];
 
@@ -60,7 +60,7 @@ class LMUniversalFeedBloc
     );
 
     if (response == null) {
-      emit(const LMUniversalFeedError(
+      emit(const LMFeedUniversalFeedErrorState(
           message: "An error occurred, please check your network connection"));
     } else {
       users.addAll(response.users.map((key, value) =>
@@ -69,7 +69,7 @@ class LMUniversalFeedBloc
           MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
 
       emit(
-        LMUniversalFeedLoaded(
+        LMFeedUniversalFeedLoadedState(
           topics: topics,
           posts: response.posts
               .map((e) => LMPostViewDataConvertor.fromPost(post: e))

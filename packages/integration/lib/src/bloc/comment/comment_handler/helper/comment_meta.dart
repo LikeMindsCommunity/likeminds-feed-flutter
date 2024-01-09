@@ -1,23 +1,23 @@
 part of '../comment_handler_bloc.dart';
 
 /// {@template lm_comment_type}
-/// LMCommentType defines the entity on which the
+/// LMFeedCommentType defines the entity on which the
 /// action is being performed [parent] or [reply]
 /// {@endtemplate}
-enum LMCommentType {
+enum LMFeedCommentType {
   parent,
   reply,
 }
 
 /// {@template lm_comment_action_type}
-/// LMCommentActionType defines the type of
-/// action being performed [LMCommentActionType.add],
-/// [LMCommentActionType.edit], [LMCommentActionType.delete],
-/// [LMCommentActionType.replying].
+/// LMFeedCommentActionType defines the type of
+/// action being performed [LMFeedCommentActionType.add],
+/// [LMFeedCommentActionType.edit], [LMFeedCommentActionType.delete],
+/// [LMFeedCommentActionType.replying].
 /// while adding a reply to an existing comment always
-/// select [LMCommentActionType.replying]
+/// select [LMFeedCommentActionType.replying]
 /// {@endtemplate}
-enum LMCommentActionType {
+enum LMFeedCommentActionType {
   add,
   edit,
   delete,
@@ -29,14 +29,14 @@ enum LMCommentActionType {
 /// which is being added, edited or deleted
 /// {@endtemplate}
 class LMCommentMetaData {
-  // [LMCommentType] defines the entity on which
+  // [LMFeedCommentType] defines the entity on which
   // the action is being performed (comment or reply)
   // {@macro lm_comment_type}
-  final LMCommentType commentActionEntity;
-  // [LMCommentActionType] defines the type of
+  final LMFeedCommentType commentActionEntity;
+  // [LMFeedCommentActionType] defines the type of
   // action being performed [add], [edit], [delete]
   // {@macro lm_comment_action_type}
-  final LMCommentActionType commentActionType;
+  final LMFeedCommentActionType commentActionType;
   // Defines the level of the comment (0 for parent, 1 for reply,
   // 2 for reply of reply, and so on)
   final int level;
@@ -65,19 +65,19 @@ class LMCommentMetaData {
 /// {@endtemplate}
 class LMCommentMetaDataBuilder {
   // @{macro lm_comment_type}
-  LMCommentType? _commentActionEntity;
+  LMFeedCommentType? _commentActionEntity;
   // @{macro lm_comment_action_type}
-  LMCommentActionType? _commentActionType;
+  LMFeedCommentActionType? _commentActionType;
   int? _level;
   String? _commentId;
   String? _replyId;
   LMUserViewData? _user;
 
-  void commentActionEntity(LMCommentType commentActionEntity) {
+  void commentActionEntity(LMFeedCommentType commentActionEntity) {
     _commentActionEntity = commentActionEntity;
   }
 
-  void commentActionType(LMCommentActionType commentActionType) {
+  void commentActionType(LMFeedCommentActionType commentActionType) {
     _commentActionType = commentActionType;
   }
 

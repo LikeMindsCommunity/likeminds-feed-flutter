@@ -1,19 +1,19 @@
 part of 'topic_bloc.dart';
 
-abstract class LMTopicState {}
+abstract class LMFeedTopicState {}
 
-class LMTopicInitial extends LMTopicState {}
+class LMFeedTopicInitialState extends LMFeedTopicState {}
 
-class LMTopicLoading extends LMTopicState {}
+class LMFeedTopicLoadingState extends LMFeedTopicState {}
 
-class LMTopicError extends LMTopicState {
+class LMFeedTopicErrorState extends LMFeedTopicState {
   final String errorMessage;
 
-  LMTopicError(this.errorMessage);
+  LMFeedTopicErrorState(this.errorMessage);
 }
 
-class LMTopicLoaded extends LMTopicState {
+class LMFeedTopicLoadedState extends LMFeedTopicState {
   final GetTopicsResponse getTopicFeedResponse;
 
-  LMTopicLoaded(this.getTopicFeedResponse);
+  LMFeedTopicLoadedState(this.getTopicFeedResponse);
 }

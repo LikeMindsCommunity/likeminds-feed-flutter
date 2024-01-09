@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LMFeedPostHeader extends StatelessWidget {
-  LMFeedPostHeader({
+  const LMFeedPostHeader({
     super.key,
     required this.user,
     this.titleText,
@@ -15,6 +15,7 @@ class LMFeedPostHeader extends StatelessWidget {
     this.customTitle,
     this.profilePicture,
     this.postHeaderStyle = const LMFeedPostHeaderStyle(),
+    required this.postViewData,
   });
 
   final LMFeedText? titleText;
@@ -34,207 +35,191 @@ class LMFeedPostHeader extends StatelessWidget {
 
   final LMFeedPostHeaderStyle postHeaderStyle;
 
-  LMPostViewData? postViewData;
+  final LMPostViewData postViewData;
 
   @override
   Widget build(BuildContext context) {
-    postViewData = InheritedPostProvider.of(context)?.post;
     Size screenSize = MediaQuery.of(context).size;
-    return postViewData == null
-        ? const SizedBox()
-        : Container(
-            width: postHeaderStyle.width ?? screenSize.width,
-            height: postHeaderStyle.height,
-            padding:
-                postHeaderStyle.padding ?? const EdgeInsets.only(bottom: 8),
-            margin: postHeaderStyle.margin,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (onProfileTap != null) {
-                      onProfileTap!();
-                    }
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    child: Row(
-                      children: [
-                        profilePicture ??
-                            LMProfilePicture(
-                              size: postHeaderStyle.imageSize ?? 42,
-                              fallbackText: user.name,
-                              imageUrl: user.imageUrl,
-                              onTap: onProfileTap,
-                              fallbackTextStyle:
-                                  postHeaderStyle.fallbackTextStyle,
-                            ),
-                        kHorizontalPaddingLarge,
-                        Container(
-                          constraints: BoxConstraints(
-                            maxWidth: screenSize.width * 0.66,
-                          ),
-                          child: IntrinsicWidth(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  children: [
-                                    Flexible(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          if (onProfileTap != null) {
-                                            onProfileTap!();
-                                          }
-                                        },
-                                        child: titleText ??
-                                            LMFeedText(
-                                              text: user.name,
-                                              style: const LMFeedTextStyle(
-                                                textStyle: TextStyle(
-                                                  fontSize: kFontMedium,
-                                                  color: kGrey1Color,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                      ),
-                                    ),
-                                    kHorizontalPaddingMedium,
-                                    !postHeaderStyle.showCustomTitle
-                                        ? const SizedBox()
-                                        : ((user.customTitle == null ||
-                                                    user.customTitle!
-                                                        .isEmpty) ||
-                                                (user.isDeleted != null &&
-                                                    user.isDeleted!))
-                                            ? const SizedBox()
-                                            : IntrinsicWidth(
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(3.0),
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .primary,
-                                                      ),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(4.0),
-                                                        child: customTitle ??
-                                                            Text(
-                                                              user.customTitle!
-                                                                      .isNotEmpty
-                                                                  ? user
-                                                                      .customTitle!
-                                                                  : "",
-                                                              // maxLines: 1,
-                                                              style: TextStyle(
-                                                                fontSize:
-                                                                    kFontSmall,
-                                                                color:
-                                                                    kWhiteColor,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontStyle: user
-                                                                        .name
-                                                                        .isNotEmpty
-                                                                    ? FontStyle
-                                                                        .normal
-                                                                    : FontStyle
-                                                                        .italic,
-                                                              ),
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                  ],
-                                ),
-                                kVerticalPaddingSmall,
-                                Row(
-                                  children: [
-                                    Flexible(
-                                        child: subText ?? const SizedBox()),
-                                    subText != null
-                                        ? kHorizontalPaddingXSmall
-                                        : const SizedBox(),
-                                    LMFeedText(
-                                      text: subText != null ? '·' : '',
-                                      style: const LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: kFontSmall,
-                                          color: kGrey3Color,
-                                        ),
-                                      ),
-                                    ),
-                                    subText != null
-                                        ? kHorizontalPaddingXSmall
-                                        : const SizedBox(),
-                                    createdAt ??
-                                        LMFeedText(
-                                          text:
-                                              postViewData!.createdAt.timeAgo(),
-                                          style: const LMFeedTextStyle(
-                                            textStyle: TextStyle(
-                                              fontSize: kFontSmall,
-                                              color: kGrey3Color,
-                                            ),
+    return Container(
+      width: postHeaderStyle.width ?? screenSize.width,
+      height: postHeaderStyle.height,
+      padding: postHeaderStyle.padding ?? const EdgeInsets.only(bottom: 8),
+      margin: postHeaderStyle.margin,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () {
+              if (onProfileTap != null) {
+                onProfileTap!();
+              }
+            },
+            child: Container(
+              color: Colors.transparent,
+              child: Row(
+                children: [
+                  profilePicture ??
+                      LMFeedProfilePicture(
+                        size: postHeaderStyle.imageSize ?? 42,
+                        fallbackText: user.name,
+                        imageUrl: user.imageUrl,
+                        onTap: onProfileTap,
+                        fallbackTextStyle: postHeaderStyle.fallbackTextStyle,
+                      ),
+                  kHorizontalPaddingLarge,
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: screenSize.width * 0.66,
+                    ),
+                    child: IntrinsicWidth(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (onProfileTap != null) {
+                                      onProfileTap!();
+                                    }
+                                  },
+                                  child: titleText ??
+                                      LMFeedText(
+                                        text: user.name,
+                                        style: const LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize: kFontMedium,
+                                            color: kGrey1Color,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                    kHorizontalPaddingSmall,
-                                    LMFeedText(
-                                      text: postViewData!.isEdited ? '·' : '',
-                                      style: const LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: kFontSmall,
-                                          color: kGrey3Color,
-                                        ),
                                       ),
-                                    ),
-                                    kHorizontalPaddingSmall,
-                                    postViewData!.isEdited
-                                        ? editedText ??
-                                            LMFeedText(
-                                              text: postViewData!.isEdited
-                                                  ? 'Edited'
-                                                  : '',
-                                              style: const LMFeedTextStyle(
-                                                textStyle: TextStyle(
-                                                  fontSize: kFontSmall,
-                                                  color: kGrey3Color,
+                                ),
+                              ),
+                              kHorizontalPaddingMedium,
+                              !postHeaderStyle.showCustomTitle
+                                  ? const SizedBox()
+                                  : ((user.customTitle == null ||
+                                              user.customTitle!.isEmpty) ||
+                                          (user.isDeleted != null &&
+                                              user.isDeleted!))
+                                      ? const SizedBox()
+                                      : IntrinsicWidth(
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          3.0),
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                ),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(4.0),
+                                                  child: customTitle ??
+                                                      Text(
+                                                        user.customTitle!
+                                                                .isNotEmpty
+                                                            ? user.customTitle!
+                                                            : "",
+                                                        // maxLines: 1,
+                                                        style: TextStyle(
+                                                          fontSize: kFontSmall,
+                                                          color: kWhiteColor,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontStyle: user.name
+                                                                  .isNotEmpty
+                                                              ? FontStyle.normal
+                                                              : FontStyle
+                                                                  .italic,
+                                                        ),
+                                                      ),
                                                 ),
                                               ),
-                                            )
-                                        : const SizedBox(),
-                                  ],
-                                )
-                              ],
-                            ),
+                                            ],
+                                          ),
+                                        ),
+                            ],
                           ),
-                        ),
-                      ],
+                          kVerticalPaddingSmall,
+                          Row(
+                            children: [
+                              Flexible(child: subText ?? const SizedBox()),
+                              subText != null
+                                  ? kHorizontalPaddingXSmall
+                                  : const SizedBox(),
+                              LMFeedText(
+                                text: subText != null ? '·' : '',
+                                style: const LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    fontSize: kFontSmall,
+                                    color: kGrey3Color,
+                                  ),
+                                ),
+                              ),
+                              subText != null
+                                  ? kHorizontalPaddingXSmall
+                                  : const SizedBox(),
+                              createdAt ??
+                                  LMFeedText(
+                                    text: postViewData.createdAt.timeAgo(),
+                                    style: const LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: kFontSmall,
+                                        color: kGrey3Color,
+                                      ),
+                                    ),
+                                  ),
+                              kHorizontalPaddingSmall,
+                              LMFeedText(
+                                text: postViewData.isEdited ? '·' : '',
+                                style: const LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    fontSize: kFontSmall,
+                                    color: kGrey3Color,
+                                  ),
+                                ),
+                              ),
+                              kHorizontalPaddingSmall,
+                              postViewData.isEdited
+                                  ? editedText ??
+                                      LMFeedText(
+                                        text: postViewData.isEdited
+                                            ? 'Edited'
+                                            : '',
+                                        style: const LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize: kFontSmall,
+                                            color: kGrey3Color,
+                                          ),
+                                        ),
+                                      )
+                                  : const SizedBox(),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                postViewData!.menuItems.isNotEmpty
-                    ? menuBuilder?.call(_defMenuBuilder()) ?? _defMenuBuilder()
-                    : const SizedBox()
-              ],
+                ],
+              ),
             ),
-          );
+          ),
+          postViewData.menuItems.isNotEmpty
+              ? menuBuilder?.call(_defMenuBuilder()) ?? _defMenuBuilder()
+              : const SizedBox()
+        ],
+      ),
+    );
   }
 
   LMFeedPostHeader copyWith(LMFeedPostHeader header) {
@@ -250,12 +235,13 @@ class LMFeedPostHeader extends StatelessWidget {
       customTitle: header.customTitle ?? customTitle,
       profilePicture: header.profilePicture ?? profilePicture,
       postHeaderStyle: header.postHeaderStyle,
+      postViewData: header.postViewData,
     );
   }
 
   LMFeedMenu _defMenuBuilder() {
     return LMFeedMenu(
-      menuItems: postViewData!.menuItems,
+      menuItems: postViewData.menuItems,
       isFeed: isFeed,
       removeItemIds: const {},
       action: LMFeedMenuAction(),

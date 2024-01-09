@@ -11,7 +11,7 @@ import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 * The topic chip can be customized by passing in the required parameters
 * and can be used in a list of chips
 */
-class LMTopicChip extends StatelessWidget {
+class LMFeedTopicChip extends StatelessWidget {
   // Action to perform after tapping on the topic chip
   final Function(LMTopicViewData)? onIconTap;
   // Required parameters
@@ -42,7 +42,7 @@ class LMTopicChip extends StatelessWidget {
   final EdgeInsets? margin;
   final bool gripChip;
 
-  const LMTopicChip({
+  const LMFeedTopicChip({
     Key? key,
     required this.topic,
     this.backgroundColor,

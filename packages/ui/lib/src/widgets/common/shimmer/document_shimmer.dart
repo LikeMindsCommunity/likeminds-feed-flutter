@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 import 'package:shimmer/shimmer.dart';
 
-class LMDocumentShimmer extends StatelessWidget {
-  const LMDocumentShimmer({super.key});
+class LMFeedDocumentShimmer extends StatelessWidget {
+  const LMFeedDocumentShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -4,14 +4,14 @@ import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-class LMDeleteConfirmationDialog extends StatelessWidget {
+class LMFeedDeleteConfirmationDialog extends StatelessWidget {
   final String title;
   final String content;
   final String userId;
   final Function(String) action;
   final String actionText;
 
-  const LMDeleteConfirmationDialog({
+  const LMFeedDeleteConfirmationDialog({
     super.key,
     required this.title,
     required this.content,
@@ -26,8 +26,8 @@ class LMDeleteConfirmationDialog extends StatelessWidget {
     bool boolVarLoading = false;
     ValueNotifier<bool> rebuildReasonBox = ValueNotifier(false);
     DeleteReason? reasonForDeletion;
-    bool isCm = LMUserLocalPreference.instance.fetchMemberState();
-    User? user = LMUserLocalPreference.instance.fetchUserData();
+    bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
+    User? user = LMFeedUserLocalPreference.instance.fetchUserData();
 
     return Dialog(
       shape: RoundedRectangleBorder(

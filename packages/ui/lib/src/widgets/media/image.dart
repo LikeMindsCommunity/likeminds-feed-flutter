@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 
-class LMImage extends StatefulWidget {
-  const LMImage({
+class LMFeedImage extends StatefulWidget {
+  const LMFeedImage({
     super.key,
     this.imageUrl,
     this.imageFile,
@@ -39,10 +39,10 @@ class LMImage extends StatefulWidget {
   final Function(String, StackTrace)? onError;
 
   @override
-  State<LMImage> createState() => _LMImageState();
+  State<LMFeedImage> createState() => _LMImageState();
 }
 
-class _LMImageState extends State<LMImage> {
+class _LMImageState extends State<LMFeedImage> {
   @override
   Widget build(BuildContext context) {
     return widget.imageUrl != null
@@ -67,7 +67,7 @@ class _LMImageState extends State<LMImage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           LMFeedIcon(
-                            type: LMIconType.icon,
+                            type: LMFeedIconType.icon,
                             icon: Icons.error_outline,
                             style: LMFeedIconStyle(
                               size: 24,

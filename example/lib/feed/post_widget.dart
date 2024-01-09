@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
+Widget clientPostWidgetBuilder(
+    BuildContext context, LMFeedPostWidget postWidget) {
   Size screenSize = MediaQuery.of(context).size;
   return Container(
     decoration: BoxDecoration(
@@ -15,7 +16,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
       ],
     ),
     child: postWidget.copyWith(
-      footerBuilder: (context, postFooter) {
+      footerBuilder: (context, postFooter, postViewData) {
         return postFooter;
       },
     ),
@@ -27,7 +28,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //     LMPostViewData postViewData,
 //     LMCommentViewData commentViewData,
 //     LMUserViewData user) {
-//   return LMCommentTile(
+//   return LMFeedCommentTile(
 //     user: user,
 //     comment: commentViewData,
 //     onTagTap: (String userId) {},
@@ -78,12 +79,12 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //           }
 //         },
 //         icon: const LMFeedIcon(
-//           type: LMIconType.icon,
+//           type: LMFeedIconType.icon,
 //           icon: Icons.thumb_up_alt_outlined,
 //           size: 20,
 //         ),
 //         activeIcon: const LMFeedIcon(
-//           type: LMIconType.svg,
+//           type: LMFeedIconType.svg,
 //           color: Colors.red,
 //           assetPath: clientLikeFilled,
 //           size: 20,
@@ -102,8 +103,8 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //                 )),
 //             onTap: () {
 //               LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-//                     ..commentActionEntity(LMCommentType.parent)
-//                     ..commentActionType(LMCommentActionType.replying)
+//                     ..commentActionEntity(LMFeedCommentType.parent)
+//                     ..commentActionType(LMFeedCommentActionType.replying)
 //                     ..level(0)
 //                     ..user(_postDetailScreenHandler!
 //                         .users[commentViewData.userId]!)
@@ -111,12 +112,12 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //                   .build();
 
 //               _postDetailScreenHandler!.commentHandlerBloc
-//                   .add(LMCommentOngoingEvent(commentMetaData: commentMetaData));
+//                   .add(LMFeedCommentOngoingEvent(commentMetaData: commentMetaData));
 
 //               _postDetailScreenHandler!.openOnScreenKeyboard();
 //             },
 //             icon: const LMFeedIcon(
-//               type: LMIconType.icon,
+//               type: LMFeedIconType.icon,
 //               icon: Icons.comment_outlined,
 //               size: 20,
 //             ),
@@ -128,16 +129,16 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //                     if (replyShown &&
 //                         commentIdReplyId != null &&
 //                         commentIdReplyId == commentViewData.id) {
-//                       _commentRepliesBloc.add(LMClearCommentReplies());
+//                       _commentRepliesBloc.add(LMFeedClearCommentReplies());
 //                       replyShown = false;
 //                       commentIdReplyId = null;
 //                     } else if (replyShown &&
 //                         commentIdReplyId != null &&
 //                         commentIdReplyId != commentViewData.id) {
-//                       _commentRepliesBloc.add(LMClearCommentReplies());
+//                       _commentRepliesBloc.add(LMFeedClearCommentReplies());
 //                       replyShown = true;
 //                       commentIdReplyId = commentViewData.id;
-//                       _commentRepliesBloc.add(LMGetCommentReplies(
+//                       _commentRepliesBloc.add(LMFeedGetCommentReplies(
 //                           commentDetailRequest: (GetCommentRequestBuilder()
 //                                 ..commentId(commentViewData.id)
 //                                 ..postId(widget.postId)
@@ -147,7 +148,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //                     } else {
 //                       replyShown = true;
 //                       commentIdReplyId = commentViewData.id;
-//                       _commentRepliesBloc.add(LMGetCommentReplies(
+//                       _commentRepliesBloc.add(LMFeedGetCommentReplies(
 //                           commentDetailRequest: (GetCommentRequestBuilder()
 //                                 ..commentId(commentViewData.id)
 //                                 ..postId(widget.postId)
@@ -184,7 +185,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //                   action: (String reason) async {
 //                     Navigator.of(childContext).pop();
 
-//                     LMAnalyticsBloc.instance.add(LMFireAnalyticsEvent(
+//                     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
 //                       eventName: LMAnalyticsKeys.commentDeleted,
 //                       eventProperties: {
 //                         "post_id": widget.postId,
@@ -203,14 +204,14 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 
 //                     LMCommentMetaData commentMetaData =
 //                         (LMCommentMetaDataBuilder()
-//                               ..commentActionEntity(LMCommentType.parent)
-//                               ..commentActionType(LMCommentActionType.delete)
+//                               ..commentActionEntity(LMFeedCommentType.parent)
+//                               ..commentActionType(LMFeedCommentActionType.delete)
 //                               ..level(0)
 //                               ..commentId(commentViewData.id))
 //                             .build();
 
 //                     _postDetailScreenHandler!.commentHandlerBloc.add(
-//                         LMCommentActionEvent(
+//                         LMFeedCommentActionEvent(
 //                             commentActionRequest: deleteCommentRequest,
 //                             commentMetaData: commentMetaData));
 //                   },
@@ -219,14 +220,14 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //       } else if (id == commentEditId) {
 //         debugPrint('Editing functionality');
 //         LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-//               ..commentActionEntity(LMCommentType.parent)
-//               ..commentActionType(LMCommentActionType.edit)
+//               ..commentActionEntity(LMFeedCommentType.parent)
+//               ..commentActionType(LMFeedCommentActionType.edit)
 //               ..level(0)
 //               ..commentId(commentViewData.id))
 //             .build();
 
 //         _postDetailScreenHandler!.commentHandlerBloc
-//             .add(LMCommentOngoingEvent(commentMetaData: commentMetaData));
+//             .add(LMFeedCommentOngoingEvent(commentMetaData: commentMetaData));
 //       }
 //     },
 //   );

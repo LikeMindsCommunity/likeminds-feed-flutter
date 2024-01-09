@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
-class LMProfilePicture extends StatelessWidget {
-  const LMProfilePicture({
+class LMFeedProfilePicture extends StatelessWidget {
+  const LMFeedProfilePicture({
     super.key,
     this.imageUrl,
     required this.fallbackText,

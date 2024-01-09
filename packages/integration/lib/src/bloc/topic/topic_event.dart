@@ -1,22 +1,22 @@
 part of 'topic_bloc.dart';
 
-abstract class LMTopicEvent extends Equatable {}
+abstract class LMFeedTopicEvent extends Equatable {}
 
-class LMInitTopicEvent extends LMTopicEvent {
+class LMFeedInitTopicEvent extends LMFeedTopicEvent {
   @override
   List<Object> get props => [];
 }
 
-class LMGetTopic extends LMTopicEvent {
+class LMFeedGetTopicEvent extends LMFeedTopicEvent {
   final GetTopicsRequest getTopicFeedRequest;
 
-  LMGetTopic({required this.getTopicFeedRequest});
+  LMFeedGetTopicEvent({required this.getTopicFeedRequest});
 
   @override
   List<Object> get props => [getTopicFeedRequest.toJson()];
 }
 
-class LMRefreshTopicEvent extends LMTopicEvent {
+class LMFeedRefreshTopicEvent extends LMFeedTopicEvent {
   @override
   List<Object> get props => [];
 }

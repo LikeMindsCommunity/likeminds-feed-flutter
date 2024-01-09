@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 // Displays a tile for a topic
 // The tile can be customized by passing in the required parameters
 // Tile has a text and an icon
 // The tile can be tapped to perform an action
 // Icon is displayed only if the tile is selected
-class LMTopicTile extends StatelessWidget {
+class LMFeedTopicTile extends StatelessWidget {
   // Action to perform after tapping on the tile, required
   final Function(LMTopicViewData) onTap;
   // Alignment of the row of the tile, defaults to
@@ -28,7 +27,7 @@ class LMTopicTile extends StatelessWidget {
   // [LMTopicViewData], consists id, topic and isEnabled boolean, required
   final LMTopicViewData topic;
 
-  const LMTopicTile({
+  const LMFeedTopicTile({
     Key? key,
     required this.topic,
     required this.icon,

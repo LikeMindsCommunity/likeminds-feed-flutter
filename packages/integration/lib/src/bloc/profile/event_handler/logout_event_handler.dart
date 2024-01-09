@@ -1,4 +1,5 @@
 part of '../profile_bloc.dart';
 
-void handleLMLogoutEvent(LMLogout event, Emitter<LMProfileState> emit) =>
-    emit(LMLogoutState());
+void handleLMLogoutEvent(
+        LMFeedLogoutEvent event, Emitter<LMFeedProfileState> emit) =>
+    emit(LMFeedLogoutState());
