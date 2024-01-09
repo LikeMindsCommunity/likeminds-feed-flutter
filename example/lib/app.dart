@@ -54,7 +54,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
                       future: memberState,
                       builder: (context, snapshot) {
                         if (snapshot.hasData && snapshot.data!.success) {
-                          return const LMPostComposeScreen();
+                          return const LMFeedPostComposeScreen();
                         } else if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return const Center(

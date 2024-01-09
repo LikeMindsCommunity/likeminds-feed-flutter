@@ -189,10 +189,12 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
                       absorbing: true,
                       child: LMFeedProfilePicture(
                         fallbackText: opt.name!,
-                        backgroundColor: LMThemeData.kPrimaryColor,
+                        style: const LMFeedProfilePictureStyle(
+                          size: 32,
+                          backgroundColor: LMThemeData.kPrimaryColor,
+                        ),
                         imageUrl: opt.imageUrl!,
                         onTap: null,
-                        size: 32,
                       ),
                     ),
                     const SizedBox(width: 12),

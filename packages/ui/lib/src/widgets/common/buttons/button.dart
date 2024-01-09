@@ -73,12 +73,12 @@ class _LMButtonState extends State<LMFeedButton> {
           mainAxisAlignment:
               inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
           children: [
-            inStyle.placement == LMIconButtonPlacement.start
+            inStyle.placement == LMFeedIconButtonPlacement.start
                 ? widget.isActive
                     ? widget.activeIcon ?? const SizedBox()
                     : widget.icon ?? const SizedBox()
                 : const SizedBox(),
-            inStyle.placement == LMIconButtonPlacement.start
+            inStyle.placement == LMFeedIconButtonPlacement.start
                 ? (widget.icon != null || widget.activeIcon != null)
                     ? SizedBox(width: inStyle.margin ?? 8)
                     : const SizedBox()
@@ -86,12 +86,12 @@ class _LMButtonState extends State<LMFeedButton> {
             widget.isActive
                 ? widget.activeText ?? widget.text ?? const SizedBox()
                 : widget.text ?? const LMFeedText(text: "LMButton"),
-            inStyle.placement == LMIconButtonPlacement.end
+            inStyle.placement == LMFeedIconButtonPlacement.end
                 ? (widget.icon != null || widget.activeIcon != null)
                     ? SizedBox(width: inStyle.margin ?? 8)
                     : const SizedBox()
                 : const SizedBox(),
-            inStyle.placement == LMIconButtonPlacement.end
+            inStyle.placement == LMFeedIconButtonPlacement.end
                 ? widget.isActive
                     ? widget.activeIcon ?? const SizedBox()
                     : widget.icon ?? const SizedBox()
@@ -134,7 +134,7 @@ class LMFeedButtonStyle {
   final Border? border;
 
   /// placement of the icon in the button
-  final LMIconButtonPlacement? placement;
+  final LMFeedIconButtonPlacement? placement;
 
   /// axis alignment for setting button's icon and text spacing
   final MainAxisAlignment? mainAxisAlignment;
@@ -161,7 +161,7 @@ class LMFeedButtonStyle {
       border: Border.all(),
       borderRadius: 8,
       height: 42,
-      placement: LMIconButtonPlacement.start,
+      placement: LMFeedIconButtonPlacement.start,
       margin: 4,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     );

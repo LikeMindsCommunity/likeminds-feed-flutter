@@ -38,7 +38,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
   // or after the text of the topic chip
   // LMIconPlacement.start places the icon before the text
   // LMIconPlacement.end places the icon after the text
-  final LMIconButtonPlacement iconPlacement;
+  final LMFeedIconButtonPlacement iconPlacement;
 
   const LMFeedTopicFeedBar({
     Key? key,
@@ -58,7 +58,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
     this.height,
     this.showDivider = true,
     this.emptyTopicChip,
-    this.iconPlacement = LMIconButtonPlacement.end,
+    this.iconPlacement = LMFeedIconButtonPlacement.end,
   }) : super(key: key);
 
   // Topic feed bar with selected topics

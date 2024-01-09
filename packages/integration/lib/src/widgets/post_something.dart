@@ -56,16 +56,18 @@ class LMFeedPostSomething extends StatelessWidget {
             children: <Widget>[
               LMFeedProfilePicture(
                 fallbackText: user.name,
-                backgroundColor: LMThemeData.theme.primaryColor,
+                style: LMFeedProfilePictureStyle(
+                  boxShape: BoxShape.circle,
+                  backgroundColor: LMThemeData.theme.primaryColor,
+                  size: 36,
+                ),
                 imageUrl: user.imageUrl,
-                boxShape: BoxShape.circle,
                 onTap: () {
                   if (user.sdkClientInfo != null) {
                     LMFeedCore.client
                         .routeToProfile(user.sdkClientInfo!.userUniqueId);
                   }
                 },
-                size: 36,
               ),
               LMThemeData.kHorizontalPaddingMedium,
               const LMFeedText(text: "Post something...")

@@ -3,7 +3,6 @@ import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 Widget clientPostWidgetBuilder(
     BuildContext context, LMFeedPostWidget postWidget) {
-  Size screenSize = MediaQuery.of(context).size;
   return Container(
     decoration: BoxDecoration(
       boxShadow: [
