@@ -82,10 +82,10 @@ class LMFeedLinkPreview extends StatelessWidget {
       child: Container(
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          color: kWhiteColor,
+          color: Colors.white,
           border: border ??
               Border.all(
-                color: kGrey3Color,
+                color: Colors.grey.shade300,
                 width: 0.5,
               ),
           borderRadius: BorderRadius.circular(8.0),
@@ -125,7 +125,7 @@ class LMFeedLinkPreview extends StatelessWidget {
                                     'NOT PRODUCING',
                             style: const LMFeedTextStyle(
                               textStyle: TextStyle(
-                                color: kGrey1Color,
+                                color: Colors.grey,
                                 fontSize: kFontMedium,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -142,10 +142,10 @@ class LMFeedLinkPreview extends StatelessWidget {
                                 : attachment!
                                         .attachmentMeta.ogTags!.description ??
                                     'NOT PRODUCING',
-                            style: const LMFeedTextStyle(
+                            style: LMFeedTextStyle(
                               maxLines: 2,
                               textStyle: TextStyle(
-                                color: kGrey3Color,
+                                color: Colors.grey.shade300,
                                 fontSize: kFontSmall,
                               ),
                             ),
@@ -163,10 +163,10 @@ class LMFeedLinkPreview extends StatelessWidget {
                                       ? attachment!.attachmentMeta.ogTags!.url!
                                           .toLowerCase()
                                       : 'NOT PRODUCING',
-                              style: const LMFeedTextStyle(
+                              style: LMFeedTextStyle(
                                 maxLines: 1,
                                 textStyle: TextStyle(
-                                  color: kGrey3Color,
+                                  color: Colors.grey.shade300,
                                   fontSize: kFontXSmall,
                                 ),
                               ),

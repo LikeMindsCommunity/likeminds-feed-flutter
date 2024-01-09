@@ -40,7 +40,7 @@ class LMFeedTopicFeedGrid extends StatelessWidget {
   // after the text of the topic chip
   // LMIconPlacement.start places the icon before the text
   // LMIconPlacement.end places the icon after the text
-  final LMIconPlacement iconPlacement;
+  final LMIconButtonPlacement iconPlacement;
 
   const LMFeedTopicFeedGrid({
     Key? key,
@@ -61,7 +61,7 @@ class LMFeedTopicFeedGrid extends StatelessWidget {
     required this.height,
     this.showDivider = true,
     this.emptyTopicChip,
-    this.iconPlacement = LMIconPlacement.end,
+    this.iconPlacement = LMIconButtonPlacement.end,
   }) : super(key: key);
 
   Widget selectedTopicsWidget(double width) {
@@ -146,7 +146,7 @@ class LMFeedTopicFeedGrid extends StatelessWidget {
           border: showDivider
               ? Border(
                   bottom: BorderSide(
-                    color: kGrey2Color.withOpacity(0.1),
+                    color: Colors.grey.withOpacity(0.1),
                   ),
                 )
               : null,

@@ -22,14 +22,14 @@ class LMFeedUserTileShimmer extends StatelessWidget {
               height: 50,
               width: 50,
               child: CircleAvatar(
-                backgroundColor: kWhiteColor,
+                backgroundColor: Colors.white,
               ),
             ),
             kHorizontalPaddingXLarge,
             Container(
               height: 12,
               width: 150,
-              color: kWhiteColor,
+              color: Colors.white,
             )
           ],
         ),

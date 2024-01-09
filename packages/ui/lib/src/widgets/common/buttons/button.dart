@@ -61,7 +61,7 @@ class _LMButtonState extends State<LMFeedButton> {
         widget.onTap();
       },
       child: Container(
-        height: inStyle.height ?? 32,
+        height: inStyle.height,
         width: inStyle.width,
         padding: inStyle.padding ?? EdgeInsets.zero,
         decoration: BoxDecoration(
@@ -73,25 +73,25 @@ class _LMButtonState extends State<LMFeedButton> {
           mainAxisAlignment:
               inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
           children: [
-            inStyle.placement == LMIconPlacement.start
+            inStyle.placement == LMIconButtonPlacement.start
                 ? widget.isActive
                     ? widget.activeIcon ?? const SizedBox()
                     : widget.icon ?? const SizedBox()
                 : const SizedBox(),
-            inStyle.placement == LMIconPlacement.start
+            inStyle.placement == LMIconButtonPlacement.start
                 ? (widget.icon != null || widget.activeIcon != null)
                     ? SizedBox(width: inStyle.margin ?? 8)
                     : const SizedBox()
                 : const SizedBox(),
             widget.isActive
                 ? widget.activeText ?? widget.text ?? const SizedBox()
-                : widget.text ?? const SizedBox(),
-            inStyle.placement == LMIconPlacement.end
+                : widget.text ?? const LMFeedText(text: "LMButton"),
+            inStyle.placement == LMIconButtonPlacement.end
                 ? (widget.icon != null || widget.activeIcon != null)
                     ? SizedBox(width: inStyle.margin ?? 8)
                     : const SizedBox()
                 : const SizedBox(),
-            inStyle.placement == LMIconPlacement.end
+            inStyle.placement == LMIconButtonPlacement.end
                 ? widget.isActive
                     ? widget.activeIcon ?? const SizedBox()
                     : widget.icon ?? const SizedBox()
@@ -134,7 +134,7 @@ class LMFeedButtonStyle {
   final Border? border;
 
   /// placement of the icon in the button
-  final LMIconPlacement? placement;
+  final LMIconButtonPlacement? placement;
 
   /// axis alignment for setting button's icon and text spacing
   final MainAxisAlignment? mainAxisAlignment;
@@ -158,11 +158,10 @@ class LMFeedButtonStyle {
     return LMFeedButtonStyle(
       padding: const EdgeInsets.all(4),
       backgroundColor: Colors.transparent,
-      border: Border.all(color: Colors.blue),
+      border: Border.all(),
       borderRadius: 8,
       height: 42,
-      width: 72,
-      placement: LMIconPlacement.start,
+      placement: LMIconButtonPlacement.start,
       margin: 4,
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     );

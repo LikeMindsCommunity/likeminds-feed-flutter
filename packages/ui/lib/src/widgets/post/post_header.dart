@@ -60,11 +60,13 @@ class LMFeedPostHeader extends StatelessWidget {
                 children: [
                   profilePicture ??
                       LMFeedProfilePicture(
-                        size: postHeaderStyle.imageSize ?? 42,
+                        style: LMFeedProfilePictureStyle(
+                          fallbackTextStyle: postHeaderStyle.fallbackTextStyle,
+                          size: postHeaderStyle.imageSize ?? 42,
+                        ),
                         fallbackText: user.name,
                         imageUrl: user.imageUrl,
                         onTap: onProfileTap,
-                        fallbackTextStyle: postHeaderStyle.fallbackTextStyle,
                       ),
                   kHorizontalPaddingLarge,
                   Container(
@@ -88,10 +90,10 @@ class LMFeedPostHeader extends StatelessWidget {
                                   child: titleText ??
                                       LMFeedText(
                                         text: user.name,
-                                        style: const LMFeedTextStyle(
+                                        style: LMFeedTextStyle(
                                           textStyle: TextStyle(
                                             fontSize: kFontMedium,
-                                            color: kGrey1Color,
+                                            color: Colors.grey[900],
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
@@ -133,7 +135,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                                         // maxLines: 1,
                                                         style: TextStyle(
                                                           fontSize: kFontSmall,
-                                                          color: kWhiteColor,
+                                                          color: Colors.white,
                                                           fontWeight:
                                                               FontWeight.w600,
                                                           fontStyle: user.name
@@ -159,10 +161,10 @@ class LMFeedPostHeader extends StatelessWidget {
                                   : const SizedBox(),
                               LMFeedText(
                                 text: subText != null ? '·' : '',
-                                style: const LMFeedTextStyle(
+                                style: LMFeedTextStyle(
                                   textStyle: TextStyle(
                                     fontSize: kFontSmall,
-                                    color: kGrey3Color,
+                                    color: Colors.grey[700],
                                   ),
                                 ),
                               ),
@@ -172,20 +174,20 @@ class LMFeedPostHeader extends StatelessWidget {
                               createdAt ??
                                   LMFeedText(
                                     text: postViewData.createdAt.timeAgo(),
-                                    style: const LMFeedTextStyle(
+                                    style: LMFeedTextStyle(
                                       textStyle: TextStyle(
                                         fontSize: kFontSmall,
-                                        color: kGrey3Color,
+                                        color: Colors.grey[700],
                                       ),
                                     ),
                                   ),
                               kHorizontalPaddingSmall,
                               LMFeedText(
                                 text: postViewData.isEdited ? '·' : '',
-                                style: const LMFeedTextStyle(
+                                style: LMFeedTextStyle(
                                   textStyle: TextStyle(
                                     fontSize: kFontSmall,
-                                    color: kGrey3Color,
+                                    color: Colors.grey[700],
                                   ),
                                 ),
                               ),
@@ -196,10 +198,10 @@ class LMFeedPostHeader extends StatelessWidget {
                                         text: postViewData.isEdited
                                             ? 'Edited'
                                             : '',
-                                        style: const LMFeedTextStyle(
+                                        style: LMFeedTextStyle(
                                           textStyle: TextStyle(
                                             fontSize: kFontSmall,
-                                            color: kGrey3Color,
+                                            color: Colors.grey[700],
                                           ),
                                         ),
                                       )
@@ -255,7 +257,7 @@ class LMFeedPostHeaderStyle {
   final double? width;
   final double? height;
   final double? imageSize;
-  final TextStyle? fallbackTextStyle;
+  final LMFeedTextStyle? fallbackTextStyle;
   final bool showCustomTitle;
 
   const LMFeedPostHeaderStyle({

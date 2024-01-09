@@ -99,7 +99,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                   color: widget.backgroundColor,
                   border: widget.showBorder
                       ? Border.all(
-                          color: widget.borderColor ?? kGreyWebBGColor,
+                          color: widget.borderColor ?? Colors.grey,
                           width: widget.borderSize ?? 1,
                         )
                       : null,
@@ -135,7 +135,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                   overflow: TextOverflow.ellipsis,
                                   textStyle: TextStyle(
                                     fontSize: 14,
-                                    color: widget.textColor ?? kGrey2Color,
+                                    color: widget.textColor ?? Colors.grey,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -148,22 +148,28 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                   Text(
                                     _fileSize!.toUpperCase(),
                                     style: TextStyle(
-                                        fontSize: kFontSmall,
-                                        color: widget.textColor ?? kGrey3Color),
+                                      fontSize: kFontSmall,
+                                      color: widget.textColor ??
+                                          Colors.grey.shade300,
+                                    ),
                                   ),
                                   kHorizontalPaddingXSmall,
                                   Text(
                                     '·',
                                     style: TextStyle(
-                                        fontSize: kFontSmall,
-                                        color: widget.textColor ?? kGrey3Color),
+                                      fontSize: kFontSmall,
+                                      color: widget.textColor ??
+                                          Colors.grey.shade300,
+                                    ),
                                   ),
                                   kHorizontalPaddingXSmall,
                                   Text(
                                     _fileExtension!.toUpperCase(),
                                     style: TextStyle(
-                                        fontSize: kFontSmall,
-                                        color: widget.textColor ?? kGrey3Color),
+                                      fontSize: kFontSmall,
+                                      color: widget.textColor ??
+                                          Colors.grey.shade300,
+                                    ),
                                   ),
                                 ],
                               )

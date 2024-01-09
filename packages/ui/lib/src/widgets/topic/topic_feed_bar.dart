@@ -38,7 +38,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
   // or after the text of the topic chip
   // LMIconPlacement.start places the icon before the text
   // LMIconPlacement.end places the icon after the text
-  final LMIconPlacement iconPlacement;
+  final LMIconButtonPlacement iconPlacement;
 
   const LMFeedTopicFeedBar({
     Key? key,
@@ -58,7 +58,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
     this.height,
     this.showDivider = true,
     this.emptyTopicChip,
-    this.iconPlacement = LMIconPlacement.end,
+    this.iconPlacement = LMIconButtonPlacement.end,
   }) : super(key: key);
 
   // Topic feed bar with selected topics
@@ -134,7 +134,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
                     child: const Text(
                       "Clear",
                       style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Colors.blue,
                       ),
                     ),
                   ),
@@ -186,7 +186,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
               ? Border(
                   bottom: BorderSide(
                     width: 0.1,
-                    color: kGrey2Color.withOpacity(0.05),
+                    color: Colors.grey.withOpacity(0.05),
                   ),
                 )
               : null,

@@ -37,7 +37,7 @@ class LMFeedTopicChip extends StatelessWidget {
   // or after the text of the topic chip
   // LMIconPlacement.start places the icon before the text
   // LMIconPlacement.end places the icon after the text
-  final LMIconPlacement iconPlacement;
+  final LMIconButtonPlacement iconPlacement;
   final double? height;
   final EdgeInsets? margin;
   final bool gripChip;
@@ -55,7 +55,7 @@ class LMFeedTopicChip extends StatelessWidget {
     this.onIconTap,
     this.borderRadius,
     this.height,
-    this.iconPlacement = LMIconPlacement.end,
+    this.iconPlacement = LMIconButtonPlacement.end,
     this.margin,
     this.gripChip = false,
   }) : super(key: key);
@@ -91,7 +91,7 @@ class LMFeedTopicChip extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon != null && iconPlacement == LMIconPlacement.start
+          icon != null && iconPlacement == LMIconButtonPlacement.start
               ? GestureDetector(
                   onTap: onIconTap != null ? () => onIconTap!(topic) : null,
                   child: Container(
@@ -100,7 +100,7 @@ class LMFeedTopicChip extends StatelessWidget {
                   ),
                 )
               : const SizedBox(),
-          icon != null && iconPlacement == LMIconPlacement.start
+          icon != null && iconPlacement == LMIconButtonPlacement.start
               ? kHorizontalPaddingSmall
               : const SizedBox(),
           topic.name.isEmpty
@@ -108,10 +108,10 @@ class LMFeedTopicChip extends StatelessWidget {
               : gripChip
                   ? Expanded(child: topicText)
                   : topicText,
-          icon != null && iconPlacement == LMIconPlacement.end
+          icon != null && iconPlacement == LMIconButtonPlacement.end
               ? kHorizontalPaddingSmall
               : const SizedBox(),
-          icon != null && iconPlacement == LMIconPlacement.end
+          icon != null && iconPlacement == LMIconButtonPlacement.end
               ? GestureDetector(
                   onTap: onIconTap != null ? () => onIconTap!(topic) : null,
                   child: Container(

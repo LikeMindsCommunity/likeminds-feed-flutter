@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 final customThemeData = ThemeData(
-  useMaterial3: true,
-  colorSchemeSeed: Colors.blue,
+  useMaterial3: false,
+  colorSchemeSeed: Colors.green,
+  scaffoldBackgroundColor: Colors.white,
   textTheme: const TextTheme(),
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(

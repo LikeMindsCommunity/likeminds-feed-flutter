@@ -239,7 +239,10 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                             user: user,
                             profilePicture: LMFeedProfilePicture(
                               imageUrl: user.imageUrl,
-                              backgroundColor: LMThemeData.kPrimaryColor,
+                              style: const LMFeedProfilePictureStyle(
+                                size: 32,
+                                backgroundColor: LMThemeData.kPrimaryColor,
+                              ),
                               fallbackText: user.name,
                               onTap: () {
                                 if (user.sdkClientInfo != null) {
@@ -248,7 +251,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                                           user.sdkClientInfo!.userUniqueId);
                                 }
                               },
-                              size: 32,
                             ),
                             subtitleText: LMFeedText(
                               text:

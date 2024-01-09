@@ -151,25 +151,6 @@ class LikesTile extends StatelessWidget {
             : LMFeedUserTile(
                 user: user!,
                 onTap: () {},
-                titleText: LMFeedText(
-                  text: user!.name,
-                  style: const LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                subText: LMFeedText(
-                  text: "@${user!.name.toLowerCase().split(" ").join("")}",
-                  style: const LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: LMThemeData.kGreyColor,
-                    ),
-                  ),
-                ),
               ),
       );
     } else {

@@ -45,12 +45,12 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
         padding: margin ?? EdgeInsets.zero,
         child: Container(
           decoration: BoxDecoration(
-            color: backgroundColor ?? kWhiteColor,
+            color: backgroundColor ?? Colors.white,
             border: border ??
                 const Border(
                   bottom: BorderSide(
                     width: 0.1,
-                    color: kGrey1Color,
+                    color: Colors.grey,
                   ),
                 ),
           ),

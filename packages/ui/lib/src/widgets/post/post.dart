@@ -152,7 +152,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
         },
         child: Container(
           decoration: BoxDecoration(
-            color: kWhiteColor,
+            color: Colors.white,
             borderRadius: widget.borderRadius,
             boxShadow: widget.boxShadow,
           ),

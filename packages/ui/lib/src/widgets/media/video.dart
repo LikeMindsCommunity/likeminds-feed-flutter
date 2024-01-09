@@ -206,7 +206,7 @@ class _LMVideoState extends VisibilityAwareState<LMFeedVideo> {
                           bottomButtonBar: [
                             const MaterialPositionIndicator(
                               style: TextStyle(
-                                color: kWhiteColor,
+                                color: Colors.white,
                                 fontSize: 14,
                               ),
                             ),
@@ -227,7 +227,7 @@ class _LMVideoState extends VisibilityAwareState<LMFeedVideo> {
                                     return LMFeedIcon(
                                       type: LMFeedIconType.icon,
                                       style: const LMFeedIconStyle(
-                                        color: kWhiteColor,
+                                        color: Colors.white,
                                       ),
                                       icon: isMuted
                                           ? Icons.volume_off

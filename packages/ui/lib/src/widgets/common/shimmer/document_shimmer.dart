@@ -11,7 +11,7 @@ class LMFeedDocumentShimmer extends StatelessWidget {
       height: 78,
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-          border: Border.all(color: kGreyWebBGColor),
+          border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(kBorderRadiusMedium)),
       padding: const EdgeInsets.all(kPaddingLarge),
       child: Shimmer.fromColors(
@@ -21,7 +21,7 @@ class LMFeedDocumentShimmer extends StatelessWidget {
           Container(
             height: 40,
             width: 35,
-            color: kWhiteColor,
+            color: Colors.white,
           ),
           kHorizontalPaddingLarge,
           Column(
@@ -31,7 +31,7 @@ class LMFeedDocumentShimmer extends StatelessWidget {
               Container(
                 height: 8,
                 width: 150,
-                color: kWhiteColor,
+                color: Colors.white,
               ),
               kVerticalPaddingMedium,
               Row(
@@ -39,18 +39,21 @@ class LMFeedDocumentShimmer extends StatelessWidget {
                   Container(
                     height: 6,
                     width: 50,
-                    color: kWhiteColor,
+                    color: Colors.white,
                   ),
                   kHorizontalPaddingXSmall,
                   const Text(
                     '·',
-                    style: TextStyle(fontSize: kFontSmall, color: kGrey3Color),
+                    style: TextStyle(
+                      fontSize: kFontSmall,
+                      color: Colors.grey,
+                    ),
                   ),
                   kHorizontalPaddingXSmall,
                   Container(
                     height: 6,
                     width: 50,
-                    color: kWhiteColor,
+                    color: Colors.white,
                   ),
                 ],
               )

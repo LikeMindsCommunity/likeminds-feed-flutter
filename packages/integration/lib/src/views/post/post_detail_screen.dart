@@ -230,8 +230,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       LMFeedProfilePicture(
                                         fallbackText: currentUser.name,
                                         imageUrl: currentUser.imageUrl,
-                                        backgroundColor:
-                                            LMThemeData.kPrimaryColor,
+                                        style: const LMFeedProfilePictureStyle(
+                                          backgroundColor:
+                                              LMThemeData.kPrimaryColor,
+                                          size: 36,
+                                        ),
                                         onTap: () {
                                           if (currentUser.sdkClientInfo !=
                                               null) {
@@ -241,7 +244,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     .userUniqueId);
                                           }
                                         },
-                                        size: 36,
                                       ),
                                       Expanded(
                                         child: LMTaggingAheadTextField(
@@ -514,14 +516,76 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     return SizedBox(
                                       child: Column(
                                         children: [
-                                          widget.commentBuilder?.call(
-                                                  context,
-                                                  defCommentTile(
-                                                      commentViewData,
-                                                      userViewData),
-                                                  postData!) ??
-                                              defCommentTile(commentViewData,
-                                                  userViewData),
+                                          LMFeedCommentTile(
+                                            user: userViewData,
+                                            comment: commentViewData,
+                                            padding: const EdgeInsets.all(16.0),
+                                            lmFeedMenuAction:
+                                                defLMFeedMenuAction(
+                                                    commentViewData),
+                                            profilePicture:
+                                                LMFeedProfilePicture(
+                                              style:
+                                                  const LMFeedProfilePictureStyle(
+                                                backgroundColor:
+                                                    LMThemeData.kPrimaryColor,
+                                                size: 36,
+                                              ),
+                                              fallbackText:
+                                                  _postDetailScreenHandler!
+                                                      .users[commentViewData
+                                                          .userId]!
+                                                      .name,
+                                              onTap: () {
+                                                if (_postDetailScreenHandler!
+                                                        .users[commentViewData
+                                                            .userId]!
+                                                        .sdkClientInfo !=
+                                                    null) {
+                                                  LMFeedCore
+                                                      .instance.lmFeedClient
+                                                      .routeToProfile(
+                                                          _postDetailScreenHandler!
+                                                              .users[
+                                                                  commentViewData
+                                                                      .userId]!
+                                                              .sdkClientInfo!
+                                                              .userUniqueId);
+                                                }
+                                              },
+                                              imageUrl:
+                                                  _postDetailScreenHandler!
+                                                      .users[commentViewData
+                                                          .userId]!
+                                                      .imageUrl,
+                                            ),
+                                            subtitleText: LMFeedText(
+                                              text:
+                                                  "@${_postDetailScreenHandler!.users[commentViewData.userId]!.name.toLowerCase().split(' ').join()} · ", //${timeago.format(commentViewData.createdAt)}",
+
+                                              style: const LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: LMThemeData
+                                                      .kSecondaryColor700,
+                                                ),
+                                              ),
+                                            ),
+                                            likeButton: defCommentLikeButton(
+                                                commentViewData),
+                                            replyButton: defCommentReplyButton(
+                                                commentViewData),
+                                            showRepliesButton:
+                                                defCommentShowRepliesButton(
+                                                    commentViewData),
+                                            actionsPadding:
+                                                const EdgeInsets.only(left: 48),
+                                            onTagTap: (String userId) {
+                                              LMFeedCore.instance.lmFeedClient
+                                                  .routeToProfile(userId);
+                                            },
+                                          ),
                                           (replyShown &&
                                                   commentIdReplyId ==
                                                       commentViewData.id)
@@ -885,7 +949,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       padding: const EdgeInsets.all(16.0),
       lmFeedMenuAction: defLMFeedMenuAction(commentViewData),
       profilePicture: LMFeedProfilePicture(
-        backgroundColor: LMThemeData.kPrimaryColor,
+        style: const LMFeedProfilePictureStyle(
+          size: 36,
+          backgroundColor: LMThemeData.kPrimaryColor,
+        ),
         fallbackText:
             _postDetailScreenHandler!.users[commentViewData.userId]!.name,
         onTap: () {
@@ -899,7 +966,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         },
         imageUrl:
             _postDetailScreenHandler!.users[commentViewData.userId]!.imageUrl,
-        size: 36,
       ),
       subtitleText: LMFeedText(
         text:

@@ -166,7 +166,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                                             Radius.circular(4),
                                           ),
                                           color: widget.activeIndicatorColor ??
-                                              kPrimaryColor,
+                                              Colors.blue,
                                         ),
                                       )
                                   : widget.inactiveIndicator ??
@@ -181,7 +181,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                                           ),
                                           color:
                                               widget.inactiveIndicatorColor ??
-                                                  kGrey1Color,
+                                                  Colors.grey,
                                         ),
                                       );
                             }).toList())
