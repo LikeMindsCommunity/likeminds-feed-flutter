@@ -361,10 +361,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 12.0,
                                                 vertical: 4.0),
-                                            icon: LMFeedIcon(
+                                            icon: const LMFeedIcon(
                                               type: LMIconType.icon,
                                               icon: CupertinoIcons.chevron_down,
-                                              style: const LMFeedIconStyle(
+                                              style: LMFeedIconStyle(
                                                 size: 16,
                                                 color: LMThemeData.appBlack,
                                               ),
@@ -391,11 +391,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 12.0,
                                                         vertical: 4.0),
-                                                icon: LMFeedIcon(
+                                                icon: const LMFeedIcon(
                                                   type: LMIconType.icon,
                                                   icon: CupertinoIcons
                                                       .chevron_down,
-                                                  style: const LMFeedIconStyle(
+                                                  style: LMFeedIconStyle(
                                                     size: 16,
                                                     color:
                                                         LMThemeData.kWhiteColor,
@@ -459,12 +459,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                     ),
                                                     LMThemeData
                                                         .kHorizontalPaddingSmall,
-                                                    LMFeedIcon(
+                                                    const LMFeedIcon(
                                                       type: LMIconType.icon,
                                                       icon: CupertinoIcons
                                                           .chevron_down,
-                                                      style:
-                                                          const LMFeedIconStyle(
+                                                      style: LMFeedIconStyle(
                                                         size: 16,
                                                         color: LMThemeData
                                                             .kWhiteColor,
@@ -568,10 +567,10 @@ class _FeedRoomViewState extends State<FeedRoomView> {
           ),
         );
       } else if (media.mediaType == LMMediaType.document) {
-        return LMFeedIcon(
+        return const LMFeedIcon(
           type: LMIconType.svg,
           assetPath: kAssetDocPDFIcon,
-          style: const LMFeedIconStyle(
+          style: LMFeedIconStyle(
             color: Colors.red,
             size: 35,
             boxPadding: 0,
@@ -861,10 +860,10 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  LMFeedIcon(
+                                  const LMFeedIcon(
                                     type: LMIconType.icon,
                                     icon: Icons.post_add,
-                                    style: const LMFeedIconStyle(
+                                    style: LMFeedIconStyle(
                                       size: 48,
                                     ),
                                   ),

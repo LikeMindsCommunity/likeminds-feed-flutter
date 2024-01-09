@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/packages/linkify/linkify.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 class LMTaggingHelper {
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
@@ -171,7 +170,7 @@ class LMTaggingHelper {
             text: text.substring(lastIndex, startIndex),
             style: const TextStyle(
               wordSpacing: 1.5,
-              color: kGrey1Color,
+              color: Colors.grey,
             ),
           ),
         );
@@ -183,7 +182,7 @@ class LMTaggingHelper {
           style: const TextStyle(
             wordSpacing: 1.5,
             fontWeight: FontWeight.bold,
-            color: kGrey1Color,
+            color: Colors.grey,
           ),
         ),
       );
@@ -195,7 +194,7 @@ class LMTaggingHelper {
       // Add a TextSpan for the remaining text
       textSpans.add(TextSpan(
         text: text.substring(lastIndex),
-        style: const TextStyle(wordSpacing: 1.5, color: kGrey1Color),
+        style: const TextStyle(wordSpacing: 1.5, color: Colors.grey),
       ));
     }
 

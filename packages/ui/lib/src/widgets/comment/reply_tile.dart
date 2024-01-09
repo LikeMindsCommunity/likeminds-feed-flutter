@@ -52,7 +52,7 @@ class _LMReplyTileState extends State<LMReplyTile> {
     final ThemeData theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: widget.backgroundColor ?? kWhiteColor,
+        color: widget.backgroundColor ?? Colors.white,
         borderRadius: widget.borderRadius,
       ),
       width: widget.width,
@@ -135,20 +135,20 @@ class _LMReplyTileState extends State<LMReplyTile> {
                   [
                     LMFeedButton(
                       onTap: () {},
-                      text: const LMFeedText(
+                      text: LMFeedText(
                         text: 'Like',
                         style: LMFeedTextStyle(
                           textStyle: TextStyle(
                             fontSize: 14,
-                            color: kGrey2Color,
+                            color: Colors.grey.shade200,
                           ),
                         ),
                       ),
-                      icon: const LMFeedIcon(
+                      icon: LMFeedIcon(
                         type: LMIconType.icon,
                         icon: Icons.favorite_outline,
                         style: LMFeedIconStyle(
-                          color: kGrey2Color,
+                          color: Colors.grey.shade200,
                           size: 16,
                         ),
                       ),
@@ -157,7 +157,7 @@ class _LMReplyTileState extends State<LMReplyTile> {
                         type: LMIconType.icon,
                         style: LMFeedIconStyle(
                           size: 16,
-                          color: kPrimaryColor,
+                          color: Colors.blue,
                         ),
                       ),
                     ),

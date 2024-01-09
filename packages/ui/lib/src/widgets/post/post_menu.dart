@@ -50,7 +50,7 @@ class LMFeedMenu extends StatelessWidget {
                             text: element.title,
                             style: const LMFeedTextStyle(
                               textStyle: TextStyle(
-                                color: kGreyColor,
+                                color: Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -59,14 +59,14 @@ class LMFeedMenu extends StatelessWidget {
                     ),
                   )
                   .toList(),
-              color: kWhiteColor,
+              color: Colors.white,
               child: menuIcon ??
                   const SizedBox(
                     height: 24,
                     width: 24,
                     child: Icon(
                       Icons.more_horiz,
-                      color: kGrey1Color,
+                      color: Colors.grey,
                       size: 24,
                     ),
                   ),

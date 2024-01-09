@@ -27,7 +27,7 @@ class LMFeedShimmer extends StatelessWidget {
                         height: 52,
                         width: 52,
                         decoration: const BoxDecoration(
-                          color: kWhiteColor,
+                          color: Colors.white,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -41,7 +41,7 @@ class LMFeedShimmer extends StatelessWidget {
                               width: 226,
                               clipBehavior: Clip.antiAlias,
                               decoration: ShapeDecoration(
-                                color: kWhiteColor,
+                                color: Colors.white,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6)),
                               ),
@@ -52,7 +52,7 @@ class LMFeedShimmer extends StatelessWidget {
                               height: 14,
                               clipBehavior: Clip.antiAlias,
                               decoration: ShapeDecoration(
-                                color: kWhiteColor,
+                                color: Colors.white,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6)),
                               ),
@@ -68,7 +68,7 @@ class LMFeedShimmer extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 height: 16,
                 decoration: ShapeDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)),
                 ),
@@ -79,7 +79,7 @@ class LMFeedShimmer extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 height: 16,
                 decoration: ShapeDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)),
                 ),
@@ -90,7 +90,7 @@ class LMFeedShimmer extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 height: 16,
                 decoration: ShapeDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)),
                 ),
@@ -104,21 +104,21 @@ class LMFeedShimmer extends StatelessWidget {
                       height: 20,
                       width: 20,
                       decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: kWhiteColor),
+                          shape: BoxShape.circle, color: Colors.white),
                     ),
                     kHorizontalPaddingXSmall,
                     Container(
                       height: 20,
                       width: 20,
                       decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: kWhiteColor),
+                          shape: BoxShape.circle, color: Colors.white),
                     ),
                     kHorizontalPaddingXSmall,
                     Container(
                       height: 20,
                       width: 20,
                       decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: kWhiteColor),
+                          shape: BoxShape.circle, color: Colors.white),
                     ),
                     kHorizontalPaddingMedium,
                     Container(
@@ -126,7 +126,7 @@ class LMFeedShimmer extends StatelessWidget {
                       height: 20,
                       clipBehavior: Clip.antiAlias,
                       decoration: ShapeDecoration(
-                        color: kWhiteColor,
+                        color: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -138,7 +138,7 @@ class LMFeedShimmer extends StatelessWidget {
                       height: 20,
                       clipBehavior: Clip.antiAlias,
                       decoration: ShapeDecoration(
-                        color: kWhiteColor,
+                        color: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -152,7 +152,7 @@ class LMFeedShimmer extends StatelessWidget {
                 height: 2,
                 margin: const EdgeInsets.symmetric(vertical: 18.0),
                 decoration: const BoxDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                 ),
               ),
               Expanded(
@@ -165,7 +165,7 @@ class LMFeedShimmer extends StatelessWidget {
                         height: 52,
                         width: 52,
                         decoration: const BoxDecoration(
-                          color: kWhiteColor,
+                          color: Colors.white,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -179,7 +179,7 @@ class LMFeedShimmer extends StatelessWidget {
                               width: 226,
                               clipBehavior: Clip.antiAlias,
                               decoration: ShapeDecoration(
-                                color: kWhiteColor,
+                                color: Colors.white,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6)),
                               ),
@@ -190,7 +190,7 @@ class LMFeedShimmer extends StatelessWidget {
                               height: 14,
                               clipBehavior: Clip.antiAlias,
                               decoration: ShapeDecoration(
-                                color: kWhiteColor,
+                                color: Colors.white,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6)),
                               ),
@@ -206,7 +206,7 @@ class LMFeedShimmer extends StatelessWidget {
                 height: 16,
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 decoration: ShapeDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)),
                 ),
@@ -217,7 +217,7 @@ class LMFeedShimmer extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 height: 16,
                 decoration: ShapeDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -228,7 +228,7 @@ class LMFeedShimmer extends StatelessWidget {
                 height: 160,
                 width: screenSize.width,
                 decoration: const BoxDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                 ),
               ),
               kVerticalPaddingLarge,
@@ -240,21 +240,21 @@ class LMFeedShimmer extends StatelessWidget {
                       height: 20,
                       width: 20,
                       decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: kWhiteColor),
+                          shape: BoxShape.circle, color: Colors.white),
                     ),
                     kHorizontalPaddingXSmall,
                     Container(
                       height: 20,
                       width: 20,
                       decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: kWhiteColor),
+                          shape: BoxShape.circle, color: Colors.white),
                     ),
                     kHorizontalPaddingXSmall,
                     Container(
                       height: 20,
                       width: 20,
                       decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: kWhiteColor),
+                          shape: BoxShape.circle, color: Colors.white),
                     ),
                     kHorizontalPaddingMedium,
                     Container(
@@ -262,7 +262,7 @@ class LMFeedShimmer extends StatelessWidget {
                       height: 20,
                       clipBehavior: Clip.antiAlias,
                       decoration: ShapeDecoration(
-                        color: kWhiteColor,
+                        color: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -274,7 +274,7 @@ class LMFeedShimmer extends StatelessWidget {
                       height: 20,
                       clipBehavior: Clip.antiAlias,
                       decoration: ShapeDecoration(
-                        color: kWhiteColor,
+                        color: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -288,7 +288,7 @@ class LMFeedShimmer extends StatelessWidget {
                 height: 2,
                 margin: const EdgeInsets.symmetric(vertical: 18.0),
                 decoration: const BoxDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                 ),
               ),
               Expanded(
@@ -300,7 +300,7 @@ class LMFeedShimmer extends StatelessWidget {
                         height: 52,
                         width: 52,
                         decoration: const BoxDecoration(
-                          color: kWhiteColor,
+                          color: Colors.white,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -314,7 +314,7 @@ class LMFeedShimmer extends StatelessWidget {
                               width: 226,
                               clipBehavior: Clip.antiAlias,
                               decoration: ShapeDecoration(
-                                color: kWhiteColor,
+                                color: Colors.white,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6)),
                               ),
@@ -325,7 +325,7 @@ class LMFeedShimmer extends StatelessWidget {
                               height: 14,
                               clipBehavior: Clip.antiAlias,
                               decoration: ShapeDecoration(
-                                color: kWhiteColor,
+                                color: Colors.white,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(6)),
                               ),
@@ -341,7 +341,7 @@ class LMFeedShimmer extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 height: 16,
                 decoration: ShapeDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)),
                 ),
@@ -352,7 +352,7 @@ class LMFeedShimmer extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 height: 16,
                 decoration: ShapeDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)),
                 ),
@@ -363,7 +363,7 @@ class LMFeedShimmer extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
                 height: 16,
                 decoration: ShapeDecoration(
-                  color: kWhiteColor,
+                  color: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6)),
                 ),

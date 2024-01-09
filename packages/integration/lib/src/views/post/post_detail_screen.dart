@@ -201,10 +201,10 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                     .add(
                                                         LMCommentCancelEvent());
                                               },
-                                              icon: LMFeedIcon(
+                                              icon: const LMFeedIcon(
                                                 type: LMIconType.icon,
                                                 icon: Icons.close,
-                                                style: const LMFeedIconStyle(
+                                                style: LMFeedIconStyle(
                                                   color: LMThemeData.kGreyColor,
                                                   size: 24,
                                                 ),
@@ -658,17 +658,17 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                             .value;
                                                   }
                                                 },
-                                                icon: LMFeedIcon(
+                                                icon: const LMFeedIcon(
                                                   type: LMIconType.icon,
                                                   icon: Icons
                                                       .thumb_up_alt_outlined,
-                                                  style: const LMFeedIconStyle(
+                                                  style: LMFeedIconStyle(
                                                     size: 20,
                                                   ),
                                                 ),
-                                                activeIcon: LMFeedIcon(
+                                                activeIcon: const LMFeedIcon(
                                                   type: LMIconType.icon,
-                                                  style: const LMFeedIconStyle(
+                                                  style: LMFeedIconStyle(
                                                     color: LMThemeData
                                                         .kPrimaryColor,
                                                     size: 20,
@@ -723,12 +723,11 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                       _postDetailScreenHandler!
                                                           .openOnScreenKeyboard();
                                                     },
-                                                    icon: LMFeedIcon(
+                                                    icon: const LMFeedIcon(
                                                       type: LMIconType.icon,
                                                       icon: Icons
                                                           .comment_outlined,
-                                                      style:
-                                                          const LMFeedIconStyle(
+                                                      style: LMFeedIconStyle(
                                                         size: 20,
                                                       ),
                                                     ),

@@ -110,6 +110,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = LMFeedTheme.of(context);
     return WillPopScope(
       onWillPop: () {
         widget.composeDiscardDialogBuilder?.call(context) ??
@@ -119,7 +120,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: widget.composeSystemOverlayStyle,
         child: Scaffold(
-          backgroundColor: kWhiteColor,
+          backgroundColor: theme.scaffoldBackgroundColor,
           bottomSheet: _defMediaPicker(),
           floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
@@ -150,9 +151,9 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
   }
 
   _showDefaultDiscardDialog(BuildContext context) {
-    showDialog(
+    showAdaptiveDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
+      builder: (dialogContext) => AlertDialog.adaptive(
         title: const Text('Discard Post'),
         content:
             const Text('Are you sure you want to discard the current post?'),
@@ -178,7 +179,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
   Widget _defAppBar() {
     final theme = LMFeedTheme.of(context);
     return LMAppBar(
-      backgroundColor: kWhiteColor,
+      backgroundColor: Colors.white,
       height: 56,
       mainAxisAlignment: MainAxisAlignment.center,
       padding: const EdgeInsets.symmetric(
@@ -192,7 +193,10 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
             textStyle: TextStyle(color: theme.colorScheme.primary),
           ),
         ),
-        onTap: Navigator.of(context).pop,
+        onTap: () {
+          widget.composeDiscardDialogBuilder?.call(context) ??
+              _showDefaultDiscardDialog(context);
+        },
       ),
       title: const LMFeedText(
         text: "Create Post",
@@ -200,7 +204,7 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
           textStyle: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: kGrey1Color,
+            color: Colors.grey,
           ),
         ),
       ),
@@ -319,9 +323,9 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
                         margin: const EdgeInsets.only(left: 16.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(500),
-                          color: kWhiteColor,
+                          color: LMFeedTheme.of(context).colorScheme.background,
                           border: Border.all(
-                            color: kPrimaryColor,
+                            color: LMFeedTheme.of(context).primaryColor,
                           ),
                         ),
                         child: LMTopicChip(
@@ -332,13 +336,15 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
                                     ..name("Topic"))
                                   .build()
                               : selectedTopics.first,
-                          textStyle: const TextStyle(color: kPrimaryColor),
+                          textStyle: TextStyle(
+                            color: LMFeedTheme.of(context).primaryColor,
+                          ),
                           icon: LMFeedIcon(
                             type: LMIconType.icon,
                             icon: CupertinoIcons.chevron_down,
-                            style: const LMFeedIconStyle(
+                            style: LMFeedIconStyle(
                               size: 16,
-                              color: kPrimaryColor,
+                              color: LMFeedTheme.of(context).primaryColor,
                             ),
                           ),
                         ),

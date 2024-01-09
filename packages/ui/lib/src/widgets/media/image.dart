@@ -62,8 +62,8 @@ class _LMImageState extends State<LMImage> {
                 }
                 return widget.errorWidget ??
                     Container(
-                      color: kBackgroundColor,
-                      child: const Column(
+                      color: Colors.grey,
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           LMFeedIcon(
@@ -71,16 +71,18 @@ class _LMImageState extends State<LMImage> {
                             icon: Icons.error_outline,
                             style: LMFeedIconStyle(
                               size: 24,
-                              color: kGrey3Color,
+                              color: Colors.grey.shade300,
                             ),
                           ),
-                          SizedBox(height: 24),
-                          Text(
-                            "An error occurred fetching media",
-                            style: TextStyle(
-                              fontSize: 14,
+                          const SizedBox(height: 24),
+                          const LMFeedText(
+                            text: "An error occurred fetching media",
+                            style: LMFeedTextStyle(
+                              textStyle: TextStyle(
+                                fontSize: 14,
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     );

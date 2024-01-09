@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 class LMProfilePicture extends StatelessWidget {
   const LMProfilePicture({
@@ -43,7 +42,7 @@ class LMProfilePicture extends StatelessWidget {
           ),
           shape: boxShape ?? BoxShape.rectangle,
           color: imageUrl != null && imageUrl!.isNotEmpty
-              ? kGrey3Color
+              ? Colors.grey.shade300
               : backgroundColor ?? Theme.of(context).primaryColor,
           image: imageUrl != null && imageUrl!.isNotEmpty
               ? DecorationImage(

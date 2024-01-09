@@ -29,6 +29,7 @@ dependencies:
   media_kit_video: ^1.1.8 # For video rendering.
   media_kit_libs_video: ^1.0.1
   visibility_aware_state: 1.0.5
+  overlay_support: any
 
 dev_dependencies:
   flutter_test:

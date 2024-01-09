@@ -146,7 +146,7 @@ class LMTopicFeedGrid extends StatelessWidget {
           border: showDivider
               ? Border(
                   bottom: BorderSide(
-                    color: kGrey2Color.withOpacity(0.1),
+                    color: Colors.grey.withOpacity(0.1),
                   ),
                 )
               : null,

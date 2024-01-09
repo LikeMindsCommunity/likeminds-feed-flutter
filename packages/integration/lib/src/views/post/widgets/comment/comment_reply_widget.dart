@@ -311,18 +311,18 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                                     });
                                   }
                                 },
-                                icon: LMFeedIcon(
+                                icon: const LMFeedIcon(
                                   type: LMIconType.icon,
                                   icon: Icons.thumb_up_alt_outlined,
-                                  style: const LMFeedIconStyle(
+                                  style: LMFeedIconStyle(
                                     color: LMThemeData.appBlack,
                                     size: 20,
                                   ),
                                 ),
-                                activeIcon: LMFeedIcon(
+                                activeIcon: const LMFeedIcon(
                                   type: LMIconType.icon,
                                   icon: Icons.thumb_up_alt_rounded,
-                                  style: const LMFeedIconStyle(
+                                  style: LMFeedIconStyle(
                                     size: 20,
                                     color: LMThemeData.kPrimaryColor,
                                   ),

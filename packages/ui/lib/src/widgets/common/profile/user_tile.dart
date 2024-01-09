@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
+import 'package:likeminds_feed_ui_fl/src/widgets/widgets.dart';
+import 'package:likeminds_feed_ui_fl/src/models/models.dart';
 
 class LMUserTile extends StatelessWidget {
   final LMUserViewData user;
@@ -28,7 +28,7 @@ class LMUserTile extends StatelessWidget {
         profilePicture ??
             LMProfilePicture(
               size: imageSize ?? 50,
-              backgroundColor: kPrimaryColor,
+              backgroundColor: Colors.blue,
               fallbackText: user.name,
               onTap: () => onTap(),
               imageUrl: user.imageUrl,
@@ -44,7 +44,7 @@ class LMUserTile extends StatelessWidget {
                     style: const LMFeedTextStyle(
                       textStyle: TextStyle(
                         fontSize: kFontMedium,
-                        color: kGrey1Color,
+                        color: Colors.grey,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

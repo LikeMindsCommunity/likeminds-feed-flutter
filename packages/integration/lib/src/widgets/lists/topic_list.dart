@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -14,10 +13,19 @@ class LMTopicList extends StatefulWidget {
   final Function(List<LMTopicViewData>, LMTopicViewData) onTopicSelected;
   final bool? isEnabled;
 
+  final Color? backgroundColor;
+
+  final BorderRadius? borderRadius;
+
+  final Widget Function()? listViewBuilder;
+
   const LMTopicList({
     super.key,
     required this.selectedTopics,
     required this.onTopicSelected,
+    this.listViewBuilder,
+    this.backgroundColor,
+    this.borderRadius,
     this.isEnabled,
   });
 
@@ -37,7 +45,6 @@ class _LMTopicListState extends State<LMTopicList> {
       .build();
   final int pageSize = 100;
   LMTopicBloc topicBloc = LMTopicBloc();
-  bool isSearching = false;
   ValueNotifier<bool> rebuildTopicsScreen = ValueNotifier<bool>(false);
   PagingController<int, LMTopicViewData> topicsPagingController =
       PagingController(firstPageKey: 1);
@@ -96,12 +103,12 @@ class _LMTopicListState extends State<LMTopicList> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    ThemeData theme = LMFeedTheme.of(context);
     return Container(
-      width: min(screenSize.width, 120),
+      width: min(screenSize.width, 180),
       constraints: const BoxConstraints(maxHeight: 250),
       decoration: BoxDecoration(
-        color: kWhiteColor,
+        color: widget.backgroundColor ??
+            LMFeedTheme.of(context).colorScheme.background,
         borderRadius: BorderRadius.circular(4.0),
       ),
       margin: const EdgeInsets.only(top: 32),
@@ -134,14 +141,16 @@ class _LMTopicListState extends State<LMTopicList> {
           }
         },
         builder: (context, state) {
+          // Loading state
           if (state is LMTopicLoading) {
-            return const Center(
+            return Center(
               child: LMLoader(
-                color: kPrimaryColor,
+                color: LMFeedTheme.of(context).primaryColor,
               ),
             );
           }
 
+          // Loaded state
           if (state is LMTopicLoaded) {
             return ValueListenableBuilder(
                 valueListenable: rebuildTopicsScreen,
@@ -179,8 +188,9 @@ class _LMTopicListState extends State<LMTopicList> {
                                           horizontal: 8.0, vertical: 10.0),
                                       decoration: BoxDecoration(
                                         color: isTopicSelected
-                                            ? kPrimaryColor
-                                            : kWhiteColor,
+                                            ? LMFeedTheme.of(context)
+                                                .primaryColor
+                                            : Colors.white,
                                       ),
                                       alignment: Alignment.topLeft,
                                       clipBehavior: Clip.hardEdge,
@@ -195,8 +205,9 @@ class _LMTopicListState extends State<LMTopicList> {
                                                 maxLines: 2,
                                                 textStyle: TextStyle(
                                                   color: isTopicSelected
-                                                      ? theme
-                                                          .colorScheme.secondary
+                                                      ? Theme.of(context)
+                                                          .colorScheme
+                                                          .secondary
                                                       : Colors.black54,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w500,
@@ -222,9 +233,86 @@ class _LMTopicListState extends State<LMTopicList> {
               child: Text("Unable to fetch topics, Please try again later"),
             );
           }
+
+          // Error state
+          else if (state is LMTopicError) {
+            return const Center(
+              child: LMFeedText(
+                text: "Unable to fetch topics, Please try again later",
+              ),
+            );
+          }
+
           return const SizedBox();
         },
       ),
     );
+  }
+
+  Widget _defaultListBuilder() {
+    return SingleChildScrollView(
+      controller: controller,
+      physics: const ClampingScrollPhysics(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: topicsPagingController.itemList?.map((e) {
+              bool isTopicSelected = selectedTopicId.contains(e.id);
+              return GestureDetector(
+                onTap: _selectTopic(isTopicSelected, e),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 10.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isTopicSelected
+                        ? LMFeedTheme.of(context).colorScheme.secondary
+                        : Colors.white,
+                  ),
+                  alignment: Alignment.topLeft,
+                  clipBehavior: Clip.hardEdge,
+                  margin: const EdgeInsets.only(right: 8.0, bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: LMFeedText(
+                          text: e.name,
+                          style: LMFeedTextStyle(
+                            maxLines: 2,
+                            textStyle: TextStyle(
+                              color: isTopicSelected
+                                  ? Colors.grey
+                                  : LMFeedTheme.of(context)
+                                      .colorScheme
+                                      .secondary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              height: 1.20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList() ??
+            [],
+      ),
+    );
+  }
+
+  _selectTopic(isTopicSelected, topic) {
+    if (isTopicSelected) {
+      selectedTopicId.remove(topic.id);
+      selectedTopics.removeWhere((element) => element.id == topic.id);
+    } else {
+      selectedTopicId.add(topic.id);
+      selectedTopics.add(topic);
+    }
+    isTopicSelected = !isTopicSelected;
+    rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
+    widget.onTopicSelected(selectedTopics, topic);
   }
 }

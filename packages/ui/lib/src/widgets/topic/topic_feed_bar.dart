@@ -134,7 +134,7 @@ class LMTopicFeedBar extends StatelessWidget {
                     child: const Text(
                       "Clear",
                       style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Colors.blue,
                       ),
                     ),
                   ),
@@ -186,7 +186,7 @@ class LMTopicFeedBar extends StatelessWidget {
               ? Border(
                   bottom: BorderSide(
                     width: 0.1,
-                    color: kGrey2Color.withOpacity(0.05),
+                    color: Colors.grey.withOpacity(0.05),
                   ),
                 )
               : null,

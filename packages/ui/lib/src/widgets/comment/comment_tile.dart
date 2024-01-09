@@ -87,7 +87,7 @@ class _LMCommentTileState extends State<LMCommentTile> {
     ThemeData theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: widget.backgroundColor ?? kWhiteColor,
+        color: widget.backgroundColor ?? Colors.white,
         borderRadius: widget.borderRadius,
         boxShadow: widget.boxShadow,
       ),
@@ -161,11 +161,11 @@ class _LMCommentTileState extends State<LMCommentTile> {
                     widget.likeButtonBuilder?.call(_defLikeCommentButton()) ??
                         _defLikeCommentButton(),
                     kHorizontalPaddingMedium,
-                    const Text(
+                    Text(
                       '|',
                       style: TextStyle(
                         fontSize: kFontSmallMed,
-                        color: kGrey3Color,
+                        color: Colors.grey.shade300,
                       ),
                     ),
                     kHorizontalPaddingMedium,
@@ -179,10 +179,10 @@ class _LMCommentTileState extends State<LMCommentTile> {
                     const Spacer(),
                     LMFeedText(
                       text: widget.comment.createdAt.timeAgo(),
-                      style: const LMFeedTextStyle(
+                      style: LMFeedTextStyle(
                         textStyle: TextStyle(
                           fontSize: kFontSmallMed,
-                          color: kGrey3Color,
+                          color: Colors.grey.shade300,
                         ),
                       ),
                     ),
@@ -205,20 +205,20 @@ class _LMCommentTileState extends State<LMCommentTile> {
   LMFeedButton _defLikeCommentButton() {
     return LMFeedButton(
       onTap: () {},
-      text: const LMFeedText(
+      text: LMFeedText(
         text: 'Like',
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 14,
-            color: kGrey2Color,
+            color: Colors.grey.shade200,
           ),
         ),
       ),
-      icon: const LMFeedIcon(
+      icon: LMFeedIcon(
         type: LMIconType.icon,
         icon: Icons.favorite_outline,
         style: LMFeedIconStyle(
-          color: kGrey2Color,
+          color: Colors.grey.shade200,
           size: 16,
         ),
       ),
@@ -227,7 +227,7 @@ class _LMCommentTileState extends State<LMCommentTile> {
         type: LMIconType.icon,
         style: LMFeedIconStyle(
           size: 16,
-          color: kPrimaryColor,
+          color: Colors.blue,
         ),
       ),
     );
@@ -236,12 +236,12 @@ class _LMCommentTileState extends State<LMCommentTile> {
   LMFeedButton _defReplyToCommentButton() {
     return LMFeedButton(
       onTap: () {},
-      text: const LMFeedText(
+      text: LMFeedText(
         text: 'Reply',
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 14,
-            color: kGrey2Color,
+            color: Colors.grey.shade200,
           ),
         ),
       ),
@@ -254,9 +254,9 @@ class _LMCommentTileState extends State<LMCommentTile> {
         text: widget.comment.repliesCount > 1
             ? "${widget.comment.repliesCount}  replies"
             : "${widget.comment.repliesCount}  reply",
-        style: const LMFeedTextStyle(
+        style: LMFeedTextStyle(
           textStyle: TextStyle(
-            color: kGrey2Color,
+            color: Colors.grey.shade200,
             fontSize: 12,
           ),
         ),
