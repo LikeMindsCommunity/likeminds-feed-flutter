@@ -157,16 +157,19 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                             horizontal: 16, vertical: 8),
                                         child: Row(
                                           children: [
-                                            LMTextView(
+                                            LMFeedText(
                                               text: state.commentMetaData
                                                           .commentActionType ==
                                                       LMCommentActionType.edit
                                                   ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'}"
                                                   : "Replying to",
-                                              textStyle: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                color: LMThemeData.kGrey1Color,
+                                              style: const LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color:
+                                                      LMThemeData.kGrey1Color,
+                                                ),
                                               ),
                                             ),
                                             const SizedBox(
@@ -176,29 +179,32 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                         .commentActionType ==
                                                     LMCommentActionType.edit
                                                 ? const SizedBox()
-                                                : LMTextView(
+                                                : LMFeedText(
                                                     text: state.commentMetaData
                                                         .user!.name,
-                                                    textStyle: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: LMThemeData
-                                                          .kLinkColor,
+                                                    style:
+                                                        const LMFeedTextStyle(
+                                                      textStyle: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: LMThemeData
+                                                            .kLinkColor,
+                                                      ),
                                                     ),
                                                   ),
                                             const Spacer(),
-                                            LMIconButton(
-                                              onTap: (active) {
+                                            LMFeedButton(
+                                              onTap: () {
                                                 _postDetailScreenHandler!
                                                     .commentHandlerBloc
                                                     .add(
                                                         LMCommentCancelEvent());
                                               },
-                                              icon: const LMIcon(
+                                              icon: LMFeedIcon(
                                                 type: LMIconType.icon,
                                                 icon: Icons.close,
-                                                iconStyle: LMIconStyle(
+                                                style: const LMFeedIconStyle(
                                                   color: LMThemeData.kGreyColor,
                                                   size: 24,
                                                 ),
@@ -269,16 +275,21 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                           .kPrimaryColor,
                                                     ),
                                                   )
-                                                : LMButton(
-                                                    height: 18,
-                                                    text: const LMTextView(
+                                                : LMFeedButton(
+                                                    style:
+                                                        const LMFeedButtonStyle(
+                                                      height: 18,
+                                                    ),
+                                                    text: const LMFeedText(
                                                       text: "Post",
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      textStyle: TextStyle(
-                                                        fontSize: 12.5,
-                                                        color: LMThemeData
-                                                            .kPrimaryColor,
+                                                      style: LMFeedTextStyle(
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        textStyle: TextStyle(
+                                                          fontSize: 12.5,
+                                                          color: LMThemeData
+                                                              .kPrimaryColor,
+                                                        ),
                                                       ),
                                                     ),
                                                     onTap: () {
@@ -539,35 +550,25 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                       .imageUrl,
                                               size: 36,
                                             ),
-                                            subtitleText: LMTextView(
+                                            subtitleText: LMFeedText(
                                               text:
                                                   "@${_postDetailScreenHandler!.users[commentViewData.userId]!.name.toLowerCase().split(' ').join()} · ", //${timeago.format(commentViewData.createdAt)}",
-                                              textStyle: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400,
-                                                color: LMThemeData
-                                                    .kSecondaryColor700,
+
+                                              style: const LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: LMThemeData
+                                                      .kSecondaryColor700,
+                                                ),
                                               ),
                                             ),
                                             commentActions: [
-                                              LMButton(
-                                                margin: 10,
-                                                text: LMTextView(
-                                                  text: commentViewData
-                                                              .likesCount ==
-                                                          0
-                                                      ? "Like"
-                                                      : commentViewData
-                                                                  .likesCount ==
-                                                              1
-                                                          ? "1 Like"
-                                                          : "${commentViewData.likesCount} Likes",
-                                                  textStyle: const TextStyle(
-                                                      color: LMThemeData
-                                                          .kSecondaryColor700,
-                                                      fontSize: 12),
+                                              LMFeedButton(
+                                                style: const LMFeedButtonStyle(
+                                                  margin: 10,
                                                 ),
-                                                activeText: LMTextView(
+                                                text: LMFeedText(
                                                   text: commentViewData
                                                               .likesCount ==
                                                           0
@@ -577,10 +578,29 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                               1
                                                           ? "1 Like"
                                                           : "${commentViewData.likesCount} Likes",
-                                                  textStyle: const TextStyle(
-                                                      color: LMThemeData
-                                                          .kPrimaryColor,
-                                                      fontSize: 12),
+                                                  style: const LMFeedTextStyle(
+                                                    textStyle: TextStyle(
+                                                        color: LMThemeData
+                                                            .kSecondaryColor700,
+                                                        fontSize: 12),
+                                                  ),
+                                                ),
+                                                activeText: LMFeedText(
+                                                  text: commentViewData
+                                                              .likesCount ==
+                                                          0
+                                                      ? "Like"
+                                                      : commentViewData
+                                                                  .likesCount ==
+                                                              1
+                                                          ? "1 Like"
+                                                          : "${commentViewData.likesCount} Likes",
+                                                  style: const LMFeedTextStyle(
+                                                    textStyle: TextStyle(
+                                                        color: LMThemeData
+                                                            .kPrimaryColor,
+                                                        fontSize: 12),
+                                                  ),
                                                 ),
                                                 onTap: () async {
                                                   commentViewData.likesCount =
@@ -638,17 +658,17 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                             .value;
                                                   }
                                                 },
-                                                icon: const LMIcon(
+                                                icon: LMFeedIcon(
                                                   type: LMIconType.icon,
                                                   icon: Icons
                                                       .thumb_up_alt_outlined,
-                                                  iconStyle: LMIconStyle(
+                                                  style: const LMFeedIconStyle(
                                                     size: 20,
                                                   ),
                                                 ),
-                                                activeIcon: const LMIcon(
+                                                activeIcon: LMFeedIcon(
                                                   type: LMIconType.icon,
-                                                  iconStyle: LMIconStyle(
+                                                  style: const LMFeedIconStyle(
                                                     color: LMThemeData
                                                         .kPrimaryColor,
                                                     size: 20,
@@ -662,13 +682,18 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                               const SizedBox(width: 12),
                                               Row(
                                                 children: [
-                                                  LMButton(
-                                                    margin: 10,
-                                                    text: const LMTextView(
-                                                        text: "Reply",
-                                                        textStyle: TextStyle(
-                                                          fontSize: 12,
-                                                        )),
+                                                  LMFeedButton(
+                                                    style:
+                                                        const LMFeedButtonStyle(
+                                                      margin: 10,
+                                                    ),
+                                                    text: const LMFeedText(
+                                                      text: "Reply",
+                                                      style: LMFeedTextStyle(
+                                                          textStyle: TextStyle(
+                                                        fontSize: 12,
+                                                      )),
+                                                    ),
                                                     onTap: () {
                                                       LMCommentMetaData
                                                           commentMetaData =
@@ -698,11 +723,12 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                       _postDetailScreenHandler!
                                                           .openOnScreenKeyboard();
                                                     },
-                                                    icon: const LMIcon(
+                                                    icon: LMFeedIcon(
                                                       type: LMIconType.icon,
                                                       icon: Icons
                                                           .comment_outlined,
-                                                      iconStyle: LMIconStyle(
+                                                      style:
+                                                          const LMFeedIconStyle(
                                                         size: 20,
                                                       ),
                                                     ),
@@ -711,7 +737,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                       .kHorizontalPaddingMedium,
                                                   commentViewData.repliesCount >
                                                           0
-                                                      ? LMButton(
+                                                      ? LMFeedButton(
                                                           onTap: () {
                                                             if (replyShown &&
                                                                 commentIdReplyId !=
@@ -774,13 +800,16 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
                                                                     .rebuildPostWidget
                                                                     .value;
                                                           },
-                                                          text: LMTextView(
+                                                          text: LMFeedText(
                                                             text:
                                                                 "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
-                                                            textStyle:
-                                                                const TextStyle(
-                                                              color: LMThemeData
-                                                                  .kPrimaryColor,
+                                                            style:
+                                                                const LMFeedTextStyle(
+                                                              textStyle:
+                                                                  TextStyle(
+                                                                color: LMThemeData
+                                                                    .kPrimaryColor,
+                                                              ),
                                                             ),
                                                           ),
                                                         )
@@ -922,30 +951,31 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
 
   LMAppBar defAppBar() {
     return LMAppBar(
-      leading: LMIconButton(
-        icon: LMIcon(
+      leading: LMFeedButton(
+        icon: LMFeedIcon(
           type: LMIconType.icon,
           icon: Platform.isAndroid
               ? Icons.arrow_back
               : CupertinoIcons.chevron_back,
-          iconStyle: const LMIconStyle(
+          style: const LMFeedIconStyle(
             size: 28,
             color: LMThemeData.appBlack,
           ),
         ),
-        onTap: (active) {
+        onTap: () {
           Navigator.pop(context);
         },
       ),
       backgroundColor: LMThemeData.kWhiteColor,
-      title: const LMTextView(
-        text: "Comments",
-        textStyle: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-          color: LMThemeData.kHeadingColor,
-        ),
-      ),
+      title: const LMFeedText(
+          text: "Comments",
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: LMThemeData.kHeadingColor,
+            ),
+          )),
       mainAxisAlignment: Platform.isAndroid
           ? MainAxisAlignment.start
           : MainAxisAlignment.spaceBetween,
@@ -967,7 +997,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
       //   footerStyle: LMFooterStyle(
       //     likeButtonStyle
       //   )
-      //   likebuttonstylebuilder: (LMButtonStyle oldStyle){
+      //   likebuttonstylebuilder: (LMFeedButtonStyle oldStyle){
       //     oldStyle.copyWith(fontSize: 24),
       //   }
       // ),
@@ -976,10 +1006,10 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             // alignment: LMAlignment.centre,
             // children: [
             //   LMTextButton(
-            //     text: const LMTextView(
+            //     text: const LMFeedText(
             //         text: "Like"),
             //     margin: 0,
-            //     activeText: const LMTextView(
+            //     activeText: const LMFeedText(
             //       text: "Like",
             //       textStyle: TextStyle(
             //         color: LMThemeData.primary500,
@@ -1039,7 +1069,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             //       }
             //       widget.onLikeClick?.call();
             //     },
-            //     icon: const LMIcon(
+            //     icon: const LMFeedIcon(
             //       type: LMIconType.icon,
             //       icon: Icons
             //           .thumb_up_off_alt_outlined,
@@ -1048,7 +1078,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             //       size: 20,
             //       boxPadding: 6,
             //     ),
-            //     activeIcon: const LMIcon(
+            //     activeIcon: const LMFeedIcon(
             //       type: LMIconType.icon,
             //       icon: Icons.thumb_up,
             //       size: 20,
@@ -1060,7 +1090,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             //   ),
             //   const Spacer(),
             //   LMTextButton(
-            //     text: const LMTextView(
+            //     text: const LMFeedText(
             //         text: "Comment"),
             //     margin: 0,
             //     onTap: () {
@@ -1087,7 +1117,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             //             .openOnScreenKeyboard();
             //       }
             //     },
-            //     icon: const LMIcon(
+            //     icon: const LMFeedIcon(
             //       type: LMIconType.icon,
             //       icon: Icons.comment_outlined,
             //       color: LMThemeData
@@ -1097,8 +1127,8 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             //     ),
             //   ),
             //   const Spacer(),
-            //   LMButton(
-            //     text: const LMTextView(
+            //   LMFeedButton(
+            //     text: const LMFeedText(
             //         text: "Share"),
             //     margin: 0,
             //     onTap: () {
@@ -1128,7 +1158,7 @@ class _LMPostDetailScreenState extends State<LMPostDetailScreen> {
             //       // TODO: Add Share Post logic
             //       //SharePost().sharePost(postData!.id);
             //     },
-            //     icon: const LMIcon(
+            //     icon: const LMFeedIcon(
             //       type: LMIconType.icon,
             //       icon: Icons.share,
             //       color: LMThemeData

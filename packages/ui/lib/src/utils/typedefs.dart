@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
-enum PostActions { like, comment, share, save }
-
-enum LMAlignment { left, centre, right }
-
 /// {@template post_header_builder}
 /// Builder function to build the post header.
 /// i.e. user image, name, time, menu button

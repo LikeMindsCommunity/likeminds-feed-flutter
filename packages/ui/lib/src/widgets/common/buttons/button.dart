@@ -3,7 +3,7 @@ import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 import 'package:likeminds_feed_ui_fl/src/widgets/common/commons.dart';
 
 // This widget is used to display a text button
-// The [LMButton] can be customized by passing in the required parameters
+// The [LMFeedButton] can be customized by passing in the required parameters
 class LMFeedButton extends StatefulWidget {
   const LMFeedButton({
     super.key,

@@ -62,12 +62,14 @@ class LMTopicChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget topicText = LMTextView(
+    Widget topicText = LMFeedText(
       text: topic.name,
-      textStyle: textStyle,
-      textAlign: TextAlign.center,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
+      style: LMFeedTextStyle(
+        textStyle: textStyle,
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
 
     return Container(

@@ -235,38 +235,44 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                               },
                               size: 32,
                             ),
-                            subtitleText: LMTextView(
+                            subtitleText: LMFeedText(
                               text:
                                   "@${user.name.toLowerCase().split(' ').join()} · ${timeago.format(commentViewData.createdAt)}",
-                              textStyle: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: LMThemeData.kGreyColor,
+                              style: const LMFeedTextStyle(
+                                textStyle: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: LMThemeData.kGreyColor,
+                                ),
                               ),
                             ),
                             lmFeedMenuAction:
                                 defLMFeedMenuAction(commentViewData),
                             commentActions: [
                               const SizedBox(width: 48),
-                              LMButton(
-                                text: LMTextView(
+                              LMFeedButton(
+                                text: LMFeedText(
                                   text: commentViewData.likesCount == 0
                                       ? "Like"
                                       : commentViewData.likesCount == 1
                                           ? "1 Like"
                                           : "${commentViewData.likesCount} Likes",
-                                  textStyle: const TextStyle(fontSize: 12),
+                                  style: const LMFeedTextStyle(
+                                    textStyle: TextStyle(fontSize: 12),
+                                  ),
                                 ),
-                                activeText: LMTextView(
+                                activeText: LMFeedText(
                                   text: commentViewData.likesCount == 0
                                       ? "Like"
                                       : commentViewData.likesCount == 1
                                           ? "1 Like"
                                           : "${commentViewData.likesCount} Likes",
-                                  textStyle: TextStyle(
-                                    color:
-                                        LMThemeData.theme.colorScheme.primary,
-                                    fontSize: 12,
+                                  style: LMFeedTextStyle(
+                                    textStyle: TextStyle(
+                                      color:
+                                          LMThemeData.theme.colorScheme.primary,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                                 onTap: () async {
@@ -305,18 +311,18 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                                     });
                                   }
                                 },
-                                icon: const LMIcon(
+                                icon: LMFeedIcon(
                                   type: LMIconType.icon,
                                   icon: Icons.thumb_up_alt_outlined,
-                                  iconStyle: LMIconStyle(
+                                  style: const LMFeedIconStyle(
                                     color: LMThemeData.appBlack,
                                     size: 20,
                                   ),
                                 ),
-                                activeIcon: const LMIcon(
+                                activeIcon: LMFeedIcon(
                                   type: LMIconType.icon,
                                   icon: Icons.thumb_up_alt_rounded,
-                                  iconStyle: LMIconStyle(
+                                  style: const LMFeedIconStyle(
                                     size: 20,
                                     color: LMThemeData.kPrimaryColor,
                                   ),

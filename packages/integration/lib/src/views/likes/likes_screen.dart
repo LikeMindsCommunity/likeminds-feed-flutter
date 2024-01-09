@@ -151,26 +151,30 @@ class LikesTile extends StatelessWidget {
             : LMUserTile(
                 user: user!,
                 onTap: () {},
-                titleText: LMTextView(
+                titleText: LMFeedText(
                   text: user!.name,
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                  style: const LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-                subText: LMTextView(
+                subText: LMFeedText(
                   text: "@${user!.name.toLowerCase().split(" ").join("")}",
-                  textStyle: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: LMThemeData.kGreyColor,
+                  style: const LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      color: LMThemeData.kGreyColor,
+                    ),
                   ),
                 ),
               ),
       );
     } else {
       return const Center(
-        child: LMTextView(text: "No likes yet"),
+        child: LMFeedText(text: "No likes yet"),
       );
     }
   }
@@ -194,11 +198,13 @@ class DeletedLikesTile extends StatelessWidget {
         ),
         LMThemeData.kHorizontalPaddingSmall,
         LMThemeData.kHorizontalPaddingMedium,
-        LMTextView(
+        LMFeedText(
           text: 'Deleted User',
-          textStyle: TextStyle(
-            fontSize: LMThemeData.kFontMedium,
-            color: LMThemeData.theme.colorScheme.onSecondary,
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: LMThemeData.kFontMedium,
+              color: LMThemeData.theme.colorScheme.onSecondary,
+            ),
           ),
         )
       ],

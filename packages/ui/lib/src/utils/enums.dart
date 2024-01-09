@@ -1,4 +1,4 @@
-/// enum to describe placement of icon inside of LMButton
+/// enum to describe placement of icon inside of LMFeedButton
 enum LMIconButtonPlacement { start, end }
 
 /// enum to describe actions possible on a post

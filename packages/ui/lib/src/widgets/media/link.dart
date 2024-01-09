@@ -51,13 +51,13 @@ class LMLinkPreview extends StatelessWidget {
   final String? imageUrl;
 
   // defaults to null, for custom styling
-  final LMTextView? title;
+  final LMFeedText? title;
 
   // defaults to null, for custom styling
-  final LMTextView? subtitle;
+  final LMFeedText? subtitle;
 
   // defaults to null, for custom styling
-  final LMTextView? url;
+  final LMFeedText? url;
 
   // defaults to false, to show link url
   final bool showLinkUrl;
@@ -118,15 +118,17 @@ class LMLinkPreview extends StatelessWidget {
                     SizedBox(
                       width: width ?? MediaQuery.of(context).size.width,
                       child: title ??
-                          LMTextView(
+                          LMFeedText(
                             text: linkModel != null
                                 ? linkModel!.ogTags!.title!
                                 : attachment!.attachmentMeta.ogTags!.title ??
                                     'NOT PRODUCING',
-                            textStyle: const TextStyle(
-                              color: kGrey1Color,
-                              fontSize: kFontMedium,
-                              fontWeight: FontWeight.bold,
+                            style: const LMFeedTextStyle(
+                              textStyle: TextStyle(
+                                color: kGrey1Color,
+                                fontSize: kFontMedium,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                     ),
@@ -134,16 +136,18 @@ class LMLinkPreview extends StatelessWidget {
                     SizedBox(
                       width: width ?? MediaQuery.of(context).size.width,
                       child: subtitle ??
-                          LMTextView(
+                          LMFeedText(
                             text: linkModel != null
                                 ? linkModel!.ogTags!.description!
                                 : attachment!
                                         .attachmentMeta.ogTags!.description ??
                                     'NOT PRODUCING',
-                            maxLines: 2,
-                            textStyle: const TextStyle(
-                              color: kGrey3Color,
-                              fontSize: kFontSmall,
+                            style: const LMFeedTextStyle(
+                              maxLines: 2,
+                              textStyle: TextStyle(
+                                color: kGrey3Color,
+                                fontSize: kFontSmall,
+                              ),
                             ),
                           ),
                     ),
@@ -151,7 +155,7 @@ class LMLinkPreview extends StatelessWidget {
                     showLinkUrl
                         ? SizedBox(
                             width: width ?? MediaQuery.of(context).size.width,
-                            child: LMTextView(
+                            child: LMFeedText(
                               text: linkModel != null
                                   ? linkModel!.link ?? linkModel!.ogTags!.url!
                                   : attachment!.attachmentMeta.ogTags!.url !=
@@ -159,10 +163,12 @@ class LMLinkPreview extends StatelessWidget {
                                       ? attachment!.attachmentMeta.ogTags!.url!
                                           .toLowerCase()
                                       : 'NOT PRODUCING',
-                              maxLines: 1,
-                              textStyle: const TextStyle(
-                                color: kGrey3Color,
-                                fontSize: kFontXSmall,
+                              style: const LMFeedTextStyle(
+                                maxLines: 1,
+                                textStyle: TextStyle(
+                                  color: kGrey3Color,
+                                  fontSize: kFontXSmall,
+                                ),
                               ),
                             ),
                           )

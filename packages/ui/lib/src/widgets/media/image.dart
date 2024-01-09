@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 
 class LMImage extends StatefulWidget {
   const LMImage({
@@ -65,10 +66,10 @@ class _LMImageState extends State<LMImage> {
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          LMIcon(
+                          LMFeedIcon(
                             type: LMIconType.icon,
                             icon: Icons.error_outline,
-                            iconStyle: LMIconStyle(
+                            style: LMFeedIconStyle(
                               size: 24,
                               color: kGrey3Color,
                             ),

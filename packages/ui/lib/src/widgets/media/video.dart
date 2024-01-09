@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:visibility_aware_state/visibility_aware_state.dart';
@@ -64,9 +65,9 @@ class LMVideo extends StatefulWidget {
   final Widget? loaderWidget;
   final Widget? errorWidget;
   final Widget? shimmerWidget;
-  final LMIconButton? playButton;
-  final LMIconButton? pauseButton;
-  final LMIconButton? muteButton;
+  final LMFeedButton? playButton;
+  final LMFeedButton? pauseButton;
+  final LMFeedButton? muteButton;
 
   // Video functionality control variables
   final bool? isMute;
@@ -224,9 +225,9 @@ class _LMVideoState extends VisibilityAwareState<LMVideo> {
                               icon: ValueListenableBuilder(
                                   valueListenable: isMuted,
                                   builder: (context, isMuted, __) {
-                                    return LMIcon(
+                                    return LMFeedIcon(
                                       type: LMIconType.icon,
-                                      iconStyle: const LMIconStyle(
+                                      style: const LMFeedIconStyle(
                                         color: kWhiteColor,
                                       ),
                                       icon: isMuted

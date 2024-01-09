@@ -17,13 +17,13 @@ class LMFeedPostHeader extends StatelessWidget {
     this.postHeaderStyle = const LMFeedPostHeaderStyle(),
   });
 
-  final LMTextView? titleText;
-  final LMTextView? customTitle;
-  final LMTextView? subText;
-  final LMTextView? editedText;
+  final LMFeedText? titleText;
+  final LMFeedText? customTitle;
+  final LMFeedText? subText;
+  final LMFeedText? editedText;
 
   final Widget Function(LMFeedMenu)? menuBuilder;
-  final LMTextView? createdAt;
+  final LMFeedText? createdAt;
   final Function()? onProfileTap;
 
   final Widget? profilePicture;
@@ -90,12 +90,14 @@ class LMFeedPostHeader extends StatelessWidget {
                                           }
                                         },
                                         child: titleText ??
-                                            LMTextView(
+                                            LMFeedText(
                                               text: user.name,
-                                              textStyle: const TextStyle(
-                                                fontSize: kFontMedium,
-                                                color: kGrey1Color,
-                                                fontWeight: FontWeight.w500,
+                                              style: const LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: kFontMedium,
+                                                  color: kGrey1Color,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
                                             ),
                                       ),
@@ -169,43 +171,51 @@ class LMFeedPostHeader extends StatelessWidget {
                                     subText != null
                                         ? kHorizontalPaddingXSmall
                                         : const SizedBox(),
-                                    LMTextView(
+                                    LMFeedText(
                                       text: subText != null ? '·' : '',
-                                      textStyle: const TextStyle(
-                                        fontSize: kFontSmall,
-                                        color: kGrey3Color,
+                                      style: const LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: kFontSmall,
+                                          color: kGrey3Color,
+                                        ),
                                       ),
                                     ),
                                     subText != null
                                         ? kHorizontalPaddingXSmall
                                         : const SizedBox(),
                                     createdAt ??
-                                        LMTextView(
+                                        LMFeedText(
                                           text:
                                               postViewData!.createdAt.timeAgo(),
-                                          textStyle: const TextStyle(
-                                            fontSize: kFontSmall,
-                                            color: kGrey3Color,
+                                          style: const LMFeedTextStyle(
+                                            textStyle: TextStyle(
+                                              fontSize: kFontSmall,
+                                              color: kGrey3Color,
+                                            ),
                                           ),
                                         ),
                                     kHorizontalPaddingSmall,
-                                    LMTextView(
+                                    LMFeedText(
                                       text: postViewData!.isEdited ? '·' : '',
-                                      textStyle: const TextStyle(
-                                        fontSize: kFontSmall,
-                                        color: kGrey3Color,
+                                      style: const LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: kFontSmall,
+                                          color: kGrey3Color,
+                                        ),
                                       ),
                                     ),
                                     kHorizontalPaddingSmall,
                                     postViewData!.isEdited
                                         ? editedText ??
-                                            LMTextView(
+                                            LMFeedText(
                                               text: postViewData!.isEdited
                                                   ? 'Edited'
                                                   : '',
-                                              textStyle: const TextStyle(
-                                                fontSize: kFontSmall,
-                                                color: kGrey3Color,
+                                              style: const LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: kFontSmall,
+                                                  color: kGrey3Color,
+                                                ),
                                               ),
                                             )
                                         : const SizedBox(),

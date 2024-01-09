@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/models/commons/popup_menu_view_data.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/icon/icon.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/text/text_view.dart';
+import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LMFeedMenu extends StatelessWidget {
   const LMFeedMenu({
@@ -15,8 +12,8 @@ class LMFeedMenu extends StatelessWidget {
     this.action,
   });
 
-  final Map<int, LMTextView>? children;
-  final LMIcon? menuIcon;
+  final Map<int, LMFeedText>? children;
+  final LMFeedIcon? menuIcon;
   final List<LMPopUpMenuItemViewData> menuItems;
   final bool isFeed;
   final Set<int> removeItemIds;
@@ -49,12 +46,14 @@ class LMFeedMenu extends StatelessWidget {
                       ),
                       value: element.id,
                       child: children?[element.id] ??
-                          LMTextView(
+                          LMFeedText(
                             text: element.title,
-                            textStyle: const TextStyle(
-                              color: kGreyColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                            style: const LMFeedTextStyle(
+                              textStyle: TextStyle(
+                                color: kGreyColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                     ),

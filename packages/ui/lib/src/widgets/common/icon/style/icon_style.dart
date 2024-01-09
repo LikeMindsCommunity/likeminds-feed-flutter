@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LMIconStyle {
+class LMFeedIconStyle {
   final Color? color;
   final double? size;
   final double? boxBorder;
@@ -9,7 +9,7 @@ class LMIconStyle {
   final Color? backgroundColor;
   final BoxFit? fit;
 
-  const LMIconStyle({
+  const LMFeedIconStyle({
     this.backgroundColor,
     this.color,
     this.size,
@@ -19,8 +19,8 @@ class LMIconStyle {
     this.fit,
   });
 
-  LMIconStyle copyWith(LMIconStyle style) {
-    return LMIconStyle(
+  LMFeedIconStyle copyWith(LMFeedIconStyle style) {
+    return LMFeedIconStyle(
       color: style.color ?? color,
       size: style.size ?? size,
       boxBorder: style.boxBorder ?? boxBorder,
@@ -31,8 +31,8 @@ class LMIconStyle {
     );
   }
 
-  factory LMIconStyle.inActivePreset() {
-    return const LMIconStyle(
+  factory LMFeedIconStyle.inActivePreset() {
+    return const LMFeedIconStyle(
       color: Colors.black,
       size: 24,
       boxPadding: 0,
@@ -40,8 +40,8 @@ class LMIconStyle {
     );
   }
 
-  factory LMIconStyle.activePreset() {
-    return const LMIconStyle(
+  factory LMFeedIconStyle.activePreset() {
+    return const LMFeedIconStyle(
       color: Colors.red,
       size: 24,
       boxPadding: 0,

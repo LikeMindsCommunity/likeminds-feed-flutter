@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 
 class LMReplyTile extends StatefulWidget {
   const LMReplyTile({
@@ -29,8 +30,8 @@ class LMReplyTile extends StatefulWidget {
   final TextStyle? textStyle;
   final TextStyle? linkStyle;
   final LMProfilePicture? profilePicture;
-  final LMTextView? titleText;
-  final LMTextView? subtitleText;
+  final LMFeedText? titleText;
+  final LMFeedText? subtitleText;
   final List<Widget>? commentActions;
   final EdgeInsets? actionsPadding;
   final LMFeedMenuAction lmFeedMenuAction;
@@ -77,11 +78,13 @@ class _LMReplyTileState extends State<LMReplyTile> {
                     SizedBox(
                       width: widget.width != null ? widget.width! * 0.6 : null,
                       child: widget.titleText ??
-                          LMTextView(
+                          LMFeedText(
                             text: widget.user.name,
-                            textStyle: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                            style: const LMFeedTextStyle(
+                              textStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                     ),
@@ -130,27 +133,29 @@ class _LMReplyTileState extends State<LMReplyTile> {
             child: Row(
               children: widget.commentActions ??
                   [
-                    LMButton(
+                    LMFeedButton(
                       onTap: () {},
-                      text: const LMTextView(
+                      text: const LMFeedText(
                         text: 'Like',
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          color: kGrey2Color,
+                        style: LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontSize: 14,
+                            color: kGrey2Color,
+                          ),
                         ),
                       ),
-                      icon: const LMIcon(
+                      icon: const LMFeedIcon(
                         type: LMIconType.icon,
                         icon: Icons.favorite_outline,
-                        iconStyle: LMIconStyle(
+                        style: LMFeedIconStyle(
                           color: kGrey2Color,
                           size: 16,
                         ),
                       ),
-                      activeIcon: const LMIcon(
+                      activeIcon: const LMFeedIcon(
                         icon: Icons.favorite,
                         type: LMIconType.icon,
-                        iconStyle: LMIconStyle(
+                        style: LMFeedIconStyle(
                           size: 16,
                           color: kPrimaryColor,
                         ),

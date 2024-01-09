@@ -24,7 +24,7 @@ class LMTopicTile extends StatelessWidget {
   // Whether the tile is selected or not, required
   final bool isSelected;
   // Text to be displayed in the tile, required
-  final LMTextView text;
+  final LMFeedText text;
   // [LMTopicViewData], consists id, topic and isEnabled boolean, required
   final LMTopicViewData topic;
 

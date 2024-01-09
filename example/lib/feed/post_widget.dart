@@ -34,7 +34,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //     commentActions: [
 //       LMTextButton(
 //         margin: 10,
-//         text: LMTextView(
+//         text: LMFeedText(
 //           text: commentViewData.likesCount == 0
 //               ? "Like"
 //               : commentViewData.likesCount == 1
@@ -43,7 +43,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //           textStyle: const TextStyle(
 //               color: LMThemeData.kSecondaryColor700, fontSize: 12),
 //         ),
-//         activeText: LMTextView(
+//         activeText: LMFeedText(
 //           text: commentViewData.likesCount == 0
 //               ? "Like"
 //               : commentViewData.likesCount == 1
@@ -77,12 +77,12 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //                 !_postDetailScreenHandler!.rebuildPostWidget.value;
 //           }
 //         },
-//         icon: const LMIcon(
+//         icon: const LMFeedIcon(
 //           type: LMIconType.icon,
 //           icon: Icons.thumb_up_alt_outlined,
 //           size: 20,
 //         ),
-//         activeIcon: const LMIcon(
+//         activeIcon: const LMFeedIcon(
 //           type: LMIconType.svg,
 //           color: Colors.red,
 //           assetPath: clientLikeFilled,
@@ -95,7 +95,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //         children: [
 //           LMTextButton(
 //             margin: 10,
-//             text: const LMTextView(
+//             text: const LMFeedText(
 //                 text: "Reply",
 //                 textStyle: TextStyle(
 //                   fontSize: 12,
@@ -115,7 +115,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 
 //               _postDetailScreenHandler!.openOnScreenKeyboard();
 //             },
-//             icon: const LMIcon(
+//             icon: const LMFeedIcon(
 //               type: LMIconType.icon,
 //               icon: Icons.comment_outlined,
 //               size: 20,
@@ -158,7 +158,7 @@ Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {
 //                     _postDetailScreenHandler!.rebuildPostWidget.value =
 //                         !_postDetailScreenHandler!.rebuildPostWidget.value;
 //                   },
-//                   text: LMTextView(
+//                   text: LMFeedText(
 //                     text:
 //                         "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
 //                     textStyle: const TextStyle(

@@ -173,14 +173,16 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
                           children: [
                             const Align(
                               alignment: Alignment.topLeft,
-                              child: LMTextView(
+                              child: LMFeedText(
                                 text: 'Topics',
-                                textAlign: TextAlign.center,
-                                textStyle: TextStyle(
-                                  color: Color(0xFF1E293B),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: -0.40,
+                                style: LMFeedTextStyle(
+                                  textAlign: TextAlign.center,
+                                  textStyle: TextStyle(
+                                    color: Color(0xFF1E293B),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.40,
+                                  ),
                                 ),
                               ),
                             ),
@@ -214,15 +216,17 @@ class _TopicBottomSheetState extends State<LMTopicBottomSheet> {
                                             margin: const EdgeInsets.only(
                                                 right: 8.0, bottom: 8.0),
                                             child: Chip(
-                                              label: LMTextView(
+                                              label: LMFeedText(
                                                 text: e.name,
-                                                textStyle: TextStyle(
-                                                  color: isTopicSelected
-                                                      ? Colors.white
-                                                      : LMThemeData.appBlack,
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  height: 1.30,
+                                                style: LMFeedTextStyle(
+                                                  textStyle: TextStyle(
+                                                    color: isTopicSelected
+                                                        ? Colors.white
+                                                        : LMThemeData.appBlack,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                    height: 1.30,
+                                                  ),
                                                 ),
                                               ),
                                               backgroundColor: isTopicSelected

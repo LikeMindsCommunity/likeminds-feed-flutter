@@ -196,11 +196,12 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    LMTextView(
+                    LMFeedText(
                       text: opt.name!,
-                      textStyle: const TextStyle(
+                      style: const LMFeedTextStyle(
+                          textStyle: TextStyle(
                         fontSize: 14,
-                      ),
+                      )),
                     ),
                   ],
                 ),

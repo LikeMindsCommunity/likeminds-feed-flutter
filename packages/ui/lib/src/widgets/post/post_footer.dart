@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 
 class LMFeedPostFooter extends StatelessWidget {
   LMFeedPostFooter({
@@ -13,10 +14,10 @@ class LMFeedPostFooter extends StatelessWidget {
 
   final LMFeedPostFooterStyle postFooterStyle;
 
-  final Widget Function(LMButton)? likeButtonBuilder;
-  final Widget Function(LMButton)? commentButtonBuilder;
-  final Widget Function(LMButton)? saveButtonBuilder;
-  final Widget Function(LMButton)? shareButtonBuilder;
+  final Widget Function(LMFeedButton)? likeButtonBuilder;
+  final Widget Function(LMFeedButton)? commentButtonBuilder;
+  final Widget Function(LMFeedButton)? saveButtonBuilder;
+  final Widget Function(LMFeedButton)? shareButtonBuilder;
 
   final _footerChildren = <Widget>[];
 
@@ -61,37 +62,63 @@ class LMFeedPostFooter extends StatelessWidget {
     }
   }
 
-  final LMButton defLikeButton = LMButton(
-    text: const LMTextView(text: "Like"),
-    margin: 0,
-    activeText: const LMTextView(
+  final LMFeedButton defLikeButton = LMFeedButton(
+    text: const LMFeedText(text: "Like"),
+    style: const LMFeedButtonStyle(
+      margin: 0,
+    ),
+    activeText: const LMFeedText(
       text: "Like",
     ),
     onTap: () {},
-    icon: LMIcon.likeInActive(),
-    activeIcon: LMIcon.likeActive(),
+    icon: const LMFeedIcon(
+      type: LMIconType.svg,
+      assetPath: lmLikeInActiveSvg,
+    ),
+    activeIcon: const LMFeedIcon(
+      type: LMIconType.svg,
+      assetPath: lmLikeActiveSvg,
+    ),
   );
 
-  final LMButton defCommentButton = LMButton(
-    text: const LMTextView(text: "Comment"),
-    margin: 0,
+  final LMFeedButton defCommentButton = LMFeedButton(
+    text: const LMFeedText(text: "Comment"),
+    style: const LMFeedButtonStyle(
+      margin: 0,
+    ),
     onTap: () {},
-    icon: LMIcon.comment(),
+    icon: const LMFeedIcon(
+      type: LMIconType.svg,
+      assetPath: lmCommentSvg,
+    ),
   );
 
-  final LMButton defSaveButton = LMButton(
-    text: const LMTextView(text: "Save"),
-    margin: 0,
+  final LMFeedButton defSaveButton = LMFeedButton(
+    text: const LMFeedText(text: "Save"),
+    style: const LMFeedButtonStyle(
+      margin: 0,
+    ),
     onTap: () {},
-    icon: LMIcon.saveInActive(),
-    activeIcon: LMIcon.saveActive(),
+    icon: const LMFeedIcon(
+      type: LMIconType.svg,
+      assetPath: lmSaveInactiveSvg,
+    ),
+    activeIcon: const LMFeedIcon(
+      type: LMIconType.svg,
+      assetPath: lmSaveActiveSvg,
+    ),
   );
 
-  final LMButton defShareButton = LMButton(
-    text: const LMTextView(text: "Share"),
-    margin: 0,
+  final LMFeedButton defShareButton = LMFeedButton(
+    text: const LMFeedText(text: "Share"),
+    style: const LMFeedButtonStyle(
+      margin: 0,
+    ),
     onTap: () {},
-    icon: LMIcon.share(),
+    icon: const LMFeedIcon(
+      type: LMIconType.svg,
+      assetPath: lmShareSvg,
+    ),
   );
 }
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LMBottomSheet extends StatefulWidget {
-  final LMTextView? title;
+  final LMFeedText? title;
   final Alignment? titleAlignment;
   final Color? backgroundColor;
   final BorderRadiusGeometry? borderRadius;

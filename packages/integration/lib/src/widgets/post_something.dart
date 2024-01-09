@@ -68,7 +68,7 @@ class PostSomething extends StatelessWidget {
                 size: 36,
               ),
               LMThemeData.kHorizontalPaddingMedium,
-              const LMTextView(text: "Post something...")
+              const LMFeedText(text: "Post something...")
             ],
           ),
         ),

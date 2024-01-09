@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 
@@ -42,10 +42,10 @@ class LMDocument extends StatefulWidget {
   final Color? borderColor;
   final Color? textColor;
 
-  final LMTextView? title;
-  final LMTextView? subtitle;
+  final LMFeedText? title;
+  final LMFeedText? subtitle;
   final Widget? documentIcon;
-  final LMIcon? removeIcon;
+  final LMFeedIcon? removeIcon;
   final Function? onRemove;
   final bool showBorder;
   final Color? backgroundColor;
@@ -114,10 +114,10 @@ class _LMDocumentState extends State<LMDocument> {
                     Container(
                       alignment: Alignment.center,
                       child: widget.documentIcon ??
-                          const LMIcon(
+                          const LMFeedIcon(
                             type: LMIconType.icon,
                             icon: Icons.picture_as_pdf,
-                            iconStyle: LMIconStyle(
+                            style: LMFeedIconStyle(
                               size: 24,
                               color: Colors.red,
                             ),
@@ -129,14 +129,16 @@ class _LMDocumentState extends State<LMDocument> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           widget.title ??
-                              LMTextView(
+                              LMFeedText(
                                 text: _fileName ?? '',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                textStyle: TextStyle(
-                                  fontSize: 14,
-                                  color: widget.textColor ?? kGrey2Color,
-                                  fontWeight: FontWeight.w500,
+                                style: LMFeedTextStyle(
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textStyle: TextStyle(
+                                    fontSize: 14,
+                                    color: widget.textColor ?? kGrey2Color,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                           kVerticalPaddingSmall,
@@ -171,11 +173,11 @@ class _LMDocumentState extends State<LMDocument> {
                     ),
                     const SizedBox(width: 32),
                     widget.documentFile != null
-                        ? LMIconButton(
+                        ? LMFeedButton(
                             icon: widget.removeIcon ??
-                                const LMIcon(
+                                const LMFeedIcon(
                                     type: LMIconType.icon, icon: Icons.close),
-                            onTap: (actice) {
+                            onTap: () {
                               if (widget.onRemove != null) {
                                 widget.onRemove!();
                               }

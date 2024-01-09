@@ -189,17 +189,19 @@ class _LMTopicListState extends State<LMTopicList> {
                                       child: Row(
                                         children: [
                                           Expanded(
-                                            child: LMTextView(
+                                            child: LMFeedText(
                                               text: e.name,
-                                              maxLines: 2,
-                                              textStyle: TextStyle(
-                                                color: isTopicSelected
-                                                    ? theme
-                                                        .colorScheme.secondary
-                                                    : Colors.black54,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                height: 1.30,
+                                              style: LMFeedTextStyle(
+                                                maxLines: 2,
+                                                textStyle: TextStyle(
+                                                  color: isTopicSelected
+                                                      ? theme
+                                                          .colorScheme.secondary
+                                                      : Colors.black54,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  height: 1.30,
+                                                ),
                                               ),
                                             ),
                                           ),

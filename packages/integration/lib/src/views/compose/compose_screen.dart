@@ -185,33 +185,39 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
         horizontal: 12.0,
         vertical: 4.0,
       ),
-      leading: LMButton(
-        text: LMTextView(
+      leading: LMFeedButton(
+        text: LMFeedText(
           text: "Cancel",
-          textStyle: TextStyle(color: theme.colorScheme.primary),
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(color: theme.colorScheme.primary),
+          ),
         ),
         onTap: Navigator.of(context).pop,
       ),
-      title: const LMTextView(
+      title: const LMFeedText(
         text: "Create Post",
-        textStyle: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: kGrey1Color,
-        ),
-      ),
-      trailing: LMButton(
-        text: LMTextView(
-          text: "Post",
+        style: LMFeedTextStyle(
           textStyle: TextStyle(
-            color: theme.colorScheme.onPrimary,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: kGrey1Color,
           ),
         ),
-        width: 48,
-        style: LMButtonStyle(
+      ),
+      trailing: LMFeedButton(
+        text: LMFeedText(
+          text: "Post",
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: theme.colorScheme.onPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        style: LMFeedButtonStyle(
           backgroundColor: theme.colorScheme.primary,
+          width: 48,
           borderRadius: 6,
         ),
         onTap: () {
@@ -327,10 +333,10 @@ class _LMPostComposeScreenState extends State<LMPostComposeScreen> {
                                   .build()
                               : selectedTopics.first,
                           textStyle: const TextStyle(color: kPrimaryColor),
-                          icon: const LMIcon(
+                          icon: LMFeedIcon(
                             type: LMIconType.icon,
                             icon: CupertinoIcons.chevron_down,
-                            iconStyle: LMIconStyle(
+                            style: const LMFeedIconStyle(
                               size: 16,
                               color: kPrimaryColor,
                             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
 
 class LMCommentTile extends StatefulWidget {
   const LMCommentTile({
@@ -34,8 +35,8 @@ class LMCommentTile extends StatefulWidget {
   final TextStyle? textStyle;
   final TextStyle? linkStyle;
   final LMProfilePicture? profilePicture;
-  final LMTextView? titleText;
-  final LMTextView? subtitleText;
+  final LMFeedText? titleText;
+  final LMFeedText? subtitleText;
   final List<Widget>? commentActions;
   final EdgeInsets? actionsPadding;
   final Function(String) onTagTap;
@@ -49,8 +50,8 @@ class LMCommentTile extends StatefulWidget {
   final List<BoxShadow>? boxShadow;
   final EdgeInsets? padding;
 
-  final Widget Function(LMButton)? likeButtonBuilder;
-  final Widget Function(LMButton)? replyButtonBuilder;
+  final Widget Function(LMFeedButton)? likeButtonBuilder;
+  final Widget Function(LMFeedButton)? replyButtonBuilder;
 
   @override
   State<LMCommentTile> createState() => _LMCommentTileState();
@@ -107,13 +108,15 @@ class _LMCommentTileState extends State<LMCommentTile> {
                   SizedBox(
                     width: widget.width != null ? widget.width! * 0.6 : null,
                     child: widget.titleText ??
-                        LMTextView(
+                        LMFeedText(
                           text: widget.user.name,
-                          textStyle: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                          style: const LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
                           ),
-                          maxLines: 1,
                         ),
                   ),
                   widget.subtitleText != null
@@ -174,11 +177,13 @@ class _LMCommentTileState extends State<LMCommentTile> {
                         ? _defShowRepliesButton()
                         : Container(),
                     const Spacer(),
-                    LMTextView(
+                    LMFeedText(
                       text: widget.comment.createdAt.timeAgo(),
-                      textStyle: const TextStyle(
-                        fontSize: kFontSmallMed,
-                        color: kGrey3Color,
+                      style: const LMFeedTextStyle(
+                        textStyle: TextStyle(
+                          fontSize: kFontSmallMed,
+                          color: kGrey3Color,
+                        ),
                       ),
                     ),
                   ],
@@ -197,28 +202,30 @@ class _LMCommentTileState extends State<LMCommentTile> {
     );
   }
 
-  LMButton _defLikeCommentButton() {
-    return LMButton(
+  LMFeedButton _defLikeCommentButton() {
+    return LMFeedButton(
       onTap: () {},
-      text: const LMTextView(
+      text: const LMFeedText(
         text: 'Like',
-        textStyle: TextStyle(
-          fontSize: 14,
-          color: kGrey2Color,
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 14,
+            color: kGrey2Color,
+          ),
         ),
       ),
-      icon: const LMIcon(
+      icon: const LMFeedIcon(
         type: LMIconType.icon,
         icon: Icons.favorite_outline,
-        iconStyle: LMIconStyle(
+        style: LMFeedIconStyle(
           color: kGrey2Color,
           size: 16,
         ),
       ),
-      activeIcon: const LMIcon(
+      activeIcon: const LMFeedIcon(
         icon: Icons.favorite,
         type: LMIconType.icon,
-        iconStyle: LMIconStyle(
+        style: LMFeedIconStyle(
           size: 16,
           color: kPrimaryColor,
         ),
@@ -226,30 +233,36 @@ class _LMCommentTileState extends State<LMCommentTile> {
     );
   }
 
-  LMButton _defReplyToCommentButton() {
-    return LMButton(
+  LMFeedButton _defReplyToCommentButton() {
+    return LMFeedButton(
       onTap: () {},
-      text: const LMTextView(
+      text: const LMFeedText(
         text: 'Reply',
-        textStyle: TextStyle(
-          fontSize: 14,
-          color: kGrey2Color,
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 14,
+            color: kGrey2Color,
+          ),
         ),
       ),
     );
   }
 
-  LMButton _defShowRepliesButton() {
-    return LMButton(
-        text: LMTextView(
-      text: widget.comment.repliesCount > 1
-          ? "${widget.comment.repliesCount}  replies"
-          : "${widget.comment.repliesCount}  reply",
-      textStyle: const TextStyle(
-        color: kGrey2Color,
-        fontSize: 12,
+  LMFeedButton _defShowRepliesButton() {
+    return LMFeedButton(
+      text: LMFeedText(
+        text: widget.comment.repliesCount > 1
+            ? "${widget.comment.repliesCount}  replies"
+            : "${widget.comment.repliesCount}  reply",
+        style: const LMFeedTextStyle(
+          textStyle: TextStyle(
+            color: kGrey2Color,
+            fontSize: 12,
+          ),
+        ),
+        onTap: () {},
       ),
       onTap: () {},
-    ));
+    );
   }
 }

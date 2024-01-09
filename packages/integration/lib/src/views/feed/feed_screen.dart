@@ -278,12 +278,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               },
               child: const Padding(
                 padding: EdgeInsets.only(left: 4.0),
-                child: LMTextView(
+                child: LMFeedText(
                   text: "Feed",
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 27,
-                    fontWeight: FontWeight.w700,
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 27,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -359,10 +361,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 12.0,
                                                 vertical: 4.0),
-                                            icon: const LMIcon(
+                                            icon: LMFeedIcon(
                                               type: LMIconType.icon,
                                               icon: CupertinoIcons.chevron_down,
-                                              iconStyle: LMIconStyle(
+                                              style: const LMFeedIconStyle(
                                                 size: 16,
                                                 color: LMThemeData.appBlack,
                                               ),
@@ -389,11 +391,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 12.0,
                                                         vertical: 4.0),
-                                                icon: const LMIcon(
+                                                icon: LMFeedIcon(
                                                   type: LMIconType.icon,
                                                   icon: CupertinoIcons
                                                       .chevron_down,
-                                                  iconStyle: LMIconStyle(
+                                                  style: const LMFeedIconStyle(
                                                     size: 16,
                                                     color:
                                                         LMThemeData.kWhiteColor,
@@ -435,30 +437,34 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                                         .circular(
                                                                             4)),
                                                       ),
-                                                      child: LMTextView(
+                                                      child: LMFeedText(
                                                         text: selectedTopics
                                                             .length
                                                             .toString(),
-                                                        textStyle:
-                                                            const TextStyle(
-                                                          color:
-                                                              Color(0xFF4666F6),
-                                                          fontSize: 12,
-                                                          fontFamily: 'Inter',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          height: 1.30,
-                                                          letterSpacing: -0.48,
+                                                        style:
+                                                            const LMFeedTextStyle(
+                                                          textStyle: TextStyle(
+                                                            color: Color(
+                                                                0xFF4666F6),
+                                                            fontSize: 12,
+                                                            fontFamily: 'Inter',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            height: 1.30,
+                                                            letterSpacing:
+                                                                -0.48,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
                                                     LMThemeData
                                                         .kHorizontalPaddingSmall,
-                                                    const LMIcon(
+                                                    LMFeedIcon(
                                                       type: LMIconType.icon,
                                                       icon: CupertinoIcons
                                                           .chevron_down,
-                                                      iconStyle: LMIconStyle(
+                                                      style:
+                                                          const LMFeedIconStyle(
                                                         size: 16,
                                                         color: LMThemeData
                                                             .kWhiteColor,
@@ -562,10 +568,10 @@ class _FeedRoomViewState extends State<FeedRoomView> {
           ),
         );
       } else if (media.mediaType == LMMediaType.document) {
-        return const LMIcon(
+        return LMFeedIcon(
           type: LMIconType.svg,
           assetPath: kAssetDocPDFIcon,
-          iconStyle: LMIconStyle(
+          style: const LMFeedIconStyle(
             color: Colors.red,
             size: 35,
             boxPadding: 0,
@@ -803,14 +809,16 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const LMTextView(
+                                    const LMFeedText(
                                       text:
                                           "Looks like there are no posts for this topic yet.",
-                                      textStyle: TextStyle(
-                                        fontSize: 15,
-                                        color: LMThemeData.onSurface500,
-                                        fontWeight: FontWeight.w600,
-                                        height: 0,
+                                      style: LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: 15,
+                                          color: LMThemeData.onSurface500,
+                                          fontWeight: FontWeight.w600,
+                                          height: 0,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
@@ -818,24 +826,26 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        LMButton(
-                                          style: LMButtonStyle(
+                                        LMFeedButton(
+                                          style: LMFeedButtonStyle(
                                             borderRadius: 48,
                                             border: Border.all(
                                               color: LMThemeData.primary500,
                                               width: 2,
                                             ),
+                                            height: 40,
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8, horizontal: 12),
                                           ),
-                                          height: 40,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8, horizontal: 12),
-                                          text: const LMTextView(
+                                          text: const LMFeedText(
                                             text: "Change Filter",
-                                            textAlign: TextAlign.center,
-                                            textStyle: TextStyle(
-                                              color: LMThemeData.primary500,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
+                                            style: LMFeedTextStyle(
+                                              textAlign: TextAlign.center,
+                                              textStyle: TextStyle(
+                                                color: LMThemeData.primary500,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              ),
                                             ),
                                           ),
                                           onTap: () =>
@@ -851,51 +861,58 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const LMIcon(
+                                  LMFeedIcon(
                                     type: LMIconType.icon,
                                     icon: Icons.post_add,
-                                    iconStyle: LMIconStyle(
+                                    style: const LMFeedIconStyle(
                                       size: 48,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
-                                  const LMTextView(
+                                  const LMFeedText(
                                     text: 'No posts to show',
-                                    textStyle: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  const LMTextView(
-                                      text: "Be the first one to post here",
+                                    style: LMFeedTextStyle(
                                       textStyle: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w300,
-                                          color: LMThemeData.kGrey2Color)),
-                                  const SizedBox(height: 28),
-                                  LMButton(
-                                    style: LMButtonStyle(
-                                      borderRadius: 28,
-                                      backgroundColor:
-                                          theme.colorScheme.primary,
-                                    ),
-                                    height: 44,
-                                    width: 153,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12, horizontal: 20),
-                                    text: LMTextView(
-                                      text: "Create Post",
-                                      textStyle: TextStyle(
-                                        color: theme.colorScheme.onPrimary,
+                                        fontSize: 24,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    placement: LMIconPlacement.end,
-                                    icon: LMIcon(
+                                  ),
+                                  const SizedBox(height: 12),
+                                  const LMFeedText(
+                                    text: "Be the first one to post here",
+                                    style: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w300,
+                                          color: LMThemeData.kGrey2Color),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 28),
+                                  LMFeedButton(
+                                    style: LMFeedButtonStyle(
+                                      borderRadius: 28,
+                                      backgroundColor:
+                                          theme.colorScheme.primary,
+                                      height: 44,
+                                      width: 153,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12, horizontal: 20),
+                                      placement: LMIconPlacement.end,
+                                    ),
+                                    text: LMFeedText(
+                                      text: "Create Post",
+                                      style: LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          color: theme.colorScheme.onPrimary,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    icon: LMFeedIcon(
                                       type: LMIconType.icon,
                                       icon: Icons.add,
-                                      iconStyle: LMIconStyle(
+                                      style: LMFeedIconStyle(
                                         size: 18,
                                         color: theme.colorScheme.onPrimary,
                                       ),
@@ -958,28 +975,30 @@ class _FeedRoomViewState extends State<FeedRoomView> {
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
-          return LMButton(
-            height: 44,
-            width: 153,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            style: LMButtonStyle(
+          return LMFeedButton(
+            style: LMFeedButtonStyle(
+              height: 44,
+              width: 153,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               borderRadius: 28,
               backgroundColor:
                   right ? theme.colorScheme.primary : LMThemeData.kGrey3Color,
+              placement: LMIconPlacement.end,
+              margin: 5,
             ),
-            placement: LMIconPlacement.end,
-            text: LMTextView(
+            text: LMFeedText(
               text: "Create Post",
-              textStyle: TextStyle(
-                color: theme.colorScheme.onPrimary,
-                fontWeight: FontWeight.w500,
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-            margin: 5,
-            icon: LMIcon(
+            icon: LMFeedIcon(
               type: LMIconType.icon,
               icon: Icons.add,
-              iconStyle: LMIconStyle(
+              style: LMFeedIconStyle(
                 fit: BoxFit.cover,
                 size: 18,
                 color: theme.colorScheme.onPrimary,

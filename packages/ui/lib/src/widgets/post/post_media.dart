@@ -33,8 +33,8 @@ class LMPostMedia extends StatefulWidget {
   final double? height;
   final Color? backgroundColor;
   final bool showLinkUrl;
-  final LMTextView? title;
-  final LMTextView? subtitle;
+  final LMFeedText? title;
+  final LMFeedText? subtitle;
   final bool showBorder;
   final Widget? errorWidget;
   final BoxFit? boxFit;
@@ -170,15 +170,18 @@ class _LMPostMediaState extends State<LMPostMedia> {
             documents.length > 3 && isCollapsed
                 ? GestureDetector(
                     onTap: () => setState(() {
-                          isCollapsed = false;
-                        }),
-                    child: LMTextView(
+                      isCollapsed = false;
+                    }),
+                    child: LMFeedText(
                       text: '+ ${documents.length - 3} more',
-                      textStyle: TextStyle(
-                        color: widget.textColor ??
-                            Theme.of(context).colorScheme.secondary,
+                      style: LMFeedTextStyle(
+                        textStyle: TextStyle(
+                          color: widget.textColor ??
+                              Theme.of(context).colorScheme.secondary,
+                        ),
                       ),
-                    ))
+                    ),
+                  )
                 : const SizedBox()
           ],
         ),

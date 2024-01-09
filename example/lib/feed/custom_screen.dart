@@ -30,6 +30,6 @@ class ClientCustomScreen extends LMPostDetailScreen {
 
 PreferredSizeWidget appBar(BuildContext context, LMPostViewData post) {
   return const LMAppBar(
-    title: LMTextView(text: "Custom APPBAR"),
+    title: LMFeedText(text: "Custom APPBAR"),
   );
 }
