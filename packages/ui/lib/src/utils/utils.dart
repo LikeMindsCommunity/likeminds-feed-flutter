@@ -42,7 +42,6 @@ Future<Map<String, int>> getNetworkImageDimensions(String image) async {
   return dimensions;
 }
 
-// defines icon placement
-// LMIconPlacement.start places the icon before the text
-// LMIconPlacement.end places the icon after the text
-enum LMIconPlacement { start, end }
+String getInitials(String name) => name.isNotEmpty
+    ? name.trim().split(' ').map((l) => l[0]).take(2).join()
+    : '';

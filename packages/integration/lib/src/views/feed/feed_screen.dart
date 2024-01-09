@@ -897,7 +897,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                       width: 153,
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 12, horizontal: 20),
-                                      placement: LMIconPlacement.end,
+                                      placement: LMIconButtonPlacement.end,
                                     ),
                                     text: LMFeedText(
                                       text: "Create Post",
@@ -982,7 +982,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               borderRadius: 28,
               backgroundColor:
                   right ? theme.colorScheme.primary : LMThemeData.kGrey3Color,
-              placement: LMIconPlacement.end,
+              placement: LMIconButtonPlacement.end,
               margin: 5,
             ),
             text: LMFeedText(

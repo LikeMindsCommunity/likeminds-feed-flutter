@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_example/app.dart';
+import 'package:likeminds_feed_example/storybook.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,5 +13,5 @@ void main() async {
   LMFeedCore.instance.initialize(
     lmFeedClient: lmFeedClient,
   );
-  runApp(const LMSampleApp());
+  runApp(const StoryBookApp());
 }

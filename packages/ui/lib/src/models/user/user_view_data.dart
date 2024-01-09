@@ -11,7 +11,7 @@ class LMUserViewData {
   String name;
 
   /// image url of the user
-  String imageUrl;
+  String? imageUrl;
   bool? isGuest;
   bool? isDeleted;
   String userUniqueId;
@@ -37,7 +37,7 @@ class LMUserViewData {
   LMUserViewData._({
     required this.id,
     required this.name,
-    required this.imageUrl,
+    this.imageUrl,
     required this.isGuest,
     required this.userUniqueId,
     this.organisationName,
@@ -83,7 +83,7 @@ class LMUserViewDataBuilder {
     _name = name;
   }
 
-  void imageUrl(String imageUrl) {
+  void imageUrl(String? imageUrl) {
     _imageUrl = imageUrl;
   }
 
@@ -144,7 +144,7 @@ class LMUserViewDataBuilder {
     return LMUserViewData._(
       id: _id!,
       name: _name!,
-      imageUrl: _imageUrl!,
+      imageUrl: _imageUrl,
       isGuest: _isGuest,
       userUniqueId: _userUniqueId!,
       organisationName: _organisationName,

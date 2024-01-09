@@ -63,12 +63,14 @@ class LMFeedPostHeader extends StatelessWidget {
                       children: [
                         profilePicture ??
                             LMProfilePicture(
-                              size: postHeaderStyle.imageSize ?? 42,
                               fallbackText: user.name,
                               imageUrl: user.imageUrl,
                               onTap: onProfileTap,
-                              fallbackTextStyle:
-                                  postHeaderStyle.fallbackTextStyle,
+                              style: LMFeedProfilePictureStyle(
+                                fallbackTextStyle:
+                                    postHeaderStyle.fallbackTextStyle,
+                                size: postHeaderStyle.imageSize ?? 42,
+                              ),
                             ),
                         kHorizontalPaddingLarge,
                         Container(
@@ -270,7 +272,7 @@ class LMFeedPostHeaderStyle {
   final double? width;
   final double? height;
   final double? imageSize;
-  final TextStyle? fallbackTextStyle;
+  final LMFeedTextStyle? fallbackTextStyle;
   final bool showCustomTitle;
 
   const LMFeedPostHeaderStyle({
