@@ -1,6 +1,5 @@
 export 'post/topic_view_data.dart';
 export 'post/post_view_data.dart';
-export 'post/post_meta_data.dart';
 
 export 'comment/comment_view_data.dart';
 

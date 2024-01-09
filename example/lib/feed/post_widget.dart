@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 Widget clientPostWidgetBuilder(BuildContext context, LMPostWidget postWidget) {

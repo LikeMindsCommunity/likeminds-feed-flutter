@@ -84,4 +84,20 @@ class LMAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
+
+  LMAppBar copyWith(LMAppBar appBar) {
+    return LMAppBar(
+      leading: appBar.leading ?? leading,
+      trailing: appBar.trailing ?? trailing,
+      title: appBar.title ?? title,
+      backButtonCallback: appBar.backButtonCallback ?? backButtonCallback,
+      backgroundColor: appBar.backgroundColor ?? backgroundColor,
+      border: appBar.border ?? border,
+      mainAxisAlignment: appBar.mainAxisAlignment ?? mainAxisAlignment,
+      margin: appBar.margin ?? margin,
+      padding: appBar.padding ?? padding,
+      height: appBar.height ?? height,
+      width: appBar.width ?? width,
+    );
+  }
 }

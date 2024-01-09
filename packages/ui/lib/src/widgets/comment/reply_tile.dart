@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:likeminds_feed_ui_fl/packages/expandable_text/expandable_text.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 class LMReplyTile extends StatefulWidget {
   const LMReplyTile({
@@ -13,7 +12,7 @@ class LMReplyTile extends StatefulWidget {
     this.subtitleText,
     this.commentActions,
     this.actionsPadding,
-    required this.onMenuTap,
+    required this.lmFeedMenuAction,
     required this.onTagTap,
     this.backgroundColor,
     this.borderRadius,
@@ -34,7 +33,7 @@ class LMReplyTile extends StatefulWidget {
   final LMTextView? subtitleText;
   final List<Widget>? commentActions;
   final EdgeInsets? actionsPadding;
-  final Function(int) onMenuTap;
+  final LMFeedMenuAction lmFeedMenuAction;
   final Function(String) onTagTap;
   final Color? backgroundColor;
   final BorderRadius? borderRadius;
@@ -118,10 +117,10 @@ class _LMReplyTileState extends State<LMReplyTile> {
                 ),
                 const Spacer(),
                 widget.menu ??
-                    LMPostMenu(
+                    LMFeedMenu(
                       isFeed: false,
                       menuItems: widget.comment.menuItems,
-                      onSelected: widget.onMenuTap,
+                      action: widget.lmFeedMenuAction,
                     ),
               ],
             ),

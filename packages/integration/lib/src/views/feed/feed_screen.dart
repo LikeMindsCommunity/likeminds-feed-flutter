@@ -544,7 +544,6 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   ScrollController? _controller;
   final ValueNotifier postSomethingNotifier = ValueNotifier(false);
   bool right = true;
-  LMPostMetaDataBuilder? postMetaDataBuilder;
 
   Widget getLoaderThumbnail(LMMediaModel? media) {
     if (media != null) {
@@ -600,10 +599,6 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         eventProperties: {'feed_type': "universal_feed"}));
     _controller = widget.scrollController..addListener(_scrollListener);
     right = checkPostCreationRights();
-    postMetaDataBuilder = (LMPostMetaDataBuilder()
-      ..users(widget.users)
-      ..topics(widget.topics)
-      ..widgets({}));
   }
 
   void _scrollListener() {

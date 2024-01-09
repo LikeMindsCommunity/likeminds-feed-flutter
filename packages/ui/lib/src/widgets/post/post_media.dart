@@ -46,6 +46,32 @@ class LMPostMedia extends StatefulWidget {
 
   @override
   State<LMPostMedia> createState() => _LMPostMediaState();
+
+  LMPostMedia copyWith(LMPostMedia postMedia) {
+    return LMPostMedia(
+      attachments: postMedia.attachments,
+      documentIcon: postMedia.documentIcon ?? documentIcon,
+      width: postMedia.width ?? width,
+      height: postMedia.height ?? height,
+      borderRadius: postMedia.borderRadius ?? borderRadius,
+      backgroundColor: postMedia.backgroundColor ?? backgroundColor,
+      showLinkUrl: postMedia.showLinkUrl,
+      carouselActiveIndicatorColor: postMedia.carouselActiveIndicatorColor ??
+          carouselActiveIndicatorColor,
+      carouselInactiveIndicatorColor:
+          postMedia.carouselInactiveIndicatorColor ??
+              carouselInactiveIndicatorColor,
+      title: postMedia.title ?? title,
+      subtitle: postMedia.subtitle ?? subtitle,
+      showBorder: postMedia.showBorder,
+      errorWidget: postMedia.errorWidget ?? errorWidget,
+      boxFit: postMedia.boxFit ?? boxFit,
+      textColor: postMedia.textColor ?? textColor,
+      initialiseVideoController:
+          postMedia.initialiseVideoController ?? initialiseVideoController,
+      onError: postMedia.onError ?? onError,
+    );
+  }
 }
 
 class _LMPostMediaState extends State<LMPostMedia> {
@@ -157,31 +183,6 @@ class _LMPostMediaState extends State<LMPostMedia> {
           ],
         ),
       ),
-    );
-  }
-
-  LMPostMedia copyWith(LMPostMedia media) {
-    return LMPostMedia(
-      attachments: media.attachments,
-      documentIcon: media.documentIcon ?? widget.documentIcon,
-      width: media.width ?? widget.width,
-      height: media.height ?? widget.height,
-      borderRadius: media.borderRadius ?? widget.borderRadius,
-      backgroundColor: media.backgroundColor ?? widget.backgroundColor,
-      showLinkUrl: media.showLinkUrl,
-      carouselActiveIndicatorColor: media.carouselActiveIndicatorColor ??
-          widget.carouselActiveIndicatorColor,
-      carouselInactiveIndicatorColor: media.carouselInactiveIndicatorColor ??
-          widget.carouselInactiveIndicatorColor,
-      title: media.title ?? widget.title,
-      subtitle: media.subtitle ?? widget.subtitle,
-      showBorder: media.showBorder,
-      errorWidget: media.errorWidget ?? widget.errorWidget,
-      boxFit: media.boxFit ?? widget.boxFit,
-      textColor: media.textColor ?? widget.textColor,
-      initialiseVideoController:
-          media.initialiseVideoController ?? widget.initialiseVideoController,
-      onError: media.onError ?? widget.onError,
     );
   }
 }

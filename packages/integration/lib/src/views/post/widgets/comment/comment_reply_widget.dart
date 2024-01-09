@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_handler/comment_handler_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/comment/comment_replies/comment_replies_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/comment/comment_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
@@ -247,74 +244,8 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
                                 color: LMThemeData.kGreyColor,
                               ),
                             ),
-                            onMenuTap: (value) async {
-                              if (value == commentDeleteId) {
-                                _commentHandlerBloc!
-                                    .add(LMCommentCancelEvent());
-
-                                showDialog(
-                                    context: context,
-                                    builder: (childContext) =>
-                                        LMDeleteConfirmationDialog(
-                                            title: 'Delete Comment',
-                                            userId: commentViewData.userId,
-                                            content:
-                                                'Are you sure you want to delete this comment. This action can not be reversed.',
-                                            action: (String reason) async {
-                                              Navigator.of(childContext).pop();
-                                              //Implement delete post analytics tracking
-                                              DeleteCommentRequest request =
-                                                  (DeleteCommentRequestBuilder()
-                                                        ..postId(postId)
-                                                        ..commentId(
-                                                            commentViewData.id)
-                                                        ..reason(reason.isEmpty
-                                                            ? "Reason for deletion"
-                                                            : reason))
-                                                      .build();
-
-                                              LMCommentMetaData
-                                                  commentMetaData =
-                                                  (LMCommentMetaDataBuilder()
-                                                        ..commentId(
-                                                            widget.reply.id)
-                                                        ..commentActionEntity(
-                                                            LMCommentType.reply)
-                                                        ..commentActionType(
-                                                            LMCommentActionType
-                                                                .delete)
-                                                        ..level(1)
-                                                        ..replyId(
-                                                            commentViewData.id))
-                                                      .build();
-
-                                              _commentHandlerBloc!.add(
-                                                  LMCommentActionEvent(
-                                                      commentActionRequest:
-                                                          request,
-                                                      commentMetaData:
-                                                          commentMetaData));
-                                            },
-                                            actionText: 'Delete'));
-                              } else if (value == commentEditId) {
-                                _commentHandlerBloc!
-                                    .add(LMCommentCancelEvent());
-                                LMCommentMetaData commentMetaData =
-                                    (LMCommentMetaDataBuilder()
-                                          ..commentId(
-                                              widget.reply.parentComment!.id)
-                                          ..commentActionEntity(
-                                              LMCommentType.reply)
-                                          ..commentActionType(
-                                              LMCommentActionType.edit)
-                                          ..level(1)
-                                          ..replyId(commentViewData.id))
-                                        .build();
-
-                                _commentHandlerBloc!.add(LMCommentOngoingEvent(
-                                    commentMetaData: commentMetaData));
-                              }
-                            },
+                            lmFeedMenuAction:
+                                defLMFeedMenuAction(commentViewData),
                             commentActions: [
                               const SizedBox(width: 48),
                               LMButton(
@@ -456,6 +387,59 @@ class _CommentReplyWidgetState extends State<LMCommentReplyWidget> {
           users.putIfAbsent(user.userUniqueId, () => user);
         }
         replyCount = replies.length;
+      },
+    );
+  }
+
+  LMFeedMenuAction defLMFeedMenuAction(LMCommentViewData commentViewData) {
+    return LMFeedMenuAction(
+      onCommentEdit: () {
+        _commentHandlerBloc!.add(LMCommentCancelEvent());
+        LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
+              ..commentId(widget.reply.parentComment!.id)
+              ..commentActionEntity(LMCommentType.reply)
+              ..commentActionType(LMCommentActionType.edit)
+              ..level(1)
+              ..replyId(commentViewData.id))
+            .build();
+
+        _commentHandlerBloc!
+            .add(LMCommentOngoingEvent(commentMetaData: commentMetaData));
+      },
+      onCommentDelete: () {
+        _commentHandlerBloc!.add(LMCommentCancelEvent());
+
+        showDialog(
+            context: context,
+            builder: (childContext) => LMDeleteConfirmationDialog(
+                title: 'Delete Comment',
+                userId: commentViewData.userId,
+                content:
+                    'Are you sure you want to delete this comment. This action can not be reversed.',
+                action: (String reason) async {
+                  Navigator.of(childContext).pop();
+                  //Implement delete post analytics tracking
+                  DeleteCommentRequest request = (DeleteCommentRequestBuilder()
+                        ..postId(postId)
+                        ..commentId(commentViewData.id)
+                        ..reason(
+                            reason.isEmpty ? "Reason for deletion" : reason))
+                      .build();
+
+                  LMCommentMetaData commentMetaData =
+                      (LMCommentMetaDataBuilder()
+                            ..commentId(widget.reply.id)
+                            ..commentActionEntity(LMCommentType.reply)
+                            ..commentActionType(LMCommentActionType.delete)
+                            ..level(1)
+                            ..replyId(commentViewData.id))
+                          .build();
+
+                  _commentHandlerBloc!.add(LMCommentActionEvent(
+                      commentActionRequest: request,
+                      commentMetaData: commentMetaData));
+                },
+                actionText: 'Delete'));
       },
     );
   }
