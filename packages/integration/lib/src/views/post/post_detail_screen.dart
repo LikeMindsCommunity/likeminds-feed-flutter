@@ -33,7 +33,12 @@ class LMFeedPostDetailScreen extends StatefulWidget {
     this.onPostTap,
     this.onLikeClick,
     this.onCommentClick,
-    this.postWidget,
+    this.postContentBuilder,
+    this.postFooterBuilder,
+    this.postHeaderBuilder,
+    this.postMediaBuilder,
+    this.postMenuBuilder,
+    this.postTopicBuilder,
   });
   // Required variables
   final String postId;
@@ -48,7 +53,23 @@ class LMFeedPostDetailScreen extends StatefulWidget {
   /// {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
 
-  final LMFeedPostWidget? postWidget;
+  /// {@macro post_footer_builder}
+  final LMFeedPostFooterBuilder? postFooterBuilder;
+
+  /// {@macro post_header_builder}
+  final LMFeedPostHeaderBuilder? postHeaderBuilder;
+
+  /// {@macro post_menu_builder}
+  final LMFeedPostMenuBuilder? postMenuBuilder;
+
+  /// {@macro post_media_builder}
+  final LMFeedPostMediaBuilder? postMediaBuilder;
+
+  /// {@macro post_content_builder}
+  final LMFeedPostContentBuilder? postContentBuilder;
+
+  /// {@macro post_topic_builder}
+  final LMFeedPostTopicBuilder? postTopicBuilder;
 
   /// {@macro post_appbar_builder}
   final LMFeedPostAppBarBuilder? appBarBuilder;
@@ -76,9 +97,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   LMPostViewData? postData;
   String? commentIdReplyId;
   bool replyShown = false;
+  LMFeedThemeData? feedTheme;
 
   bool right = true;
   List<LMUserTagViewData> userTags = [];
+
+  void onLikeTap() {}
 
   @override
   void initState() {
@@ -115,6 +139,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    feedTheme = LMFeedTheme.of(context);
     return Theme(
       data: LMThemeData.theme,
       child: RefreshIndicator(
@@ -204,12 +229,15 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     .add(
                                                         LMFeedCommentCancelEvent());
                                               },
-                                              icon: const LMFeedIcon(
-                                                type: LMFeedIconType.icon,
-                                                icon: Icons.close,
-                                                style: LMFeedIconStyle(
-                                                  color: LMThemeData.kGreyColor,
-                                                  size: 24,
+                                              style: const LMFeedButtonStyle(
+                                                icon: LMFeedIcon(
+                                                  type: LMFeedIconType.icon,
+                                                  icon: Icons.close,
+                                                  style: LMFeedIconStyle(
+                                                    color:
+                                                        LMThemeData.kGreyColor,
+                                                    size: 24,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -219,7 +247,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     : const SizedBox.shrink(),
                                 Container(
                                   decoration: BoxDecoration(
-                                      color: LMThemeData.kPrimaryColor
+                                      color: feedTheme!.primaryColor
                                           .withOpacity(0.04),
                                       borderRadius: BorderRadius.circular(24)),
                                   margin: const EdgeInsets.symmetric(
@@ -230,9 +258,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       LMFeedProfilePicture(
                                         fallbackText: currentUser.name,
                                         imageUrl: currentUser.imageUrl,
-                                        style: const LMFeedProfilePictureStyle(
+                                        style: LMFeedProfilePictureStyle(
                                           backgroundColor:
-                                              LMThemeData.kPrimaryColor,
+                                              feedTheme!.primaryColor,
                                           size: 36,
                                         ),
                                         onTap: () {
@@ -525,10 +553,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     commentViewData),
                                             profilePicture:
                                                 LMFeedProfilePicture(
-                                              style:
-                                                  const LMFeedProfilePictureStyle(
+                                              style: LMFeedProfilePictureStyle(
                                                 backgroundColor:
-                                                    LMThemeData.kPrimaryColor,
+                                                    feedTheme!.primaryColor,
                                                 size: 36,
                                               ),
                                               fallbackText:
@@ -716,14 +743,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   LMFeedAppBar defAppBar() {
     return LMFeedAppBar(
       leading: LMFeedButton(
-        icon: LMFeedIcon(
-          type: LMFeedIconType.icon,
-          icon: Platform.isAndroid
-              ? Icons.arrow_back
-              : CupertinoIcons.chevron_back,
-          style: const LMFeedIconStyle(
-            size: 28,
-            color: LMThemeData.appBlack,
+        style: LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: Platform.isAndroid
+                ? Icons.arrow_back
+                : CupertinoIcons.chevron_back,
+            style: const LMFeedIconStyle(
+              size: 28,
+              color: LMThemeData.appBlack,
+            ),
           ),
         ),
         onTap: () {
@@ -746,199 +775,34 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     );
   }
 
+  LMFeedPostFooter defPostFooter() {
+    return LMFeedPostFooter();
+  }
+
   LMFeedPostWidget defPostWidget() {
-    return widget.postWidget ??
-        LMFeedPostWidget(
-          post: postData!,
-          user: _postDetailScreenHandler!.users[postData!.userId]!,
-          topics: _postDetailScreenHandler!.topics,
-          onPostTap: (context, post) {
-            debugPrint("Post in detail screen tapped");
-            widget.onPostTap?.call();
-          },
-          isFeed: false,
-          onTagTap: (tag) {},
-          footerBuilder: (context, post, postViewData) {
-            return LMFeedPostFooter(
-                // alignment: LMFeedAlignment.centre,
-                // children: [
-                //   LMTextButton(
-                //     text: const LMFeedText(
-                //         text: "Like"),
-                //     margin: 0,
-                //     activeText: const LMFeedText(
-                //       text: "Like",
-                //       textStyle: TextStyle(
-                //         color: LMThemeData.primary500,
-                //       ),
-                //     ),
-                //     onTap: () async {
-                //       if (postData!.isLiked) {
-                //         postData!.likeCount -= 1;
-                //         postData!.isLiked = false;
-                //       } else {
-                //         postData!.likeCount += 1;
-                //         postData!.isLiked = true;
-                //       }
-
-                //       _postDetailScreenHandler!
-                //               .rebuildPostWidget
-                //               .value =
-                //           !_postDetailScreenHandler!
-                //               .rebuildPostWidget
-                //               .value;
-
-                //       final response = await LMFeedCore
-                //           .instance.lmFeedClient
-                //           .likePost(
-                //               (LikePostRequestBuilder()
-                //                     ..postId(
-                //                         postData!.id))
-                //                   .build());
-
-                //       if (!response.success) {
-                //         toast(
-                //           response.errorMessage ??
-                //               "There was an error liking the post",
-                //           duration: Toast.LENGTH_LONG,
-                //         );
-
-                //         if (postData!.isLiked) {
-                //           postData!.likeCount -= 1;
-                //           postData!.isLiked = false;
-                //         } else {
-                //           postData!.likeCount += 1;
-                //           postData!.isLiked = true;
-                //         }
-
-                //         _postDetailScreenHandler!
-                //                 .rebuildPostWidget
-                //                 .value =
-                //             !_postDetailScreenHandler!
-                //                 .rebuildPostWidget
-                //                 .value;
-                //       } else {
-                //         LMPostBloc.instance.add(
-                //           LMUpdatePost(
-                //             post: postData!,
-                //           ),
-                //         );
-                //       }
-                //       widget.onLikeClick?.call();
-                //     },
-                //     icon: const LMFeedIcon(
-                //       type: LMFeedIconType.icon,
-                //       icon: Icons
-                //           .thumb_up_off_alt_outlined,
-                //       color: LMThemeData
-                //           .kSecondaryColor700,
-                //       size: 20,
-                //       boxPadding: 6,
-                //     ),
-                //     activeIcon: const LMFeedIcon(
-                //       type: LMFeedIconType.icon,
-                //       icon: Icons.thumb_up,
-                //       size: 20,
-                //       boxPadding: 6,
-                //       color:
-                //           LMThemeData.kPrimaryColor,
-                //     ),
-                //     isActive: postData!.isLiked,
-                //   ),
-                //   const Spacer(),
-                //   LMTextButton(
-                //     text: const LMFeedText(
-                //         text: "Comment"),
-                //     margin: 0,
-                //     onTap: () {
-                //       if (widget.isFeed) {
-                //         LMFeedAnalyticsBloc.instance.add(
-                //             LMFeedFireAnalyticsEvent(
-                //                 eventName:
-                //                     LMAnalyticsKeys
-                //                         .commentListOpen,
-                //                 eventProperties: {
-                //               'postId': postData!.id,
-                //             }));
-                //         Navigator.push(
-                //           context,
-                //           MaterialPageRoute(
-                //             builder: (context) =>
-                //                 LMPostDetailScreen(
-                //               postId: postData!.id,
-                //             ),
-                //           ),
-                //         );
-                //       } else {
-                //         _postDetailScreenHandler!
-                //             .openOnScreenKeyboard();
-                //       }
-                //     },
-                //     icon: const LMFeedIcon(
-                //       type: LMFeedIconType.icon,
-                //       icon: Icons.comment_outlined,
-                //       color: LMThemeData
-                //           .kSecondaryColor700,
-                //       size: 20,
-                //       boxPadding: 6,
-                //     ),
-                //   ),
-                //   const Spacer(),
-                //   LMFeedButton(
-                //     text: const LMFeedText(
-                //         text: "Share"),
-                //     margin: 0,
-                //     onTap: () {
-                //       String? postType = postData!
-                //                       .attachments ==
-                //                   null ||
-                //               postData!.attachments!
-                //                   .isEmpty
-                //           ? 'text'
-                //           : getPostType(postData!
-                //                   .attachments
-                //                   ?.first
-                //                   .attachmentType ??
-                //               0);
-
-                //       LMFeedAnalyticsBloc.instance
-                //           .add(LMFeedFireAnalyticsEvent(
-                //         eventName: LMAnalyticsKeys
-                //             .postShared,
-                //         eventProperties: {
-                //           "post_id": postData!.id,
-                //           "post_type": postType,
-                //           "user_id": currentUser
-                //               .userUniqueId,
-                //         },
-                //       ));
-                //       // TODO: Add Share Post logic
-                //       //SharePost().sharePost(postData!.id);
-                //     },
-                //     icon: const LMFeedIcon(
-                //       type: LMFeedIconType.icon,
-                //       icon: Icons.share,
-                //       color: LMThemeData
-                //           .kSecondaryColor700,
-                //       size: 20,
-                //       boxPadding: 6,
-                //     ),
-                //   ),
-                // ],
-                // children: [
-
-                // ],
-                );
-          },
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x19000000),
-              blurRadius: 5,
-              offset: Offset(1, 1),
-              spreadRadius: 0,
-            )
-          ],
-        );
+    return LMFeedPostWidget(
+      post: postData!,
+      user: _postDetailScreenHandler!.users[postData!.userId]!,
+      topics: _postDetailScreenHandler!.topics,
+      onPostTap: (context, post) {
+        debugPrint("Post in detail screen tapped");
+        widget.onPostTap?.call();
+      },
+      isFeed: false,
+      onTagTap: (tag) {},
+      // footer: widget.postFooterBuilder(context, defPostFooter(), postData!) ??
+      //     defPostFooter(),
+      style: LMFeedPostStyle(
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x19000000),
+            blurRadius: 5,
+            offset: Offset(1, 1),
+            spreadRadius: 0,
+          )
+        ],
+      ),
+    );
   }
 
   LMFeedCommentTile defCommentTile(
@@ -949,9 +813,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       padding: const EdgeInsets.all(16.0),
       lmFeedMenuAction: defLMFeedMenuAction(commentViewData),
       profilePicture: LMFeedProfilePicture(
-        style: const LMFeedProfilePictureStyle(
+        style: LMFeedProfilePictureStyle(
           size: 36,
-          backgroundColor: LMThemeData.kPrimaryColor,
+          backgroundColor: feedTheme!.primaryColor,
         ),
         fallbackText:
             _postDetailScreenHandler!.users[commentViewData.userId]!.name,
@@ -991,8 +855,23 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedButton defCommentLikeButton(LMCommentViewData commentViewData) {
     return LMFeedButton(
-      style: const LMFeedButtonStyle(
+      style: LMFeedButtonStyle(
         margin: 10,
+        icon: const LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.thumb_up_alt_outlined,
+          style: LMFeedIconStyle(
+            size: 20,
+          ),
+        ),
+        activeIcon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          style: LMFeedIconStyle(
+            color: feedTheme!.primaryColor,
+            size: 20,
+          ),
+          icon: Icons.thumb_up_alt_rounded,
+        ),
       ),
       text: LMFeedText(
         text: commentViewData.likesCount == 0
@@ -1011,8 +890,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             : commentViewData.likesCount == 1
                 ? "1 Like"
                 : "${commentViewData.likesCount} Likes",
-        style: const LMFeedTextStyle(
-          textStyle: TextStyle(color: LMThemeData.kPrimaryColor, fontSize: 12),
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(color: feedTheme!.primaryColor, fontSize: 12),
         ),
       ),
       onTap: () async {
@@ -1043,21 +922,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               !_postDetailScreenHandler!.rebuildPostWidget.value;
         }
       },
-      icon: const LMFeedIcon(
-        type: LMFeedIconType.icon,
-        icon: Icons.thumb_up_alt_outlined,
-        style: LMFeedIconStyle(
-          size: 20,
-        ),
-      ),
-      activeIcon: const LMFeedIcon(
-        type: LMFeedIconType.icon,
-        style: LMFeedIconStyle(
-          color: LMThemeData.kPrimaryColor,
-          size: 20,
-        ),
-        icon: Icons.thumb_up_alt_rounded,
-      ),
       isActive: commentViewData.isLiked,
     );
   }
@@ -1066,6 +930,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedButton(
       style: const LMFeedButtonStyle(
         margin: 10,
+        icon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.comment_outlined,
+          style: LMFeedIconStyle(
+            size: 20,
+          ),
+        ),
       ),
       text: const LMFeedText(
         text: "Reply",
@@ -1088,13 +959,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
         _postDetailScreenHandler!.openOnScreenKeyboard();
       },
-      icon: const LMFeedIcon(
-        type: LMFeedIconType.icon,
-        icon: Icons.comment_outlined,
-        style: LMFeedIconStyle(
-          size: 20,
-        ),
-      ),
     );
   }
 
@@ -1137,9 +1001,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       text: LMFeedText(
         text:
             "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
-        style: const LMFeedTextStyle(
+        style: LMFeedTextStyle(
           textStyle: TextStyle(
-            color: LMThemeData.kPrimaryColor,
+            color: feedTheme!.primaryColor,
           ),
         ),
       ),

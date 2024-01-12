@@ -40,6 +40,7 @@ class LMFeedPostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return Container(
       width: postHeaderStyle.width ?? screenSize.width,
       height: postHeaderStyle.height,
@@ -119,9 +120,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           3.0),
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
+                                                  color: feedTheme.primaryColor,
                                                 ),
                                                 child: Padding(
                                                   padding:

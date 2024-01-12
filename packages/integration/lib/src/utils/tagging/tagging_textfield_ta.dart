@@ -121,6 +121,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
 
   @override
   Widget build(BuildContext context) {
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
       child: TypeAheadField<LMUserTagViewData>(
@@ -189,9 +190,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
                       absorbing: true,
                       child: LMFeedProfilePicture(
                         fallbackText: opt.name!,
-                        style: const LMFeedProfilePictureStyle(
+                        style: LMFeedProfilePictureStyle(
                           size: 32,
-                          backgroundColor: LMThemeData.kPrimaryColor,
+                          backgroundColor: feedTheme.primaryColor,
                         ),
                         imageUrl: opt.imageUrl!,
                         onTap: null,

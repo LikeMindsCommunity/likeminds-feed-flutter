@@ -7,10 +7,8 @@ import 'package:likeminds_feed_ui_fl/src/widgets/common/commons.dart';
 class LMFeedButton extends StatefulWidget {
   const LMFeedButton({
     super.key,
-    this.icon,
     this.text,
     required this.onTap,
-    this.activeIcon,
     this.activeText,
     this.isActive = false,
     this.style,
@@ -22,17 +20,11 @@ class LMFeedButton extends StatefulWidget {
   /// style class to customise the look and feel of the button
   final LMFeedButtonStyle? style;
 
-  /// Icon to be displayed in the button
-  final LMFeedIcon? icon;
-
   /// Text to be displayed in the button
   final LMFeedText? text;
 
   /// Action to perform after tapping on the button
   final Function() onTap;
-
-  /// Icon to be displayed in the button if the button is active
-  final LMFeedIcon? activeIcon;
 
   /// Text to be displayed in the button if the button is active
   final LMFeedText? activeText;
@@ -75,27 +67,31 @@ class _LMButtonState extends State<LMFeedButton> {
           children: [
             inStyle.placement == LMFeedIconButtonPlacement.start
                 ? widget.isActive
-                    ? widget.activeIcon ?? const SizedBox()
-                    : widget.icon ?? const SizedBox()
-                : const SizedBox(),
+                    ? inStyle.activeIcon ?? const SizedBox.shrink()
+                    : inStyle.icon ?? const SizedBox.shrink()
+                : const SizedBox.shrink(),
             inStyle.placement == LMFeedIconButtonPlacement.start
-                ? (widget.icon != null || widget.activeIcon != null)
+                ? (inStyle.icon != null || inStyle.activeIcon != null)
                     ? SizedBox(width: inStyle.margin ?? 8)
-                    : const SizedBox()
-                : const SizedBox(),
-            widget.isActive
-                ? widget.activeText ?? widget.text ?? const SizedBox()
-                : widget.text ?? const LMFeedText(text: "LMButton"),
+                    : const SizedBox.shrink()
+                : const SizedBox.shrink(),
+            inStyle.showText
+                ? widget.isActive
+                    ? widget.activeText ??
+                        widget.text ??
+                        const SizedBox.shrink()
+                    : widget.text ?? const LMFeedText(text: "LMButton")
+                : const SizedBox.shrink(),
             inStyle.placement == LMFeedIconButtonPlacement.end
-                ? (widget.icon != null || widget.activeIcon != null)
+                ? (inStyle.icon != null || inStyle.activeIcon != null)
                     ? SizedBox(width: inStyle.margin ?? 8)
-                    : const SizedBox()
-                : const SizedBox(),
+                    : const SizedBox.shrink()
+                : const SizedBox.shrink(),
             inStyle.placement == LMFeedIconButtonPlacement.end
                 ? widget.isActive
-                    ? widget.activeIcon ?? const SizedBox()
-                    : widget.icon ?? const SizedBox()
-                : const SizedBox(),
+                    ? inStyle.activeIcon ?? const SizedBox.shrink()
+                    : inStyle.icon ?? const SizedBox.shrink()
+                : const SizedBox.shrink(),
           ],
         ),
       ),
@@ -142,6 +138,14 @@ class LMFeedButtonStyle {
   /// margin between the text and icon
   final double? margin;
 
+  final bool showText;
+
+  /// Icon to be displayed in the button
+  final LMFeedIcon? icon;
+
+  /// Icon to be displayed in the button if the button is active
+  final LMFeedIcon? activeIcon;
+
   const LMFeedButtonStyle({
     this.padding,
     this.backgroundColor,
@@ -152,6 +156,9 @@ class LMFeedButtonStyle {
     this.placement,
     this.margin,
     this.mainAxisAlignment,
+    this.showText = true,
+    this.icon,
+    this.activeIcon,
   });
 
   factory LMFeedButtonStyle.basic() {

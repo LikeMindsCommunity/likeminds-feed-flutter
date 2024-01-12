@@ -24,6 +24,7 @@ class LMFeedTopicBottomSheet extends StatefulWidget {
 }
 
 class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
+  LMFeedThemeData? feedTheme;
   List<LMTopicViewData> selectedTopics = [];
   bool paginationComplete = false;
   ScrollController controller = ScrollController();
@@ -105,6 +106,7 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     ThemeData theme = LMThemeData.theme;
+    feedTheme = LMFeedTheme.of(context);
     return Container(
       width: screenSize.width,
       constraints: BoxConstraints(
@@ -156,9 +158,9 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
               },
               builder: (context, state) {
                 if (state is LMFeedTopicLoadingState) {
-                  return const Center(
+                  return Center(
                     child: LMFeedLoader(
-                      color: LMThemeData.kPrimaryColor,
+                      color: feedTheme!.primaryColor,
                     ),
                   );
                 }

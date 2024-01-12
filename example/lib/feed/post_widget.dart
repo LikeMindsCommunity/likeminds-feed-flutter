@@ -1,26 +1,23 @@
-import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-
-Widget clientPostWidgetBuilder(
-    BuildContext context, LMFeedPostWidget postWidget) {
-  return Container(
-    decoration: BoxDecoration(
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          spreadRadius: 1,
-          blurRadius: 1,
-          offset: const Offset(0, 1), // changes position of shadow
-        ),
-      ],
-    ),
-    child: postWidget.copyWith(
-      footerBuilder: (context, postFooter, postViewData) {
-        return postFooter;
-      },
-    ),
-  );
-}
+// Widget clientPostWidgetBuilder(
+//     BuildContext context, LMFeedPostWidget postWidget) {
+//   return Container(
+//     decoration: BoxDecoration(
+//       boxShadow: [
+//         BoxShadow(
+//           color: Colors.black.withOpacity(0.1),
+//           spreadRadius: 1,
+//           blurRadius: 1,
+//           offset: const Offset(0, 1), // changes position of shadow
+//         ),
+//       ],
+//     ),
+//     child: postWidget.copyWith(
+//       footerBuilder: (context, postFooter, postViewData) {
+//         return postFooter;
+//       },
+//     ),
+//   );
+// }
 
 // Widget clientCommentWidgetBuilder(
 //     BuildContext context,

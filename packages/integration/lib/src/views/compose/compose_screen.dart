@@ -121,7 +121,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: widget.composeSystemOverlayStyle,
         child: Scaffold(
-          backgroundColor: theme.scaffoldBackgroundColor,
+          backgroundColor: theme.backgroundColor,
           bottomSheet: _defMediaPicker(),
           floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
@@ -191,7 +191,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
         text: LMFeedText(
           text: "Cancel",
           style: LMFeedTextStyle(
-            textStyle: TextStyle(color: theme.colorScheme.primary),
+            textStyle: TextStyle(color: theme.primaryColor),
           ),
         ),
         onTap: () {
@@ -210,18 +210,18 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
         ),
       ),
       trailing: LMFeedButton(
-        text: LMFeedText(
+        text: const LMFeedText(
           text: "Post",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
-              color: theme.colorScheme.onPrimary,
+              // color: theme.,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
           ),
         ),
         style: LMFeedButtonStyle(
-          backgroundColor: theme.colorScheme.primary,
+          backgroundColor: theme.primaryColor,
           width: 48,
           borderRadius: 6,
         ),
@@ -324,7 +324,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
                         margin: const EdgeInsets.only(left: 16.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(500),
-                          color: LMFeedTheme.of(context).colorScheme.background,
+                          color: LMFeedTheme.of(context).backgroundColor,
                           border: Border.all(
                             color: LMFeedTheme.of(context).primaryColor,
                           ),

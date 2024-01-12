@@ -225,20 +225,22 @@ class _LMCommentTileState extends State<LMFeedCommentTile> {
           ),
         ),
       ),
-      icon: LMFeedIcon(
-        type: LMFeedIconType.icon,
-        icon: Icons.favorite_outline,
-        style: LMFeedIconStyle(
-          color: Colors.grey.shade200,
-          size: 16,
+      style: LMFeedButtonStyle(
+        icon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.favorite_outline,
+          style: LMFeedIconStyle(
+            color: Colors.grey.shade200,
+            size: 16,
+          ),
         ),
-      ),
-      activeIcon: const LMFeedIcon(
-        icon: Icons.favorite,
-        type: LMFeedIconType.icon,
-        style: LMFeedIconStyle(
-          size: 16,
-          color: Colors.blue,
+        activeIcon: const LMFeedIcon(
+          icon: Icons.favorite,
+          type: LMFeedIconType.icon,
+          style: LMFeedIconStyle(
+            size: 16,
+            color: Colors.blue,
+          ),
         ),
       ),
     );

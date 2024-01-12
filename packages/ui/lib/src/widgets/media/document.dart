@@ -179,10 +179,12 @@ class _LMDocumentState extends State<LMFeedDocument> {
                     const SizedBox(width: 32),
                     widget.documentFile != null
                         ? LMFeedButton(
-                            icon: widget.removeIcon ??
-                                const LMFeedIcon(
-                                    type: LMFeedIconType.icon,
-                                    icon: Icons.close),
+                            style: LMFeedButtonStyle(
+                              icon: widget.removeIcon ??
+                                  const LMFeedIcon(
+                                      type: LMFeedIconType.icon,
+                                      icon: Icons.close),
+                            ),
                             onTap: () {
                               if (widget.onRemove != null) {
                                 widget.onRemove!();

@@ -4,7 +4,6 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_example/constants/theme.dart';
 import 'package:likeminds_feed_example/globals.dart';
-import 'package:likeminds_feed_example/theme.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LMSampleApp extends StatefulWidget {
@@ -38,7 +37,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
   @override
   Widget build(BuildContext context) {
     return LMFeedTheme(
-      theme: customThemeData,
+      theme: LMFeedThemeData.light(),
       child: MaterialApp(
         title: 'Integration App for UI + SDK package',
         debugShowCheckedModeBanner: true,
@@ -54,7 +53,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
                       future: memberState,
                       builder: (context, snapshot) {
                         if (snapshot.hasData && snapshot.data!.success) {
-                          return const LMFeedPostComposeScreen();
+                          return const LMFeedScreen();
                         } else if (snapshot.connectionState ==
                             ConnectionState.waiting) {
                           return const Center(

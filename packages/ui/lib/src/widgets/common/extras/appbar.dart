@@ -64,11 +64,13 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               leading ??
                   LMFeedButton(
-                    icon: LMFeedIcon(
-                      type: LMFeedIconType.icon,
-                      icon: Icons.chevron_left,
-                      style: LMFeedIconStyle(
-                        color: theme.colorScheme.primary,
+                    style: LMFeedButtonStyle(
+                      icon: LMFeedIcon(
+                        type: LMFeedIconType.icon,
+                        icon: Icons.chevron_left,
+                        style: LMFeedIconStyle(
+                          color: theme.primaryColor,
+                        ),
                       ),
                     ),
                     onTap: () {

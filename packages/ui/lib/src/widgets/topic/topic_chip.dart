@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 /*
 * Topic chip widget
@@ -21,7 +20,7 @@ class LMFeedTopicChip extends StatelessWidget {
   // border color of the topic chip defaults to null
   final Color? borderColor;
   // border radius of the topic chip defaults to 5.0
-  final double? borderRadius;
+  final BorderRadius? borderRadius;
   // showBorder must be true, border width of the topic chip defaults to 1.0
   final double? borderWidth;
   // Whether to show a border around the topic chip
@@ -72,56 +71,61 @@ class LMFeedTopicChip extends StatelessWidget {
       ),
     );
 
-    return Container(
-      margin: margin ?? const EdgeInsets.only(right: 8.0),
-      alignment: Alignment.center,
-      height: height,
-      padding: padding ??
-          const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius ?? 5.0),
-        border: showBorder
-            ? Border.all(
-                color: borderColor ?? Colors.transparent,
-                width: borderWidth ?? 1,
-              )
-            : null,
-        color: backgroundColor ?? Colors.transparent,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          icon != null && iconPlacement == LMFeedIconButtonPlacement.start
-              ? GestureDetector(
-                  onTap: onIconTap != null ? () => onIconTap!(topic) : null,
-                  child: Container(
-                    color: Colors.transparent,
-                    child: icon,
-                  ),
-                )
-              : const SizedBox(),
-          icon != null && iconPlacement == LMFeedIconButtonPlacement.start
-              ? kHorizontalPaddingSmall
-              : const SizedBox(),
-          topic.name.isEmpty
-              ? const SizedBox()
-              : gripChip
-                  ? Expanded(child: topicText)
-                  : topicText,
-          icon != null && iconPlacement == LMFeedIconButtonPlacement.end
-              ? kHorizontalPaddingSmall
-              : const SizedBox(),
-          icon != null && iconPlacement == LMFeedIconButtonPlacement.end
-              ? GestureDetector(
-                  onTap: onIconTap != null ? () => onIconTap!(topic) : null,
-                  child: Container(
-                    color: Colors.transparent,
-                    child: icon,
-                  ),
-                )
-              : const SizedBox()
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          margin: margin ?? const EdgeInsets.only(right: 8.0),
+          alignment: Alignment.center,
+          height: height,
+          padding: padding ??
+              const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+          decoration: BoxDecoration(
+            borderRadius: borderRadius ?? BorderRadius.circular(5.0),
+            border: showBorder
+                ? Border.all(
+                    color: borderColor ?? Colors.transparent,
+                    width: borderWidth ?? 1,
+                  )
+                : null,
+            color: backgroundColor ?? Colors.transparent,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              icon != null && iconPlacement == LMFeedIconButtonPlacement.start
+                  ? GestureDetector(
+                      onTap: onIconTap != null ? () => onIconTap!(topic) : null,
+                      child: Container(
+                        color: Colors.transparent,
+                        child: icon,
+                      ),
+                    )
+                  : const SizedBox(),
+              icon != null && iconPlacement == LMFeedIconButtonPlacement.start
+                  ? kHorizontalPaddingSmall
+                  : const SizedBox(),
+              topic.name.isEmpty
+                  ? const SizedBox()
+                  : gripChip
+                      ? Expanded(child: topicText)
+                      : topicText,
+              icon != null && iconPlacement == LMFeedIconButtonPlacement.end
+                  ? kHorizontalPaddingSmall
+                  : const SizedBox(),
+              icon != null && iconPlacement == LMFeedIconButtonPlacement.end
+                  ? GestureDetector(
+                      onTap: onIconTap != null ? () => onIconTap!(topic) : null,
+                      child: Container(
+                        color: Colors.transparent,
+                        child: icon,
+                      ),
+                    )
+                  : const SizedBox()
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -49,6 +49,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   ValueNotifier<bool> rebuildReplyList = ValueNotifier(false);
   List<LMCommentViewData> replies = [];
   Map<String, LMUserViewData> users = {};
+  LMFeedThemeData? feedTheme;
 
   LMCommentViewData? reply;
   late final LMUserViewData user;
@@ -78,7 +79,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   @override
   void didUpdateWidget(covariant LMFeedCommentReplyWidget oldWidget) {
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
     if (oldWidget.reply != widget.reply) {
       initialiseReply();
@@ -89,6 +89,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   @override
   Widget build(BuildContext context) {
+    feedTheme = LMFeedTheme.of(context);
     return BlocConsumer(
       bloc: _commentRepliesBloc,
       buildWhen: (previous, current) {
@@ -114,14 +115,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         }
         if (state is LMFeedCommentRepliesLoadingState) {
           if (state.commentId == widget.reply.id) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
               child: Center(
                 child: SizedBox(
                   height: 20,
                   width: 20,
                   child: LMFeedLoader(
-                    color: LMThemeData.kPrimaryColor,
+                    color: feedTheme!.primaryColor,
                   ),
                 ),
               ),
@@ -239,9 +241,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                             user: user,
                             profilePicture: LMFeedProfilePicture(
                               imageUrl: user.imageUrl,
-                              style: const LMFeedProfilePictureStyle(
+                              style: LMFeedProfilePictureStyle(
                                 size: 32,
-                                backgroundColor: LMThemeData.kPrimaryColor,
+                                backgroundColor: feedTheme!.primaryColor,
                               ),
                               fallbackText: user.name,
                               onTap: () {
@@ -268,6 +270,25 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                             commentActions: [
                               const SizedBox(width: 48),
                               LMFeedButton(
+                                style: LMFeedButtonStyle(
+                                  icon: const LMFeedIcon(
+                                    type: LMFeedIconType.icon,
+                                    icon: Icons.thumb_up_alt_outlined,
+                                    style: LMFeedIconStyle(
+                                      color: LMThemeData.appBlack,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  activeIcon: LMFeedIcon(
+                                    type: LMFeedIconType.icon,
+                                    icon: Icons.thumb_up_alt_rounded,
+                                    style: LMFeedIconStyle(
+                                      size: 20,
+                                      color: feedTheme!.primaryColor,
+                                    ),
+                                    assetPath: kAssetLikeFilledIcon,
+                                  ),
+                                ),
                                 text: LMFeedText(
                                   text: commentViewData.likesCount == 0
                                       ? "Like"
@@ -328,23 +349,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                                     });
                                   }
                                 },
-                                icon: const LMFeedIcon(
-                                  type: LMFeedIconType.icon,
-                                  icon: Icons.thumb_up_alt_outlined,
-                                  style: LMFeedIconStyle(
-                                    color: LMThemeData.appBlack,
-                                    size: 20,
-                                  ),
-                                ),
-                                activeIcon: const LMFeedIcon(
-                                  type: LMFeedIconType.icon,
-                                  icon: Icons.thumb_up_alt_rounded,
-                                  style: LMFeedIconStyle(
-                                    size: 20,
-                                    color: LMThemeData.kPrimaryColor,
-                                  ),
-                                  assetPath: kAssetLikeFilledIcon,
-                                ),
                                 isActive: commentViewData.isLiked,
                               ),
                               const SizedBox(width: 8),
