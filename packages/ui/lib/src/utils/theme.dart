@@ -24,31 +24,12 @@ class LMFeedTheme extends InheritedWidget {
   }
 }
 
-const double kFontSmall = 12;
-const double kButtonFontSize = 12;
-const double kFontXSmall = 11;
-const double kFontSmallMed = 14;
-const double kFontMedium = 16;
-const double kPaddingXSmall = 2;
-const double kPaddingSmall = 4;
-const double kPaddingMedium = 8;
-const double kPaddingLarge = 16;
-const double kPaddingXLarge = 20;
-const double kBorderRadiusXSmall = 2;
-const double kBorderRadiusMedium = 8;
-const SizedBox kHorizontalPaddingXLarge = SizedBox(width: kPaddingXLarge);
-const SizedBox kHorizontalPaddingSmall = SizedBox(width: kPaddingSmall);
-const SizedBox kHorizontalPaddingXSmall = SizedBox(width: kPaddingXSmall);
-const SizedBox kHorizontalPaddingLarge = SizedBox(width: kPaddingLarge);
-const SizedBox kHorizontalPaddingMedium = SizedBox(width: kPaddingMedium);
-const SizedBox kVerticalPaddingXLarge = SizedBox(height: kPaddingXLarge);
-const SizedBox kVerticalPaddingSmall = SizedBox(height: kPaddingSmall);
-const SizedBox kVerticalPaddingXSmall = SizedBox(height: kPaddingXSmall);
-const SizedBox kVerticalPaddingLarge = SizedBox(height: kPaddingLarge);
-const SizedBox kVerticalPaddingMedium = SizedBox(height: kPaddingMedium);
-
 class LMFeedThemeData {
   final LMFeedPostStyle postStyle;
+  final LMFeedCommentStyle commentStyle;
+  final LMFeedReplyStyle replyStyle;
+  final LMFeedButtonStyle feedButtonStyle;
+  final LMFeedIconStyle feedIconStyle;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -57,6 +38,12 @@ class LMFeedThemeData {
   final Color disabledColor;
   final Color errorColor;
   final Color inActiveColor;
+  final Color tagColor;
+  final Color hashTagColor;
+  final Color linkColor;
+  final Color container;
+  final Color onContainer;
+  final Color onPrimary;
 
   // factory LMFeedThemeData({LMFeedPostStyle? postStyle}) {
   //   return LMFeedThemeData._(
@@ -74,6 +61,16 @@ class LMFeedThemeData {
     required this.disabledColor,
     required this.errorColor,
     required this.inActiveColor,
+    required this.tagColor,
+    required this.hashTagColor,
+    required this.linkColor,
+    required this.commentStyle,
+    required this.replyStyle,
+    required this.feedButtonStyle,
+    required this.feedIconStyle,
+    required this.container,
+    required this.onContainer,
+    required this.onPrimary,
   });
 
   factory LMFeedThemeData.light() {
@@ -85,6 +82,9 @@ class LMFeedThemeData {
       disabledColor: LikeMindsTheme.disabledColor,
       errorColor: LikeMindsTheme.errorColor,
       inActiveColor: LikeMindsTheme.inactiveColor,
+      container: LikeMindsTheme.container,
+      onContainer: LikeMindsTheme.onContainer,
+      onPrimary: LikeMindsTheme.onPrimary,
       postStyle: LMFeedPostStyle(
         boxShadow: [
           const BoxShadow(
@@ -93,17 +93,29 @@ class LMFeedThemeData {
         margin: const EdgeInsets.only(bottom: 16.0),
         topicStyle: LMFeedPostTopicStyle(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          chipPadding:
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
-          backgroundColor: LikeMindsTheme.backgroundColor,
-          chipColor: LikeMindsTheme.primaryColor.withOpacity(0.1),
-          textStyle: const TextStyle(
-            color: LikeMindsTheme.primaryColor,
-            fontSize: 14,
-            fontFamily: 'Roboto',
-            fontWeight: FontWeight.w400,
+          activeChipStyle: LMFeedTopicChipStyle(
+            backgroundColor: LikeMindsTheme.primaryColor.withOpacity(0.1),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+            textStyle: const TextStyle(
+              color: LikeMindsTheme.primaryColor,
+              fontSize: 14,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w400,
+            ),
+            borderRadius: BorderRadius.circular(4.0),
           ),
-          borderRadius: BorderRadius.circular(4.0),
+          inactiveChipStyle: LMFeedTopicChipStyle(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+            textStyle: const TextStyle(
+              color: LikeMindsTheme.primaryColor,
+              fontSize: 14,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w400,
+            ),
+            borderRadius: BorderRadius.circular(4.0),
+            showBorder: true,
+            borderColor: LikeMindsTheme.primaryColor,
+          ),
         ),
         contentStyle: const LMFeedPostContentStyle(
           padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -162,6 +174,13 @@ class LMFeedThemeData {
           ),
         ),
       ),
+      hashTagColor: LikeMindsTheme.hashTagColor,
+      linkColor: LikeMindsTheme.linkColor,
+      tagColor: LikeMindsTheme.tagColor,
+      commentStyle: const LMFeedCommentStyle(),
+      replyStyle: const LMFeedReplyStyle(),
+      feedButtonStyle: const LMFeedButtonStyle(),
+      feedIconStyle: const LMFeedIconStyle(),
     );
   }
 }
@@ -177,6 +196,12 @@ class LikeMindsTheme {
   static const Color whiteColor = Color.fromRGBO(255, 255, 255, 1);
   static const Color greyColor = Color.fromRGBO(102, 102, 102, 1);
   static const Color blackColor = Color.fromRGBO(0, 0, 0, 1);
+  static const Color tagColor = Color.fromRGBO(0, 122, 255, 1);
+  static const Color hashTagColor = Color.fromRGBO(0, 122, 255, 1);
+  static const Color linkColor = Color.fromRGBO(0, 122, 255, 1);
+  static const Color container = whiteColor;
+  static const Color onContainer = blackColor;
+  static const Color onPrimary = whiteColor;
 
   static const double kFontSmall = 12;
   static const double kButtonFontSize = 12;

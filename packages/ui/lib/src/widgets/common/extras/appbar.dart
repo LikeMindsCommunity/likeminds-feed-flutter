@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/enums.dart';
 
 class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   const LMFeedAppBar({
@@ -39,8 +38,12 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final theme = LMFeedTheme.of(context);
     final Size screenSize = MediaQuery.of(context).size;
-    return PreferredSize(
-      preferredSize: Size(width ?? screenSize.width, height ?? 64),
+    return
+        //  PreferredSize(
+        //   preferredSize: Size(width ?? screenSize.width, height ?? 64),
+        //   child:
+        SafeArea(
+      bottom: false,
       child: Padding(
         padding: margin ?? EdgeInsets.zero,
         child: Container(
@@ -85,6 +88,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
+      // ),
     );
   }
 

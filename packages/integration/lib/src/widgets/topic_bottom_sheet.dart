@@ -4,7 +4,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/topic/topic_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/post/topic_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LMFeedTopicBottomSheet extends StatefulWidget {
@@ -105,170 +104,156 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    ThemeData theme = LMThemeData.theme;
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     feedTheme = LMFeedTheme.of(context);
     return Container(
       width: screenSize.width,
+      decoration: BoxDecoration(
+        color: feedTheme.container,
+      ),
       constraints: BoxConstraints(
-        maxHeight: 300,
+        maxHeight: screenSize.height * 0.4,
         minHeight: screenSize.height * 0.2,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Column(
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 43.67,
-            height: 7.23,
-            decoration: ShapeDecoration(
-              color: LMThemeData.onSurface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(99),
+      child: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 43.67,
+              height: 7.23,
+              decoration: ShapeDecoration(
+                //color: LikeMindsTheme.onSurface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(99),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: BlocConsumer<LMFeedTopicBloc, LMFeedTopicState>(
-              bloc: topicBloc,
-              buildWhen: (previous, current) {
-                if (_page > 1 && current is LMFeedTopicLoadingState) {
-                  return false;
-                }
-                return true;
-              },
-              listener: (context, state) {
-                if (state is LMFeedTopicLoadedState) {
-                  _page++;
-                  if (state.getTopicFeedResponse.topics!.isEmpty) {
-                    topicsPagingController.appendLastPage([]);
-                  } else {
-                    state.getTopicFeedResponse.topics?.removeWhere(
-                        (element) => selectedTopicId.contains(element.id));
-                    topicsPagingController.appendPage(
-                      state.getTopicFeedResponse.topics!
-                          .map((e) => LMTopicViewDataConvertor.fromTopic(e))
-                          .toList(),
-                      _page,
+            const SizedBox(height: 24),
+            Expanded(
+              child: BlocConsumer<LMFeedTopicBloc, LMFeedTopicState>(
+                bloc: topicBloc,
+                buildWhen: (previous, current) {
+                  if (_page > 1 && current is LMFeedTopicLoadingState) {
+                    return false;
+                  }
+                  return true;
+                },
+                listener: (context, state) {
+                  if (state is LMFeedTopicLoadedState) {
+                    _page++;
+                    if (state.getTopicFeedResponse.topics!.isEmpty) {
+                      topicsPagingController.appendLastPage([]);
+                    } else {
+                      state.getTopicFeedResponse.topics?.removeWhere(
+                          (element) => selectedTopicId.contains(element.id));
+                      topicsPagingController.appendPage(
+                        state.getTopicFeedResponse.topics!
+                            .map((e) => LMTopicViewDataConvertor.fromTopic(e))
+                            .toList(),
+                        _page,
+                      );
+                    }
+                  } else if (state is LMFeedTopicErrorState) {
+                    topicsPagingController.error = state.errorMessage;
+                  }
+                },
+                builder: (context, state) {
+                  if (state is LMFeedTopicLoadingState) {
+                    return Center(
+                      child: LMFeedLoader(
+                        color: feedTheme.primaryColor,
+                      ),
                     );
                   }
-                } else if (state is LMFeedTopicErrorState) {
-                  topicsPagingController.error = state.errorMessage;
-                }
-              },
-              builder: (context, state) {
-                if (state is LMFeedTopicLoadingState) {
-                  return Center(
-                    child: LMFeedLoader(
-                      color: feedTheme!.primaryColor,
-                    ),
-                  );
-                }
 
-                if (state is LMFeedTopicLoadedState) {
-                  return ValueListenableBuilder(
-                      valueListenable: rebuildTopicsScreen,
-                      builder: (context, _, __) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Align(
-                              alignment: Alignment.topLeft,
-                              child: LMFeedText(
-                                text: 'Topics',
-                                style: LMFeedTextStyle(
-                                  textAlign: TextAlign.center,
-                                  textStyle: TextStyle(
-                                    color: Color(0xFF1E293B),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.40,
+                  if (state is LMFeedTopicLoadedState) {
+                    return ValueListenableBuilder(
+                        valueListenable: rebuildTopicsScreen,
+                        builder: (context, _, __) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Align(
+                                alignment: Alignment.topLeft,
+                                child: LMFeedText(
+                                  text: 'Topics',
+                                  style: LMFeedTextStyle(
+                                    textAlign: TextAlign.center,
+                                    textStyle: TextStyle(
+                                      color: Color(0xFF1E293B),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: -0.40,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            Expanded(
-                              child: SingleChildScrollView(
-                                controller: controller,
-                                child: Wrap(
-                                  children: topicsPagingController.itemList
-                                          ?.map((e) {
-                                        bool isTopicSelected =
-                                            selectedTopicId.contains(e.id);
-                                        return GestureDetector(
-                                          onTap: () {
-                                            if (isTopicSelected) {
-                                              selectedTopicId.remove(e.id);
-                                              selectedTopics.removeWhere(
-                                                  (element) =>
-                                                      element.id == e.id);
-                                            } else {
-                                              selectedTopicId.add(e.id);
-                                              selectedTopics.add(e);
-                                            }
-                                            isTopicSelected = !isTopicSelected;
-                                            rebuildTopicsScreen.value =
-                                                !rebuildTopicsScreen.value;
-                                            widget.onTopicSelected(
-                                                selectedTopics, e);
-                                          },
-                                          child: Container(
-                                            margin: const EdgeInsets.only(
-                                                right: 8.0, bottom: 8.0),
-                                            child: Chip(
-                                              label: LMFeedText(
-                                                text: e.name,
-                                                style: LMFeedTextStyle(
-                                                  textStyle: TextStyle(
-                                                    color: isTopicSelected
-                                                        ? Colors.white
-                                                        : LMThemeData.appBlack,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                    height: 1.30,
-                                                  ),
-                                                ),
+                              const SizedBox(height: 16),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  controller: controller,
+                                  child: Wrap(
+                                    children: topicsPagingController.itemList
+                                            ?.map((e) {
+                                          bool isTopicSelected =
+                                              selectedTopicId.contains(e.id);
+                                          return GestureDetector(
+                                            onTap: () {
+                                              if (isTopicSelected) {
+                                                selectedTopicId.remove(e.id);
+                                                selectedTopics.removeWhere(
+                                                    (element) =>
+                                                        element.id == e.id);
+                                              } else {
+                                                selectedTopicId.add(e.id);
+                                                selectedTopics.add(e);
+                                              }
+                                              isTopicSelected =
+                                                  !isTopicSelected;
+                                              rebuildTopicsScreen.value =
+                                                  !rebuildTopicsScreen.value;
+                                              widget.onTopicSelected(
+                                                  selectedTopics, e);
+                                            },
+                                            child: Container(
+                                              margin: const EdgeInsets.only(
+                                                  right: 8.0, bottom: 8.0),
+                                              child: LMFeedTopicChip(
+                                                topic: e,
+                                                style: isTopicSelected
+                                                    ? feedTheme
+                                                        .postStyle
+                                                        .topicStyle
+                                                        ?.activeChipStyle
+                                                    : feedTheme
+                                                        .postStyle
+                                                        .topicStyle
+                                                        ?.inactiveChipStyle,
                                               ),
-                                              backgroundColor: isTopicSelected
-                                                  ? theme.colorScheme.secondary
-                                                  : LMThemeData.kWhiteColor,
-                                              clipBehavior: Clip.hardEdge,
-                                              materialTapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                              shape: RoundedRectangleBorder(
-                                                  side: isTopicSelected
-                                                      ? BorderSide.none
-                                                      : const BorderSide(
-                                                          color: LMThemeData
-                                                              .appSecondaryBlack,
-                                                        ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          21.0)),
                                             ),
-                                          ),
-                                        );
-                                      }).toList() ??
-                                      [],
+                                          );
+                                        }).toList() ??
+                                        [],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        );
-                      });
-                } else if (state is LMFeedTopicErrorState) {
-                  return Center(
-                    child: Text(state.errorMessage),
-                  );
-                }
-                return const SizedBox();
-              },
+                            ],
+                          );
+                        });
+                  } else if (state is LMFeedTopicErrorState) {
+                    return Center(
+                      child: Text(state.errorMessage),
+                    );
+                  }
+                  return const SizedBox();
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

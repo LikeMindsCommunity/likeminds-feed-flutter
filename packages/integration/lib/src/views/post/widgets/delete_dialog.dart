@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedDeleteConfirmationDialog extends StatelessWidget {
@@ -28,6 +28,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     DeleteReason? reasonForDeletion;
     bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
     User? user = LMFeedUserLocalPreference.instance.fetchUserData();
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -45,12 +46,12 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-            LMThemeData.kVerticalPaddingLarge,
+            LikeMindsTheme.kVerticalPaddingLarge,
             Text(content),
             user.userUniqueId == userId
                 ? const SizedBox.shrink()
                 : isCm
-                    ? LMThemeData.kVerticalPaddingLarge
+                    ? LikeMindsTheme.kVerticalPaddingLarge
                     : const SizedBox.shrink(),
             user.userUniqueId == userId
                 ? const SizedBox.shrink()
@@ -66,148 +67,152 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                         boolVarLoading = true;
                                         rebuildReasonBox.value =
                                             !rebuildReasonBox.value;
-                                        GetDeleteReasonResponse response =
-                                            await LMFeedCore
-                                                .instance.lmFeedClient
-                                                .getReportTags(
-                                                    ((GetDeleteReasonRequestBuilder()
-                                                          ..type(0))
-                                                        .build()));
-                                        if (response.success) {
-                                          List<DeleteReason> reportTags =
-                                              response.reportTags!;
 
-                                          await showModalBottomSheet(
-                                              context: context,
-                                              elevation: 5,
-                                              enableDrag: true,
-                                              clipBehavior: Clip.hardEdge,
-                                              backgroundColor:
-                                                  LMThemeData.kWhiteColor,
-                                              useSafeArea: true,
-                                              shape:
-                                                  const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft:
-                                                      Radius.circular(16.0),
-                                                  topRight:
-                                                      Radius.circular(16.0),
-                                                ),
-                                              ),
-                                              builder: (context) {
-                                                return Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 20.0,
-                                                      vertical: 30.0),
-                                                  width: screenSize.width,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      const Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 10.0),
-                                                        child: Text(
-                                                          'Reason for deletion',
-                                                          textAlign:
-                                                              TextAlign.left,
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: LMThemeData
-                                                                .kFontMedium,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      LMThemeData
-                                                          .kVerticalPaddingXLarge,
-                                                      Expanded(
-                                                        child: SafeArea(
-                                                          child: ListView
-                                                              .separated(
-                                                            separatorBuilder:
-                                                                (context,
-                                                                        index) =>
-                                                                    Container(
-                                                              margin:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 50),
-                                                              child:
-                                                                  const Divider(
-                                                                thickness: 0.5,
-                                                                color: LMThemeData
-                                                                    .kGrey3Color,
-                                                              ),
-                                                            ),
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              return InkWell(
-                                                                onTap: () {
-                                                                  reasonForDeletion =
-                                                                      reportTags[
-                                                                          index];
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child:
-                                                                    Container(
-                                                                  color: Colors
-                                                                      .transparent,
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Container(
-                                                                        color: Colors
-                                                                            .transparent,
-                                                                        width:
-                                                                            35,
-                                                                        child: Radio(
-                                                                            value: reportTags[index]
-                                                                                .id,
-                                                                            groupValue: reasonForDeletion == null
-                                                                                ? -1
-                                                                                : reasonForDeletion!.id,
-                                                                            onChanged: (value) {}),
-                                                                      ),
-                                                                      LMThemeData
-                                                                          .kHorizontalPaddingLarge,
-                                                                      Text(
-                                                                        reportTags[index]
-                                                                            .name,
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              );
-                                                            },
-                                                            itemCount:
-                                                                reportTags
-                                                                    .length,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
+                                        LMFeedCore.instance.lmFeedClient
+                                            .getReportTags(
+                                                ((GetDeleteReasonRequestBuilder()
+                                                      ..type(0))
+                                                    .build()))
+                                            .then((value) {
+                                          if (value.success) {
+                                            List<DeleteReason> reportTags =
+                                                value.reportTags!;
+
+                                            showModalBottomSheet(
+                                                context: context,
+                                                elevation: 5,
+                                                enableDrag: true,
+                                                clipBehavior: Clip.hardEdge,
+                                                backgroundColor:
+                                                    LikeMindsTheme.whiteColor,
+                                                useSafeArea: true,
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(16.0),
+                                                    topRight:
+                                                        Radius.circular(16.0),
                                                   ),
-                                                );
-                                              });
+                                                ),
+                                                builder: (context) {
+                                                  return Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20.0,
+                                                        vertical: 30.0),
+                                                    width: screenSize.width,
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        const Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 10.0),
+                                                          child: Text(
+                                                            'Reason for deletion',
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  LikeMindsTheme
+                                                                      .kFontMedium,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        LikeMindsTheme
+                                                            .kVerticalPaddingXLarge,
+                                                        Expanded(
+                                                          child: SafeArea(
+                                                            child: ListView
+                                                                .separated(
+                                                              separatorBuilder:
+                                                                  (context,
+                                                                          index) =>
+                                                                      Container(
+                                                                margin:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            50),
+                                                                child:
+                                                                    const Divider(
+                                                                  thickness:
+                                                                      0.5,
+                                                                  color: LikeMindsTheme
+                                                                      .greyColor,
+                                                                ),
+                                                              ),
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return InkWell(
+                                                                  onTap: () {
+                                                                    reasonForDeletion =
+                                                                        reportTags[
+                                                                            index];
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    color: Colors
+                                                                        .transparent,
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Container(
+                                                                          color:
+                                                                              Colors.transparent,
+                                                                          width:
+                                                                              35,
+                                                                          child: Radio(
+                                                                              value: reportTags[index].id,
+                                                                              groupValue: reasonForDeletion == null ? -1 : reasonForDeletion!.id,
+                                                                              onChanged: (value) {}),
+                                                                        ),
+                                                                        LikeMindsTheme
+                                                                            .kHorizontalPaddingLarge,
+                                                                        Text(
+                                                                          reportTags[index]
+                                                                              .name,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              },
+                                                              itemCount:
+                                                                  reportTags
+                                                                      .length,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }).then((value) {
+                                              rebuildReasonBox.value =
+                                                  !rebuildReasonBox.value;
+                                            });
+                                          } else {
+                                            toast(value.errorMessage ??
+                                                'An error occurred');
+                                          }
+                                          boolVarLoading = false;
                                           rebuildReasonBox.value =
                                               !rebuildReasonBox.value;
-                                        } else {
-                                          toast(response.errorMessage ??
-                                              'An error occurred');
-                                        }
-                                        boolVarLoading = false;
-                                        rebuildReasonBox.value =
-                                            !rebuildReasonBox.value;
+                                        });
                                       },
                                 child: Container(
                                     padding: const EdgeInsets.all(14.0),
                                     decoration: BoxDecoration(
-                                        color: LMThemeData.kWhiteColor,
+                                        color: LikeMindsTheme.whiteColor,
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         boxShadow: const [
@@ -227,10 +232,8 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                               ? 'Reason for deletion'
                                               : reasonForDeletion!.name,
                                         ),
-                                        Icon(
+                                        const Icon(
                                           Icons.arrow_drop_down,
-                                          color: LMThemeData
-                                              .theme.colorScheme.onSecondary,
                                         )
                                       ],
                                     )),
@@ -238,7 +241,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                             });
                       })
                     : const SizedBox.shrink(),
-            LMThemeData.kVerticalPaddingSmall,
+            LikeMindsTheme.kVerticalPaddingSmall,
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
@@ -254,7 +257,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                   child: const Text(
                     'Cancel',
                     style: TextStyle(
-                      color: LMThemeData.kGrey3Color,
+                      color: LikeMindsTheme.greyColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -262,10 +265,8 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     if (user.userUniqueId != userId && isCm) {
-                      if (reasonForDeletion == null) {
-                        toast('Please select a reason for deletion');
-                        return;
-                      }
+                      toast('Please select a reason for deletion');
+                      return;
                     }
                     action(reasonForDeletion == null
                         ? ''
@@ -278,8 +279,8 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                   ),
                   child: Text(
                     actionText,
-                    style: const TextStyle(
-                      color: LMThemeData.kLinkColor,
+                    style: TextStyle(
+                      color: feedTheme.linkColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

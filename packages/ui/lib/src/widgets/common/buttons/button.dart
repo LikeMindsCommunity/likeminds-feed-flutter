@@ -67,7 +67,9 @@ class _LMButtonState extends State<LMFeedButton> {
           children: [
             inStyle.placement == LMFeedIconButtonPlacement.start
                 ? widget.isActive
-                    ? inStyle.activeIcon ?? const SizedBox.shrink()
+                    ? inStyle.activeIcon ??
+                        inStyle.icon ??
+                        const SizedBox.shrink()
                     : inStyle.icon ?? const SizedBox.shrink()
                 : const SizedBox.shrink(),
             inStyle.placement == LMFeedIconButtonPlacement.start
@@ -89,7 +91,9 @@ class _LMButtonState extends State<LMFeedButton> {
                 : const SizedBox.shrink(),
             inStyle.placement == LMFeedIconButtonPlacement.end
                 ? widget.isActive
-                    ? inStyle.activeIcon ?? const SizedBox.shrink()
+                    ? inStyle.activeIcon ??
+                        inStyle.icon ??
+                        const SizedBox.shrink()
                     : inStyle.icon ?? const SizedBox.shrink()
                 : const SizedBox.shrink(),
           ],

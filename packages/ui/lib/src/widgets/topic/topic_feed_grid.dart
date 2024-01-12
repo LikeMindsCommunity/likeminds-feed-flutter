@@ -125,7 +125,7 @@ class LMFeedTopicFeedGrid extends StatelessWidget {
                 Text(
                   'All topics',
                 ),
-                kHorizontalPaddingMedium,
+                LikeMindsTheme.kHorizontalPaddingMedium,
                 Icon(
                   Icons.arrow_downward,
                   size: 18,

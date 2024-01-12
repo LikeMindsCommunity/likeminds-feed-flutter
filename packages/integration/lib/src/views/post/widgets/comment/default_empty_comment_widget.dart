@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 
 class LMFeedEmptyCommentWidget extends StatelessWidget {
   const LMFeedEmptyCommentWidget({super.key});
@@ -13,15 +12,11 @@ class LMFeedEmptyCommentWidget extends StatelessWidget {
         ),
         Text(
           'No comment found',
-          style: TextStyle(
-            fontSize: LMThemeData.kFontMedium,
-          ),
+          style: TextStyle(),
         ),
         Text(
           'Be the first one to comment',
-          style: TextStyle(
-            fontSize: LMThemeData.kFontSmall,
-          ),
+          style: TextStyle(),
         ),
       ],
     );

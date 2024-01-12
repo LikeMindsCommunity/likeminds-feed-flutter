@@ -337,15 +337,17 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
                                     ..name("Topic"))
                                   .build()
                               : selectedTopics.first,
-                          textStyle: TextStyle(
-                            color: LMFeedTheme.of(context).primaryColor,
-                          ),
-                          icon: LMFeedIcon(
-                            type: LMFeedIconType.icon,
-                            icon: CupertinoIcons.chevron_down,
-                            style: LMFeedIconStyle(
-                              size: 16,
+                          style: LMFeedTopicChipStyle(
+                            textStyle: TextStyle(
                               color: LMFeedTheme.of(context).primaryColor,
+                            ),
+                            icon: LMFeedIcon(
+                              type: LMFeedIconType.icon,
+                              icon: CupertinoIcons.chevron_down,
+                              style: LMFeedIconStyle(
+                                size: 16,
+                                color: LMFeedTheme.of(context).primaryColor,
+                              ),
                             ),
                           ),
                         ),

@@ -7,7 +7,6 @@ import 'package:likeminds_feed_driver_fl/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed_driver_fl/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
 import 'package:media_kit/media_kit.dart';
 
@@ -37,9 +36,6 @@ class LMFeedCore {
     await LMFeedUserLocalPreference.instance.initialize();
     MediaKit.ensureInitialized();
     await LMFeedUserLocalPreference.instance.initialize();
-    if (theme != null) {
-      LMThemeData.instance.setTheme = theme;
-    }
   }
 
   Future<void> closeBlocs() async {

@@ -111,6 +111,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
   @override
   Widget build(BuildContext context) {
     mapAttachmentsToWidget();
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return Container(
       width: widget.width,
       decoration: BoxDecoration(
@@ -147,7 +148,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 return Column(
                   children: [
                     checkIfMultipleAttachments()
-                        ? kVerticalPaddingMedium
+                        ? LikeMindsTheme.kVerticalPaddingMedium
                         : const SizedBox(),
                     checkIfMultipleAttachments()
                         ? Row(
@@ -166,7 +167,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                                             Radius.circular(4),
                                           ),
                                           color: widget.activeIndicatorColor ??
-                                              Colors.blue,
+                                              feedTheme.primaryColor,
                                         ),
                                       )
                                   : widget.inactiveIndicator ??

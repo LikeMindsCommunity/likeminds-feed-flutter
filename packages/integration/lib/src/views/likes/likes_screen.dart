@@ -1,7 +1,6 @@
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_driver_fl/src/views/likes/handler/likes_screen_handler.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
@@ -54,14 +53,14 @@ class _LikesScreenState extends State<LMFeedLikesScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 18.0),
       child: Row(
         children: [
-          LMThemeData.kHorizontalPaddingSmall,
+          LikeMindsTheme.kHorizontalPaddingSmall,
           IconButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.arrow_back_ios),
           ),
-          LMThemeData.kHorizontalPaddingSmall,
+          LikeMindsTheme.kHorizontalPaddingSmall,
           Text(
             text,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
@@ -78,7 +77,7 @@ class _LikesScreenState extends State<LMFeedLikesScreen> {
           getAppBar(
             "${handler.totalLikesCount ?? '--'} Likes",
           ),
-          LMThemeData.kVerticalPaddingLarge,
+          LikeMindsTheme.kVerticalPaddingLarge,
           Expanded(
             child: PagedListView<int, LMLikeViewData>(
               padding: EdgeInsets.zero,
@@ -88,7 +87,7 @@ class _LikesScreenState extends State<LMFeedLikesScreen> {
                   height: 20,
                 ),
                 noItemsFoundIndicatorBuilder: (context) => const Scaffold(
-                  backgroundColor: LMThemeData.kWhiteColor,
+                  backgroundColor: LikeMindsTheme.whiteColor,
                   body: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -100,11 +99,14 @@ class _LikesScreenState extends State<LMFeedLikesScreen> {
                               fontWeight: FontWeight.bold,
                             )),
                         SizedBox(height: 12),
-                        Text("Be the first one to like this post",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
-                                color: LMThemeData.kGrey2Color)),
+                        Text(
+                          "Be the first one to like this post",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300,
+                            color: LikeMindsTheme.greyColor,
+                          ),
+                        ),
                         SizedBox(height: 28),
                       ],
                     ),
@@ -172,19 +174,18 @@ class DeletedLikesTile extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(27),
-              color: LMThemeData.kGreyBGColor),
+            borderRadius: BorderRadius.circular(27),
+          ),
           height: 54,
           width: 54,
         ),
-        LMThemeData.kHorizontalPaddingSmall,
-        LMThemeData.kHorizontalPaddingMedium,
-        LMFeedText(
+        LikeMindsTheme.kHorizontalPaddingSmall,
+        LikeMindsTheme.kHorizontalPaddingMedium,
+        const LMFeedText(
           text: 'Deleted User',
           style: LMFeedTextStyle(
             textStyle: TextStyle(
-              fontSize: LMThemeData.kFontMedium,
-              color: LMThemeData.theme.colorScheme.onSecondary,
+              fontSize: LikeMindsTheme.kFontMedium,
             ),
           ),
         )

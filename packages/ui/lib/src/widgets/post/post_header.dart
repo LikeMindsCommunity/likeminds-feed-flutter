@@ -69,7 +69,7 @@ class LMFeedPostHeader extends StatelessWidget {
                         imageUrl: user.imageUrl,
                         onTap: onProfileTap,
                       ),
-                  kHorizontalPaddingLarge,
+                  LikeMindsTheme.kHorizontalPaddingLarge,
                   Container(
                     constraints: BoxConstraints(
                       maxWidth: screenSize.width * 0.66,
@@ -93,7 +93,8 @@ class LMFeedPostHeader extends StatelessWidget {
                                         text: user.name,
                                         style: LMFeedTextStyle(
                                           textStyle: TextStyle(
-                                            fontSize: kFontMedium,
+                                            fontSize:
+                                                LikeMindsTheme.kFontMedium,
                                             color: Colors.grey[900],
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -101,7 +102,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                       ),
                                 ),
                               ),
-                              kHorizontalPaddingMedium,
+                              LikeMindsTheme.kHorizontalPaddingMedium,
                               !postHeaderStyle.showCustomTitle
                                   ? const SizedBox()
                                   : ((user.customTitle == null ||
@@ -133,7 +134,9 @@ class LMFeedPostHeader extends StatelessWidget {
                                                             : "",
                                                         // maxLines: 1,
                                                         style: TextStyle(
-                                                          fontSize: kFontSmall,
+                                                          fontSize:
+                                                              LikeMindsTheme
+                                                                  .kFontSmall,
                                                           color: Colors.white,
                                                           fontWeight:
                                                               FontWeight.w600,
@@ -151,46 +154,46 @@ class LMFeedPostHeader extends StatelessWidget {
                                         ),
                             ],
                           ),
-                          kVerticalPaddingSmall,
+                          LikeMindsTheme.kVerticalPaddingSmall,
                           Row(
                             children: [
                               Flexible(child: subText ?? const SizedBox()),
                               subText != null
-                                  ? kHorizontalPaddingXSmall
+                                  ? LikeMindsTheme.kHorizontalPaddingXSmall
                                   : const SizedBox(),
                               LMFeedText(
                                 text: subText != null ? '·' : '',
                                 style: LMFeedTextStyle(
                                   textStyle: TextStyle(
-                                    fontSize: kFontSmall,
+                                    fontSize: LikeMindsTheme.kFontSmall,
                                     color: Colors.grey[700],
                                   ),
                                 ),
                               ),
                               subText != null
-                                  ? kHorizontalPaddingXSmall
+                                  ? LikeMindsTheme.kHorizontalPaddingXSmall
                                   : const SizedBox(),
                               createdAt ??
                                   LMFeedText(
                                     text: postViewData.createdAt.timeAgo(),
                                     style: LMFeedTextStyle(
                                       textStyle: TextStyle(
-                                        fontSize: kFontSmall,
+                                        fontSize: LikeMindsTheme.kFontSmall,
                                         color: Colors.grey[700],
                                       ),
                                     ),
                                   ),
-                              kHorizontalPaddingSmall,
+                              LikeMindsTheme.kHorizontalPaddingSmall,
                               LMFeedText(
                                 text: postViewData.isEdited ? '·' : '',
                                 style: LMFeedTextStyle(
                                   textStyle: TextStyle(
-                                    fontSize: kFontSmall,
+                                    fontSize: LikeMindsTheme.kFontSmall,
                                     color: Colors.grey[700],
                                   ),
                                 ),
                               ),
-                              kHorizontalPaddingSmall,
+                              LikeMindsTheme.kHorizontalPaddingSmall,
                               postViewData.isEdited
                                   ? editedText ??
                                       LMFeedText(
@@ -199,7 +202,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                             : '',
                                         style: LMFeedTextStyle(
                                           textStyle: TextStyle(
-                                            fontSize: kFontSmall,
+                                            fontSize: LikeMindsTheme.kFontSmall,
                                             color: Colors.grey[700],
                                           ),
                                         ),

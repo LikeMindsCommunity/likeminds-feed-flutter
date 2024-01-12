@@ -35,53 +35,34 @@ class LMFeedPostTopic extends StatelessWidget {
   LMFeedTopicChip defTopicChip(LMTopicViewData topicViewData) =>
       LMFeedTopicChip(
         topic: topicViewData,
-        backgroundColor: style?.chipColor,
-        borderColor: style?.borderColor,
-        borderRadius: style?.borderRadius,
-        borderWidth: style?.borderWidth,
-        height: style?.height,
-        icon: style?.icon,
-        iconPlacement: style?.iconPlacement ?? LMFeedIconButtonPlacement.end,
-        margin: style?.chipMargin,
-        onIconTap: style?.onIconTap,
-        padding: style?.chipPadding,
-        showBorder: style?.showBorder ?? false,
-        textStyle: style?.textStyle,
+        style: style?.activeChipStyle,
       );
 }
 
 class LMFeedPostTopicStyle {
-  final Color? backgroundColor;
-  final Color? chipColor;
-  final Color? borderColor;
-  final double? borderWidth;
-  final BorderRadius? borderRadius;
-  final double? height;
-  final Widget? icon;
-  final LMFeedIconButtonPlacement iconPlacement;
   final EdgeInsets? margin;
   final EdgeInsets? padding;
-  final EdgeInsets? chipPadding;
-  final EdgeInsets? chipMargin;
-  final bool showBorder;
-  final TextStyle? textStyle;
-  final Function(LMTopicViewData)? onIconTap;
+  final LMFeedTopicChipStyle? activeChipStyle;
+  final LMFeedTopicChipStyle? inactiveChipStyle;
 
   const LMFeedPostTopicStyle({
-    this.backgroundColor,
-    this.chipColor,
-    this.borderColor,
-    this.borderWidth,
-    this.borderRadius,
-    this.height,
-    this.icon,
-    this.iconPlacement = LMFeedIconButtonPlacement.end,
     this.margin,
     this.padding,
-    this.showBorder = false,
-    this.textStyle,
-    this.onIconTap,
-    this.chipPadding,
-    this.chipMargin,
+    this.activeChipStyle,
+    this.inactiveChipStyle,
   });
+
+  LMFeedPostTopicStyle copyWith({
+    EdgeInsets? margin,
+    EdgeInsets? padding,
+    LMFeedTopicChipStyle? activeChipStyle,
+    LMFeedTopicChipStyle? inactiveChipStyle,
+  }) {
+    return LMFeedPostTopicStyle(
+      margin: margin ?? this.margin,
+      padding: padding ?? this.padding,
+      activeChipStyle: activeChipStyle ?? this.activeChipStyle,
+      inactiveChipStyle: inactiveChipStyle ?? this.inactiveChipStyle,
+    );
+  }
 }

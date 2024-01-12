@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
 
 /*
 * Topic chip widget
@@ -126,13 +125,13 @@ class LMFeedLinkPreview extends StatelessWidget {
                             style: const LMFeedTextStyle(
                               textStyle: TextStyle(
                                 color: Colors.grey,
-                                fontSize: kFontMedium,
+                                fontSize: LikeMindsTheme.kFontMedium,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
                     ),
-                    kVerticalPaddingSmall,
+                    LikeMindsTheme.kVerticalPaddingSmall,
                     SizedBox(
                       width: width ?? MediaQuery.of(context).size.width,
                       child: subtitle ??
@@ -146,12 +145,12 @@ class LMFeedLinkPreview extends StatelessWidget {
                               maxLines: 2,
                               textStyle: TextStyle(
                                 color: Colors.grey.shade300,
-                                fontSize: kFontSmall,
+                                fontSize: LikeMindsTheme.kFontSmall,
                               ),
                             ),
                           ),
                     ),
-                    kVerticalPaddingXSmall,
+                    LikeMindsTheme.kVerticalPaddingXSmall,
                     showLinkUrl
                         ? SizedBox(
                             width: width ?? MediaQuery.of(context).size.width,
@@ -167,7 +166,7 @@ class LMFeedLinkPreview extends StatelessWidget {
                                 maxLines: 1,
                                 textStyle: TextStyle(
                                   color: Colors.grey.shade300,
-                                  fontSize: kFontXSmall,
+                                  fontSize: LikeMindsTheme.kFontXSmall,
                                 ),
                               ),
                             ),

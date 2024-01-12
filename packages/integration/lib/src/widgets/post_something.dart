@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -24,6 +23,7 @@ class LMFeedPostSomething extends StatelessWidget {
   Widget build(BuildContext context) {
     User user = LMFeedUserLocalPreference.instance.fetchUserData();
     Size screenSize = MediaQuery.of(context).size;
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return GestureDetector(
       onTap: enabled
           ? () {
@@ -49,7 +49,7 @@ class LMFeedPostSomething extends StatelessWidget {
             color: backgroundColor,
             border: Border.all(
               width: 1,
-              color: borderColor ?? LMThemeData.onSurface,
+              color: borderColor ?? LikeMindsTheme.greyColor,
             ),
           ),
           child: Row(
@@ -58,7 +58,7 @@ class LMFeedPostSomething extends StatelessWidget {
                 fallbackText: user.name,
                 style: LMFeedProfilePictureStyle(
                   boxShape: BoxShape.circle,
-                  backgroundColor: LMThemeData.theme.primaryColor,
+                  backgroundColor: feedTheme.primaryColor,
                   size: 36,
                 ),
                 imageUrl: user.imageUrl,
@@ -69,7 +69,7 @@ class LMFeedPostSomething extends StatelessWidget {
                   }
                 },
               ),
-              LMThemeData.kHorizontalPaddingMedium,
+              LikeMindsTheme.kHorizontalPaddingMedium,
               const LMFeedText(text: "Post something...")
             ],
           ),

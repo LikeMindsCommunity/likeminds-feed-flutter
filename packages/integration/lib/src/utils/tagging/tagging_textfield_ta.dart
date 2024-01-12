@@ -4,7 +4,6 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
 import 'package:likeminds_feed_driver_fl/packages/flutter_typeahead-4.3.7/lib/flutter_typeahead.dart';
 import 'package:likeminds_feed_driver_fl/src/convertors/helper/tagging/user_tag_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
 
 import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
@@ -174,7 +173,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
               color: Colors.white,
               border: Border(
                 bottom: BorderSide(
-                  color: LMThemeData.kGrey3Color,
+                  color: LikeMindsTheme.greyColor,
                   width: 0.5,
                 ),
               ),

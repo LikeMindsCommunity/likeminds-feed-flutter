@@ -25,7 +25,7 @@ class LMFeedUserTileShimmer extends StatelessWidget {
                 backgroundColor: Colors.white,
               ),
             ),
-            kHorizontalPaddingXLarge,
+            LikeMindsTheme.kHorizontalPaddingXLarge,
             Container(
               height: 12,
               width: 150,

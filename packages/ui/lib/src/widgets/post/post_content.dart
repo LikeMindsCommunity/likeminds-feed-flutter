@@ -22,6 +22,7 @@ class LMFeedPostContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final postDetails = InheritedPostProvider.of(context)?.post;
     final ThemeData theme = Theme.of(context);
+    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return Container(
       width: style.width,
       height: style.height,
@@ -40,13 +41,13 @@ class LMFeedPostContent extends StatelessWidget {
             Theme.of(context)
                 .textTheme
                 .bodyMedium!
-                .copyWith(color: theme.colorScheme.primary),
+                .copyWith(color: feedTheme.primaryColor),
         prefixStyle: style.expandTextStyle,
         linkStyle: style.linkStyle ??
             Theme.of(context)
                 .textTheme
                 .bodyMedium!
-                .copyWith(color: theme.colorScheme.primary),
+                .copyWith(color: feedTheme.primaryColor),
         textAlign: style.textAlign ?? TextAlign.left,
         style: style.textStyle ?? Theme.of(context).textTheme.bodyMedium,
       ),

@@ -73,4 +73,4 @@ typedef LMFeedPostAppBarBuilder = PreferredSizeWidget Function(
 /// takes in [BuildContext], [LMUserViewData] and [LMCommentViewData] as params.
 /// {@endtemplate}
 typedef LMFeedPostCommentBuilder = Widget Function(
-    BuildContext, LMFeedCommentTile, LMPostViewData);
+    BuildContext, LMFeedCommentWidget, LMPostViewData);

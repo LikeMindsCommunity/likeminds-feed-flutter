@@ -38,7 +38,7 @@
 //                   ? "1 Like"
 //                   : "${commentViewData.likesCount} Likes",
 //           textStyle: const TextStyle(
-//               color: LMThemeData.kSecondaryColor700, fontSize: 12),
+//               color: LikeMindsTheme.kSecondaryColor700, fontSize: 12),
 //         ),
 //         activeText: LMFeedText(
 //           text: commentViewData.likesCount == 0
@@ -46,7 +46,7 @@
 //               : commentViewData.likesCount == 1
 //                   ? "1 Like"
 //                   : "${commentViewData.likesCount} Likes",
-//           textStyle: TextStyle(color: LMThemeData.kPrimaryColor, fontSize: 12),
+//           textStyle: TextStyle(color: LikeMindsTheme.kPrimaryColor, fontSize: 12),
 //         ),
 //         onTap: () async {
 //           commentViewData.likesCount = commentViewData.isLiked
@@ -118,7 +118,7 @@
 //               size: 20,
 //             ),
 //           ),
-//           LMThemeData.kHorizontalPaddingMedium,
+//           LikeMindsTheme.kHorizontalPaddingMedium,
 //           commentViewData.repliesCount > 0
 //               ? LMTextButton(
 //                   onTap: () {
@@ -159,7 +159,7 @@
 //                     text:
 //                         "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
 //                     textStyle: const TextStyle(
-//                       color: LMThemeData.kPrimaryColor,
+//                       color: LikeMindsTheme.kPrimaryColor,
 //                     ),
 //                   ),
 //                 )

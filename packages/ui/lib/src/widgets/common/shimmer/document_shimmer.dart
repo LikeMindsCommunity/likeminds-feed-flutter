@@ -12,8 +12,9 @@ class LMFeedDocumentShimmer extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
           border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(kBorderRadiusMedium)),
-      padding: const EdgeInsets.all(kPaddingLarge),
+          borderRadius:
+              BorderRadius.circular(LikeMindsTheme.kBorderRadiusMedium)),
+      padding: const EdgeInsets.all(LikeMindsTheme.kPaddingLarge),
       child: Shimmer.fromColors(
         baseColor: Colors.black26,
         highlightColor: Colors.black12,
@@ -23,7 +24,7 @@ class LMFeedDocumentShimmer extends StatelessWidget {
             width: 35,
             color: Colors.white,
           ),
-          kHorizontalPaddingLarge,
+          LikeMindsTheme.kHorizontalPaddingLarge,
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +34,7 @@ class LMFeedDocumentShimmer extends StatelessWidget {
                 width: 150,
                 color: Colors.white,
               ),
-              kVerticalPaddingMedium,
+              LikeMindsTheme.kVerticalPaddingMedium,
               Row(
                 children: <Widget>[
                   Container(
@@ -41,15 +42,15 @@ class LMFeedDocumentShimmer extends StatelessWidget {
                     width: 50,
                     color: Colors.white,
                   ),
-                  kHorizontalPaddingXSmall,
+                  LikeMindsTheme.kHorizontalPaddingXSmall,
                   const Text(
                     '·',
                     style: TextStyle(
-                      fontSize: kFontSmall,
+                      fontSize: LikeMindsTheme.kFontSmall,
                       color: Colors.grey,
                     ),
                   ),
-                  kHorizontalPaddingXSmall,
+                  LikeMindsTheme.kHorizontalPaddingXSmall,
                   Container(
                     height: 6,
                     width: 50,
