@@ -92,8 +92,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  // TODO: implement preferredSize
-  Size get preferredSize => const Size.fromHeight(92);
+  Size get preferredSize => Size.fromHeight(style?.height ?? 92);
 }
 
 class LMFeedAppBarStyle {

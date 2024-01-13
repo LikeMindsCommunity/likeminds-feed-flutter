@@ -29,6 +29,9 @@ class LMFeedThemeData {
   final LMFeedReplyStyle replyStyle;
   final LMFeedButtonStyle feedButtonStyle;
   final LMFeedIconStyle feedIconStyle;
+  final LMFeedTextFieldStyle textFieldStyle;
+  final LMFeedDialogStyle dialogStyle;
+  final LMFeedPopUpMenuStyle popUpMenuStyle;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -70,6 +73,9 @@ class LMFeedThemeData {
     required this.container,
     required this.onContainer,
     required this.onPrimary,
+    required this.textFieldStyle,
+    required this.dialogStyle,
+    required this.popUpMenuStyle,
   });
 
   factory LMFeedThemeData.light() {
@@ -180,6 +186,15 @@ class LMFeedThemeData {
       replyStyle: const LMFeedReplyStyle(),
       feedButtonStyle: const LMFeedButtonStyle(),
       feedIconStyle: const LMFeedIconStyle(),
+      textFieldStyle: const LMFeedTextFieldStyle(
+        backgroundColor: LikeMindsTheme.backgroundColor,
+        decoration: InputDecoration(
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+        ),
+      ),
+      dialogStyle: const LMFeedDialogStyle(),
+      popUpMenuStyle: const LMFeedPopUpMenuStyle(),
     );
   }
 
@@ -202,6 +217,9 @@ class LMFeedThemeData {
     Color? container,
     Color? onContainer,
     Color? onPrimary,
+    LMFeedTextFieldStyle? textFieldStyle,
+    LMFeedDialogStyle? dialogStyle,
+    LMFeedPopUpMenuStyle? popUpMenuStyle,
   }) {
     return LMFeedThemeData._(
       postStyle: postStyle ?? this.postStyle,
@@ -222,6 +240,9 @@ class LMFeedThemeData {
       container: container ?? this.container,
       onContainer: onContainer ?? this.onContainer,
       onPrimary: onPrimary ?? this.onPrimary,
+      dialogStyle: dialogStyle ?? this.dialogStyle,
+      textFieldStyle: textFieldStyle ?? this.textFieldStyle,
+      popUpMenuStyle: popUpMenuStyle ?? this.popUpMenuStyle,
     );
   }
 }
@@ -274,4 +295,89 @@ class LikeMindsTheme {
   static const SizedBox kVerticalPaddingMedium =
       SizedBox(height: kPaddingMedium);
   static const SizedBox kVerticalPaddingLarge = SizedBox(height: kPaddingLarge);
+}
+
+class LMFeedTextFieldStyle {
+  final Color? backgroundColor;
+  final InputDecoration? decoration;
+
+  const LMFeedTextFieldStyle({
+    this.backgroundColor,
+    this.decoration,
+  });
+
+  LMFeedTextFieldStyle copyWith({
+    Color? backgroundColor,
+    InputDecoration? decoration,
+  }) {
+    return LMFeedTextFieldStyle(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      decoration: decoration ?? this.decoration,
+    );
+  }
+}
+
+class LMFeedDialogStyle {
+  final Color? backgroundColor;
+
+  const LMFeedDialogStyle({
+    this.backgroundColor,
+  });
+
+  LMFeedDialogStyle copyWith({Color? backgroundColor}) {
+    return LMFeedDialogStyle(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+    );
+  }
+}
+
+class LMFeedPopUpMenuStyle {
+  final Color? backgroundColor;
+  final LMFeedIcon? icon;
+  final LMFeedIcon? activeIcon;
+  final Color? activeBackgroundColor;
+  final Color? activeColor;
+  final Color? inActiveColor;
+  final double? width;
+  final double? height;
+  final Border? border;
+  final Color? borderColor;
+  final double? borderWidth;
+
+  const LMFeedPopUpMenuStyle({
+    this.backgroundColor,
+    this.icon,
+    this.activeIcon,
+    this.activeBackgroundColor,
+    this.activeColor,
+    this.inActiveColor,
+    this.width,
+    this.height,
+    this.border,
+    this.borderColor,
+    this.borderWidth,
+  });
+
+  LMFeedPopUpMenuStyle copyWith({
+    Color? backgroundColor,
+    LMFeedIcon? icon,
+    LMFeedIcon? activeIcon,
+    Color? activeBackgroundColor,
+    Color? activeColor,
+    Color? inActiveColor,
+    double? width,
+    double? height,
+  }) {
+    return LMFeedPopUpMenuStyle(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      icon: icon ?? this.icon,
+      activeIcon: activeIcon ?? this.activeIcon,
+      activeBackgroundColor:
+          activeBackgroundColor ?? this.activeBackgroundColor,
+      activeColor: activeColor ?? this.activeColor,
+      inActiveColor: inActiveColor ?? this.inActiveColor,
+      width: width ?? this.width,
+      height: height ?? this.height,
+    );
+  }
 }

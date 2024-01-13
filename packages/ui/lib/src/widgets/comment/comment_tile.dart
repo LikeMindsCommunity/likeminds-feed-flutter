@@ -292,6 +292,9 @@ class LMFeedCommentStyle {
   final double? width;
   final List<BoxShadow>? boxShadow;
   final EdgeInsets? padding;
+  final LMFeedButtonStyle? likeButtonStyle;
+  final LMFeedButtonStyle? replyButtonStyle;
+  final LMFeedButtonStyle? showRepliesButtonStyle;
 
   const LMFeedCommentStyle({
     this.textStyle,
@@ -304,6 +307,9 @@ class LMFeedCommentStyle {
     this.width,
     this.boxShadow,
     this.padding,
+    this.likeButtonStyle,
+    this.replyButtonStyle,
+    this.showRepliesButtonStyle,
   });
 
   LMFeedCommentStyle copyWith({
@@ -317,6 +323,9 @@ class LMFeedCommentStyle {
     double? width,
     List<BoxShadow>? boxShadow,
     EdgeInsets? padding,
+    LMFeedButtonStyle? likeButtonStyle,
+    LMFeedButtonStyle? replyButtonStyle,
+    LMFeedButtonStyle? showRepliesButtonStyle,
   }) {
     return LMFeedCommentStyle(
       textStyle: textStyle ?? this.textStyle,
@@ -330,6 +339,10 @@ class LMFeedCommentStyle {
       width: width ?? this.width,
       boxShadow: boxShadow ?? this.boxShadow,
       padding: padding ?? this.padding,
+      likeButtonStyle: likeButtonStyle ?? this.likeButtonStyle,
+      replyButtonStyle: replyButtonStyle ?? this.replyButtonStyle,
+      showRepliesButtonStyle:
+          showRepliesButtonStyle ?? this.showRepliesButtonStyle,
     );
   }
 }

@@ -220,70 +220,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                   return SizedBox(
                                     child: Column(
                                       children: [
-                                        LMFeedCommentWidget(
-                                          user: userViewData,
-                                          comment: commentViewData,
-                                          style: const LMFeedCommentStyle(
-                                            actionsPadding:
-                                                EdgeInsets.only(left: 48),
-                                            padding: EdgeInsets.all(16.0),
-                                          ),
-                                          lmFeedMenuAction: defLMFeedMenuAction(
-                                              commentViewData),
-                                          profilePicture: LMFeedProfilePicture(
-                                            style: LMFeedProfilePictureStyle(
-                                              backgroundColor:
-                                                  feedTheme!.primaryColor,
-                                              size: 36,
-                                            ),
-                                            fallbackText:
-                                                _postDetailScreenHandler!
-                                                    .users[
-                                                        commentViewData.userId]!
-                                                    .name,
-                                            onTap: () {
-                                              if (_postDetailScreenHandler!
-                                                      .users[commentViewData
-                                                          .userId]!
-                                                      .sdkClientInfo !=
-                                                  null) {
-                                                LMFeedCore.instance.lmFeedClient
-                                                    .routeToProfile(
-                                                        _postDetailScreenHandler!
-                                                            .users[
-                                                                commentViewData
-                                                                    .userId]!
-                                                            .sdkClientInfo!
-                                                            .userUniqueId);
-                                              }
-                                            },
-                                            imageUrl: _postDetailScreenHandler!
-                                                .users[commentViewData.userId]!
-                                                .imageUrl,
-                                          ),
-                                          subtitleText: LMFeedText(
-                                            text:
-                                                "@${_postDetailScreenHandler!.users[commentViewData.userId]!.name.toLowerCase().split(' ').join()} · ", //${timeago.format(commentViewData.createdAt)}",
-
-                                            style: const LMFeedTextStyle(
-                                              textStyle: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ),
-                                          likeButton: defCommentLikeButton(
-                                              commentViewData),
-                                          replyButton: defCommentReplyButton(
-                                              commentViewData),
-                                          showRepliesButton:
-                                              defCommentShowRepliesButton(
-                                                  commentViewData),
-                                          onTagTap: (String userId) {
-                                            LMFeedCore.instance.lmFeedClient
-                                                .routeToProfile(userId);
-                                          },
-                                        ),
+                                        widget.commentBuilder?.call(
+                                                context,
+                                                defCommentTile(commentViewData,
+                                                    userViewData),
+                                                postData!) ??
+                                            defCommentTile(
+                                                commentViewData, userViewData),
                                         (replyShown &&
                                                 commentIdReplyId ==
                                                     commentViewData.id)
@@ -666,6 +609,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           ),
         ),
       ),
+      style: feedTheme?.commentStyle?.,
     );
   }
 
@@ -773,9 +717,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                           userTags.add(tag);
                         },
                         controller: _postDetailScreenHandler!.commentController,
-                        decoration: InputDecoration(
+                        decoration:
+                            feedTheme?.textFieldStyle.decoration?.copyWith(
                           enabled: right,
-                          border: InputBorder.none,
                           hintText: right
                               ? 'Write a comment'
                               : "You do not have permission to comment.",
