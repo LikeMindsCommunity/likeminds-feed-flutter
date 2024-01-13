@@ -119,7 +119,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         errorWidget: widget.errorWidget,
         onError: widget.onError,
       );
-    } else {
+    } else if (attachments!.first.attachmentType == 1 ||
+        attachments!.first.attachmentType == 2) {
       return LMFeedCarousel(
         initialiseVideoController: widget.initialiseVideoController,
         attachments: attachments!,
@@ -132,6 +133,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         height: widget.height,
         onError: widget.onError,
       );
+    } else {
+      return const SizedBox.shrink();
     }
   }
 

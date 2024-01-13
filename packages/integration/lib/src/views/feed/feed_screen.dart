@@ -269,9 +269,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return Scaffold(
       backgroundColor: LikeMindsTheme.whiteColor,
       appBar: widget.appBar ??
-          AppBar(
-            backgroundColor: LikeMindsTheme.whiteColor,
-            centerTitle: false,
+          LMFeedAppBar(
             title: GestureDetector(
               onTap: () {
                 _scrollToTop();
@@ -290,7 +288,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
             ),
-            elevation: 1,
+            style: const LMFeedAppBarStyle(
+              backgroundColor: LikeMindsTheme.whiteColor,
+            ),
           ),
       body: RefreshIndicator(
         onRefresh: () async {

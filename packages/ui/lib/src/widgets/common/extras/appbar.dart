@@ -14,7 +14,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   final Widget? leading;
   final Widget? trailing;
-  final LMFeedText? title;
+  final Widget? title;
 
   final Function? backButtonCallback;
 

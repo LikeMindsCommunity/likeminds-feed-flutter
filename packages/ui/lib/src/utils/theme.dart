@@ -131,7 +131,7 @@ class LMFeedThemeData {
           showSaveButton: false,
           likeButtonStyle: LMFeedButtonStyle(
               icon: LMFeedIcon(
-                type: LMFeedIconType.icon,
+                type: LMFeedIconType.svg,
                 assetPath: lmLikeInActiveSvg,
               ),
               activeIcon: LMFeedIcon(

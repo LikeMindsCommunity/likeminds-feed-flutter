@@ -32,12 +32,6 @@ class LMFeedPostDetailScreen extends StatefulWidget {
     this.onPostTap,
     this.onLikeClick,
     this.onCommentClick,
-    this.postContentBuilder,
-    this.postFooterBuilder,
-    this.postHeaderBuilder,
-    this.postMediaBuilder,
-    this.postMenuBuilder,
-    this.postTopicBuilder,
   });
   // Required variables
   final String postId;
@@ -51,24 +45,6 @@ class LMFeedPostDetailScreen extends StatefulWidget {
   // the default in each case will be used
   /// {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
-
-  /// {@macro post_footer_builder}
-  final LMFeedPostFooterBuilder? postFooterBuilder;
-
-  /// {@macro post_header_builder}
-  final LMFeedPostHeaderBuilder? postHeaderBuilder;
-
-  /// {@macro post_menu_builder}
-  final LMFeedPostMenuBuilder? postMenuBuilder;
-
-  /// {@macro post_media_builder}
-  final LMFeedPostMediaBuilder? postMediaBuilder;
-
-  /// {@macro post_content_builder}
-  final LMFeedPostContentBuilder? postContentBuilder;
-
-  /// {@macro post_topic_builder}
-  final LMFeedPostTopicBuilder? postTopicBuilder;
 
   /// {@macro post_appbar_builder}
   final LMFeedPostAppBarBuilder? appBarBuilder;
