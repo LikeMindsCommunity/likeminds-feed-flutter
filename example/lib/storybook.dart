@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 class StoryBookApp extends StatefulWidget {
   const StoryBookApp({super.key});
@@ -11,8 +12,10 @@ class StoryBookApp extends StatefulWidget {
 class _StoryBookAppState extends State<StoryBookApp> {
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: StoryBookPage(),
+    return const OverlaySupport.global(
+      child: MaterialApp(
+        home: StoryBookPage(),
+      ),
     );
   }
 }

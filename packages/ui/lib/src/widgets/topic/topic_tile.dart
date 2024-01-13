@@ -56,7 +56,7 @@ class LMFeedTopicTile extends StatelessWidget {
           mainAxisAlignment: tileRowAlignment ?? MainAxisAlignment.spaceBetween,
           children: [
             text,
-            kHorizontalPaddingLarge,
+            LikeMindsTheme.kHorizontalPaddingLarge,
             isSelected ? icon : const SizedBox()
           ],
         ),

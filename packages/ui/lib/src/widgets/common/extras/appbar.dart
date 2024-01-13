@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
-class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
+class LMFeedAppBar extends StatelessWidget {
   const LMFeedAppBar({
     super.key,
     this.leading,
@@ -24,12 +24,12 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final inStyle = style ?? LMFeedAppBarStyle.basic();
     final theme = LMFeedTheme.of(context);
-    final Size screenSize = MediaQuery.of(context).size;
-    return PreferredSize(
-      preferredSize: Size(
-        inStyle.width ?? screenSize.width,
-        inStyle.height ?? 64,
-      ),
+    return
+        //  PreferredSize(
+        //   preferredSize: Size(width ?? screenSize.width, height ?? 64),
+        //   child:
+        SafeArea(
+      bottom: false,
       child: Padding(
         padding: inStyle.margin ?? EdgeInsets.zero,
         child: Container(
@@ -54,11 +54,13 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               leading ??
                   LMFeedButton(
-                    icon: LMFeedIcon(
-                      type: LMFeedIconType.icon,
-                      icon: Icons.chevron_left,
-                      style: LMFeedIconStyle(
-                        color: theme.colorScheme.primary,
+                    style: LMFeedButtonStyle(
+                      icon: LMFeedIcon(
+                        type: LMFeedIconType.icon,
+                        icon: Icons.chevron_left,
+                        style: LMFeedIconStyle(
+                          color: theme.primaryColor,
+                        ),
                       ),
                     ),
                     onTap: () {
@@ -73,6 +75,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
+      // ),
     );
   }
 
@@ -91,10 +94,6 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
       style: style ?? this.style,
     );
   }
-
-  @override
-  // TODO: implement preferredSize
-  Size get preferredSize => throw UnimplementedError();
 }
 
 class LMFeedAppBarStyle {

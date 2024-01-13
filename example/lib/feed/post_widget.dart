@@ -1,26 +1,23 @@
-import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
-
-Widget clientPostWidgetBuilder(
-    BuildContext context, LMFeedPostWidget postWidget) {
-  return Container(
-    decoration: BoxDecoration(
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          spreadRadius: 1,
-          blurRadius: 1,
-          offset: const Offset(0, 1), // changes position of shadow
-        ),
-      ],
-    ),
-    child: postWidget.copyWith(
-      footerBuilder: (context, postFooter, postViewData) {
-        return postFooter;
-      },
-    ),
-  );
-}
+// Widget clientPostWidgetBuilder(
+//     BuildContext context, LMFeedPostWidget postWidget) {
+//   return Container(
+//     decoration: BoxDecoration(
+//       boxShadow: [
+//         BoxShadow(
+//           color: Colors.black.withOpacity(0.1),
+//           spreadRadius: 1,
+//           blurRadius: 1,
+//           offset: const Offset(0, 1), // changes position of shadow
+//         ),
+//       ],
+//     ),
+//     child: postWidget.copyWith(
+//       footerBuilder: (context, postFooter, postViewData) {
+//         return postFooter;
+//       },
+//     ),
+//   );
+// }
 
 // Widget clientCommentWidgetBuilder(
 //     BuildContext context,
@@ -41,7 +38,7 @@ Widget clientPostWidgetBuilder(
 //                   ? "1 Like"
 //                   : "${commentViewData.likesCount} Likes",
 //           textStyle: const TextStyle(
-//               color: LMThemeData.kSecondaryColor700, fontSize: 12),
+//               color: LikeMindsTheme.kSecondaryColor700, fontSize: 12),
 //         ),
 //         activeText: LMFeedText(
 //           text: commentViewData.likesCount == 0
@@ -49,7 +46,7 @@ Widget clientPostWidgetBuilder(
 //               : commentViewData.likesCount == 1
 //                   ? "1 Like"
 //                   : "${commentViewData.likesCount} Likes",
-//           textStyle: TextStyle(color: LMThemeData.kPrimaryColor, fontSize: 12),
+//           textStyle: TextStyle(color: LikeMindsTheme.kPrimaryColor, fontSize: 12),
 //         ),
 //         onTap: () async {
 //           commentViewData.likesCount = commentViewData.isLiked
@@ -121,7 +118,7 @@ Widget clientPostWidgetBuilder(
 //               size: 20,
 //             ),
 //           ),
-//           LMThemeData.kHorizontalPaddingMedium,
+//           LikeMindsTheme.kHorizontalPaddingMedium,
 //           commentViewData.repliesCount > 0
 //               ? LMTextButton(
 //                   onTap: () {
@@ -162,7 +159,7 @@ Widget clientPostWidgetBuilder(
 //                     text:
 //                         "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
 //                     textStyle: const TextStyle(
-//                       color: LMThemeData.kPrimaryColor,
+//                       color: LikeMindsTheme.kPrimaryColor,
 //                     ),
 //                   ),
 //                 )

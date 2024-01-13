@@ -92,7 +92,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
               onTap: widget.onTap == null ? null : () => widget.onTap!(),
               child: Container(
                 margin: const EdgeInsets.symmetric(
-                  vertical: kPaddingSmall,
+                  vertical: LikeMindsTheme.kPaddingSmall,
                 ),
                 height: widget.height ?? 78,
                 decoration: BoxDecoration(
@@ -104,10 +104,10 @@ class _LMDocumentState extends State<LMFeedDocument> {
                         )
                       : null,
                   borderRadius: BorderRadius.circular(
-                    widget.borderRadius ?? kBorderRadiusMedium,
+                    widget.borderRadius ?? LikeMindsTheme.kBorderRadiusMedium,
                   ),
                 ),
-                padding: const EdgeInsets.all(kPaddingLarge),
+                padding: const EdgeInsets.all(LikeMindsTheme.kPaddingLarge),
                 child: Row(
                   children: [
                     Container(
@@ -122,7 +122,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                             ),
                           ),
                     ),
-                    kHorizontalPaddingLarge,
+                    LikeMindsTheme.kHorizontalPaddingLarge,
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,33 +140,33 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                   ),
                                 ),
                               ),
-                          kVerticalPaddingSmall,
+                          LikeMindsTheme.kVerticalPaddingSmall,
                           widget.subtitle ??
                               Row(
                                 children: [
-                                  kHorizontalPaddingXSmall,
+                                  LikeMindsTheme.kHorizontalPaddingXSmall,
                                   Text(
                                     _fileSize!.toUpperCase(),
                                     style: TextStyle(
-                                      fontSize: kFontSmall,
+                                      fontSize: LikeMindsTheme.kFontSmall,
                                       color: widget.textColor ??
                                           Colors.grey.shade300,
                                     ),
                                   ),
-                                  kHorizontalPaddingXSmall,
+                                  LikeMindsTheme.kHorizontalPaddingXSmall,
                                   Text(
                                     '·',
                                     style: TextStyle(
-                                      fontSize: kFontSmall,
+                                      fontSize: LikeMindsTheme.kFontSmall,
                                       color: widget.textColor ??
                                           Colors.grey.shade300,
                                     ),
                                   ),
-                                  kHorizontalPaddingXSmall,
+                                  LikeMindsTheme.kHorizontalPaddingXSmall,
                                   Text(
                                     _fileExtension!.toUpperCase(),
                                     style: TextStyle(
-                                      fontSize: kFontSmall,
+                                      fontSize: LikeMindsTheme.kFontSmall,
                                       color: widget.textColor ??
                                           Colors.grey.shade300,
                                     ),
@@ -179,10 +179,12 @@ class _LMDocumentState extends State<LMFeedDocument> {
                     const SizedBox(width: 32),
                     widget.documentFile != null
                         ? LMFeedButton(
-                            icon: widget.removeIcon ??
-                                const LMFeedIcon(
-                                    type: LMFeedIconType.icon,
-                                    icon: Icons.close),
+                            style: LMFeedButtonStyle(
+                              icon: widget.removeIcon ??
+                                  const LMFeedIcon(
+                                      type: LMFeedIconType.icon,
+                                      icon: Icons.close),
+                            ),
                             onTap: () {
                               if (widget.onRemove != null) {
                                 widget.onRemove!();

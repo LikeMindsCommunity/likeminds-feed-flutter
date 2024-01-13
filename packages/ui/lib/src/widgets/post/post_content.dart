@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/post/post.dart';
 
 class LMFeedPostContent extends StatelessWidget {
@@ -21,7 +22,7 @@ class LMFeedPostContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final postDetails = InheritedPostProvider.of(context)?.post;
-    final ThemeData theme = Theme.of(context);
+    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return Container(
       width: style.width,
       height: style.height,
@@ -40,13 +41,13 @@ class LMFeedPostContent extends StatelessWidget {
             Theme.of(context)
                 .textTheme
                 .bodyMedium!
-                .copyWith(color: theme.colorScheme.primary),
+                .copyWith(color: feedTheme.primaryColor),
         prefixStyle: style.expandTextStyle,
         linkStyle: style.linkStyle ??
             Theme.of(context)
                 .textTheme
                 .bodyMedium!
-                .copyWith(color: theme.colorScheme.primary),
+                .copyWith(color: feedTheme.primaryColor),
         textAlign: style.textAlign ?? TextAlign.left,
         style: style.textStyle ?? Theme.of(context).textTheme.bodyMedium,
       ),

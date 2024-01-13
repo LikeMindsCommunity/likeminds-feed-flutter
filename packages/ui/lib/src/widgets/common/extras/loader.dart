@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
 
 class LMFeedLoader extends StatelessWidget {
   final bool isPrimary;
@@ -8,9 +9,11 @@ class LMFeedLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      color:
-          color ?? (isPrimary ? Theme.of(context).primaryColor : Colors.white),
+    return CircularProgressIndicator.adaptive(
+      valueColor: AlwaysStoppedAnimation<Color>(
+        color ??
+            (isPrimary ? LMFeedTheme.of(context).primaryColor : Colors.white),
+      ),
     );
   }
 }

@@ -38,7 +38,7 @@ class LMFeedUserTile extends LMFeedTile {
             text: user.name,
             style: const LMFeedTextStyle(
               textStyle: TextStyle(
-                fontSize: kFontMedium,
+                fontSize: LikeMindsTheme.kFontMedium,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -49,7 +49,7 @@ class LMFeedUserTile extends LMFeedTile {
                   text: user.sdkClientInfo!.userUniqueId,
                   style: const LMFeedTextStyle(
                     textStyle: TextStyle(
-                      fontSize: kFontSmall,
+                      fontSize: LikeMindsTheme.kFontSmall,
                       color: Colors.grey,
                       fontWeight: FontWeight.w300,
                     ),

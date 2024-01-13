@@ -4,8 +4,6 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/flutter_typeahead.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/helper/tagging/user_tag_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/ui_constants.dart';
-
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMTaggingAheadTextField extends StatefulWidget {
@@ -121,6 +119,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
 
   @override
   Widget build(BuildContext context) {
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
       child: TypeAheadField<LMUserTagViewData>(
@@ -173,7 +172,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
               color: Colors.white,
               border: Border(
                 bottom: BorderSide(
-                  color: LMThemeData.kGrey3Color,
+                  color: LikeMindsTheme.greyColor,
                   width: 0.5,
                 ),
               ),
@@ -189,9 +188,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
                       absorbing: true,
                       child: LMFeedProfilePicture(
                         fallbackText: opt.name!,
-                        style: const LMFeedProfilePictureStyle(
+                        style: LMFeedProfilePictureStyle(
                           size: 32,
-                          backgroundColor: LMThemeData.kPrimaryColor,
+                          backgroundColor: feedTheme.primaryColor,
                         ),
                         imageUrl: opt.imageUrl!,
                         onTap: null,

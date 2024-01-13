@@ -17,12 +17,99 @@ class LMFeedTopicChip extends StatelessWidget {
   final Function(LMTopicViewData)? onIconTap;
   // Required parameters
   final LMTopicViewData topic;
-  // background color of the topic chip defaults to transparent
+
+  final LMFeedTopicChipStyle? style;
+
+  const LMFeedTopicChip({
+    Key? key,
+    required this.topic,
+    this.style,
+    this.onIconTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    Widget topicText = LMFeedText(
+      text: topic.name,
+      style: LMFeedTextStyle(
+        textStyle: style?.textStyle,
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          margin: style?.margin ?? const EdgeInsets.only(right: 8.0),
+          alignment: Alignment.center,
+          height: style?.height,
+          padding: style?.padding ??
+              const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+          decoration: BoxDecoration(
+            borderRadius: style?.borderRadius ?? BorderRadius.circular(5.0),
+            border: (style?.showBorder ?? false)
+                ? Border.all(
+                    color: style?.borderColor ?? Colors.transparent,
+                    width: style?.borderWidth ?? 1,
+                  )
+                : null,
+            color: style?.backgroundColor ?? Colors.transparent,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              style?.icon != null &&
+                      style?.iconPlacement == LMFeedIconButtonPlacement.start
+                  ? GestureDetector(
+                      onTap: onIconTap != null ? () => onIconTap!(topic) : null,
+                      child: Container(
+                        color: Colors.transparent,
+                        child: style?.icon,
+                      ),
+                    )
+                  : const SizedBox(),
+              style?.icon != null &&
+                      style?.iconPlacement == LMFeedIconButtonPlacement.start
+                  ? LikeMindsTheme.kHorizontalPaddingSmall
+                  : const SizedBox(),
+              topic.name.isEmpty
+                  ? const SizedBox()
+                  : (style?.gripChip ?? false)
+                      ? Expanded(child: topicText)
+                      : topicText,
+              style?.icon != null &&
+                      style?.iconPlacement == LMFeedIconButtonPlacement.end
+                  ? LikeMindsTheme.kHorizontalPaddingSmall
+                  : const SizedBox(),
+              style?.icon != null &&
+                      style?.iconPlacement == LMFeedIconButtonPlacement.end
+                  ? GestureDetector(
+                      onTap: onIconTap != null ? () => onIconTap!(topic) : null,
+                      child: Container(
+                        color: Colors.transparent,
+                        child: style?.icon,
+                      ),
+                    )
+                  : const SizedBox()
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class LMFeedTopicChipStyle {
+// background color of the topic chip defaults to transparent
   final Color? backgroundColor;
   // border color of the topic chip defaults to null
   final Color? borderColor;
   // border radius of the topic chip defaults to 5.0
-  final double? borderRadius;
+  final BorderRadius? borderRadius;
   // showBorder must be true, border width of the topic chip defaults to 1.0
   final double? borderWidth;
   // Whether to show a border around the topic chip
@@ -43,86 +130,48 @@ class LMFeedTopicChip extends StatelessWidget {
   final EdgeInsets? margin;
   final bool gripChip;
 
-  const LMFeedTopicChip({
-    Key? key,
-    required this.topic,
+  const LMFeedTopicChipStyle({
     this.backgroundColor,
     this.borderColor,
+    this.borderRadius,
     this.borderWidth,
     this.showBorder = false,
     this.textStyle,
     this.icon,
     this.padding,
-    this.onIconTap,
-    this.borderRadius,
-    this.height,
     this.iconPlacement = LMFeedIconButtonPlacement.end,
+    this.height,
     this.margin,
     this.gripChip = false,
-  }) : super(key: key);
+  });
 
-  @override
-  Widget build(BuildContext context) {
-    Widget topicText = LMFeedText(
-      text: topic.name,
-      style: LMFeedTextStyle(
-        textStyle: textStyle,
-        textAlign: TextAlign.center,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-
-    return Container(
-      margin: margin ?? const EdgeInsets.only(right: 8.0),
-      alignment: Alignment.center,
-      height: height,
-      padding: padding ??
-          const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius ?? 5.0),
-        border: showBorder
-            ? Border.all(
-                color: borderColor ?? Colors.transparent,
-                width: borderWidth ?? 1,
-              )
-            : null,
-        color: backgroundColor ?? Colors.transparent,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          icon != null && iconPlacement == LMFeedIconButtonPlacement.start
-              ? GestureDetector(
-                  onTap: onIconTap != null ? () => onIconTap!(topic) : null,
-                  child: Container(
-                    color: Colors.transparent,
-                    child: icon,
-                  ),
-                )
-              : const SizedBox(),
-          icon != null && iconPlacement == LMFeedIconButtonPlacement.start
-              ? kHorizontalPaddingSmall
-              : const SizedBox(),
-          topic.name.isEmpty
-              ? const SizedBox()
-              : gripChip
-                  ? Expanded(child: topicText)
-                  : topicText,
-          icon != null && iconPlacement == LMFeedIconButtonPlacement.end
-              ? kHorizontalPaddingSmall
-              : const SizedBox(),
-          icon != null && iconPlacement == LMFeedIconButtonPlacement.end
-              ? GestureDetector(
-                  onTap: onIconTap != null ? () => onIconTap!(topic) : null,
-                  child: Container(
-                    color: Colors.transparent,
-                    child: icon,
-                  ),
-                )
-              : const SizedBox()
-        ],
-      ),
+  LMFeedTopicChipStyle copyWith({
+    Color? backgroundColor,
+    Color? borderColor,
+    BorderRadius? borderRadius,
+    double? borderWidth,
+    bool? showBorder,
+    TextStyle? textStyle,
+    Widget? icon,
+    EdgeInsets? padding,
+    LMFeedIconButtonPlacement? iconPlacement,
+    double? height,
+    EdgeInsets? margin,
+    bool? gripChip,
+  }) {
+    return LMFeedTopicChipStyle(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderColor: borderColor ?? this.borderColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderWidth: borderWidth ?? this.borderWidth,
+      showBorder: showBorder ?? this.showBorder,
+      textStyle: textStyle ?? this.textStyle,
+      icon: icon ?? this.icon,
+      padding: padding ?? this.padding,
+      iconPlacement: iconPlacement ?? this.iconPlacement,
+      height: height ?? this.height,
+      margin: margin ?? this.margin,
+      gripChip: gripChip ?? this.gripChip,
     );
   }
 }

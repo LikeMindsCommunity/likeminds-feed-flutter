@@ -5,7 +5,6 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/comment/comment_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -49,6 +48,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   ValueNotifier<bool> rebuildReplyList = ValueNotifier(false);
   List<LMCommentViewData> replies = [];
   Map<String, LMUserViewData> users = {};
+  LMFeedThemeData? feedTheme;
 
   LMCommentViewData? reply;
   late final LMUserViewData user;
@@ -78,7 +78,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   @override
   void didUpdateWidget(covariant LMFeedCommentReplyWidget oldWidget) {
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
     if (oldWidget.reply != widget.reply) {
       initialiseReply();
@@ -89,6 +88,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   @override
   Widget build(BuildContext context) {
+    feedTheme = LMFeedTheme.of(context);
     return BlocConsumer(
       bloc: _commentRepliesBloc,
       buildWhen: (previous, current) {
@@ -114,14 +114,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         }
         if (state is LMFeedCommentRepliesLoadingState) {
           if (state.commentId == widget.reply.id) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
               child: Center(
                 child: SizedBox(
                   height: 20,
                   width: 20,
                   child: LMFeedLoader(
-                    color: LMThemeData.kPrimaryColor,
+                    color: feedTheme!.primaryColor,
                   ),
                 ),
               ),
@@ -230,125 +231,46 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                       LMCommentViewData commentViewData = replies[index];
                       LMUserViewData user = users[commentViewData.userId]!;
                       return StatefulBuilder(builder: (context, setReplyState) {
-                        return LMFeedReplyTile(
-                            comment: commentViewData,
-                            onTagTap: (String userId) {
-                              LMFeedCore.instance.lmFeedClient
-                                  .routeToProfile(userId);
+                        return LMFeedReplyWidget(
+                          comment: commentViewData,
+                          onTagTap: (String userId) {
+                            LMFeedCore.instance.lmFeedClient
+                                .routeToProfile(userId);
+                          },
+                          user: user,
+                          profilePicture: LMFeedProfilePicture(
+                            imageUrl: user.imageUrl,
+                            style: LMFeedProfilePictureStyle(
+                              size: 32,
+                              backgroundColor: feedTheme!.primaryColor,
+                            ),
+                            fallbackText: user.name,
+                            onTap: () {
+                              if (user.sdkClientInfo != null) {
+                                LMFeedCore.instance.lmFeedClient.routeToProfile(
+                                    user.sdkClientInfo!.userUniqueId);
+                              }
                             },
-                            user: user,
-                            profilePicture: LMFeedProfilePicture(
-                              imageUrl: user.imageUrl,
-                              style: const LMFeedProfilePictureStyle(
-                                size: 32,
-                                backgroundColor: LMThemeData.kPrimaryColor,
-                              ),
-                              fallbackText: user.name,
-                              onTap: () {
-                                if (user.sdkClientInfo != null) {
-                                  LMFeedCore.instance.lmFeedClient
-                                      .routeToProfile(
-                                          user.sdkClientInfo!.userUniqueId);
-                                }
-                              },
-                            ),
-                            subtitleText: LMFeedText(
-                              text:
-                                  "@${user.name.toLowerCase().split(' ').join()} · ${timeago.format(commentViewData.createdAt)}",
-                              style: const LMFeedTextStyle(
-                                textStyle: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400,
-                                  color: LMThemeData.kGreyColor,
-                                ),
+                          ),
+                          subtitleText: LMFeedText(
+                            text:
+                                "@${user.name.toLowerCase().split(' ').join()} · ${timeago.format(commentViewData.createdAt)}",
+                            style: const LMFeedTextStyle(
+                              textStyle: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: LikeMindsTheme.greyColor,
                               ),
                             ),
-                            lmFeedMenuAction:
-                                defLMFeedMenuAction(commentViewData),
-                            commentActions: [
-                              const SizedBox(width: 48),
-                              LMFeedButton(
-                                text: LMFeedText(
-                                  text: commentViewData.likesCount == 0
-                                      ? "Like"
-                                      : commentViewData.likesCount == 1
-                                          ? "1 Like"
-                                          : "${commentViewData.likesCount} Likes",
-                                  style: const LMFeedTextStyle(
-                                    textStyle: TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                                activeText: LMFeedText(
-                                  text: commentViewData.likesCount == 0
-                                      ? "Like"
-                                      : commentViewData.likesCount == 1
-                                          ? "1 Like"
-                                          : "${commentViewData.likesCount} Likes",
-                                  style: LMFeedTextStyle(
-                                    textStyle: TextStyle(
-                                      color:
-                                          LMThemeData.theme.colorScheme.primary,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                                onTap: () async {
-                                  LMCommentViewData commentFromList =
-                                      replies.firstWhere((element) =>
-                                          element.id == commentViewData.id);
-                                  setReplyState(() {
-                                    if (commentFromList.isLiked) {
-                                      commentFromList.likesCount -= 1;
-                                    } else {
-                                      commentFromList.likesCount += 1;
-                                    }
-                                    commentFromList.isLiked =
-                                        !commentFromList.isLiked;
-                                  });
-
-                                  ToggleLikeCommentRequest request =
-                                      (ToggleLikeCommentRequestBuilder()
-                                            ..commentId(commentViewData.id)
-                                            ..postId(widget.postId))
-                                          .build();
-
-                                  ToggleLikeCommentResponse response =
-                                      await LMFeedCore.instance.lmFeedClient
-                                          .toggleLikeComment(request);
-
-                                  if (!response.success) {
-                                    setReplyState(() {
-                                      if (commentFromList.isLiked) {
-                                        commentFromList.likesCount -= 1;
-                                      } else {
-                                        commentFromList.likesCount += 1;
-                                      }
-                                      commentFromList.isLiked =
-                                          !commentFromList.isLiked;
-                                    });
-                                  }
-                                },
-                                icon: const LMFeedIcon(
-                                  type: LMFeedIconType.icon,
-                                  icon: Icons.thumb_up_alt_outlined,
-                                  style: LMFeedIconStyle(
-                                    color: LMThemeData.appBlack,
-                                    size: 20,
-                                  ),
-                                ),
-                                activeIcon: const LMFeedIcon(
-                                  type: LMFeedIconType.icon,
-                                  icon: Icons.thumb_up_alt_rounded,
-                                  style: LMFeedIconStyle(
-                                    size: 20,
-                                    color: LMThemeData.kPrimaryColor,
-                                  ),
-                                  assetPath: kAssetLikeFilledIcon,
-                                ),
-                                isActive: commentViewData.isLiked,
-                              ),
-                              const SizedBox(width: 8),
-                            ]);
+                          ),
+                          lmFeedMenuAction: defLMFeedMenuAction(
+                            commentViewData,
+                          ),
+                          likeButton: defLikeButton(
+                            commentViewData,
+                            setReplyState,
+                          ),
+                        );
                       });
                     }),
                 if (replies.isNotEmpty &&
@@ -357,8 +279,8 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      TextButton(
-                        onPressed: () {
+                      LMFeedButton(
+                        onTap: () {
                           page++;
                           _commentRepliesBloc!.add(LMFeedGetCommentRepliesEvent(
                               commentDetailRequest: (GetCommentRequestBuilder()
@@ -368,21 +290,24 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                                   .build(),
                               forLoadMore: true));
                         },
-                        child: const Text(
-                          'View more replies',
-                          style: TextStyle(
-                            color: LMThemeData.kBlueGreyColor,
-                            fontSize: 14,
+                        text: const LMFeedText(
+                          text: 'View more replies',
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ),
-                      Text(
-                        ' ${replies.length} of ${reply!.repliesCount}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: LMThemeData.kGrey3Color,
+                      LMFeedText(
+                        text: ' ${replies.length} of ${reply!.repliesCount}',
+                        style: const LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontSize: 11,
+                            color: LikeMindsTheme.greyColor,
+                          ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 // replies.add();
@@ -466,4 +391,85 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       },
     );
   }
+
+  LMFeedButton defLikeButton(
+          LMCommentViewData commentViewData, StateSetter setReplyState) =>
+      LMFeedButton(
+        style: LMFeedButtonStyle(
+          icon: const LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: Icons.thumb_up_alt_outlined,
+            style: LMFeedIconStyle(
+              color: LikeMindsTheme.blackColor,
+              size: 20,
+            ),
+          ),
+          activeIcon: LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: Icons.thumb_up_alt_rounded,
+            style: LMFeedIconStyle(
+              size: 20,
+              color: feedTheme!.primaryColor,
+            ),
+            assetPath: kAssetLikeFilledIcon,
+          ),
+        ),
+        text: LMFeedText(
+          text: commentViewData.likesCount == 0
+              ? "Like"
+              : commentViewData.likesCount == 1
+                  ? "1 Like"
+                  : "${commentViewData.likesCount} Likes",
+          style: const LMFeedTextStyle(
+            textStyle: TextStyle(fontSize: 12),
+          ),
+        ),
+        activeText: LMFeedText(
+          text: commentViewData.likesCount == 0
+              ? "Like"
+              : commentViewData.likesCount == 1
+                  ? "1 Like"
+                  : "${commentViewData.likesCount} Likes",
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: feedTheme?.primaryColor,
+              fontSize: 12,
+            ),
+          ),
+        ),
+        onTap: () async {
+          LMCommentViewData commentFromList =
+              replies.firstWhere((element) => element.id == commentViewData.id);
+          setReplyState(() {
+            if (commentFromList.isLiked) {
+              commentFromList.likesCount -= 1;
+            } else {
+              commentFromList.likesCount += 1;
+            }
+            commentFromList.isLiked = !commentFromList.isLiked;
+          });
+
+          ToggleLikeCommentRequest request = (ToggleLikeCommentRequestBuilder()
+                ..commentId(commentViewData.id)
+                ..postId(widget.postId))
+              .build();
+
+          ToggleLikeCommentResponse response =
+              await LMFeedCore.instance.lmFeedClient.toggleLikeComment(request);
+
+          if (!response.success) {
+            setReplyState(
+              () {
+                if (commentFromList.isLiked) {
+                  commentFromList.likesCount -= 1;
+                } else {
+                  commentFromList.likesCount += 1;
+                }
+                commentFromList.isLiked = !commentFromList.isLiked;
+              },
+            );
+          }
+        },
+        isActive: commentViewData.isLiked,
+      );
 }

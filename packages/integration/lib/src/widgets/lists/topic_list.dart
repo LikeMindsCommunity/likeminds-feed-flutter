@@ -107,8 +107,8 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
       width: min(screenSize.width, 180),
       constraints: const BoxConstraints(maxHeight: 250),
       decoration: BoxDecoration(
-        color: widget.backgroundColor ??
-            LMFeedTheme.of(context).colorScheme.background,
+        color:
+            widget.backgroundColor ?? LMFeedTheme.of(context).backgroundColor,
         borderRadius: BorderRadius.circular(4.0),
       ),
       margin: const EdgeInsets.only(top: 32),
@@ -265,7 +265,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
                   ),
                   decoration: BoxDecoration(
                     color: isTopicSelected
-                        ? LMFeedTheme.of(context).colorScheme.secondary
+                        ? LMFeedTheme.of(context).secondaryColor
                         : Colors.white,
                   ),
                   alignment: Alignment.topLeft,
@@ -281,9 +281,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
                             textStyle: TextStyle(
                               color: isTopicSelected
                                   ? Colors.grey
-                                  : LMFeedTheme.of(context)
-                                      .colorScheme
-                                      .secondary,
+                                  : LMFeedTheme.of(context).secondaryColor,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               height: 1.20,

@@ -8,7 +8,6 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
@@ -245,7 +244,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       elevation: 5,
       isDismissible: true,
       useRootNavigator: true,
-      backgroundColor: LMThemeData.kWhiteColor,
+      backgroundColor: LikeMindsTheme.whiteColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28.0),
@@ -266,12 +265,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = LMThemeData.theme;
+    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
     return Scaffold(
-      backgroundColor: LMThemeData.kWhiteColor,
+      backgroundColor: LikeMindsTheme.whiteColor,
       appBar: widget.appBar ??
           AppBar(
-            backgroundColor: LMThemeData.kWhiteColor,
+            backgroundColor: LikeMindsTheme.whiteColor,
             centerTitle: false,
             title: GestureDetector(
               onTap: () {
@@ -300,7 +299,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         },
         child: Column(
           children: [
-            LMThemeData.kVerticalPaddingLarge,
             widget.showCustomWidget
                 ? ValueListenableBuilder(
                     valueListenable: postSomethingNotifier,
@@ -349,27 +347,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                             topic: (LMTopicViewDataBuilder()
                                                   ..id("0")
                                                   ..isEnabled(true)
-                                                  ..name("Topic"))
+                                                  ..name("All Topic"))
                                                 .build(),
-                                            borderRadius: 20.0,
-                                            borderWidth: 1,
-                                            showBorder: true,
-                                            borderColor:
-                                                LMThemeData.appSecondaryBlack,
-                                            textStyle: const TextStyle(
-                                              color: LMThemeData.appBlack,
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12.0,
-                                                vertical: 4.0),
-                                            icon: const LMFeedIcon(
-                                              type: LMFeedIconType.icon,
-                                              icon: CupertinoIcons.chevron_down,
-                                              style: LMFeedIconStyle(
-                                                size: 16,
-                                                color: LMThemeData.appBlack,
-                                              ),
-                                            ),
+                                            style: feedThemeData.postStyle
+                                                .topicStyle?.inactiveChipStyle,
                                           )
                                         : selectedTopics.length == 1
                                             ? LMFeedTopicChip(
@@ -381,27 +362,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                       ..name(selectedTopics
                                                           .first.name))
                                                     .build(),
-                                                borderRadius: 20.0,
-                                                backgroundColor:
-                                                    theme.colorScheme.secondary,
-                                                textStyle: const TextStyle(
-                                                  color:
-                                                      LMThemeData.kWhiteColor,
-                                                ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 12.0,
-                                                        vertical: 4.0),
-                                                icon: const LMFeedIcon(
-                                                  type: LMFeedIconType.icon,
-                                                  icon: CupertinoIcons
-                                                      .chevron_down,
-                                                  style: LMFeedIconStyle(
-                                                    size: 16,
-                                                    color:
-                                                        LMThemeData.kWhiteColor,
-                                                  ),
-                                                ),
+                                                style: feedThemeData
+                                                    .postStyle
+                                                    .topicStyle
+                                                    ?.inactiveChipStyle,
                                               )
                                             : LMFeedTopicChip(
                                                 topic: (LMTopicViewDataBuilder()
@@ -409,68 +373,62 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                       ..isEnabled(true)
                                                       ..name("Topics"))
                                                     .build(),
-                                                borderRadius: 20.0,
-                                                backgroundColor:
-                                                    theme.colorScheme.secondary,
-                                                textStyle: const TextStyle(
-                                                  color:
-                                                      LMThemeData.kWhiteColor,
-                                                ),
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 12.0,
-                                                        vertical: 4.0),
-                                                icon: Row(
-                                                  children: [
-                                                    LMThemeData
-                                                        .kHorizontalPaddingXSmall,
-                                                    Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 4),
-                                                      decoration:
-                                                          ShapeDecoration(
-                                                        color: Colors.white,
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            4)),
-                                                      ),
-                                                      child: LMFeedText(
-                                                        text: selectedTopics
-                                                            .length
-                                                            .toString(),
-                                                        style:
-                                                            const LMFeedTextStyle(
-                                                          textStyle: TextStyle(
-                                                            color: Color(
-                                                                0xFF4666F6),
-                                                            fontSize: 12,
-                                                            fontFamily: 'Inter',
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            height: 1.30,
-                                                            letterSpacing:
-                                                                -0.48,
+                                                style: feedThemeData
+                                                    .postStyle
+                                                    .topicStyle
+                                                    ?.inactiveChipStyle
+                                                    ?.copyWith(
+                                                  icon: Row(
+                                                    children: [
+                                                      LikeMindsTheme
+                                                          .kHorizontalPaddingXSmall,
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 4),
+                                                        decoration:
+                                                            ShapeDecoration(
+                                                          color: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          4)),
+                                                        ),
+                                                        child: LMFeedText(
+                                                          text: selectedTopics
+                                                              .length
+                                                              .toString(),
+                                                          style:
+                                                              LMFeedTextStyle(
+                                                            textStyle:
+                                                                TextStyle(
+                                                              color: feedThemeData
+                                                                  .primaryColor,
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    LMThemeData
-                                                        .kHorizontalPaddingSmall,
-                                                    const LMFeedIcon(
-                                                      type: LMFeedIconType.icon,
-                                                      icon: CupertinoIcons
-                                                          .chevron_down,
-                                                      style: LMFeedIconStyle(
-                                                        size: 16,
-                                                        color: LMThemeData
-                                                            .kWhiteColor,
+                                                      LikeMindsTheme
+                                                          .kHorizontalPaddingSmall,
+                                                      LMFeedIcon(
+                                                        type:
+                                                            LMFeedIconType.icon,
+                                                        icon: CupertinoIcons
+                                                            .chevron_down,
+                                                        style: LMFeedIconStyle(
+                                                          size: 16,
+                                                          color: feedThemeData
+                                                              .primaryColor,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                   ],
@@ -627,9 +585,9 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   @override
   Widget build(BuildContext context) {
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
-    final ThemeData theme = LMThemeData.theme;
+    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return Scaffold(
-      backgroundColor: LMThemeData.theme.colorScheme.background,
+      backgroundColor: feedTheme.disabledColor,
       body: Column(
         children: [
           BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
@@ -719,7 +677,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               if (state is LMFeedEditPostUploadingState) {
                 return Container(
                   height: 60,
-                  color: LMThemeData.theme.colorScheme.background,
+                  color: feedTheme.backgroundColor,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: const Row(
@@ -731,16 +689,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                             width: 50,
                             height: 50,
                           ),
-                          LMThemeData.kHorizontalPaddingMedium,
+                          LikeMindsTheme.kHorizontalPaddingMedium,
                           Text('Saving')
                         ],
                       ),
-                      CircularProgressIndicator(
-                        backgroundColor: LMThemeData.kGrey3Color,
-                        valueColor:
-                            AlwaysStoppedAnimation(LMThemeData.kPrimaryColor),
-                        strokeWidth: 3,
-                      ),
+                      LMFeedLoader(),
                     ],
                   ),
                 );
@@ -748,7 +701,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               if (state is LMFeedNewPostUploadingState) {
                 return Container(
                   height: 60,
-                  color: LMThemeData.kWhiteColor,
+                  color: LikeMindsTheme.whiteColor,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
@@ -757,7 +710,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                       Row(
                         children: <Widget>[
                           getLoaderThumbnail(state.thumbnailMedia),
-                          LMThemeData.kHorizontalPaddingMedium,
+                          LikeMindsTheme.kHorizontalPaddingMedium,
                           const Text('Posting')
                         ],
                       ),
@@ -773,9 +726,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                           snapshot.data == 0.0
                                       ? null
                                       : snapshot.data?.toDouble()),
-                                  backgroundColor: LMThemeData.kGrey3Color,
-                                  valueColor: const AlwaysStoppedAnimation(
-                                      LMThemeData.kPrimaryColor),
+                                  valueColor: AlwaysStoppedAnimation(
+                                      feedTheme.primaryColor),
                                   strokeWidth: 3,
                                 ));
                           }),
@@ -817,7 +769,6 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                       style: LMFeedTextStyle(
                                         textStyle: TextStyle(
                                           fontSize: 15,
-                                          color: LMThemeData.onSurface500,
                                           fontWeight: FontWeight.w600,
                                           height: 0,
                                         ),
@@ -832,22 +783,22 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                           style: LMFeedButtonStyle(
                                             borderRadius: 48,
                                             border: Border.all(
-                                              color: LMThemeData.primary500,
+                                              color: feedTheme.primaryColor,
                                               width: 2,
                                             ),
                                             height: 40,
                                             padding: const EdgeInsets.symmetric(
                                                 vertical: 8, horizontal: 12),
                                           ),
-                                          text: const LMFeedText(
+                                          text: LMFeedText(
                                             text: "Change Filter",
                                             style: LMFeedTextStyle(
                                               textAlign: TextAlign.center,
                                               textStyle: TextStyle(
-                                                color: LMThemeData.primary500,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                  color:
+                                                      feedTheme.primaryColor),
                                             ),
                                           ),
                                           onTap: () =>
@@ -885,38 +836,36 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                     text: "Be the first one to post here",
                                     style: LMFeedTextStyle(
                                       textStyle: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w300,
-                                          color: LMThemeData.kGrey2Color),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w300,
+                                        color: LikeMindsTheme.greyColor,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 28),
                                   LMFeedButton(
                                     style: LMFeedButtonStyle(
+                                      icon: const LMFeedIcon(
+                                        type: LMFeedIconType.icon,
+                                        icon: Icons.add,
+                                        style: LMFeedIconStyle(
+                                          size: 18,
+                                        ),
+                                      ),
                                       borderRadius: 28,
-                                      backgroundColor:
-                                          theme.colorScheme.primary,
+                                      backgroundColor: feedTheme.primaryColor,
                                       height: 44,
                                       width: 153,
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 12, horizontal: 20),
                                       placement: LMFeedIconButtonPlacement.end,
                                     ),
-                                    text: LMFeedText(
+                                    text: const LMFeedText(
                                       text: "Create Post",
                                       style: LMFeedTextStyle(
                                         textStyle: TextStyle(
-                                          color: theme.colorScheme.onPrimary,
                                           fontWeight: FontWeight.bold,
                                         ),
-                                      ),
-                                    ),
-                                    icon: LMFeedIcon(
-                                      type: LMFeedIconType.icon,
-                                      icon: Icons.add,
-                                      style: LMFeedIconStyle(
-                                        size: 18,
-                                        color: theme.colorScheme.onPrimary,
                                       ),
                                     ),
                                     onTap: right
@@ -954,16 +903,16 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                             if (widget.users[item.userId] == null) {
                               return const SizedBox();
                             }
-                            return Column(
-                              children: [
-                                const SizedBox(height: 8),
-                                widget.postBuilder?.call(
-                                        context, defPostWidget(item), item) ??
-                                    defPostWidget(item),
-                                const SizedBox(height: 8),
-                              ],
-                            );
+                            return widget.postBuilder?.call(context,
+                                    defPostWidget(feedTheme, item), item) ??
+                                defPostWidget(feedTheme, item);
                           },
+                          firstPageProgressIndicatorBuilder: (context) =>
+                              Center(
+                            child: LMFeedLoader(
+                              color: feedTheme.primaryColor,
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -980,12 +929,21 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         builder: (context, _, __) {
           return LMFeedButton(
             style: LMFeedButtonStyle(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.add,
+                style: LMFeedIconStyle(
+                  fit: BoxFit.cover,
+                  size: 18,
+                  color: feedTheme.onPrimary,
+                ),
+              ),
               height: 44,
               width: 153,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               borderRadius: 28,
               backgroundColor:
-                  right ? theme.colorScheme.primary : LMThemeData.kGrey3Color,
+                  right ? feedTheme.primaryColor : feedTheme.disabledColor,
               placement: LMFeedIconButtonPlacement.end,
               margin: 5,
             ),
@@ -993,18 +951,9 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               text: "Create Post",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
-                  color: theme.colorScheme.onPrimary,
+                  color: feedTheme.onPrimary,
                   fontWeight: FontWeight.w500,
                 ),
-              ),
-            ),
-            icon: LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.add,
-              style: LMFeedIconStyle(
-                fit: BoxFit.cover,
-                size: 18,
-                color: theme.colorScheme.onPrimary,
               ),
             ),
             onTap: right
@@ -1036,13 +985,25 @@ class _FeedRoomViewState extends State<FeedRoomView> {
     );
   }
 
-  LMFeedPostWidget defPostWidget(LMPostViewData post) {
+  LMFeedPostWidget defPostWidget(
+      LMFeedThemeData feedTheme, LMPostViewData post) {
     return LMFeedPostWidget(
       post: post,
       topics: widget.topics,
       user: widget.users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {},
+      style: feedTheme.postStyle,
+      onPostTap: (context, post) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMFeedPostDetailScreen(
+              postId: post.id,
+            ),
+          ),
+        );
+      },
     );
   }
 }

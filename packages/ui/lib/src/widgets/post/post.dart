@@ -17,46 +17,41 @@ class LMFeedPostWidget extends StatefulWidget {
     this.onPostTap,
     required this.isFeed,
     this.onTagTap,
-    this.headerBuilder,
-    this.footerBuilder,
-    this.menuBuilder,
-    this.mediaBuilder,
-    this.contentBuilder,
-    this.boxShadow,
-    this.borderRadius,
     this.onLikeTap,
     this.onPinTap,
     this.onSaveTap,
     required this.topics,
-    this.topicBuilder,
-    this.padding,
-    this.margin,
     this.childrenSpacing,
     this.header,
     this.footer,
     this.menu,
     this.content,
     this.media,
+    this.topicWidget,
+    this.headerBuilder,
+    this.contentBuilder,
+    this.topicBuilder,
+    this.menuBuilder,
+    this.mediaBuilder,
+    this.footerBuilder,
+    this.style,
   });
 
+  final LMFeedPostStyle? style;
+
   final LMFeedPostHeaderBuilder? headerBuilder;
-  final LMFeedPostFooterBuilder? footerBuilder;
+  final LMFeedPostContentBuilder? contentBuilder;
   final LMFeedPostTopicBuilder? topicBuilder;
   final LMFeedPostMenuBuilder? menuBuilder;
   final LMFeedPostMediaBuilder? mediaBuilder;
-  final LMFeedPostContentBuilder? contentBuilder;
+  final LMFeedPostFooterBuilder? footerBuilder;
 
   final LMFeedPostHeader? header;
   final LMFeedPostFooter? footer;
   final LMFeedMenu? menu;
   final LMFeedPostMedia? media;
   final LMFeedPostContent? content;
-
-  // Styling variables
-  final List<BoxShadow>? boxShadow;
-  final BorderRadiusGeometry? borderRadius;
-  final EdgeInsetsGeometry? padding;
-  final EdgeInsetsGeometry? margin;
+  final LMFeedPostTopic? topicWidget;
 
   // Required variables
   final LMPostViewData post;
@@ -95,16 +90,14 @@ class LMFeedPostWidget extends StatefulWidget {
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
     double? childrenSpacing,
+    LMFeedPostContent? content,
+    LMFeedPostFooter? footer,
+    LMFeedPostHeader? header,
+    LMFeedPostMedia? media,
+    LMFeedMenu? menu,
+    LMFeedPostTopic? topicWidget,
   }) {
     return LMFeedPostWidget(
-      headerBuilder: headerBuilder ?? this.headerBuilder,
-      footerBuilder: footerBuilder ?? this.footerBuilder,
-      topicBuilder: topicBuilder ?? this.topicBuilder,
-      menuBuilder: menuBuilder ?? this.menuBuilder,
-      mediaBuilder: mediaBuilder ?? this.mediaBuilder,
-      contentBuilder: contentBuilder ?? this.contentBuilder,
-      boxShadow: boxShadow ?? this.boxShadow,
-      borderRadius: borderRadius ?? this.borderRadius,
       post: post ?? this.post,
       user: user ?? this.user,
       topics: topics ?? this.topics,
@@ -114,9 +107,19 @@ class LMFeedPostWidget extends StatefulWidget {
       onLikeTap: onLikeTap ?? this.onLikeTap,
       onPinTap: onPinTap ?? this.onPinTap,
       onSaveTap: onSaveTap ?? this.onSaveTap,
-      padding: padding ?? this.padding,
-      margin: margin ?? this.margin,
-      childrenSpacing: childrenSpacing ?? childrenSpacing,
+      childrenSpacing: childrenSpacing ?? this.childrenSpacing,
+      content: content ?? this.content,
+      footer: footer ?? this.footer,
+      header: header ?? this.header,
+      media: media ?? this.media,
+      menu: menu ?? this.menu,
+      topicWidget: topicWidget ?? this.topicWidget,
+      headerBuilder: headerBuilder ?? this.headerBuilder,
+      contentBuilder: contentBuilder ?? this.contentBuilder,
+      topicBuilder: topicBuilder ?? this.topicBuilder,
+      menuBuilder: menuBuilder ?? this.menuBuilder,
+      mediaBuilder: mediaBuilder ?? this.mediaBuilder,
+      footerBuilder: footerBuilder ?? this.footerBuilder,
     );
   }
 }
@@ -128,77 +131,82 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   bool? isPinned;
   ValueNotifier<bool> rebuildLikeWidget = ValueNotifier(false);
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
+  LMFeedPostStyle? style;
 
-  onPostTap() {}
+  LMFeedPostHeader? _postHeader;
+  LMFeedPostFooter? _postFooter;
+  LMFeedPostContent? _postContent;
+  LMFeedPostMedia? _postMedia;
+  LMFeedPostTopic? _postTopic;
+  LMFeedMenu? _postMenu;
 
   @override
   void initState() {
     super.initState();
+    style = widget.style ?? LMFeedTheme.of(context).postStyle;
+    _postHeader = widget.header ?? _defPostHeader();
+    _postFooter = widget.footer ?? _defFooterWidget();
+    _postContent = widget.content ?? _defContentWidget();
+    _postMedia = widget.media ?? _defPostMedia();
+    _postTopic = widget.topicWidget ?? _defTopicWidget();
+    _postMenu = widget.menu;
   }
 
   @override
   void didUpdateWidget(covariant LMFeedPostWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.post.id != widget.post.id) {}
+    if (oldWidget.post.id != widget.post.id) {
+      _postHeader = widget.header ?? _defPostHeader();
+      _postFooter = widget.footer ?? _defFooterWidget();
+      _postContent = widget.content ?? _defContentWidget();
+      _postMedia = widget.media ?? _defPostMedia();
+      _postTopic = widget.topicWidget ?? _defTopicWidget();
+      _postMenu = widget.menu;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    style = widget.style ?? LMFeedTheme.of(context).postStyle;
     return InheritedPostProvider(
       post: widget.post,
       child: GestureDetector(
         onTap: () {
           widget.onPostTap?.call(context, widget.post);
-          onPostTap();
         },
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: widget.borderRadius,
-            boxShadow: widget.boxShadow,
+            borderRadius: style?.borderRadius,
+            boxShadow: style?.boxShadow,
+            border: style?.border,
           ),
-          padding: widget.padding,
-          margin: widget.margin,
+          padding: style?.padding,
+          margin: style?.margin,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              widget.headerBuilder
-                      ?.call(context, _defPostHeader(), widget.post) ??
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: widget.childrenSpacing ?? 0,
-                    ),
-                    child: _defPostHeader(),
-                  ),
-              widget.contentBuilder
-                      ?.call(context, _defContentWidget(), widget.post) ??
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: widget.childrenSpacing ?? 0,
-                    ),
-                    child: _defContentWidget(),
-                  ),
+              widget.headerBuilder?.call(context, _postHeader!, widget.post) ??
+                  _postHeader!,
+              widget.post.topics.isEmpty
+                  ? const SizedBox.shrink()
+                  : widget.topicBuilder
+                          ?.call(context, _postTopic!, widget.post) ??
+                      _postTopic!,
+              widget.post.text.isEmpty
+                  ? const SizedBox.shrink()
+                  : widget.contentBuilder
+                          ?.call(context, _postContent!, widget.post) ??
+                      _postContent!,
               widget.post.attachments != null &&
                       widget.post.attachments!.isNotEmpty
                   ? widget.mediaBuilder
-                          ?.call(context, _defPostMedia(), widget.post) ??
-                      Padding(
-                        padding: EdgeInsets.only(
-                          bottom: widget.childrenSpacing ?? 0,
-                        ),
-                        child: _defPostMedia(),
-                      )
-                  : const SizedBox(),
-              const SizedBox(height: 18),
-              widget.footerBuilder
-                      ?.call(context, _defFooterWidget(), widget.post) ??
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: widget.childrenSpacing ?? 0,
-                    ),
-                    child: _defFooterWidget(),
-                  ),
+                          ?.call(context, _postMedia!, widget.post) ??
+                      _postMedia!
+                  : const SizedBox.shrink(),
+              widget.footerBuilder?.call(context, _postFooter!, widget.post) ??
+                  _postFooter!,
             ],
           ),
         ),
@@ -206,14 +214,25 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
     );
   }
 
+  LMFeedPostTopic _defTopicWidget() {
+    return LMFeedPostTopic(
+      topics: widget.topics,
+      post: widget.post,
+      style: style?.topicStyle,
+    );
+  }
+
   LMFeedPostContent _defContentWidget() {
     return LMFeedPostContent(
       onTagTap: widget.onTagTap,
+      style: style?.contentStyle ?? const LMFeedPostContentStyle(),
     );
   }
 
   LMFeedPostFooter _defFooterWidget() {
-    return LMFeedPostFooter();
+    return LMFeedPostFooter(
+      postFooterStyle: style?.footerStyle,
+    );
   }
 
   LMFeedPostHeader _defPostHeader() {
@@ -221,6 +240,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
       user: widget.user,
       isFeed: widget.isFeed,
       postViewData: widget.post,
+      postHeaderStyle: style?.headerStyle ?? const LMFeedPostHeaderStyle(),
     );
   }
 
@@ -250,4 +270,31 @@ class InheritedPostProvider extends InheritedWidget {
   bool updateShouldNotify(InheritedPostProvider oldWidget) {
     return true;
   }
+}
+
+class LMFeedPostStyle {
+  // Styling variables
+  final List<BoxShadow>? boxShadow;
+  final BorderRadiusGeometry? borderRadius;
+  final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
+
+  final LMFeedPostContentStyle? contentStyle;
+  final LMFeedPostHeaderStyle? headerStyle;
+  final LMFeedPostFooterStyle? footerStyle;
+  final LMFeedPostTopicStyle? topicStyle;
+
+  final BoxBorder? border;
+
+  LMFeedPostStyle({
+    this.boxShadow,
+    this.borderRadius,
+    this.padding,
+    this.margin,
+    this.contentStyle,
+    this.headerStyle,
+    this.footerStyle,
+    this.topicStyle,
+    this.border,
+  });
 }
