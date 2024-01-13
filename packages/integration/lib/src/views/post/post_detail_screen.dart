@@ -609,7 +609,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           ),
         ),
       ),
-      style: feedTheme?.commentStyle?.,
+      style: feedTheme?.commentStyle.showRepliesButtonStyle,
     );
   }
 

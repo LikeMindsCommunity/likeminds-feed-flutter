@@ -47,13 +47,6 @@ class LMFeedThemeData {
   final Color onContainer;
   final Color onPrimary;
 
-  // factory LMFeedThemeData({LMFeedPostStyle? postStyle}) {
-  //   return LMFeedThemeData._(
-  //     postStyle: postStyle ?? LMFeedPostStyle(),
-  //     primaryColor:
-  //   );
-  // }
-
   const LMFeedThemeData._({
     required this.postStyle,
     required this.primaryColor,
@@ -182,7 +175,25 @@ class LMFeedThemeData {
       hashTagColor: LikeMindsTheme.hashTagColor,
       linkColor: LikeMindsTheme.linkColor,
       tagColor: LikeMindsTheme.tagColor,
-      commentStyle: const LMFeedCommentStyle(),
+      commentStyle: const LMFeedCommentStyle(
+        likeButtonStyle: LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.icon,
+            assetPath: lmLikeInActiveSvg,
+          ),
+          activeIcon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeActiveSvg,
+          ),
+        ),
+        replyButtonStyle: LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmCommentSvg,
+          ),
+        ),
+        showRepliesButtonStyle: LMFeedButtonStyle(),
+      ),
       replyStyle: const LMFeedReplyStyle(),
       feedButtonStyle: const LMFeedButtonStyle(),
       feedIconStyle: const LMFeedIconStyle(),

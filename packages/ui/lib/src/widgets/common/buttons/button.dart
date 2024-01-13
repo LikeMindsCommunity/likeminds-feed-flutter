@@ -155,10 +155,9 @@ class LMFeedButtonStyle {
   });
 
   factory LMFeedButtonStyle.basic() {
-    return LMFeedButtonStyle(
-      padding: const EdgeInsets.all(4),
+    return const LMFeedButtonStyle(
+      padding: EdgeInsets.all(4),
       backgroundColor: Colors.transparent,
-      border: Border.all(),
       borderRadius: 8,
       height: 42,
       placement: LMFeedIconButtonPlacement.start,
