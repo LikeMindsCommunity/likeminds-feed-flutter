@@ -301,7 +301,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
             Container(
               width: MediaQuery.of(context).size.width - 80,
               decoration: BoxDecoration(
-                color: theme.colorScheme.background,
+                color: theme.backgroundColor,
               ),
               // constraints: BoxConstraints(
               //     maxHeight: screenSize.height * 0.8),
@@ -337,7 +337,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
     final theme = LMFeedTheme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: theme.colorScheme.background,
+        color: theme.backgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.4),
@@ -350,13 +350,15 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
       child: Row(
         children: [
           LMFeedButton(
-            icon: LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.photo,
-              style: LMFeedIconStyle(
-                color: theme.primaryColor,
-                size: 44,
-                boxPadding: 0,
+            style: LMFeedButtonStyle(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.photo,
+                style: LMFeedIconStyle(
+                  color: theme.primaryColor,
+                  size: 44,
+                  boxPadding: 0,
+                ),
               ),
             ),
             onTap: () async {
@@ -364,13 +366,15 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
             },
           ),
           LMFeedButton(
-            icon: LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.photo,
-              style: LMFeedIconStyle(
-                color: theme.primaryColor,
-                size: 44,
-                boxPadding: 0,
+            style: LMFeedButtonStyle(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.photo,
+                style: LMFeedIconStyle(
+                  color: theme.primaryColor,
+                  size: 44,
+                  boxPadding: 0,
+                ),
               ),
             ),
             onTap: () async {
@@ -378,13 +382,15 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
             },
           ),
           LMFeedButton(
-            icon: LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.photo,
-              style: LMFeedIconStyle(
-                color: theme.primaryColor,
-                size: 44,
-                boxPadding: 0,
+            style: LMFeedButtonStyle(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.photo,
+                style: LMFeedIconStyle(
+                  color: theme.primaryColor,
+                  size: 44,
+                  boxPadding: 0,
+                ),
               ),
             ),
             onTap: () async {

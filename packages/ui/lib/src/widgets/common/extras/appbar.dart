@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
-class LMFeedAppBar extends StatelessWidget {
+class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   const LMFeedAppBar({
     super.key,
     this.leading,
@@ -24,6 +24,7 @@ class LMFeedAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final inStyle = style ?? LMFeedAppBarStyle.basic();
     final theme = LMFeedTheme.of(context);
+
     return
         //  PreferredSize(
         //   preferredSize: Size(width ?? screenSize.width, height ?? 64),
@@ -94,6 +95,10 @@ class LMFeedAppBar extends StatelessWidget {
       style: style ?? this.style,
     );
   }
+
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => throw UnimplementedError();
 }
 
 class LMFeedAppBarStyle {

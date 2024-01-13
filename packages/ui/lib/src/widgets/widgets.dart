@@ -21,6 +21,7 @@ export 'media/link.dart';
 
 export 'topic/topic_chip.dart';
 export 'topic/topic_feed_bar.dart';
+export 'post/post_topic.dart';
 export 'topic/topic_feed_grid.dart';
 export 'topic/topic_tile.dart';
 

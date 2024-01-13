@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/post/post_topic.dart';
 
 class LMFeedTheme extends InheritedWidget {
   const LMFeedTheme({super.key, required this.theme, required super.child});
