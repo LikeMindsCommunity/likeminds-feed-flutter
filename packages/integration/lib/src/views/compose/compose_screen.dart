@@ -12,6 +12,7 @@ import 'package:likeminds_feed_flutter_core/src/utils/media/media_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/lists/topic_list.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedPostComposeScreen extends StatefulWidget {
   //Builder for appbar
@@ -86,6 +87,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
   final CustomPopupMenuController _controllerPopUp =
       CustomPopupMenuController();
   Timer? _debounce;
+  String? result;
 
   /// Lists to maintain throughout the screen for sending/receiving data
   List<LMMediaModel> postMedia = [];
@@ -124,7 +126,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: widget.composeSystemOverlayStyle,
         child: Scaffold(
-          backgroundColor: theme.backgroundColor,
+          backgroundColor: theme.container,
           bottomSheet: _defMediaPicker(),
           floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
@@ -185,7 +187,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
     return LMFeedAppBar(
       style: const LMFeedAppBarStyle(
         backgroundColor: Colors.white,
-        height: 56,
+        height: 72,
         mainAxisAlignment: MainAxisAlignment.center,
         padding: EdgeInsets.symmetric(
           horizontal: 18.0,
@@ -205,22 +207,22 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
         },
         style: const LMFeedButtonStyle(),
       ),
-      title: const LMFeedText(
+      title: LMFeedText(
         text: "Create Post",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.grey,
+            color: theme.onContainer,
           ),
         ),
       ),
       trailing: LMFeedButton(
-        text: const LMFeedText(
+        text: LMFeedText(
           text: "Post",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
-              // color: theme.,
+              color: theme.onPrimary,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -237,37 +239,45 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
 
           String postText = _controller.text;
           postText = postText.trim();
-          // if (postText.isNotEmpty || postMedia.isNotEmpty) {
-          //   if (selectedTopic.isEmpty) {
-          //     toast(
-          //       "Can't create a post without topic",
-          //       duration: Toast.LENGTH_LONG,
-          //     );
-          //     return;
-          //   }
-          //   checkTextLinks();
-          //   userTags = TaggingHelper.matchTags(_controller.text, userTags);
+          if (postText.isNotEmpty || postMedia.isNotEmpty) {
+            if (selectedTopics.isEmpty) {
+              toast(
+                "Can't create a post without topic",
+                duration: Toast.LENGTH_LONG,
+              );
+              return;
+            }
+            // checkTextLinks();
+            userTags =
+                LMFeedTaggingHelper.matchTags(_controller.text, userTags);
 
-          //   result = TaggingHelper.encodeString(_controller.text, userTags);
+            result =
+                LMFeedTaggingHelper.encodeString(_controller.text, userTags);
 
-          //   sendPostCreationCompletedEvent(postMedia, userTags, selectedTopic);
+            sendPostCreationCompletedEvent(postMedia, userTags, selectedTopics);
 
-          //   lmPostBloc!.add(
-          //     CreateNewPost(
-          //       postText: result!,
-          //       postMedia: postMedia,
-          //       selectedTopics: selectedTopic,
-          //       user: user,
-          //     ),
-          //   );
-          //   videoController?.player.pause();
-          //   Navigator.pop(context);
-          // } else {
-          //   toast(
-          //     "Can't create a post without text or attachments",
-          //     duration: Toast.LENGTH_LONG,
-          //   );
-          // }
+            LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
+              user: user,
+              postText: postText,
+              selectedTopics: selectedTopics,
+            ));
+
+            // lmPostBloc!.add(
+            //   CreateNewPost(
+            //     postText: result!,
+            //     postMedia: postMedia,
+            //     selectedTopics: selectedTopics,
+            //     user: user,
+            //   ),
+            // );
+            // videoController?.player.pause();
+            Navigator.pop(context);
+          } else {
+            toast(
+              "Can't create a post without text or attachments",
+              duration: Toast.LENGTH_LONG,
+            );
+          }
         },
       ),
     );
@@ -275,61 +285,67 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
 
   Widget _defContentInput() {
     final theme = LMFeedTheme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 4.0),
-          child: LMFeedProfilePicture(
-            fallbackText: user.name,
-            imageUrl: user.imageUrl,
-            onTap: () {
-              if (user.sdkClientInfo != null) {
-                LMFeedCore.client
-                    .routeToProfile(user.sdkClientInfo!.userUniqueId);
-              }
-            },
-            style: LMFeedProfilePictureStyle(
-              backgroundColor: theme.primaryColor,
-              size: 36,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 4,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: LMFeedProfilePicture(
+              fallbackText: user.name,
+              imageUrl: user.imageUrl,
+              onTap: () {
+                if (user.sdkClientInfo != null) {
+                  LMFeedCore.client
+                      .routeToProfile(user.sdkClientInfo!.userUniqueId);
+                }
+              },
+              style: LMFeedProfilePictureStyle(
+                backgroundColor: theme.primaryColor,
+                size: 36,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 18),
-        Column(
-          children: [
-            Container(
-              width: MediaQuery.of(context).size.width - 80,
-              decoration: BoxDecoration(
-                color: theme.backgroundColor,
-              ),
-              // constraints: BoxConstraints(
-              //     maxHeight: screenSize.height * 0.8),
-              child: LMTaggingAheadTextField(
-                isDown: true,
-                minLines: 3,
-                // maxLines: 200,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
+          const SizedBox(width: 18),
+          Column(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width - 84,
+                decoration: BoxDecoration(
+                  color: theme.container,
                 ),
-                onTagSelected: (tag) {
-                  userTags.add(tag);
-                },
-                controller: _controller,
-                focusNode: _focusNode,
-                // onChange: _onTextChanged,
-                onChange: (p) {},
+                // constraints: BoxConstraints(
+                //     maxHeight: screenSize.height * 0.8),
+                child: LMTaggingAheadTextField(
+                  isDown: true,
+                  minLines: 3,
+                  // maxLines: 200,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                  ),
+                  onTagSelected: (tag) {
+                    userTags.add(tag);
+                  },
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  // onChange: _onTextChanged,
+                  onChange: (p) {},
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ],
+              const SizedBox(height: 24),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -337,7 +353,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
     final theme = LMFeedTheme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: theme.backgroundColor,
+        color: theme.container,
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.4),
@@ -346,18 +362,28 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
           ), //BoxShadow
         ],
       ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8.0,
+      ),
       height: 72,
       child: Row(
         children: [
           LMFeedButton(
+            isActive: false,
             style: LMFeedButtonStyle(
+              placement: LMFeedIconButtonPlacement.start,
+              height: 42,
+              width: 42,
+              showText: false,
               icon: LMFeedIcon(
                 type: LMFeedIconType.icon,
-                icon: Icons.photo,
+                icon: Icons.photo_outlined,
                 style: LMFeedIconStyle(
                   color: theme.primaryColor,
-                  size: 44,
+                  size: 32,
                   boxPadding: 0,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
@@ -366,14 +392,20 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
             },
           ),
           LMFeedButton(
+            isActive: false,
             style: LMFeedButtonStyle(
+              placement: LMFeedIconButtonPlacement.start,
+              height: 42,
+              width: 42,
+              showText: false,
               icon: LMFeedIcon(
                 type: LMFeedIconType.icon,
-                icon: Icons.photo,
+                icon: Icons.videocam_outlined,
                 style: LMFeedIconStyle(
                   color: theme.primaryColor,
-                  size: 44,
+                  size: 32,
                   boxPadding: 0,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
@@ -382,14 +414,20 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
             },
           ),
           LMFeedButton(
+            isActive: false,
             style: LMFeedButtonStyle(
+              placement: LMFeedIconButtonPlacement.start,
+              height: 42,
+              width: 42,
+              showText: false,
               icon: LMFeedIcon(
                 type: LMFeedIconType.icon,
-                icon: Icons.photo,
+                icon: Icons.file_open_outlined,
                 style: LMFeedIconStyle(
                   color: theme.primaryColor,
-                  size: 44,
+                  size: 32,
                   boxPadding: 0,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
@@ -449,7 +487,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
                         margin: const EdgeInsets.only(left: 16.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(500),
-                          color: LMFeedTheme.of(context).backgroundColor,
+                          color: LMFeedTheme.of(context).container,
                           border: Border.all(
                             color: LMFeedTheme.of(context).primaryColor,
                           ),
@@ -485,4 +523,77 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
       ],
     );
   }
+}
+
+void sendPostCreationCompletedEvent(List<LMMediaModel> postMedia,
+    List<LMUserTagViewData> usersTagged, List<LMTopicViewData> topics) {
+  Map<String, String> propertiesMap = {};
+
+  if (postMedia.isNotEmpty) {
+    if (postMedia.first.mediaType == LMMediaType.link) {
+      propertiesMap['link_attached'] = 'yes';
+      propertiesMap['link'] =
+          postMedia.first.ogTags?.url ?? postMedia.first.link!;
+    } else {
+      propertiesMap['link_attached'] = 'no';
+      int imageCount = 0;
+      int videoCount = 0;
+      int documentCount = 0;
+      for (LMMediaModel media in postMedia) {
+        if (media.mediaType == LMMediaType.image) {
+          imageCount++;
+        } else if (media.mediaType == LMMediaType.video) {
+          videoCount++;
+        } else if (media.mediaType == LMMediaType.document) {
+          documentCount++;
+        }
+      }
+      if (imageCount > 0) {
+        propertiesMap['image_attached'] = 'yes';
+        propertiesMap['image_count'] = imageCount.toString();
+      } else {
+        propertiesMap['image_attached'] = 'no';
+      }
+      if (videoCount > 0) {
+        propertiesMap['video_attached'] = 'yes';
+        propertiesMap['video_count'] = videoCount.toString();
+      } else {
+        propertiesMap['video_attached'] = 'no';
+      }
+
+      if (documentCount > 0) {
+        propertiesMap['document_attached'] = 'yes';
+        propertiesMap['document_count'] = documentCount.toString();
+      } else {
+        propertiesMap['document_attached'] = 'no';
+      }
+    }
+  }
+
+  if (usersTagged.isNotEmpty) {
+    int taggedUserCount = 0;
+    List<String> taggedUserId = [];
+
+    taggedUserCount = usersTagged.length;
+    taggedUserId = usersTagged
+        .map((e) => e.sdkClientInfo?.userUniqueId ?? e.userUniqueId!)
+        .toList();
+
+    propertiesMap['user_tagged'] = taggedUserCount == 0 ? 'no' : 'yes';
+    if (taggedUserCount > 0) {
+      propertiesMap['tagged_users_count'] = taggedUserCount.toString();
+      propertiesMap['tagged_users_id'] = taggedUserId.join(',');
+    }
+  }
+
+  if (topics.isNotEmpty) {
+    propertiesMap['topics_added'] = 'yes';
+    propertiesMap['topics'] = topics.map((e) => e.id).toList().join(',');
+  } else {
+    propertiesMap['topics_added'] = 'no';
+  }
+
+  LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+      eventName: LMFeedAnalyticsKeys.postCreationCompleted,
+      eventProperties: propertiesMap));
 }

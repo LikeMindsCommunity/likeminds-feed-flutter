@@ -877,14 +877,13 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                                           LMFeedAnalyticsKeys
                                                               .postCreationStarted,
                                                       eventProperties: {}));
-                                              // TODO: Navigate to NewPostScreen
-                                              // Navigator.push(
-                                              //   context,
-                                              //   MaterialPageRoute(
-                                              //     builder: (context) =>
-                                              //         const NewPostScreen(),
-                                              //   ),
-                                              // );
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const LMFeedPostComposeScreen(),
+                                                ),
+                                              );
                                             } else {
                                               toast(
                                                 'A post is already uploading.',
@@ -964,13 +963,12 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                               eventName:
                                   LMFeedAnalyticsKeys.postCreationStarted,
                               eventProperties: {}));
-                      // TODO: Navigate to NewPostScreen
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const NewPostScreen(),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LMFeedPostComposeScreen(),
+                        ),
+                      );
                     } else {
                       toast(
                         'A post is already uploading.',

@@ -182,6 +182,48 @@ class LMFeedThemeData {
       feedIconStyle: const LMFeedIconStyle(),
     );
   }
+
+  LMFeedThemeData copyWith({
+    LMFeedPostStyle? postStyle,
+    Color? primaryColor,
+    Color? backgroundColor,
+    Color? secondaryColor,
+    Color? shadowColor,
+    Color? disabledColor,
+    Color? errorColor,
+    Color? inActiveColor,
+    Color? tagColor,
+    Color? hashTagColor,
+    Color? linkColor,
+    LMFeedCommentStyle? commentStyle,
+    LMFeedReplyStyle? replyStyle,
+    LMFeedButtonStyle? feedButtonStyle,
+    LMFeedIconStyle? feedIconStyle,
+    Color? container,
+    Color? onContainer,
+    Color? onPrimary,
+  }) {
+    return LMFeedThemeData._(
+      postStyle: postStyle ?? this.postStyle,
+      primaryColor: primaryColor ?? this.primaryColor,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      secondaryColor: secondaryColor ?? this.secondaryColor,
+      shadowColor: shadowColor ?? this.shadowColor,
+      disabledColor: disabledColor ?? this.disabledColor,
+      errorColor: errorColor ?? this.errorColor,
+      inActiveColor: inActiveColor ?? this.inActiveColor,
+      tagColor: tagColor ?? this.tagColor,
+      hashTagColor: hashTagColor ?? this.hashTagColor,
+      linkColor: linkColor ?? this.linkColor,
+      commentStyle: commentStyle ?? this.commentStyle,
+      replyStyle: replyStyle ?? this.replyStyle,
+      feedButtonStyle: feedButtonStyle ?? this.feedButtonStyle,
+      feedIconStyle: feedIconStyle ?? this.feedIconStyle,
+      container: container ?? this.container,
+      onContainer: onContainer ?? this.onContainer,
+      onPrimary: onPrimary ?? this.onPrimary,
+    );
+  }
 }
 
 class LikeMindsTheme {

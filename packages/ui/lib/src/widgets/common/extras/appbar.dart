@@ -25,11 +25,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     final inStyle = style ?? LMFeedAppBarStyle.basic();
     final theme = LMFeedTheme.of(context);
 
-    return
-        //  PreferredSize(
-        //   preferredSize: Size(width ?? screenSize.width, height ?? 64),
-        //   child:
-        SafeArea(
+    return SafeArea(
       bottom: false,
       child: Padding(
         padding: inStyle.margin ?? EdgeInsets.zero,
@@ -76,7 +72,6 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
-      // ),
     );
   }
 
@@ -98,7 +93,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   // TODO: implement preferredSize
-  Size get preferredSize => throw UnimplementedError();
+  Size get preferredSize => const Size.fromHeight(92);
 }
 
 class LMFeedAppBarStyle {

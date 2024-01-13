@@ -82,7 +82,7 @@ class _LMButtonState extends State<LMFeedButton> {
                     ? widget.activeText ??
                         widget.text ??
                         const SizedBox.shrink()
-                    : widget.text ?? const LMFeedText(text: "LMButton")
+                    : widget.text ?? const SizedBox.shrink()
                 : const SizedBox.shrink(),
             inStyle.placement == LMFeedIconButtonPlacement.end
                 ? (inStyle.icon != null || inStyle.activeIcon != null)
@@ -99,17 +99,6 @@ class _LMButtonState extends State<LMFeedButton> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _defText() {
-    return const LMFeedText(text: "Button");
-  }
-
-  Widget _defIcon() {
-    return const LMFeedIcon(
-      type: LMFeedIconType.icon,
-      icon: Icons.done_all,
     );
   }
 }
