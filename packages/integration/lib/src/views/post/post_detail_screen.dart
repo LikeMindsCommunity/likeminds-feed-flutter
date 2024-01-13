@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post/widgets/comment/comment_reply_widget.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post/widgets/comment/default_empty_comment_widget.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post/handler/post_detail_screen_handler.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comment_reply_widget.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 /// {@template post_detail_screen}
@@ -730,7 +730,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           Navigator.pop(context);
         },
       ),
-      backgroundColor: LMThemeData.kWhiteColor,
       title: const LMFeedText(
           text: "Comments",
           style: LMFeedTextStyle(
@@ -740,9 +739,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               color: LMThemeData.kHeadingColor,
             ),
           )),
-      mainAxisAlignment: Platform.isAndroid
-          ? MainAxisAlignment.start
-          : MainAxisAlignment.spaceBetween,
+      style: LMFeedAppBarStyle(
+        backgroundColor: LMThemeData.kWhiteColor,
+        mainAxisAlignment: Platform.isAndroid
+            ? MainAxisAlignment.start
+            : MainAxisAlignment.spaceBetween,
+      ),
     );
   }
 

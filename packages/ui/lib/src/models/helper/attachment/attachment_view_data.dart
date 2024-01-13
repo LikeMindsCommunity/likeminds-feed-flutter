@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_ui_fl/src/models/helper/attachment/attachment_meta_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/helper/attachment/attachment_meta_view_data.dart';
 
 class LMAttachmentViewData {
   final int attachmentType;

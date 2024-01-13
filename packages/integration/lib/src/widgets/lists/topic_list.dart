@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/topic/topic_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/convertors/model_convertor.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/topic/topic_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedTopicList extends StatefulWidget {
   final List<LMTopicViewData> selectedTopics;

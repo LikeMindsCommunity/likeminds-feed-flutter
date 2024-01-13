@@ -4,8 +4,9 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/packages/linkify/linkify.dart';
+import 'package:likeminds_feed_flutter_ui/packages/linkify/linkify.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import './text_parser.dart';

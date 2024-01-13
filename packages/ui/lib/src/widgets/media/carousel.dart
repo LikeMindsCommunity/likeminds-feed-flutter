@@ -1,9 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/models/helper/attachment/attachment_view_data.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/media/image.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/media/video.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/helper/attachment/attachment_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/media/image.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/media/video.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedCarousel extends StatefulWidget {

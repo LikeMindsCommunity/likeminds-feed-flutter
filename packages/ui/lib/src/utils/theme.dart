@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedTheme extends InheritedWidget {
   const LMFeedTheme({super.key, required this.theme, required super.child});
@@ -20,18 +19,6 @@ class LMFeedTheme extends InheritedWidget {
     );
 
     return lmTheme!.theme;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return OverlaySupport.global(
-      toastTheme: ToastThemeData(
-        background: Colors.black,
-        textColor: Colors.white,
-        alignment: Alignment.bottomCenter,
-      ),
-      child: super.child,
-    );
   }
 }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/ui_constants.dart';
 
 class LMFeedEmptyCommentWidget extends StatelessWidget {
   const LMFeedEmptyCommentWidget({super.key});

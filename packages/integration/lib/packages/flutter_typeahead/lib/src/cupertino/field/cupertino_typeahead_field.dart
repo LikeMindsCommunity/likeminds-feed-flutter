@@ -3,13 +3,13 @@ import 'dart:core';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/field/cupertino_text_field_configuration.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/suggestions_box/cupertino_suggestions_box.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/suggestions_box/cupertino_suggestions_box_controller.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/suggestions_box/cupertino_suggestions_box_decoration.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/suggestions_box/cupertino_suggestions_list.dart';
-import 'package:flutter_typeahead_mm/src/typedef.dart';
-import 'package:flutter_typeahead_mm/src/utils.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/field/cupertino_text_field_configuration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box_controller.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box_decoration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_list.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/typedef.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/utils.dart';
 
 /// A [CupertinoTextField](https://docs.flutter.io/flutter/cupertino/CupertinoTextField-class.html)
 /// that displays a list of suggestions as the user types
@@ -281,7 +281,7 @@ class CupertinoTypeAheadField<T> extends StatefulWidget {
   final bool hideKeyboardOnDrag;
 
   /// Creates a [CupertinoTypeAheadField]
-  CupertinoTypeAheadField({
+  const CupertinoTypeAheadField({
     Key? key,
     required this.suggestionsCallback,
     required this.itemBuilder,
@@ -521,7 +521,7 @@ class _CupertinoTypeAheadFieldState<T> extends State<CupertinoTypeAheadField<T>>
               ? suggestionsList
               : FractionalTranslation(
                   translation:
-                      Offset(0.0, -1.0), // visually flips list to go up
+                      const Offset(0.0, -1.0), // visually flips list to go up
                   child: suggestionsList,
                 ),
         ),

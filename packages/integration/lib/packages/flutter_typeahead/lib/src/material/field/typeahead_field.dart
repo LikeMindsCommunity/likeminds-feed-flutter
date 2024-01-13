@@ -4,15 +4,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_typeahead_mm/src/material/field/text_field_configuration.dart';
-import 'package:flutter_typeahead_mm/src/keyboard_suggestion_selection_notifier.dart';
-import 'package:flutter_typeahead_mm/src/should_refresh_suggestion_focus_index_notifier.dart';
-import 'package:flutter_typeahead_mm/src/material/suggestions_box/suggestions_box.dart';
-import 'package:flutter_typeahead_mm/src/material/suggestions_box/suggestions_box_controller.dart';
-import 'package:flutter_typeahead_mm/src/material/suggestions_box/suggestions_box_decoration.dart';
-import 'package:flutter_typeahead_mm/src/material/suggestions_box/suggestions_list.dart';
-import 'package:flutter_typeahead_mm/src/typedef.dart';
-import 'package:flutter_typeahead_mm/src/utils.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/field/text_field_configuration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/keyboard_suggestion_selection_notifier.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/should_refresh_suggestion_focus_index_notifier.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_box.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_box_controller.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_box_decoration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_list.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/typedef.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/utils.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 
 /// # Flutter TypeAhead
@@ -527,7 +527,7 @@ class TypeAheadField<T> extends StatefulWidget {
   final void Function(dynamic)? onTagTap;
 
   /// Creates a [TypeAheadField]
-  TypeAheadField({
+  const TypeAheadField({
     required this.suggestionsCallback,
     required this.itemBuilder,
     required this.onSuggestionSelected,
@@ -822,7 +822,8 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
         child: _suggestionsBox!.direction == AxisDirection.down
             ? suggestionsList
             : FractionalTranslation(
-                translation: Offset(0.0, -1.0), // visually flips list to go up
+                translation:
+                    const Offset(0.0, -1.0), // visually flips list to go up
                 child: suggestionsList,
               ),
       );
@@ -858,7 +859,7 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
       link: this._layerLink,
       child: ExtendedTextField(
         specialTextSpanBuilder: MySpecialTextSpanBuilder(
-          onTagTap: widget.onTagTap ?? null,
+          onTagTap: widget.onTagTap,
           tagColor: widget.tagColor,
         ),
         scrollPhysics: const NeverScrollableScrollPhysics(),
@@ -983,8 +984,8 @@ class MySpecialTextSpanBuilder extends SpecialTextSpanBuilder {
     ///index is end index of start flag, so text start index should be index-(flag.length-1)
     if (isStart(flag, AtText.flag)) {
       return AtText(
-        textStyle ?? TextStyle(),
-        onTap: onTap ?? onTagTap ?? null,
+        textStyle ?? const TextStyle(),
+        onTap: onTap ?? onTagTap,
         start: index! - (AtText.flag.length),
         showAtBackground: showAtBackground,
         tagColor: tagColor,

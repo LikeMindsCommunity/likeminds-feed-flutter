@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/packages/expandable_text/expandable_text.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/post/post.dart';
+import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/post/post.dart';
 
 class LMFeedPostContent extends StatelessWidget {
   const LMFeedPostContent({

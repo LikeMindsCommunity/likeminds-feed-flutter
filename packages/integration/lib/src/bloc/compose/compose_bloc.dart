@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 import 'handler/compose_topic_event_handler.dart';

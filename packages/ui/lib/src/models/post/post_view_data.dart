@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 
 /// {@template post_view_data}
 /// A data class to hold the post data.

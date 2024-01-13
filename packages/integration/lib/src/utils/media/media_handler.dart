@@ -5,14 +5,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/media/media_utils.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/media/media_utils.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 
-class LMFeedMediaPermissionHandler {
+class LMFeedMediaHandler {
   static Future<bool> handlePermissions(int mediaType) async {
     if (Platform.isAndroid) {
       PermissionStatus permissionStatus;
@@ -230,6 +230,75 @@ class LMFeedMediaPermissionHandler {
         duration: Toast.LENGTH_LONG,
       );
       return null;
+    }
+  }
+
+  Future<List<LMMediaModel>?> pickImages(
+      int mediaCount, Function(bool) onUploaded) async {
+    // onUploading();
+    try {
+      final FilePickerResult? list = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.image,
+      );
+      CommunityConfigurations config =
+          await LMFeedUserLocalPreference.instance.getCommunityConfigurations();
+      if (config.value == null || config.value!["max_image_size"] == null) {
+        final configResponse =
+            await LMFeedCore.client.getCommunityConfigurations();
+        if (configResponse.success &&
+            configResponse.communityConfigurations != null &&
+            configResponse.communityConfigurations!.isNotEmpty) {
+          config = configResponse.communityConfigurations!.first;
+        }
+      }
+      final double sizeLimit;
+      if (config.value != null && config.value!["max_image_size"] != null) {
+        sizeLimit = config.value!["max_image_size"]! / 1024;
+      } else {
+        sizeLimit = 5;
+      }
+
+      if (list != null && list.files.isNotEmpty) {
+        if (mediaCount + list.files.length > 10) {
+          toast(
+            'A total of 10 attachments can be added to a post',
+            duration: Toast.LENGTH_LONG,
+          );
+          onUploaded(false);
+        }
+        for (PlatformFile image in list.files) {
+          int fileBytes = image.size;
+          double fileSize = getFileSizeInDouble(fileBytes);
+          if (fileSize > sizeLimit) {
+            toast(
+              'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
+              duration: Toast.LENGTH_LONG,
+            );
+            onUploaded(false);
+            return [];
+          }
+        }
+        List<File> pickedFiles = list.files.map((e) => File(e.path!)).toList();
+        List<LMMediaModel> mediaFiles = pickedFiles
+            .map((e) => LMMediaModel(
+                mediaFile: File(e.path), mediaType: LMMediaType.image))
+            .toList();
+        onUploaded(true);
+
+        return mediaFiles;
+      } else {
+        onUploaded(false);
+        return [];
+      }
+    } on Exception catch (err) {
+      toast(
+        'An error occurred',
+        duration: Toast.LENGTH_LONG,
+      );
+      onUploaded(false);
+      debugPrint(err.toString());
+      return [];
     }
   }
 }

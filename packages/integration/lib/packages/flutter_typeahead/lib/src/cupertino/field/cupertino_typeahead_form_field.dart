@@ -1,11 +1,11 @@
 import 'dart:core';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/field/cupertino_text_field_configuration.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/field/cupertino_typeahead_field.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/suggestions_box/cupertino_suggestions_box_controller.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/suggestions_box/cupertino_suggestions_box_decoration.dart';
-import 'package:flutter_typeahead_mm/src/typedef.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/field/cupertino_text_field_configuration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/field/cupertino_typeahead_field.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box_controller.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box_decoration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/typedef.dart';
 
 /// A [FormField](https://docs.flutter.io/flutter/widgets/FormField-class.html)
 /// implementation of [TypeAheadField], that allows the value to be saved,
@@ -149,13 +149,15 @@ class CupertinoTypeAheadFormFieldState<T> extends FormFieldState<String> {
           ?.addListener(_handleControllerChanged);
 
       if (oldWidget.textFieldConfiguration.controller != null &&
-          widget.textFieldConfiguration.controller == null)
+          widget.textFieldConfiguration.controller == null) {
         _controller = TextEditingController.fromValue(
             oldWidget.textFieldConfiguration.controller!.value);
+      }
       if (widget.textFieldConfiguration.controller != null) {
         setValue(widget.textFieldConfiguration.controller!.text);
-        if (oldWidget.textFieldConfiguration.controller == null)
+        if (oldWidget.textFieldConfiguration.controller == null) {
           _controller = null;
+        }
       }
     }
   }
@@ -183,7 +185,8 @@ class CupertinoTypeAheadFormFieldState<T> extends FormFieldState<String> {
     // notifications for changes originating from within this class -- for
     // example, the reset() method. In such cases, the FormField value will
     // already have been set.
-    if (_effectiveController!.text != value)
+    if (_effectiveController!.text != value) {
       didChange(_effectiveController!.text);
+    }
   }
 }

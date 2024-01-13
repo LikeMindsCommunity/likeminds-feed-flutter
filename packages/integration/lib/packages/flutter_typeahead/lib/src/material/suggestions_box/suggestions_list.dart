@@ -3,11 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_typeahead_mm/src/keyboard_suggestion_selection_notifier.dart';
-import 'package:flutter_typeahead_mm/src/should_refresh_suggestion_focus_index_notifier.dart';
-import 'package:flutter_typeahead_mm/src/material/suggestions_box/suggestions_box.dart';
-import 'package:flutter_typeahead_mm/src/material/suggestions_box/suggestions_box_decoration.dart';
-import 'package:flutter_typeahead_mm/src/typedef.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/keyboard_suggestion_selection_notifier.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/should_refresh_suggestion_focus_index_notifier.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_box.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_box_decoration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/typedef.dart';
 
 class SuggestionsList<T> extends StatefulWidget {
   final SuggestionsBox? suggestionsBox;
@@ -39,7 +39,8 @@ class SuggestionsList<T> extends StatefulWidget {
   final KeyEventResult Function(FocusNode _, RawKeyEvent event) onKeyEvent;
   final bool hideKeyboardOnDrag;
 
-  SuggestionsList({
+  const SuggestionsList({
+    super.key,
     required this.suggestionsBox,
     this.controller,
     this.getImmediateSuggestions = false,
@@ -212,7 +213,7 @@ class _SuggestionsListState<T> extends State<SuggestionsList<T>>
         error = e;
       }
 
-      if (this.mounted) {
+      if (mounted) {
         // if it wasn't removed in the meantime
         setState(() {
           double? animationStart = widget.animationStart;
@@ -248,8 +249,9 @@ class _SuggestionsListState<T> extends State<SuggestionsList<T>>
 
   @override
   Widget build(BuildContext context) {
-    bool isEmpty =
-        this._suggestions?.length == 0 && widget.controller!.text == "";
+    bool isEmpty = this._suggestions != null
+        ? this._suggestions!.isEmpty && widget.controller!.text == ""
+        : true;
     if ((this._suggestions == null || isEmpty) &&
         this._isLoading == false &&
         this._error == null) return Container();
@@ -329,10 +331,10 @@ class _SuggestionsListState<T> extends State<SuggestionsList<T>>
     } else {
       child = widget.loadingBuilder != null
           ? widget.loadingBuilder!(context)
-          : Align(
+          : const Align(
               alignment: Alignment.center,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                padding: EdgeInsets.symmetric(vertical: 8.0),
                 child: CircularProgressIndicator(),
               ),
             );

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead_mm/src/material/field/text_field_configuration.dart';
-import 'package:flutter_typeahead_mm/src/material/field/typeahead_field.dart';
-import 'package:flutter_typeahead_mm/src/material/suggestions_box/suggestions_box_controller.dart';
-import 'package:flutter_typeahead_mm/src/material/suggestions_box/suggestions_box_decoration.dart';
-import 'package:flutter_typeahead_mm/src/typedef.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/field/text_field_configuration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/field/typeahead_field.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_box_controller.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/material/suggestions_box/suggestions_box_decoration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/typedef.dart';
 
 /// A [FormField](https://docs.flutter.io/flutter/widgets/FormField-class.html)
 /// implementation of [TypeAheadField], that allows the value to be saved,
@@ -156,13 +156,15 @@ class _TypeAheadFormFieldState<T> extends FormFieldState<String> {
           ?.addListener(_handleControllerChanged);
 
       if (oldWidget.textFieldConfiguration.controller != null &&
-          widget.textFieldConfiguration.controller == null)
+          widget.textFieldConfiguration.controller == null) {
         _controller = TextEditingController.fromValue(
             oldWidget.textFieldConfiguration.controller!.value);
+      }
       if (widget.textFieldConfiguration.controller != null) {
         setValue(widget.textFieldConfiguration.controller!.text);
-        if (oldWidget.textFieldConfiguration.controller == null)
+        if (oldWidget.textFieldConfiguration.controller == null) {
           _controller = null;
+        }
       }
     }
   }
@@ -193,7 +195,8 @@ class _TypeAheadFormFieldState<T> extends FormFieldState<String> {
     // notifications for changes originating from within this class -- for
     // example, the reset() method. In such cases, the FormField value will
     // already have been set.
-    if (_effectiveController!.text != value)
+    if (_effectiveController!.text != value) {
       didChange(_effectiveController!.text);
+    }
   }
 }

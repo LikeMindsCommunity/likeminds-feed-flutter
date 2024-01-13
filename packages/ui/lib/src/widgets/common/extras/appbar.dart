@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/enums.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   const LMFeedAppBar({
@@ -8,14 +8,8 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leading,
     this.trailing,
     this.title,
+    this.style,
     this.backButtonCallback,
-    this.backgroundColor,
-    this.border,
-    this.mainAxisAlignment,
-    this.margin,
-    this.padding,
-    this.height,
-    this.width,
   });
 
   final Widget? leading;
@@ -24,29 +18,24 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   final Function? backButtonCallback;
 
-  final double? height;
-  final double? width;
-  final Color? backgroundColor;
-  final Border? border;
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
-  final MainAxisAlignment? mainAxisAlignment;
-
-  @override
-  Size get preferredSize => Size(width ?? 0, height ?? 0);
+  final LMFeedAppBarStyle? style;
 
   @override
   Widget build(BuildContext context) {
+    final inStyle = style ?? LMFeedAppBarStyle.basic();
     final theme = LMFeedTheme.of(context);
     final Size screenSize = MediaQuery.of(context).size;
     return PreferredSize(
-      preferredSize: Size(width ?? screenSize.width, height ?? 64),
+      preferredSize: Size(
+        inStyle.width ?? screenSize.width,
+        inStyle.height ?? 64,
+      ),
       child: Padding(
-        padding: margin ?? EdgeInsets.zero,
+        padding: inStyle.margin ?? EdgeInsets.zero,
         child: Container(
           decoration: BoxDecoration(
-            color: backgroundColor ?? Colors.white,
-            border: border ??
+            color: inStyle.backgroundColor ?? Colors.white,
+            border: inStyle.border ??
                 const Border(
                   bottom: BorderSide(
                     width: 0.1,
@@ -54,13 +43,14 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
           ),
-          padding: padding ??
+          padding: inStyle.padding ??
               const EdgeInsets.symmetric(
                 horizontal: 12.0,
                 vertical: 4.0,
               ),
           child: Row(
-            mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
+            mainAxisAlignment:
+                inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
             children: [
               leading ??
                   LMFeedButton(
@@ -86,19 +76,73 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  LMFeedAppBar copyWith(LMFeedAppBar appBar) {
+  LMFeedAppBar copyWith({
+    Widget? leading,
+    Widget? trailing,
+    LMFeedText? title,
+    Function? backButtonCallback,
+    LMFeedAppBarStyle? style,
+  }) {
     return LMFeedAppBar(
-      leading: appBar.leading ?? leading,
-      trailing: appBar.trailing ?? trailing,
-      title: appBar.title ?? title,
-      backButtonCallback: appBar.backButtonCallback ?? backButtonCallback,
-      backgroundColor: appBar.backgroundColor ?? backgroundColor,
-      border: appBar.border ?? border,
-      mainAxisAlignment: appBar.mainAxisAlignment ?? mainAxisAlignment,
-      margin: appBar.margin ?? margin,
-      padding: appBar.padding ?? padding,
-      height: appBar.height ?? height,
-      width: appBar.width ?? width,
+      leading: leading ?? this.leading,
+      trailing: trailing ?? this.trailing,
+      title: title ?? this.title,
+      backButtonCallback: backButtonCallback ?? this.backButtonCallback,
+      style: style ?? this.style,
+    );
+  }
+
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => throw UnimplementedError();
+}
+
+class LMFeedAppBarStyle {
+  final Color? backgroundColor;
+  final double? height;
+  final double? width;
+  final Border? border;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final MainAxisAlignment? mainAxisAlignment;
+
+  const LMFeedAppBarStyle({
+    this.backgroundColor,
+    this.border,
+    this.mainAxisAlignment,
+    this.margin,
+    this.padding,
+    this.height,
+    this.width,
+  });
+
+  LMFeedAppBarStyle copyWith({
+    Color? backgroundColor,
+    double? height,
+    double? width,
+    Border? border,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    MainAxisAlignment? mainAxisAlignment,
+  }) {
+    return LMFeedAppBarStyle(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      height: height ?? this.height,
+      width: width ?? this.width,
+      margin: margin ?? this.margin,
+      padding: padding ?? this.padding,
+      mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
+      border: border ?? this.border,
+    );
+  }
+
+  factory LMFeedAppBarStyle.basic() {
+    return const LMFeedAppBarStyle(
+      backgroundColor: Colors.transparent,
+      height: 72,
+      width: double.infinity,
+      padding: EdgeInsets.all(12),
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     );
   }
 }

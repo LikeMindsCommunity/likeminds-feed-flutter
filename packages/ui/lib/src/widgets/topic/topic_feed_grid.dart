@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/post/topic_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 
 // This widget is used to display a topic grid
 // A [LMFeedTopicFeedGrid] displays a grid of selected topics

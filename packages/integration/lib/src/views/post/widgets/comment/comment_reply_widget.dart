@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/convertors/comment/comment_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/comment/comment_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class LMFeedCommentReplyWidget extends StatefulWidget {

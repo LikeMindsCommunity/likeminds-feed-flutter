@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/suggestions_box/cupertino_suggestions_box.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/suggestions_box/cupertino_suggestions_box_decoration.dart';
-import 'package:flutter_typeahead_mm/src/typedef.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/suggestions_box/cupertino_suggestions_box_decoration.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/typedef.dart';
 
 class CupertinoSuggestionsList<T> extends StatefulWidget {
   final CupertinoSuggestionsBox? suggestionsBox;
@@ -29,7 +29,8 @@ class CupertinoSuggestionsList<T> extends StatefulWidget {
   final int? minCharsForSuggestions;
   final bool hideKeyboardOnDrag;
 
-  CupertinoSuggestionsList({
+  const CupertinoSuggestionsList({
+    super.key,
     required this.suggestionsBox,
     this.controller,
     this.getImmediateSuggestions = false,
@@ -164,7 +165,7 @@ class _CupertinoSuggestionsListState<T>
         error = e;
       }
 
-      if (this.mounted) {
+      if (mounted) {
         // if it wasn't removed in the meantime
         setState(() {
           double? animationStart = widget.animationStart;
@@ -190,10 +191,12 @@ class _CupertinoSuggestionsListState<T>
 
   @override
   Widget build(BuildContext context) {
-    bool isEmpty =
-        this._suggestions?.length == 0 && widget.controller!.text == "";
-    if ((this._suggestions == null || isEmpty) && this._isLoading == false)
+    bool isEmpty = this._suggestions != null
+        ? this._suggestions!.isEmpty && widget.controller!.text == ""
+        : true;
+    if ((this._suggestions == null || isEmpty) && this._isLoading == false) {
       return Container();
+    }
 
     Widget child;
     if (this._isLoading!) {
@@ -268,10 +271,10 @@ class _CupertinoSuggestionsListState<T>
                   width: 1.0,
                 ),
               ),
-              child: Align(
+              child: const Align(
                 alignment: Alignment.center,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
                   child: CupertinoActivityIndicator(),
                 ),
               ),
@@ -297,7 +300,7 @@ class _CupertinoSuggestionsListState<T>
               child: Text(
                 'Error: ${this._error}',
                 textAlign: TextAlign.start,
-                style: TextStyle(
+                style: const TextStyle(
                   color: CupertinoColors.destructiveRed,
                   fontSize: 18.0,
                 ),
@@ -317,8 +320,8 @@ class _CupertinoSuggestionsListState<T>
                 width: 1.0,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
+            child: const Padding(
+              padding: EdgeInsets.all(4.0),
               child: Text(
                 'No Items Found!',
                 textAlign: TextAlign.start,
@@ -334,18 +337,13 @@ class _CupertinoSuggestionsListState<T>
   Widget createSuggestionsWidget() {
     Widget child = Container(
       decoration: BoxDecoration(
-        color: widget.decoration!.color != null
-            ? widget.decoration!.color
-            : CupertinoColors.white,
-        border: widget.decoration!.border != null
-            ? widget.decoration!.border
-            : Border.all(
-                color: CupertinoColors.extraLightBackgroundGray,
-                width: 1.0,
-              ),
-        borderRadius: widget.decoration!.borderRadius != null
-            ? widget.decoration!.borderRadius
-            : null,
+        color: widget.decoration!.color ?? CupertinoColors.white,
+        border: widget.decoration!.border ??
+            Border.all(
+              color: CupertinoColors.extraLightBackgroundGray,
+              width: 1.0,
+            ),
+        borderRadius: widget.decoration!.borderRadius,
       ),
       child: ListView(
         padding: EdgeInsets.zero,

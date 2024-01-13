@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/packages/linkify/linkify.dart';
+import 'package:likeminds_feed_flutter_ui/packages/linkify/linkify.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 
 class LMFeedTaggingHelper {
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');

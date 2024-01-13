@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_ui_fl/packages/linkify/linkify.dart';
+import 'package:likeminds_feed_flutter_ui/packages/linkify/linkify.dart';
 
 final _emailRegex = RegExp(
   r'^(.*?)((mailto:)?[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z][A-Z]+)',

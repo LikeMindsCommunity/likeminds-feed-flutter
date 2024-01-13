@@ -6,9 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/widgets/lists/topic_list.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/media/media_handler.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/lists/topic_list.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedPostComposeScreen extends StatefulWidget {
   //Builder for appbar
@@ -86,7 +89,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
 
   /// Lists to maintain throughout the screen for sending/receiving data
   List<LMMediaModel> postMedia = [];
-  List<UserTag> userTags = [];
+  List<LMUserTagViewData> userTags = [];
   List<LMTopicViewData> selectedTopics = [];
 
   /// Value notifiers to rebuild small widgets throughout the screen
@@ -180,12 +183,14 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
   Widget _defAppBar() {
     final theme = LMFeedTheme.of(context);
     return LMFeedAppBar(
-      backgroundColor: Colors.white,
-      height: 56,
-      mainAxisAlignment: MainAxisAlignment.center,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12.0,
-        vertical: 4.0,
+      style: const LMFeedAppBarStyle(
+        backgroundColor: Colors.white,
+        height: 56,
+        mainAxisAlignment: MainAxisAlignment.center,
+        padding: EdgeInsets.symmetric(
+          horizontal: 18.0,
+          vertical: 8.0,
+        ),
       ),
       leading: LMFeedButton(
         text: LMFeedText(
@@ -198,6 +203,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
           widget.composeDiscardDialogBuilder?.call(context) ??
               _showDefaultDiscardDialog(context);
         },
+        style: const LMFeedButtonStyle(),
       ),
       title: const LMFeedText(
         text: "Create Post",
@@ -223,6 +229,7 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
         style: LMFeedButtonStyle(
           backgroundColor: theme.colorScheme.primary,
           width: 48,
+          height: 32,
           borderRadius: 6,
         ),
         onTap: () {
@@ -267,13 +274,125 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
   }
 
   Widget _defContentInput() {
-    return Container();
+    final theme = LMFeedTheme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: LMFeedProfilePicture(
+            fallbackText: user.name,
+            imageUrl: user.imageUrl,
+            onTap: () {
+              if (user.sdkClientInfo != null) {
+                LMFeedCore.client
+                    .routeToProfile(user.sdkClientInfo!.userUniqueId);
+              }
+            },
+            style: LMFeedProfilePictureStyle(
+              backgroundColor: theme.primaryColor,
+              size: 36,
+            ),
+          ),
+        ),
+        const SizedBox(width: 18),
+        Column(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width - 80,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.background,
+              ),
+              // constraints: BoxConstraints(
+              //     maxHeight: screenSize.height * 0.8),
+              child: LMTaggingAheadTextField(
+                isDown: true,
+                minLines: 3,
+                // maxLines: 200,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                ),
+                onTagSelected: (tag) {
+                  userTags.add(tag);
+                },
+                controller: _controller,
+                focusNode: _focusNode,
+                // onChange: _onTextChanged,
+                onChange: (p) {},
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _defMediaPicker() {
+    final theme = LMFeedTheme.of(context);
     return Container(
-      color: Colors.red,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.background,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.4),
+            offset: const Offset(0.0, -1.0),
+            blurRadius: 1.0,
+          ), //BoxShadow
+        ],
+      ),
       height: 72,
+      child: Row(
+        children: [
+          LMFeedButton(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.photo,
+              style: LMFeedIconStyle(
+                color: theme.primaryColor,
+                size: 44,
+                boxPadding: 0,
+              ),
+            ),
+            onTap: () async {
+              composeBloc.add(LMFeedComposeAddImageEvent());
+            },
+          ),
+          LMFeedButton(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.photo,
+              style: LMFeedIconStyle(
+                color: theme.primaryColor,
+                size: 44,
+                boxPadding: 0,
+              ),
+            ),
+            onTap: () async {
+              composeBloc.add(LMFeedComposeAddVideoEvent());
+            },
+          ),
+          LMFeedButton(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.photo,
+              style: LMFeedIconStyle(
+                color: theme.primaryColor,
+                size: 44,
+                boxPadding: 0,
+              ),
+            ),
+            onTap: () async {
+              composeBloc.add(LMFeedComposeAddDocumentEvent());
+            },
+          ),
+        ],
+      ),
     );
   }
 

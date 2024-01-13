@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/profile/profile_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/routing/routing_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/typedefs.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/analytics/analytics_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 
 /// {@template lm_bloc_listener}
 /// This is the main class that needs to be initialized before using the SDK.

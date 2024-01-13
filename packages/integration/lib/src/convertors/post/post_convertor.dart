@@ -1,8 +1,8 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/src/convertors/comment/comment_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/convertors/common/popup_menu_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/convertors/helper/attachment/attachment_convertor.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/comment/comment_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/common/popup_menu_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/attachment_convertor.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMPostViewDataConvertor {
   static LMPostViewData fromPost({required Post post}) {

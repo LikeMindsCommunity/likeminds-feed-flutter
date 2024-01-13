@@ -4,15 +4,15 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_driver_fl/src/convertors/user/user_convertor.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/typedefs.dart';
-import 'package:likeminds_feed_driver_fl/src/widgets/post_something.dart';
-import 'package:likeminds_feed_driver_fl/src/widgets/topic_bottom_sheet.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedScreen extends StatefulWidget {

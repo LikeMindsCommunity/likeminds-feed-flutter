@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_ui_fl/src/models/sdk/sdk_client_info_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/sdk/sdk_client_info_view_data.dart';
 
 /// {@template lm_user_view_data}
 /// A data class to hold the user data.

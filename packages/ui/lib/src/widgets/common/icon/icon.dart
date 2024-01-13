@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:flutter_svg/svg.dart';
 
 /// A simple icon widget to be used throughout the feed

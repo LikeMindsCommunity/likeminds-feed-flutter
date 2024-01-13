@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_ui_fl/src/models/helper/og_tags_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/helper/og_tags_view_data.dart';
 
 class LMAttachmentMetaViewData {
   final String? url;

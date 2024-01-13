@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 part 'comment_replies_event.dart';
 part 'comment_replies_state.dart';

@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_ui_fl/src/models/user/user_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/user/user_view_data.dart';
 
 class LMFeedRoomViewData {
   int id;

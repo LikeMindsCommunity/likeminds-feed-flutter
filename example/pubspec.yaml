@@ -15,12 +15,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_svg:
   dotenv: ^4.2.0
-  likeminds_feed_driver_fl:
-    path: ../packages/integration
+  likeminds_feed_flutter_core:
   likeminds_feed: # 1.6.3
     path: ../../LikeMinds-Flutter-Feed-SDK
-  likeminds_feed_ui_fl:
-    path: ../packages/ui
+  likeminds_feed_flutter_ui:
 
 dev_dependencies:
   flutter_test:

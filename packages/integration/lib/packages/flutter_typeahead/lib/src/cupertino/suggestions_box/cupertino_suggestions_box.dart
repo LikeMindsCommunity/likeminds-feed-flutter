@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_typeahead_mm/src/cupertino/field/cupertino_typeahead_field.dart';
+import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/src/cupertino/field/cupertino_typeahead_field.dart';
 
 class CupertinoSuggestionsBox {
   static const int waitMetricsTimeoutMillis = 1000;
@@ -28,25 +28,25 @@ class CupertinoSuggestionsBox {
   ) : desiredDirection = direction;
 
   void open() {
-    if (this.isOpened) return;
-    assert(this.overlayEntry != null);
+    if (isOpened) return;
+    assert(overlayEntry != null);
     resize();
-    Overlay.of(context).insert(this.overlayEntry!);
-    this.isOpened = true;
+    Overlay.of(context).insert(overlayEntry!);
+    isOpened = true;
   }
 
   void close() {
-    if (!this.isOpened) return;
-    assert(this.overlayEntry != null);
-    this.overlayEntry!.remove();
-    this.isOpened = false;
+    if (!isOpened) return;
+    assert(overlayEntry != null);
+    overlayEntry!.remove();
+    isOpened = false;
   }
 
   void toggle() {
-    if (this.isOpened) {
-      this.close();
+    if (isOpened) {
+      close();
     } else {
-      this.open();
+      open();
     }
   }
 

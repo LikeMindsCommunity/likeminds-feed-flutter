@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class StoryBookApp extends StatefulWidget {
   const StoryBookApp({super.key});

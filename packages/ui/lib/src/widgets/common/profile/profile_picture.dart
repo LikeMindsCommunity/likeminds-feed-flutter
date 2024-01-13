@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/widgets.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 class LMFeedProfilePicture extends StatelessWidget {
   const LMFeedProfilePicture({

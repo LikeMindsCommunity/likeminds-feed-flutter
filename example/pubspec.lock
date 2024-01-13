@@ -523,13 +523,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_typeahead_mm:
-    dependency: transitive
-    description:
-      path: "../packages/integration/lib/packages/flutter_typeahead-4.3.7"
-      relative: true
-    source: path
-    version: "4.3.7"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -669,21 +662,21 @@ packages:
       path: "../../LikeMinds-Flutter-Feed-SDK"
       relative: true
     source: path
-    version: "1.6.5"
-  likeminds_feed_driver_fl:
+    version: "1.6.6"
+  likeminds_feed_flutter_core:
     dependency: "direct main"
     description:
       path: "../packages/integration"
       relative: true
     source: path
-    version: "0.0.1"
-  likeminds_feed_ui_fl:
+    version: "1.0.0"
+  likeminds_feed_flutter_ui:
     dependency: "direct main"
     description:
       path: "../packages/ui"
       relative: true
     source: path
-    version: "1.3.9"
+    version: "1.0.0"
   lints:
     dependency: transitive
     description:

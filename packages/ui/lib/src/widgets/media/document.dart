@@ -1,6 +1,6 @@
 import 'dart:io';
-
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 

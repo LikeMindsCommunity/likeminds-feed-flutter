@@ -1,20 +1,20 @@
-library likeminds_feed_driver_fl;
+library likeminds_feed_flutter_core;
 
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/analytics/analytics_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/post/post_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/profile/profile_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/bloc/routing/routing_bloc.dart';
-import 'package:likeminds_feed_driver_fl/src/services/media_service.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/analytics/analytics_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/post/post_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/constants/ui_constants.dart';
-import 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:media_kit/media_kit.dart';
 
-export 'package:likeminds_feed_driver_fl/src/views/views.dart';
-export 'package:likeminds_feed_driver_fl/src/utils/constants/constants.dart';
-export 'package:likeminds_feed_driver_fl/src/bloc/lm_bloc.dart';
-export 'package:likeminds_feed_driver_fl/src/utils/persistence/user_local_preference.dart';
+export 'package:likeminds_feed_flutter_core/src/views/views.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
+export 'package:likeminds_feed_flutter_core/src/bloc/lm_bloc.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/index.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/widgets.dart';
-import 'package:likeminds_feed_ui_fl/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 
 class LMFeedUserTile extends LMFeedTile {
   final LMUserViewData user;
@@ -25,40 +25,6 @@ class LMFeedUserTile extends LMFeedTile {
 
   @override
   Widget build(BuildContext context) {
-    // return Row(
-    //   children: [
-    //     profilePicture ??
-    //         LMProfilePicture(
-    //           size: imageSize ?? 50,
-    //           backgroundColor: Colors.blue,
-    //           fallbackText: user.name,
-    //           onTap: () => onTap(),
-    //           imageUrl: user.imageUrl,
-    //         ),
-    //     kHorizontalPaddingLarge,
-    //     Expanded(
-    //       child: Column(
-    //         crossAxisAlignment: CrossAxisAlignment.start,
-    //         children: [
-    //           titleText ??
-    //               LMFeedText(
-    //                 text: user.name,
-    //                 style: const LMFeedTextStyle(
-    //                   textStyle: TextStyle(
-    //                     fontSize: kFontMedium,
-    //                     color: Colors.grey,
-    //                     fontWeight: FontWeight.w500,
-    //                   ),
-    //                 ),
-    //               ),
-    //           kVerticalPaddingMedium,
-    //           subText ?? const SizedBox(),
-    //         ],
-    //       ),
-    //     ),
-    //   ],
-    // );
-    // return super.build(context);
     return LMFeedTile(
       leading: LMFeedProfilePicture(
         style: const LMFeedProfilePictureStyle(
