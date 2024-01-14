@@ -157,22 +157,33 @@ class LMFeedThemeData {
             ),
           ),
           commentButtonStyle: LMFeedButtonStyle(
+            showText: false,
+            placement: LMFeedIconButtonPlacement.start,
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmCommentSvg,
               style: LMFeedIconStyle(
-                color: theme.primaryColor,
+                color: theme.colorScheme.onPrimaryContainer,
+                size: 28,
+                boxPadding: 0,
+                fit: BoxFit.contain,
               ),
             ),
+            height: 48,
           ),
           shareButtonStyle: LMFeedButtonStyle(
+            placement: LMFeedIconButtonPlacement.start,
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmShareSvg,
               style: LMFeedIconStyle(
-                color: theme.primaryColor,
+                color: theme.colorScheme.onPrimaryContainer,
+                size: 28,
+                boxPadding: 0,
+                fit: BoxFit.contain,
               ),
             ),
+            height: 48,
           ),
           alignment: MainAxisAlignment.spaceBetween,
           padding: const EdgeInsets.symmetric(

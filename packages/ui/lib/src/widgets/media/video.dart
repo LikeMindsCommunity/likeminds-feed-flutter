@@ -86,7 +86,6 @@ class _LMVideoState extends VisibilityAwareState<LMFeedVideo> {
   bool _onTouch = true;
   bool initialiseOverlay = false;
   ValueNotifier<bool> isMuted = ValueNotifier(false);
-  Future<void>? initialiseController;
   ValueNotifier<bool> rebuildVideo = ValueNotifier(false);
 
   Player player = Player();
@@ -105,24 +104,17 @@ class _LMVideoState extends VisibilityAwareState<LMFeedVideo> {
   @override
   void didUpdateWidget(LMFeedVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
-    initialiseController = initialiseControllers();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    initialiseController = initialiseControllers();
-  }
-
-  @override
-  void onVisibilityChanged(WidgetVisibility visibility) {
-    if (visibility == WidgetVisibility.INVISIBLE) {
-      controller?.player.pause();
-    } else if (visibility == WidgetVisibility.GONE) {
-      controller?.player.pause();
-    }
-    super.onVisibilityChanged(visibility);
-  }
+  // @override
+  // void onVisibilityChanged(WidgetVisibility visibility) {
+  //   if (visibility == WidgetVisibility.INVISIBLE) {
+  //     controller?.player.pause();
+  //   } else if (visibility == WidgetVisibility.GONE) {
+  //     controller?.player.pause();
+  //   }
+  //   super.onVisibilityChanged(visibility);
+  // }
 
   Future<void> initialiseControllers() async {
     player = Player(
@@ -162,7 +154,7 @@ class _LMVideoState extends VisibilityAwareState<LMFeedVideo> {
         valueListenable: rebuildVideo,
         builder: (context, _, __) {
           return FutureBuilder(
-            future: initialiseController,
+            future: initialiseControllers(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const LMPostMediaShimmer();

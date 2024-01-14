@@ -5,6 +5,10 @@ sealed class LMFeedComposeState {}
 
 final class LMFeedComposeInitialState extends LMFeedComposeState {}
 
+class LMFeedComposeMediaLoadingState extends LMFeedComposeState {}
+
+class LMFeedComposeTopicsLoadingState extends LMFeedComposeState {}
+
 class LMFeedComposeFetchedTopicsState extends LMFeedComposeState {
   final List<LMTopicViewData> topics;
 
@@ -12,6 +16,12 @@ class LMFeedComposeFetchedTopicsState extends LMFeedComposeState {
 }
 
 class LMFeedComposeAddedImageState extends LMFeedComposeState {}
+
+class LMFeedComposeMediaErrorState extends LMFeedComposeState {
+  final Error error;
+
+  LMFeedComposeMediaErrorState(this.error);
+}
 
 class LMFeedComposeAddedVideoState extends LMFeedComposeState {}
 

@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/media/media_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -98,8 +99,7 @@ class LMFeedMediaHandler {
     return true;
   }
 
-  static Future<List<LMMediaModel>?> pickVideos(
-      int currentMediaLength, Function(bool) onUploadedMedia) async {
+  static Future<List<LMMediaModel>?> pickVideos(int currentMediaLength) async {
     try {
       // final XFile? pickedFile =
       List<LMMediaModel> videoFiles = [];
@@ -108,7 +108,7 @@ class LMFeedMediaHandler {
       );
 
       if (pickedFiles == null || pickedFiles.files.isEmpty) {
-        onUploadedMedia(false);
+        // onUploadedMedia(false);
         return null;
       }
 
@@ -136,7 +136,7 @@ class LMFeedMediaHandler {
             'A total of 10 attachments can be added to a post',
             duration: Toast.LENGTH_LONG,
           );
-          onUploadedMedia(false);
+          // onUploadedMedia(false);
           return null;
         } else {
           for (PlatformFile pFile in pickedFiles.files) {
@@ -166,11 +166,11 @@ class LMFeedMediaHandler {
               controller.dispose();
             }
           }
-          onUploadedMedia(true);
+          // onUploadedMedia(true);
           return videoFiles;
         }
       } else {
-        onUploadedMedia(false);
+        // onUploadedMedia(false);
         return null;
       }
     } on Exception catch (e) {
@@ -178,7 +178,7 @@ class LMFeedMediaHandler {
         'An error occurred',
         duration: Toast.LENGTH_LONG,
       );
-      onUploadedMedia(false);
+      // onUploadedMedia(false);
       debugPrint(e.toString());
       return null;
     }
@@ -233,72 +233,74 @@ class LMFeedMediaHandler {
     }
   }
 
-  Future<List<LMMediaModel>?> pickImages(
-      int mediaCount, Function(bool) onUploaded) async {
+  static Future<List<LMMediaModel>?> pickImages(int mediaCount) async {
     // onUploading();
-    try {
-      final FilePickerResult? list = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
-        type: FileType.image,
-      );
-      CommunityConfigurations config =
-          await LMFeedUserLocalPreference.instance.getCommunityConfigurations();
-      if (config.value == null || config.value!["max_image_size"] == null) {
-        final configResponse =
-            await LMFeedCore.client.getCommunityConfigurations();
-        if (configResponse.success &&
-            configResponse.communityConfigurations != null &&
-            configResponse.communityConfigurations!.isNotEmpty) {
-          config = configResponse.communityConfigurations!.first;
-        }
+    final FilePickerResult? list = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.image,
+    );
+    CommunityConfigurations config =
+        await LMFeedUserLocalPreference.instance.getCommunityConfigurations();
+    if (config.value == null || config.value!["max_image_size"] == null) {
+      final configResponse =
+          await LMFeedCore.client.getCommunityConfigurations();
+      if (configResponse.success &&
+          configResponse.communityConfigurations != null &&
+          configResponse.communityConfigurations!.isNotEmpty) {
+        config = configResponse.communityConfigurations!.first;
       }
-      final double sizeLimit;
-      if (config.value != null && config.value!["max_image_size"] != null) {
-        sizeLimit = config.value!["max_image_size"]! / 1024;
-      } else {
-        sizeLimit = 5;
-      }
+    }
+    final double sizeLimit;
+    if (config.value != null && config.value!["max_image_size"] != null) {
+      sizeLimit = config.value!["max_image_size"]! / 1024;
+    } else {
+      sizeLimit = 5;
+    }
 
-      if (list != null && list.files.isNotEmpty) {
-        if (mediaCount + list.files.length > 10) {
+    if (list != null && list.files.isNotEmpty) {
+      if (mediaCount + list.files.length > 10) {
+        toast(
+          'A total of 10 attachments can be added to a post',
+          duration: Toast.LENGTH_LONG,
+        );
+        // onUploaded(false);
+      }
+      for (PlatformFile image in list.files) {
+        int fileBytes = image.size;
+        double fileSize = getFileSizeInDouble(fileBytes);
+        if (fileSize > sizeLimit) {
           toast(
-            'A total of 10 attachments can be added to a post',
+            'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
             duration: Toast.LENGTH_LONG,
           );
-          onUploaded(false);
+          // onUploaded(false);
+          return [];
         }
-        for (PlatformFile image in list.files) {
-          int fileBytes = image.size;
-          double fileSize = getFileSizeInDouble(fileBytes);
-          if (fileSize > sizeLimit) {
-            toast(
-              'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-              duration: Toast.LENGTH_LONG,
-            );
-            onUploaded(false);
-            return [];
-          }
-        }
-        List<File> pickedFiles = list.files.map((e) => File(e.path!)).toList();
-        List<LMMediaModel> mediaFiles = pickedFiles
-            .map((e) => LMMediaModel(
-                mediaFile: File(e.path), mediaType: LMMediaType.image))
-            .toList();
-        onUploaded(true);
-
-        return mediaFiles;
-      } else {
-        onUploaded(false);
-        return [];
       }
-    } on Exception catch (err) {
-      toast(
-        'An error occurred',
-        duration: Toast.LENGTH_LONG,
-      );
-      onUploaded(false);
-      debugPrint(err.toString());
+      List<File> pickedFiles = list.files.map((e) => File(e.path!)).toList();
+      List<LMMediaModel> mediaFiles = pickedFiles
+          .map(
+            (e) => LMMediaModel(
+              mediaFile: File(e.path),
+              mediaType: LMMediaType.image,
+            ),
+          )
+          .toList();
+      // onUploaded(true);
+
+      return mediaFiles;
+    } else {
+      // onUploaded(false);
       return [];
     }
+    // } on Exception catch (err) {
+    //   toast(
+    //     'An error occurred',
+    //     duration: Toast.LENGTH_LONG,
+    //   );
+    //   // onUploaded(false);
+    //   debugPrint(err.toString());
+    //   return [];
+    // }
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/credentials/credentials.dart';
 import 'package:path/path.dart' as path;
 
 import 'package:simple_s3/simple_s3.dart';
@@ -10,9 +11,9 @@ class LMFeedMediaService {
   final _region = AWSRegions.apSouth1;
   final SimpleS3 _s3Client = SimpleS3();
 
-  LMFeedMediaService({required String bucketName, required String poolId}) {
-    _bucketName = bucketName;
-    _poolId = poolId;
+  LMFeedMediaService(bool isProd) {
+    _bucketName = isProd ? CredsProd.bucketName : CredsDev.bucketName;
+    _poolId = isProd ? CredsProd.poolId : CredsDev.poolId;
   }
 
   Future<String?> uploadFile(File file, String userUniqueId) async {

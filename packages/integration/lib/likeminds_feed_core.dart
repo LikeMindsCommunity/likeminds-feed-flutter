@@ -12,8 +12,7 @@ import 'package:media_kit/media_kit.dart';
 
 export 'package:likeminds_feed_flutter_core/src/views/views.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
-export 'package:likeminds_feed_flutter_core/src/bloc/lm_bloc.dart';
-export 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
+export 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
@@ -28,14 +27,15 @@ class LMFeedCore {
   LMFeedCore._();
 
   Future<void> initialize({
-    required LMFeedClient lmFeedClient,
+    String? apiKey,
+    LMFeedClient? lmFeedClient,
     ThemeData? theme,
   }) async {
-    this.lmFeedClient = lmFeedClient;
-    media = LMFeedMediaService(bucketName: "", poolId: "");
+    assert(apiKey != null || lmFeedClient != null);
+    this.lmFeedClient =
+        lmFeedClient ?? (LMFeedClientBuilder()..apiKey(apiKey!)).build();
     await LMFeedUserLocalPreference.instance.initialize();
     MediaKit.ensureInitialized();
-    await LMFeedUserLocalPreference.instance.initialize();
   }
 
   Future<void> closeBlocs() async {
