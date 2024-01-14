@@ -231,7 +231,7 @@ class LMFeedThemeData {
           const BoxShadow(
               color: Color.fromRGBO(0, 0, 0, 0.239), blurRadius: 1.0)
         ],
-        margin: const EdgeInsets.only(bottom: 16.0),
+        margin: const EdgeInsets.only(bottom: 12.0),
         topicStyle: LMFeedPostTopicStyle(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           activeChipStyle: LMFeedTopicChipStyle(
@@ -279,18 +279,18 @@ class LMFeedThemeData {
               assetPath: lmLikeInActiveSvg,
               style: LMFeedIconStyle(
                 color: LikeMindsTheme.greyColor,
-                size: 28,
+                size: 24,
                 boxPadding: 0,
                 fit: BoxFit.contain,
               ),
             ),
-            height: 48,
+            height: 44,
             activeIcon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmLikeActiveSvg,
               style: LMFeedIconStyle(
                 color: LikeMindsTheme.errorColor,
-                size: 28,
+                size: 24,
                 boxPadding: 0,
                 fit: BoxFit.contain,
               ),
@@ -302,7 +302,7 @@ class LMFeedThemeData {
               assetPath: lmCommentSvg,
               style: LMFeedIconStyle(
                 color: LikeMindsTheme.greyColor,
-                size: 28,
+                size: 24,
                 boxPadding: 0,
                 fit: BoxFit.contain,
               ),
@@ -314,7 +314,7 @@ class LMFeedThemeData {
               assetPath: lmShareSvg,
               style: LMFeedIconStyle(
                 color: LikeMindsTheme.greyColor,
-                size: 28,
+                size: 24,
                 boxPadding: 0,
                 fit: BoxFit.contain,
               ),
@@ -348,18 +348,33 @@ class LMFeedThemeData {
       commentStyle: const LMFeedCommentStyle(
         likeButtonStyle: LMFeedButtonStyle(
           icon: LMFeedIcon(
-            type: LMFeedIconType.icon,
+            type: LMFeedIconType.svg,
             assetPath: lmLikeInActiveSvg,
+            style: LMFeedIconStyle(
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
           ),
           activeIcon: LMFeedIcon(
             type: LMFeedIconType.svg,
             assetPath: lmLikeActiveSvg,
+            style: LMFeedIconStyle(
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
         replyButtonStyle: LMFeedButtonStyle(
           icon: LMFeedIcon(
             type: LMFeedIconType.svg,
             assetPath: lmCommentSvg,
+            style: LMFeedIconStyle(
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
         showRepliesButtonStyle: LMFeedButtonStyle(),

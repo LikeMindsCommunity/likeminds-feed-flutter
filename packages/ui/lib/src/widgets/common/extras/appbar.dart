@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
@@ -47,7 +49,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
           child: Row(
             mainAxisAlignment:
-                inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
+                inStyle.mainAxisAlignment ?? MainAxisAlignment.start,
             children: [
               leading ??
                   LMFeedButton(
@@ -56,7 +58,8 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                         type: LMFeedIconType.icon,
                         icon: Icons.chevron_left,
                         style: LMFeedIconStyle(
-                          color: theme.primaryColor,
+                          color: theme.onContainer,
+                          size: 24,
                         ),
                       ),
                     ),
@@ -64,9 +67,9 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                       backButtonCallback?.call() ?? Navigator.of(context).pop();
                     },
                   ),
-              // const Spacer(),
+              const SizedBox.shrink(),
               title ?? const SizedBox(),
-              // const Spacer(),
+              Platform.isAndroid ? const Spacer() : const SizedBox.shrink(),
               trailing ?? const SizedBox(),
             ],
           ),

@@ -185,7 +185,8 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                                                   Colors.grey,
                                         ),
                                       );
-                            }).toList())
+                            }).toList(),
+                          )
                         : const SizedBox(),
                   ],
                 );

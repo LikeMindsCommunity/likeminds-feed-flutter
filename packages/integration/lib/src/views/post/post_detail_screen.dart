@@ -133,7 +133,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               snapshot.hasData) {
             return Scaffold(
               resizeToAvoidBottomInset: true,
-              backgroundColor: LikeMindsTheme.whiteColor,
+              backgroundColor: feedTheme!.backgroundColor,
               bottomSheet:
                   widget.bottomTextFieldBuilder?.call(context, postData!) ??
                       defBottomTextField(),
@@ -150,11 +150,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                 ?.call(context, defPostWidget(), postData!) ??
                             defPostWidget();
                       },
-                    ),
-                  ),
-                  const SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 16,
                     ),
                   ),
                   SliverToBoxAdapter(
@@ -177,10 +172,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               builderDelegate:
                                   PagedChildBuilderDelegate<LMCommentViewData>(
                                 firstPageProgressIndicatorBuilder: (context) {
-                                  return Container(
-                                    color: LikeMindsTheme.whiteColor,
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: const Center(
+                                  return const Padding(
+                                    padding: EdgeInsets.only(top: 150.0),
+                                    child: Center(
                                       child:
                                           CircularProgressIndicator.adaptive(),
                                     ),
