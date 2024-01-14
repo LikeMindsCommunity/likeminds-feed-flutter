@@ -61,42 +61,45 @@ class _LMButtonState extends State<LMFeedButton> {
           borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 0),
           border: inStyle.border,
         ),
-        child: Row(
-          mainAxisAlignment:
-              inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
-          children: [
-            inStyle.placement == LMFeedIconButtonPlacement.start
-                ? widget.isActive
-                    ? inStyle.activeIcon ??
-                        inStyle.icon ??
-                        const SizedBox.shrink()
-                    : inStyle.icon ?? const SizedBox.shrink()
-                : const SizedBox.shrink(),
-            inStyle.placement == LMFeedIconButtonPlacement.start
-                ? (inStyle.icon != null || inStyle.activeIcon != null)
-                    ? SizedBox(width: inStyle.margin ?? 8)
-                    : const SizedBox.shrink()
-                : const SizedBox.shrink(),
-            inStyle.showText
-                ? widget.isActive
-                    ? widget.activeText ??
-                        widget.text ??
-                        const SizedBox.shrink()
-                    : widget.text ?? const SizedBox.shrink()
-                : const SizedBox.shrink(),
-            inStyle.placement == LMFeedIconButtonPlacement.end
-                ? (inStyle.icon != null || inStyle.activeIcon != null)
-                    ? SizedBox(width: inStyle.margin ?? 8)
-                    : const SizedBox.shrink()
-                : const SizedBox.shrink(),
-            inStyle.placement == LMFeedIconButtonPlacement.end
-                ? widget.isActive
-                    ? inStyle.activeIcon ??
-                        inStyle.icon ??
-                        const SizedBox.shrink()
-                    : inStyle.icon ?? const SizedBox.shrink()
-                : const SizedBox.shrink(),
-          ],
+        child: Center(
+          child: Row(
+            mainAxisAlignment:
+                inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              inStyle.placement == LMFeedIconButtonPlacement.start
+                  ? _active
+                      ? inStyle.activeIcon ??
+                          inStyle.icon ??
+                          const SizedBox.shrink()
+                      : inStyle.icon ?? const SizedBox.shrink()
+                  : const SizedBox.shrink(),
+              inStyle.placement == LMFeedIconButtonPlacement.start
+                  ? (inStyle.icon != null || inStyle.activeIcon != null)
+                      ? SizedBox(width: inStyle.margin ?? 8)
+                      : const SizedBox.shrink()
+                  : const SizedBox.shrink(),
+              inStyle.showText
+                  ? _active
+                      ? widget.activeText ??
+                          widget.text ??
+                          const SizedBox.shrink()
+                      : widget.text ?? const SizedBox.shrink()
+                  : const SizedBox.shrink(),
+              inStyle.placement == LMFeedIconButtonPlacement.end
+                  ? (inStyle.icon != null || inStyle.activeIcon != null)
+                      ? SizedBox(width: inStyle.margin ?? 8)
+                      : const SizedBox.shrink()
+                  : const SizedBox.shrink(),
+              inStyle.placement == LMFeedIconButtonPlacement.end
+                  ? _active
+                      ? inStyle.activeIcon ??
+                          inStyle.icon ??
+                          const SizedBox.shrink()
+                      : inStyle.icon ?? const SizedBox.shrink()
+                  : const SizedBox.shrink(),
+            ],
+          ),
         ),
       ),
     );
@@ -159,10 +162,9 @@ class LMFeedButtonStyle {
       padding: EdgeInsets.all(4),
       backgroundColor: Colors.transparent,
       borderRadius: 8,
-      height: 42,
+      height: 28,
       placement: LMFeedIconButtonPlacement.start,
       margin: 4,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     );
   }
 }

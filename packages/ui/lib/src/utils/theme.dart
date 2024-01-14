@@ -19,7 +19,7 @@ class LMFeedTheme extends InheritedWidget {
     //   'You must have a LMFeedTheme widget at the top of your widget tree',
     // );
 
-    return lmTheme?.theme ?? LMFeedThemeData.light();
+    return lmTheme?.theme ?? LMFeedThemeData.fromThemeData(Theme.of(context));
   }
 }
 
@@ -70,6 +70,149 @@ class LMFeedThemeData {
     required this.dialogStyle,
     required this.popUpMenuStyle,
   });
+
+  factory LMFeedThemeData.fromThemeData(ThemeData theme) {
+    return LMFeedThemeData._(
+      backgroundColor: theme.colorScheme.background,
+      primaryColor: theme.primaryColor,
+      secondaryColor: theme.colorScheme.secondary,
+      shadowColor: theme.shadowColor,
+      disabledColor: theme.disabledColor,
+      errorColor: theme.colorScheme.error,
+      inActiveColor: theme.unselectedWidgetColor,
+      container: theme.colorScheme.background,
+      onContainer: theme.colorScheme.onPrimaryContainer,
+      onPrimary: theme.colorScheme.onPrimary,
+      postStyle: LMFeedPostStyle(
+        boxShadow: [
+          const BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.239),
+            blurRadius: 1.0,
+          )
+        ],
+        margin: const EdgeInsets.only(bottom: 16.0),
+        topicStyle: LMFeedPostTopicStyle(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          activeChipStyle: LMFeedTopicChipStyle(
+            backgroundColor: theme.primaryColor.withOpacity(0.1),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+            textStyle: TextStyle(
+              color: theme.primaryColor,
+              fontSize: 14,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w400,
+            ),
+            borderRadius: BorderRadius.circular(4.0),
+          ),
+          inactiveChipStyle: LMFeedTopicChipStyle(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+            textStyle: TextStyle(
+              color: theme.primaryColor,
+              fontSize: 14,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w400,
+            ),
+            borderRadius: BorderRadius.circular(4.0),
+            showBorder: true,
+            borderColor: theme.primaryColor,
+          ),
+        ),
+        contentStyle: const LMFeedPostContentStyle(
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          textStyle: TextStyle(
+            color: LikeMindsTheme.greyColor,
+            fontSize: 16,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        footerStyle: LMFeedPostFooterStyle(
+          showLikeButton: true,
+          showCommentButton: true,
+          showShareButton: true,
+          showSaveButton: false,
+          likeButtonStyle: LMFeedButtonStyle(
+            placement: LMFeedIconButtonPlacement.start,
+            icon: LMFeedIcon(
+              type: LMFeedIconType.svg,
+              assetPath: lmLikeInActiveSvg,
+              style: LMFeedIconStyle(
+                color: theme.colorScheme.onPrimaryContainer,
+                size: 28,
+                boxPadding: 0,
+                fit: BoxFit.contain,
+              ),
+            ),
+            height: 48,
+            activeIcon: LMFeedIcon(
+              type: LMFeedIconType.svg,
+              assetPath: lmLikeActiveSvg,
+              style: LMFeedIconStyle(
+                color: theme.primaryColor,
+                size: 28,
+                boxPadding: 0,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          commentButtonStyle: LMFeedButtonStyle(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.svg,
+              assetPath: lmCommentSvg,
+              style: LMFeedIconStyle(
+                color: theme.primaryColor,
+              ),
+            ),
+          ),
+          shareButtonStyle: LMFeedButtonStyle(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.svg,
+              assetPath: lmShareSvg,
+              style: LMFeedIconStyle(
+                color: theme.primaryColor,
+              ),
+            ),
+          ),
+          alignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 10.0,
+          ),
+        ),
+        headerStyle: const LMFeedPostHeaderStyle(
+          imageSize: 48,
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 8.0,
+          ),
+          fallbackTextStyle: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: LikeMindsTheme.onPrimary,
+              fontSize: 16,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+      hashTagColor: theme.primaryColor,
+      linkColor: theme.primaryColor,
+      tagColor: theme.primaryColor,
+      commentStyle: const LMFeedCommentStyle(),
+      replyStyle: const LMFeedReplyStyle(),
+      feedButtonStyle: const LMFeedButtonStyle(),
+      feedIconStyle: const LMFeedIconStyle(),
+      textFieldStyle: const LMFeedTextFieldStyle(
+        backgroundColor: LikeMindsTheme.backgroundColor,
+        decoration: InputDecoration(
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+        ),
+      ),
+      dialogStyle: const LMFeedDialogStyle(),
+      popUpMenuStyle: const LMFeedPopUpMenuStyle(),
+    );
+  }
 
   factory LMFeedThemeData.light() {
     return LMFeedThemeData._(
@@ -130,14 +273,29 @@ class LMFeedThemeData {
           showShareButton: true,
           showSaveButton: false,
           likeButtonStyle: LMFeedButtonStyle(
-              icon: LMFeedIcon(
-                type: LMFeedIconType.svg,
-                assetPath: lmLikeInActiveSvg,
+            placement: LMFeedIconButtonPlacement.start,
+            icon: LMFeedIcon(
+              type: LMFeedIconType.svg,
+              assetPath: lmLikeInActiveSvg,
+              style: LMFeedIconStyle(
+                color: LikeMindsTheme.greyColor,
+                size: 28,
+                boxPadding: 0,
+                fit: BoxFit.contain,
               ),
-              activeIcon: LMFeedIcon(
-                type: LMFeedIconType.svg,
-                assetPath: lmLikeActiveSvg,
-              )),
+            ),
+            height: 48,
+            activeIcon: LMFeedIcon(
+              type: LMFeedIconType.svg,
+              assetPath: lmLikeActiveSvg,
+              style: LMFeedIconStyle(
+                color: LikeMindsTheme.primaryColor,
+                size: 28,
+                boxPadding: 0,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
           commentButtonStyle: LMFeedButtonStyle(
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
@@ -164,7 +322,7 @@ class LMFeedThemeData {
           ),
           fallbackTextStyle: LMFeedTextStyle(
             textStyle: TextStyle(
-              color: Color(0xFF222020),
+              color: LikeMindsTheme.onPrimary,
               fontSize: 16,
               fontFamily: 'Roboto',
               fontWeight: FontWeight.w500,

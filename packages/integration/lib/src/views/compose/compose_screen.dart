@@ -163,16 +163,38 @@ class _LMFeedPostComposeScreenState extends State<LMFeedPostComposeScreen> {
         title: const Text('Discard Post'),
         content:
             const Text('Are you sure you want to discard the current post?'),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.all(8),
         actions: <Widget>[
-          TextButton(
-            child: const Text('No'),
-            onPressed: () {
+          LMFeedButton(
+            text: LMFeedText(
+              text: "No",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  color: LMFeedTheme.of(context).primaryColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
+            style: const LMFeedButtonStyle(height: 42),
+            onTap: () {
               Navigator.of(dialogContext).pop();
             },
           ),
-          TextButton(
-            child: const Text('Yes'),
-            onPressed: () {
+          LMFeedButton(
+            text: LMFeedText(
+              text: "Yes",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  color: LMFeedTheme.of(context).primaryColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
+            style: const LMFeedButtonStyle(height: 42),
+            onTap: () {
               Navigator.of(dialogContext).pop();
               Navigator.of(context).pop();
             },

@@ -357,6 +357,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           )),
       style: LMFeedAppBarStyle(
         backgroundColor: LikeMindsTheme.whiteColor,
+        height: 72,
         mainAxisAlignment: Platform.isAndroid
             ? MainAxisAlignment.start
             : MainAxisAlignment.spaceBetween,
@@ -604,6 +605,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ),
             ],
           ),
+          padding: const EdgeInsets.all(6),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -668,7 +670,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     color: feedTheme!.primaryColor.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(24)),
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                padding: const EdgeInsets.all(3.0),
+                padding: const EdgeInsets.all(6.0),
                 child: Row(
                   children: [
                     LMFeedProfilePicture(
@@ -685,6 +687,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         }
                       },
                     ),
+                    const SizedBox(width: 6),
                     Expanded(
                       child: LMTaggingAheadTextField(
                         isDown: false,
@@ -704,6 +707,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         onChange: (String p0) {},
                       ),
                     ),
+                    const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: !right
@@ -723,7 +727,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     style: LMFeedTextStyle(
                                       textAlign: TextAlign.center,
                                       textStyle: TextStyle(
-                                        fontSize: 12.5,
+                                        fontSize: 13,
                                         color: feedTheme?.primaryColor,
                                       ),
                                     ),

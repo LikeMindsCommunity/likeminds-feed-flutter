@@ -48,7 +48,7 @@ class LMFeedProfilePicture extends StatelessWidget {
         child: imageUrl == null || imageUrl!.isEmpty
             ? Center(
                 child: LMFeedText(
-                  text: getInitials(fallbackText),
+                  text: getInitials(fallbackText).toUpperCase(),
                   style: inStyle.fallbackTextStyle ??
                       LMFeedTextStyle(
                         textStyle: TextStyle(
