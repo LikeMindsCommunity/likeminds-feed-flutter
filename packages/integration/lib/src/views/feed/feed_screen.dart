@@ -8,6 +8,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
@@ -265,12 +266,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return Scaffold(
       backgroundColor: LikeMindsTheme.whiteColor,
       appBar: widget.appBar ??
           LMFeedAppBar(
-            leading: null,
             title: GestureDetector(
               onTap: () {
                 _scrollToTop();
@@ -282,7 +282,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
                       color: Colors.black,
-                      fontSize: 28,
+                      fontSize: 27,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -291,8 +291,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
             style: const LMFeedAppBarStyle(
               backgroundColor: LikeMindsTheme.whiteColor,
-              mainAxisAlignment: MainAxisAlignment.start,
-              padding: EdgeInsets.symmetric(horizontal: 16),
             ),
           ),
       body: RefreshIndicator(
@@ -320,7 +318,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     },
                   )
                 : const SizedBox(),
-            const SizedBox(height: 8),
             ValueListenableBuilder(
               valueListenable: rebuildTopicFeed,
               builder: (context, _, __) {
@@ -351,10 +348,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                             topic: (LMTopicViewDataBuilder()
                                                   ..id("0")
                                                   ..isEnabled(true)
-                                                  ..name("All Topics"))
+                                                  ..name("All Topic"))
                                                 .build(),
-                                            style: feedThemeData.postStyle
-                                                .topicStyle?.inactiveChipStyle,
+                                            style: feedTheme.postStyle
+                                                .topicStyle.inactiveChipStyle,
                                           )
                                         : selectedTopics.length == 1
                                             ? LMFeedTopicChip(
@@ -366,10 +363,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                       ..name(selectedTopics
                                                           .first.name))
                                                     .build(),
-                                                style: feedThemeData
+                                                style: feedTheme
                                                     .postStyle
                                                     .topicStyle
-                                                    ?.inactiveChipStyle,
+                                                    .inactiveChipStyle,
                                               )
                                             : LMFeedTopicChip(
                                                 topic: (LMTopicViewDataBuilder()
@@ -377,10 +374,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                       ..isEnabled(true)
                                                       ..name("Topics"))
                                                     .build(),
-                                                style: feedThemeData
+                                                style: feedTheme
                                                     .postStyle
                                                     .topicStyle
-                                                    ?.inactiveChipStyle
+                                                    .inactiveChipStyle
                                                     ?.copyWith(
                                                   icon: Row(
                                                     children: [
@@ -408,7 +405,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                               LMFeedTextStyle(
                                                             textStyle:
                                                                 TextStyle(
-                                                              color: feedThemeData
+                                                              color: feedTheme
                                                                   .primaryColor,
                                                               fontSize: 12,
                                                               fontWeight:
@@ -427,7 +424,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                             .chevron_down,
                                                         style: LMFeedIconStyle(
                                                           size: 16,
-                                                          color: feedThemeData
+                                                          color: feedTheme
                                                               .primaryColor,
                                                         ),
                                                       ),
@@ -448,7 +445,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 );
               },
             ),
-            const SizedBox(height: 8),
             Expanded(
               child: BlocListener(
                 bloc: _feedBloc,
@@ -1007,6 +1003,123 @@ class _FeedRoomViewState extends State<FeedRoomView> {
           ),
         );
       },
+      footer: _defFooterWidget(feedTheme, post),
+      header: _defPostHeader(feedTheme, post),
+      content: _defContentWidget(feedTheme, post),
+      media: _defPostMedia(feedTheme, post),
+      topicWidget: _defTopicWidget(feedTheme, post),
     );
   }
+
+  LMFeedPostTopic _defTopicWidget(
+      LMFeedThemeData feedTheme, LMPostViewData post) {
+    return LMFeedPostTopic(
+      topics: widget.topics,
+      post: post,
+    );
+  }
+
+  LMFeedPostContent _defContentWidget(
+      LMFeedThemeData feedTheme, LMPostViewData post) {
+    return LMFeedPostContent(
+      onTagTap: (String? userId) {},
+    );
+  }
+
+  LMFeedPostFooter _defFooterWidget(
+      LMFeedThemeData feedTheme, LMPostViewData post) {
+    return LMFeedPostFooter(
+      likeButton: defLikeButton(feedTheme, post),
+      commentButton: defCommentButton(feedTheme, post),
+      shareButton: defShareButton(feedTheme, post),
+    );
+  }
+
+  LMFeedPostHeader _defPostHeader(
+      LMFeedThemeData feedTheme, LMPostViewData post) {
+    return LMFeedPostHeader(
+      user: widget.user,
+      isFeed: true,
+      postViewData: post,
+    );
+  }
+
+  LMFeedPostMedia _defPostMedia(
+      LMFeedThemeData feedTheme, LMPostViewData post) {
+    return LMFeedPostMedia(
+      attachments: post.attachments!,
+    );
+  }
+
+  LMFeedButton defLikeButton(
+          LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
+      LMFeedButton(
+        isActive: postViewData.isLiked,
+        text: LMFeedText(
+            text:
+                '${postViewData.likeCount} ${getLikeText(postViewData.likeCount)}'),
+        style: feedTheme.postStyle.footerStyle.likeButtonStyle,
+        onTap: () async {
+          if (postViewData.isLiked) {
+            postViewData.isLiked = false;
+            postViewData.likeCount -= 1;
+          } else {
+            postViewData.isLiked = true;
+            postViewData.likeCount += 1;
+          }
+          rebuildPostWidget.value = !rebuildPostWidget.value;
+          LMFeedPostBloc.instance
+              .add(LMFeedUpdatePostEvent(post: postViewData));
+
+          final likePostRequest =
+              (LikePostRequestBuilder()..postId(postViewData.id)).build();
+
+          final LikePostResponse response =
+              await LMFeedCore.client.likePost(likePostRequest);
+
+          if (!response.success) {
+            postViewData.isLiked = !postViewData.isLiked;
+            postViewData.likeCount = postViewData.isLiked
+                ? postViewData.likeCount + 1
+                : postViewData.likeCount - 1;
+            rebuildPostWidget.value = !rebuildPostWidget.value;
+            LMFeedPostBloc.instance
+                .add(LMFeedUpdatePostEvent(post: postViewData));
+          }
+        },
+      );
+
+  LMFeedButton defCommentButton(
+          LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
+      LMFeedButton(
+        text: const LMFeedText(text: "Comment"),
+        style: feedTheme.postStyle.footerStyle.commentButtonStyle,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LMFeedPostDetailScreen(
+                postId: postViewData.id,
+                isFeed: false,
+              ),
+            ),
+          );
+        },
+      );
+
+  LMFeedButton defSaveButton(
+          LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
+      LMFeedButton(
+        text: const LMFeedText(text: "Save"),
+        onTap: () {},
+        style: feedTheme.postStyle.footerStyle.saveButtonStyle,
+      );
+
+  LMFeedButton defShareButton(
+          LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
+      LMFeedButton(
+        text: const LMFeedText(text: "Share"),
+        onTap: () {},
+        style: feedTheme.postStyle.footerStyle.shareButtonStyle,
+      );
 }

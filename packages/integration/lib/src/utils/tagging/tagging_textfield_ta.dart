@@ -124,6 +124,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
       child: TypeAheadField<LMUserTagViewData>(
         onTagTap: (p) {},
+        tagColor: feedTheme.tagColor,
         suggestionsBoxController: _suggestionsBoxController,
         suggestionsBoxDecoration: SuggestionsBoxDecoration(
           elevation: 4,
@@ -137,6 +138,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         scrollController: _scrollController,
         textFieldConfiguration: TextFieldConfiguration(
           keyboardType: TextInputType.multiline,
+          cursorColor: feedTheme.primaryColor,
           controller: _controller,
           focusNode: _focusNode,
           minLines: widget.minLines,
