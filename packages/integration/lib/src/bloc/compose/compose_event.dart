@@ -25,3 +25,5 @@ class LMFeedComposeRemoveVideoEvent extends LMFeedComposeEvent {}
 class LMFeedComposeRemoveDocumentEvent extends LMFeedComposeEvent {}
 
 class LMFeedComposeRemoveLinkPreviewEvent extends LMFeedComposeEvent {}
+
+class LMFeedComposeCloseEvent extends LMFeedComposeEvent {}

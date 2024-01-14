@@ -5,6 +5,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_example/constants/theme.dart';
 import 'package:likeminds_feed_example/globals.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 class LMSampleApp extends StatefulWidget {
   const LMSampleApp({super.key});
@@ -38,46 +39,48 @@ class _LMSampleAppState extends State<LMSampleApp> {
   Widget build(BuildContext context) {
     return LMFeedTheme(
       theme: LMFeedThemeData.light(),
-      child: MaterialApp(
-        title: 'Integration App for UI + SDK package',
-        debugShowCheckedModeBanner: true,
-        navigatorKey: rootNavigatorKey,
-        scaffoldMessengerKey: rootScaffoldMessengerKey,
-        theme: clientTheme,
-        home: Scaffold(
-          body: FutureBuilder(
-              future: initiateUser,
-              builder: (context, snapshot) {
-                if (snapshot.hasData && snapshot.data!.success) {
-                  return FutureBuilder(
-                      future: memberState,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData && snapshot.data!.success) {
-                          return const LMFeedScreen();
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          );
-                        } else {
-                          return const Center(
-                            child: Text("An error occurred"),
-                          );
-                        }
-                      });
-                } else if (snapshot.connectionState ==
-                    ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  );
-                } else {
-                  return const Center(
-                    child: Text("Nothing"),
-                  );
-                }
-              }),
+      child: OverlaySupport.global(
+        child: MaterialApp(
+          title: 'Integration App for UI + SDK package',
+          debugShowCheckedModeBanner: true,
+          navigatorKey: rootNavigatorKey,
+          scaffoldMessengerKey: rootScaffoldMessengerKey,
+          theme: clientTheme,
+          home: Scaffold(
+            body: FutureBuilder(
+                future: initiateUser,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!.success) {
+                    return FutureBuilder(
+                        future: memberState,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData && snapshot.data!.success) {
+                            return const LMFeedScreen();
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator.adaptive(),
+                            );
+                          } else {
+                            return const Center(
+                              child: Text("An error occurred"),
+                            );
+                          }
+                        });
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    );
+                  } else {
+                    return const Center(
+                      child: Text("Nothing"),
+                    );
+                  }
+                }),
+          ),
+          // ),
         ),
-        // ),
       ),
     );
   }

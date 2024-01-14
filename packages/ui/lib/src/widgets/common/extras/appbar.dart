@@ -41,6 +41,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                     color: Colors.grey,
                   ),
                 ),
+            boxShadow: inStyle.shadow,
           ),
           padding: inStyle.padding ??
               const EdgeInsets.symmetric(
@@ -106,6 +107,7 @@ class LMFeedAppBarStyle {
   final EdgeInsets? padding;
   final EdgeInsets? margin;
   final MainAxisAlignment? mainAxisAlignment;
+  final List<BoxShadow>? shadow;
 
   const LMFeedAppBarStyle({
     this.backgroundColor,
@@ -115,6 +117,7 @@ class LMFeedAppBarStyle {
     this.padding,
     this.height,
     this.width,
+    this.shadow,
   });
 
   LMFeedAppBarStyle copyWith({
@@ -125,6 +128,7 @@ class LMFeedAppBarStyle {
     EdgeInsets? padding,
     EdgeInsets? margin,
     MainAxisAlignment? mainAxisAlignment,
+    List<BoxShadow>? shadow,
   }) {
     return LMFeedAppBarStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -134,6 +138,7 @@ class LMFeedAppBarStyle {
       padding: padding ?? this.padding,
       mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
       border: border ?? this.border,
+      shadow: shadow ?? this.shadow,
     );
   }
 
@@ -144,6 +149,13 @@ class LMFeedAppBarStyle {
       width: double.infinity,
       padding: EdgeInsets.all(12),
       mainAxisAlignment: MainAxisAlignment.start,
+      shadow: [
+        BoxShadow(
+          color: Colors.grey,
+          blurRadius: 2.0,
+          offset: Offset(0.0, 1.0), // shadow direction: bottom right
+        )
+      ],
     );
   }
 }

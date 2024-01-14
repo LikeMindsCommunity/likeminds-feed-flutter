@@ -9,6 +9,7 @@ import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
@@ -882,7 +883,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      const LMFeedPostComposeScreen(),
+                                                      const LMFeedComposeScreen(),
                                                 ),
                                               );
                                             } else {
@@ -967,7 +968,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const LMFeedPostComposeScreen(),
+                          builder: (context) => const LMFeedComposeScreen(),
                         ),
                       );
                     } else {
