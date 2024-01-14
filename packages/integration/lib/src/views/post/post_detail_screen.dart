@@ -7,6 +7,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
@@ -28,10 +29,10 @@ class LMFeedPostDetailScreen extends StatefulWidget {
     this.appBarBuilder,
     this.commentBuilder,
     this.bottomTextFieldBuilder,
-    this.isFeed = false,
     this.onPostTap,
     this.onLikeClick,
     this.onCommentClick,
+    this.openKeyboard = false,
   });
   // Required variables
   final String postId;
@@ -54,7 +55,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
 
   final Widget Function(BuildContext, LMPostViewData)? bottomTextFieldBuilder;
 
-  final bool isFeed;
+  final bool openKeyboard;
 
   @override
   State<LMFeedPostDetailScreen> createState() => _LMFeedPostDetailScreenState();
@@ -92,6 +93,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       return value;
     });
     right = _postDetailScreenHandler!.checkCommentRights();
+    if (widget.openKeyboard) {
+      _postDetailScreenHandler!.openOnScreenKeyboard();
+    }
   }
 
   @override
@@ -379,10 +383,115 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         widget.onPostTap?.call();
       },
       isFeed: false,
-      onTagTap: (String userId) {},
-      style: feedTheme?.postStyle,
+      onTagTap: (String userId) {
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            userUniqueId: userId,
+          ),
+        );
+      },
+      style: feedTheme!.postStyle,
+      header: _defPostHeader(),
+      content: _defContentWidget(),
+      footer: _defFooterWidget(),
+      topicWidget: _defTopicWidget(),
+      media: _defPostMedia(),
     );
   }
+
+  LMFeedPostTopic _defTopicWidget() {
+    return LMFeedPostTopic(
+      topics: _postDetailScreenHandler!.topics,
+      post: postData!,
+    );
+  }
+
+  LMFeedPostContent _defContentWidget() {
+    return LMFeedPostContent(
+      onTagTap: (String? userId) {},
+    );
+  }
+
+  LMFeedPostFooter _defFooterWidget() {
+    return LMFeedPostFooter(
+      likeButton: defLikeButton(),
+      commentButton: defCommentButton(),
+      shareButton: defShareButton(),
+    );
+  }
+
+  LMFeedPostHeader _defPostHeader() {
+    return LMFeedPostHeader(
+      user: _postDetailScreenHandler!.users[postData!.userId]!,
+      isFeed: true,
+      postViewData: postData!,
+    );
+  }
+
+  LMFeedPostMedia _defPostMedia() {
+    return LMFeedPostMedia(
+      attachments: postData!.attachments!,
+    );
+  }
+
+  LMFeedButton defLikeButton() => LMFeedButton(
+        isActive: postData!.isLiked,
+        text: LMFeedText(
+            text: '${postData!.likeCount} ${getLikeText(postData!.likeCount)}'),
+        style: feedTheme!.postStyle.footerStyle.likeButtonStyle,
+        onTap: () async {
+          if (postData!.isLiked) {
+            postData!.isLiked = false;
+            postData!.likeCount -= 1;
+          } else {
+            postData!.isLiked = true;
+            postData!.likeCount += 1;
+          }
+          _postDetailScreenHandler!.rebuildPostWidget.value =
+              !_postDetailScreenHandler!.rebuildPostWidget.value;
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+
+          final likePostRequest =
+              (LikePostRequestBuilder()..postId(postData!.id)).build();
+
+          final LikePostResponse response =
+              await LMFeedCore.client.likePost(likePostRequest);
+
+          if (!response.success) {
+            postData!.isLiked = !postData!.isLiked;
+            postData!.likeCount = postData!.isLiked
+                ? postData!.likeCount + 1
+                : postData!.likeCount - 1;
+            _postDetailScreenHandler!.rebuildPostWidget.value =
+                !_postDetailScreenHandler!.rebuildPostWidget.value;
+            LMFeedPostBloc.instance.add(
+              LMFeedUpdatePostEvent(
+                post: postData!,
+              ),
+            );
+          }
+        },
+      );
+
+  LMFeedButton defCommentButton() => LMFeedButton(
+        text: const LMFeedText(text: "Comment"),
+        style: feedTheme!.postStyle.footerStyle.commentButtonStyle,
+        onTap: () {
+          _postDetailScreenHandler!.openOnScreenKeyboard();
+        },
+      );
+
+  LMFeedButton defSaveButton() => LMFeedButton(
+        text: const LMFeedText(text: "Save"),
+        onTap: () {},
+        style: feedTheme!.postStyle.footerStyle.saveButtonStyle,
+      );
+
+  LMFeedButton defShareButton() => LMFeedButton(
+        text: const LMFeedText(text: "Share"),
+        onTap: () {},
+        style: feedTheme!.postStyle.footerStyle.shareButtonStyle,
+      );
 
   LMFeedCommentWidget defCommentTile(
       LMCommentViewData commentViewData, LMUserViewData userViewData) {
@@ -605,7 +714,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(6),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

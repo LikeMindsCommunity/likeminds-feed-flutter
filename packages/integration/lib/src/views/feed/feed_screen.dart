@@ -991,7 +991,13 @@ class _FeedRoomViewState extends State<FeedRoomView> {
       topics: widget.topics,
       user: widget.users[post.userId]!,
       isFeed: false,
-      onTagTap: (String userId) {},
+      onTagTap: (String userId) {
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            userUniqueId: userId,
+          ),
+        );
+      },
       style: feedTheme.postStyle,
       onPostTap: (context, post) {
         Navigator.push(
@@ -1100,7 +1106,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             MaterialPageRoute(
               builder: (context) => LMFeedPostDetailScreen(
                 postId: postViewData.id,
-                isFeed: false,
+                openKeyboard: true,
               ),
             ),
           );
