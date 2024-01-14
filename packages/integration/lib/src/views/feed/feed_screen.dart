@@ -269,9 +269,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return Scaffold(
       backgroundColor: LikeMindsTheme.whiteColor,
       appBar: widget.appBar ??
-          AppBar(
-            backgroundColor: LikeMindsTheme.whiteColor,
-            centerTitle: false,
+          LMFeedAppBar(
+            leading: null,
             title: GestureDetector(
               onTap: () {
                 _scrollToTop();
@@ -283,14 +282,18 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
                       color: Colors.black,
-                      fontSize: 27,
+                      fontSize: 28,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
               ),
             ),
-            elevation: 1,
+            style: const LMFeedAppBarStyle(
+              backgroundColor: LikeMindsTheme.whiteColor,
+              mainAxisAlignment: MainAxisAlignment.start,
+              padding: EdgeInsets.symmetric(horizontal: 16),
+            ),
           ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -317,6 +320,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     },
                   )
                 : const SizedBox(),
+            const SizedBox(height: 8),
             ValueListenableBuilder(
               valueListenable: rebuildTopicFeed,
               builder: (context, _, __) {
@@ -347,7 +351,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                             topic: (LMTopicViewDataBuilder()
                                                   ..id("0")
                                                   ..isEnabled(true)
-                                                  ..name("All Topic"))
+                                                  ..name("All Topics"))
                                                 .build(),
                                             style: feedThemeData.postStyle
                                                 .topicStyle?.inactiveChipStyle,
@@ -444,6 +448,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 );
               },
             ),
+            const SizedBox(height: 8),
             Expanded(
               child: BlocListener(
                 bloc: _feedBloc,

@@ -14,7 +14,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   final Widget? leading;
   final Widget? trailing;
-  final LMFeedText? title;
+  final Widget? title;
 
   final Function? backButtonCallback;
 
@@ -64,9 +64,9 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                       backButtonCallback?.call() ?? Navigator.of(context).pop();
                     },
                   ),
-              const Spacer(),
+              // const Spacer(),
               title ?? const SizedBox(),
-              const Spacer(),
+              // const Spacer(),
               trailing ?? const SizedBox(),
             ],
           ),
@@ -93,7 +93,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   // TODO: implement preferredSize
-  Size get preferredSize => const Size.fromHeight(92);
+  Size get preferredSize => Size.fromHeight(style?.height ?? 48);
 }
 
 class LMFeedAppBarStyle {
@@ -141,7 +141,7 @@ class LMFeedAppBarStyle {
       height: 72,
       width: double.infinity,
       padding: EdgeInsets.all(12),
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.start,
     );
   }
 }
