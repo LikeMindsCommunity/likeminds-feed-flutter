@@ -131,8 +131,8 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   bool? isPinned;
   ValueNotifier<bool> rebuildLikeWidget = ValueNotifier(false);
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
-  LMFeedPostStyle? style;
 
+  LMFeedPostStyle? style;
   LMFeedPostHeader? _postHeader;
   LMFeedPostFooter? _postFooter;
   LMFeedPostContent? _postContent;
@@ -155,19 +155,16 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   @override
   void didUpdateWidget(covariant LMFeedPostWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.post.id != widget.post.id) {
-      _postHeader = widget.header ?? _defPostHeader();
-      _postFooter = widget.footer ?? _defFooterWidget();
-      _postContent = widget.content ?? _defContentWidget();
-      _postMedia = widget.media ?? _defPostMedia();
-      _postTopic = widget.topicWidget ?? _defTopicWidget();
-      _postMenu = widget.menu;
-    }
+    _postHeader = widget.header ?? _defPostHeader();
+    _postFooter = widget.footer ?? _defFooterWidget();
+    _postContent = widget.content ?? _defContentWidget();
+    _postMedia = widget.media ?? _defPostMedia();
+    _postTopic = widget.topicWidget ?? _defTopicWidget();
+    _postMenu = widget.menu;
   }
 
   @override
   Widget build(BuildContext context) {
-    style = widget.style ?? LMFeedTheme.of(context).postStyle;
     return InheritedPostProvider(
       post: widget.post,
       child: GestureDetector(
@@ -218,20 +215,20 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
     return LMFeedPostTopic(
       topics: widget.topics,
       post: widget.post,
-      style: style?.topicStyle,
+      style: widget.style?.topicStyle,
     );
   }
 
   LMFeedPostContent _defContentWidget() {
     return LMFeedPostContent(
       onTagTap: widget.onTagTap,
-      style: style?.contentStyle ?? const LMFeedPostContentStyle(),
+      style: widget.style?.contentStyle,
     );
   }
 
   LMFeedPostFooter _defFooterWidget() {
     return LMFeedPostFooter(
-      postFooterStyle: style?.footerStyle,
+      postFooterStyle: widget.style?.footerStyle,
     );
   }
 
@@ -240,7 +237,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
       user: widget.user,
       isFeed: widget.isFeed,
       postViewData: widget.post,
-      postHeaderStyle: style?.headerStyle ?? const LMFeedPostHeaderStyle(),
+      postHeaderStyle: widget.style?.headerStyle,
     );
   }
 
@@ -279,10 +276,10 @@ class LMFeedPostStyle {
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
 
-  final LMFeedPostContentStyle? contentStyle;
-  final LMFeedPostHeaderStyle? headerStyle;
-  final LMFeedPostFooterStyle? footerStyle;
-  final LMFeedPostTopicStyle? topicStyle;
+  final LMFeedPostContentStyle contentStyle;
+  final LMFeedPostHeaderStyle headerStyle;
+  final LMFeedPostFooterStyle footerStyle;
+  final LMFeedPostTopicStyle topicStyle;
 
   final BoxBorder? border;
 
@@ -291,10 +288,10 @@ class LMFeedPostStyle {
     this.borderRadius,
     this.padding,
     this.margin,
-    this.contentStyle,
-    this.headerStyle,
-    this.footerStyle,
-    this.topicStyle,
+    required this.contentStyle,
+    required this.headerStyle,
+    required this.footerStyle,
+    required this.topicStyle,
     this.border,
   });
 }

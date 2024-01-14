@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
@@ -20,23 +21,27 @@ class LMFeedPostTopic extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    LMFeedPostTopicStyle topicStyle =
+        style ?? LMFeedTheme.of(context).postStyle.topicStyle;
     return Container(
-      margin: style?.margin,
-      padding: style?.padding,
+      margin: topicStyle.margin,
+      padding: topicStyle.padding,
       child: Wrap(
         children: post.topics
             .map((e) =>
-                topicChipBuilder?.call(context, defTopicChip(topics[e]!)) ??
-                defTopicChip(topics[e]!))
+                topicChipBuilder?.call(
+                    context, defTopicChip(topics[e]!, topicStyle)) ??
+                defTopicChip(topics[e]!, topicStyle))
             .toList(),
       ),
     );
   }
 
-  LMFeedTopicChip defTopicChip(LMTopicViewData topicViewData) =>
+  LMFeedTopicChip defTopicChip(
+          LMTopicViewData topicViewData, LMFeedPostTopicStyle topicStyle) =>
       LMFeedTopicChip(
         topic: topicViewData,
-        style: style?.activeChipStyle,
+        style: topicStyle.activeChipStyle,
       );
 }
 

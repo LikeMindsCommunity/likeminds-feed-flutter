@@ -9,7 +9,7 @@ class LMFeedPostContent extends StatelessWidget {
     this.text,
     this.onTagTap,
     this.expanded = false,
-    this.style = const LMFeedPostContentStyle(),
+    this.style,
   });
 
   final String? text;
@@ -17,49 +17,56 @@ class LMFeedPostContent extends StatelessWidget {
   final Function(String)? onTagTap;
   final bool expanded;
 
-  final LMFeedPostContentStyle style;
+  final LMFeedPostContentStyle? style;
 
   @override
   Widget build(BuildContext context) {
     final postDetails = InheritedPostProvider.of(context)?.post;
     final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    final LMFeedPostContentStyle contentStyle =
+        style ?? feedTheme.postStyle.contentStyle;
     return Container(
-      width: style.width,
-      height: style.height,
-      padding: style.padding,
-      margin: style.margin,
+      width: contentStyle.width,
+      height: contentStyle.height,
+      padding: contentStyle.padding,
+      margin: contentStyle.margin,
       child: ExpandableText(
         text ?? postDetails!.text,
         onTagTap: (String userId) {
           onTagTap?.call(userId);
         },
-        expandText: style.expandText ?? "see more",
-        animation: style.animation ?? true,
-        maxLines: style.visibleLines ?? 4,
+        expandText: contentStyle.expandText ?? "see more",
+        animation: contentStyle.animation ?? true,
+        maxLines: contentStyle.visibleLines ?? 4,
         expanded: expanded,
-        hashtagStyle: style.linkStyle ??
+        hashtagStyle: contentStyle.linkStyle ??
             Theme.of(context)
                 .textTheme
                 .bodyMedium!
                 .copyWith(color: feedTheme.primaryColor),
-        prefixStyle: style.expandTextStyle,
-        linkStyle: style.linkStyle ??
+        prefixStyle: contentStyle.expandTextStyle,
+        linkStyle: contentStyle.linkStyle ??
             Theme.of(context)
                 .textTheme
                 .bodyMedium!
                 .copyWith(color: feedTheme.primaryColor),
-        textAlign: style.textAlign ?? TextAlign.left,
-        style: style.textStyle ?? Theme.of(context).textTheme.bodyMedium,
+        textAlign: contentStyle.textAlign ?? TextAlign.left,
+        style: contentStyle.textStyle ?? Theme.of(context).textTheme.bodyMedium,
       ),
     );
   }
 
-  LMFeedPostContent copyWith(LMFeedPostContent content) {
+  LMFeedPostContent copyWith({
+    String? text,
+    Function(String)? onTagTap,
+    bool? expanded,
+    LMFeedPostContentStyle? style,
+  }) {
     return LMFeedPostContent(
-      text: content.text ?? text,
-      onTagTap: content.onTagTap,
-      expanded: content.expanded,
-      style: style.copyWith(content.style),
+      text: text ?? this.text,
+      onTagTap: onTagTap ?? this.onTagTap,
+      expanded: expanded ?? this.expanded,
+      style: style ?? this.style,
     );
   }
 }

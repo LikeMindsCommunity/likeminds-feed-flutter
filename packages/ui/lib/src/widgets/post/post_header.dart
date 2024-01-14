@@ -16,7 +16,7 @@ class LMFeedPostHeader extends StatelessWidget {
     required this.isFeed,
     this.customTitle,
     this.profilePicture,
-    this.postHeaderStyle = const LMFeedPostHeaderStyle(),
+    this.postHeaderStyle,
     required this.postViewData,
   });
 
@@ -35,7 +35,7 @@ class LMFeedPostHeader extends StatelessWidget {
 
   final LMUserViewData user;
 
-  final LMFeedPostHeaderStyle postHeaderStyle;
+  final LMFeedPostHeaderStyle? postHeaderStyle;
 
   final LMPostViewData postViewData;
 
@@ -43,11 +43,13 @@ class LMFeedPostHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedPostHeaderStyle headerStyle =
+        postHeaderStyle ?? feedTheme.postStyle.headerStyle;
     return Container(
-      width: postHeaderStyle.width ?? screenSize.width,
-      height: postHeaderStyle.height,
-      padding: postHeaderStyle.padding ?? const EdgeInsets.only(bottom: 8),
-      margin: postHeaderStyle.margin,
+      width: headerStyle.width ?? screenSize.width,
+      height: headerStyle.height,
+      padding: headerStyle.padding ?? const EdgeInsets.only(bottom: 8),
+      margin: headerStyle.margin,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -64,8 +66,8 @@ class LMFeedPostHeader extends StatelessWidget {
                   profilePicture ??
                       LMFeedProfilePicture(
                         style: LMFeedProfilePictureStyle(
-                          fallbackTextStyle: postHeaderStyle.fallbackTextStyle,
-                          size: postHeaderStyle.imageSize ?? 42,
+                          fallbackTextStyle: headerStyle.fallbackTextStyle,
+                          size: headerStyle.imageSize ?? 42,
                         ),
                         fallbackText: user.name,
                         imageUrl: user.imageUrl,
@@ -105,7 +107,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                 ),
                               ),
                               LikeMindsTheme.kHorizontalPaddingMedium,
-                              !postHeaderStyle.showCustomTitle
+                              !headerStyle.showCustomTitle
                                   ? const SizedBox()
                                   : ((user.customTitle == null ||
                                               user.customTitle!.isEmpty) ||

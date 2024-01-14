@@ -65,7 +65,6 @@ class _LMButtonState extends State<LMFeedButton> {
           child: Row(
             mainAxisAlignment:
                 inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               inStyle.placement == LMFeedIconButtonPlacement.start
                   ? _active

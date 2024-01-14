@@ -87,3 +87,11 @@ Future<Map<String, int>> getNetworkImageDimensions(String image) async {
   dimensions.addAll({"height": decodedImage.height});
   return dimensions;
 }
+
+String getLikeText(int likes) {
+  if (likes == 1) {
+    return 'Like';
+  } else {
+    return 'Likes';
+  }
+}

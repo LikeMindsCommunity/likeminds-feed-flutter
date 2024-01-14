@@ -289,7 +289,7 @@ class LMFeedThemeData {
               type: LMFeedIconType.svg,
               assetPath: lmLikeActiveSvg,
               style: LMFeedIconStyle(
-                color: LikeMindsTheme.primaryColor,
+                color: LikeMindsTheme.errorColor,
                 size: 28,
                 boxPadding: 0,
                 fit: BoxFit.contain,
@@ -300,12 +300,24 @@ class LMFeedThemeData {
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmCommentSvg,
+              style: LMFeedIconStyle(
+                color: LikeMindsTheme.greyColor,
+                size: 28,
+                boxPadding: 0,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
           shareButtonStyle: LMFeedButtonStyle(
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmShareSvg,
+              style: LMFeedIconStyle(
+                color: LikeMindsTheme.greyColor,
+                size: 28,
+                boxPadding: 0,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
           alignment: MainAxisAlignment.spaceBetween,

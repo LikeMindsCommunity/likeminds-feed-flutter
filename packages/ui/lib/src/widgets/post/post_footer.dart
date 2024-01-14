@@ -10,6 +10,10 @@ class LMFeedPostFooter extends StatelessWidget {
     this.commentButtonBuilder,
     this.saveButtonBuilder,
     this.shareButtonBuilder,
+    this.likeButton,
+    this.commentButton,
+    this.saveButton,
+    this.shareButton,
   });
 
   final LMFeedPostFooterStyle? postFooterStyle;
@@ -19,48 +23,55 @@ class LMFeedPostFooter extends StatelessWidget {
   final Widget Function(LMFeedButton)? saveButtonBuilder;
   final Widget Function(LMFeedButton)? shareButtonBuilder;
 
+  final LMFeedButton? likeButton;
+  final LMFeedButton? commentButton;
+  final LMFeedButton? saveButton;
+  final LMFeedButton? shareButton;
+
   final _footerChildren = <Widget>[];
 
   @override
   Widget build(BuildContext context) {
-    _populateButtonList();
+    LMFeedPostFooterStyle footerStyle =
+        postFooterStyle ?? LMFeedTheme.of(context).postStyle.footerStyle;
+    _populateButtonList(footerStyle);
     return Container(
-      width: postFooterStyle?.width,
-      height: postFooterStyle?.height,
-      padding: postFooterStyle?.padding,
-      margin: postFooterStyle?.margin,
+      width: footerStyle.width,
+      height: footerStyle.height,
+      padding: footerStyle.padding,
+      margin: footerStyle.margin,
       child: Row(
-        mainAxisAlignment:
-            postFooterStyle?.alignment ?? MainAxisAlignment.start,
+        mainAxisAlignment: footerStyle.alignment ?? MainAxisAlignment.start,
         children: _footerChildren,
       ),
     );
   }
 
-  void _populateButtonList() {
+  void _populateButtonList(LMFeedPostFooterStyle postFooterStyle) {
     _footerChildren.clear();
 
-    if (postFooterStyle?.showLikeButton ?? true) {
-      Widget lmButton =
-          likeButtonBuilder?.call(defLikeButton()) ?? defLikeButton();
+    if (postFooterStyle.showLikeButton ?? true) {
+      LMFeedButton likeButton = this.likeButton ?? defLikeButton();
+      Widget lmButton = likeButtonBuilder?.call(likeButton) ?? likeButton;
       _footerChildren.add(lmButton);
     }
 
-    if (postFooterStyle?.showCommentButton ?? true) {
+    if (postFooterStyle.showCommentButton ?? true) {
+      LMFeedButton commentButton = this.commentButton ?? defCommentButton();
       Widget lmButton =
-          commentButtonBuilder?.call(defCommentButton()) ?? defCommentButton();
+          commentButtonBuilder?.call(commentButton) ?? commentButton;
       _footerChildren.add(lmButton);
     }
 
-    if (postFooterStyle?.showSaveButton ?? true) {
-      Widget lmButton =
-          saveButtonBuilder?.call(defSaveButton()) ?? defSaveButton();
+    if (postFooterStyle.showSaveButton ?? true) {
+      LMFeedButton saveButton = this.saveButton ?? defSaveButton();
+      Widget lmButton = saveButtonBuilder?.call(saveButton) ?? saveButton;
       _footerChildren.add(lmButton);
     }
 
-    if (postFooterStyle?.showShareButton ?? true) {
-      Widget lmButton =
-          shareButtonBuilder?.call(defShareButton()) ?? defShareButton();
+    if (postFooterStyle.showShareButton ?? true) {
+      LMFeedButton shareButton = this.shareButton ?? defShareButton();
+      Widget lmButton = shareButtonBuilder?.call(shareButton) ?? shareButton;
       _footerChildren.add(lmButton);
     }
   }
