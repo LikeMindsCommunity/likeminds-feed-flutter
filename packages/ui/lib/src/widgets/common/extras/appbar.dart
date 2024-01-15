@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
@@ -27,11 +28,12 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     final inStyle = style ?? LMFeedAppBarStyle.basic();
     final theme = LMFeedTheme.of(context);
 
-    return SafeArea(
-      bottom: false,
-      child: Padding(
-        padding: inStyle.margin ?? EdgeInsets.zero,
+    return Container(
+      color: inStyle.backgroundColor ?? Colors.white,
+      child: SafeArea(
+        bottom: false,
         child: Container(
+          margin: inStyle.margin ?? EdgeInsets.zero,
           decoration: BoxDecoration(
             color: inStyle.backgroundColor ?? Colors.white,
             border: inStyle.border ??
@@ -57,7 +59,9 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                     style: LMFeedButtonStyle(
                       icon: LMFeedIcon(
                         type: LMFeedIconType.icon,
-                        icon: Icons.chevron_left,
+                        icon: Platform.isAndroid
+                            ? Icons.chevron_left
+                            : CupertinoIcons.chevron_back,
                         style: LMFeedIconStyle(
                           color: theme.onContainer,
                           size: 24,

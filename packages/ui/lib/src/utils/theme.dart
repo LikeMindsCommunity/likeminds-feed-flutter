@@ -26,7 +26,7 @@ class LMFeedTheme extends InheritedWidget {
 class LMFeedThemeData {
   final LMFeedPostStyle postStyle;
   final LMFeedCommentStyle commentStyle;
-  final LMFeedReplyStyle replyStyle;
+  final LMFeedCommentStyle replyStyle;
   final LMFeedButtonStyle feedButtonStyle;
   final LMFeedIconStyle feedIconStyle;
   final LMFeedTextFieldStyle textFieldStyle;
@@ -207,7 +207,7 @@ class LMFeedThemeData {
       linkColor: theme.primaryColor,
       tagColor: theme.primaryColor,
       commentStyle: const LMFeedCommentStyle(),
-      replyStyle: const LMFeedReplyStyle(),
+      replyStyle: const LMFeedCommentStyle(),
       feedButtonStyle: const LMFeedButtonStyle(),
       feedIconStyle: const LMFeedIconStyle(),
       textFieldStyle: const LMFeedTextFieldStyle(
@@ -354,40 +354,62 @@ class LMFeedThemeData {
       linkColor: LikeMindsTheme.linkColor,
       tagColor: LikeMindsTheme.tagColor,
       commentStyle: const LMFeedCommentStyle(
+        padding: EdgeInsets.all(12.0),
         likeButtonStyle: LMFeedButtonStyle(
           icon: LMFeedIcon(
             type: LMFeedIconType.svg,
             assetPath: lmLikeInActiveSvg,
             style: LMFeedIconStyle(
+              color: LikeMindsTheme.greyColor,
               size: 24,
               boxPadding: 0,
               fit: BoxFit.contain,
             ),
           ),
+          height: 44,
           activeIcon: LMFeedIcon(
             type: LMFeedIconType.svg,
             assetPath: lmLikeActiveSvg,
             style: LMFeedIconStyle(
+              color: LikeMindsTheme.errorColor,
               size: 24,
               boxPadding: 0,
               fit: BoxFit.contain,
             ),
           ),
         ),
-        replyButtonStyle: LMFeedButtonStyle(
-          icon: LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmCommentSvg,
-            style: LMFeedIconStyle(
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
+        replyButtonStyle: LMFeedButtonStyle(),
         showRepliesButtonStyle: LMFeedButtonStyle(),
       ),
-      replyStyle: const LMFeedReplyStyle(),
+      replyStyle: const LMFeedCommentStyle(
+        padding: EdgeInsets.all(12.0),
+        likeButtonStyle: LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeInActiveSvg,
+            style: LMFeedIconStyle(
+              color: LikeMindsTheme.greyColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+          height: 44,
+          activeIcon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeActiveSvg,
+            style: LMFeedIconStyle(
+              color: LikeMindsTheme.errorColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        showRepliesButton: false,
+        showReplyButton: false,
+        replyButtonStyle: LMFeedButtonStyle(),
+      ),
       feedButtonStyle: const LMFeedButtonStyle(),
       feedIconStyle: const LMFeedIconStyle(),
       textFieldStyle: const LMFeedTextFieldStyle(
@@ -415,7 +437,7 @@ class LMFeedThemeData {
     Color? hashTagColor,
     Color? linkColor,
     LMFeedCommentStyle? commentStyle,
-    LMFeedReplyStyle? replyStyle,
+    LMFeedCommentStyle? replyStyle,
     LMFeedButtonStyle? feedButtonStyle,
     LMFeedIconStyle? feedIconStyle,
     Color? container,

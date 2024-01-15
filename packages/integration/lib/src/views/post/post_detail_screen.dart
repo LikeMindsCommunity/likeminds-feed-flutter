@@ -356,7 +356,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           )),
       style: LMFeedAppBarStyle(
         backgroundColor: LikeMindsTheme.whiteColor,
-        height: 72,
+        height: 60,
         mainAxisAlignment: Platform.isAndroid
             ? MainAxisAlignment.start
             : MainAxisAlignment.spaceBetween,
@@ -540,30 +540,31 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedButton defCommentLikeButton(LMCommentViewData commentViewData) {
     return LMFeedButton(
-      style: LMFeedButtonStyle(
-        margin: 10,
-        icon: const LMFeedIcon(
-          type: LMFeedIconType.icon,
-          icon: Icons.thumb_up_alt_outlined,
-          style: LMFeedIconStyle(
-            size: 20,
+      style: feedTheme?.commentStyle.likeButtonStyle?.copyWith(
+              showText: commentViewData.likesCount == 0 ? false : true) ??
+          LMFeedButtonStyle(
+            margin: 10,
+            showText: commentViewData.likesCount == 0 ? false : true,
+            icon: const LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.thumb_up_alt_outlined,
+              style: LMFeedIconStyle(
+                size: 20,
+              ),
+            ),
+            activeIcon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              style: LMFeedIconStyle(
+                color: feedTheme!.primaryColor,
+                size: 20,
+              ),
+              icon: Icons.thumb_up_alt_rounded,
+            ),
           ),
-        ),
-        activeIcon: LMFeedIcon(
-          type: LMFeedIconType.icon,
-          style: LMFeedIconStyle(
-            color: feedTheme!.primaryColor,
-            size: 20,
-          ),
-          icon: Icons.thumb_up_alt_rounded,
-        ),
-      ),
       text: LMFeedText(
-        text: commentViewData.likesCount == 0
-            ? "Like"
-            : commentViewData.likesCount == 1
-                ? "1 Like"
-                : "${commentViewData.likesCount} Likes",
+        text: commentViewData.likesCount == 1
+            ? "1 Like"
+            : "${commentViewData.likesCount} Likes",
         style: const LMFeedTextStyle(
           textStyle: TextStyle(fontSize: 12),
         ),
@@ -612,16 +613,17 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedButton defCommentReplyButton(LMCommentViewData commentViewData) {
     return LMFeedButton(
-      style: const LMFeedButtonStyle(
-        margin: 10,
-        icon: LMFeedIcon(
-          type: LMFeedIconType.icon,
-          icon: Icons.comment_outlined,
-          style: LMFeedIconStyle(
-            size: 20,
+      style: feedTheme?.commentStyle.replyButtonStyle ??
+          const LMFeedButtonStyle(
+            margin: 10,
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.comment_outlined,
+              style: LMFeedIconStyle(
+                size: 20,
+              ),
+            ),
           ),
-        ),
-      ),
       text: const LMFeedText(
         text: "Reply",
         style: LMFeedTextStyle(

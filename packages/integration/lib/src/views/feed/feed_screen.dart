@@ -272,6 +272,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       backgroundColor: LikeMindsTheme.whiteColor,
       appBar: widget.appBar ??
           LMFeedAppBar(
+            leading: const SizedBox.shrink(),
             title: GestureDetector(
               onTap: () {
                 _scrollToTop();

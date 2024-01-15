@@ -224,14 +224,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: replies.length,
-                    itemBuilder: (context, index) {
-                      LMCommentViewData commentViewData = replies[index];
-                      LMUserViewData user = users[commentViewData.userId]!;
-                      return StatefulBuilder(builder: (context, setReplyState) {
-                        return LMFeedReplyWidget(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: replies.length,
+                  itemBuilder: (context, index) {
+                    LMCommentViewData commentViewData = replies[index];
+                    LMUserViewData user = users[commentViewData.userId]!;
+                    return StatefulBuilder(
+                      builder: (context, setReplyState) {
+                        return LMFeedCommentWidget(
                           comment: commentViewData,
                           onTagTap: (String userId) {
                             LMFeedCore.instance.lmFeedClient
@@ -271,8 +272,10 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                             setReplyState,
                           ),
                         );
-                      });
-                    }),
+                      },
+                    );
+                  },
+                ),
                 if (replies.isNotEmpty &&
                     replies.length % 10 == 0 &&
                     replies.length != reply!.repliesCount)
@@ -395,25 +398,26 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedButton defLikeButton(
           LMCommentViewData commentViewData, StateSetter setReplyState) =>
       LMFeedButton(
-        style: LMFeedButtonStyle(
-          icon: const LMFeedIcon(
-            type: LMFeedIconType.icon,
-            icon: Icons.thumb_up_alt_outlined,
-            style: LMFeedIconStyle(
-              color: LikeMindsTheme.blackColor,
-              size: 20,
+        style: feedTheme?.replyStyle.likeButtonStyle ??
+            LMFeedButtonStyle(
+              icon: const LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.thumb_up_alt_outlined,
+                style: LMFeedIconStyle(
+                  color: LikeMindsTheme.blackColor,
+                  size: 20,
+                ),
+              ),
+              activeIcon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.thumb_up_alt_rounded,
+                style: LMFeedIconStyle(
+                  size: 20,
+                  color: feedTheme!.primaryColor,
+                ),
+                assetPath: kAssetLikeFilledIcon,
+              ),
             ),
-          ),
-          activeIcon: LMFeedIcon(
-            type: LMFeedIconType.icon,
-            icon: Icons.thumb_up_alt_rounded,
-            style: LMFeedIconStyle(
-              size: 20,
-              color: feedTheme!.primaryColor,
-            ),
-            assetPath: kAssetLikeFilledIcon,
-          ),
-        ),
         text: LMFeedText(
           text: commentViewData.likesCount == 0
               ? "Like"

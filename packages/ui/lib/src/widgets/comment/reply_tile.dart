@@ -162,7 +162,7 @@ class _LMReplyTileState extends State<LMFeedReplyWidget> {
           ),
         ),
         style: widget.style?.likeButtonStyle ??
-            LMFeedTheme.of(context).postStyle.footerStyle?.likeButtonStyle,
+            LMFeedTheme.of(context).postStyle.footerStyle.likeButtonStyle,
       );
 }
 
@@ -176,6 +176,10 @@ class LMFeedReplyStyle {
   final double? width;
 
   final LMFeedButtonStyle? likeButtonStyle;
+  final LMFeedButtonStyle? replyButtonStyle;
+
+  final bool showLikeButton;
+  final bool showReplyButton;
 
   const LMFeedReplyStyle({
     this.textStyle,
@@ -186,5 +190,8 @@ class LMFeedReplyStyle {
     this.margin,
     this.width,
     this.likeButtonStyle,
+    this.replyButtonStyle,
+    this.showLikeButton = true,
+    this.showReplyButton = false,
   });
 }

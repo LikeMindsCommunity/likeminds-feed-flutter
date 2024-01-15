@@ -164,4 +164,34 @@ class LMFeedButtonStyle {
       margin: 4,
     );
   }
+
+  LMFeedButtonStyle copyWith({
+    EdgeInsets? padding,
+    Color? backgroundColor,
+    Border? border,
+    double? borderRadius,
+    double? height,
+    double? width,
+    LMFeedIconButtonPlacement? placement,
+    MainAxisAlignment? mainAxisAlignment,
+    double? margin,
+    bool? showText,
+    LMFeedIcon? icon,
+    LMFeedIcon? activeIcon,
+  }) {
+    return LMFeedButtonStyle(
+      padding: padding ?? this.padding,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      border: border ?? this.border,
+      borderRadius: borderRadius ?? this.borderRadius,
+      height: height ?? this.height,
+      width: width ?? this.width,
+      placement: placement ?? this.placement,
+      mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
+      margin: margin ?? this.margin,
+      showText: showText ?? this.showText,
+      icon: icon ?? this.icon,
+      activeIcon: activeIcon ?? this.activeIcon,
+    );
+  }
 }
