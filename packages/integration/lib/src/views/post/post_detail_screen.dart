@@ -358,7 +358,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       style: LMFeedAppBarStyle(
         backgroundColor: LikeMindsTheme.whiteColor,
         height: 60,
-        mainAxisAlignment: Platform.isIOS
+        mainAxisAlignment: Platform.isAndroid
             ? MainAxisAlignment.start
             : MainAxisAlignment.spaceBetween,
       ),
