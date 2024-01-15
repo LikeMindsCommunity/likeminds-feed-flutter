@@ -223,10 +223,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             );
           }
           if (state is LMFeedComposeAddedVideoState) {
-            return Container(
+            return SizedBox(
               height: 240,
               width: double.infinity,
-              color: Colors.grey,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
@@ -346,13 +345,16 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             result =
                 LMFeedTaggingHelper.encodeString(_controller.text, userTags);
 
-            sendPostCreationCompletedEvent([], userTags, selectedTopics);
+            sendPostCreationCompletedEvent(
+                composeBloc.postMedia, userTags, selectedTopics);
 
             LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
               user: user,
               postText: result!,
               selectedTopics: selectedTopics,
+              postMedia: composeBloc.postMedia,
             ));
+            composeBloc.add(LMFeedComposeCloseEvent());
             Navigator.pop(context);
           } else {
             toast(

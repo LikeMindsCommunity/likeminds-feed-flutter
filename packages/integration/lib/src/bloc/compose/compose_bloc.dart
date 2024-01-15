@@ -41,5 +41,7 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
         postMedia.length,
       ),
     );
+    on<LMFeedComposeCloseEvent>(
+        (event, emit) => emit(LMFeedComposeInitialState()));
   }
 }

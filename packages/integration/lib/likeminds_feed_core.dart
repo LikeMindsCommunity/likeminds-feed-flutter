@@ -16,13 +16,14 @@ export 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
-  late final LMFeedMediaService? media;
+  late final LMFeedMediaService? mediaService;
 
   static LMFeedCore? _instance;
 
   static LMFeedCore get instance => _instance ??= LMFeedCore._();
 
   static LMFeedClient get client => instance.lmFeedClient;
+  static LMFeedMediaService get media => instance.mediaService!;
 
   LMFeedCore._();
 
@@ -34,6 +35,7 @@ class LMFeedCore {
     assert(apiKey != null || lmFeedClient != null);
     this.lmFeedClient =
         lmFeedClient ?? (LMFeedClientBuilder()..apiKey(apiKey!)).build();
+    mediaService = LMFeedMediaService(false);
     await LMFeedUserLocalPreference.instance.initialize();
     MediaKit.ensureInitialized();
   }

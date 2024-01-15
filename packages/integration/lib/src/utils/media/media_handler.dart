@@ -104,6 +104,7 @@ class LMFeedMediaHandler {
       // final XFile? pickedFile =
       List<LMMediaModel> videoFiles = [];
       final FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
         type: FileType.video,
       );
 
