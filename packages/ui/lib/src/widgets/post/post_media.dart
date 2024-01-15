@@ -9,42 +9,22 @@ class LMFeedPostMedia extends StatefulWidget {
   const LMFeedPostMedia({
     super.key,
     required this.attachments,
-    this.documentIcon,
-    this.width,
-    this.height,
-    this.borderRadius,
-    this.backgroundColor,
-    this.showLinkUrl = false,
-    this.carouselActiveIndicatorColor,
-    this.carouselInactiveIndicatorColor,
     this.title,
     this.subtitle,
-    this.showBorder = true,
-    this.errorWidget,
-    this.boxFit,
-    this.textColor,
     this.initialiseVideoController,
     this.onError,
+    this.style,
   });
 
   final List<LMAttachmentViewData> attachments;
   final Function(VideoController)? initialiseVideoController;
-  final Widget? documentIcon;
-  final double? borderRadius;
-  final double? width;
-  final double? height;
-  final Color? backgroundColor;
-  final bool showLinkUrl;
+
   final LMFeedText? title;
   final LMFeedText? subtitle;
-  final bool showBorder;
-  final Widget? errorWidget;
-  final BoxFit? boxFit;
-  final Color? textColor;
+
   final Function(String, StackTrace)? onError;
 
-  final Color? carouselActiveIndicatorColor;
-  final Color? carouselInactiveIndicatorColor;
+  final LMFeedPostMediaStyle? style;
 
   @override
   State<LMFeedPostMedia> createState() => _LMPostMediaState();
@@ -52,23 +32,9 @@ class LMFeedPostMedia extends StatefulWidget {
   LMFeedPostMedia copyWith(LMFeedPostMedia postMedia) {
     return LMFeedPostMedia(
       attachments: postMedia.attachments,
-      documentIcon: postMedia.documentIcon ?? documentIcon,
-      width: postMedia.width ?? width,
-      height: postMedia.height ?? height,
-      borderRadius: postMedia.borderRadius ?? borderRadius,
-      backgroundColor: postMedia.backgroundColor ?? backgroundColor,
-      showLinkUrl: postMedia.showLinkUrl,
-      carouselActiveIndicatorColor: postMedia.carouselActiveIndicatorColor ??
-          carouselActiveIndicatorColor,
-      carouselInactiveIndicatorColor:
-          postMedia.carouselInactiveIndicatorColor ??
-              carouselInactiveIndicatorColor,
       title: postMedia.title ?? title,
       subtitle: postMedia.subtitle ?? subtitle,
-      showBorder: postMedia.showBorder,
-      errorWidget: postMedia.errorWidget ?? errorWidget,
-      boxFit: postMedia.boxFit ?? boxFit,
-      textColor: postMedia.textColor ?? textColor,
+      style: postMedia.style ?? style,
       initialiseVideoController:
           postMedia.initialiseVideoController ?? initialiseVideoController,
       onError: postMedia.onError ?? onError,
@@ -79,6 +45,7 @@ class LMFeedPostMedia extends StatefulWidget {
 class _LMPostMediaState extends State<LMFeedPostMedia> {
   List<LMAttachmentViewData>? attachments;
   late Size screenSize;
+  LMFeedPostMediaStyle? style;
 
   void initialiseAttachments() {
     attachments = [...widget.attachments];
@@ -100,6 +67,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
+    style = widget.style ?? LMFeedTheme.of(context).postStyle.mediaStyle;
     if (attachments == null || attachments!.isEmpty) {
       return const SizedBox();
     }
@@ -109,29 +77,21 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
       /// we need to call the method 'getDocumentList'
       return getPostDocuments();
     } else if (attachments!.first.attachmentType == 4) {
-      return LMFeedLinkPreview(
+      return LMFeedPostLinkPreview(
         attachment: attachments![0],
-        borderRadius: widget.borderRadius,
-        backgroundColor: widget.backgroundColor,
-        showLinkUrl: widget.showLinkUrl,
         title: widget.title,
         subtitle: widget.subtitle,
-        errorWidget: widget.errorWidget,
         onError: widget.onError,
+        style: widget.style?.linkStyle,
       );
     } else if (attachments!.first.attachmentType == 1 ||
         attachments!.first.attachmentType == 2) {
       return LMFeedCarousel(
         initialiseVideoController: widget.initialiseVideoController,
         attachments: attachments!,
-        borderRadius: widget.borderRadius,
-        activeIndicatorColor: widget.carouselActiveIndicatorColor,
-        inactiveIndicatorColor: widget.carouselInactiveIndicatorColor,
-        errorWidget: widget.errorWidget,
-        boxFit: widget.boxFit,
-        width: widget.width,
-        height: widget.height,
         onError: widget.onError,
+        imageStyle: widget.style?.imageStyle,
+        videoStyle: widget.style?.videoStyle,
       );
     } else {
       return const SizedBox.shrink();
@@ -148,11 +108,9 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
             // document: e,
             size: PostHelper.getFileSizeString(bytes: e.attachmentMeta.size!),
             documentUrl: e.attachmentMeta.url,
-            documentIcon: widget.documentIcon,
-            showBorder: widget.showBorder,
+
             type: e.attachmentMeta.format!,
-            backgroundColor: widget.backgroundColor,
-            textColor: widget.textColor,
+            style: widget.style?.documentStyle,
             onTap: () {
               Uri fileUrl = Uri.parse(e.attachmentMeta.url!);
               launchUrl(fileUrl, mode: LaunchMode.externalApplication);
@@ -163,7 +121,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
 
     return Align(
       child: SizedBox(
-        width: widget.width ?? screenSize.width - 32,
+        width: screenSize.width - 32,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -181,8 +139,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
                       text: '+ ${documents.length - 3} more',
                       style: LMFeedTextStyle(
                         textStyle: TextStyle(
-                          color: widget.textColor ??
-                              Theme.of(context).colorScheme.secondary,
+                          color: widget.style?.documentStyle.textColor ??
+                              style?.documentStyle.textColor,
                         ),
                       ),
                     ),
@@ -191,6 +149,38 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class LMFeedPostMediaStyle {
+  final LMFeedPostVideoStyle videoStyle;
+  final LMFeedPostImageStyle imageStyle;
+  final LMFeedPostDocumentStyle documentStyle;
+  final LMFeedPostLinkPreviewStyle linkStyle;
+  final LMFeedPostCarouselStyle carouselStyle;
+
+  const LMFeedPostMediaStyle({
+    required this.videoStyle,
+    required this.imageStyle,
+    required this.documentStyle,
+    required this.linkStyle,
+    required this.carouselStyle,
+  });
+
+  LMFeedPostMediaStyle copyWith({
+    LMFeedPostVideoStyle? videoStyle,
+    LMFeedPostImageStyle? imageStyle,
+    LMFeedPostDocumentStyle? documentStyle,
+    LMFeedPostLinkPreviewStyle? linkStyle,
+    LMFeedPostCarouselStyle? carouselStyle,
+  }) {
+    return LMFeedPostMediaStyle(
+      videoStyle: videoStyle ?? this.videoStyle,
+      imageStyle: imageStyle ?? this.imageStyle,
+      documentStyle: documentStyle ?? this.documentStyle,
+      linkStyle: linkStyle ?? this.linkStyle,
+      carouselStyle: carouselStyle ?? this.carouselStyle,
     );
   }
 }

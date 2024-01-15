@@ -246,6 +246,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   LMFeedPostMedia _defPostMedia() {
     return LMFeedPostMedia(
       attachments: widget.post.attachments!,
+      style: widget.style?.mediaStyle,
     );
   }
 }
@@ -282,6 +283,7 @@ class LMFeedPostStyle {
   final LMFeedPostHeaderStyle headerStyle;
   final LMFeedPostFooterStyle footerStyle;
   final LMFeedPostTopicStyle topicStyle;
+  final LMFeedPostMediaStyle mediaStyle;
 
   final BoxBorder? border;
 
@@ -294,6 +296,7 @@ class LMFeedPostStyle {
     required this.headerStyle,
     required this.footerStyle,
     required this.topicStyle,
+    required this.mediaStyle,
     this.border,
   });
 
@@ -306,6 +309,7 @@ class LMFeedPostStyle {
     LMFeedPostHeaderStyle? headerStyle,
     LMFeedPostFooterStyle? footerStyle,
     LMFeedPostTopicStyle? topicStyle,
+    LMFeedPostMediaStyle? mediaStyle,
     BoxBorder? border,
   }) {
     return LMFeedPostStyle(
@@ -317,6 +321,7 @@ class LMFeedPostStyle {
       headerStyle: headerStyle ?? this.headerStyle,
       footerStyle: footerStyle ?? this.footerStyle,
       topicStyle: topicStyle ?? this.topicStyle,
+      mediaStyle: mediaStyle ?? this.mediaStyle,
       border: border ?? this.border,
     );
   }

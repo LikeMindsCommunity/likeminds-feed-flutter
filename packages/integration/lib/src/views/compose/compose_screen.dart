@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/cupertino.dart';
@@ -214,7 +213,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: LMFeedImage(
+                    child: LMFeedPostImage(
                       imageFile: composeBloc.postMedia[index].mediaFile,
                     ),
                   );
@@ -233,7 +232,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: LMFeedVideo(
+                    child: LMFeedPostVideo(
                       videoFile: composeBloc.postMedia[index].mediaFile,
                     ),
                   );

@@ -10,36 +10,19 @@ import 'package:visibility_detector/visibility_detector.dart';
 import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart'
     as media_kit_video_controls;
 
-class LMFeedVideo extends StatefulWidget {
+class LMFeedPostVideo extends StatefulWidget {
   // late final LMFeedVideo? _instance;
 
-  const LMFeedVideo({
+  const LMFeedPostVideo({
     super.key,
     this.videoUrl,
     this.videoFile,
-    this.height,
-    this.width,
-    this.aspectRatio,
-    this.borderRadius,
-    this.borderColor,
-    this.borderWidth,
-    this.loaderWidget,
-    this.errorWidget,
-    this.shimmerWidget,
-    this.boxFit,
     this.playButton,
     this.pauseButton,
     this.muteButton,
-    this.showControls,
-    this.autoPlay,
-    this.looping,
-    this.allowFullScreen,
-    this.allowMuting,
     this.isMute,
-    this.progressTextStyle,
-    this.seekBarBufferColor,
-    this.seekBarColor,
     this.initialiseVideoController,
+    this.style,
   }) : assert(videoUrl != null || videoFile != null);
 
   //Video asset variables
@@ -48,96 +31,42 @@ class LMFeedVideo extends StatefulWidget {
 
   final Function(VideoController)? initialiseVideoController;
 
-  // Video structure variables
-  final double? height;
-  final double? width;
-  final double? aspectRatio; // defaults to 16/9
-  final double? borderRadius; // defaults to 0
-  final Color? borderColor;
-  final double? borderWidth;
-  final BoxFit? boxFit; // defaults to BoxFit.cover
-
-  // Video styling variables
-  final Color? seekBarColor;
-  final Color? seekBarBufferColor;
-  final TextStyle? progressTextStyle;
-  final Widget? loaderWidget;
-  final Widget? errorWidget;
-  final Widget? shimmerWidget;
   final LMFeedButton? playButton;
   final LMFeedButton? pauseButton;
   final LMFeedButton? muteButton;
 
+  final LMFeedPostVideoStyle? style;
   // Video functionality control variables
   final bool? isMute;
-  final bool? showControls;
-  final bool? autoPlay;
-  final bool? looping;
-  final bool? allowFullScreen;
-  final bool? allowMuting;
 
   @override
-  State<LMFeedVideo> createState() => _LMVideoState();
+  State<LMFeedPostVideo> createState() => _LMFeedPostVideoState();
 
-  LMFeedVideo copyWith({
+  LMFeedPostVideo copyWith({
     String? videoUrl,
     File? videoFile,
-    double? height,
-    double? width,
-    double? aspectRatio,
-    double? borderRadius,
-    Color? borderColor,
-    double? borderWidth,
-    BoxFit? boxFit,
-    Color? seekBarColor,
-    Color? seekBarBufferColor,
-    TextStyle? progressTextStyle,
-    Widget? loaderWidget,
-    Widget? errorWidget,
-    Widget? shimmerWidget,
     LMFeedButton? playButton,
     LMFeedButton? pauseButton,
     LMFeedButton? muteButton,
     bool? isMute,
-    bool? showControls,
-    bool? autoPlay,
-    bool? looping,
-    bool? allowFullScreen,
-    bool? allowMuting,
     Function(VideoController)? initialiseVideoController,
+    LMFeedPostVideoStyle? style,
   }) {
-    return LMFeedVideo(
+    return LMFeedPostVideo(
       videoUrl: videoUrl ?? this.videoUrl,
       videoFile: videoFile ?? this.videoFile,
-      height: height ?? this.height,
-      width: width ?? this.width,
-      aspectRatio: aspectRatio ?? this.aspectRatio,
-      borderRadius: borderRadius ?? this.borderRadius,
-      borderColor: borderColor ?? this.borderColor,
-      borderWidth: borderWidth ?? this.borderWidth,
-      boxFit: boxFit ?? this.boxFit,
-      seekBarColor: seekBarColor ?? this.seekBarColor,
-      seekBarBufferColor: seekBarBufferColor ?? this.seekBarBufferColor,
-      progressTextStyle: progressTextStyle ?? this.progressTextStyle,
-      loaderWidget: loaderWidget ?? this.loaderWidget,
-      errorWidget: errorWidget ?? this.errorWidget,
-      shimmerWidget: shimmerWidget ?? this.shimmerWidget,
       playButton: playButton ?? this.playButton,
       pauseButton: pauseButton ?? this.pauseButton,
       muteButton: muteButton ?? this.muteButton,
       isMute: isMute ?? this.isMute,
-      showControls: showControls ?? this.showControls,
-      autoPlay: autoPlay ?? this.autoPlay,
-      looping: looping ?? this.looping,
-      allowFullScreen: allowFullScreen ?? this.allowFullScreen,
-      allowMuting: allowMuting ?? this.allowMuting,
       initialiseVideoController:
           initialiseVideoController ?? this.initialiseVideoController,
+      style: style ?? this.style,
     );
   }
 }
 
-class _LMVideoState extends State<LMFeedVideo> {
+class _LMFeedPostVideoState extends State<LMFeedPostVideo> {
   ValueNotifier<bool> rebuildOverlay = ValueNotifier(false);
   bool _onTouch = true;
   bool initialiseOverlay = false;
@@ -148,6 +77,8 @@ class _LMVideoState extends State<LMFeedVideo> {
   VideoController? controller;
 
   Timer? _timer;
+
+  LMFeedPostVideoStyle? style;
 
   @override
   void dispose() async {
@@ -166,7 +97,7 @@ class _LMVideoState extends State<LMFeedVideo> {
   }
 
   @override
-  void didUpdateWidget(LMFeedVideo oldWidget) {
+  void didUpdateWidget(LMFeedPostVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
 
@@ -191,12 +122,12 @@ class _LMVideoState extends State<LMFeedVideo> {
     if (widget.videoUrl != null) {
       await player.open(
         Media(widget.videoUrl!),
-        play: widget.autoPlay ?? false,
+        play: style?.autoPlay ?? false,
       );
     } else {
       await player.open(
         Media(widget.videoFile!.uri.toString()),
-        play: widget.autoPlay ?? false,
+        play: style?.autoPlay ?? false,
       );
     }
   }
@@ -204,6 +135,8 @@ class _LMVideoState extends State<LMFeedVideo> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    style =
+        widget.style ?? LMFeedTheme.of(context).postStyle.mediaStyle.videoStyle;
     return GestureDetector(
       onTap: () {
         _timer?.cancel();
@@ -258,14 +191,15 @@ class _LMVideoState extends State<LMFeedVideo> {
                         }
                       },
                       child: Container(
-                        width: widget.width ?? screenSize.width,
-                        height: widget.height,
+                        width: widget.style?.width ?? screenSize.width,
+                        height: widget.style?.height,
                         clipBehavior: Clip.hardEdge,
                         decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(widget.borderRadius ?? 0),
+                          borderRadius: BorderRadius.circular(
+                              widget.style?.borderRadius ?? 0),
                           border: Border.all(
-                            color: widget.borderColor ?? Colors.transparent,
+                            color:
+                                widget.style?.borderColor ?? Colors.transparent,
                             width: 0,
                           ),
                         ),
@@ -309,16 +243,16 @@ class _LMVideoState extends State<LMFeedVideo> {
                               horizontal: 4,
                               vertical: 8,
                             ),
-                            seekBarPositionColor: widget.seekBarColor ??
+                            seekBarPositionColor: widget.style?.seekBarColor ??
                                 const Color.fromARGB(255, 0, 137, 123),
-                            seekBarThumbColor: widget.seekBarColor ??
+                            seekBarThumbColor: widget.style?.seekBarColor ??
                                 const Color.fromARGB(255, 0, 137, 123),
                           ),
                           fullscreen: const MaterialVideoControlsThemeData(),
                           child: Video(
                             controller: controller!,
-                            controls: widget.showControls != null &&
-                                    widget.showControls!
+                            controls: widget.style?.showControls != null &&
+                                    widget.style!.showControls!
                                 ? media_kit_video_controls.AdaptiveVideoControls
                                 : (state) {
                                     return ValueListenableBuilder(
@@ -384,11 +318,111 @@ class _LMVideoState extends State<LMFeedVideo> {
                     ),
                   ]);
                 } else {
-                  return widget.errorWidget ?? const SizedBox();
+                  return widget.style?.errorWidget ?? const SizedBox();
                 }
               },
             );
           }),
+    );
+  }
+}
+
+class LMFeedPostVideoStyle {
+  // Video structure variables
+  final double? height;
+  final double? width;
+  final double? aspectRatio; // defaults to 16/9
+  final double? borderRadius; // defaults to 0
+  final Color? borderColor;
+  final double? borderWidth;
+  final BoxFit? boxFit; // defaults to BoxFit.cover
+
+  // Video styling variables
+  final Color? seekBarColor;
+  final Color? seekBarBufferColor;
+  final TextStyle? progressTextStyle;
+  final Widget? loaderWidget;
+  final Widget? errorWidget;
+  final Widget? shimmerWidget;
+  final LMFeedButton? playButton;
+  final LMFeedButton? pauseButton;
+  final LMFeedButton? muteButton;
+  // Video functionality control variables
+  final bool? showControls;
+  final bool? autoPlay;
+  final bool? looping;
+  final bool? allowFullScreen;
+  final bool? allowMuting;
+
+  const LMFeedPostVideoStyle({
+    this.height,
+    this.width,
+    this.aspectRatio,
+    this.borderRadius,
+    this.borderColor,
+    this.borderWidth,
+    this.boxFit,
+    this.seekBarColor,
+    this.seekBarBufferColor,
+    this.progressTextStyle,
+    this.loaderWidget,
+    this.errorWidget,
+    this.shimmerWidget,
+    this.playButton,
+    this.pauseButton,
+    this.muteButton,
+    this.showControls,
+    this.autoPlay,
+    this.looping,
+    this.allowFullScreen,
+    this.allowMuting,
+  });
+
+  LMFeedPostVideoStyle copyWith({
+    double? height,
+    double? width,
+    double? aspectRatio,
+    double? borderRadius,
+    Color? borderColor,
+    double? borderWidth,
+    BoxFit? boxFit,
+    Color? seekBarColor,
+    Color? seekBarBufferColor,
+    TextStyle? progressTextStyle,
+    Widget? loaderWidget,
+    Widget? errorWidget,
+    Widget? shimmerWidget,
+    LMFeedButton? playButton,
+    LMFeedButton? pauseButton,
+    LMFeedButton? muteButton,
+    bool? showControls,
+    bool? autoPlay,
+    bool? looping,
+    bool? allowFullScreen,
+    bool? allowMuting,
+  }) {
+    return LMFeedPostVideoStyle(
+      height: height ?? this.height,
+      width: width ?? this.width,
+      aspectRatio: aspectRatio ?? this.aspectRatio,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
+      boxFit: boxFit ?? this.boxFit,
+      seekBarColor: seekBarColor ?? this.seekBarColor,
+      seekBarBufferColor: seekBarBufferColor ?? this.seekBarBufferColor,
+      progressTextStyle: progressTextStyle ?? this.progressTextStyle,
+      loaderWidget: loaderWidget ?? this.loaderWidget,
+      errorWidget: errorWidget ?? this.errorWidget,
+      shimmerWidget: shimmerWidget ?? this.shimmerWidget,
+      playButton: playButton ?? this.playButton,
+      pauseButton: pauseButton ?? this.pauseButton,
+      muteButton: muteButton ?? this.muteButton,
+      showControls: showControls ?? this.showControls,
+      autoPlay: autoPlay ?? this.autoPlay,
+      looping: looping ?? this.looping,
+      allowFullScreen: allowFullScreen ?? this.allowFullScreen,
+      allowMuting: allowMuting ?? this.allowMuting,
     );
   }
 }

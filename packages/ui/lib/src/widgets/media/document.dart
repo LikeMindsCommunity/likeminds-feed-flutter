@@ -10,21 +10,12 @@ class LMFeedDocument extends StatefulWidget {
     this.onTap,
     this.documentFile,
     this.documentUrl,
-    this.height,
-    this.width,
     this.type,
     this.size,
-    this.borderRadius,
-    this.borderSize,
-    this.borderColor,
     this.title,
     this.subtitle,
-    this.documentIcon,
     this.onRemove,
-    this.removeIcon,
-    this.showBorder = true,
-    this.backgroundColor,
-    this.textColor,
+    this.style,
   }) : assert(documentFile != null || documentUrl != null);
 
   final Function()? onTap;
@@ -34,20 +25,12 @@ class LMFeedDocument extends StatefulWidget {
   final String? type;
   final String? size;
 
-  final double? height;
-  final double? width;
-  final double? borderRadius;
-  final double? borderSize;
-  final Color? borderColor;
-  final Color? textColor;
-
   final LMFeedText? title;
   final LMFeedText? subtitle;
-  final Widget? documentIcon;
-  final LMFeedIcon? removeIcon;
+
   final Function? onRemove;
-  final bool showBorder;
-  final Color? backgroundColor;
+
+  final LMFeedPostDocumentStyle? style;
 
   @override
   State<LMFeedDocument> createState() => _LMDocumentState();
@@ -58,19 +41,10 @@ class LMFeedDocument extends StatefulWidget {
     String? documentUrl,
     String? type,
     String? size,
-    double? height,
-    double? width,
-    double? borderRadius,
-    double? borderSize,
-    Color? borderColor,
     LMFeedText? title,
     LMFeedText? subtitle,
-    Widget? documentIcon,
-    LMFeedIcon? removeIcon,
     Function? onRemove,
-    bool? showBorder,
-    Color? backgroundColor,
-    Color? textColor,
+    LMFeedPostDocumentStyle? style,
   }) {
     return LMFeedDocument(
       onTap: onTap ?? this.onTap,
@@ -78,19 +52,10 @@ class LMFeedDocument extends StatefulWidget {
       documentUrl: documentUrl ?? this.documentUrl,
       type: type ?? this.type,
       size: size ?? this.size,
-      height: height ?? this.height,
-      width: width ?? this.width,
-      borderRadius: borderRadius ?? this.borderRadius,
-      borderSize: borderSize ?? this.borderSize,
-      borderColor: borderColor ?? this.borderColor,
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
-      documentIcon: documentIcon ?? this.documentIcon,
-      removeIcon: removeIcon ?? this.removeIcon,
       onRemove: onRemove ?? this.onRemove,
-      showBorder: showBorder ?? this.showBorder,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      textColor: textColor ?? this.textColor,
+      style: style ?? this.style,
     );
   }
 }
@@ -102,6 +67,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
   String? url;
   File? file;
   Future<File>? fileLoaderFuture;
+  LMFeedPostDocumentStyle? style;
 
   Future<File> loadFile() async {
     File file;
@@ -125,6 +91,8 @@ class _LMDocumentState extends State<LMFeedDocument> {
 
   @override
   Widget build(BuildContext context) {
+    style = widget.style ??
+        LMFeedTheme.of(context).postStyle.mediaStyle.documentStyle;
     return FutureBuilder(
         future: fileLoaderFuture,
         builder: (context, snapshot) {
@@ -136,17 +104,17 @@ class _LMDocumentState extends State<LMFeedDocument> {
                 margin: const EdgeInsets.symmetric(
                   vertical: LikeMindsTheme.kPaddingSmall,
                 ),
-                height: widget.height ?? 78,
+                height: style!.height ?? 78,
                 decoration: BoxDecoration(
-                  color: widget.backgroundColor,
-                  border: widget.showBorder
+                  color: style!.backgroundColor,
+                  border: style!.showBorder
                       ? Border.all(
-                          color: widget.borderColor ?? Colors.grey,
-                          width: widget.borderSize ?? 1,
+                          color: style!.borderColor ?? Colors.grey,
+                          width: style!.borderSize ?? 1,
                         )
                       : null,
                   borderRadius: BorderRadius.circular(
-                    widget.borderRadius ?? LikeMindsTheme.kBorderRadiusMedium,
+                    style!.borderRadius ?? LikeMindsTheme.kBorderRadiusMedium,
                   ),
                 ),
                 padding: const EdgeInsets.all(LikeMindsTheme.kPaddingLarge),
@@ -154,7 +122,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                   children: [
                     Container(
                       alignment: Alignment.center,
-                      child: widget.documentIcon ??
+                      child: style!.documentIcon ??
                           const LMFeedIcon(
                             type: LMFeedIconType.icon,
                             icon: Icons.picture_as_pdf,
@@ -177,7 +145,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                   overflow: TextOverflow.ellipsis,
                                   textStyle: TextStyle(
                                     fontSize: 14,
-                                    color: widget.textColor ?? Colors.grey,
+                                    color: style!.textColor ?? Colors.grey,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -191,7 +159,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                     _fileSize!.toUpperCase(),
                                     style: TextStyle(
                                       fontSize: LikeMindsTheme.kFontSmall,
-                                      color: widget.textColor ??
+                                      color: style!.textColor ??
                                           Colors.grey.shade300,
                                     ),
                                   ),
@@ -200,7 +168,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                     '·',
                                     style: TextStyle(
                                       fontSize: LikeMindsTheme.kFontSmall,
-                                      color: widget.textColor ??
+                                      color: style!.textColor ??
                                           Colors.grey.shade300,
                                     ),
                                   ),
@@ -209,7 +177,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                     _fileExtension!.toUpperCase(),
                                     style: TextStyle(
                                       fontSize: LikeMindsTheme.kFontSmall,
-                                      color: widget.textColor ??
+                                      color: style!.textColor ??
                                           Colors.grey.shade300,
                                     ),
                                   ),
@@ -222,7 +190,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                     widget.documentFile != null
                         ? LMFeedButton(
                             style: LMFeedButtonStyle(
-                              icon: widget.removeIcon ??
+                              icon: style!.removeIcon ??
                                   const LMFeedIcon(
                                       type: LMFeedIconType.icon,
                                       icon: Icons.close),
@@ -244,5 +212,57 @@ class _LMDocumentState extends State<LMFeedDocument> {
             return const SizedBox.shrink();
           }
         });
+  }
+}
+
+class LMFeedPostDocumentStyle {
+  final double? height;
+  final double? width;
+  final double? borderRadius;
+  final double? borderSize;
+  final Color? borderColor;
+  final Color? textColor;
+  final Widget? documentIcon;
+  final LMFeedIcon? removeIcon;
+  final bool showBorder;
+  final Color? backgroundColor;
+
+  const LMFeedPostDocumentStyle({
+    this.height,
+    this.width,
+    this.borderRadius,
+    this.borderSize,
+    this.borderColor,
+    this.textColor,
+    this.documentIcon,
+    this.removeIcon,
+    this.showBorder = true,
+    this.backgroundColor,
+  });
+
+  LMFeedPostDocumentStyle copyWith({
+    double? height,
+    double? width,
+    double? borderRadius,
+    double? borderSize,
+    Color? borderColor,
+    Color? textColor,
+    Widget? documentIcon,
+    LMFeedIcon? removeIcon,
+    bool? showBorder,
+    Color? backgroundColor,
+  }) {
+    return LMFeedPostDocumentStyle(
+      height: height ?? this.height,
+      width: width ?? this.width,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderSize: borderSize ?? this.borderSize,
+      borderColor: borderColor ?? this.borderColor,
+      textColor: textColor ?? this.textColor,
+      documentIcon: documentIcon ?? this.documentIcon,
+      removeIcon: removeIcon ?? this.removeIcon,
+      showBorder: showBorder ?? this.showBorder,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+    );
   }
 }

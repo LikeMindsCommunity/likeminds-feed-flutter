@@ -523,9 +523,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             color: Colors.black,
             borderRadius: BorderRadius.circular(6.0),
           ),
-          child: LMFeedImage(
+          child: LMFeedPostImage(
             imageFile: media.mediaFile!,
-            boxFit: BoxFit.contain,
+            style: const LMFeedPostImageStyle(
+              boxFit: BoxFit.contain,
+            ),
           ),
         );
       } else if (media.mediaType == LMMediaType.document) {
