@@ -68,9 +68,8 @@ class _LMButtonState extends State<LMFeedButton> {
             children: [
               inStyle.placement == LMFeedIconButtonPlacement.start
                   ? _active
-                      ? inStyle.activeIcon ??
-                          inStyle.icon ??
-                          const SizedBox.shrink()
+                      ? ((inStyle.activeIcon ?? inStyle.icon) ??
+                          const SizedBox.shrink())
                       : inStyle.icon ?? const SizedBox.shrink()
                   : const SizedBox.shrink(),
               inStyle.placement == LMFeedIconButtonPlacement.start
@@ -125,7 +124,7 @@ class LMFeedButtonStyle {
   final Border? border;
 
   /// placement of the icon in the button
-  final LMFeedIconButtonPlacement? placement;
+  final LMFeedIconButtonPlacement placement;
 
   /// axis alignment for setting button's icon and text spacing
   final MainAxisAlignment? mainAxisAlignment;
@@ -148,7 +147,7 @@ class LMFeedButtonStyle {
     this.borderRadius,
     this.height,
     this.width,
-    this.placement,
+    this.placement = LMFeedIconButtonPlacement.start,
     this.margin,
     this.mainAxisAlignment,
     this.showText = true,
@@ -162,7 +161,6 @@ class LMFeedButtonStyle {
       backgroundColor: Colors.transparent,
       borderRadius: 8,
       height: 28,
-      placement: LMFeedIconButtonPlacement.start,
       margin: 4,
     );
   }

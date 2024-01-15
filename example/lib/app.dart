@@ -1,9 +1,9 @@
 // import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_example/constants/theme.dart';
 import 'package:likeminds_feed_example/globals.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -28,11 +28,13 @@ class _LMSampleAppState extends State<LMSampleApp> {
               ..userId("56b35125-770d-4a2b-8591-03ee169cb528 ")
               ..userName("Flutter Faad Team Bot"))
             .build())
-          ..then((value) async {
-            if (value.success) {
-              memberState = LMFeedCore.instance.getMemberState();
-            }
-          });
+          ..then(
+            (value) async {
+              if (value.success) {
+                memberState = LMFeedCore.instance.getMemberState();
+              }
+            },
+          );
   }
 
   @override

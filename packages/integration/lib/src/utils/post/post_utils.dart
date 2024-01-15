@@ -88,10 +88,20 @@ Future<Map<String, int>> getNetworkImageDimensions(String image) async {
   return dimensions;
 }
 
-String getLikeText(int likes) {
+String getLikeCountSuffixText(int likes) {
   if (likes == 1) {
     return 'Like';
   } else {
     return 'Likes';
+  }
+}
+
+String getCommentCountSuffixText(int comment) {
+  if (comment == 0) {
+    return 'Add Comment';
+  } else if (comment == 1) {
+    return '1 Comment';
+  } else {
+    return '$comment Comments';
   }
 }

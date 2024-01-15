@@ -132,7 +132,6 @@ class LMFeedThemeData {
           showShareButton: true,
           showSaveButton: false,
           likeButtonStyle: LMFeedButtonStyle(
-            placement: LMFeedIconButtonPlacement.start,
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmLikeInActiveSvg,
@@ -157,7 +156,6 @@ class LMFeedThemeData {
           ),
           commentButtonStyle: LMFeedButtonStyle(
             showText: false,
-            placement: LMFeedIconButtonPlacement.start,
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmCommentSvg,
@@ -171,7 +169,6 @@ class LMFeedThemeData {
             height: 48,
           ),
           shareButtonStyle: LMFeedButtonStyle(
-            placement: LMFeedIconButtonPlacement.start,
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmShareSvg,
@@ -284,7 +281,6 @@ class LMFeedThemeData {
           showShareButton: true,
           showSaveButton: false,
           likeButtonStyle: LMFeedButtonStyle(
-            placement: LMFeedIconButtonPlacement.start,
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmLikeInActiveSvg,
@@ -320,6 +316,7 @@ class LMFeedThemeData {
             ),
           ),
           shareButtonStyle: LMFeedButtonStyle(
+            showText: false,
             icon: LMFeedIcon(
               type: LMFeedIconType.svg,
               assetPath: lmShareSvg,

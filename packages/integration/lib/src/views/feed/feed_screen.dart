@@ -1064,7 +1064,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         isActive: postViewData.isLiked,
         text: LMFeedText(
             text:
-                '${postViewData.likeCount} ${getLikeText(postViewData.likeCount)}'),
+                '${postViewData.likeCount} ${getLikeCountSuffixText(postViewData.likeCount)}'),
         style: feedTheme.postStyle.footerStyle.likeButtonStyle,
         onTap: () async {
           if (postViewData.isLiked) {
@@ -1099,7 +1099,9 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   LMFeedButton defCommentButton(
           LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
       LMFeedButton(
-        text: const LMFeedText(text: "Comment"),
+        text: LMFeedText(
+          text: getCommentCountSuffixText(postViewData.commentCount),
+        ),
         style: feedTheme.postStyle.footerStyle.commentButtonStyle,
         onTap: () {
           Navigator.push(

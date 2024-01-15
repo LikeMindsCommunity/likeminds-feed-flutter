@@ -432,7 +432,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   LMFeedButton defLikeButton() => LMFeedButton(
         isActive: postData!.isLiked,
         text: LMFeedText(
-            text: '${postData!.likeCount} ${getLikeText(postData!.likeCount)}'),
+            text:
+                '${postData!.likeCount} ${getLikeCountSuffixText(postData!.likeCount)}'),
         style: feedTheme!.postStyle.footerStyle.likeButtonStyle,
         onTap: () async {
           if (postData!.isLiked) {
