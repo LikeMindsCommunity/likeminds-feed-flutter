@@ -151,4 +151,17 @@ class LMFeedMenuAction {
     this.onCommentReport,
     this.onCommentEdit,
   });
+
+  LMFeedMenuAction copyWith(LMFeedMenuAction action) {
+    return LMFeedMenuAction(
+      onPostDelete: action.onPostDelete ?? onPostDelete,
+      onPostPin: action.onPostPin ?? onPostPin,
+      onPostUnpin: action.onPostUnpin ?? onPostUnpin,
+      onPostReport: action.onPostReport ?? onPostReport,
+      onPostEdit: action.onPostEdit ?? onPostEdit,
+      onCommentDelete: action.onCommentDelete ?? onCommentDelete,
+      onCommentReport: action.onCommentReport ?? onCommentReport,
+      onCommentEdit: action.onCommentEdit ?? onCommentEdit,
+    );
+  }
 }

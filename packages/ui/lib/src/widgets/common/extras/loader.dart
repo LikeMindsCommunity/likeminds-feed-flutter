@@ -16,4 +16,14 @@ class LMFeedLoader extends StatelessWidget {
       ),
     );
   }
+
+  LMFeedLoader copyWith({
+    bool? isPrimary,
+    Color? color,
+  }) {
+    return LMFeedLoader(
+      isPrimary: isPrimary ?? this.isPrimary,
+      color: color ?? this.color,
+    );
+  }
 }

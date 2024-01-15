@@ -101,6 +101,18 @@ class LMFeedTopicChip extends StatelessWidget {
       ],
     );
   }
+
+  LMFeedTopicChip copyWith({
+    Function(LMTopicViewData)? onIconTap,
+    LMTopicViewData? topic,
+    LMFeedTopicChipStyle? style,
+  }) {
+    return LMFeedTopicChip(
+      onIconTap: onIconTap ?? this.onIconTap,
+      topic: topic ?? this.topic,
+      style: style ?? this.style,
+    );
+  }
 }
 
 class LMFeedTopicChipStyle {

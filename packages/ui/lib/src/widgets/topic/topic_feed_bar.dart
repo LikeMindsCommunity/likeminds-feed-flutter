@@ -77,7 +77,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
                             onTap();
                           },
                           style: style ??
-                              feedTheme.postStyle.topicStyle?.activeChipStyle,
+                              feedTheme.postStyle.topicStyle.activeChipStyle,
                         ),
                       );
                     }
@@ -165,6 +165,32 @@ class LMFeedTopicFeedBar extends StatelessWidget {
             ? emptyTopicsWidget(feedTheme)
             : selectedTopicsWidget(feedTheme, screenSize.width),
       ),
+    );
+  }
+
+  LMFeedTopicFeedBar copyWith({
+    List<LMTopicViewData>? selectedTopics,
+    Function? onTap,
+    Function? onClear,
+    Function(LMTopicViewData)? onIconTap,
+    Widget? trailingIcon,
+    Function? onTrailingIconTap,
+    bool? showDivider,
+    Widget? emptyTopicChip,
+    double? height,
+    LMFeedTopicChipStyle? style,
+  }) {
+    return LMFeedTopicFeedBar(
+      selectedTopics: selectedTopics ?? this.selectedTopics,
+      onTap: onTap ?? this.onTap,
+      onClear: onClear ?? this.onClear,
+      onIconTap: onIconTap ?? this.onIconTap,
+      trailingIcon: trailingIcon ?? this.trailingIcon,
+      onTrailingIconTap: onTrailingIconTap ?? this.onTrailingIconTap,
+      showDivider: showDivider ?? this.showDivider,
+      emptyTopicChip: emptyTopicChip ?? this.emptyTopicChip,
+      height: height ?? this.height,
+      style: style ?? this.style,
     );
   }
 }

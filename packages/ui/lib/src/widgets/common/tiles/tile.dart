@@ -11,7 +11,7 @@ class LMFeedTile extends StatelessWidget {
     this.trailing,
   });
 
-  final Function()? onTap;
+  final VoidCallback? onTap;
   final LMFeedTileStyle? style;
 
   final Widget? leading;

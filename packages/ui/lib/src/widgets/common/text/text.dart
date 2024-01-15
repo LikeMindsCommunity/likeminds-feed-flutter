@@ -87,4 +87,22 @@ class LMFeedTextStyle {
       textStyle: TextStyle(fontSize: 14),
     );
   }
+
+  /// copyWith function to get a new object of [LMFeedTextStyle]
+  /// with specific single values passed
+  LMFeedTextStyle copyWith({
+    bool? selectable,
+    TextStyle? textStyle,
+    int? maxLines,
+    TextOverflow? overflow,
+    TextAlign? textAlign,
+  }) {
+    return LMFeedTextStyle(
+      selectable: selectable ?? this.selectable,
+      textStyle: textStyle ?? this.textStyle,
+      maxLines: maxLines ?? this.maxLines,
+      overflow: overflow ?? this.overflow,
+      textAlign: textAlign ?? this.textAlign,
+    );
+  }
 }

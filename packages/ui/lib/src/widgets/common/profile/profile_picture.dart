@@ -110,4 +110,22 @@ class LMFeedProfilePictureStyle {
       ),
     );
   }
+
+  LMFeedProfilePictureStyle copyWith({
+    double? size,
+    LMFeedTextStyle? fallbackTextStyle,
+    double? borderRadius,
+    double? border,
+    Color? backgroundColor,
+    BoxShape? boxShape,
+  }) {
+    return LMFeedProfilePictureStyle(
+      size: size ?? this.size,
+      borderRadius: borderRadius ?? this.borderRadius,
+      border: border ?? this.border,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      boxShape: boxShape ?? this.boxShape,
+      fallbackTextStyle: fallbackTextStyle ?? this.fallbackTextStyle,
+    );
+  }
 }

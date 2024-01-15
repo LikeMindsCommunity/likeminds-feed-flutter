@@ -96,6 +96,7 @@ class LMFeedPostWidget extends StatefulWidget {
     LMFeedPostMedia? media,
     LMFeedMenu? menu,
     LMFeedPostTopic? topicWidget,
+    LMFeedPostStyle? style,
   }) {
     return LMFeedPostWidget(
       post: post ?? this.post,
@@ -120,6 +121,7 @@ class LMFeedPostWidget extends StatefulWidget {
       menuBuilder: menuBuilder ?? this.menuBuilder,
       mediaBuilder: mediaBuilder ?? this.mediaBuilder,
       footerBuilder: footerBuilder ?? this.footerBuilder,
+      style: style ?? this.style,
     );
   }
 }
@@ -294,4 +296,28 @@ class LMFeedPostStyle {
     required this.topicStyle,
     this.border,
   });
+
+  LMFeedPostStyle copyWith({
+    List<BoxShadow>? boxShadow,
+    BorderRadiusGeometry? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    LMFeedPostContentStyle? contentStyle,
+    LMFeedPostHeaderStyle? headerStyle,
+    LMFeedPostFooterStyle? footerStyle,
+    LMFeedPostTopicStyle? topicStyle,
+    BoxBorder? border,
+  }) {
+    return LMFeedPostStyle(
+      boxShadow: boxShadow ?? this.boxShadow,
+      borderRadius: borderRadius ?? this.borderRadius,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      contentStyle: contentStyle ?? this.contentStyle,
+      headerStyle: headerStyle ?? this.headerStyle,
+      footerStyle: footerStyle ?? this.footerStyle,
+      topicStyle: topicStyle ?? this.topicStyle,
+      border: border ?? this.border,
+    );
+  }
 }

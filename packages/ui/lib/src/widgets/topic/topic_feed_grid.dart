@@ -4,7 +4,8 @@ import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 
 // This widget is used to display a topic grid
 // A [LMFeedTopicFeedGrid] displays a grid of selected topics
-// The [LMFeedTopicFeedGrid] can be customized by passing in the required parameters
+// The [LMFeedTopicFeedGrid] can be customized by
+// passing in the required parameters
 class LMFeedTopicFeedGrid extends StatelessWidget {
   // Required parameters
   // Text color of the topic chip
@@ -155,6 +156,48 @@ class LMFeedTopicFeedGrid extends StatelessWidget {
             ? emptyTopicsWidget()
             : selectedTopicsWidget(screenSize.width),
       ),
+    );
+  }
+
+  LMFeedTopicFeedGrid copyWith({
+    List<LMTopicViewData>? selectedTopics,
+    Function? onTap,
+    Function(LMTopicViewData)? onIconTap,
+    Widget? trailingIcon,
+    Function? onTrailingIconTap,
+    bool? showDivider,
+    double? height,
+    Widget? emptyTopicChip,
+    LMFeedIconButtonPlacement? iconPlacement,
+    Color? textColor,
+    Color? backgroundColor,
+    Color? borderColor,
+    double? borderRadius,
+    double? borderWidth,
+    TextStyle? textStyle,
+    Icon? icon,
+    EdgeInsets? chipPadding,
+    bool? showBorder,
+  }) {
+    return LMFeedTopicFeedGrid(
+      textColor: textColor ?? this.textColor,
+      selectedTopics: selectedTopics ?? this.selectedTopics,
+      onTap: onTap ?? this.onTap,
+      onIconTap: onIconTap ?? this.onIconTap,
+      trailingIcon: trailingIcon ?? this.trailingIcon,
+      onTrailingIconTap: onTrailingIconTap ?? this.onTrailingIconTap,
+      showDivider: showDivider ?? this.showDivider,
+      height: height ?? this.height,
+      emptyTopicChip: emptyTopicChip ?? this.emptyTopicChip,
+      iconPlacement: iconPlacement ?? this.iconPlacement,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderColor: borderColor ?? this.borderColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderWidth: borderWidth ?? this.borderWidth,
+      chipPadding: chipPadding ?? this.chipPadding,
+      icon: icon ?? this.icon,
+      showBorder: showBorder ?? this.showBorder,
+      textStyle: textStyle ?? this.textStyle,
     );
   }
 }

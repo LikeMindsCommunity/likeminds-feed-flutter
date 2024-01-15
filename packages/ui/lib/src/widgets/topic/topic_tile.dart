@@ -63,4 +63,34 @@ class LMFeedTopicTile extends StatelessWidget {
       ),
     );
   }
+
+  /// copyWith function to get a new object of [LMFeedTopicTile]
+  /// with specific single values passed
+  LMFeedTopicTile copyWith({
+    Function(LMTopicViewData)? onTap,
+    MainAxisAlignment? tileRowAlignment,
+    Color? backgroundColor,
+    double? height,
+    Icon? icon,
+    Color? borderColor,
+    double? borderWidth,
+    EdgeInsets? padding,
+    bool? isSelected,
+    LMFeedText? text,
+    LMTopicViewData? topic,
+  }) {
+    return LMFeedTopicTile(
+      onTap: onTap ?? this.onTap,
+      tileRowAlignment: tileRowAlignment ?? this.tileRowAlignment,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      height: height ?? this.height,
+      icon: icon ?? this.icon,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
+      padding: padding ?? this.padding,
+      isSelected: isSelected ?? this.isSelected,
+      text: text ?? this.text,
+      topic: topic ?? this.topic,
+    );
+  }
 }

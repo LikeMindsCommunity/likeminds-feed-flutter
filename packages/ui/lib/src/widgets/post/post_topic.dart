@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
-import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 class LMFeedPostTopic extends StatelessWidget {
   final LMPostViewData post;
@@ -43,6 +41,20 @@ class LMFeedPostTopic extends StatelessWidget {
         topic: topicViewData,
         style: topicStyle.activeChipStyle,
       );
+
+  LMFeedPostTopic copyWith({
+    LMPostViewData? post,
+    Map<String, LMTopicViewData>? topics,
+    Widget Function(BuildContext, LMFeedTopicChip)? topicChipBuilder,
+    LMFeedPostTopicStyle? style,
+  }) {
+    return LMFeedPostTopic(
+      post: post ?? this.post,
+      topics: topics ?? this.topics,
+      topicChipBuilder: topicChipBuilder ?? this.topicChipBuilder,
+      style: style ?? this.style,
+    );
+  }
 }
 
 class LMFeedPostTopicStyle {

@@ -51,6 +51,48 @@ class LMFeedDocument extends StatefulWidget {
 
   @override
   State<LMFeedDocument> createState() => _LMDocumentState();
+
+  LMFeedDocument copyWith({
+    Function()? onTap,
+    File? documentFile,
+    String? documentUrl,
+    String? type,
+    String? size,
+    double? height,
+    double? width,
+    double? borderRadius,
+    double? borderSize,
+    Color? borderColor,
+    LMFeedText? title,
+    LMFeedText? subtitle,
+    Widget? documentIcon,
+    LMFeedIcon? removeIcon,
+    Function? onRemove,
+    bool? showBorder,
+    Color? backgroundColor,
+    Color? textColor,
+  }) {
+    return LMFeedDocument(
+      onTap: onTap ?? this.onTap,
+      documentFile: documentFile ?? this.documentFile,
+      documentUrl: documentUrl ?? this.documentUrl,
+      type: type ?? this.type,
+      size: size ?? this.size,
+      height: height ?? this.height,
+      width: width ?? this.width,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderSize: borderSize ?? this.borderSize,
+      borderColor: borderColor ?? this.borderColor,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      documentIcon: documentIcon ?? this.documentIcon,
+      removeIcon: removeIcon ?? this.removeIcon,
+      onRemove: onRemove ?? this.onRemove,
+      showBorder: showBorder ?? this.showBorder,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      textColor: textColor ?? this.textColor,
+    );
+  }
 }
 
 class _LMDocumentState extends State<LMFeedDocument> {

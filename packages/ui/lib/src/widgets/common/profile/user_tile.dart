@@ -6,7 +6,7 @@ import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 class LMFeedUserTile extends LMFeedTile {
   final LMUserViewData user;
   @override
-  final Function()? onTap;
+  final VoidCallback? onTap;
   @override
   final LMFeedTileStyle? style;
   @override
@@ -21,7 +21,13 @@ class LMFeedUserTile extends LMFeedTile {
     this.style,
     this.title,
     this.subtitle,
-  }) : super(key: key);
+  }) : super(
+          key: key,
+          onTap: onTap,
+          style: style,
+          title: title,
+          subtitle: subtitle,
+        );
 
   @override
   Widget build(BuildContext context) {

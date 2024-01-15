@@ -33,6 +33,36 @@ class LMFeedBottomSheet extends StatefulWidget {
 
   @override
   State<LMFeedBottomSheet> createState() => _LMBottomSheetState();
+
+  LMFeedBottomSheet copyWith({
+    LMFeedText? title,
+    Alignment? titleAlignment,
+    Color? backgroundColor,
+    BorderRadiusGeometry? borderRadius,
+    double? height,
+    double? elevation,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    List<Widget>? children,
+    List<BoxShadow>? boxShadow,
+    Widget? dragBar,
+    Color? dragBarColor,
+  }) {
+    return LMFeedBottomSheet(
+      title: title ?? this.title,
+      titleAlignment: titleAlignment ?? this.titleAlignment,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      height: height ?? this.height,
+      elevation: elevation ?? this.elevation,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      boxShadow: boxShadow ?? this.boxShadow,
+      dragBar: dragBar ?? this.dragBar,
+      dragBarColor: dragBarColor ?? this.dragBarColor,
+      children: children ?? this.children,
+    );
+  }
 }
 
 class _LMBottomSheetState extends State<LMFeedBottomSheet> {

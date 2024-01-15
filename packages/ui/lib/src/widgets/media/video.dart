@@ -6,7 +6,6 @@ import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:visibility_aware_state/visibility_aware_state.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart'
     as media_kit_video_controls;
@@ -79,6 +78,63 @@ class LMFeedVideo extends StatefulWidget {
 
   @override
   State<LMFeedVideo> createState() => _LMVideoState();
+
+  LMFeedVideo copyWith({
+    String? videoUrl,
+    File? videoFile,
+    double? height,
+    double? width,
+    double? aspectRatio,
+    double? borderRadius,
+    Color? borderColor,
+    double? borderWidth,
+    BoxFit? boxFit,
+    Color? seekBarColor,
+    Color? seekBarBufferColor,
+    TextStyle? progressTextStyle,
+    Widget? loaderWidget,
+    Widget? errorWidget,
+    Widget? shimmerWidget,
+    LMFeedButton? playButton,
+    LMFeedButton? pauseButton,
+    LMFeedButton? muteButton,
+    bool? isMute,
+    bool? showControls,
+    bool? autoPlay,
+    bool? looping,
+    bool? allowFullScreen,
+    bool? allowMuting,
+    Function(VideoController)? initialiseVideoController,
+  }) {
+    return LMFeedVideo(
+      videoUrl: videoUrl ?? this.videoUrl,
+      videoFile: videoFile ?? this.videoFile,
+      height: height ?? this.height,
+      width: width ?? this.width,
+      aspectRatio: aspectRatio ?? this.aspectRatio,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
+      boxFit: boxFit ?? this.boxFit,
+      seekBarColor: seekBarColor ?? this.seekBarColor,
+      seekBarBufferColor: seekBarBufferColor ?? this.seekBarBufferColor,
+      progressTextStyle: progressTextStyle ?? this.progressTextStyle,
+      loaderWidget: loaderWidget ?? this.loaderWidget,
+      errorWidget: errorWidget ?? this.errorWidget,
+      shimmerWidget: shimmerWidget ?? this.shimmerWidget,
+      playButton: playButton ?? this.playButton,
+      pauseButton: pauseButton ?? this.pauseButton,
+      muteButton: muteButton ?? this.muteButton,
+      isMute: isMute ?? this.isMute,
+      showControls: showControls ?? this.showControls,
+      autoPlay: autoPlay ?? this.autoPlay,
+      looping: looping ?? this.looping,
+      allowFullScreen: allowFullScreen ?? this.allowFullScreen,
+      allowMuting: allowMuting ?? this.allowMuting,
+      initialiseVideoController:
+          initialiseVideoController ?? this.initialiseVideoController,
+    );
+  }
 }
 
 class _LMVideoState extends State<LMFeedVideo> {
@@ -113,17 +169,6 @@ class _LMVideoState extends State<LMFeedVideo> {
   void didUpdateWidget(LMFeedVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
-
-  // @override
-  // void onVisibilityChanged(WidgetVisibility visibility) {
-  //   debugPrint("Visibility changed to $visibility");
-  //   if (visibility == WidgetVisibility.INVISIBLE) {
-  //     player.pause();
-  //   } else if (visibility == WidgetVisibility.GONE) {
-  //     player.pause();
-  //   }
-  //   super.onVisibilityChanged(visibility);
-  // }
 
   Future<void> initialiseControllers() async {
     player = Player(

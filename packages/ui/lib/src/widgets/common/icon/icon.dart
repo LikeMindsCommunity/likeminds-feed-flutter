@@ -80,6 +80,20 @@ class LMFeedIcon extends StatelessWidget {
       ),
     );
   }
+
+  LMFeedIcon copyWith({
+    LMFeedIconType? type,
+    IconData? icon,
+    String? assetPath,
+    LMFeedIconStyle? style,
+  }) {
+    return LMFeedIcon(
+      type: type ?? this.type,
+      icon: icon ?? this.icon,
+      assetPath: assetPath ?? this.assetPath,
+      style: style ?? this.style,
+    );
+  }
 }
 
 class LMFeedIconStyle {
@@ -125,6 +139,28 @@ class LMFeedIconStyle {
       boxSize: 36,
       boxPadding: 8,
       fit: BoxFit.contain,
+    );
+  }
+
+  LMFeedIconStyle copyWith({
+    Color? color,
+    double? size,
+    double? boxSize,
+    double? boxBorder,
+    double? boxBorderRadius,
+    double? boxPadding,
+    Color? backgroundColor,
+    BoxFit? fit,
+  }) {
+    return LMFeedIconStyle(
+      color: color ?? this.color,
+      size: size ?? this.size,
+      boxSize: boxSize ?? this.boxSize,
+      boxBorder: boxBorder ?? this.boxBorder,
+      boxBorderRadius: boxBorderRadius ?? this.boxBorderRadius,
+      boxPadding: boxPadding ?? this.boxPadding,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      fit: fit ?? this.fit,
     );
   }
 }

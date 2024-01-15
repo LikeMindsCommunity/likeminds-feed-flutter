@@ -7,7 +7,6 @@ export 'post/post_menu.dart';
 export 'post/post_topic.dart';
 
 export 'comment/comment_tile.dart';
-export 'comment/reply_tile.dart';
 
 export 'common/buttons/button.dart';
 export 'common/commons.dart';

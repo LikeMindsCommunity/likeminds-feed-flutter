@@ -40,6 +40,36 @@ class LMFeedImage extends StatefulWidget {
 
   @override
   State<LMFeedImage> createState() => _LMImageState();
+
+  LMFeedImage copyWith({
+    String? imageUrl,
+    File? imageFile,
+    double? height,
+    double? width,
+    double? aspectRatio,
+    double? borderRadius,
+    Color? borderColor,
+    Widget? loaderWidget,
+    Widget? errorWidget,
+    Widget? shimmerWidget,
+    BoxFit? boxFit,
+    Function(String, StackTrace)? onError,
+  }) {
+    return LMFeedImage(
+      imageUrl: imageUrl ?? this.imageUrl,
+      imageFile: imageFile ?? this.imageFile,
+      height: height ?? this.height,
+      width: width ?? this.width,
+      aspectRatio: aspectRatio ?? this.aspectRatio,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderColor: borderColor ?? this.borderColor,
+      loaderWidget: loaderWidget ?? this.loaderWidget,
+      errorWidget: errorWidget ?? this.errorWidget,
+      shimmerWidget: shimmerWidget ?? this.shimmerWidget,
+      boxFit: boxFit ?? this.boxFit,
+      onError: onError ?? this.onError,
+    );
+  }
 }
 
 class _LMImageState extends State<LMFeedImage> {

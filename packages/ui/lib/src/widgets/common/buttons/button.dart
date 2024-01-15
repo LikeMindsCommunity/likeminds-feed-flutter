@@ -31,6 +31,22 @@ class LMFeedButton extends StatefulWidget {
 
   @override
   State<LMFeedButton> createState() => _LMButtonState();
+
+  LMFeedButton copyWith({
+    bool? isActive,
+    LMFeedButtonStyle? style,
+    LMFeedText? text,
+    Function()? onTap,
+    LMFeedText? activeText,
+  }) {
+    return LMFeedButton(
+      isActive: isActive ?? this.isActive,
+      style: style ?? this.style,
+      text: text ?? this.text,
+      onTap: onTap ?? this.onTap,
+      activeText: activeText ?? this.activeText,
+    );
+  }
 }
 
 class _LMButtonState extends State<LMFeedButton> {

@@ -183,4 +183,44 @@ class LMFeedLinkPreview extends StatelessWidget {
       ),
     );
   }
+
+  /// copyWith function to get a new object of [LMFeedLinkPreview]
+  /// with specific single values passed
+  LMFeedLinkPreview copyWith({
+    LMMediaModel? linkModel,
+    LMAttachmentViewData? attachment,
+    double? width,
+    double? height,
+    Color? backgroundColor,
+    double? borderRadius,
+    double? padding,
+    VoidCallback? onTap,
+    LMFeedText? title,
+    LMFeedText? subtitle,
+    LMFeedText? url,
+    String? imageUrl,
+    bool? showLinkUrl,
+    Border? border,
+    Widget? errorWidget,
+    Function(String, StackTrace)? onError,
+  }) {
+    return LMFeedLinkPreview(
+      linkModel: linkModel ?? this.linkModel,
+      attachment: attachment ?? this.attachment,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      padding: padding ?? this.padding,
+      onTap: onTap ?? this.onTap,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      url: url ?? this.url,
+      imageUrl: imageUrl ?? this.imageUrl,
+      showLinkUrl: showLinkUrl ?? this.showLinkUrl,
+      border: border ?? this.border,
+      errorWidget: errorWidget ?? this.errorWidget,
+      onError: onError ?? this.onError,
+    );
+  }
 }

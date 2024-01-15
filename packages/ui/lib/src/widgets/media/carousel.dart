@@ -49,6 +49,44 @@ class LMFeedCarousel extends StatefulWidget {
 
   @override
   State<LMFeedCarousel> createState() => _LMCarouselState();
+
+  static LMFeedCarousel defCarousel(
+    List<LMAttachmentViewData> attachments, {
+    double? height,
+    double? width,
+    double? borderRadius,
+    double? borderSize,
+    Color? borderColor,
+    Color? activeIndicatorColor,
+    Color? inactiveIndicatorColor,
+    Widget? activeIndicator,
+    Widget? inactiveIndicator,
+    LMFeedImage? imageItem,
+    LMFeedVideo? videoItem,
+    Widget? errorWidget,
+    BoxFit? boxFit,
+    Function(String, StackTrace)? onError,
+    Function(VideoController)? initialiseVideoController,
+  }) {
+    return LMFeedCarousel(
+      attachments: attachments,
+      height: height,
+      width: width,
+      borderRadius: borderRadius,
+      borderSize: borderSize,
+      borderColor: borderColor,
+      activeIndicatorColor: activeIndicatorColor,
+      inactiveIndicatorColor: inactiveIndicatorColor,
+      activeIndicator: activeIndicator,
+      inactiveIndicator: inactiveIndicator,
+      imageItem: imageItem,
+      videoItem: videoItem,
+      errorWidget: errorWidget,
+      boxFit: boxFit,
+      onError: onError,
+      initialiseVideoController: initialiseVideoController,
+    );
+  }
 }
 
 class _LMCarouselState extends State<LMFeedCarousel> {

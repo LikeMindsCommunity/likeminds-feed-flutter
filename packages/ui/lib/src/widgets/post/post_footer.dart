@@ -138,6 +138,30 @@ class LMFeedPostFooter extends StatelessWidget {
             ),
         onTap: () {},
       );
+
+  LMFeedPostFooter copyWith({
+    LMFeedPostFooterStyle? postFooterStyle,
+    Widget Function(LMFeedButton)? likeButtonBuilder,
+    Widget Function(LMFeedButton)? commentButtonBuilder,
+    Widget Function(LMFeedButton)? saveButtonBuilder,
+    Widget Function(LMFeedButton)? shareButtonBuilder,
+    LMFeedButton? likeButton,
+    LMFeedButton? commentButton,
+    LMFeedButton? saveButton,
+    LMFeedButton? shareButton,
+  }) {
+    return LMFeedPostFooter(
+      postFooterStyle: postFooterStyle ?? this.postFooterStyle,
+      likeButtonBuilder: likeButtonBuilder ?? this.likeButtonBuilder,
+      commentButtonBuilder: commentButtonBuilder ?? this.commentButtonBuilder,
+      saveButtonBuilder: saveButtonBuilder ?? this.saveButtonBuilder,
+      shareButtonBuilder: shareButtonBuilder ?? this.shareButtonBuilder,
+      likeButton: likeButton ?? this.likeButton,
+      commentButton: commentButton ?? this.commentButton,
+      saveButton: saveButton ?? this.saveButton,
+      shareButton: shareButton ?? this.shareButton,
+    );
+  }
 }
 
 class LMFeedPostFooterStyle {
@@ -174,17 +198,35 @@ class LMFeedPostFooterStyle {
     this.shareButtonStyle,
   });
 
-  LMFeedPostFooterStyle copyWith(LMFeedPostFooterStyle style) {
+  LMFeedPostFooterStyle copyWith({
+    bool? showSaveButton,
+    bool? showLikeButton,
+    bool? showCommentButton,
+    bool? showShareButton,
+    MainAxisAlignment? alignment,
+    double? width,
+    double? height,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    LMFeedButtonStyle? likeButtonStyle,
+    LMFeedButtonStyle? commentButtonStyle,
+    LMFeedButtonStyle? saveButtonStyle,
+    LMFeedButtonStyle? shareButtonStyle,
+  }) {
     return LMFeedPostFooterStyle(
-      showSaveButton: style.showSaveButton ?? showSaveButton,
-      showLikeButton: style.showLikeButton ?? showLikeButton,
-      showCommentButton: style.showCommentButton ?? showCommentButton,
-      showShareButton: style.showShareButton ?? showShareButton,
-      alignment: style.alignment ?? alignment,
-      width: style.width ?? width,
-      height: style.height ?? height,
-      padding: style.padding ?? padding,
-      margin: style.margin ?? margin,
+      showSaveButton: showSaveButton ?? showSaveButton,
+      showLikeButton: showLikeButton ?? showLikeButton,
+      showCommentButton: showCommentButton ?? showCommentButton,
+      showShareButton: showShareButton ?? this.showShareButton,
+      alignment: alignment ?? this.alignment,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      commentButtonStyle: commentButtonStyle ?? this.commentButtonStyle,
+      likeButtonStyle: likeButtonStyle ?? this.likeButtonStyle,
+      saveButtonStyle: saveButtonStyle ?? this.saveButtonStyle,
+      shareButtonStyle: shareButtonStyle ?? this.shareButtonStyle,
     );
   }
 }
