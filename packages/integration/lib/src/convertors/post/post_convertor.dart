@@ -50,6 +50,14 @@ class LMPostViewDataConvertor {
 
     postViewDataBuilder.commentCount(post.commentCount);
 
+    postViewDataBuilder.isReposted(post.isRepost);
+
+    postViewDataBuilder.isRepostedByUser(post.isRepostedByUser);
+
+    postViewDataBuilder.repostCount(post.repostCount);
+
+    postViewDataBuilder.isDeleted(post.isDeleted ?? false);
+
     return postViewDataBuilder.build();
   }
 
@@ -77,6 +85,10 @@ class LMPostViewDataConvertor {
       replies: postViewData.replies
           .map((e) => LMCommentViewDataConvertor.toComment(e))
           .toList(),
+      isRepost: postViewData.isReposted,
+      isRepostedByUser: postViewData.isRepostedByUser,
+      repostCount: postViewData.repostCount,
+      isDeleted: postViewData.isDeleted,
     );
   }
 }
