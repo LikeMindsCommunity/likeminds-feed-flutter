@@ -119,7 +119,7 @@ class LMFeedThemeData {
         contentStyle: const LMFeedPostContentStyle(
           padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           textStyle: TextStyle(
-            color: LikeMindsTheme.greyColor,
+            color: LikeMindsTheme.onContainer,
             fontSize: 16,
             fontFamily: 'Roboto',
             fontWeight: FontWeight.w400,
