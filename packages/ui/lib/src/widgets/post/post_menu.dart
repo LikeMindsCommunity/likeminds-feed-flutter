@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/models/commons/popup_menu_view_data.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/icon/icon.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/text/text_view.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
-class LMPostMenu extends StatelessWidget {
-  const LMPostMenu({
+class LMFeedMenu extends StatelessWidget {
+  const LMFeedMenu({
     super.key,
     this.children,
     required this.menuItems,
     required this.isFeed,
-    required this.onSelected,
     this.menuIcon,
     this.removeItemIds = const {4, 7},
+    this.action,
   });
 
-  final Map<int, LMTextView>? children;
-  final LMIcon? menuIcon;
-  final List<PopUpMenuItemViewData> menuItems;
+  final Map<int, LMFeedText>? children;
+  final LMFeedIcon? menuIcon;
+  final List<LMPopUpMenuItemViewData> menuItems;
   final bool isFeed;
-  final Function(int)? onSelected;
   final Set<int> removeItemIds;
+  final LMFeedMenuAction? action;
 
   void removeReportIntegration() {
     menuItems.removeWhere((element) {
@@ -39,7 +37,7 @@ class LMPostMenu extends StatelessWidget {
         return SizedBox(
           child: Builder(builder: (context) {
             return PopupMenuButton<int>(
-              onSelected: onSelected,
+              onSelected: _handleMenuTap,
               itemBuilder: (context) => menuItems
                   .map(
                     (element) => PopupMenuItem(
@@ -49,25 +47,27 @@ class LMPostMenu extends StatelessWidget {
                       ),
                       value: element.id,
                       child: children?[element.id] ??
-                          LMTextView(
+                          LMFeedText(
                             text: element.title,
-                            textStyle: const TextStyle(
-                              color: kGreyColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                            style: const LMFeedTextStyle(
+                              textStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                     ),
                   )
                   .toList(),
-              color: kWhiteColor,
+              color: Colors.white,
               child: menuIcon ??
                   const SizedBox(
                     height: 24,
                     width: 24,
                     child: Icon(
                       Icons.more_horiz,
-                      color: kGrey1Color,
+                      color: Colors.grey,
                       size: 24,
                     ),
                   ),
@@ -75,6 +75,93 @@ class LMPostMenu extends StatelessWidget {
           }),
         );
       },
+    );
+  }
+
+  void _handleMenuTap(int itemId) {
+    switch (itemId) {
+      case LMFeedMenuAction.postDeleteId:
+        action?.onPostDelete?.call();
+        break;
+      case LMFeedMenuAction.postPinId:
+        action?.onPostPin?.call();
+        break;
+      case LMFeedMenuAction.postUnpinId:
+        action?.onPostUnpin?.call();
+        break;
+      case LMFeedMenuAction.postReportId:
+        action?.onPostReport?.call();
+        break;
+      case LMFeedMenuAction.postEditId:
+        action?.onPostEdit?.call();
+        break;
+      case LMFeedMenuAction.commentDeleteId:
+        action?.onCommentDelete?.call();
+        break;
+      case LMFeedMenuAction.commentReportId:
+        action?.onCommentReport?.call();
+        break;
+      case LMFeedMenuAction.commentEditId:
+        action?.onCommentEdit?.call();
+        break;
+    }
+  }
+
+  LMFeedMenu copyWith(LMFeedMenu menu) {
+    return LMFeedMenu(
+      children: menu.children ?? children,
+      menuIcon: menu.menuIcon ?? menuIcon,
+      menuItems: menu.menuItems,
+      isFeed: menu.isFeed,
+      removeItemIds: menu.removeItemIds,
+      action: menu.action ?? action,
+    );
+  }
+}
+
+class LMFeedMenuAction {
+  static const int postDeleteId = 1;
+  static const int postPinId = 2;
+  static const int postUnpinId = 3;
+  static const int postReportId = 4;
+  static const int postEditId = 5;
+
+// Comment & Reply Id
+  static const int commentDeleteId = 6;
+  static const int commentReportId = 7;
+  static const int commentEditId = 8;
+
+  VoidCallback? onPostDelete;
+  VoidCallback? onPostPin;
+  VoidCallback? onPostUnpin;
+  VoidCallback? onPostReport;
+  VoidCallback? onPostEdit;
+
+  VoidCallback? onCommentDelete;
+  VoidCallback? onCommentReport;
+  VoidCallback? onCommentEdit;
+
+  LMFeedMenuAction({
+    this.onPostDelete,
+    this.onPostPin,
+    this.onPostUnpin,
+    this.onPostReport,
+    this.onPostEdit,
+    this.onCommentDelete,
+    this.onCommentReport,
+    this.onCommentEdit,
+  });
+
+  LMFeedMenuAction copyWith(LMFeedMenuAction action) {
+    return LMFeedMenuAction(
+      onPostDelete: action.onPostDelete ?? onPostDelete,
+      onPostPin: action.onPostPin ?? onPostPin,
+      onPostUnpin: action.onPostUnpin ?? onPostUnpin,
+      onPostReport: action.onPostReport ?? onPostReport,
+      onPostEdit: action.onPostEdit ?? onPostEdit,
+      onCommentDelete: action.onCommentDelete ?? onCommentDelete,
+      onCommentReport: action.onCommentReport ?? onCommentReport,
+      onCommentEdit: action.onCommentEdit ?? onCommentEdit,
     );
   }
 }

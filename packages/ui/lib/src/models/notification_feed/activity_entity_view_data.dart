@@ -1,9 +1,9 @@
-import 'package:likeminds_feed_ui_fl/src/models/comment/comment_view_data.dart';
-import 'package:likeminds_feed_ui_fl/src/models/helper/attachment/attachment_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/comment/comment_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/helper/attachment/attachment_view_data.dart';
 
-class ActivityEntityViewData {
+class LMActivityEntityViewData {
   String id;
-  List<AttachmentViewData>? attachments;
+  List<LMAttachmentViewData>? attachments;
   int? chatroomId;
   int communityId;
   int createdAt;
@@ -16,11 +16,11 @@ class ActivityEntityViewData {
   bool? isPinned;
   bool? isEdited;
   String text;
-  List<CommentViewData>? replies;
+  List<LMCommentViewData>? replies;
   int? updatedAt;
   String userId;
 
-  ActivityEntityViewData._({
+  LMActivityEntityViewData._({
     required this.id,
     this.attachments,
     this.chatroomId,
@@ -41,9 +41,9 @@ class ActivityEntityViewData {
   });
 }
 
-class ActivityEntityViewDataBuilder {
+class LMActivityEntityViewDataBuilder {
   String? _id;
-  List<AttachmentViewData>? _attachments;
+  List<LMAttachmentViewData>? _attachments;
   int? _chatroomId;
   int? _communityId;
   int? _createdAt;
@@ -57,7 +57,7 @@ class ActivityEntityViewDataBuilder {
   bool? _isEdited;
   String? _text;
 
-  List<CommentViewData>? _replies;
+  List<LMCommentViewData>? _replies;
   int? _updatedAt;
   String? _userId;
 
@@ -65,7 +65,7 @@ class ActivityEntityViewDataBuilder {
     _id = id;
   }
 
-  void attachments(List<AttachmentViewData> attachments) {
+  void attachments(List<LMAttachmentViewData> attachments) {
     _attachments = attachments;
   }
 
@@ -117,7 +117,7 @@ class ActivityEntityViewDataBuilder {
     _text = text;
   }
 
-  void replies(List<CommentViewData> replies) {
+  void replies(List<LMCommentViewData> replies) {
     _replies = replies;
   }
 
@@ -129,8 +129,8 @@ class ActivityEntityViewDataBuilder {
     _userId = userId;
   }
 
-  ActivityEntityViewData build() {
-    return ActivityEntityViewData._(
+  LMActivityEntityViewData build() {
+    return LMActivityEntityViewData._(
       id: _id!,
       attachments: _attachments,
       chatroomId: _chatroomId,

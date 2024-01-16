@@ -1,13 +1,13 @@
-class TopicViewData {
+class LMTopicViewData {
   String name;
   final String id;
   bool isEnabled;
 
-  TopicViewData._(
+  LMTopicViewData._(
       {required this.name, required this.id, required this.isEnabled});
 }
 
-class TopicViewDataBuilder {
+class LMTopicViewDataBuilder {
   String? _name;
   String? _id;
   bool? _isEnabled;
@@ -24,11 +24,11 @@ class TopicViewDataBuilder {
     _isEnabled = isEnabled;
   }
 
-  TopicViewData build() {
+  LMTopicViewData build() {
     if (_name == null || _id == null || _isEnabled == null) {
       throw Exception(
-          "TopicViewDataBuilder: name, id and isEnabled must be set");
+          "LMTopicViewDataBuilder: name, id and isEnabled must be set");
     }
-    return TopicViewData._(name: _name!, id: _id!, isEnabled: _isEnabled!);
+    return LMTopicViewData._(name: _name!, id: _id!, isEnabled: _isEnabled!);
   }
 }

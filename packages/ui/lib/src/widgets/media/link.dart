@@ -1,69 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 /*
 * Topic chip widget
 * This widget is used to display link preview
-* A [LMLinkPreview] displays link heading, description and URL
-* The [LMLinkPreview] can be customized by passing in the required parameters
+* A [LMFeedLinkPreview] displays link heading, description and URL
+* The [LMFeedLinkPreview] can be customized by passing in the required parameters
 */
-class LMLinkPreview extends StatelessWidget {
-  const LMLinkPreview({
+class LMFeedPostLinkPreview extends StatelessWidget {
+  const LMFeedPostLinkPreview({
     super.key,
     this.attachment,
     this.linkModel,
-    this.width,
-    this.height,
-    this.backgroundColor,
-    this.borderRadius,
-    this.padding,
     this.onTap,
     this.title,
     this.subtitle,
     this.url,
     this.imageUrl,
-    this.showLinkUrl = false,
-    this.border,
-    this.errorWidget,
     this.onError,
+    this.style,
   });
 
   // data class to provide link preview data
-  final MediaModel? linkModel;
-  final AttachmentViewData? attachment;
+  final LMMediaModel? linkModel;
+  final LMAttachmentViewData? attachment;
 
-  // defaults to width of screen
-  final double? width;
-
-  // defaults to null
-  final double? height;
-
-  // defaults to null
-  final Color? backgroundColor;
-
-  // defaults to 8.0
-  final double? borderRadius;
-  final double? padding;
   final VoidCallback? onTap;
 
   // defaults to null,
   final String? imageUrl;
 
   // defaults to null, for custom styling
-  final LMTextView? title;
+  final LMFeedText? title;
 
   // defaults to null, for custom styling
-  final LMTextView? subtitle;
+  final LMFeedText? subtitle;
 
   // defaults to null, for custom styling
-  final LMTextView? url;
+  final LMFeedText? url;
 
   // defaults to false, to show link url
-  final bool showLinkUrl;
-  final Border? border;
-  final Widget? errorWidget;
+
   final Function(String, StackTrace)? onError;
+
+  final LMFeedPostLinkPreviewStyle? style;
 
   bool checkNullMedia() {
     return ((linkModel == null ||
@@ -77,30 +59,33 @@ class LMLinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LMFeedPostLinkPreviewStyle style =
+        this.style ?? const LMFeedPostLinkPreviewStyle();
     return GestureDetector(
       onTap: onTap,
       child: Container(
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          color: kWhiteColor,
-          border: border ??
+          color: Colors.white,
+          border: style.border ??
               Border.all(
-                color: kGrey3Color,
+                color: Colors.grey.shade300,
                 width: 0.5,
               ),
           borderRadius: BorderRadius.circular(8.0),
         ),
-        height: height,
-        width: width ?? MediaQuery.of(context).size.width,
+        height: style.height,
+        width: style.width ?? MediaQuery.of(context).size.width,
         child: Column(
           children: <Widget>[
             checkNullMedia()
                 ? const SizedBox.shrink()
-                : LMImage(
-                    width: width,
-                    height: 150,
-                    borderRadius: borderRadius,
-                    errorWidget: errorWidget,
+                : LMFeedPostImage(
+                    style: LMFeedPostImageStyle(
+                      height: 150,
+                      borderRadius: style.borderRadius,
+                      errorWidget: style.errorWidget,
+                    ),
                     onError: onError,
                     imageUrl: imageUrl ??
                         (linkModel != null
@@ -108,50 +93,55 @@ class LMLinkPreview extends StatelessWidget {
                             : attachment!.attachmentMeta.ogTags!.image!),
                   ),
             Container(
-              height: height != null ? (height! - 152) : null,
-              color: backgroundColor,
+              height: style.height != null ? (style.height! - 152) : null,
+              color: style.backgroundColor,
               padding: const EdgeInsets.all(8.0),
               child: SizedBox(
-                width: width ?? MediaQuery.of(context).size.width,
+                width: style.width ?? MediaQuery.of(context).size.width,
                 child: Column(
                   children: <Widget>[
                     SizedBox(
-                      width: width ?? MediaQuery.of(context).size.width,
+                      width: style.width ?? MediaQuery.of(context).size.width,
                       child: title ??
-                          LMTextView(
+                          LMFeedText(
                             text: linkModel != null
                                 ? linkModel!.ogTags!.title!
                                 : attachment!.attachmentMeta.ogTags!.title ??
                                     'NOT PRODUCING',
-                            textStyle: const TextStyle(
-                              color: kGrey1Color,
-                              fontSize: kFontMedium,
-                              fontWeight: FontWeight.bold,
+                            style: const LMFeedTextStyle(
+                              textStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: LikeMindsTheme.kFontMedium,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                     ),
-                    kVerticalPaddingSmall,
+                    LikeMindsTheme.kVerticalPaddingSmall,
                     SizedBox(
-                      width: width ?? MediaQuery.of(context).size.width,
+                      width: style.width ?? MediaQuery.of(context).size.width,
                       child: subtitle ??
-                          LMTextView(
+                          LMFeedText(
                             text: linkModel != null
                                 ? linkModel!.ogTags!.description!
                                 : attachment!
                                         .attachmentMeta.ogTags!.description ??
                                     'NOT PRODUCING',
-                            maxLines: 2,
-                            textStyle: const TextStyle(
-                              color: kGrey3Color,
-                              fontSize: kFontSmall,
+                            style: LMFeedTextStyle(
+                              maxLines: 2,
+                              textStyle: TextStyle(
+                                color: Colors.grey.shade300,
+                                fontSize: LikeMindsTheme.kFontSmall,
+                              ),
                             ),
                           ),
                     ),
-                    kVerticalPaddingXSmall,
-                    showLinkUrl
+                    LikeMindsTheme.kVerticalPaddingXSmall,
+                    style.showLinkUrl
                         ? SizedBox(
-                            width: width ?? MediaQuery.of(context).size.width,
-                            child: LMTextView(
+                            width: style.width ??
+                                MediaQuery.of(context).size.width,
+                            child: LMFeedText(
                               text: linkModel != null
                                   ? linkModel!.link ?? linkModel!.ogTags!.url!
                                   : attachment!.attachmentMeta.ogTags!.url !=
@@ -159,10 +149,12 @@ class LMLinkPreview extends StatelessWidget {
                                       ? attachment!.attachmentMeta.ogTags!.url!
                                           .toLowerCase()
                                       : 'NOT PRODUCING',
-                              maxLines: 1,
-                              textStyle: const TextStyle(
-                                color: kGrey3Color,
-                                fontSize: kFontXSmall,
+                              style: LMFeedTextStyle(
+                                maxLines: 1,
+                                textStyle: TextStyle(
+                                  color: Colors.grey.shade300,
+                                  fontSize: LikeMindsTheme.kFontXSmall,
+                                ),
                               ),
                             ),
                           )
@@ -174,6 +166,91 @@ class LMLinkPreview extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// copyWith function to get a new object of [LMFeedPostLinkPreview]
+  /// with specific single values passed
+  LMFeedPostLinkPreview copyWith({
+    LMMediaModel? linkModel,
+    LMAttachmentViewData? attachment,
+    double? width,
+    double? height,
+    Color? backgroundColor,
+    double? borderRadius,
+    double? padding,
+    VoidCallback? onTap,
+    LMFeedText? title,
+    LMFeedText? subtitle,
+    LMFeedText? url,
+    String? imageUrl,
+    bool? showLinkUrl,
+    Border? border,
+    Widget? errorWidget,
+    Function(String, StackTrace)? onError,
+    LMFeedPostLinkPreviewStyle? style,
+  }) {
+    return LMFeedPostLinkPreview(
+      linkModel: linkModel ?? this.linkModel,
+      attachment: attachment ?? this.attachment,
+      onTap: onTap ?? this.onTap,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      url: url ?? this.url,
+      imageUrl: imageUrl ?? this.imageUrl,
+      onError: onError ?? this.onError,
+      style: style ?? this.style,
+    );
+  }
+}
+
+class LMFeedPostLinkPreviewStyle {
+// defaults to width of screen
+  final double? width;
+
+  // defaults to null
+  final double? height;
+
+  // defaults to null
+  final Color? backgroundColor;
+
+  // defaults to 8.0
+  final double? borderRadius;
+  final double? padding;
+  final bool showLinkUrl;
+  final Border? border;
+  final Widget? errorWidget;
+
+  const LMFeedPostLinkPreviewStyle({
+    this.width,
+    this.height,
+    this.backgroundColor,
+    this.borderRadius,
+    this.padding,
+    this.showLinkUrl = false,
+    this.border,
+    this.errorWidget,
+  });
+
+  LMFeedPostLinkPreviewStyle copyWith({
+    double? width,
+    double? height,
+    Color? backgroundColor,
+    double? borderRadius,
+    double? padding,
+    bool? showLinkUrl,
+    Border? border,
+    Widget? errorWidget,
+  }) {
+    return LMFeedPostLinkPreviewStyle(
+      width: width ?? this.width,
+      height: height ?? this.height,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      padding: padding ?? this.padding,
+      showLinkUrl: showLinkUrl ?? this.showLinkUrl,
+      border: border ?? this.border,
+      errorWidget: errorWidget ?? this.errorWidget,
     );
   }
 }

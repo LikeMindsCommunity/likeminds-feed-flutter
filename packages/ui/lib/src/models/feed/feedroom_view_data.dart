@@ -1,6 +1,6 @@
-import 'package:likeminds_feed_ui_fl/src/models/user/user_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/user/user_view_data.dart';
 
-class FeedRoomViewData {
+class LMFeedRoomViewData {
   int id;
   String title;
   String header;
@@ -39,11 +39,11 @@ class FeedRoomViewData {
   int participantsCount;
   int? memberId;
   String? access;
-  UserViewData member;
+  LMUserViewData member;
   List<dynamic>? cohorts;
   List<dynamic>? coHosts;
 
-  FeedRoomViewData._({
+  LMFeedRoomViewData._({
     required this.id,
     required this.title,
     required this.header,
@@ -88,7 +88,7 @@ class FeedRoomViewData {
   });
 }
 
-class FeedRoomViewDataBuilder {
+class LMFeedRoomViewDataBuilder {
   int? _id;
   String? _title;
   String? _header;
@@ -127,7 +127,7 @@ class FeedRoomViewDataBuilder {
   int? _participantsCount;
   int? _memberId;
   String? _access;
-  UserViewData? _member;
+  LMUserViewData? _member;
   List<dynamic>? _cohorts;
   List<dynamic>? _coHosts;
 
@@ -283,7 +283,7 @@ class FeedRoomViewDataBuilder {
     _access = access;
   }
 
-  void member(UserViewData member) {
+  void member(LMUserViewData member) {
     _member = member;
   }
 
@@ -295,8 +295,8 @@ class FeedRoomViewDataBuilder {
     _coHosts = coHosts;
   }
 
-  FeedRoomViewData build() {
-    return FeedRoomViewData._(
+  LMFeedRoomViewData build() {
+    return LMFeedRoomViewData._(
       id: _id!,
       title: _title!,
       header: _header!,

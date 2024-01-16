@@ -1,24 +1,48 @@
-import 'package:likeminds_feed_ui_fl/src/models/commons/popup_menu_view_data.dart';
-import 'package:likeminds_feed_ui_fl/src/models/helper/attachment/attachment_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 
-class PostViewData {
+/// {@template post_view_data}
+/// A data class to hold the post data.
+/// {@endtemplate}
+class LMPostViewData {
+  /// unique indentifier of the post
+  /// [required]
   final String id;
+
+  /// content of the post [nullable]
+  /// might contain tags and mentions
   String text;
+
+  /// topics of the post [nullable]
   List<String> topics;
-  List<AttachmentViewData>? attachments;
+
+  /// attachments of the post [nullable]
+  /// can be of type image, video, file
+  List<LMAttachmentViewData>? attachments;
+
+  /// community id of the community to which the post belongs
   final int communityId;
+
   bool isPinned;
+
+  /// user id of the user who created the post
   final String userId;
+
   int likeCount;
+
   int commentCount;
   bool isSaved;
   bool isLiked;
-  List<PopUpMenuItemViewData> menuItems;
+
+  /// menu items to be displayed in the post menu
+  List<LMPopUpMenuItemViewData> menuItems;
   final DateTime createdAt;
   DateTime updatedAt;
   bool isEdited;
 
-  PostViewData._({
+  List<LMCommentViewData> replies;
+
+  /// {@macro post_view_data}
+  LMPostViewData._({
     required this.id,
     required this.text,
     required this.attachments,
@@ -34,14 +58,15 @@ class PostViewData {
     required this.isLiked,
     required this.commentCount,
     required this.isEdited,
+    required this.replies,
   });
 }
 
-class PostViewDataBuilder {
+class LMPostViewDataBuilder {
   String? _id;
   String? _text;
   List<String>? _topics;
-  List<AttachmentViewData>? _attachments;
+  List<LMAttachmentViewData>? _attachments;
   int? _communityId;
   bool? _isPinned;
   String? _userId;
@@ -49,10 +74,11 @@ class PostViewDataBuilder {
   int? _commentCount;
   bool? _isSaved;
   bool? _isLiked;
-  List<PopUpMenuItemViewData>? _menuItems;
+  List<LMPopUpMenuItemViewData>? _menuItems;
   DateTime? _createdAt;
   DateTime? _updatedAt;
   bool? _isEdited;
+  List<LMCommentViewData>? _replies;
 
   void id(String id) {
     _id = id;
@@ -66,7 +92,7 @@ class PostViewDataBuilder {
     _topics = topics;
   }
 
-  void attachments(List<AttachmentViewData> attachments) {
+  void attachments(List<LMAttachmentViewData> attachments) {
     _attachments = attachments;
   }
 
@@ -98,7 +124,7 @@ class PostViewDataBuilder {
     _isLiked = isLiked;
   }
 
-  void menuItems(List<PopUpMenuItemViewData> menuItems) {
+  void menuItems(List<LMPopUpMenuItemViewData> menuItems) {
     _menuItems = menuItems;
   }
 
@@ -114,8 +140,12 @@ class PostViewDataBuilder {
     _isEdited = isEdited;
   }
 
-  PostViewData build() {
-    return PostViewData._(
+  void replies(List<LMCommentViewData> replies) {
+    _replies = replies;
+  }
+
+  LMPostViewData build() {
+    return LMPostViewData._(
       id: _id!,
       text: _text!,
       topics: _topics!,
@@ -131,6 +161,7 @@ class PostViewDataBuilder {
       createdAt: _createdAt!,
       updatedAt: _updatedAt!,
       isEdited: _isEdited!,
+      replies: _replies!,
     );
   }
 }

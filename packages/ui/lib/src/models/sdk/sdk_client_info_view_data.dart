@@ -1,16 +1,16 @@
-class SDKClientInfoViewData {
+class LMSDKClientInfoViewData {
   int community;
   int user;
   String userUniqueId;
 
-  SDKClientInfoViewData._({
+  LMSDKClientInfoViewData._({
     required this.community,
     required this.user,
     required this.userUniqueId,
   });
 }
 
-class SDKClientInfoViewDataBuilder {
+class LMSDKClientInfoViewDataBuilder {
   int? _community;
   int? _user;
   String? _userUniqueId;
@@ -27,8 +27,8 @@ class SDKClientInfoViewDataBuilder {
     _userUniqueId = userUniqueId;
   }
 
-  SDKClientInfoViewData build() {
-    return SDKClientInfoViewData._(
+  LMSDKClientInfoViewData build() {
+    return LMSDKClientInfoViewData._(
       community: _community!,
       user: _user!,
       userUniqueId: _userUniqueId!,

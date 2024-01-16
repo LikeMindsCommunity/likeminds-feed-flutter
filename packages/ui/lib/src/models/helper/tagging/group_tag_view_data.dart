@@ -1,11 +1,11 @@
-class GroupTagViewData {
+class LMGroupTagViewData {
   String? description;
   String? imageUrl;
   String? name;
   String? route;
   String? tag;
 
-  GroupTagViewData._({
+  LMGroupTagViewData._({
     this.description,
     this.imageUrl,
     this.name,
@@ -14,7 +14,7 @@ class GroupTagViewData {
   });
 }
 
-class GroupTagViewDataBuilder {
+class LMGroupTagViewDataBuilder {
   String? _description;
   String? _imageUrl;
   String? _name;
@@ -41,8 +41,8 @@ class GroupTagViewDataBuilder {
     _tag = tag;
   }
 
-  GroupTagViewData build() {
-    return GroupTagViewData._(
+  LMGroupTagViewData build() {
+    return LMGroupTagViewData._(
       description: _description,
       imageUrl: _imageUrl,
       name: _name,

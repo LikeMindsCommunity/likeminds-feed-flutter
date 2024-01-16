@@ -2,11 +2,10 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/packages/linkify/linkify.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/packages/linkify/linkify.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 
-class TaggingHelper {
+class LMFeedTaggingHelper {
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
   static const String notificationTagRoute =
       r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>';
@@ -16,11 +15,11 @@ class TaggingHelper {
       r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)';
 
   /// Encodes the string with the user tags and returns the encoded string
-  static String encodeString(String string, List<UserTagViewData> userTags) {
+  static String encodeString(String string, List<LMUserTagViewData> userTags) {
     final Iterable<RegExpMatch> matches = tagRegExp.allMatches(string);
     for (final match in matches) {
       final String tag = match.group(1)!;
-      final UserTagViewData? userTag =
+      final LMUserTagViewData? userTag =
           userTags.firstWhereOrNull((element) => element.name! == tag);
       if (userTag != null) {
         string = string.replaceAll('@$tag~',
@@ -59,13 +58,13 @@ class TaggingHelper {
   }
 
   /// Matches the tags in the string and returns the list of matched tags
-  static List<UserTagViewData> matchTags(
-      String text, List<UserTagViewData> items) {
-    final List<UserTagViewData> tags = [];
+  static List<LMUserTagViewData> matchTags(
+      String text, List<LMUserTagViewData> items) {
+    final List<LMUserTagViewData> tags = [];
     final Iterable<RegExpMatch> matches = tagRegExp.allMatches(text);
     for (final match in matches) {
       final String tag = match.group(1)!;
-      final UserTagViewData? userTag =
+      final LMUserTagViewData? userTag =
           items.firstWhereOrNull((element) => element.name! == tag);
       if (userTag != null) {
         tags.add(userTag);
@@ -113,7 +112,7 @@ class TaggingHelper {
       {bool withTilde = true}) {
     final Iterable<RegExpMatch> matches =
         RegExp(notificationTagRoute).allMatches(text);
-    List<UserTagViewData> userTags = [];
+    List<LMUserTagViewData> userTags = [];
     for (final match in matches) {
       final String tag = match.group(1)!;
       final String mid = match.group(2)!;
@@ -121,7 +120,8 @@ class TaggingHelper {
       text = text.replaceAll(
           '<<$tag|route://$mid/$id>>', withTilde ? '@$tag~' : '@$tag');
 
-      UserTagViewDataBuilder userTagViewDataBuilder = UserTagViewDataBuilder();
+      LMUserTagViewDataBuilder userTagViewDataBuilder =
+          LMUserTagViewDataBuilder();
 
       userTagViewDataBuilder
         ..name(tag)
@@ -132,16 +132,17 @@ class TaggingHelper {
     return {'text': text, 'userTags': userTags};
   }
 
-  static List<UserTagViewData> addUserTagsIfMatched(String input) {
+  static List<LMUserTagViewData> addUserTagsIfMatched(String input) {
     final Iterable<RegExpMatch> matches =
         RegExp(notificationTagRoute).allMatches(input);
-    List<UserTagViewData> userTags = [];
+    List<LMUserTagViewData> userTags = [];
     for (final match in matches) {
       final String tag = match.group(1)!;
       //final String mid = match.group(2)!;
       final String id = match.group(3)!;
 
-      UserTagViewDataBuilder userTagViewDataBuilder = UserTagViewDataBuilder();
+      LMUserTagViewDataBuilder userTagViewDataBuilder =
+          LMUserTagViewDataBuilder();
 
       userTagViewDataBuilder
         ..name(tag)
@@ -169,7 +170,7 @@ class TaggingHelper {
             text: text.substring(lastIndex, startIndex),
             style: const TextStyle(
               wordSpacing: 1.5,
-              color: kGrey1Color,
+              color: Colors.grey,
             ),
           ),
         );
@@ -177,11 +178,11 @@ class TaggingHelper {
       // Add a TextSpan for the URL
       textSpans.add(
         TextSpan(
-          text: TaggingHelper.decodeNotificationString(link!).keys.first,
+          text: LMFeedTaggingHelper.decodeNotificationString(link!).keys.first,
           style: const TextStyle(
             wordSpacing: 1.5,
             fontWeight: FontWeight.bold,
-            color: kGrey1Color,
+            color: Colors.grey,
           ),
         ),
       );
@@ -193,7 +194,7 @@ class TaggingHelper {
       // Add a TextSpan for the remaining text
       textSpans.add(TextSpan(
         text: text.substring(lastIndex),
-        style: const TextStyle(wordSpacing: 1.5, color: kGrey1Color),
+        style: const TextStyle(wordSpacing: 1.5, color: Colors.grey),
       ));
     }
 
@@ -202,7 +203,7 @@ class TaggingHelper {
 }
 
 List<String> extractLinkFromString(String text) {
-  RegExp exp = RegExp(TaggingHelper.linkRoute);
+  RegExp exp = RegExp(LMFeedTaggingHelper.linkRoute);
   Iterable<RegExpMatch> matches = exp.allMatches(text);
   List<String> links = [];
   for (var match in matches) {

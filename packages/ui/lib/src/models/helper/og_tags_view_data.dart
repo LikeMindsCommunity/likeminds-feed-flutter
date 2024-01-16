@@ -1,10 +1,10 @@
-class OgTagsViewData {
+class LMOgTagsViewData {
   final String? title;
   final String? image;
   final String? description;
   final String? url;
 
-  OgTagsViewData._({
+  LMOgTagsViewData._({
     this.title,
     this.image,
     this.description,
@@ -12,7 +12,7 @@ class OgTagsViewData {
   });
 }
 
-class OgTagsViewDataBuilder {
+class LMOgTagsViewDataBuilder {
   String? _title;
   String? _image;
   String? _description;
@@ -34,8 +34,8 @@ class OgTagsViewDataBuilder {
     _url = url;
   }
 
-  OgTagsViewData build() {
-    return OgTagsViewData._(
+  LMOgTagsViewData build() {
+    return LMOgTagsViewData._(
       title: _title,
       image: _image,
       description: _description,

@@ -1,64 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 // This widget is used to display a topic feed bar
-// A [LMTopicFeedBar] displays a list of selected topics
-// The [LMTopicFeedBar] can be customized by passing in the required parameters
-class LMTopicFeedBar extends StatelessWidget {
+// A [LMFeedTopicFeedBar] displays a list of selected topics
+// The [LMFeedTopicFeedBar] can be customized by passing in the required parameters
+class LMFeedTopicFeedBar extends StatelessWidget {
   // Required parameters
   // List of selected topic [pass empty list if no topic is selected]
-  final List<TopicViewData> selectedTopics;
+  final List<LMTopicViewData> selectedTopics;
   // Action to perform after tapping on the topic feed bar
   final Function onTap;
 
-  final bool showBorder;
-  // background color of the topic chip defaults to transparent
-  final Color? backgroundColor;
-  // border color of the topic chip defaults to null
-  final Color? borderColor;
-  // border width of the topic chip defaults to 1.0
-  final double? borderWidth;
-  final TextStyle? textStyle;
-  // Icon to be displayed on the topic chip if any defaults to null
-  final Icon? icon;
   final Function? onClear;
-  final Function(TopicViewData)? onIconTap;
+  final Function(LMTopicViewData)? onIconTap;
   final Widget? trailingIcon;
   final Function? onTrailingIconTap;
-  final EdgeInsets? chipPadding;
   // Whether to show divider below topic feed bar or not
   // defaults to true
   final bool showDivider;
-  // Height of the chips of topic feed bar, defaults to 30.0
-  final double? height;
   // Placeholder chip if no topic is selected
   final Widget? emptyTopicChip;
-  // Whether to place the icon before the text
-  // or after the text of the topic chip
-  // LMIconPlacement.start places the icon before the text
-  // LMIconPlacement.end places the icon after the text
-  final LMIconPlacement iconPlacement;
 
-  const LMTopicFeedBar({
+  /// height of topic feed bar
+  final double? height;
+
+  final LMFeedTopicChipStyle? style;
+
+  const LMFeedTopicFeedBar({
     Key? key,
     required this.selectedTopics,
-    this.backgroundColor,
-    this.borderColor,
-    this.borderWidth,
-    this.showBorder = false,
-    this.textStyle,
-    this.icon,
     this.onClear,
     this.onIconTap,
     required this.onTap,
     this.trailingIcon,
     this.onTrailingIconTap,
-    this.chipPadding,
-    this.height,
     this.showDivider = true,
     this.emptyTopicChip,
-    this.iconPlacement = LMIconPlacement.end,
+    this.style,
+    this.height,
   }) : super(key: key);
 
   // Topic feed bar with selected topics
@@ -66,7 +47,7 @@ class LMTopicFeedBar extends StatelessWidget {
   // at the end of the list of selected topics
   // If no trailing icon is passed, the topic
   // feed bar displays only the list of selected topics
-  Widget selectedTopicsWidget(double width) {
+  Widget selectedTopicsWidget(LMFeedThemeData feedTheme, double width) {
     return SizedBox(
       width: width,
       child: Row(
@@ -86,9 +67,8 @@ class LMTopicFeedBar extends StatelessWidget {
                         trailingIcon != null) {
                       return Container(
                         color: Colors.transparent,
-                        child: LMTopicChip(
-                          padding: chipPadding,
-                          topic: (TopicViewDataBuilder()
+                        child: LMFeedTopicChip(
+                          topic: (LMTopicViewDataBuilder()
                                 ..id("-1")
                                 ..isEnabled(false)
                                 ..name("name"))
@@ -96,34 +76,23 @@ class LMTopicFeedBar extends StatelessWidget {
                           onIconTap: (tapped) {
                             onTap();
                           },
-                          showBorder: showBorder,
-                          borderColor: borderColor,
-                          borderWidth: borderWidth,
-                          backgroundColor: backgroundColor,
-                          textStyle: textStyle,
-                          icon: trailingIcon,
-                          iconPlacement: iconPlacement,
+                          style: style ??
+                              feedTheme.postStyle.topicStyle.activeChipStyle,
                         ),
                       );
                     }
                     return Container(
                       color: Colors.transparent,
-                      child: LMTopicChip(
-                        padding: chipPadding,
+                      child: LMFeedTopicChip(
                         topic: selectedTopics[index],
                         onIconTap: onIconTap,
-                        showBorder: showBorder,
-                        borderColor: borderColor,
-                        borderWidth: borderWidth,
-                        backgroundColor: backgroundColor,
-                        textStyle: textStyle,
-                        icon: icon,
+                        style: style,
                       ),
                     );
                   }),
             ),
           ),
-          kHorizontalPaddingMedium,
+          LikeMindsTheme.kHorizontalPaddingMedium,
           onClear == null
               ? const SizedBox()
               : GestureDetector(
@@ -134,7 +103,7 @@ class LMTopicFeedBar extends StatelessWidget {
                     child: const Text(
                       "Clear",
                       style: TextStyle(
-                        color: kPrimaryColor,
+                        color: Colors.blue,
                       ),
                     ),
                   ),
@@ -147,7 +116,7 @@ class LMTopicFeedBar extends StatelessWidget {
   // Topic feed bar with no topic selected [Placeholder chip]
   // If no placeholder chip is passed, a default placeholder chip is displayed`
   // The default placeholder chip displays "All topics" text
-  Widget emptyTopicsWidget() {
+  Widget emptyTopicsWidget(LMFeedThemeData feedTheme) {
     return emptyTopicChip != null
         ? Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,7 +133,7 @@ class LMTopicFeedBar extends StatelessWidget {
                 Text(
                   'All topics',
                 ),
-                kHorizontalPaddingMedium,
+                LikeMindsTheme.kHorizontalPaddingMedium,
                 Icon(
                   Icons.arrow_downward,
                   size: 18,
@@ -177,6 +146,7 @@ class LMTopicFeedBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return GestureDetector(
       onTap: () => onTap(),
       child: Container(
@@ -186,15 +156,41 @@ class LMTopicFeedBar extends StatelessWidget {
               ? Border(
                   bottom: BorderSide(
                     width: 0.1,
-                    color: kGrey2Color.withOpacity(0.05),
+                    color: Colors.grey.withOpacity(0.05),
                   ),
                 )
               : null,
         ),
         child: selectedTopics.isEmpty
-            ? emptyTopicsWidget()
-            : selectedTopicsWidget(screenSize.width),
+            ? emptyTopicsWidget(feedTheme)
+            : selectedTopicsWidget(feedTheme, screenSize.width),
       ),
+    );
+  }
+
+  LMFeedTopicFeedBar copyWith({
+    List<LMTopicViewData>? selectedTopics,
+    Function? onTap,
+    Function? onClear,
+    Function(LMTopicViewData)? onIconTap,
+    Widget? trailingIcon,
+    Function? onTrailingIconTap,
+    bool? showDivider,
+    Widget? emptyTopicChip,
+    double? height,
+    LMFeedTopicChipStyle? style,
+  }) {
+    return LMFeedTopicFeedBar(
+      selectedTopics: selectedTopics ?? this.selectedTopics,
+      onTap: onTap ?? this.onTap,
+      onClear: onClear ?? this.onClear,
+      onIconTap: onIconTap ?? this.onIconTap,
+      trailingIcon: trailingIcon ?? this.trailingIcon,
+      onTrailingIconTap: onTrailingIconTap ?? this.onTrailingIconTap,
+      showDivider: showDivider ?? this.showDivider,
+      emptyTopicChip: emptyTopicChip ?? this.emptyTopicChip,
+      height: height ?? this.height,
+      style: style ?? this.style,
     );
   }
 }

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/post/topic_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 
 // This widget is used to display a topic grid
-// A [LMTopicFeedGrid] displays a grid of selected topics
-// The [LMTopicFeedGrid] can be customized by passing in the required parameters
-class LMTopicFeedGrid extends StatelessWidget {
+// A [LMFeedTopicFeedGrid] displays a grid of selected topics
+// The [LMFeedTopicFeedGrid] can be customized by
+// passing in the required parameters
+class LMFeedTopicFeedGrid extends StatelessWidget {
   // Required parameters
   // Text color of the topic chip
   final Color textColor;
   // List of selected topic [pass empty list if no topic is selected]
-  final List<TopicViewData> selectedTopics;
+  final List<LMTopicViewData> selectedTopics;
   // Action to perform after tapping on the topic feed bar
   final Function onTap;
 
@@ -25,7 +26,7 @@ class LMTopicFeedGrid extends StatelessWidget {
   final TextStyle? textStyle;
   // Icon to be displayed on the topic chip if any defaults to null
   final Icon? icon;
-  final Function(TopicViewData)? onIconTap;
+  final Function(LMTopicViewData)? onIconTap;
   final Widget? trailingIcon;
   final Function? onTrailingIconTap;
   final EdgeInsets? chipPadding;
@@ -40,9 +41,9 @@ class LMTopicFeedGrid extends StatelessWidget {
   // after the text of the topic chip
   // LMIconPlacement.start places the icon before the text
   // LMIconPlacement.end places the icon after the text
-  final LMIconPlacement iconPlacement;
+  final LMFeedIconButtonPlacement iconPlacement;
 
-  const LMTopicFeedGrid({
+  const LMFeedTopicFeedGrid({
     Key? key,
     required this.selectedTopics,
     this.backgroundColor,
@@ -61,7 +62,7 @@ class LMTopicFeedGrid extends StatelessWidget {
     required this.height,
     this.showDivider = true,
     this.emptyTopicChip,
-    this.iconPlacement = LMIconPlacement.end,
+    this.iconPlacement = LMFeedIconButtonPlacement.end,
   }) : super(key: key);
 
   Widget selectedTopicsWidget(double width) {
@@ -125,7 +126,7 @@ class LMTopicFeedGrid extends StatelessWidget {
                 Text(
                   'All topics',
                 ),
-                kHorizontalPaddingMedium,
+                LikeMindsTheme.kHorizontalPaddingMedium,
                 Icon(
                   Icons.arrow_downward,
                   size: 18,
@@ -146,7 +147,7 @@ class LMTopicFeedGrid extends StatelessWidget {
           border: showDivider
               ? Border(
                   bottom: BorderSide(
-                    color: kGrey2Color.withOpacity(0.1),
+                    color: Colors.grey.withOpacity(0.1),
                   ),
                 )
               : null,
@@ -155,6 +156,48 @@ class LMTopicFeedGrid extends StatelessWidget {
             ? emptyTopicsWidget()
             : selectedTopicsWidget(screenSize.width),
       ),
+    );
+  }
+
+  LMFeedTopicFeedGrid copyWith({
+    List<LMTopicViewData>? selectedTopics,
+    Function? onTap,
+    Function(LMTopicViewData)? onIconTap,
+    Widget? trailingIcon,
+    Function? onTrailingIconTap,
+    bool? showDivider,
+    double? height,
+    Widget? emptyTopicChip,
+    LMFeedIconButtonPlacement? iconPlacement,
+    Color? textColor,
+    Color? backgroundColor,
+    Color? borderColor,
+    double? borderRadius,
+    double? borderWidth,
+    TextStyle? textStyle,
+    Icon? icon,
+    EdgeInsets? chipPadding,
+    bool? showBorder,
+  }) {
+    return LMFeedTopicFeedGrid(
+      textColor: textColor ?? this.textColor,
+      selectedTopics: selectedTopics ?? this.selectedTopics,
+      onTap: onTap ?? this.onTap,
+      onIconTap: onIconTap ?? this.onIconTap,
+      trailingIcon: trailingIcon ?? this.trailingIcon,
+      onTrailingIconTap: onTrailingIconTap ?? this.onTrailingIconTap,
+      showDivider: showDivider ?? this.showDivider,
+      height: height ?? this.height,
+      emptyTopicChip: emptyTopicChip ?? this.emptyTopicChip,
+      iconPlacement: iconPlacement ?? this.iconPlacement,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      borderColor: borderColor ?? this.borderColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderWidth: borderWidth ?? this.borderWidth,
+      chipPadding: chipPadding ?? this.chipPadding,
+      icon: icon ?? this.icon,
+      showBorder: showBorder ?? this.showBorder,
+      textStyle: textStyle ?? this.textStyle,
     );
   }
 }

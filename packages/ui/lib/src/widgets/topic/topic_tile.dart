@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 // Displays a tile for a topic
 // The tile can be customized by passing in the required parameters
 // Tile has a text and an icon
 // The tile can be tapped to perform an action
 // Icon is displayed only if the tile is selected
-class LMTopicTile extends StatelessWidget {
+class LMFeedTopicTile extends StatelessWidget {
   // Action to perform after tapping on the tile, required
-  final Function(TopicViewData) onTap;
+  final Function(LMTopicViewData) onTap;
   // Alignment of the row of the tile, defaults to
   // MainAxisAlignment.spaceBetween
   final MainAxisAlignment? tileRowAlignment;
@@ -24,11 +25,11 @@ class LMTopicTile extends StatelessWidget {
   // Whether the tile is selected or not, required
   final bool isSelected;
   // Text to be displayed in the tile, required
-  final LMTextView text;
-  // [TopicViewData], consists id, topic and isEnabled boolean, required
-  final TopicViewData topic;
+  final LMFeedText text;
+  // [LMTopicViewData], consists id, topic and isEnabled boolean, required
+  final LMTopicViewData topic;
 
-  const LMTopicTile({
+  const LMFeedTopicTile({
     Key? key,
     required this.topic,
     required this.icon,
@@ -55,11 +56,41 @@ class LMTopicTile extends StatelessWidget {
           mainAxisAlignment: tileRowAlignment ?? MainAxisAlignment.spaceBetween,
           children: [
             text,
-            kHorizontalPaddingLarge,
+            LikeMindsTheme.kHorizontalPaddingLarge,
             isSelected ? icon : const SizedBox()
           ],
         ),
       ),
+    );
+  }
+
+  /// copyWith function to get a new object of [LMFeedTopicTile]
+  /// with specific single values passed
+  LMFeedTopicTile copyWith({
+    Function(LMTopicViewData)? onTap,
+    MainAxisAlignment? tileRowAlignment,
+    Color? backgroundColor,
+    double? height,
+    Icon? icon,
+    Color? borderColor,
+    double? borderWidth,
+    EdgeInsets? padding,
+    bool? isSelected,
+    LMFeedText? text,
+    LMTopicViewData? topic,
+  }) {
+    return LMFeedTopicTile(
+      onTap: onTap ?? this.onTap,
+      tileRowAlignment: tileRowAlignment ?? this.tileRowAlignment,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      height: height ?? this.height,
+      icon: icon ?? this.icon,
+      borderColor: borderColor ?? this.borderColor,
+      borderWidth: borderWidth ?? this.borderWidth,
+      padding: padding ?? this.padding,
+      isSelected: isSelected ?? this.isSelected,
+      text: text ?? this.text,
+      topic: topic ?? this.topic,
     );
   }
 }

@@ -1,193 +1,232 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/typedefs.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/buttons/icon_button.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/buttons/text_button.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/icon/icon.dart';
-import 'package:likeminds_feed_ui_fl/src/widgets/common/text/text_view.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
-class LMPostFooter extends StatelessWidget {
-  const LMPostFooter({
+class LMFeedPostFooter extends StatelessWidget {
+  LMFeedPostFooter({
     super.key,
-    this.children,
-    this.alignment = LMAlignment.left,
+    this.postFooterStyle,
+    this.likeButtonBuilder,
+    this.commentButtonBuilder,
+    this.saveButtonBuilder,
+    this.shareButtonBuilder,
+    this.likeButton,
+    this.commentButton,
+    this.saveButton,
+    this.shareButton,
   });
 
-  final List<Widget>? children;
-  final LMAlignment alignment;
+  final LMFeedPostFooterStyle? postFooterStyle;
+
+  final Widget Function(LMFeedButton)? likeButtonBuilder;
+  final Widget Function(LMFeedButton)? commentButtonBuilder;
+  final Widget Function(LMFeedButton)? saveButtonBuilder;
+  final Widget Function(LMFeedButton)? shareButtonBuilder;
+
+  final LMFeedButton? likeButton;
+  final LMFeedButton? commentButton;
+  final LMFeedButton? saveButton;
+  final LMFeedButton? shareButton;
+
+  final _footerChildren = <Widget>[];
 
   @override
   Widget build(BuildContext context) {
-    MainAxisAlignment mainAxisAlignment;
+    LMFeedPostFooterStyle footerStyle =
+        postFooterStyle ?? LMFeedTheme.of(context).postStyle.footerStyle;
+    _populateButtonList(footerStyle);
+    return Container(
+      width: footerStyle.width,
+      height: footerStyle.height,
+      padding: footerStyle.padding,
+      margin: footerStyle.margin,
+      child: Row(
+        mainAxisAlignment: footerStyle.alignment ?? MainAxisAlignment.start,
+        children: _footerChildren,
+      ),
+    );
+  }
 
-    switch (alignment) {
-      case LMAlignment.left:
-        mainAxisAlignment = MainAxisAlignment.start;
-        break;
-      case LMAlignment.centre:
-        mainAxisAlignment = MainAxisAlignment.spaceBetween;
-        break;
-      case LMAlignment.right:
-        mainAxisAlignment = MainAxisAlignment.end;
-        break;
-      default:
-        mainAxisAlignment = MainAxisAlignment.start;
-        break;
+  void _populateButtonList(LMFeedPostFooterStyle postFooterStyle) {
+    _footerChildren.clear();
+
+    if (postFooterStyle.showLikeButton ?? true) {
+      LMFeedButton likeButton = this.likeButton ?? defLikeButton();
+      Widget lmButton = likeButtonBuilder?.call(likeButton) ?? likeButton;
+      _footerChildren.add(lmButton);
     }
 
-    return Row(
-      mainAxisAlignment: mainAxisAlignment,
-      children: children ??
-          [
-            LMTextButton(
-              text: const LMTextView(text: "Like"),
-              onTap: () {},
-              icon: const LMIcon(
-                type: LMIconType.icon,
-                icon: Icons.favorite_outline,
-                size: 28,
+    if (postFooterStyle.showCommentButton ?? true) {
+      LMFeedButton commentButton = this.commentButton ?? defCommentButton();
+      Widget lmButton =
+          commentButtonBuilder?.call(commentButton) ?? commentButton;
+      _footerChildren.add(lmButton);
+    }
+
+    if (postFooterStyle.showSaveButton ?? true) {
+      LMFeedButton saveButton = this.saveButton ?? defSaveButton();
+      Widget lmButton = saveButtonBuilder?.call(saveButton) ?? saveButton;
+      _footerChildren.add(lmButton);
+    }
+
+    if (postFooterStyle.showShareButton ?? true) {
+      LMFeedButton shareButton = this.shareButton ?? defShareButton();
+      Widget lmButton = shareButtonBuilder?.call(shareButton) ?? shareButton;
+      _footerChildren.add(lmButton);
+    }
+  }
+
+  LMFeedButton defLikeButton() => LMFeedButton(
+        text: const LMFeedText(text: "Like"),
+        style: postFooterStyle?.likeButtonStyle ??
+            const LMFeedButtonStyle(
+              margin: 0,
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmLikeInActiveSvg,
               ),
-              activeIcon: const LMIcon(
-                type: LMIconType.icon,
-                icon: Icons.favorite,
-                size: 28,
-                color: Colors.red,
+              activeIcon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmLikeActiveSvg,
               ),
             ),
-            // LMLikeButton(),
-            const SizedBox(width: 16),
-            LMTextButton(
-              text: const LMTextView(text: "Comment"),
-              onTap: () {},
-              icon: const LMIcon(
-                type: LMIconType.icon,
-                icon: Icons.message_outlined,
-                size: 28,
+        activeText: const LMFeedText(
+          text: "Like",
+        ),
+        onTap: () {},
+      );
+
+  LMFeedButton defCommentButton() => LMFeedButton(
+        text: const LMFeedText(text: "Comment"),
+        style: postFooterStyle?.commentButtonStyle ??
+            const LMFeedButtonStyle(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmCommentSvg,
+              ),
+              margin: 0,
+            ),
+        onTap: () {},
+      );
+
+  LMFeedButton defSaveButton() => LMFeedButton(
+        text: const LMFeedText(text: "Save"),
+        style: postFooterStyle?.saveButtonStyle ??
+            const LMFeedButtonStyle(
+              margin: 0,
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmSaveInactiveSvg,
+              ),
+              activeIcon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmSaveActiveSvg,
               ),
             ),
-            const Spacer(),
-            LMIconButton(
-              icon: const LMIcon(
-                type: LMIconType.icon,
-                icon: Icons.bookmark_border_outlined,
-                size: 28,
+        onTap: () {},
+      );
+
+  LMFeedButton defShareButton() => LMFeedButton(
+        text: const LMFeedText(text: "Share"),
+        style: postFooterStyle?.shareButtonStyle ??
+            const LMFeedButtonStyle(
+              margin: 0,
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmShareSvg,
               ),
-              onTap: (active) {},
             ),
-            const SizedBox(width: 12),
-            LMIconButton(
-              icon: const LMIcon(
-                type: LMIconType.icon,
-                icon: Icons.share_outlined,
-                size: 28,
-              ),
-              onTap: (active) {},
-            ),
-          ],
+        onTap: () {},
+      );
+
+  LMFeedPostFooter copyWith({
+    LMFeedPostFooterStyle? postFooterStyle,
+    Widget Function(LMFeedButton)? likeButtonBuilder,
+    Widget Function(LMFeedButton)? commentButtonBuilder,
+    Widget Function(LMFeedButton)? saveButtonBuilder,
+    Widget Function(LMFeedButton)? shareButtonBuilder,
+    LMFeedButton? likeButton,
+    LMFeedButton? commentButton,
+    LMFeedButton? saveButton,
+    LMFeedButton? shareButton,
+  }) {
+    return LMFeedPostFooter(
+      postFooterStyle: postFooterStyle ?? this.postFooterStyle,
+      likeButtonBuilder: likeButtonBuilder ?? this.likeButtonBuilder,
+      commentButtonBuilder: commentButtonBuilder ?? this.commentButtonBuilder,
+      saveButtonBuilder: saveButtonBuilder ?? this.saveButtonBuilder,
+      shareButtonBuilder: shareButtonBuilder ?? this.shareButtonBuilder,
+      likeButton: likeButton ?? this.likeButton,
+      commentButton: commentButton ?? this.commentButton,
+      saveButton: saveButton ?? this.saveButton,
+      shareButton: shareButton ?? this.shareButton,
     );
   }
 }
 
-// class LMLikeButton extends LMTextView {
-//   LMLikeButton({
-//     super.key,
-//     ValueNotifier<bool>? rebuildLikeButton,
-//   })  : _rebuildLikeButton = rebuildLikeButton,
-//         super(text: "Like");
+class LMFeedPostFooterStyle {
+  final bool? showSaveButton;
+  final bool? showLikeButton;
+  final bool? showCommentButton;
+  final bool? showShareButton;
 
-//   final ValueNotifier<bool>? _rebuildLikeButton;
+  final double? width;
+  final double? height;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return LMTextView(
-//       text: "Like",
-//       valueNotifier: _rebuildLikeButton,
-//       leadingIcon: const LMIcon(
-//         inactiveIcon: Icon(
-//           Icons.favorite_outline,
-//         ),
-//         activeIcon: Icon(
-//           Icons.favorite,
-//           color: kPrimaryColor,
-//         ),
-//       ),
-//       activeTextStyle:
-//        Theme.of(context).textTheme.bodyLarge!.copyWith(color: kPrimaryColor),
-//       inactiveTextStyle: Theme.of(context).textTheme.bodyLarge,
-//     );
-//   }
-// }
+  final MainAxisAlignment? alignment;
 
-// class LMCommentButton extends StatefulWidget {
-//   LMCommentButton({
-//     super.key,
-//   });
+  final LMFeedButtonStyle? likeButtonStyle;
+  final LMFeedButtonStyle? commentButtonStyle;
+  final LMFeedButtonStyle? saveButtonStyle;
+  final LMFeedButtonStyle? shareButtonStyle;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return LMTextView(
-//       text: "Comment",
-//       textStyle:
-//       Theme.of(context).textTheme.bodyLarge!.copyWith(color: kPrimaryColor),
-//     );
-//   }
-// }
+  const LMFeedPostFooterStyle({
+    this.showSaveButton,
+    this.showLikeButton,
+    this.showCommentButton,
+    this.showShareButton,
+    this.alignment,
+    this.width,
+    this.height,
+    this.padding,
+    this.margin,
+    this.likeButtonStyle,
+    this.commentButtonStyle,
+    this.saveButtonStyle,
+    this.shareButtonStyle,
+  });
 
-// class LMSaveButton extends LMTextView {
-//   LMSaveButton({
-//     super.key,
-//     ValueNotifier<bool>? rebuildSaveButton,
-//   })  : _rebuildSaveButton = rebuildSaveButton,
-//         super(text: "Save");
-
-//   final ValueNotifier<bool>? _rebuildSaveButton;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return LMTextView(
-//       text: "",
-//       valueNotifier: _rebuildSaveButton,
-//       leadingIcon: const LMIcon(
-//         inactiveIcon: Icon(
-//           Icons.bookmark_border,
-//         ),
-//         activeIcon: Icon(
-//           Icons.bookmark,
-//           color: kPrimaryColor,
-//         ),
-//       ),
-//       activeTextStyle:
-//       Theme.of(context).textTheme.bodyLarge!.copyWith(color: kPrimaryColor),
-//       inactiveTextStyle: Theme.of(context).textTheme.bodyLarge,
-//     );
-//   }
-// }
-
-// class LMShareButton extends LMTextView {
-//   LMShareButton({
-//     super.key,
-//     ValueNotifier<bool>? rebuildShareButton,
-//   })  : _rebuildShareButton = rebuildShareButton,
-//         super(text: "Save");
-
-//   final ValueNotifier<bool>? _rebuildShareButton;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return LMTextView(
-//       text: "",
-//       valueNotifier: _rebuildShareButton,
-//       leadingIcon: const LMIcon(
-//         inactiveIcon: Icon(
-//           Icons.share_outlined,
-//         ),
-//         activeIcon: Icon(
-//           Icons.share,
-//           color: kPrimaryColor,
-//         ),
-//       ),
-//       activeTextStyle:
-//        Theme.of(context).textTheme.bodyLarge!.copyWith(color: kPrimaryColor),
-//       inactiveTextStyle: Theme.of(context).textTheme.bodyLarge,
-//     );
-//   }
-// }
+  LMFeedPostFooterStyle copyWith({
+    bool? showSaveButton,
+    bool? showLikeButton,
+    bool? showCommentButton,
+    bool? showShareButton,
+    MainAxisAlignment? alignment,
+    double? width,
+    double? height,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    LMFeedButtonStyle? likeButtonStyle,
+    LMFeedButtonStyle? commentButtonStyle,
+    LMFeedButtonStyle? saveButtonStyle,
+    LMFeedButtonStyle? shareButtonStyle,
+  }) {
+    return LMFeedPostFooterStyle(
+      showSaveButton: showSaveButton ?? showSaveButton,
+      showLikeButton: showLikeButton ?? showLikeButton,
+      showCommentButton: showCommentButton ?? showCommentButton,
+      showShareButton: showShareButton ?? this.showShareButton,
+      alignment: alignment ?? this.alignment,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      commentButtonStyle: commentButtonStyle ?? this.commentButtonStyle,
+      likeButtonStyle: likeButtonStyle ?? this.likeButtonStyle,
+      saveButtonStyle: saveButtonStyle ?? this.saveButtonStyle,
+      shareButtonStyle: shareButtonStyle ?? this.shareButtonStyle,
+    );
+  }
+}

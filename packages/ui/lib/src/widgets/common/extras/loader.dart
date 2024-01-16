@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 
-class LMLoader extends StatelessWidget {
+class LMFeedLoader extends StatelessWidget {
   final bool isPrimary;
   final Color? color;
 
-  const LMLoader({super.key, this.isPrimary = true, this.color});
+  const LMFeedLoader({super.key, this.isPrimary = true, this.color});
 
   @override
   Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      color: color ?? (isPrimary ? Theme
-          .of(context)
-          .primaryColor : Colors.white),
+    return CircularProgressIndicator.adaptive(
+      valueColor: AlwaysStoppedAnimation<Color>(
+        color ??
+            (isPrimary ? LMFeedTheme.of(context).primaryColor : Colors.white),
+      ),
+    );
+  }
+
+  LMFeedLoader copyWith({
+    bool? isPrimary,
+    Color? color,
+  }) {
+    return LMFeedLoader(
+      isPrimary: isPrimary ?? this.isPrimary,
+      color: color ?? this.color,
     );
   }
 }

@@ -4,9 +4,9 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/packages/linkify/linkify.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/packages/linkify/linkify.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import './text_parser.dart';
@@ -244,8 +244,8 @@ class ExpandableTextState extends State<ExpandableText>
           String resultText;
           if (!_expanded) {
             var response =
-                TaggingHelper.convertRouteToTagAndUserMap(widget.text);
-            List<UserTagViewData> userTags = response['userTags'];
+                LMFeedTaggingHelper.convertRouteToTagAndUserMap(widget.text);
+            List<LMUserTagViewData> userTags = response['userTags'];
             resultText = response['text'];
             // final lineCount = textPainter.computeLineMetrics().length;
             final nCount = '\n'.allMatches(resultText).length + 1;
@@ -255,7 +255,7 @@ class ExpandableTextState extends State<ExpandableText>
               resultText = resultText.substring(0, max(endOffset, 0));
             }
 
-            resultText = TaggingHelper.encodeString(resultText, userTags);
+            resultText = LMFeedTaggingHelper.encodeString(resultText, userTags);
           } else {
             resultText = widget.text;
           }
@@ -408,7 +408,7 @@ class ExpandableTextState extends State<ExpandableText>
       if (link != null && link.isNotEmpty && link[0] == '#') {
         textSpans.add(TextSpan(
           text: link,
-          style: widget.hashtagStyle ?? const TextStyle(color: kPrimaryColor),
+          style: widget.hashtagStyle ?? const TextStyle(color: Colors.blue),
         ));
       } else {
         bool isTag = link != null && link[0] == '<';
@@ -425,8 +425,9 @@ class ExpandableTextState extends State<ExpandableText>
         }
         // Add a TextSpan for the URL
         textSpans.add(TextSpan(
-          text: isTag ? TaggingHelper.decodeString(link).keys.first : link,
-          style: widget.linkStyle ?? const TextStyle(color: kPrimaryColor),
+          text:
+              isTag ? LMFeedTaggingHelper.decodeString(link).keys.first : link,
+          style: widget.linkStyle ?? const TextStyle(color: Colors.blue),
           recognizer: TapGestureRecognizer()
             ..onTap = () async {
               if (!isTag) {
@@ -447,10 +448,10 @@ class ExpandableTextState extends State<ExpandableText>
                 }
               } else {
                 widget.onTagTap(
-                  TaggingHelper.decodeString(link).values.first,
+                  LMFeedTaggingHelper.decodeString(link).values.first,
                 );
-                // TaggingHelper.routeToProfile(
-                //   TaggingHelper.decodeString(link).values.first,
+                // LMFeedTaggingHelper.routeToProfile(
+                //   LMFeedTaggingHelper.decodeString(link).values.first,
                 // );
               }
             },

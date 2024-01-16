@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_ui_fl/packages/linkify/linkify.dart';
+import 'package:likeminds_feed_flutter_ui/packages/linkify/linkify.dart';
 
 final _urlRegex = RegExp(
   r'^(.*?)((?:https?:\/\/|www\.)[^\s/$.?#].[^\s]*)',
@@ -11,7 +11,6 @@ final _looseUrlRegex = RegExp(
   caseSensitive: false,
   dotAll: true,
 );
-
 
 final _protocolIdentifierRegex = RegExp(
   r'^(https?:\/\/)',

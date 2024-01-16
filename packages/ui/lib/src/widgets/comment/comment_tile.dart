@@ -1,204 +1,381 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_ui_fl/likeminds_feed_ui_fl.dart';
-import 'package:likeminds_feed_ui_fl/packages/expandable_text/expandable_text.dart';
-import 'package:likeminds_feed_ui_fl/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
-class LMCommentTile extends StatefulWidget {
-  const LMCommentTile({
+class LMFeedCommentWidget extends StatefulWidget {
+  const LMFeedCommentWidget({
     super.key,
     required this.user,
     required this.comment,
     this.profilePicture,
     this.titleText,
     this.subtitleText,
-    this.commentActions,
-    this.actionsPadding,
-    required this.onMenuTap,
+    required this.lmFeedMenuAction,
     required this.onTagTap,
-    this.backgroundColor,
-    this.contentBackgroundColor,
-    this.margin,
-    this.borderRadius,
-    this.width,
     this.menu,
-    this.textStyle,
-    this.linkStyle,
+    this.likeButtonBuilder,
+    this.replyButtonBuilder,
+    this.showRepliesButtonBuilder,
+    this.likeButton,
+    this.replyButton,
+    this.showRepliesButton,
+    this.style,
   });
 
-  final UserViewData user;
-  final CommentViewData comment;
+  final LMUserViewData user;
+  final LMCommentViewData comment;
 
-  final TextStyle? textStyle;
-  final TextStyle? linkStyle;
-  final LMProfilePicture? profilePicture;
-  final LMTextView? titleText;
-  final LMTextView? subtitleText;
-  final List<Widget>? commentActions;
-  final EdgeInsets? actionsPadding;
-  final Function(int) onMenuTap;
+  final LMFeedProfilePicture? profilePicture;
+  final LMFeedText? titleText;
+  final LMFeedText? subtitleText;
+
   final Function(String) onTagTap;
-  final Color? backgroundColor;
-  final Color? contentBackgroundColor;
-  final EdgeInsets? margin;
-  final BorderRadius? borderRadius;
-  final double? width;
-  final Widget? menu;
+
+  final Widget Function(LMFeedMenu)? menu;
+  final LMFeedMenuAction lmFeedMenuAction;
+
+  final Widget Function(LMFeedButton)? likeButtonBuilder;
+  final Widget Function(LMFeedButton)? replyButtonBuilder;
+  final Widget Function(LMFeedButton)? showRepliesButtonBuilder;
+
+  final LMFeedButton? likeButton;
+  final LMFeedButton? replyButton;
+  final LMFeedButton? showRepliesButton;
+
+  final LMFeedCommentStyle? style;
 
   @override
-  State<LMCommentTile> createState() => _LMCommentTileState();
+  State<LMFeedCommentWidget> createState() => _LMCommentTileState();
+
+  LMFeedCommentWidget copyWith({
+    LMUserViewData? user,
+    LMCommentViewData? comment,
+    LMFeedProfilePicture? profilePicture,
+    LMFeedText? titleText,
+    LMFeedText? subtitleText,
+    Function(String)? onTagTap,
+    Widget Function(LMFeedMenu)? menu,
+    LMFeedMenuAction? lmFeedMenuAction,
+    Widget Function(LMFeedButton)? likeButtonBuilder,
+    Widget Function(LMFeedButton)? replyButtonBuilder,
+    Widget Function(LMFeedButton)? showRepliesButtonBuilder,
+    LMFeedButton? likeButton,
+    LMFeedButton? replyButton,
+    LMFeedButton? showRepliesButton,
+    LMFeedCommentStyle? style,
+  }) {
+    return LMFeedCommentWidget(
+      user: user ?? this.user,
+      comment: comment ?? this.comment,
+      profilePicture: profilePicture ?? this.profilePicture,
+      titleText: titleText ?? this.titleText,
+      subtitleText: subtitleText ?? this.subtitleText,
+      onTagTap: onTagTap ?? this.onTagTap,
+      menu: menu ?? this.menu,
+      lmFeedMenuAction: lmFeedMenuAction ?? this.lmFeedMenuAction,
+      likeButtonBuilder: likeButtonBuilder ?? this.likeButtonBuilder,
+      replyButtonBuilder: replyButtonBuilder ?? this.replyButtonBuilder,
+      showRepliesButtonBuilder:
+          showRepliesButtonBuilder ?? this.showRepliesButtonBuilder,
+      likeButton: likeButton ?? this.likeButton,
+      replyButton: replyButton ?? this.replyButton,
+      showRepliesButton: showRepliesButton ?? this.showRepliesButton,
+      style: style ?? this.style,
+    );
+  }
 }
 
-class _LMCommentTileState extends State<LMCommentTile> {
+class _LMCommentTileState extends State<LMFeedCommentWidget> {
+  LMFeedCommentStyle? style;
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    style = widget.style ?? feedTheme.commentStyle;
     return Container(
       decoration: BoxDecoration(
-        color: widget.backgroundColor ?? kWhiteColor,
-        borderRadius: widget.borderRadius,
+        color: style!.backgroundColor ?? Colors.white,
+        borderRadius: style!.borderRadius,
+        boxShadow: style!.boxShadow,
       ),
-      margin: widget.margin,
-      width: widget.width,
-      padding: const EdgeInsets.all(kPaddingLarge),
+      margin: style!.margin,
+      width: style!.width,
+      padding: style!.padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                widget.profilePicture ?? const SizedBox(),
-                kHorizontalPaddingLarge,
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: widget.width != null ? widget.width! * 0.6 : null,
-                      child: widget.titleText ??
-                          LMTextView(
-                            text: widget.user.name,
-                            textStyle: const TextStyle(
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              widget.profilePicture ?? const SizedBox(),
+              LikeMindsTheme.kHorizontalPaddingLarge,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: style!.width != null ? style!.width! * 0.6 : null,
+                    child: widget.titleText ??
+                        LMFeedText(
+                          text: widget.user.name,
+                          style: const LMFeedTextStyle(
+                            textStyle: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
                             maxLines: 1,
                           ),
-                    ),
-                    widget.subtitleText != null
-                        ? kVerticalPaddingSmall
-                        : const SizedBox(),
-                    widget.subtitleText ?? const SizedBox(),
-                  ],
-                ),
-                const Spacer(),
-                widget.menu ??
-                    LMPostMenu(
-                      isFeed: false,
-                      menuItems: widget.comment.menuItems,
-                      onSelected: widget.onMenuTap,
-                    ),
-              ],
-            ),
+                        ),
+                  ),
+                  widget.subtitleText != null
+                      ? LikeMindsTheme.kVerticalPaddingSmall
+                      : const SizedBox(),
+                  widget.subtitleText ?? const SizedBox(),
+                ],
+              ),
+              const Spacer(),
+              widget.menu?.call(_defPostMenu()) ?? _defPostMenu()
+            ],
           ),
-          kVerticalPaddingMedium,
+          LikeMindsTheme.kVerticalPaddingMedium,
           Container(
-            padding: widget.actionsPadding ?? EdgeInsets.zero,
+            padding: style!.actionsPadding ?? EdgeInsets.zero,
             child: ExpandableText(
               widget.comment.text,
               onTagTap: widget.onTagTap,
               expandText: "see more",
               animation: true,
               maxLines: 4,
-              hashtagStyle: widget.linkStyle ??
+              hashtagStyle: style!.linkStyle ??
                   Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: theme.colorScheme.primary),
-              linkStyle: widget.linkStyle ??
+                      .copyWith(color: feedTheme.hashTagColor),
+              linkStyle: style!.linkStyle ??
                   Theme.of(context)
                       .textTheme
                       .bodyMedium!
-                      .copyWith(color: theme.colorScheme.primary),
+                      .copyWith(color: feedTheme.linkColor),
               textAlign: TextAlign.left,
-              style: widget.textStyle ?? Theme.of(context).textTheme.bodyMedium,
+              style: style!.textStyle,
             ),
           ),
-          kVerticalPaddingSmall,
+          LikeMindsTheme.kVerticalPaddingSmall,
           Padding(
-            padding: widget.actionsPadding ?? EdgeInsets.zero,
+            padding: style!.actionsPadding ?? EdgeInsets.zero,
             child: Row(
-              children: widget.commentActions ??
-                  [
-                    LMTextButton(
-                      onTap: () {},
-                      text: const LMTextView(
-                        text: 'Like',
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          color: kGrey2Color,
-                        ),
-                      ),
-                      icon: const LMIcon(
-                        type: LMIconType.icon,
-                        icon: Icons.favorite_outline,
-                        color: kGrey2Color,
-                        size: 16,
-                      ),
-                      activeIcon: const LMIcon(
-                        icon: Icons.favorite,
-                        type: LMIconType.icon,
-                        size: 16,
-                        color: kPrimaryColor,
-                      ),
+              children: [
+                Padding(
+                    padding: style!.likeButtonStyle?.padding ??
+                        const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: widget.likeButtonBuilder
+                            ?.call(_defLikeCommentButton()) ??
+                        _defLikeCommentButton()),
+                Text(
+                  '|',
+                  style: TextStyle(
+                    fontSize: LikeMindsTheme.kFontSmallMed,
+                    color: Colors.grey.shade300,
+                  ),
+                ),
+                style!.showReplyButton
+                    ? Padding(
+                        padding: style!.replyButtonStyle?.padding ??
+                            const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: widget.replyButtonBuilder
+                                ?.call(_defReplyToCommentButton()) ??
+                            _defReplyToCommentButton())
+                    : const SizedBox.shrink(),
+                style!.showRepliesButton
+                    ? Padding(
+                        padding: style!.showRepliesButtonStyle?.padding ??
+                            const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: widget.comment.repliesCount > 0
+                            ? widget.replyButtonBuilder
+                                    ?.call(_defShowRepliesButton()) ??
+                                _defShowRepliesButton()
+                            : const SizedBox.shrink())
+                    : const SizedBox.shrink(),
+                const Spacer(),
+                LMFeedText(
+                  text: widget.comment.createdAt.timeAgo(),
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontSize: LikeMindsTheme.kFontSmallMed,
+                      color: Colors.grey.shade300,
                     ),
-                    kHorizontalPaddingMedium,
-                    const Text(
-                      '|',
-                      style: TextStyle(
-                        fontSize: kFontSmallMed,
-                        color: kGrey3Color,
-                      ),
-                    ),
-                    kHorizontalPaddingMedium,
-                    LMTextButton(
-                      onTap: () {},
-                      text: const LMTextView(
-                        text: 'Reply',
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          color: kGrey2Color,
-                        ),
-                      ),
-                    ),
-                    kHorizontalPaddingMedium,
-                    widget.comment.repliesCount > 0
-                        ? GestureDetector(
-                            onTap: () {},
-                            child: LMTextView(
-                              text: widget.comment.repliesCount > 1
-                                  ? "${widget.comment.repliesCount}  replies"
-                                  : "${widget.comment.repliesCount}  reply",
-                              textStyle: const TextStyle(
-                                color: kGrey2Color,
-                                fontSize: 12,
-                              ),
-                            ),
-                          )
-                        : Container(),
-                    const Spacer(),
-                    LMTextView(
-                      text: widget.comment.createdAt.timeAgo(),
-                      textStyle: const TextStyle(
-                        fontSize: kFontSmallMed,
-                        color: kGrey3Color,
-                      ),
-                    ),
-                  ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  LMFeedMenu _defPostMenu() {
+    return LMFeedMenu(
+      isFeed: false,
+      menuItems: widget.comment.menuItems,
+      action: widget.lmFeedMenuAction,
+    );
+  }
+
+  LMFeedButton _defLikeCommentButton() {
+    return widget.likeButton ??
+        LMFeedButton(
+          onTap: () {},
+          text: LMFeedText(
+            text: 'Like',
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade200,
+              ),
+            ),
+          ),
+          style: style!.likeButtonStyle ??
+              LMFeedButtonStyle(
+                icon: LMFeedIcon(
+                  type: LMFeedIconType.icon,
+                  icon: Icons.favorite_outline,
+                  style: LMFeedIconStyle(
+                    color: Colors.grey.shade200,
+                    size: 16,
+                  ),
+                ),
+                activeIcon: const LMFeedIcon(
+                  icon: Icons.favorite,
+                  type: LMFeedIconType.icon,
+                  style: LMFeedIconStyle(
+                    size: 16,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+        );
+  }
+
+  LMFeedButton _defReplyToCommentButton() {
+    return widget.replyButton ??
+        LMFeedButton(
+          onTap: () {},
+          text: LMFeedText(
+            text: 'Reply',
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade200,
+              ),
+            ),
+          ),
+          style: style!.replyButtonStyle ??
+              LMFeedButtonStyle(
+                icon: LMFeedIcon(
+                  type: LMFeedIconType.icon,
+                  icon: Icons.comment_outlined,
+                  style: LMFeedIconStyle(
+                    color: Colors.grey.shade200,
+                    size: 16,
+                  ),
+                ),
+              ),
+        );
+  }
+
+  LMFeedButton _defShowRepliesButton() {
+    return widget.showRepliesButton ??
+        LMFeedButton(
+          onTap: () {},
+          style: style!.showRepliesButtonStyle,
+          text: LMFeedText(
+            text: widget.comment.repliesCount > 1
+                ? "${widget.comment.repliesCount}  replies"
+                : "${widget.comment.repliesCount}  reply",
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                color: Colors.grey.shade200,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        );
+  }
+}
+
+class LMFeedCommentStyle {
+  final TextStyle? textStyle;
+  final TextStyle? linkStyle;
+  final EdgeInsets? actionsPadding;
+  final Color? backgroundColor;
+  final Color? contentBackgroundColor;
+  final EdgeInsets? margin;
+  final BorderRadius? borderRadius;
+  final double? width;
+  final List<BoxShadow>? boxShadow;
+  final EdgeInsets? padding;
+  final LMFeedButtonStyle? likeButtonStyle;
+  final LMFeedButtonStyle? replyButtonStyle;
+  final bool showReplyButton;
+  final bool showRepliesButton;
+  final LMFeedButtonStyle? showRepliesButtonStyle;
+
+  const LMFeedCommentStyle({
+    this.textStyle,
+    this.linkStyle,
+    this.actionsPadding,
+    this.backgroundColor,
+    this.contentBackgroundColor,
+    this.margin,
+    this.borderRadius,
+    this.width,
+    this.boxShadow,
+    this.padding,
+    this.likeButtonStyle,
+    this.replyButtonStyle,
+    this.showRepliesButtonStyle,
+    this.showReplyButton = true,
+    this.showRepliesButton = true,
+  });
+
+  LMFeedCommentStyle copyWith({
+    TextStyle? textStyle,
+    TextStyle? linkStyle,
+    EdgeInsets? actionsPadding,
+    Color? backgroundColor,
+    Color? contentBackgroundColor,
+    EdgeInsets? margin,
+    BorderRadius? borderRadius,
+    double? width,
+    List<BoxShadow>? boxShadow,
+    EdgeInsets? padding,
+    LMFeedButtonStyle? likeButtonStyle,
+    LMFeedButtonStyle? replyButtonStyle,
+    LMFeedButtonStyle? showRepliesButtonStyle,
+    bool? showReplyButton,
+    bool? showRepliesButton,
+  }) {
+    return LMFeedCommentStyle(
+      textStyle: textStyle ?? this.textStyle,
+      linkStyle: linkStyle ?? this.linkStyle,
+      actionsPadding: actionsPadding ?? this.actionsPadding,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      contentBackgroundColor:
+          contentBackgroundColor ?? this.contentBackgroundColor,
+      margin: margin ?? this.margin,
+      borderRadius: borderRadius ?? this.borderRadius,
+      width: width ?? this.width,
+      boxShadow: boxShadow ?? this.boxShadow,
+      padding: padding ?? this.padding,
+      likeButtonStyle: likeButtonStyle ?? this.likeButtonStyle,
+      replyButtonStyle: replyButtonStyle ?? this.replyButtonStyle,
+      showRepliesButtonStyle:
+          showRepliesButtonStyle ?? this.showRepliesButtonStyle,
+      showRepliesButton: showRepliesButton ?? this.showRepliesButton,
+      showReplyButton: showReplyButton ?? this.showReplyButton,
     );
   }
 }

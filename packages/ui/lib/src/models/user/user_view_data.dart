@@ -1,27 +1,43 @@
-import 'package:likeminds_feed_ui_fl/src/models/sdk/sdk_client_info_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/sdk/sdk_client_info_view_data.dart';
 
-class UserViewData {
+/// {@template lm_user_view_data}
+/// A data class to hold the user data.
+/// {@endtemplate}
+class LMUserViewData {
+  /// unique indentifier of the user
   int id;
+
+  /// name of the user
   String name;
-  String imageUrl;
+
+  /// image url of the user
+  String? imageUrl;
   bool? isGuest;
   bool? isDeleted;
   String userUniqueId;
   String? organisationName;
-  SDKClientInfoViewData? sdkClientInfo;
+  LMSDKClientInfoViewData? sdkClientInfo;
   int? updatedAt;
   bool? isOwner;
+
+  /// custom title of the user
+  /// eg: Community Manager
   String? customTitle;
+
+  /// date since the user is a member of the community
   String? memberSince;
   String? route;
   int? state;
+
+  /// community id of the community to which the user belongs
   int? communityId;
   int? createdAt;
 
-  UserViewData._({
+  /// {@macro user_view_data}
+  LMUserViewData._({
     required this.id,
     required this.name,
-    required this.imageUrl,
+    this.imageUrl,
     required this.isGuest,
     required this.userUniqueId,
     this.organisationName,
@@ -38,7 +54,10 @@ class UserViewData {
   });
 }
 
-class UserViewDataBuilder {
+/// {@template user_view_data_builder}
+/// A builder class to build [LMUserViewData]
+/// {@endtemplate}
+class LMUserViewDataBuilder {
   int? _id;
   String? _name;
   String? _imageUrl;
@@ -46,7 +65,7 @@ class UserViewDataBuilder {
   bool? _isDeleted;
   String? _userUniqueId;
   String? _organisationName;
-  SDKClientInfoViewData? _sdkClientInfo;
+  LMSDKClientInfoViewData? _sdkClientInfo;
   int? _updatedAt;
   bool? _isOwner;
   String? _customTitle;
@@ -64,7 +83,7 @@ class UserViewDataBuilder {
     _name = name;
   }
 
-  void imageUrl(String imageUrl) {
+  void imageUrl(String? imageUrl) {
     _imageUrl = imageUrl;
   }
 
@@ -84,7 +103,7 @@ class UserViewDataBuilder {
     _organisationName = organisationName;
   }
 
-  void sdkClientInfo(SDKClientInfoViewData sdkClientInfo) {
+  void sdkClientInfo(LMSDKClientInfoViewData sdkClientInfo) {
     _sdkClientInfo = sdkClientInfo;
   }
 
@@ -120,11 +139,12 @@ class UserViewDataBuilder {
     _createdAt = createdAt;
   }
 
-  UserViewData build() {
-    return UserViewData._(
+  /// {@macro user_view_data_builder}
+  LMUserViewData build() {
+    return LMUserViewData._(
       id: _id!,
       name: _name!,
-      imageUrl: _imageUrl!,
+      imageUrl: _imageUrl,
       isGuest: _isGuest,
       userUniqueId: _userUniqueId!,
       organisationName: _organisationName,

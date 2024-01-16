@@ -1,29 +1,29 @@
-import 'package:likeminds_feed_ui_fl/src/models/helper/attachment/attachment_meta_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/src/models/helper/attachment/attachment_meta_view_data.dart';
 
-class AttachmentViewData {
+class LMAttachmentViewData {
   final int attachmentType;
-  final AttachmentMetaViewData attachmentMeta;
+  final LMAttachmentMetaViewData attachmentMeta;
 
-  AttachmentViewData._({
+  LMAttachmentViewData._({
     required this.attachmentType,
     required this.attachmentMeta,
   });
 }
 
-class AttachmentViewDataBuilder {
+class LMAttachmentViewDataBuilder {
   int? _attachmentType;
-  AttachmentMetaViewData? _attachmentMeta;
+  LMAttachmentMetaViewData? _attachmentMeta;
 
   void attachmentType(int attachmentType) {
     _attachmentType = attachmentType;
   }
 
-  void attachmentMeta(AttachmentMetaViewData attachmentMeta) {
+  void attachmentMeta(LMAttachmentMetaViewData attachmentMeta) {
     _attachmentMeta = attachmentMeta;
   }
 
-  AttachmentViewData build() {
-    return AttachmentViewData._(
+  LMAttachmentViewData build() {
+    return LMAttachmentViewData._(
       attachmentType: _attachmentType!,
       attachmentMeta: _attachmentMeta!,
     );
