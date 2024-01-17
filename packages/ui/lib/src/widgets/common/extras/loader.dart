@@ -9,10 +9,12 @@ class LMFeedLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircularProgressIndicator.adaptive(
-      valueColor: AlwaysStoppedAnimation<Color>(
-        color ??
-            (isPrimary ? LMFeedTheme.of(context).primaryColor : Colors.white),
+    return Center(
+      child: CircularProgressIndicator.adaptive(
+        valueColor: AlwaysStoppedAnimation<Color>(
+          color ??
+              (isPrimary ? LMFeedTheme.of(context).primaryColor : Colors.white),
+        ),
       ),
     );
   }

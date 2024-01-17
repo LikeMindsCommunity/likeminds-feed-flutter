@@ -13,8 +13,21 @@ part 'universal_feed_event.dart';
 part 'universal_feed_state.dart';
 
 class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
+  // list of selected topics by the user
+  List<LMTopicViewData> selectedTopics = [];
+  // list of all the topics
+  Map<String, LMTopicViewData> topics = {};
+  // list of all the users
+  Map<String, LMUserViewData> users = {};
+  // list of all the widgets
+  Map<String, LMWidgetViewData> widgets = {};
+
+  static LMFeedBloc? _instance;
+
+  static LMFeedBloc get instance => _instance ??= LMFeedBloc._();
+
   // final FeedApi feedApi;
-  LMFeedBloc() : super(LMFeedInitialState()) {
+  LMFeedBloc._() : super(LMFeedInitialState()) {
     on<LMFeedEvent>((event, emit) async {
       if (event is LMFeedGetUniversalFeedEvent) {
         await _mapLMGetUniversalFeedToState(event: event, emit: emit);

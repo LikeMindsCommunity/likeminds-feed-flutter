@@ -41,7 +41,6 @@ class LMFeedFetchCommentReplyBloc
       required bool forLoadMore,
       required Emitter<LMFeedCommentRepliesState> emit,
       required LMFeedCore lmFeedIntegration}) async {
-    // if (!hasReachedMax(state, forLoadMore)) {
     Map<String, User> users = {};
     List<Comment> comments = [];
     if (state is LMFeedCommentRepliesLoadedState &&

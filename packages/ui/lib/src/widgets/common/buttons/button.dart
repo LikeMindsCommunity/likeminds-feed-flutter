@@ -12,6 +12,7 @@ class LMFeedButton extends StatefulWidget {
     this.activeText,
     this.isActive = false,
     this.style,
+    this.onTextTap,
   });
 
   /// Required parameter, defines whether the button is active or disabled
@@ -29,6 +30,8 @@ class LMFeedButton extends StatefulWidget {
   /// Text to be displayed in the button if the button is active
   final LMFeedText? activeText;
 
+  final VoidCallback? onTextTap;
+
   @override
   State<LMFeedButton> createState() => _LMButtonState();
 
@@ -38,6 +41,7 @@ class LMFeedButton extends StatefulWidget {
     LMFeedText? text,
     Function()? onTap,
     LMFeedText? activeText,
+    VoidCallback? onTextTap,
   }) {
     return LMFeedButton(
       isActive: isActive ?? this.isActive,
@@ -45,6 +49,7 @@ class LMFeedButton extends StatefulWidget {
       text: text ?? this.text,
       onTap: onTap ?? this.onTap,
       activeText: activeText ?? this.activeText,
+      onTextTap: onTextTap ?? this.onTextTap,
     );
   }
 }
@@ -94,11 +99,18 @@ class _LMButtonState extends State<LMFeedButton> {
                       : const SizedBox.shrink()
                   : const SizedBox.shrink(),
               inStyle.showText
-                  ? _active
-                      ? widget.activeText ??
-                          widget.text ??
-                          const SizedBox.shrink()
-                      : widget.text ?? const SizedBox.shrink()
+                  ? GestureDetector(
+                      onTap: widget.onTextTap,
+                      child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.transparent,
+                          ),
+                          child: _active
+                              ? widget.activeText ??
+                                  widget.text ??
+                                  const SizedBox.shrink()
+                              : widget.text ?? const SizedBox.shrink()),
+                    )
                   : const SizedBox.shrink(),
               inStyle.placement == LMFeedIconButtonPlacement.end
                   ? (inStyle.icon != null || inStyle.activeIcon != null)

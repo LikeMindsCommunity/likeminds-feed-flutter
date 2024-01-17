@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
@@ -15,12 +14,7 @@ class LMFeedTheme extends InheritedWidget {
   static LMFeedThemeData of(BuildContext context) {
     final lmTheme = context.dependOnInheritedWidgetOfExactType<LMFeedTheme>();
 
-    // assert(
-    //   lmTheme != null,
-    //   'You must have a LMFeedTheme widget at the top of your widget tree',
-    // );
-
-    return lmTheme?.theme ?? LMFeedThemeData.fromThemeData(Theme.of(context));
+    return lmTheme?.theme ?? LMFeedThemeData.light();
   }
 }
 
@@ -48,7 +42,7 @@ class LMFeedThemeData {
   final Color onContainer;
   final Color onPrimary;
 
-  const LMFeedThemeData._({
+  const LMFeedThemeData({
     required this.postStyle,
     required this.primaryColor,
     required this.backgroundColor,
@@ -73,7 +67,7 @@ class LMFeedThemeData {
   });
 
   factory LMFeedThemeData.fromThemeData(ThemeData theme) {
-    return LMFeedThemeData._(
+    return LMFeedThemeData(
       backgroundColor: theme.colorScheme.background,
       primaryColor: theme.primaryColor,
       secondaryColor: theme.colorScheme.secondary,
@@ -281,148 +275,234 @@ class LMFeedThemeData {
     );
   }
 
-  factory LMFeedThemeData.light() {
-    return LMFeedThemeData._(
-      backgroundColor: LikeMindsTheme.backgroundColor,
-      primaryColor: LikeMindsTheme.primaryColor,
-      secondaryColor: LikeMindsTheme.secondaryColor,
-      shadowColor: LikeMindsTheme.shadowColor,
-      disabledColor: LikeMindsTheme.disabledColor,
-      errorColor: LikeMindsTheme.errorColor,
-      inActiveColor: LikeMindsTheme.inactiveColor,
-      container: LikeMindsTheme.container,
-      onContainer: LikeMindsTheme.onContainer,
-      onPrimary: LikeMindsTheme.onPrimary,
-      postStyle: LMFeedPostStyle(
-        boxShadow: [
-          const BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.239), blurRadius: 1.0)
-        ],
-        margin: const EdgeInsets.only(bottom: 12.0),
-        topicStyle: LMFeedPostTopicStyle(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          activeChipStyle: LMFeedTopicChipStyle(
-            backgroundColor: LikeMindsTheme.primaryColor.withOpacity(0.1),
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-            textStyle: const TextStyle(
-              color: LikeMindsTheme.primaryColor,
-              fontSize: 14,
-              fontFamily: 'Roboto',
-              fontWeight: FontWeight.w400,
-            ),
-            borderRadius: BorderRadius.circular(4.0),
-          ),
-          inactiveChipStyle: LMFeedTopicChipStyle(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-            textStyle: const TextStyle(
-              color: LikeMindsTheme.primaryColor,
-              fontSize: 14,
-              fontFamily: 'Roboto',
-              fontWeight: FontWeight.w400,
-            ),
-            borderRadius: BorderRadius.circular(4.0),
-            showBorder: true,
-            borderColor: LikeMindsTheme.primaryColor,
-          ),
-        ),
-        contentStyle: const LMFeedPostContentStyle(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          textStyle: TextStyle(
-            color: LikeMindsTheme.greyColor,
-            fontSize: 16,
-            fontFamily: 'Roboto',
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        mediaStyle: const LMFeedPostMediaStyle(
-          carouselStyle: LMFeedPostCarouselStyle(),
-          documentStyle: LMFeedPostDocumentStyle(),
-          imageStyle: LMFeedPostImageStyle(),
-          linkStyle: LMFeedPostLinkPreviewStyle(),
-          videoStyle: LMFeedPostVideoStyle(),
-        ),
-        footerStyle: const LMFeedPostFooterStyle(
-          showLikeButton: true,
-          showCommentButton: true,
-          showShareButton: true,
-          showSaveButton: false,
-          likeButtonStyle: LMFeedButtonStyle(
-            icon: LMFeedIcon(
-              type: LMFeedIconType.svg,
-              assetPath: lmLikeInActiveSvg,
-              style: LMFeedIconStyle(
+  factory LMFeedThemeData.light({
+    Color? primaryColor,
+    Color? backgroundColor,
+    Color? secondaryColor,
+    Color? shadowColor,
+    Color? disabledColor,
+    Color? errorColor,
+    Color? inActiveColor,
+    Color? tagColor,
+    Color? hashTagColor,
+    Color? linkColor,
+    LMFeedPostStyle? postStyle,
+    LMFeedPostHeaderStyle? headerStyle,
+    LMFeedPostTopicStyle? topicStyle,
+    LMFeedPostContentStyle? contentStyle,
+    LMFeedPostMediaStyle? mediaStyle,
+    LMFeedPostFooterStyle? footerStyle,
+    LMFeedCommentStyle? commentStyle,
+    LMFeedCommentStyle? replyStyle,
+    LMFeedButtonStyle? feedButtonStyle,
+    LMFeedIconStyle? feedIconStyle,
+    Color? container,
+    Color? onContainer,
+    Color? onPrimary,
+  }) {
+    return LMFeedThemeData(
+      backgroundColor: backgroundColor ?? LikeMindsTheme.backgroundColor,
+      primaryColor: primaryColor ?? LikeMindsTheme.primaryColor,
+      secondaryColor: secondaryColor ?? LikeMindsTheme.secondaryColor,
+      shadowColor: shadowColor ?? LikeMindsTheme.shadowColor,
+      disabledColor: disabledColor ?? LikeMindsTheme.disabledColor,
+      errorColor: errorColor ?? LikeMindsTheme.errorColor,
+      inActiveColor: inActiveColor ?? LikeMindsTheme.inactiveColor,
+      container: container ?? LikeMindsTheme.container,
+      onContainer: onContainer ?? LikeMindsTheme.onContainer,
+      onPrimary: onPrimary ?? LikeMindsTheme.onPrimary,
+      postStyle: postStyle ??
+          LMFeedPostStyle(
+            boxShadow: [
+              const BoxShadow(
+                  color: Color.fromRGBO(0, 0, 0, 0.239), blurRadius: 1.0)
+            ],
+            margin: const EdgeInsets.only(bottom: 12.0),
+            topicStyle: topicStyle ??
+                LMFeedPostTopicStyle(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  activeChipStyle: LMFeedTopicChipStyle(
+                    backgroundColor: primaryColor?.withOpacity(0.1) ??
+                        LikeMindsTheme.primaryColor.withOpacity(0.1),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 2.0),
+                    textStyle: TextStyle(
+                      color: primaryColor ?? LikeMindsTheme.primaryColor,
+                      fontSize: 14,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w400,
+                    ),
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                  inactiveChipStyle: LMFeedTopicChipStyle(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 2.0),
+                    textStyle: TextStyle(
+                      color: primaryColor ?? LikeMindsTheme.primaryColor,
+                      fontSize: 14,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w400,
+                    ),
+                    borderRadius: BorderRadius.circular(4.0),
+                    showBorder: true,
+                    borderColor: primaryColor ?? LikeMindsTheme.primaryColor,
+                  ),
+                ),
+            contentStyle: const LMFeedPostContentStyle(
+              padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              textStyle: TextStyle(
                 color: LikeMindsTheme.greyColor,
-                size: 24,
-                boxPadding: 0,
-                fit: BoxFit.contain,
+                fontSize: 16,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w400,
               ),
             ),
-            height: 44,
-            activeIcon: LMFeedIcon(
-              type: LMFeedIconType.svg,
-              assetPath: lmLikeActiveSvg,
-              style: LMFeedIconStyle(
-                color: LikeMindsTheme.errorColor,
-                size: 24,
-                boxPadding: 0,
-                fit: BoxFit.contain,
+            mediaStyle: const LMFeedPostMediaStyle(
+              carouselStyle: LMFeedPostCarouselStyle(),
+              documentStyle: LMFeedPostDocumentStyle(),
+              imageStyle: LMFeedPostImageStyle(),
+              linkStyle: LMFeedPostLinkPreviewStyle(),
+              videoStyle: LMFeedPostVideoStyle(),
+            ),
+            footerStyle: LMFeedPostFooterStyle(
+              showLikeButton: true,
+              showCommentButton: true,
+              showShareButton: true,
+              showSaveButton: true,
+              likeButtonStyle: LMFeedButtonStyle(
+                padding: const EdgeInsets.only(right: 16.0),
+                icon: const LMFeedIcon(
+                  type: LMFeedIconType.svg,
+                  assetPath: lmLikeInActiveSvg,
+                  style: LMFeedIconStyle(
+                    color: LikeMindsTheme.greyColor,
+                    size: 24,
+                    boxPadding: 0,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                height: 44,
+                activeIcon: LMFeedIcon(
+                  type: LMFeedIconType.svg,
+                  assetPath: lmLikeActiveSvg,
+                  style: LMFeedIconStyle(
+                    color: primaryColor ?? LikeMindsTheme.errorColor,
+                    size: 24,
+                    boxPadding: 0,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              commentButtonStyle: const LMFeedButtonStyle(
+                icon: LMFeedIcon(
+                  type: LMFeedIconType.svg,
+                  assetPath: lmCommentSvg,
+                  style: LMFeedIconStyle(
+                    color: LikeMindsTheme.greyColor,
+                    size: 24,
+                    boxPadding: 0,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              shareButtonStyle: const LMFeedButtonStyle(
+                showText: false,
+                icon: LMFeedIcon(
+                  type: LMFeedIconType.svg,
+                  assetPath: lmShareSvg,
+                  style: LMFeedIconStyle(
+                    color: LikeMindsTheme.greyColor,
+                    size: 24,
+                    boxPadding: 0,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              saveButtonStyle: LMFeedButtonStyle(
+                showText: false,
+                icon: const LMFeedIcon(
+                  type: LMFeedIconType.svg,
+                  assetPath: lmSaveInactiveSvg,
+                  style: LMFeedIconStyle(
+                    color: LikeMindsTheme.greyColor,
+                    size: 24,
+                    boxPadding: 0,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                activeIcon: LMFeedIcon(
+                  type: LMFeedIconType.svg,
+                  assetPath: lmSaveActiveSvg,
+                  style: LMFeedIconStyle(
+                    color: primaryColor ?? LikeMindsTheme.disabledColor,
+                    size: 24,
+                    boxPadding: 0,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                padding: const EdgeInsets.only(right: 8.0),
+              ),
+              alignment: MainAxisAlignment.start,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 10.0,
+              ),
+            ),
+            headerStyle: LMFeedPostHeaderStyle(
+              imageSize: 48,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              fallbackTextStyle: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  color: onPrimary ?? LikeMindsTheme.onPrimary,
+                  fontSize: 16,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
-          commentButtonStyle: LMFeedButtonStyle(
-            icon: LMFeedIcon(
-              type: LMFeedIconType.svg,
-              assetPath: lmCommentSvg,
-              style: LMFeedIconStyle(
-                color: LikeMindsTheme.greyColor,
-                size: 24,
-                boxPadding: 0,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          shareButtonStyle: LMFeedButtonStyle(
-            showText: false,
-            icon: LMFeedIcon(
-              type: LMFeedIconType.svg,
-              assetPath: lmShareSvg,
-              style: LMFeedIconStyle(
-                color: LikeMindsTheme.greyColor,
-                size: 24,
-                boxPadding: 0,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          alignment: MainAxisAlignment.spaceBetween,
-          padding: EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 10.0,
-          ),
-        ),
-        headerStyle: const LMFeedPostHeaderStyle(
-          imageSize: 48,
-          padding: EdgeInsets.symmetric(
-            horizontal: 16.0,
-            vertical: 8.0,
-          ),
-          fallbackTextStyle: LMFeedTextStyle(
-            textStyle: TextStyle(
-              color: LikeMindsTheme.onPrimary,
-              fontSize: 16,
-              fontFamily: 'Roboto',
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-      hashTagColor: LikeMindsTheme.hashTagColor,
-      linkColor: LikeMindsTheme.linkColor,
-      tagColor: LikeMindsTheme.tagColor,
-      commentStyle: const LMFeedCommentStyle(
-        padding: EdgeInsets.all(12.0),
+      hashTagColor: hashTagColor ?? LikeMindsTheme.hashTagColor,
+      linkColor: linkColor ?? LikeMindsTheme.linkColor,
+      tagColor: tagColor ?? LikeMindsTheme.tagColor,
+      commentStyle: LMFeedCommentStyle(
+        showProfilePicture: false,
+        padding: const EdgeInsets.all(12.0),
         likeButtonStyle: LMFeedButtonStyle(
-          icon: LMFeedIcon(
+          icon: const LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeInActiveSvg,
+            style: LMFeedIconStyle(
+              color: LikeMindsTheme.greyColor,
+              size: 16,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+          height: 44,
+          activeIcon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeActiveSvg,
+            style: LMFeedIconStyle(
+              color: errorColor ?? LikeMindsTheme.errorColor,
+              size: 16,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        replyButtonStyle: const LMFeedButtonStyle(),
+        showRepliesButtonStyle: const LMFeedButtonStyle(),
+      ),
+      replyStyle: LMFeedCommentStyle(
+        showProfilePicture: false,
+        padding: const EdgeInsets.only(
+            left: 48.0, top: 12.0, bottom: 12, right: 12.0),
+        likeButtonStyle: LMFeedButtonStyle(
+          icon: const LMFeedIcon(
             type: LMFeedIconType.svg,
             assetPath: lmLikeInActiveSvg,
             style: LMFeedIconStyle(
@@ -437,35 +517,7 @@ class LMFeedThemeData {
             type: LMFeedIconType.svg,
             assetPath: lmLikeActiveSvg,
             style: LMFeedIconStyle(
-              color: LikeMindsTheme.errorColor,
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-        replyButtonStyle: LMFeedButtonStyle(),
-        showRepliesButtonStyle: LMFeedButtonStyle(),
-      ),
-      replyStyle: const LMFeedCommentStyle(
-        padding: EdgeInsets.all(12.0),
-        likeButtonStyle: LMFeedButtonStyle(
-          icon: LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmLikeInActiveSvg,
-            style: LMFeedIconStyle(
-              color: LikeMindsTheme.greyColor,
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-          height: 44,
-          activeIcon: LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmLikeActiveSvg,
-            style: LMFeedIconStyle(
-              color: LikeMindsTheme.errorColor,
+              color: errorColor ?? LikeMindsTheme.errorColor,
               size: 24,
               boxPadding: 0,
               fit: BoxFit.contain,
@@ -474,7 +526,7 @@ class LMFeedThemeData {
         ),
         showRepliesButton: false,
         showReplyButton: false,
-        replyButtonStyle: LMFeedButtonStyle(),
+        replyButtonStyle: const LMFeedButtonStyle(),
       ),
       feedButtonStyle: const LMFeedButtonStyle(),
       feedIconStyle: const LMFeedIconStyle(),
@@ -513,7 +565,7 @@ class LMFeedThemeData {
     LMFeedDialogStyle? dialogStyle,
     LMFeedPopUpMenuStyle? popUpMenuStyle,
   }) {
-    return LMFeedThemeData._(
+    return LMFeedThemeData(
       postStyle: postStyle ?? this.postStyle,
       primaryColor: primaryColor ?? this.primaryColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,

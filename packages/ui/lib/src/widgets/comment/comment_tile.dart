@@ -110,12 +110,17 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              widget.profilePicture ?? const SizedBox(),
-              LikeMindsTheme.kHorizontalPaddingLarge,
+              (style?.showProfilePicture ?? true)
+                  ? Container(
+                      padding: style?.profilePicturePadding,
+                      child: widget.profilePicture ?? const SizedBox.shrink(),
+                    )
+                  : const SizedBox.shrink(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
+                  Container(
+                    padding: style?.titlePadding,
                     width: style!.width != null ? style!.width! * 0.6 : null,
                     child: widget.titleText ??
                         LMFeedText(
@@ -130,9 +135,10 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                         ),
                   ),
                   widget.subtitleText != null
-                      ? LikeMindsTheme.kVerticalPaddingSmall
-                      : const SizedBox(),
-                  widget.subtitleText ?? const SizedBox(),
+                      ? Container(
+                          padding: style?.subtitlePadding,
+                          child: widget.subtitleText)
+                      : const SizedBox.shrink(),
                 ],
               ),
               const Spacer(),
@@ -323,6 +329,12 @@ class LMFeedCommentStyle {
   final bool showRepliesButton;
   final LMFeedButtonStyle? showRepliesButtonStyle;
 
+  final bool? showProfilePicture;
+  final EdgeInsets? profilePicturePadding;
+
+  final EdgeInsets? titlePadding;
+  final EdgeInsets? subtitlePadding;
+
   const LMFeedCommentStyle({
     this.textStyle,
     this.linkStyle,
@@ -339,6 +351,10 @@ class LMFeedCommentStyle {
     this.showRepliesButtonStyle,
     this.showReplyButton = true,
     this.showRepliesButton = true,
+    this.showProfilePicture = true,
+    this.profilePicturePadding,
+    this.titlePadding,
+    this.subtitlePadding,
   });
 
   LMFeedCommentStyle copyWith({
@@ -357,6 +373,10 @@ class LMFeedCommentStyle {
     LMFeedButtonStyle? showRepliesButtonStyle,
     bool? showReplyButton,
     bool? showRepliesButton,
+    bool? showProfilePicture,
+    EdgeInsets? profilePicturePadding,
+    EdgeInsets? titlePadding,
+    EdgeInsets? subtitlePadding,
   }) {
     return LMFeedCommentStyle(
       textStyle: textStyle ?? this.textStyle,
@@ -376,6 +396,11 @@ class LMFeedCommentStyle {
           showRepliesButtonStyle ?? this.showRepliesButtonStyle,
       showRepliesButton: showRepliesButton ?? this.showRepliesButton,
       showReplyButton: showReplyButton ?? this.showReplyButton,
+      showProfilePicture: showProfilePicture ?? this.showProfilePicture,
+      profilePicturePadding:
+          profilePicturePadding ?? this.profilePicturePadding,
+      titlePadding: titlePadding ?? this.titlePadding,
+      subtitlePadding: subtitlePadding ?? this.subtitlePadding,
     );
   }
 }

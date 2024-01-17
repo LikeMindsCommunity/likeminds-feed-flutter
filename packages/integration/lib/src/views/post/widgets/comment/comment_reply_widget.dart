@@ -14,13 +14,14 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
   final LMCommentViewData reply;
   final LMUserViewData user;
   final Function() refresh;
+  final LMFeedCommentStyle? style;
 
   const LMFeedCommentReplyWidget({
     Key? key,
     required this.reply,
     required this.user,
     required this.postId,
-    // required this.onReply,
+    this.style,
     required this.refresh,
   }) : super(key: key);
 
@@ -49,6 +50,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   List<LMCommentViewData> replies = [];
   Map<String, LMUserViewData> users = {};
   LMFeedThemeData? feedTheme;
+  LMFeedCommentStyle? replyStyle;
 
   LMCommentViewData? reply;
   late final LMUserViewData user;
@@ -89,6 +91,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   @override
   Widget build(BuildContext context) {
     feedTheme = LMFeedTheme.of(context);
+    replyStyle = widget.style ?? feedTheme?.replyStyle;
     return BlocConsumer(
       bloc: _commentRepliesBloc,
       buildWhen: (previous, current) {
@@ -117,13 +120,11 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
             return Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
-              child: Center(
-                child: SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: LMFeedLoader(
-                    color: feedTheme!.primaryColor,
-                  ),
+              child: SizedBox(
+                height: 20,
+                width: 20,
+                child: LMFeedLoader(
+                  color: feedTheme!.primaryColor,
                 ),
               ),
             );
@@ -214,108 +215,92 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 return false;
             }
           },
-          builder: (context, state) => Container(
-            padding: const EdgeInsets.only(
-              left: 48,
-              bottom: 0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: replies.length,
-                  itemBuilder: (context, index) {
-                    LMCommentViewData commentViewData = replies[index];
-                    LMUserViewData user = users[commentViewData.userId]!;
-                    return StatefulBuilder(
-                      builder: (context, setReplyState) {
-                        return LMFeedCommentWidget(
-                          comment: commentViewData,
-                          onTagTap: (String userId) {
-                            LMFeedCore.instance.lmFeedClient
-                                .routeToProfile(userId);
-                          },
-                          user: user,
-                          profilePicture: LMFeedProfilePicture(
-                            imageUrl: user.imageUrl,
-                            style: LMFeedProfilePictureStyle(
-                              size: 32,
-                              backgroundColor: feedTheme!.primaryColor,
-                            ),
-                            fallbackText: user.name,
-                            onTap: () {
-                              if (user.sdkClientInfo != null) {
-                                LMFeedCore.instance.lmFeedClient.routeToProfile(
-                                    user.sdkClientInfo!.userUniqueId);
-                              }
-                            },
-                          ),
-                          subtitleText: LMFeedText(
-                            text:
-                                "@${user.name.toLowerCase().split(' ').join()} · ${timeago.format(commentViewData.createdAt)}",
-                            style: const LMFeedTextStyle(
-                              textStyle: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
-                                color: LikeMindsTheme.greyColor,
-                              ),
-                            ),
-                          ),
-                          lmFeedMenuAction: defLMFeedMenuAction(
-                            commentViewData,
-                          ),
-                          likeButton: defLikeButton(
-                            commentViewData,
-                            setReplyState,
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-                if (replies.isNotEmpty &&
-                    replies.length % 10 == 0 &&
-                    replies.length != reply!.repliesCount)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      LMFeedButton(
-                        onTap: () {
-                          page++;
-                          _commentRepliesBloc!.add(LMFeedGetCommentRepliesEvent(
-                              commentDetailRequest: (GetCommentRequestBuilder()
-                                    ..commentId(reply!.id)
-                                    ..page(page)
-                                    ..postId(postId))
-                                  .build(),
-                              forLoadMore: true));
+          builder: (context, state) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: replies.length,
+                itemBuilder: (context, index) {
+                  LMCommentViewData commentViewData = replies[index];
+                  LMUserViewData user = users[commentViewData.userId]!;
+                  return StatefulBuilder(
+                    builder: (context, setReplyState) {
+                      return LMFeedCommentWidget(
+                        style: replyStyle,
+                        comment: commentViewData,
+                        onTagTap: (String userId) {
+                          LMFeedCore.instance.lmFeedClient
+                              .routeToProfile(userId);
                         },
-                        text: const LMFeedText(
-                          text: 'View more replies',
-                          style: LMFeedTextStyle(
-                            textStyle: TextStyle(
-                              fontSize: 14,
-                            ),
+                        user: user,
+                        profilePicture: LMFeedProfilePicture(
+                          imageUrl: user.imageUrl,
+                          style: LMFeedProfilePictureStyle(
+                            size: 32,
+                            backgroundColor: feedTheme!.primaryColor,
                           ),
+                          fallbackText: user.name,
+                          onTap: () {
+                            if (user.sdkClientInfo != null) {
+                              LMFeedCore.instance.lmFeedClient.routeToProfile(
+                                  user.sdkClientInfo!.userUniqueId);
+                            }
+                          },
                         ),
-                      ),
-                      LMFeedText(
-                        text: ' ${replies.length} of ${reply!.repliesCount}',
-                        style: const LMFeedTextStyle(
+                        lmFeedMenuAction: defLMFeedMenuAction(
+                          commentViewData,
+                        ),
+                        likeButton: defLikeButton(
+                          commentViewData,
+                          setReplyState,
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+              if (replies.isNotEmpty &&
+                  replies.length % 10 == 0 &&
+                  replies.length != reply!.repliesCount)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    LMFeedButton(
+                      onTap: () {
+                        page++;
+                        _commentRepliesBloc!.add(LMFeedGetCommentRepliesEvent(
+                            commentDetailRequest: (GetCommentRequestBuilder()
+                                  ..commentId(reply!.id)
+                                  ..page(page)
+                                  ..postId(postId))
+                                .build(),
+                            forLoadMore: true));
+                      },
+                      text: const LMFeedText(
+                        text: 'View more replies',
+                        style: LMFeedTextStyle(
                           textStyle: TextStyle(
-                            fontSize: 11,
-                            color: LikeMindsTheme.greyColor,
+                            fontSize: 14,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                // replies.add();
-              ],
-            ),
+                    ),
+                    LMFeedText(
+                      text: ' ${replies.length} of ${reply!.repliesCount}',
+                      style: const LMFeedTextStyle(
+                        textStyle: TextStyle(
+                          fontSize: 11,
+                          color: LikeMindsTheme.greyColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              // replies.add();
+            ],
           ),
         );
       }),

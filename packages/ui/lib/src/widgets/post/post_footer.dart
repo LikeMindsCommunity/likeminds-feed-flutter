@@ -50,35 +50,51 @@ class LMFeedPostFooter extends StatelessWidget {
   void _populateButtonList(LMFeedPostFooterStyle postFooterStyle) {
     _footerChildren.clear();
 
-    if (postFooterStyle.showLikeButton ?? true) {
-      LMFeedButton likeButton = this.likeButton ?? defLikeButton();
+    bool showLike = (postFooterStyle.showLikeButton ?? true);
+
+    if (showLike) {
+      LMFeedButton likeButton =
+          this.likeButton ?? defLikeButton(postFooterStyle);
       Widget lmButton = likeButtonBuilder?.call(likeButton) ?? likeButton;
       _footerChildren.add(lmButton);
     }
 
-    if (postFooterStyle.showCommentButton ?? true) {
-      LMFeedButton commentButton = this.commentButton ?? defCommentButton();
+    bool showComment = (postFooterStyle.showCommentButton ?? true);
+
+    if (showComment) {
+      LMFeedButton commentButton =
+          this.commentButton ?? defCommentButton(postFooterStyle);
       Widget lmButton =
           commentButtonBuilder?.call(commentButton) ?? commentButton;
       _footerChildren.add(lmButton);
     }
 
-    if (postFooterStyle.showSaveButton ?? true) {
-      LMFeedButton saveButton = this.saveButton ?? defSaveButton();
-      Widget lmButton = saveButtonBuilder?.call(saveButton) ?? saveButton;
-      _footerChildren.add(lmButton);
-    }
+    bool showSave = (postFooterStyle.showSaveButton ?? true);
+    bool showShare = (postFooterStyle.showShareButton ?? true);
 
-    if (postFooterStyle.showShareButton ?? true) {
-      LMFeedButton shareButton = this.shareButton ?? defShareButton();
-      Widget lmButton = shareButtonBuilder?.call(shareButton) ?? shareButton;
-      _footerChildren.add(lmButton);
+    if (showSave || showShare) {
+      _footerChildren.add(const Spacer());
+
+      if (showSave) {
+        LMFeedButton saveButton =
+            this.saveButton ?? defSaveButton(postFooterStyle);
+        Widget lmButton = saveButtonBuilder?.call(saveButton) ?? saveButton;
+        _footerChildren.add(lmButton);
+      }
+
+      if (showShare) {
+        LMFeedButton shareButton =
+            this.shareButton ?? defShareButton(postFooterStyle);
+        Widget lmButton = shareButtonBuilder?.call(shareButton) ?? shareButton;
+        _footerChildren.add(lmButton);
+      }
     }
   }
 
-  LMFeedButton defLikeButton() => LMFeedButton(
+  LMFeedButton defLikeButton(LMFeedPostFooterStyle postFooterStyle) =>
+      LMFeedButton(
         text: const LMFeedText(text: "Like"),
-        style: postFooterStyle?.likeButtonStyle ??
+        style: postFooterStyle.likeButtonStyle ??
             const LMFeedButtonStyle(
               margin: 0,
               icon: LMFeedIcon(
@@ -96,9 +112,10 @@ class LMFeedPostFooter extends StatelessWidget {
         onTap: () {},
       );
 
-  LMFeedButton defCommentButton() => LMFeedButton(
+  LMFeedButton defCommentButton(LMFeedPostFooterStyle postFooterStyle) =>
+      LMFeedButton(
         text: const LMFeedText(text: "Comment"),
-        style: postFooterStyle?.commentButtonStyle ??
+        style: postFooterStyle.commentButtonStyle ??
             const LMFeedButtonStyle(
               icon: LMFeedIcon(
                 type: LMFeedIconType.svg,
@@ -109,26 +126,17 @@ class LMFeedPostFooter extends StatelessWidget {
         onTap: () {},
       );
 
-  LMFeedButton defSaveButton() => LMFeedButton(
+  LMFeedButton defSaveButton(LMFeedPostFooterStyle postFooterStyle) =>
+      LMFeedButton(
         text: const LMFeedText(text: "Save"),
-        style: postFooterStyle?.saveButtonStyle ??
-            const LMFeedButtonStyle(
-              margin: 0,
-              icon: LMFeedIcon(
-                type: LMFeedIconType.svg,
-                assetPath: lmSaveInactiveSvg,
-              ),
-              activeIcon: LMFeedIcon(
-                type: LMFeedIconType.svg,
-                assetPath: lmSaveActiveSvg,
-              ),
-            ),
+        style: postFooterStyle.saveButtonStyle,
         onTap: () {},
       );
 
-  LMFeedButton defShareButton() => LMFeedButton(
+  LMFeedButton defShareButton(LMFeedPostFooterStyle postFooterStyle) =>
+      LMFeedButton(
         text: const LMFeedText(text: "Share"),
-        style: postFooterStyle?.shareButtonStyle ??
+        style: postFooterStyle.shareButtonStyle ??
             const LMFeedButtonStyle(
               margin: 0,
               icon: LMFeedIcon(

@@ -17,6 +17,7 @@ class LMFeedPostDetailScreenHandler {
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   Map<String, LMTopicViewData> topics = {};
+  LMPostViewData? postData;
 
   LMFeedPostDetailScreenHandler(this.commetListPagingController, this.postId) {
     commentHandlerBloc = LMFeedCommentHandlerBloc.instance;
@@ -98,7 +99,13 @@ class LMFeedPostDetailScreenHandler {
           LMCommentViewData commentViewData =
               LMCommentViewDataConvertor.fromComment(response.reply!);
 
+          postData!.commentCount += 1;
+
           addCommentToController(commentViewData);
+
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+
+          rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
       case const (LMFeedCommentSuccessState<EditCommentResponse>):
@@ -113,6 +120,9 @@ class LMFeedPostDetailScreenHandler {
               LMCommentViewDataConvertor.fromComment(response.reply!);
 
           updateCommentInController(commentViewData);
+
+          rebuildPostWidget.value = !rebuildPostWidget.value;
+
           break;
         }
       case const (LMFeedCommentSuccessState<DeleteCommentResponse>):
@@ -133,6 +143,11 @@ class LMFeedPostDetailScreenHandler {
               updateCommentInController(commentViewData);
             }
           }
+
+          postData!.commentCount -= 1;
+
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }

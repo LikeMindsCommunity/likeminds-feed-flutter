@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 class LMFeedMenu extends StatelessWidget {
@@ -29,14 +30,11 @@ class LMFeedMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     removeReportIntegration();
-    return Builder(
-      builder: (context) {
-        if (menuItems.isEmpty) {
-          return Container();
-        }
-        return SizedBox(
-          child: Builder(builder: (context) {
-            return PopupMenuButton<int>(
+    LMFeedThemeData theme = LMFeedTheme.of(context);
+    return menuItems.isEmpty
+        ? Container()
+        : SizedBox(
+            child: PopupMenuButton<int>(
               onSelected: _handleMenuTap,
               itemBuilder: (context) => menuItems
                   .map(
@@ -49,9 +47,9 @@ class LMFeedMenu extends StatelessWidget {
                       child: children?[element.id] ??
                           LMFeedText(
                             text: element.title,
-                            style: const LMFeedTextStyle(
+                            style: LMFeedTextStyle(
                               textStyle: TextStyle(
-                                color: Colors.white,
+                                color: theme.onContainer,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -60,7 +58,8 @@ class LMFeedMenu extends StatelessWidget {
                     ),
                   )
                   .toList(),
-              color: Colors.white,
+              color: theme.container,
+              surfaceTintColor: Colors.transparent,
               child: menuIcon ??
                   const SizedBox(
                     height: 24,
@@ -71,11 +70,8 @@ class LMFeedMenu extends StatelessWidget {
                       size: 24,
                     ),
                   ),
-            );
-          }),
-        );
-      },
-    );
+            ),
+          );
   }
 
   void _handleMenuTap(int itemId) {

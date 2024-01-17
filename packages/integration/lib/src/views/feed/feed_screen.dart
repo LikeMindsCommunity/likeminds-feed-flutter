@@ -11,6 +11,7 @@ import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants
 import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
@@ -88,16 +89,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   // future to get the topics
   Future<GetTopicsResponse>? getTopicsResponse;
 
-  // list of selected topics by the user
-  List<LMTopicViewData> selectedTopics = [];
   bool topicVisible = true;
-
-  // list of all the topics
-  Map<String, LMTopicViewData> topics = {};
-  // list of all the users
-  Map<String, LMUserViewData> users = {};
-  // list of all the widgets
-  Map<String, LMWidgetViewData> widgets = {};
 
   // bloc to handle universal feed
   late final LMFeedBloc _feedBloc; // bloc to fetch the feedroom data
@@ -132,9 +124,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           .build(),
     );
     Bloc.observer = LMFeedBlocObserver();
-    _feedBloc = LMFeedBloc();
-    _feedBloc
-        .add(LMFeedGetUniversalFeedEvent(offset: 1, topics: selectedTopics));
+    _feedBloc = LMFeedBloc.instance;
+    _feedBloc.add(
+      LMFeedGetUniversalFeedEvent(
+        offset: 1,
+        topics: _feedBloc.selectedTopics,
+      ),
+    );
     _controller.addListener(_scrollListener);
     userPostingRights = checkPostCreationRights();
   }
@@ -169,13 +165,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   }
 
   void updateSelectedTopics(List<LMTopicViewData> topics) {
-    selectedTopics = topics;
+    _feedBloc.selectedTopics = topics;
     rebuildTopicFeed.value = !rebuildTopicFeed.value;
     clearPagingController();
     _feedBloc.add(
       LMFeedGetUniversalFeedEvent(
         offset: 1,
-        topics: selectedTopics,
+        topics: _feedBloc.selectedTopics,
       ),
     );
   }
@@ -204,7 +200,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         _feedBloc.add(
           LMFeedGetUniversalFeedEvent(
             offset: pageKey,
-            topics: selectedTopics,
+            topics: _feedBloc.selectedTopics,
           ),
         );
       },
@@ -219,9 +215,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       _pageFeed++;
       List<LMPostViewData> listOfPosts = state.posts;
 
-      users.addAll(state.users);
-      topics.addAll(state.topics);
-      widgets.addAll(state.widgets);
+      _feedBloc.users.addAll(state.users);
+      _feedBloc.topics.addAll(state.topics);
+      _feedBloc.widgets.addAll(state.widgets);
 
       if (state.posts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
@@ -257,10 +253,19 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       clipBehavior: Clip.hardEdge,
       builder: (context) => LMFeedTopicBottomSheet(
         key: GlobalKey(),
-        selectedTopics: selectedTopics,
+        selectedTopics: _feedBloc.selectedTopics,
         onTopicSelected: (updatedTopics, tappedTopic) {
           updateSelectedTopics(updatedTopics);
         },
+      ),
+    );
+  }
+
+  void navigateToTopicSelectScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LMFeedTopicSelectScreen(),
       ),
     );
   }
@@ -345,7 +350,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                 onTap: () => showTopicSelectSheet(),
                                 child: Row(
                                   children: [
-                                    selectedTopics.isEmpty
+                                    _feedBloc.selectedTopics.isEmpty
                                         ? LMFeedTopicChip(
                                             topic: (LMTopicViewDataBuilder()
                                                   ..id("0")
@@ -355,15 +360,21 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                             style: feedTheme.postStyle
                                                 .topicStyle.inactiveChipStyle,
                                           )
-                                        : selectedTopics.length == 1
+                                        : _feedBloc.selectedTopics.length == 1
                                             ? LMFeedTopicChip(
                                                 topic: (LMTopicViewDataBuilder()
-                                                      ..id(selectedTopics
-                                                          .first.id)
-                                                      ..isEnabled(selectedTopics
-                                                          .first.isEnabled)
-                                                      ..name(selectedTopics
-                                                          .first.name))
+                                                      ..id(_feedBloc
+                                                          .selectedTopics
+                                                          .first
+                                                          .id)
+                                                      ..isEnabled(_feedBloc
+                                                          .selectedTopics
+                                                          .first
+                                                          .isEnabled)
+                                                      ..name(_feedBloc
+                                                          .selectedTopics
+                                                          .first
+                                                          .name))
                                                     .build(),
                                                 style: feedTheme
                                                     .postStyle
@@ -400,7 +411,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                                           4)),
                                                         ),
                                                         child: LMFeedText(
-                                                          text: selectedTopics
+                                                          text: _feedBloc
+                                                              .selectedTopics
                                                               .length
                                                               .toString(),
                                                           style:
@@ -456,9 +468,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   universalFeedBloc: _feedBloc,
                   feedRoomPagingController: _pagingController,
                   user: user,
-                  topics: topics,
-                  users: users,
-                  widgets: widgets,
                   onRefresh: refresh,
                   scrollController: _controller,
                   openTopicBottomSheet: showTopicSelectSheet,
@@ -477,9 +486,6 @@ class FeedRoomView extends StatefulWidget {
   final bool isCm;
   final LMUserViewData user;
   final LMFeedBloc universalFeedBloc;
-  final Map<String, LMUserViewData> users;
-  final Map<String, LMWidgetViewData> widgets;
-  final Map<String, LMTopicViewData> topics;
   final PagingController<int, LMPostViewData> feedRoomPagingController;
   final ScrollController scrollController;
   final VoidCallback onRefresh;
@@ -495,9 +501,6 @@ class FeedRoomView extends StatefulWidget {
     required this.onRefresh,
     required this.scrollController,
     required this.openTopicBottomSheet,
-    required this.users,
-    required this.widgets,
-    required this.topics,
     this.postBuilder,
   });
 
@@ -511,6 +514,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   ScrollController? _controller;
   final ValueNotifier postSomethingNotifier = ValueNotifier(false);
   bool right = true;
+  LMFeedThemeData? feedTheme;
 
   Widget getLoaderThumbnail(LMMediaModel? media) {
     if (media != null) {
@@ -590,9 +594,9 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   @override
   Widget build(BuildContext context) {
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
-    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedTheme.of(context);
     return Scaffold(
-      backgroundColor: feedTheme.disabledColor,
+      backgroundColor: feedTheme?.backgroundColor,
       body: Column(
         children: [
           BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
@@ -638,8 +642,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                     feedRoomItemList.length > 10) {
                   feedRoomItemList.removeLast();
                 }
-                widget.users.addAll(curr.userData);
-                widget.topics.addAll(curr.topics);
+                widget.universalFeedBloc.users.addAll(curr.userData);
+                widget.universalFeedBloc.topics.addAll(curr.topics);
                 widget.feedRoomPagingController.itemList = feedRoomItemList;
                 postUploading.value = false;
                 rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -654,8 +658,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                 if (index != -1) {
                   feedRoomItemList?[index] = item;
                 }
-                widget.users.addAll(curr.userData);
-                widget.topics.addAll(curr.topics);
+                widget.universalFeedBloc.users.addAll(curr.userData);
+                widget.universalFeedBloc.topics.addAll(curr.topics);
                 postUploading.value = false;
                 rebuildPostWidget.value = !rebuildPostWidget.value;
               }
@@ -682,7 +686,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               if (state is LMFeedEditPostUploadingState) {
                 return Container(
                   height: 60,
-                  color: feedTheme.backgroundColor,
+                  color: feedTheme?.backgroundColor,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: const Row(
@@ -732,7 +736,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                       ? null
                                       : snapshot.data?.toDouble()),
                                   valueColor: AlwaysStoppedAnimation(
-                                      feedTheme.primaryColor),
+                                      feedTheme?.primaryColor),
                                   strokeWidth: 3,
                                 ));
                           }),
@@ -764,147 +768,13 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                         as LMFeedUniversalFeedLoadedState)
                                     .topics
                                     .isNotEmpty) {
-                              return Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const LMFeedText(
-                                      text:
-                                          "Looks like there are no posts for this topic yet.",
-                                      style: LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          height: 0,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        LMFeedButton(
-                                          style: LMFeedButtonStyle(
-                                            borderRadius: 48,
-                                            border: Border.all(
-                                              color: feedTheme.primaryColor,
-                                              width: 2,
-                                            ),
-                                            height: 40,
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 8, horizontal: 12),
-                                          ),
-                                          text: LMFeedText(
-                                            text: "Change Filter",
-                                            style: LMFeedTextStyle(
-                                              textAlign: TextAlign.center,
-                                              textStyle: TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                  color:
-                                                      feedTheme.primaryColor),
-                                            ),
-                                          ),
-                                          onTap: () =>
-                                              widget.openTopicBottomSheet(),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              );
+                              return noPostUnderTopicWidget();
                             }
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const LMFeedIcon(
-                                    type: LMFeedIconType.icon,
-                                    icon: Icons.post_add,
-                                    style: LMFeedIconStyle(
-                                      size: 48,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  const LMFeedText(
-                                    text: 'No posts to show',
-                                    style: LMFeedTextStyle(
-                                      textStyle: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  const LMFeedText(
-                                    text: "Be the first one to post here",
-                                    style: LMFeedTextStyle(
-                                      textStyle: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w300,
-                                        color: LikeMindsTheme.greyColor,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 28),
-                                  LMFeedButton(
-                                    style: LMFeedButtonStyle(
-                                      icon: const LMFeedIcon(
-                                        type: LMFeedIconType.icon,
-                                        icon: Icons.add,
-                                        style: LMFeedIconStyle(
-                                          size: 18,
-                                        ),
-                                      ),
-                                      borderRadius: 28,
-                                      backgroundColor: feedTheme.primaryColor,
-                                      height: 44,
-                                      width: 153,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12, horizontal: 20),
-                                      placement: LMFeedIconButtonPlacement.end,
-                                    ),
-                                    text: const LMFeedText(
-                                      text: "Create Post",
-                                      style: LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    onTap: right
-                                        ? () {
-                                            if (!postUploading.value) {
-                                              LMFeedAnalyticsBloc.instance.add(
-                                                  const LMFeedFireAnalyticsEvent(
-                                                      eventName:
-                                                          LMFeedAnalyticsKeys
-                                                              .postCreationStarted,
-                                                      eventProperties: {}));
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const LMFeedComposeScreen(),
-                                                ),
-                                              );
-                                            } else {
-                                              toast(
-                                                'A post is already uploading.',
-                                                duration: Toast.LENGTH_LONG,
-                                              );
-                                            }
-                                          }
-                                        : () => toast(
-                                            "You do not have permission to create a post"),
-                                  ),
-                                ],
-                              ),
-                            );
+                            return noPostInFeedWidget();
                           },
                           itemBuilder: (context, item, index) {
-                            if (widget.users[item.userId] == null) {
+                            if (widget.universalFeedBloc.users[item.userId] ==
+                                null) {
                               return const SizedBox();
                             }
                             return widget.postBuilder?.call(context,
@@ -912,10 +782,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                 defPostWidget(feedTheme, item);
                           },
                           firstPageProgressIndicatorBuilder: (context) =>
-                              Center(
-                            child: LMFeedLoader(
-                              color: feedTheme.primaryColor,
-                            ),
+                              LMFeedLoader(
+                            color: feedTheme?.primaryColor,
                           ),
                         ),
                       );
@@ -939,7 +807,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                 style: LMFeedIconStyle(
                   fit: BoxFit.cover,
                   size: 18,
-                  color: feedTheme.onPrimary,
+                  color: feedTheme?.onPrimary,
                 ),
               ),
               height: 44,
@@ -947,15 +815,15 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               borderRadius: 28,
               backgroundColor:
-                  right ? feedTheme.primaryColor : feedTheme.disabledColor,
+                  right ? feedTheme?.primaryColor : feedTheme?.disabledColor,
               placement: LMFeedIconButtonPlacement.end,
-              margin: 5,
+              margin: 5.0,
             ),
             text: LMFeedText(
               text: "Create Post",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
-                  color: feedTheme.onPrimary,
+                  color: feedTheme?.onPrimary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -989,11 +857,11 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   }
 
   LMFeedPostWidget defPostWidget(
-      LMFeedThemeData feedTheme, LMPostViewData post) {
+      LMFeedThemeData? feedTheme, LMPostViewData post) {
     return LMFeedPostWidget(
       post: post,
-      topics: widget.topics,
-      user: widget.users[post.userId]!,
+      topics: widget.universalFeedBloc.topics,
+      user: widget.universalFeedBloc.users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
         LMFeedProfileBloc.instance.add(
@@ -1002,7 +870,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
           ),
         );
       },
-      style: feedTheme.postStyle,
+      style: feedTheme?.postStyle,
       onPostTap: (context, post) {
         Navigator.push(
           context,
@@ -1013,40 +881,37 @@ class _FeedRoomViewState extends State<FeedRoomView> {
           ),
         );
       },
-      footer: _defFooterWidget(feedTheme, post),
-      header: _defPostHeader(feedTheme, post),
-      content: _defContentWidget(feedTheme, post),
-      media: _defPostMedia(feedTheme, post),
-      topicWidget: _defTopicWidget(feedTheme, post),
+      footer: _defFooterWidget(post),
+      header: _defPostHeader(post),
+      content: _defContentWidget(post),
+      media: _defPostMedia(post),
+      topicWidget: _defTopicWidget(post),
     );
   }
 
-  LMFeedPostTopic _defTopicWidget(
-      LMFeedThemeData feedTheme, LMPostViewData post) {
+  LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
     return LMFeedPostTopic(
-      topics: widget.topics,
+      topics: widget.universalFeedBloc.topics,
       post: post,
     );
   }
 
-  LMFeedPostContent _defContentWidget(
-      LMFeedThemeData feedTheme, LMPostViewData post) {
+  LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
       onTagTap: (String? userId) {},
     );
   }
 
-  LMFeedPostFooter _defFooterWidget(
-      LMFeedThemeData feedTheme, LMPostViewData post) {
+  LMFeedPostFooter _defFooterWidget(LMPostViewData post) {
     return LMFeedPostFooter(
-      likeButton: defLikeButton(feedTheme, post),
-      commentButton: defCommentButton(feedTheme, post),
-      shareButton: defShareButton(feedTheme, post),
+      likeButton: defLikeButton(post),
+      commentButton: defCommentButton(post),
+      saveButton: defSaveButton(post),
+      shareButton: defShareButton(post),
     );
   }
 
-  LMFeedPostHeader _defPostHeader(
-      LMFeedThemeData feedTheme, LMPostViewData post) {
+  LMFeedPostHeader _defPostHeader(LMPostViewData post) {
     return LMFeedPostHeader(
       user: widget.user,
       isFeed: true,
@@ -1054,21 +919,28 @@ class _FeedRoomViewState extends State<FeedRoomView> {
     );
   }
 
-  LMFeedPostMedia _defPostMedia(
-      LMFeedThemeData feedTheme, LMPostViewData post) {
+  LMFeedPostMedia _defPostMedia(LMPostViewData post) {
     return LMFeedPostMedia(
       attachments: post.attachments!,
     );
   }
 
-  LMFeedButton defLikeButton(
-          LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
-      LMFeedButton(
+  LMFeedButton defLikeButton(LMPostViewData postViewData) => LMFeedButton(
         isActive: postViewData.isLiked,
         text: LMFeedText(
             text:
                 '${postViewData.likeCount} ${getLikeCountSuffixText(postViewData.likeCount)}'),
-        style: feedTheme.postStyle.footerStyle.likeButtonStyle,
+        style: feedTheme?.postStyle.footerStyle.likeButtonStyle,
+        onTextTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LMFeedLikesScreen(
+                postId: postViewData.id,
+              ),
+            ),
+          );
+        },
         onTap: () async {
           if (postViewData.isLiked) {
             postViewData.isLiked = false;
@@ -1078,8 +950,6 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             postViewData.likeCount += 1;
           }
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
 
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
@@ -1093,19 +963,15 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
           }
         },
       );
 
-  LMFeedButton defCommentButton(
-          LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
-      LMFeedButton(
+  LMFeedButton defCommentButton(LMPostViewData postViewData) => LMFeedButton(
         text: LMFeedText(
           text: getCommentCountSuffixText(postViewData.commentCount),
         ),
-        style: feedTheme.postStyle.footerStyle.commentButtonStyle,
+        style: feedTheme?.postStyle.footerStyle.commentButtonStyle,
         onTap: () {
           Navigator.push(
             context,
@@ -1119,19 +985,165 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         },
       );
 
-  LMFeedButton defSaveButton(
-          LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
-      LMFeedButton(
-        text: const LMFeedText(text: "Save"),
-        onTap: () {},
-        style: feedTheme.postStyle.footerStyle.saveButtonStyle,
+  LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
+        onTap: () async {
+          postViewData.isSaved = !postViewData.isSaved;
+          rebuildPostWidget.value = !rebuildPostWidget.value;
+          LMFeedPostBloc.instance
+              .add(LMFeedUpdatePostEvent(post: postViewData));
+
+          final savePostRequest =
+              (SavePostRequestBuilder()..postId(postViewData.id)).build();
+
+          final SavePostResponse response =
+              await LMFeedCore.client.savePost(savePostRequest);
+
+          if (!response.success) {
+            postViewData.isSaved = !postViewData.isSaved;
+            rebuildPostWidget.value = !rebuildPostWidget.value;
+            LMFeedPostBloc.instance
+                .add(LMFeedUpdatePostEvent(post: postViewData));
+          }
+        },
+        style: feedTheme?.postStyle.footerStyle.saveButtonStyle,
       );
 
-  LMFeedButton defShareButton(
-          LMFeedThemeData feedTheme, LMPostViewData postViewData) =>
-      LMFeedButton(
+  LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
         text: const LMFeedText(text: "Share"),
         onTap: () {},
-        style: feedTheme.postStyle.footerStyle.shareButtonStyle,
+        style: feedTheme?.postStyle.footerStyle.shareButtonStyle,
+      );
+
+  Widget noPostUnderTopicWidget() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const LMFeedText(
+              text: "Looks like there are no posts for this topic yet.",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  height: 0,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                LMFeedButton(
+                  style: LMFeedButtonStyle(
+                    borderRadius: 48,
+                    border: Border.all(
+                      color:
+                          feedTheme?.primaryColor ?? LikeMindsTheme.onContainer,
+                      width: 2,
+                    ),
+                    height: 40,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
+                  text: LMFeedText(
+                    text: "Change Filter",
+                    style: LMFeedTextStyle(
+                      textAlign: TextAlign.center,
+                      textStyle: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: feedTheme?.primaryColor),
+                    ),
+                  ),
+                  onTap: () => widget.openTopicBottomSheet(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+
+  Widget noPostInFeedWidget() => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.post_add,
+              style: LMFeedIconStyle(
+                size: 48,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const LMFeedText(
+              text: 'No posts to show',
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const LMFeedText(
+              text: "Be the first one to post here",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,
+                  color: LikeMindsTheme.greyColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+            LMFeedButton(
+              style: LMFeedButtonStyle(
+                icon: const LMFeedIcon(
+                  type: LMFeedIconType.icon,
+                  icon: Icons.add,
+                  style: LMFeedIconStyle(
+                    size: 18,
+                  ),
+                ),
+                borderRadius: 28,
+                backgroundColor: feedTheme?.primaryColor,
+                height: 44,
+                width: 153,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                placement: LMFeedIconButtonPlacement.end,
+              ),
+              text: const LMFeedText(
+                text: "Create Post",
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              onTap: right
+                  ? () {
+                      if (!postUploading.value) {
+                        LMFeedAnalyticsBloc.instance.add(
+                            const LMFeedFireAnalyticsEvent(
+                                eventName:
+                                    LMFeedAnalyticsKeys.postCreationStarted,
+                                eventProperties: {}));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LMFeedComposeScreen(),
+                          ),
+                        );
+                      } else {
+                        toast(
+                          'A post is already uploading.',
+                          duration: Toast.LENGTH_LONG,
+                        );
+                      }
+                    }
+                  : () => toast("You do not have permission to create a post"),
+            ),
+          ],
+        ),
       );
 }

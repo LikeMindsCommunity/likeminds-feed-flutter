@@ -54,7 +54,6 @@ class LMFeedTile extends StatelessWidget {
             SizedBox(width: inStyle.margin ?? 8),
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   title ??
@@ -65,9 +64,6 @@ class LMFeedTile extends StatelessWidget {
                           color: Colors.grey,
                         ),
                       ),
-                  subtitle != null
-                      ? const SizedBox(height: 8)
-                      : const SizedBox(),
                   subtitle ?? const SizedBox(),
                 ],
               ),
@@ -157,7 +153,6 @@ class LMFeedTileStyle {
       borderRadius: 0,
       mainAxisAlignment: MainAxisAlignment.start,
       padding: EdgeInsets.all(12),
-      height: 72,
       width: double.infinity,
       margin: 12,
     );

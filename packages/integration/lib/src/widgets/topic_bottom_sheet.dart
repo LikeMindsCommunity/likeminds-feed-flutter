@@ -161,10 +161,8 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
                 },
                 builder: (context, state) {
                   if (state is LMFeedTopicLoadingState) {
-                    return Center(
-                      child: LMFeedLoader(
-                        color: feedTheme.primaryColor,
-                      ),
+                    return LMFeedLoader(
+                      color: feedTheme.primaryColor,
                     );
                   }
 
@@ -227,11 +225,11 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
                                                     ? feedTheme
                                                         .postStyle
                                                         .topicStyle
-                                                        ?.activeChipStyle
+                                                        .activeChipStyle
                                                     : feedTheme
                                                         .postStyle
                                                         .topicStyle
-                                                        ?.inactiveChipStyle,
+                                                        .inactiveChipStyle,
                                               ),
                                             ),
                                           );

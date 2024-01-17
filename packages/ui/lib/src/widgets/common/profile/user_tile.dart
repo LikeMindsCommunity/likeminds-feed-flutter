@@ -31,10 +31,11 @@ class LMFeedUserTile extends LMFeedTile {
 
   @override
   Widget build(BuildContext context) {
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return LMFeedTile(
       leading: LMFeedProfilePicture(
-        style: const LMFeedProfilePictureStyle(
-          backgroundColor: Colors.blue,
+        style: LMFeedProfilePictureStyle(
+          backgroundColor: feedTheme.primaryColor,
         ),
         fallbackText: user.name,
         imageUrl: user.imageUrl,
