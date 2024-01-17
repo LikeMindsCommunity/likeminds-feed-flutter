@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
@@ -14,7 +14,6 @@ import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comme
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 /// {@template post_detail_screen}
@@ -126,6 +125,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         _commentRepliesBloc.add(LMFeedClearCommentRepliesEvent());
         return Future.value();
       },
+      color: feedTheme?.primaryColor,
       child: FutureBuilder<LMPostViewData?>(
         future: getPostData,
         builder: (context, snapshot) {
@@ -164,25 +164,31 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               ),
                               child: Column(
                                 children: [
-                                  LikeMindsTheme.kVerticalPaddingXLarge,
-                                  Container(
-                                    padding: feedTheme?.commentStyle.padding ??
-                                        const EdgeInsets.symmetric(
-                                            horizontal: 16.0),
-                                    alignment: Alignment.topLeft,
-                                    child: LMFeedText(
-                                      text: getCommentCountSuffixText(
-                                          _postDetailScreenHandler!
-                                              .postData!.commentCount),
-                                      style: LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: feedTheme!.onContainer,
+                                  _postDetailScreenHandler!
+                                              .postData!.commentCount ==
+                                          0
+                                      ? const SizedBox.shrink()
+                                      : Container(
+                                          margin:
+                                              const EdgeInsets.only(top: 10.0),
+                                          padding:
+                                              feedTheme?.commentStyle.padding ??
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16.0),
+                                          alignment: Alignment.topLeft,
+                                          child: LMFeedText(
+                                            text: getCommentCountSuffixText(
+                                                _postDetailScreenHandler!
+                                                    .postData!.commentCount),
+                                            style: LMFeedTextStyle(
+                                              textStyle: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: feedTheme!.onContainer,
+                                              ),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
                                   PagedListView.separated(
                                     pagingController: _postDetailScreenHandler!
                                         .commetListPagingController,
@@ -376,9 +382,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         },
       ),
       title: Column(
-        crossAxisAlignment: Platform.isAndroid
-            ? CrossAxisAlignment.start
-            : CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           LMFeedText(
             text: "Post",
@@ -390,26 +395,27 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ),
             ),
           ),
-          LMFeedText(
-            text: getCommentCountSuffixText(
-                _postDetailScreenHandler!.postData?.commentCount ?? 0),
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: feedTheme?.primaryColor,
-              ),
-            ),
-          ),
+          (_postDetailScreenHandler?.postData?.commentCount == null ||
+                  _postDetailScreenHandler!.postData!.commentCount == 0)
+              ? const SizedBox.shrink()
+              : LMFeedText(
+                  text: getCommentCountSuffixText(
+                      _postDetailScreenHandler!.postData?.commentCount ?? 0),
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: feedTheme?.primaryColor,
+                    ),
+                  ),
+                ),
         ],
       ),
       trailing: const SizedBox(width: 36),
-      style: LMFeedAppBarStyle(
+      style: const LMFeedAppBarStyle(
         backgroundColor: LikeMindsTheme.whiteColor,
         height: 61,
-        mainAxisAlignment: Platform.isAndroid
-            ? MainAxisAlignment.start
-            : MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
       ),
     );
   }
@@ -487,7 +493,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         text: LMFeedText(
             text:
                 '${_postDetailScreenHandler!.postData!.likeCount} ${getLikeCountSuffixText(_postDetailScreenHandler!.postData!.likeCount)}'),
-        style: feedTheme!.postStyle.footerStyle.likeButtonStyle,
+        style: feedTheme!.footerStyle.likeButtonStyle,
         onTap: () async {
           if (_postDetailScreenHandler!.postData!.isLiked) {
             _postDetailScreenHandler!.postData!.isLiked = false;
@@ -531,7 +537,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           text: getCommentCountSuffixText(
               _postDetailScreenHandler!.postData!.commentCount),
         ),
-        style: feedTheme!.postStyle.footerStyle.commentButtonStyle,
+        style: feedTheme!.footerStyle.commentButtonStyle,
         onTap: () {
           _postDetailScreenHandler!.openOnScreenKeyboard();
         },
@@ -539,12 +545,15 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedButton defSaveButton() => LMFeedButton(
         onTap: () {},
-        style: feedTheme!.postStyle.footerStyle.saveButtonStyle,
+        style: feedTheme!.footerStyle.saveButtonStyle,
       );
 
   LMFeedButton defShareButton() => LMFeedButton(
-        onTap: () {},
-        style: feedTheme!.postStyle.footerStyle.shareButtonStyle,
+        onTap: () {
+          LMFeedDeepLinkHandler()
+              .sharePost(_postDetailScreenHandler!.postData!.id);
+        },
+        style: feedTheme!.footerStyle.shareButtonStyle,
       );
 
   LMFeedCommentWidget defCommentTile(

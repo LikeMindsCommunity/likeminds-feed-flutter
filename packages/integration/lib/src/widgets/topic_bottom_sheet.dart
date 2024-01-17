@@ -104,12 +104,11 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     feedTheme = LMFeedTheme.of(context);
     return Container(
       width: screenSize.width,
       decoration: BoxDecoration(
-        color: feedTheme.container,
+        color: feedTheme?.container,
       ),
       constraints: BoxConstraints(
         maxHeight: screenSize.height * 0.4,
@@ -162,7 +161,7 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
                 builder: (context, state) {
                   if (state is LMFeedTopicLoadingState) {
                     return LMFeedLoader(
-                      color: feedTheme.primaryColor,
+                      color: feedTheme?.primaryColor,
                     );
                   }
 
@@ -174,14 +173,14 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Align(
+                              Align(
                                 alignment: Alignment.topLeft,
                                 child: LMFeedText(
                                   text: 'Topics',
                                   style: LMFeedTextStyle(
                                     textAlign: TextAlign.center,
                                     textStyle: TextStyle(
-                                      color: Color(0xFF1E293B),
+                                      color: feedTheme?.onContainer,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w700,
                                       letterSpacing: -0.40,
@@ -221,15 +220,7 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
                                                   right: 8.0, bottom: 8.0),
                                               child: LMFeedTopicChip(
                                                 topic: e,
-                                                style: isTopicSelected
-                                                    ? feedTheme
-                                                        .postStyle
-                                                        .topicStyle
-                                                        .activeChipStyle
-                                                    : feedTheme
-                                                        .postStyle
-                                                        .topicStyle
-                                                        .inactiveChipStyle,
+                                                isSelected: isTopicSelected,
                                               ),
                                             ),
                                           );

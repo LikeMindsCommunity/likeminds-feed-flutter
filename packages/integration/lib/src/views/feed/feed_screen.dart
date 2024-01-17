@@ -1,21 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
+
+part 'feed_screen_configuration.dart';
 
 class LMFeedScreen extends StatefulWidget {
   const LMFeedScreen({
@@ -32,7 +34,7 @@ class LMFeedScreen extends StatefulWidget {
     this.feedErrorViewBuilder,
     this.noNewPageWidgetBuilder,
     this.enablePostCreation = true,
-    this.enableTopicFiltering = true,
+    this.config = const LMFeedScreenConfig(),
     this.showCustomWidget = false,
   });
 
@@ -69,7 +71,8 @@ class LMFeedScreen extends StatefulWidget {
   final LMFeedContextWidgetBuilder? noNewPageWidgetBuilder;
 
   final bool enablePostCreation;
-  final bool enableTopicFiltering;
+
+  final LMFeedScreenConfig config;
 
   @override
   State<LMFeedScreen> createState() => _LMFeedScreenState();
@@ -112,6 +115,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   final ValueNotifier postSomethingNotifier = ValueNotifier(false);
   bool userPostingRights = true;
   var iconContainerHeight = 60.00;
+
+  LMFeedThemeData? feedThemeData;
 
   @override
   void initState() {
@@ -242,7 +247,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       elevation: 5,
       isDismissible: true,
       useRootNavigator: true,
-      backgroundColor: LikeMindsTheme.whiteColor,
+      backgroundColor: feedThemeData?.container,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28.0),
@@ -265,14 +270,18 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const LMFeedTopicSelectScreen(),
+        builder: (context) => LMFeedTopicSelectScreen(
+          onTopicSelected: (updatedTopics) {
+            updateSelectedTopics(updatedTopics);
+          },
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    feedThemeData = LMFeedTheme.of(context);
     return Scaffold(
       backgroundColor: LikeMindsTheme.whiteColor,
       appBar: widget.appBar ??
@@ -305,6 +314,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           refresh();
           clearPagingController();
         },
+        color: feedThemeData?.primaryColor,
         child: Column(
           children: [
             widget.showCustomWidget
@@ -347,7 +357,20 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20.0, vertical: 12.0),
                               child: GestureDetector(
-                                onTap: () => showTopicSelectSheet(),
+                                onTap: () {
+                                  LMFeedTopicSelectionWidgetType
+                                      topicSelectionWidgetType =
+                                      widget.config.topicSelectionWidgetType;
+                                  if (topicSelectionWidgetType ==
+                                      LMFeedTopicSelectionWidgetType
+                                          .showTopicSelectionBottomSheet) {
+                                    showTopicSelectSheet();
+                                  } else if (topicSelectionWidgetType ==
+                                      LMFeedTopicSelectionWidgetType
+                                          .showTopicSelectionScreen) {
+                                    navigateToTopicSelectScreen();
+                                  }
+                                },
                                 child: Row(
                                   children: [
                                     _feedBloc.selectedTopics.isEmpty
@@ -357,8 +380,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                   ..isEnabled(true)
                                                   ..name("All Topic"))
                                                 .build(),
-                                            style: feedTheme.postStyle
-                                                .topicStyle.inactiveChipStyle,
+                                            style: feedThemeData
+                                                ?.topicStyle.inactiveChipStyle,
+                                            isSelected: false,
                                           )
                                         : _feedBloc.selectedTopics.length == 1
                                             ? LMFeedTopicChip(
@@ -376,10 +400,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                           .first
                                                           .name))
                                                     .build(),
-                                                style: feedTheme
-                                                    .postStyle
-                                                    .topicStyle
+                                                style: feedThemeData?.topicStyle
                                                     .inactiveChipStyle,
+                                                isSelected: false,
                                               )
                                             : LMFeedTopicChip(
                                                 topic: (LMTopicViewDataBuilder()
@@ -387,9 +410,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                       ..isEnabled(true)
                                                       ..name("Topics"))
                                                     .build(),
-                                                style: feedTheme
-                                                    .postStyle
-                                                    .topicStyle
+                                                isSelected: false,
+                                                style: feedThemeData?.topicStyle
                                                     .inactiveChipStyle
                                                     ?.copyWith(
                                                   icon: Row(
@@ -419,8 +441,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                               LMFeedTextStyle(
                                                             textStyle:
                                                                 TextStyle(
-                                                              color: feedTheme
-                                                                  .primaryColor,
+                                                              color: feedThemeData
+                                                                  ?.primaryColor,
                                                               fontSize: 12,
                                                               fontWeight:
                                                                   FontWeight
@@ -438,8 +460,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                                             .chevron_down,
                                                         style: LMFeedIconStyle(
                                                           size: 16,
-                                                          color: feedTheme
-                                                              .primaryColor,
+                                                          color: feedThemeData
+                                                              ?.primaryColor,
                                                         ),
                                                       ),
                                                     ],
@@ -777,9 +799,17 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                                 null) {
                               return const SizedBox();
                             }
-                            return widget.postBuilder?.call(context,
-                                    defPostWidget(feedTheme, item), item) ??
-                                defPostWidget(feedTheme, item);
+                            return widget.postBuilder?.call(
+                                    context,
+                                    defPostWidget(
+                                      feedTheme,
+                                      item,
+                                    ),
+                                    item) ??
+                                defPostWidget(
+                                  feedTheme,
+                                  item,
+                                );
                           },
                           firstPageProgressIndicatorBuilder: (context) =>
                               LMFeedLoader(
@@ -913,7 +943,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
 
   LMFeedPostHeader _defPostHeader(LMPostViewData post) {
     return LMFeedPostHeader(
-      user: widget.user,
+      user: widget.universalFeedBloc.users[post.userId]!,
       isFeed: true,
       postViewData: post,
     );
@@ -930,7 +960,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         text: LMFeedText(
             text:
                 '${postViewData.likeCount} ${getLikeCountSuffixText(postViewData.likeCount)}'),
-        style: feedTheme?.postStyle.footerStyle.likeButtonStyle,
+        style: feedTheme?.footerStyle.likeButtonStyle,
         onTextTap: () {
           Navigator.push(
             context,
@@ -971,7 +1001,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         text: LMFeedText(
           text: getCommentCountSuffixText(postViewData.commentCount),
         ),
-        style: feedTheme?.postStyle.footerStyle.commentButtonStyle,
+        style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {
           Navigator.push(
             context,
@@ -1005,13 +1035,15 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                 .add(LMFeedUpdatePostEvent(post: postViewData));
           }
         },
-        style: feedTheme?.postStyle.footerStyle.saveButtonStyle,
+        style: feedTheme?.footerStyle.saveButtonStyle,
       );
 
   LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
         text: const LMFeedText(text: "Share"),
-        onTap: () {},
-        style: feedTheme?.postStyle.footerStyle.shareButtonStyle,
+        onTap: () {
+          LMFeedDeepLinkHandler().sharePost(postViewData.id);
+        },
+        style: feedTheme?.footerStyle.shareButtonStyle,
       );
 
   Widget noPostUnderTopicWidget() => Center(

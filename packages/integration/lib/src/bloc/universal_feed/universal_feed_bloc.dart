@@ -3,10 +3,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/post/post_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/post/topic_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 part 'universal_feed_event.dart';
 

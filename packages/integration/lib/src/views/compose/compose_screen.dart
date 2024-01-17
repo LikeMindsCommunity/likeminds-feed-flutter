@@ -570,6 +570,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           ),
                         ),
                         child: LMFeedTopicChip(
+                          isSelected: false,
                           topic: selectedTopics.isEmpty
                               ? (LMTopicViewDataBuilder()
                                     ..id("0")
