@@ -15,10 +15,16 @@ export 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
 export 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
 export 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handler.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
   late final LMFeedMediaService? mediaService;
+
+  /// This is the domain of the client. This is used to show
+  /// generate link for sharing post
+  String? clientDomain;
 
   static LMFeedCore? _instance;
 
@@ -27,16 +33,20 @@ class LMFeedCore {
   static LMFeedClient get client => instance.lmFeedClient;
   static LMFeedMediaService get media => instance.mediaService!;
 
+  static String? get domain => instance.clientDomain;
+
   LMFeedCore._();
 
   Future<void> initialize({
     String? apiKey,
     LMFeedClient? lmFeedClient,
     ThemeData? theme,
+    String? domain,
   }) async {
     assert(apiKey != null || lmFeedClient != null);
     this.lmFeedClient =
         lmFeedClient ?? (LMFeedClientBuilder()..apiKey(apiKey!)).build();
+    clientDomain = domain;
     mediaService = LMFeedMediaService(false);
     await LMFeedUserLocalPreference.instance.initialize();
     MediaKit.ensureInitialized();
@@ -62,12 +72,14 @@ class LMFeedCore {
 
   Future<MemberStateResponse> getMemberState() async {
     return lmFeedClient.getMemberState()
-      ..then((value) async {
-        if (value.success) {
-          await LMFeedUserLocalPreference.instance
-              .storeMemberRightsFromMemberStateResponse(value);
-        }
-        return value;
-      });
+      ..then(
+        (value) async {
+          if (value.success) {
+            await LMFeedUserLocalPreference.instance
+                .storeMemberRightsFromMemberStateResponse(value);
+          }
+          return value;
+        },
+      );
   }
 }
