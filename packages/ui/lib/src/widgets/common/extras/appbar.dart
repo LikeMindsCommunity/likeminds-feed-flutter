@@ -13,6 +13,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.style,
     this.backButtonCallback,
+    this.centerTitle = true,
   });
 
   final Widget? leading;
@@ -22,6 +23,8 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Function? backButtonCallback;
 
   final LMFeedAppBarStyle? style;
+
+  final centerTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +77,9 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
               const SizedBox.shrink(),
               title ?? const SizedBox(),
-              Platform.isAndroid ? const Spacer() : const SizedBox.shrink(),
+              Platform.isAndroid && !centerTitle
+                  ? const Spacer()
+                  : const SizedBox.shrink(),
               trailing ?? const SizedBox(),
             ],
           ),

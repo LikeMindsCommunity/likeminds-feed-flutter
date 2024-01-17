@@ -91,8 +91,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
 
   @override
   Widget build(BuildContext context) {
-    style = widget.style ??
-        LMFeedTheme.of(context).postStyle.mediaStyle.documentStyle;
+    style = widget.style ?? LMFeedTheme.of(context).mediaStyle.documentStyle;
     return FutureBuilder(
         future: fileLoaderFuture,
         builder: (context, snapshot) {

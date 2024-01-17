@@ -106,7 +106,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
   @override
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
-    style = widget.style ?? feedTheme.postStyle.mediaStyle.carouselStyle;
+    style = widget.style ?? feedTheme.mediaStyle.carouselStyle;
     mapAttachmentsToWidget();
     return Container(
       width: style!.carouselWidth ?? MediaQuery.of(context).size.width,

@@ -67,7 +67,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
-    style = widget.style ?? LMFeedTheme.of(context).postStyle.mediaStyle;
+    style = widget.style ?? LMFeedTheme.of(context).mediaStyle;
     if (attachments == null || attachments!.isEmpty) {
       return const SizedBox();
     }
@@ -183,4 +183,12 @@ class LMFeedPostMediaStyle {
       carouselStyle: carouselStyle ?? this.carouselStyle,
     );
   }
+
+  factory LMFeedPostMediaStyle.basic() => const LMFeedPostMediaStyle(
+        carouselStyle: LMFeedPostCarouselStyle(),
+        documentStyle: LMFeedPostDocumentStyle(),
+        imageStyle: LMFeedPostImageStyle(),
+        linkStyle: LMFeedPostLinkPreviewStyle(),
+        videoStyle: LMFeedPostVideoStyle(),
+      );
 }

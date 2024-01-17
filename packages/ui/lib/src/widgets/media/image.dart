@@ -44,10 +44,13 @@ class _LMImageState extends State<LMFeedPostImage> {
 
   @override
   Widget build(BuildContext context) {
-    style =
-        widget.style ?? LMFeedTheme.of(context).postStyle.mediaStyle.imageStyle;
+    style = widget.style ?? LMFeedTheme.of(context).mediaStyle.imageStyle;
     return widget.imageUrl != null
         ? ClipRRect(
+            clipBehavior: Clip.hardEdge,
+            borderRadius: style?.borderRadius != null
+                ? BorderRadius.circular(style!.borderRadius!)
+                : BorderRadius.zero,
             child: CachedNetworkImage(
               cacheKey: widget.imageUrl!,
               height: style!.height,
@@ -94,6 +97,10 @@ class _LMImageState extends State<LMFeedPostImage> {
           )
         : widget.imageFile != null
             ? ClipRRect(
+                clipBehavior: Clip.hardEdge,
+                borderRadius: style?.borderRadius != null
+                    ? BorderRadius.circular(style!.borderRadius!)
+                    : BorderRadius.zero,
                 child: Image.file(
                   widget.imageFile!,
                   height: style!.height,

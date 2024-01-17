@@ -403,4 +403,85 @@ class LMFeedCommentStyle {
       subtitlePadding: subtitlePadding ?? this.subtitlePadding,
     );
   }
+
+  factory LMFeedCommentStyle.basic(
+      {Color? activeIconColor,
+      Color? inActiveIconColor,
+      bool isReply = false}) {
+    if (!isReply) {
+      return LMFeedCommentStyle._commentBasic(
+          activeIconColor: activeIconColor,
+          inActiveIconColor: inActiveIconColor);
+    } else {
+      return LMFeedCommentStyle._replyBasic(
+          activeIconColor: activeIconColor,
+          inActiveIconColor: inActiveIconColor);
+    }
+  }
+
+  factory LMFeedCommentStyle._commentBasic(
+          {Color? activeIconColor, Color? inActiveIconColor}) =>
+      LMFeedCommentStyle(
+        showProfilePicture: false,
+        padding: const EdgeInsets.all(12.0),
+        likeButtonStyle: LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeInActiveSvg,
+            style: LMFeedIconStyle(
+              color: inActiveIconColor ?? LikeMindsTheme.greyColor,
+              size: 16,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+          height: 44,
+          activeIcon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeActiveSvg,
+            style: LMFeedIconStyle(
+              color: activeIconColor ?? LikeMindsTheme.errorColor,
+              size: 16,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        replyButtonStyle: const LMFeedButtonStyle(),
+        showRepliesButtonStyle: const LMFeedButtonStyle(),
+      );
+
+  factory LMFeedCommentStyle._replyBasic(
+          {Color? activeIconColor, Color? inActiveIconColor}) =>
+      LMFeedCommentStyle(
+        showProfilePicture: false,
+        padding: const EdgeInsets.only(
+            left: 48.0, top: 12.0, bottom: 12, right: 12.0),
+        likeButtonStyle: LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeInActiveSvg,
+            style: LMFeedIconStyle(
+              color: inActiveIconColor ?? LikeMindsTheme.greyColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+          height: 44,
+          activeIcon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeActiveSvg,
+            style: LMFeedIconStyle(
+              color: activeIconColor ?? LikeMindsTheme.errorColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        showRepliesButton: false,
+        showReplyButton: false,
+        replyButtonStyle: const LMFeedButtonStyle(),
+      );
 }

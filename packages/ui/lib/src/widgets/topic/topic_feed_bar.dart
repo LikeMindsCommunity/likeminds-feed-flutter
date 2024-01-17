@@ -76,8 +76,8 @@ class LMFeedTopicFeedBar extends StatelessWidget {
                           onIconTap: (tapped) {
                             onTap();
                           },
-                          style: style ??
-                              feedTheme.postStyle.topicStyle.activeChipStyle,
+                          style: style ?? feedTheme.topicStyle.activeChipStyle,
+                          isSelected: true,
                         ),
                       );
                     }
@@ -87,6 +87,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
                         topic: selectedTopics[index],
                         onIconTap: onIconTap,
                         style: style,
+                        isSelected: false,
                       ),
                     );
                   }),

@@ -217,21 +217,17 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
     return LMFeedPostTopic(
       topics: widget.topics,
       post: widget.post,
-      style: widget.style?.topicStyle,
     );
   }
 
   LMFeedPostContent _defContentWidget() {
     return LMFeedPostContent(
       onTagTap: widget.onTagTap,
-      style: widget.style?.contentStyle,
     );
   }
 
   LMFeedPostFooter _defFooterWidget() {
-    return LMFeedPostFooter(
-      postFooterStyle: widget.style?.footerStyle,
-    );
+    return LMFeedPostFooter();
   }
 
   LMFeedPostHeader _defPostHeader() {
@@ -239,14 +235,12 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
       user: widget.user,
       isFeed: widget.isFeed,
       postViewData: widget.post,
-      postHeaderStyle: widget.style?.headerStyle,
     );
   }
 
   LMFeedPostMedia _defPostMedia() {
     return LMFeedPostMedia(
       attachments: widget.post.attachments!,
-      style: widget.style?.mediaStyle,
     );
   }
 }
@@ -279,12 +273,6 @@ class LMFeedPostStyle {
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
 
-  final LMFeedPostContentStyle contentStyle;
-  final LMFeedPostHeaderStyle headerStyle;
-  final LMFeedPostFooterStyle footerStyle;
-  final LMFeedPostTopicStyle topicStyle;
-  final LMFeedPostMediaStyle mediaStyle;
-
   final BoxBorder? border;
 
   LMFeedPostStyle({
@@ -292,11 +280,6 @@ class LMFeedPostStyle {
     this.borderRadius,
     this.padding,
     this.margin,
-    required this.contentStyle,
-    required this.headerStyle,
-    required this.footerStyle,
-    required this.topicStyle,
-    required this.mediaStyle,
     this.border,
   });
 
@@ -317,12 +300,15 @@ class LMFeedPostStyle {
       borderRadius: borderRadius ?? this.borderRadius,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
-      contentStyle: contentStyle ?? this.contentStyle,
-      headerStyle: headerStyle ?? this.headerStyle,
-      footerStyle: footerStyle ?? this.footerStyle,
-      topicStyle: topicStyle ?? this.topicStyle,
-      mediaStyle: mediaStyle ?? this.mediaStyle,
       border: border ?? this.border,
     );
   }
+
+  factory LMFeedPostStyle.basic() => LMFeedPostStyle(
+        boxShadow: [
+          const BoxShadow(
+              color: Color.fromRGBO(0, 0, 0, 0.239), blurRadius: 1.0)
+        ],
+        margin: const EdgeInsets.only(bottom: 12.0),
+      );
 }

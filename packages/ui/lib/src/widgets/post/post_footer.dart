@@ -33,7 +33,7 @@ class LMFeedPostFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     LMFeedPostFooterStyle footerStyle =
-        postFooterStyle ?? LMFeedTheme.of(context).postStyle.footerStyle;
+        postFooterStyle ?? LMFeedTheme.of(context).footerStyle;
     _populateButtonList(footerStyle);
     return Container(
       width: footerStyle.width,
@@ -237,4 +237,90 @@ class LMFeedPostFooterStyle {
       shareButtonStyle: shareButtonStyle ?? this.shareButtonStyle,
     );
   }
+
+  factory LMFeedPostFooterStyle.basic({Color? primaryColor}) =>
+      LMFeedPostFooterStyle(
+        showLikeButton: true,
+        showCommentButton: true,
+        showShareButton: true,
+        showSaveButton: true,
+        likeButtonStyle: LMFeedButtonStyle(
+          padding: const EdgeInsets.only(right: 16.0),
+          icon: const LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeInActiveSvg,
+            style: LMFeedIconStyle(
+              color: LikeMindsTheme.greyColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+          height: 44,
+          activeIcon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmLikeActiveSvg,
+            style: LMFeedIconStyle(
+              color: primaryColor ?? LikeMindsTheme.errorColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        commentButtonStyle: const LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmCommentSvg,
+            style: LMFeedIconStyle(
+              color: LikeMindsTheme.greyColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        shareButtonStyle: const LMFeedButtonStyle(
+          showText: false,
+          icon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmShareSvg,
+            style: LMFeedIconStyle(
+              color: LikeMindsTheme.greyColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        saveButtonStyle: LMFeedButtonStyle(
+          showText: false,
+          icon: const LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmSaveInactiveSvg,
+            style: LMFeedIconStyle(
+              color: LikeMindsTheme.greyColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+          activeIcon: LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: lmSaveActiveSvg,
+            style: LMFeedIconStyle(
+              color: primaryColor ?? LikeMindsTheme.greyColor,
+              size: 24,
+              boxPadding: 0,
+              fit: BoxFit.contain,
+            ),
+          ),
+          padding: const EdgeInsets.only(right: 8.0),
+        ),
+        alignment: MainAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 10.0,
+        ),
+      );
 }

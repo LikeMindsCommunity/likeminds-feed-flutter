@@ -44,7 +44,7 @@ class LMFeedPostHeader extends StatelessWidget {
     Size screenSize = MediaQuery.of(context).size;
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     LMFeedPostHeaderStyle headerStyle =
-        postHeaderStyle ?? feedTheme.postStyle.headerStyle;
+        postHeaderStyle ?? feedTheme.headerStyle;
     return Container(
       width: headerStyle.width ?? screenSize.width,
       height: headerStyle.height,
@@ -287,4 +287,21 @@ class LMFeedPostHeaderStyle {
       showCustomTitle: style.showCustomTitle,
     );
   }
+
+  factory LMFeedPostHeaderStyle.basic({Color? onPrimary}) =>
+      LMFeedPostHeaderStyle(
+        imageSize: 48,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 8.0,
+        ),
+        fallbackTextStyle: LMFeedTextStyle(
+          textStyle: TextStyle(
+            color: onPrimary ?? LikeMindsTheme.onPrimary,
+            fontSize: 16,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
 }

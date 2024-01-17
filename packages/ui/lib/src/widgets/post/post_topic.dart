@@ -20,7 +20,7 @@ class LMFeedPostTopic extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     LMFeedPostTopicStyle topicStyle =
-        style ?? LMFeedTheme.of(context).postStyle.topicStyle;
+        style ?? LMFeedTheme.of(context).topicStyle;
     return Container(
       margin: topicStyle.margin,
       padding: topicStyle.padding,
@@ -40,6 +40,7 @@ class LMFeedPostTopic extends StatelessWidget {
       LMFeedTopicChip(
         topic: topicViewData,
         style: topicStyle.activeChipStyle,
+        isSelected: true,
       );
 
   LMFeedPostTopic copyWith({
@@ -83,4 +84,15 @@ class LMFeedPostTopicStyle {
       inactiveChipStyle: inactiveChipStyle ?? this.inactiveChipStyle,
     );
   }
+
+  factory LMFeedPostTopicStyle.basic({Color? primaryColor}) =>
+      LMFeedPostTopicStyle(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        activeChipStyle: LMFeedTopicChipStyle.active(
+          primaryColor: primaryColor,
+        ),
+        inactiveChipStyle: LMFeedTopicChipStyle.inActive(
+          primaryColor: primaryColor,
+        ),
+      );
 }

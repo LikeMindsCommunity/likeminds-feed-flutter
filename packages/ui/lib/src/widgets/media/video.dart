@@ -135,8 +135,7 @@ class _LMFeedPostVideoState extends State<LMFeedPostVideo> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    style =
-        widget.style ?? LMFeedTheme.of(context).postStyle.mediaStyle.videoStyle;
+    style = widget.style ?? LMFeedTheme.of(context).mediaStyle.videoStyle;
     return GestureDetector(
       onTap: () {
         _timer?.cancel();

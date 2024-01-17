@@ -20,16 +20,25 @@ class LMFeedTopicChip extends StatelessWidget {
 
   final LMFeedTopicChipStyle? style;
 
+  final bool isSelected;
+
   const LMFeedTopicChip({
     Key? key,
     required this.topic,
     this.style,
     this.onIconTap,
+    required this.isSelected,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+
+    LMFeedTopicChipStyle? style = this.style ??
+        (isSelected
+            ? feedTheme.topicStyle.activeChipStyle
+            : feedTheme.topicStyle.inactiveChipStyle);
+
     Widget topicText = LMFeedText(
       text: topic.name,
       style: LMFeedTextStyle(
@@ -106,11 +115,13 @@ class LMFeedTopicChip extends StatelessWidget {
     Function(LMTopicViewData)? onIconTap,
     LMTopicViewData? topic,
     LMFeedTopicChipStyle? style,
+    bool? isSelected,
   }) {
     return LMFeedTopicChip(
       onIconTap: onIconTap ?? this.onIconTap,
       topic: topic ?? this.topic,
       style: style ?? this.style,
+      isSelected: isSelected ?? this.isSelected,
     );
   }
 }
@@ -186,4 +197,32 @@ class LMFeedTopicChipStyle {
       gripChip: gripChip ?? this.gripChip,
     );
   }
+
+  factory LMFeedTopicChipStyle.active({Color? primaryColor}) =>
+      LMFeedTopicChipStyle(
+        backgroundColor: primaryColor?.withOpacity(0.1) ??
+            LikeMindsTheme.primaryColor.withOpacity(0.1),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+        textStyle: TextStyle(
+          color: primaryColor ?? LikeMindsTheme.primaryColor,
+          fontSize: 14,
+          fontFamily: 'Roboto',
+          fontWeight: FontWeight.w400,
+        ),
+        borderRadius: BorderRadius.circular(4.0),
+      );
+
+  factory LMFeedTopicChipStyle.inActive({Color? primaryColor}) =>
+      LMFeedTopicChipStyle(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+        textStyle: TextStyle(
+          color: primaryColor ?? LikeMindsTheme.primaryColor,
+          fontSize: 14,
+          fontFamily: 'Roboto',
+          fontWeight: FontWeight.w400,
+        ),
+        borderRadius: BorderRadius.circular(4.0),
+        showBorder: true,
+        borderColor: primaryColor ?? LikeMindsTheme.primaryColor,
+      );
 }

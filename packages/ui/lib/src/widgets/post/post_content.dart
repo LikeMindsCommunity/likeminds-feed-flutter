@@ -23,8 +23,7 @@ class LMFeedPostContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final postDetails = InheritedPostProvider.of(context)?.post;
     final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
-    final LMFeedPostContentStyle contentStyle =
-        style ?? feedTheme.postStyle.contentStyle;
+    final LMFeedPostContentStyle contentStyle = style ?? feedTheme.contentStyle;
     return Container(
       width: contentStyle.width,
       height: contentStyle.height,
@@ -113,4 +112,15 @@ class LMFeedPostContentStyle {
       margin: style.margin ?? margin,
     );
   }
+
+  factory LMFeedPostContentStyle.basic({Color? onContainer}) =>
+      LMFeedPostContentStyle(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        textStyle: TextStyle(
+          color: onContainer ?? LikeMindsTheme.greyColor,
+          fontSize: 16,
+          fontFamily: 'Roboto',
+          fontWeight: FontWeight.w400,
+        ),
+      );
 }
