@@ -13,6 +13,8 @@ import 'package:media_kit/media_kit.dart';
 export 'package:likeminds_feed_flutter_core/src/views/views.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
 export 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
+export 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
+export 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
