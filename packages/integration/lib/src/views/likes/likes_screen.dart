@@ -18,23 +18,32 @@ class LMFeedLikesScreen extends StatefulWidget {
   });
 
   @override
-  State<LMFeedLikesScreen> createState() => _LikesScreenState();
+  State<LMFeedLikesScreen> createState() => _LMFeedLikesScreenState();
 }
 
-class _LikesScreenState extends State<LMFeedLikesScreen> {
-  Map<String, LMUserViewData> userData = {};
-  late LMLikesScreenHandler handler;
+class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
+  LMLikesScreenHandler? handler;
 
   @override
   void initState() {
     super.initState();
     handler = LMLikesScreenHandler.instance;
-    handler.initialise(postId: widget.postId, commentId: widget.commentId);
+    handler?.initialise(postId: widget.postId, commentId: widget.commentId);
+  }
+
+  @override
+  void didUpdateWidget(covariant LMFeedLikesScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.postId != oldWidget.postId ||
+        widget.commentId != oldWidget.commentId) {
+      handler?.initialise(postId: widget.postId, commentId: widget.commentId);
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
+    handler?.dispose();
   }
 
   @override
@@ -74,14 +83,19 @@ class _LikesScreenState extends State<LMFeedLikesScreen> {
     return SafeArea(
       child: Column(
         children: [
-          getAppBar(
-            "${handler.totalLikesCount ?? '--'} Likes",
+          ValueListenableBuilder(
+            valueListenable: handler!.totalLikesCountNotifier,
+            builder: (context, likesCount, __) {
+              return getAppBar(
+                "$likesCount ${likesCount == 1 ? 'Likes' : 'Like'}",
+              );
+            },
           ),
           LikeMindsTheme.kVerticalPaddingLarge,
           Expanded(
             child: PagedListView<int, LMLikeViewData>(
               padding: EdgeInsets.zero,
-              pagingController: handler.pagingController,
+              pagingController: handler!.pagingController,
               builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
                 noMoreItemsIndicatorBuilder: (context) => const SizedBox(
                   height: 20,
@@ -113,7 +127,7 @@ class _LikesScreenState extends State<LMFeedLikesScreen> {
                   ),
                 ),
                 itemBuilder: (context, item, index) =>
-                    LikesTile(user: userData[item.userId]),
+                    LikesTile(user: handler!.userData[item.userId]),
                 firstPageProgressIndicatorBuilder: (context) => SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 50.0),
@@ -147,7 +161,6 @@ class LikesTile extends StatelessWidget {
     if (user != null) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        margin: const EdgeInsets.only(bottom: 20.0),
         child: user!.isDeleted != null && user!.isDeleted!
             ? const DeletedLikesTile()
             : LMFeedUserTile(
