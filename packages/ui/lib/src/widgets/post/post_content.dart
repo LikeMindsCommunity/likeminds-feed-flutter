@@ -97,19 +97,31 @@ class LMFeedPostContentStyle {
     this.margin,
   });
 
-  LMFeedPostContentStyle copyWith(LMFeedPostContentStyle style) {
+  LMFeedPostContentStyle copyWith({
+    TextStyle? textStyle,
+    TextStyle? linkStyle,
+    TextStyle? expandTextStyle,
+    TextAlign? textAlign,
+    String? expandText,
+    bool? animation,
+    int? visibleLines,
+    double? width,
+    double? height,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+  }) {
     return LMFeedPostContentStyle(
-      textStyle: style.textStyle ?? textStyle,
-      linkStyle: style.linkStyle ?? linkStyle,
-      expandTextStyle: style.expandTextStyle ?? expandTextStyle,
-      expandText: style.expandText ?? expandText,
-      animation: style.animation ?? animation,
-      visibleLines: style.visibleLines ?? visibleLines,
-      textAlign: style.textAlign ?? textAlign,
-      width: style.width ?? width,
-      height: style.height ?? height,
-      padding: style.padding ?? padding,
-      margin: style.margin ?? margin,
+      textStyle: textStyle ?? this.textStyle,
+      linkStyle: linkStyle ?? this.linkStyle,
+      expandTextStyle: expandTextStyle ?? this.expandTextStyle,
+      expandText: expandText ?? this.expandText,
+      animation: animation ?? this.animation,
+      visibleLines: visibleLines ?? this.visibleLines,
+      textAlign: textAlign ?? this.textAlign,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
     );
   }
 

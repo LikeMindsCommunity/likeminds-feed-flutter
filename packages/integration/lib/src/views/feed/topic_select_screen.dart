@@ -78,7 +78,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
   @override
   void initState() {
     super.initState();
-    selectedTopics = LMFeedBloc.instance.selectedTopics;
+    selectedTopics = [...LMFeedBloc.instance.selectedTopics];
     for (LMTopicViewData topic in selectedTopics) {
       selectedTopicId.add(topic.id);
     }
@@ -125,7 +125,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
   @override
   void didUpdateWidget(LMFeedTopicSelectScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    selectedTopics = LMFeedBloc.instance.selectedTopics;
+    selectedTopics = [...LMFeedBloc.instance.selectedTopics];
   }
 
   @override
@@ -145,88 +145,95 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
           color: feedThemeData.onPrimary,
         ),
       ),
-      appBar: AppBar(
-        backgroundColor: feedThemeData.container,
+      appBar: LMFeedAppBar(
+        style: LMFeedAppBarStyle(
+          backgroundColor: feedThemeData.container,
+          height: 60,
+        ),
+        centerTitle: false,
         title: ValueListenableBuilder(
           valueListenable: rebuildTopicsScreen,
           builder: (context, _, __) {
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                isSearching
-                    ? Expanded(
-                        child: TextField(
-                        controller: searchController,
-                        focusNode: keyboardNode,
-                        decoration:
-                            const InputDecoration(border: InputBorder.none),
-                        onChanged: (p0) {
-                          _onTextChanged(p0);
-                        },
-                      ))
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Select Topic",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: feedThemeData.onContainer,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          LikeMindsTheme.kVerticalPaddingSmall,
-                          Text(
-                            "${selectedTopics.length} selected",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: feedThemeData.onContainer,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                        ],
-                      ),
-                GestureDetector(
-                  onTap: () {
-                    if (isSearching) {
-                      if (keyboardNode.hasFocus) {
-                        keyboardNode.unfocus();
-                      }
-                      searchController.clear();
-                      search = "";
-                      searchType = "";
-                      _page = 1;
-                      topicsPagingController.itemList?.clear();
-                      topicBloc.add(
-                        LMFeedGetTopicEvent(
-                          getTopicFeedRequest: (GetTopicsRequestBuilder()
-                                ..page(_page)
-                                ..isEnabled(widget.isEnabled)
-                                ..pageSize(pageSize)
-                                ..search(search)
-                                ..searchType(searchType))
-                              .build(),
-                        ),
-                      );
-                    } else {
-                      if (keyboardNode.canRequestFocus) {
-                        keyboardNode.requestFocus();
-                      }
-                    }
-                    isSearching = !isSearching;
-                    rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    padding: const EdgeInsets.all(10.0),
-                    child: Icon(
-                      isSearching ? CupertinoIcons.xmark : Icons.search,
-                      size: 18,
-                      color: feedThemeData.onContainer,
+            return isSearching
+                ? Expanded(
+                    child: TextField(
+                      controller: searchController,
+                      focusNode: keyboardNode,
+                      cursorColor: feedThemeData.primaryColor,
+                      decoration: feedThemeData.textFieldStyle.decoration ??
+                          const InputDecoration(border: InputBorder.none),
+                      onChanged: (p0) {
+                        _onTextChanged(p0);
+                      },
                     ),
-                  ),
-                )
-              ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Select Topic",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: feedThemeData.onContainer,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      LikeMindsTheme.kVerticalPaddingSmall,
+                      Text(
+                        "${selectedTopics.length} selected",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: feedThemeData.onContainer,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      )
+                    ],
+                  );
+          },
+        ),
+        trailing: ValueListenableBuilder(
+          valueListenable: rebuildTopicsScreen,
+          builder: (context, _, __) {
+            return GestureDetector(
+              onTap: () {
+                if (isSearching) {
+                  if (keyboardNode.hasFocus) {
+                    keyboardNode.unfocus();
+                  }
+                  searchController.clear();
+                  search = "";
+                  searchType = "";
+                  _page = 1;
+                  topicsPagingController.itemList?.clear();
+                  topicsPagingController.itemList = selectedTopics;
+                  topicBloc.add(
+                    LMFeedGetTopicEvent(
+                      getTopicFeedRequest: (GetTopicsRequestBuilder()
+                            ..page(_page)
+                            ..isEnabled(widget.isEnabled)
+                            ..pageSize(pageSize)
+                            ..search(search)
+                            ..searchType(searchType))
+                          .build(),
+                    ),
+                  );
+                } else {
+                  if (keyboardNode.canRequestFocus) {
+                    keyboardNode.requestFocus();
+                  }
+                }
+                isSearching = !isSearching;
+                rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
+              },
+              child: Container(
+                color: Colors.transparent,
+                padding: const EdgeInsets.all(10.0),
+                child: Icon(
+                  isSearching ? CupertinoIcons.xmark : Icons.search,
+                  size: 18,
+                  color: feedThemeData.onContainer,
+                ),
+              ),
             );
           },
         ),
@@ -236,6 +243,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
           },
           child: Container(
             color: Colors.transparent,
+            margin: const EdgeInsets.only(right: 24),
             child: Icon(
               Icons.arrow_back,
               color: feedThemeData.onContainer,

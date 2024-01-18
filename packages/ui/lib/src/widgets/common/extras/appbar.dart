@@ -77,9 +77,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
               const SizedBox.shrink(),
               title ?? const SizedBox(),
-              Platform.isAndroid && !centerTitle
-                  ? const Spacer()
-                  : const SizedBox.shrink(),
+              !centerTitle ? const Spacer() : const SizedBox.shrink(),
               trailing ?? const SizedBox(),
             ],
           ),

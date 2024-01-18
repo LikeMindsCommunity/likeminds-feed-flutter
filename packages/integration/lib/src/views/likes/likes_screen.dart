@@ -24,6 +24,7 @@ class LMFeedLikesScreen extends StatefulWidget {
 
 class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
   LMLikesScreenHandler? handler;
+  LMFeedThemeData? feedTheme;
 
   @override
   void initState() {
@@ -49,32 +50,59 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    feedTheme = LMFeedTheme.of(context);
     return WillPopScope(
       onWillPop: () {
         Navigator.of(context).pop();
         return Future(() => false);
       },
-      child: Scaffold(body: getLikesLoadedView()),
+      child: Scaffold(
+          backgroundColor: feedTheme?.container,
+          appBar: getAppBar(),
+          body: getLikesLoadedView()),
     );
   }
 
-  Widget getAppBar(String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18.0),
-      child: Row(
+  LMFeedAppBar getAppBar() {
+    return LMFeedAppBar(
+      style: LMFeedAppBarStyle(
+        backgroundColor: feedTheme?.container,
+        height: 60,
+      ),
+      leading: IconButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        icon: const Icon(Icons.arrow_back_ios),
+      ),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          LikeMindsTheme.kHorizontalPaddingSmall,
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios),
+          const LMFeedText(
+            text: 'Likes',
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                color: Color(0xFF333333),
+                fontSize: 20,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-          LikeMindsTheme.kHorizontalPaddingSmall,
-          Text(
-            text,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-          )
+          ValueListenableBuilder(
+            valueListenable: handler!.totalLikesCountNotifier,
+            builder: (context, likesCount, __) {
+              return Text(
+                "$likesCount ${likesCount == 1 ? 'Like' : 'Likes'}",
+                style: const TextStyle(
+                  color: Color(0xFF666666),
+                  fontSize: 13,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w400,
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -84,15 +112,6 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
     return SafeArea(
       child: Column(
         children: [
-          ValueListenableBuilder(
-            valueListenable: handler!.totalLikesCountNotifier,
-            builder: (context, likesCount, __) {
-              return getAppBar(
-                "$likesCount ${likesCount == 1 ? 'Likes' : 'Like'}",
-              );
-            },
-          ),
-          LikeMindsTheme.kVerticalPaddingLarge,
           Expanded(
             child: PagedListView<int, LMLikeViewData>(
               padding: EdgeInsets.zero,
@@ -155,7 +174,10 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
 
 class LikesTile extends StatelessWidget {
   final LMUserViewData? user;
-  const LikesTile({super.key, required this.user});
+  const LikesTile({
+    super.key,
+    required this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +188,14 @@ class LikesTile extends StatelessWidget {
             ? const DeletedLikesTile()
             : LMFeedUserTile(
                 user: user!,
+                style: const LMFeedTileStyle(
+                  padding: EdgeInsets.only(
+                    left: 16.0,
+                    top: 16.0,
+                    bottom: 16.0,
+                    right: 8.0,
+                  ),
+                ),
                 onTap: () {},
               ),
       );

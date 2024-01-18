@@ -215,7 +215,7 @@ class LMFeedPostLinkPreviewStyle {
   final Color? backgroundColor;
 
   // defaults to 8.0
-  final double? borderRadius;
+  final BorderRadius? borderRadius;
   final double? padding;
   final bool showLinkUrl;
   final Border? border;
@@ -236,7 +236,7 @@ class LMFeedPostLinkPreviewStyle {
     double? width,
     double? height,
     Color? backgroundColor,
-    double? borderRadius,
+    BorderRadius? borderRadius,
     double? padding,
     bool? showLinkUrl,
     Border? border,

@@ -48,9 +48,7 @@ class _LMImageState extends State<LMFeedPostImage> {
     return widget.imageUrl != null
         ? ClipRRect(
             clipBehavior: Clip.hardEdge,
-            borderRadius: style?.borderRadius != null
-                ? BorderRadius.circular(style!.borderRadius!)
-                : BorderRadius.zero,
+            borderRadius: style!.borderRadius ?? BorderRadius.zero,
             child: CachedNetworkImage(
               cacheKey: widget.imageUrl!,
               height: style!.height,
@@ -98,9 +96,7 @@ class _LMImageState extends State<LMFeedPostImage> {
         : widget.imageFile != null
             ? ClipRRect(
                 clipBehavior: Clip.hardEdge,
-                borderRadius: style?.borderRadius != null
-                    ? BorderRadius.circular(style!.borderRadius!)
-                    : BorderRadius.zero,
+                borderRadius: style!.borderRadius ?? BorderRadius.zero,
                 child: Image.file(
                   widget.imageFile!,
                   height: style!.height,
@@ -116,7 +112,7 @@ class LMFeedPostImageStyle {
   final double? height;
   final double? width;
   final double? aspectRatio;
-  final double? borderRadius;
+  final BorderRadius? borderRadius;
   final Color? borderColor;
 
   final Widget? loaderWidget;
@@ -141,7 +137,7 @@ class LMFeedPostImageStyle {
     double? height,
     double? width,
     double? aspectRatio,
-    double? borderRadius,
+    BorderRadius? borderRadius,
     Color? borderColor,
     Widget? loaderWidget,
     Widget? errorWidget,

@@ -276,15 +276,23 @@ class LMFeedPostHeaderStyle {
     this.showCustomTitle = true,
   });
 
-  LMFeedPostHeaderStyle copyWith(LMFeedPostHeaderStyle style) {
+  LMFeedPostHeaderStyle copyWith({
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    double? width,
+    double? height,
+    double? imageSize,
+    LMFeedTextStyle? fallbackTextStyle,
+    bool? showCustomTitle,
+  }) {
     return LMFeedPostHeaderStyle(
-      padding: style.padding ?? padding,
-      margin: style.margin ?? margin,
-      width: style.width ?? width,
-      height: style.height ?? height,
-      imageSize: style.imageSize ?? imageSize,
-      fallbackTextStyle: style.fallbackTextStyle ?? fallbackTextStyle,
-      showCustomTitle: style.showCustomTitle,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      imageSize: imageSize ?? this.imageSize,
+      fallbackTextStyle: fallbackTextStyle ?? this.fallbackTextStyle,
+      showCustomTitle: showCustomTitle ?? this.showCustomTitle,
     );
   }
 

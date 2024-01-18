@@ -75,7 +75,11 @@ class _LMCarouselState extends State<LMFeedCarousel> {
     mediaWidgets = widget.attachments.map((e) {
       if (e.attachmentType == 1) {
         return Container(
-          color: Colors.black,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            borderRadius: style?.carouselBorderRadius,
+            color: Colors.black,
+          ),
           width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
           child: Center(
             child: widget.imageItem ??
@@ -88,7 +92,11 @@ class _LMCarouselState extends State<LMFeedCarousel> {
         );
       } else if ((e.attachmentType == 2)) {
         return Container(
-          color: Colors.black,
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            borderRadius: style?.carouselBorderRadius,
+            color: Colors.black,
+          ),
           width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
           child: widget.videoItem ??
               LMFeedPostVideo(

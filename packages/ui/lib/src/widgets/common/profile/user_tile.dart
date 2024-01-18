@@ -33,6 +33,9 @@ class LMFeedUserTile extends LMFeedTile {
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return LMFeedTile(
+      style: LMFeedTileStyle(
+        backgroundColor: feedTheme.container,
+      ),
       leading: LMFeedProfilePicture(
         style: LMFeedProfilePictureStyle(
           backgroundColor: feedTheme.primaryColor,
