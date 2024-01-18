@@ -907,6 +907,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
           MaterialPageRoute(
             builder: (context) => LMFeedPostDetailScreen(
               postId: post.id,
+              postBuilder: widget.postBuilder,
             ),
           ),
         );
@@ -1009,6 +1010,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               builder: (context) => LMFeedPostDetailScreen(
                 postId: postViewData.id,
                 openKeyboard: true,
+                postBuilder: widget.postBuilder,
               ),
             ),
           );

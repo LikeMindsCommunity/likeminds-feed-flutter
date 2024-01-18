@@ -15,7 +15,7 @@ typedef LMFeedPostHeaderBuilder = Widget Function(
 /// i.e. like, comment, share, save buttons
 /// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
 /// {@endtemplate}
-typedef LMFeedPostFooterBuilder = LMFeedPostFooter Function(
+typedef LMFeedPostFooterBuilder = Widget Function(
     BuildContext, LMFeedPostFooter, LMPostViewData);
 
 /// {@template post_menu_builder}

@@ -134,10 +134,8 @@ class LMFeedIconStyle {
 
   factory LMFeedIconStyle.basic() {
     return const LMFeedIconStyle(
-      color: Colors.black,
-      size: 28,
-      boxSize: 36,
-      boxPadding: 8,
+      size: 24,
+      boxPadding: 0,
       fit: BoxFit.contain,
     );
   }

@@ -222,4 +222,55 @@ class LMFeedButtonStyle {
       activeIcon: activeIcon ?? this.activeIcon,
     );
   }
+
+  factory LMFeedButtonStyle.like({Color? primaryColor}) => LMFeedButtonStyle(
+        padding: const EdgeInsets.only(right: 16.0),
+        icon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmLikeInActiveSvg,
+          style: LMFeedIconStyle.basic(),
+        ),
+        height: 44,
+        activeIcon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmLikeActiveSvg,
+          style: LMFeedIconStyle.basic().copyWith(
+            color: primaryColor,
+          ),
+        ),
+      );
+
+  factory LMFeedButtonStyle.comment() => LMFeedButtonStyle(
+        icon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmCommentSvg,
+          style: LMFeedIconStyle.basic(),
+        ),
+      );
+
+  factory LMFeedButtonStyle.share() => LMFeedButtonStyle(
+        showText: false,
+        icon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmShareSvg,
+          style: LMFeedIconStyle.basic(),
+        ),
+      );
+
+  factory LMFeedButtonStyle.save({Color? primaryColor}) => LMFeedButtonStyle(
+        showText: false,
+        icon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmSaveInactiveSvg,
+          style: LMFeedIconStyle.basic(),
+        ),
+        activeIcon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmSaveActiveSvg,
+          style: LMFeedIconStyle.basic().copyWith(
+            color: primaryColor,
+          ),
+        ),
+        padding: const EdgeInsets.only(right: 8.0),
+      );
 }

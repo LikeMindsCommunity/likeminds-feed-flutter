@@ -62,6 +62,9 @@ class LMFeedPostFooter extends StatelessWidget {
     bool showComment = (postFooterStyle.showCommentButton ?? true);
 
     if (showComment) {
+      if (postFooterStyle.alignment == MainAxisAlignment.spaceBetween) {
+        _footerChildren.add(const Spacer());
+      }
       LMFeedButton commentButton =
           this.commentButton ?? defCommentButton(postFooterStyle);
       Widget lmButton =
@@ -73,9 +76,13 @@ class LMFeedPostFooter extends StatelessWidget {
     bool showShare = (postFooterStyle.showShareButton ?? true);
 
     if (showSave || showShare) {
-      _footerChildren.add(const Spacer());
-
+      if (postFooterStyle.alignment == MainAxisAlignment.start) {
+        _footerChildren.add(const Spacer());
+      }
       if (showSave) {
+        if (postFooterStyle.alignment == MainAxisAlignment.spaceBetween) {
+          _footerChildren.add(const Spacer());
+        }
         LMFeedButton saveButton =
             this.saveButton ?? defSaveButton(postFooterStyle);
         Widget lmButton = saveButtonBuilder?.call(saveButton) ?? saveButton;
@@ -83,6 +90,9 @@ class LMFeedPostFooter extends StatelessWidget {
       }
 
       if (showShare) {
+        if (postFooterStyle.alignment == MainAxisAlignment.spaceBetween) {
+          _footerChildren.add(const Spacer());
+        }
         LMFeedButton shareButton =
             this.shareButton ?? defShareButton(postFooterStyle);
         Widget lmButton = shareButtonBuilder?.call(shareButton) ?? shareButton;
@@ -244,79 +254,10 @@ class LMFeedPostFooterStyle {
         showCommentButton: true,
         showShareButton: true,
         showSaveButton: true,
-        likeButtonStyle: LMFeedButtonStyle(
-          padding: const EdgeInsets.only(right: 16.0),
-          icon: const LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmLikeInActiveSvg,
-            style: LMFeedIconStyle(
-              color: LikeMindsTheme.greyColor,
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-          height: 44,
-          activeIcon: LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmLikeActiveSvg,
-            style: LMFeedIconStyle(
-              color: primaryColor ?? LikeMindsTheme.errorColor,
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-        commentButtonStyle: const LMFeedButtonStyle(
-          icon: LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmCommentSvg,
-            style: LMFeedIconStyle(
-              color: LikeMindsTheme.greyColor,
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-        shareButtonStyle: const LMFeedButtonStyle(
-          showText: false,
-          icon: LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmShareSvg,
-            style: LMFeedIconStyle(
-              color: LikeMindsTheme.greyColor,
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-        saveButtonStyle: LMFeedButtonStyle(
-          showText: false,
-          icon: const LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmSaveInactiveSvg,
-            style: LMFeedIconStyle(
-              color: LikeMindsTheme.greyColor,
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-          activeIcon: LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: lmSaveActiveSvg,
-            style: LMFeedIconStyle(
-              color: primaryColor ?? LikeMindsTheme.greyColor,
-              size: 24,
-              boxPadding: 0,
-              fit: BoxFit.contain,
-            ),
-          ),
-          padding: const EdgeInsets.only(right: 8.0),
-        ),
+        likeButtonStyle: LMFeedButtonStyle.like(primaryColor: primaryColor),
+        commentButtonStyle: LMFeedButtonStyle.comment(),
+        shareButtonStyle: LMFeedButtonStyle.share(),
+        saveButtonStyle: LMFeedButtonStyle.save(primaryColor: primaryColor),
         alignment: MainAxisAlignment.start,
         padding: const EdgeInsets.symmetric(
           horizontal: 16.0,
