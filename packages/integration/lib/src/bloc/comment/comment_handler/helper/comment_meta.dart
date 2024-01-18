@@ -49,6 +49,8 @@ class LMCommentMetaData {
   // @{macro lm_user_view_data}
   final LMUserViewData? user;
 
+  final String? commentText;
+
   /// {@macro lm_comment_meta_data}
   const LMCommentMetaData._({
     required this.commentActionEntity,
@@ -57,6 +59,7 @@ class LMCommentMetaData {
     required this.commentId,
     this.replyId,
     this.user,
+    this.commentText,
   });
 }
 
@@ -72,6 +75,7 @@ class LMCommentMetaDataBuilder {
   String? _commentId;
   String? _replyId;
   LMUserViewData? _user;
+  String? _commentText;
 
   void commentActionEntity(LMFeedCommentType commentActionEntity) {
     _commentActionEntity = commentActionEntity;
@@ -97,6 +101,10 @@ class LMCommentMetaDataBuilder {
     _user = user;
   }
 
+  void commentText(String commentText) {
+    _commentText = commentText;
+  }
+
   LMCommentMetaData build() {
     return LMCommentMetaData._(
       commentActionEntity: _commentActionEntity!,
@@ -105,6 +113,7 @@ class LMCommentMetaDataBuilder {
       commentId: _commentId,
       replyId: _replyId,
       user: _user,
+      commentText: _commentText,
     );
   }
 }

@@ -21,7 +21,11 @@ class MyApp extends StatelessWidget {
         alignment: Alignment.bottomCenter,
       ),
       child: LMFeedTheme(
-        theme: LMFeedThemeData.light(primaryColor: Colors.red[300]),
+        theme: LMFeedThemeData.light(
+          primaryColor: Colors.red[300],
+          tagColor: Colors.red[300],
+          linkColor: Colors.red[300],
+        ),
         child: MaterialApp(
           title: 'Integration App for UI + SDK package',
           navigatorKey: rootNavigatorKey,

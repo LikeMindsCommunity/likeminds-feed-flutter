@@ -118,7 +118,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     feedTheme = LMFeedTheme.of(context);
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: () {
         _pagingController.itemList?.clear();
         _pagingController.refresh();
@@ -126,6 +126,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         return Future.value();
       },
       color: feedTheme?.primaryColor,
+      backgroundColor: feedTheme?.container,
       child: FutureBuilder<LMPostViewData?>(
         future: getPostData,
         builder: (context, snapshot) {
@@ -158,112 +159,106 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               _postDetailScreenHandler!
                                   .handleBlocChanges(state);
                             },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: feedTheme?.container,
-                              ),
-                              child: Column(
-                                children: [
-                                  _postDetailScreenHandler!
-                                              .postData!.commentCount ==
-                                          0
-                                      ? const SizedBox.shrink()
-                                      : Container(
-                                          margin:
-                                              const EdgeInsets.only(top: 10.0),
-                                          padding:
-                                              feedTheme?.commentStyle.padding ??
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16.0),
-                                          alignment: Alignment.topLeft,
-                                          child: LMFeedText(
-                                            text: getCommentCountSuffixText(
-                                                _postDetailScreenHandler!
-                                                    .postData!.commentCount),
-                                            style: LMFeedTextStyle(
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                color: feedTheme!.onContainer,
-                                              ),
+                            child: Column(
+                              children: [
+                                _postDetailScreenHandler!
+                                            .postData!.commentCount ==
+                                        0
+                                    ? const SizedBox.shrink()
+                                    : Container(
+                                        decoration: BoxDecoration(
+                                            color: feedTheme?.container),
+                                        margin:
+                                            const EdgeInsets.only(top: 10.0),
+                                        padding:
+                                            feedTheme?.commentStyle.padding ??
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 16.0,
+                                                ),
+                                        alignment: Alignment.topLeft,
+                                        child: LMFeedText(
+                                          text: LMFeedPostUtils
+                                              .getCommentCountTextWithCount(
+                                                  _postDetailScreenHandler!
+                                                      .postData!.commentCount),
+                                          style: LMFeedTextStyle(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: feedTheme!.onContainer,
                                             ),
                                           ),
                                         ),
-                                  PagedListView.separated(
-                                    pagingController: _postDetailScreenHandler!
-                                        .commetListPagingController,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    builderDelegate: PagedChildBuilderDelegate<
-                                        LMCommentViewData>(
-                                      firstPageProgressIndicatorBuilder:
-                                          (context) {
-                                        return const Padding(
-                                          padding: EdgeInsets.only(top: 150.0),
-                                          child: Center(
-                                            child: CircularProgressIndicator
-                                                .adaptive(),
-                                          ),
-                                        );
-                                      },
-                                      noItemsFoundIndicatorBuilder: (context) =>
-                                          const LMFeedEmptyCommentWidget(),
-                                      itemBuilder:
-                                          (context, commentViewData, index) {
-                                        LMUserViewData userViewData;
-                                        if (!_postDetailScreenHandler!.users
-                                            .containsKey(
-                                                commentViewData.userId)) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        userViewData = _postDetailScreenHandler!
-                                            .users[commentViewData.userId]!;
+                                      ),
+                                PagedListView.separated(
+                                  pagingController: _postDetailScreenHandler!
+                                      .commetListPagingController,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  builderDelegate: PagedChildBuilderDelegate<
+                                      LMCommentViewData>(
+                                    firstPageProgressIndicatorBuilder:
+                                        (context) {
+                                      return const Padding(
+                                        padding: EdgeInsets.only(top: 150.0),
+                                        child: LMFeedLoader(),
+                                      );
+                                    },
+                                    noItemsFoundIndicatorBuilder: (context) =>
+                                        const LMFeedEmptyCommentWidget(),
+                                    itemBuilder:
+                                        (context, commentViewData, index) {
+                                      LMUserViewData userViewData;
+                                      if (!_postDetailScreenHandler!.users
+                                          .containsKey(
+                                              commentViewData.userId)) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      userViewData = _postDetailScreenHandler!
+                                          .users[commentViewData.userId]!;
 
-                                        return SizedBox(
-                                          child: Column(
-                                            children: [
-                                              widget.commentBuilder?.call(
-                                                      context,
-                                                      defCommentTile(
-                                                          commentViewData,
-                                                          userViewData),
-                                                      _postDetailScreenHandler!
-                                                          .postData!) ??
-                                                  defCommentTile(
-                                                      commentViewData,
-                                                      userViewData),
-                                              (replyShown &&
-                                                      commentIdReplyId ==
-                                                          commentViewData.id)
-                                                  ? LMFeedCommentReplyWidget(
-                                                      refresh: () {
-                                                        _pagingController
-                                                            .refresh();
-                                                      },
-                                                      postId: widget.postId,
-                                                      reply: commentViewData,
-                                                      user:
-                                                          _postDetailScreenHandler!
-                                                                  .users[
-                                                              commentViewData
-                                                                  .userId]!,
-                                                    )
-                                                  : const SizedBox.shrink()
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    separatorBuilder: (context, index) =>
-                                        const Divider(
-                                      thickness: 0.2,
-                                      height: 0,
-                                    ),
+                                      return SizedBox(
+                                        child: Column(
+                                          children: [
+                                            widget.commentBuilder?.call(
+                                                    context,
+                                                    defCommentTile(
+                                                        commentViewData,
+                                                        userViewData),
+                                                    _postDetailScreenHandler!
+                                                        .postData!) ??
+                                                defCommentTile(commentViewData,
+                                                    userViewData),
+                                            (replyShown &&
+                                                    commentIdReplyId ==
+                                                        commentViewData.id)
+                                                ? LMFeedCommentReplyWidget(
+                                                    refresh: () {
+                                                      _pagingController
+                                                          .refresh();
+                                                    },
+                                                    postId: widget.postId,
+                                                    reply: commentViewData,
+                                                    user:
+                                                        _postDetailScreenHandler!
+                                                                .users[
+                                                            commentViewData
+                                                                .userId]!,
+                                                  )
+                                                : const SizedBox.shrink()
+                                          ],
+                                        ),
+                                      );
+                                    },
                                   ),
-                                ],
-                              ),
+                                  padding: EdgeInsets.zero,
+                                  separatorBuilder: (context, index) =>
+                                      const Divider(
+                                    thickness: 0.2,
+                                    height: 0,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -278,9 +273,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 });
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
+              body: LMFeedLoader(),
             );
           } else if (snapshot.hasError) {
             return Scaffold(
@@ -307,11 +300,15 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 ..commentActionEntity(LMFeedCommentType.parent)
                 ..commentActionType(LMFeedCommentActionType.edit)
                 ..level(0)
-                ..commentId(commentViewData.id))
+                ..commentId(commentViewData.id)
+                ..commentText(LMFeedTaggingHelper.convertRouteToTag(
+                    commentViewData.text)))
               .build();
 
           _postDetailScreenHandler!.commentHandlerBloc.add(
-            LMFeedCommentOngoingEvent(commentMetaData: commentMetaData),
+            LMFeedCommentOngoingEvent(
+              commentMetaData: commentMetaData,
+            ),
           );
         },
         onCommentDelete: () {
@@ -399,7 +396,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   _postDetailScreenHandler!.postData!.commentCount == 0)
               ? const SizedBox.shrink()
               : LMFeedText(
-                  text: getCommentCountSuffixText(
+                  text: LMFeedPostUtils.getCommentCountTextWithCount(
                       _postDetailScreenHandler!.postData?.commentCount ?? 0),
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
@@ -491,8 +488,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   LMFeedButton defLikeButton() => LMFeedButton(
         isActive: _postDetailScreenHandler!.postData!.isLiked,
         text: LMFeedText(
-            text:
-                '${_postDetailScreenHandler!.postData!.likeCount} ${getLikeCountSuffixText(_postDetailScreenHandler!.postData!.likeCount)}'),
+          text: LMFeedPostUtils.getLikeCountTextWithCount(
+              _postDetailScreenHandler!.postData!.likeCount),
+        ),
         style: feedTheme!.footerStyle.likeButtonStyle,
         onTap: () async {
           if (_postDetailScreenHandler!.postData!.isLiked) {
@@ -534,10 +532,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedButton defCommentButton() => LMFeedButton(
         text: LMFeedText(
-          text: getCommentCountSuffixText(
+          text: LMFeedPostUtils.getCommentCountTextWithCount(
               _postDetailScreenHandler!.postData!.commentCount),
         ),
-        style: feedTheme!.footerStyle.commentButtonStyle,
+        style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {
           _postDetailScreenHandler!.openOnScreenKeyboard();
         },
@@ -545,7 +543,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedButton defSaveButton() => LMFeedButton(
         onTap: () {},
-        style: feedTheme!.footerStyle.saveButtonStyle,
+        style: feedTheme?.footerStyle.saveButtonStyle,
       );
 
   LMFeedButton defShareButton() => LMFeedButton(
@@ -553,7 +551,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           LMFeedDeepLinkHandler()
               .sharePost(_postDetailScreenHandler!.postData!.id);
         },
-        style: feedTheme!.footerStyle.shareButtonStyle,
+        style: feedTheme?.footerStyle.shareButtonStyle,
       );
 
   LMFeedCommentWidget defCommentTile(
@@ -570,7 +568,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       profilePicture: LMFeedProfilePicture(
         style: LMFeedProfilePictureStyle(
           size: 36,
-          backgroundColor: feedTheme!.primaryColor,
+          backgroundColor: feedTheme?.primaryColor,
         ),
         fallbackText:
             _postDetailScreenHandler!.users[commentViewData.userId]!.name,
@@ -612,28 +610,24 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             activeIcon: LMFeedIcon(
               type: LMFeedIconType.icon,
               style: LMFeedIconStyle(
-                color: feedTheme!.primaryColor,
+                color: feedTheme?.primaryColor,
                 size: 20,
               ),
               icon: Icons.thumb_up_alt_rounded,
             ),
           ),
       text: LMFeedText(
-        text: commentViewData.likesCount == 1
-            ? "1 Like"
-            : "${commentViewData.likesCount} Likes",
+        text: LMFeedPostUtils.getLikeCountTextWithCount(
+            commentViewData.likesCount),
         style: const LMFeedTextStyle(
           textStyle: TextStyle(fontSize: 12),
         ),
       ),
       activeText: LMFeedText(
-        text: commentViewData.likesCount == 0
-            ? "Like"
-            : commentViewData.likesCount == 1
-                ? "1 Like"
-                : "${commentViewData.likesCount} Likes",
+        text: LMFeedPostUtils.getLikeCountTextWithCount(
+            commentViewData.likesCount),
         style: LMFeedTextStyle(
-          textStyle: TextStyle(color: feedTheme!.primaryColor, fontSize: 12),
+          textStyle: TextStyle(color: feedTheme?.primaryColor, fontSize: 12),
         ),
       ),
       onTap: () async {
@@ -698,7 +692,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             .build();
 
         _postDetailScreenHandler!.commentHandlerBloc
-            .add(LMFeedCommentOngoingEvent(commentMetaData: commentMetaData));
+            .add(LMFeedCommentOngoingEvent(
+          commentMetaData: commentMetaData,
+        ));
 
         _postDetailScreenHandler!.openOnScreenKeyboard();
       },
@@ -746,7 +742,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
-            color: feedTheme!.primaryColor,
+            color: feedTheme?.primaryColor,
           ),
         ),
       ),
@@ -830,7 +826,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   : const SizedBox.shrink(),
               Container(
                 decoration: BoxDecoration(
-                    color: feedTheme!.primaryColor.withOpacity(0.04),
+                    color: feedTheme?.primaryColor.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(24)),
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 padding: const EdgeInsets.all(6.0),
@@ -840,7 +836,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       fallbackText: currentUser.name,
                       imageUrl: currentUser.imageUrl,
                       style: LMFeedProfilePictureStyle(
-                        backgroundColor: feedTheme!.primaryColor,
+                        backgroundColor: feedTheme?.primaryColor,
                         size: 36,
                       ),
                       onTap: () {

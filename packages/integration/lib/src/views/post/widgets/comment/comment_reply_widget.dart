@@ -336,7 +336,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
               ..commentActionEntity(LMFeedCommentType.reply)
               ..commentActionType(LMFeedCommentActionType.edit)
               ..level(1)
-              ..replyId(commentViewData.id))
+              ..replyId(commentViewData.id)
+              ..commentText(
+                  LMFeedTaggingHelper.convertRouteToTag(commentViewData.text)))
             .build();
 
         _commentHandlerBloc!

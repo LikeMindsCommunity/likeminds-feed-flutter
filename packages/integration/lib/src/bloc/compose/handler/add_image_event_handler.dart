@@ -20,11 +20,15 @@ addImageEventHandler(
   if (result) {
     try {
       final images = await LMFeedMediaHandler.pickImages(mediaCount);
-      if (images!.isNotEmpty) {
+      if (images != null && images.isNotEmpty) {
         LMFeedComposeBloc.instance.postMedia.addAll(images);
         emitter(LMFeedComposeAddedImageState());
       } else {
-        emitter(LMFeedComposeInitialState());
+        if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
+          emitter(LMFeedComposeInitialState());
+        } else {
+          emitter(LMFeedComposeAddedImageState());
+        }
       }
     } on Error catch (e) {
       emitter(LMFeedComposeMediaErrorState(e));

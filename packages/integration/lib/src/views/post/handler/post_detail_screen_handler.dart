@@ -88,7 +88,16 @@ class LMFeedPostDetailScreenHandler {
   void handleBlocChanges(LMFeedCommentHandlerState state) {
     switch (state.runtimeType) {
       case LMFeedCommentActionOngoingState:
-        break;
+        {
+          LMCommentMetaData commentMetaData =
+              (state as LMFeedCommentActionOngoingState).commentMetaData;
+
+          if (commentMetaData.commentActionType ==
+              LMFeedCommentActionType.edit) {
+            commentController.text = commentMetaData.commentText!;
+          }
+          break;
+        }
       case const (LMFeedCommentSuccessState<AddCommentResponse>):
         {
           final LMFeedCommentSuccessState commentSuccessState =

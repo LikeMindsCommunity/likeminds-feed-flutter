@@ -11,14 +11,13 @@ import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_pre
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/lists/topic_list.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
-  //Builder for appbar
-  //Builder for content
-  //Builder for media preview
-  //Builder for bottom bar for buttons
+  // Builder for appbar
+  // Builder for content
+  // Builder for media preview
+  // Builder for bottom bar for buttons
   const LMFeedComposeScreen({
     super.key,
     //Widget builder functions for customizations
@@ -29,9 +28,12 @@ class LMFeedComposeScreen extends StatefulWidget {
     this.composeMediaPreviewBuilder,
     //Config for the screen
     this.config = const LMFeedComposeScreenConfig(),
+    this.style,
   });
 
   final LMFeedComposeScreenConfig config;
+
+  final LMFeedComposeScreenStyle? style;
 
   final Function(BuildContext context)? composeDiscardDialogBuilder;
   final Widget Function(LMFeedAppBar oldAppBar)? composeAppBarBuilder;
@@ -112,6 +114,12 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
                 child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
                   bloc: composeBloc,
+                  buildWhen: (previous, current) {
+                    if (current is LMFeedComposeFetchedTopicsState) {
+                      return true;
+                    }
+                    return false;
+                  },
                   builder: (context, state) {
                     if (state is LMFeedComposeFetchedTopicsState) {
                       return widget.composeTopicSelectorBuilder
@@ -196,73 +204,127 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   Widget _defMediaPreview() {
     return BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
-        bloc: composeBloc,
-        builder: (context, state) {
-          if (state is LMFeedComposeMediaLoadingState) {
-            return const LMFeedLoader();
-          }
-          if (state is LMFeedComposeAddedImageState) {
-            return Container(
-              height: 240,
-              width: double.infinity,
-              color: Colors.grey,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: composeBloc.postMedia.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: LMFeedPostImage(
-                      imageFile: composeBloc.postMedia[index].mediaFile,
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-          if (state is LMFeedComposeAddedVideoState) {
-            return SizedBox(
-              height: 240,
-              width: double.infinity,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: composeBloc.postMedia.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: LMFeedPostVideo(
-                      videoFile: composeBloc.postMedia[index].mediaFile,
-                    ),
-                  );
-                },
-              ),
-            );
-          }
-          if (state is LMFeedComposeAddedDocumentState) {
-            return Container(
-              height: 240,
-              width: double.infinity,
-              color: Colors.grey,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: composeBloc.postMedia.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: LMFeedDocument(
-                      documentFile: composeBloc.postMedia[index].mediaFile,
-                    ),
-                  );
-                },
-              ),
-            );
-          }
+      bloc: composeBloc,
+      builder: (context, state) {
+        if (state is LMFeedComposeMediaLoadingState) {
+          return const LMFeedLoader();
+        }
+        if (state is LMFeedComposeAddedImageState ||
+            state is LMFeedComposeAddedVideoState) {
+          return SizedBox(
+            height: 240,
+            width: double.infinity,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemCount: composeBloc.postMedia.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: composeBloc.postMedia[index].mediaType ==
+                          LMMediaType.image
+                      ? LMFeedPostImage(
+                          imageFile: composeBloc.postMedia[index].mediaFile,
+                        )
+                      : composeBloc.postMedia[index].mediaType ==
+                              LMMediaType.video
+                          ? LMFeedPostVideo(
+                              videoFile: composeBloc.postMedia[index].mediaFile,
+                            )
+                          : const SizedBox(),
+                );
+              },
+            ),
+          );
+        }
+        if (state is LMFeedComposeAddedLinkPreviewState) {
+          return SizedBox(
+            height: 239,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemCount: composeBloc.postMedia.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: composeBloc.postMedia[index].mediaType ==
+                          LMMediaType.link
+                      ? LMFeedPostLinkPreview(
+                          linkModel: composeBloc.postMedia[index],
+                          style: LMFeedPostLinkPreviewStyle(
+                            height: 215,
+                            width: 313,
+                            backgroundColor: LikeMindsTheme.backgroundColor,
+                            border: Border.all(
+                              color: LikeMindsTheme.secondaryColor,
+                            ),
+                          ),
+                          onTap: () {
+                            // launchUrl(
+                            //   Uri.parse(
+                            //       composeBloc.postMedia[index].ogTags?.url ??
+                            //           ''),
+                            //   mode: LaunchMode.externalApplication,
+                            // );
+                          },
+                          title: LMFeedText(
+                            text: composeBloc.postMedia[index].ogTags?.title ??
+                                "--",
+                            style: const LMFeedTextStyle(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textStyle: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: LikeMindsTheme.blackColor,
+                                height: 1.30,
+                              ),
+                            ),
+                          ),
+                          subtitle: LMFeedText(
+                            text: composeBloc
+                                    .postMedia[index].ogTags?.description ??
+                                "--",
+                            style: const LMFeedTextStyle(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textStyle: TextStyle(
+                                color: LikeMindsTheme.blackColor,
+                                fontWeight: FontWeight.w400,
+                                height: 1.30,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(),
+                );
+              },
+            ),
+          );
+        }
 
-          return const SizedBox.shrink();
-        });
+        if (state is LMFeedComposeAddedDocumentState) {
+          return SizedBox(
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemCount: composeBloc.postMedia.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: LMFeedDocument(
+                    documentFile: composeBloc.postMedia[index].mediaFile,
+                    size: PostHelper.getFileSizeString(
+                        bytes: composeBloc.postMedia[index].size ?? 0),
+                  ),
+                );
+              },
+            ),
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
   }
 
   LMFeedAppBar _defAppBar() {
@@ -414,8 +476,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   },
                   controller: _controller,
                   focusNode: _focusNode,
-                  // onChange: _onTextChanged,
-                  onChange: (p) {},
+                  onChange: _onTextChanged,
+                  //onChange: (p) {},
                 ),
               ),
               const SizedBox(height: 24),
@@ -424,6 +486,28 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         ],
       ),
     );
+  }
+
+  void _onTextChanged(String p0) {
+    if (_debounce?.isActive ?? false) {
+      _debounce?.cancel();
+    }
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      handleTextLinks(p0);
+    });
+  }
+
+  /*
+  * Takes a string as input
+  * extracts the first valid link from the string
+  * decodes the url using LikeMinds SDK
+  * and generates a preview for the link
+  */
+  void handleTextLinks(String text) async {
+    String link = getFirstValidLinkFromString(text);
+    if (link.isNotEmpty) {
+      composeBloc.add(LMFeedComposeAddLinkPreviewEvent(url: link));
+    }
   }
 
   Widget _defMediaPicker() {
@@ -541,23 +625,24 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       horizontalMargin: 16.0,
                       pressType: PressType.singleClick,
                       menuBuilder: () => LMFeedTopicList(
-                          selectedTopics: selectedTopics,
-                          isEnabled: true,
-                          onTopicSelected: (updatedTopics, tappedTopic) {
-                            if (selectedTopics.isEmpty) {
-                              selectedTopics.add(tappedTopic);
+                        selectedTopics: selectedTopics,
+                        isEnabled: true,
+                        onTopicSelected: (updatedTopics, tappedTopic) {
+                          if (selectedTopics.isEmpty) {
+                            selectedTopics.add(tappedTopic);
+                          } else {
+                            if (selectedTopics.first.id == tappedTopic.id) {
+                              selectedTopics.clear();
                             } else {
-                              if (selectedTopics.first.id == tappedTopic.id) {
-                                selectedTopics.clear();
-                              } else {
-                                selectedTopics.clear();
-                                selectedTopics.add(tappedTopic);
-                              }
+                              selectedTopics.clear();
+                              selectedTopics.add(tappedTopic);
                             }
-                            _controllerPopUp.hideMenu();
-                            rebuildTopicFloatingButton.value =
-                                !rebuildTopicFloatingButton.value;
-                          }),
+                          }
+                          _controllerPopUp.hideMenu();
+                          rebuildTopicFloatingButton.value =
+                              !rebuildTopicFloatingButton.value;
+                        },
+                      ),
                       child: Container(
                         height: 36,
                         alignment: Alignment.bottomLeft,
@@ -678,4 +763,8 @@ void sendPostCreationCompletedEvent(
     eventName: LMFeedAnalyticsKeys.postCreationCompleted,
     eventProperties: propertiesMap,
   ));
+}
+
+class LMFeedComposeScreenStyle {
+  const LMFeedComposeScreenStyle();
 }

@@ -17,6 +17,7 @@ export 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart'
 export 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handler.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;

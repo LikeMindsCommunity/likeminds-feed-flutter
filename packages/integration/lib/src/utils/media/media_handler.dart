@@ -212,12 +212,13 @@ class LMFeedMediaHandler {
               duration: Toast.LENGTH_LONG,
             );
           } else {
-            LMMediaModel videoFile = LMMediaModel(
-                mediaType: LMMediaType.document,
-                mediaFile: File(pickedFile.path!),
-                format: pickedFile.extension,
-                size: pickedFile.size);
-            attachedFiles.add(videoFile);
+            LMMediaModel documentFile = LMMediaModel(
+              mediaType: LMMediaType.document,
+              mediaFile: File(pickedFile.path!),
+              format: pickedFile.extension,
+              size: pickedFile.size,
+            );
+            attachedFiles.add(documentFile);
           }
         }
 

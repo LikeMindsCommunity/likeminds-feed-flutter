@@ -19,8 +19,10 @@ class _LMSampleAppState extends State<LMSampleApp> {
   @override
   void initState() {
     super.initState();
-    // var env = DotEnv(includePlatformEnvironment: true)..load();
+    callInitiateUser();
+  }
 
+  void callInitiateUser() {
     InitiateUserRequestBuilder request = InitiateUserRequestBuilder();
 
     if (widget.userId != null && widget.userId!.isNotEmpty) {
@@ -45,37 +47,69 @@ class _LMSampleAppState extends State<LMSampleApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-          future: initiateUser,
-          builder: (context, snapshot) {
-            if (snapshot.hasData && snapshot.data!.success) {
-              return FutureBuilder(
-                  future: memberState,
-                  builder: (context, snapshot) {
-                    if (ConnectionState.done == snapshot.connectionState &&
-                        snapshot.hasData &&
-                        snapshot.data!.success) {
-                      return const LMFeedScreen();
-                    } else if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      );
-                    } else {
-                      return const Center(
-                        child: Text("An error occurred"),
-                      );
-                    }
-                  });
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator.adaptive(),
-              );
-            } else {
-              return const Center(
-                child: Text("Nothing"),
-              );
-            }
-          }),
+        future: initiateUser,
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data!.success) {
+            return FutureBuilder(
+                future: memberState,
+                builder: (context, snapshot) {
+                  if (ConnectionState.done == snapshot.connectionState &&
+                      snapshot.hasData &&
+                      snapshot.data!.success) {
+                    return const LMFeedScreen();
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    );
+                  } else {
+                    return const Center(
+                      child: Text("An error occurred"),
+                    );
+                  }
+                });
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator.adaptive(),
+            );
+          } else {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                LikeMindsTheme.kVerticalPaddingLarge,
+                const Center(
+                  child: LMFeedText(
+                    text: "An error occurred, please try again later",
+                    style: LMFeedTextStyle(textAlign: TextAlign.center),
+                  ),
+                ),
+                LikeMindsTheme.kVerticalPaddingLarge,
+                GestureDetector(
+                  onTap: () {
+                    callInitiateUser();
+                    setState(() {});
+                  },
+                  child: Container(
+                    color: Colors.transparent,
+                    child: const Column(
+                      children: <Widget>[
+                        Icon(
+                          Icons.refresh,
+                          size: 45,
+                          color: Colors.black,
+                        ),
+                        LikeMindsTheme.kVerticalPaddingSmall,
+                        LMFeedText(text: 'Retry')
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        },
+      ),
     );
   }
 }

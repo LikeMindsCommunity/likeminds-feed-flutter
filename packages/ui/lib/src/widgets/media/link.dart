@@ -82,7 +82,7 @@ class LMFeedPostLinkPreview extends StatelessWidget {
                 ? const SizedBox.shrink()
                 : LMFeedPostImage(
                     style: LMFeedPostImageStyle(
-                      height: 150,
+                      height: 155,
                       borderRadius: style.borderRadius,
                       errorWidget: style.errorWidget,
                     ),
@@ -99,6 +99,7 @@ class LMFeedPostLinkPreview extends StatelessWidget {
               child: SizedBox(
                 width: style.width ?? MediaQuery.of(context).size.width,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     SizedBox(
                       width: style.width ?? MediaQuery.of(context).size.width,

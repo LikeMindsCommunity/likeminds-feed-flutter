@@ -16,7 +16,14 @@ class LMFeedComposeAddVideoEvent extends LMFeedComposeEvent {}
 
 class LMFeedComposeAddDocumentEvent extends LMFeedComposeEvent {}
 
-class LMFeedComposeAddLinkPreviewEvent extends LMFeedComposeEvent {}
+class LMFeedComposeAddLinkPreviewEvent extends LMFeedComposeEvent {
+  final String url;
+
+  const LMFeedComposeAddLinkPreviewEvent({required this.url});
+
+  @override
+  List<Object?> get props => [url];
+}
 
 class LMFeedComposeRemoveImageEvent extends LMFeedComposeEvent {}
 

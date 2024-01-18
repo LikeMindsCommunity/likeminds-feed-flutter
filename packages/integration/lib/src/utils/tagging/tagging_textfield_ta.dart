@@ -127,6 +127,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         tagColor: feedTheme.tagColor,
         suggestionsBoxController: _suggestionsBoxController,
         suggestionsBoxDecoration: SuggestionsBoxDecoration(
+          color: feedTheme.container,
           elevation: 4,
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.22,

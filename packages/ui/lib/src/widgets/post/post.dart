@@ -8,6 +8,8 @@ import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 /// Provide a header, footer, menu, media
 /// and content instance to customize the post.
 /// {@endtemplate}
+///
+
 class LMFeedPostWidget extends StatefulWidget {
   ///{@macro post_widget}
   const LMFeedPostWidget({

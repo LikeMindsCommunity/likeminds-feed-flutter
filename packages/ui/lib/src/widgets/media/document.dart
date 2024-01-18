@@ -10,7 +10,7 @@ class LMFeedDocument extends StatefulWidget {
     this.onTap,
     this.documentFile,
     this.documentUrl,
-    this.type,
+    this.type = 'pdf',
     this.size,
     this.title,
     this.subtitle,
@@ -92,6 +92,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
   @override
   Widget build(BuildContext context) {
     style = widget.style ?? LMFeedTheme.of(context).mediaStyle.documentStyle;
+    Size screenSize = MediaQuery.of(context).size;
     return FutureBuilder(
         future: fileLoaderFuture,
         builder: (context, snapshot) {
@@ -103,7 +104,8 @@ class _LMDocumentState extends State<LMFeedDocument> {
                 margin: const EdgeInsets.symmetric(
                   vertical: LikeMindsTheme.kPaddingSmall,
                 ),
-                height: style!.height ?? 78,
+                width: style?.width ?? screenSize.width - 40,
+                height: 72, //style!.height ?? 72,
                 decoration: BoxDecoration(
                   color: style!.backgroundColor,
                   border: style!.showBorder
@@ -155,7 +157,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                 children: [
                                   LikeMindsTheme.kHorizontalPaddingXSmall,
                                   Text(
-                                    _fileSize!.toUpperCase(),
+                                    _fileSize?.toUpperCase() ?? '--',
                                     style: TextStyle(
                                       fontSize: LikeMindsTheme.kFontSmall,
                                       color: style!.textColor ??

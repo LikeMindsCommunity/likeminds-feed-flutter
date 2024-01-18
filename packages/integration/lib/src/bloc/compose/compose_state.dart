@@ -1,34 +1,76 @@
 part of 'compose_bloc.dart';
 
 @immutable
-sealed class LMFeedComposeState {}
+sealed class LMFeedComposeState extends Equatable {}
 
-final class LMFeedComposeInitialState extends LMFeedComposeState {}
+final class LMFeedComposeInitialState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
 
-class LMFeedComposeMediaLoadingState extends LMFeedComposeState {}
+class LMFeedComposeMediaLoadingState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
 
-class LMFeedComposeTopicsLoadingState extends LMFeedComposeState {}
+class LMFeedComposeTopicsLoadingState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
 
 class LMFeedComposeFetchedTopicsState extends LMFeedComposeState {
   final List<LMTopicViewData> topics;
 
   LMFeedComposeFetchedTopicsState({required this.topics});
-}
 
-class LMFeedComposeAddedImageState extends LMFeedComposeState {}
+  @override
+  List<Object> get props => [];
+}
 
 class LMFeedComposeMediaErrorState extends LMFeedComposeState {
   final Error error;
 
   LMFeedComposeMediaErrorState(this.error);
+
+  @override
+  List<Object> get props => [];
 }
 
-class LMFeedComposeAddedVideoState extends LMFeedComposeState {}
+class LMFeedComposeAddedImageState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
 
-class LMFeedComposeAddedDocumentState extends LMFeedComposeState {}
+class LMFeedComposeAddedLinkPreviewState extends LMFeedComposeState {
+  final String url;
 
-class LMFeedComposeRemovedImageState extends LMFeedComposeState {}
+  LMFeedComposeAddedLinkPreviewState({required this.url});
 
-class LMFeedComposeRemovedVideoState extends LMFeedComposeState {}
+  @override
+  List<Object> get props => [url];
+}
 
-class LMFeedComposeRemovedDocumentState extends LMFeedComposeState {}
+class LMFeedComposeAddedVideoState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
+
+class LMFeedComposeAddedDocumentState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
+
+class LMFeedComposeRemovedImageState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
+
+class LMFeedComposeRemovedVideoState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
+
+class LMFeedComposeRemovedDocumentState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}

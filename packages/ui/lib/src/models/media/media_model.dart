@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 
-enum LMMediaType { video, image, document, link, widget }
+enum LMMediaType { video, image, document, link, widget, repost }
 
 class LMMediaModel {
   // defines the type of media

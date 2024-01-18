@@ -308,12 +308,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               backgroundColor: LikeMindsTheme.whiteColor,
             ),
           ),
-      body: RefreshIndicator(
+      body: RefreshIndicator.adaptive(
         onRefresh: () async {
           refresh();
           clearPagingController();
         },
         color: feedThemeData?.primaryColor,
+        backgroundColor: feedThemeData?.container,
         child: Column(
           children: [
             widget.showCustomWidget
@@ -749,17 +750,18 @@ class _FeedRoomViewState extends State<FeedRoomView> {
                           stream: state.progress,
                           builder: (context, snapshot) {
                             return SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  value: (snapshot.data == null ||
-                                          snapshot.data == 0.0
-                                      ? null
-                                      : snapshot.data?.toDouble()),
-                                  valueColor: AlwaysStoppedAnimation(
-                                      feedTheme?.primaryColor),
-                                  strokeWidth: 3,
-                                ));
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                value: (snapshot.data == null ||
+                                        snapshot.data == 0.0
+                                    ? null
+                                    : snapshot.data?.toDouble()),
+                                valueColor: AlwaysStoppedAnimation(
+                                    feedTheme?.primaryColor),
+                                strokeWidth: 3,
+                              ),
+                            );
                           }),
                     ],
                   ),
@@ -958,8 +960,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
   LMFeedButton defLikeButton(LMPostViewData postViewData) => LMFeedButton(
         isActive: postViewData.isLiked,
         text: LMFeedText(
-            text:
-                '${postViewData.likeCount} ${getLikeCountSuffixText(postViewData.likeCount)}'),
+            text: LMFeedPostUtils.getLikeCountTextWithCount(
+                postViewData.likeCount)),
         style: feedTheme?.footerStyle.likeButtonStyle,
         onTextTap: () {
           Navigator.push(
@@ -999,7 +1001,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
 
   LMFeedButton defCommentButton(LMPostViewData postViewData) => LMFeedButton(
         text: LMFeedText(
-          text: getCommentCountSuffixText(postViewData.commentCount),
+          text: LMFeedPostUtils.getCommentCountTextWithCount(
+              postViewData.commentCount),
         ),
         style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {

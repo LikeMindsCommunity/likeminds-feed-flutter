@@ -159,9 +159,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
                 ),
                 newPageProgressIndicatorBuilder: (context) => const Padding(
                   padding: EdgeInsets.symmetric(vertical: 20.0),
-                  child: Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  ),
+                  child: LMFeedLoader(),
                 ),
               ),
             ),
