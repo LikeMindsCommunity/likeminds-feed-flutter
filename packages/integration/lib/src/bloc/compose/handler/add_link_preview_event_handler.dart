@@ -5,8 +5,9 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 addLinkPreviewEventHandler(
   LMFeedComposeAddLinkPreviewEvent event,
   Emitter<LMFeedComposeState> emitter,
-  List<LMMediaModel> mediaList,
 ) async {
+  List<LMMediaModel> mediaList = LMFeedComposeBloc.instance.postMedia;
+
   mediaList.removeWhere((element) => element.mediaType == LMMediaType.link);
 
   for (LMMediaModel media in mediaList) {

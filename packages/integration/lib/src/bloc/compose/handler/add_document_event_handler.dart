@@ -6,8 +6,9 @@ import 'package:likeminds_feed_flutter_core/src/utils/media/media_handler.dart';
 addDocumentEventHandler(
   LMFeedComposeAddDocumentEvent event,
   Emitter<LMFeedComposeState> emitter,
-  int mediaCount,
 ) async {
+  int mediaCount = LMFeedComposeBloc.instance.postMedia.length;
+
   if (mediaCount == 0) {
     emitter(LMFeedComposeMediaLoadingState());
   } else {
@@ -24,6 +25,7 @@ addDocumentEventHandler(
     try {
       final documents = await LMFeedMediaHandler.pickDocuments(mediaCount);
       if (documents != null && documents.isNotEmpty) {
+        LMFeedComposeBloc.instance.documentCount += documents.length;
         LMFeedComposeBloc.instance.postMedia.addAll(documents);
         emitter(LMFeedComposeAddedDocumentState());
       } else {

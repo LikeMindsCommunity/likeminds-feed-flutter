@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
@@ -456,7 +455,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               selectedTopics: selectedTopics,
               postMedia: composeBloc.postMedia,
             ));
-            composeBloc.add(LMFeedComposeCloseEvent());
+
             Navigator.pop(context);
           } else {
             toast(
@@ -553,89 +552,100 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   Widget _defMediaPicker() {
     final theme = LMFeedTheme.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.container,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.4),
-            offset: const Offset(0.0, -1.0),
-            blurRadius: 1.0,
-          ), //BoxShadow
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 8.0,
-      ),
-      height: 72,
-      child: Row(
-        children: [
-          LMFeedButton(
-            isActive: false,
-            style: LMFeedButtonStyle(
-              placement: LMFeedIconButtonPlacement.start,
-              showText: false,
-              icon: style?.addImageIcon ??
-                  LMFeedIcon(
-                    type: LMFeedIconType.icon,
-                    icon: Icons.photo_outlined,
-                    style: LMFeedIconStyle(
-                      color: theme.primaryColor,
-                      size: 32,
-                      boxPadding: 0,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-            ),
-            onTap: () async {
-              composeBloc.add(LMFeedComposeAddImageEvent());
-            },
+    return BlocBuilder(
+      bloc: composeBloc,
+      builder: (context, state) {
+        if (composeBloc.postMedia.length == 10) {
+          return const SizedBox();
+        }
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.container,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.4),
+                offset: const Offset(0.0, -1.0),
+                blurRadius: 1.0,
+              ), //BoxShadow
+            ],
           ),
-          LMFeedButton(
-            isActive: false,
-            style: LMFeedButtonStyle(
-              placement: LMFeedIconButtonPlacement.start,
-              showText: false,
-              icon: style?.addVideoIcon ??
-                  LMFeedIcon(
-                    type: LMFeedIconType.icon,
-                    icon: Icons.videocam_outlined,
-                    style: LMFeedIconStyle(
-                      color: theme.primaryColor,
-                      size: 32,
-                      boxPadding: 0,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-            ),
-            onTap: () async {
-              composeBloc.add(LMFeedComposeAddVideoEvent());
-            },
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16.0,
+            vertical: 8.0,
           ),
-          LMFeedButton(
-            isActive: false,
-            style: LMFeedButtonStyle(
-              placement: LMFeedIconButtonPlacement.start,
-              showText: false,
-              icon: style?.addDocumentIcon ??
-                  LMFeedIcon(
-                    type: LMFeedIconType.icon,
-                    icon: Icons.file_open_outlined,
-                    style: LMFeedIconStyle(
-                      color: theme.primaryColor,
-                      size: 32,
-                      boxPadding: 0,
-                      fit: BoxFit.contain,
-                    ),
+          height: 72,
+          child: Row(
+            children: [
+              if (composeBloc.documentCount == 0)
+                LMFeedButton(
+                  isActive: false,
+                  style: LMFeedButtonStyle(
+                    placement: LMFeedIconButtonPlacement.start,
+                    showText: false,
+                    icon: style?.addImageIcon ??
+                        LMFeedIcon(
+                          type: LMFeedIconType.icon,
+                          icon: Icons.photo_outlined,
+                          style: LMFeedIconStyle(
+                            color: theme.primaryColor,
+                            size: 32,
+                            boxPadding: 0,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                   ),
-            ),
-            onTap: () async {
-              composeBloc.add(LMFeedComposeAddDocumentEvent());
-            },
+                  onTap: () async {
+                    composeBloc.add(LMFeedComposeAddImageEvent());
+                  },
+                ),
+              if (composeBloc.documentCount == 0)
+                LMFeedButton(
+                  isActive: false,
+                  style: LMFeedButtonStyle(
+                    placement: LMFeedIconButtonPlacement.start,
+                    showText: false,
+                    icon: style?.addVideoIcon ??
+                        LMFeedIcon(
+                          type: LMFeedIconType.icon,
+                          icon: Icons.videocam_outlined,
+                          style: LMFeedIconStyle(
+                            color: theme.primaryColor,
+                            size: 32,
+                            boxPadding: 0,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                  ),
+                  onTap: () async {
+                    composeBloc.add(LMFeedComposeAddVideoEvent());
+                  },
+                ),
+              if (composeBloc.videoCount == 0 && composeBloc.imageCount == 0)
+                LMFeedButton(
+                  isActive: false,
+                  style: LMFeedButtonStyle(
+                    placement: LMFeedIconButtonPlacement.start,
+                    showText: false,
+                    icon: style?.addDocumentIcon ??
+                        LMFeedIcon(
+                          type: LMFeedIconType.icon,
+                          icon: Icons.file_open_outlined,
+                          style: LMFeedIconStyle(
+                            color: theme.primaryColor,
+                            size: 32,
+                            boxPadding: 0,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                  ),
+                  onTap: () async {
+                    composeBloc.add(LMFeedComposeAddDocumentEvent());
+                  },
+                ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

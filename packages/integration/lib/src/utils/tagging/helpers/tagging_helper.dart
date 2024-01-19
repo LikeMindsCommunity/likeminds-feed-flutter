@@ -1,9 +1,7 @@
 import 'package:collection/collection.dart';
 
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedTaggingHelper {
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
@@ -126,7 +124,7 @@ class LMFeedTaggingHelper {
     List<UserTag> userTags = [];
     for (final match in matches) {
       final String tag = match.group(1)!;
-      final String mid = match.group(2)!;
+      //final String mid = match.group(2)!;
       final String id = match.group(3)!;
       userTags.add(UserTag(userUniqueId: id, name: tag));
     }

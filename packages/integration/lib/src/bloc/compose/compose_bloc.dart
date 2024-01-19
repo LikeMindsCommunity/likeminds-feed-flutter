@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_document_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_link_preview_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_video_event_handler.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/close_compose_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/remove_attahment_event_handler.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:meta/meta.dart';
@@ -19,6 +20,9 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
   static LMFeedComposeBloc get instance => _bloc ??= LMFeedComposeBloc._();
 
   /// Lists to maintain throughout the screen for sending/receiving data
+  int imageCount = 0;
+  int videoCount = 0;
+  int documentCount = 0;
   List<LMMediaModel> postMedia = [];
   List<LMUserTagViewData> userTags = [];
   List<LMTopicViewData> selectedTopics = [];
@@ -34,28 +38,24 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
       (event, emitter) => addImageEventHandler(
         event,
         emitter,
-        postMedia.length,
       ),
     );
     on<LMFeedComposeAddVideoEvent>(
       (event, emitter) => addVideoEventHandler(
         event,
         emitter,
-        postMedia.length,
       ),
     );
     on<LMFeedComposeAddDocumentEvent>(
       (event, emitter) => addDocumentEventHandler(
         event,
         emitter,
-        postMedia.length,
       ),
     );
     on<LMFeedComposeAddLinkPreviewEvent>(
       (event, emitter) => addLinkPreviewEventHandler(
         event,
         emitter,
-        postMedia,
       ),
     );
     on<LMFeedComposeRemoveAttachmentEvent>(
@@ -69,6 +69,10 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
       ),
     );
     on<LMFeedComposeCloseEvent>(
-        (event, emit) => emit(LMFeedComposeInitialState()));
+      (event, emitter) => closeComposeEventHandler(
+        event,
+        emitter,
+      ),
+    );
   }
 }

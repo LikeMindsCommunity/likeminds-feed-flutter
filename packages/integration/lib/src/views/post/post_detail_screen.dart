@@ -4,10 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handler.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comment_reply_widget.dart';
@@ -452,12 +449,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedPostTopic(
       topics: _postDetailScreenHandler!.topics,
       post: _postDetailScreenHandler!.postData!,
+      style: feedTheme?.topicStyle,
     );
   }
 
   LMFeedPostContent _defContentWidget() {
     return LMFeedPostContent(
       onTagTap: (String? userId) {},
+      style: feedTheme?.contentStyle,
     );
   }
 
@@ -467,6 +466,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       commentButton: defCommentButton(),
       shareButton: defShareButton(),
       saveButton: defSaveButton(),
+      postFooterStyle: feedTheme?.footerStyle,
     );
   }
 
@@ -476,12 +476,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           .users[_postDetailScreenHandler!.postData!.userId]!,
       isFeed: true,
       postViewData: _postDetailScreenHandler!.postData!,
+      postHeaderStyle: feedTheme?.headerStyle,
     );
   }
 
   LMFeedPostMedia _defPostMedia() {
     return LMFeedPostMedia(
       attachments: _postDetailScreenHandler!.postData!.attachments!,
+      style: feedTheme?.mediaStyle,
     );
   }
 

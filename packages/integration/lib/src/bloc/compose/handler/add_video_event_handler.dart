@@ -6,8 +6,9 @@ import 'package:likeminds_feed_flutter_core/src/utils/media/media_handler.dart';
 addVideoEventHandler(
   LMFeedComposeAddVideoEvent event,
   Emitter<LMFeedComposeState> emitter,
-  int mediaCount,
 ) async {
+  int mediaCount = LMFeedComposeBloc.instance.postMedia.length;
+
   if (mediaCount == 0) {
     emitter(LMFeedComposeMediaLoadingState());
   } else {
@@ -24,6 +25,7 @@ addVideoEventHandler(
     try {
       final videos = await LMFeedMediaHandler.pickVideos(mediaCount);
       if (videos != null && videos.isNotEmpty) {
+        LMFeedComposeBloc.instance.videoCount += videos.length;
         LMFeedComposeBloc.instance.postMedia.addAll(videos);
         emitter(LMFeedComposeAddedVideoState());
       } else {

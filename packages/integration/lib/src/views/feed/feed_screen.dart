@@ -4,11 +4,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
@@ -925,12 +923,14 @@ class _FeedRoomViewState extends State<FeedRoomView> {
     return LMFeedPostTopic(
       topics: widget.universalFeedBloc.topics,
       post: post,
+      style: feedTheme?.topicStyle,
     );
   }
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
       onTagTap: (String? userId) {},
+      style: feedTheme?.contentStyle,
     );
   }
 
@@ -940,6 +940,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
       commentButton: defCommentButton(post),
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
+      postFooterStyle: feedTheme?.footerStyle,
     );
   }
 
@@ -948,12 +949,14 @@ class _FeedRoomViewState extends State<FeedRoomView> {
       user: widget.universalFeedBloc.users[post.userId]!,
       isFeed: true,
       postViewData: post,
+      postHeaderStyle: feedTheme?.headerStyle,
     );
   }
 
   LMFeedPostMedia _defPostMedia(LMPostViewData post) {
     return LMFeedPostMedia(
       attachments: post.attachments!,
+      style: feedTheme?.mediaStyle,
     );
   }
 

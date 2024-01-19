@@ -156,8 +156,8 @@ class LMFeedThemeData {
           ),
       dialogStyle: dialogStyle ?? const LMFeedDialogStyle(),
       popUpMenuStyle: popUpMenuStyle ?? const LMFeedPopUpMenuStyle(),
-      composeScreenStyle:
-          composeScreenStyle ?? LMFeedComposeScreenStyle.basic(),
+      composeScreenStyle: composeScreenStyle ??
+          LMFeedComposeScreenStyle.basic(primaryColor: primaryColor),
     );
   }
 

@@ -6,8 +6,9 @@ import 'package:likeminds_feed_flutter_core/src/utils/media/media_handler.dart';
 addImageEventHandler(
   LMFeedComposeAddImageEvent event,
   Emitter<LMFeedComposeState> emitter,
-  int mediaCount,
 ) async {
+  int mediaCount = LMFeedComposeBloc.instance.postMedia.length;
+
   if (mediaCount == 0) {
     emitter(LMFeedComposeMediaLoadingState());
   } else {
@@ -24,6 +25,7 @@ addImageEventHandler(
     try {
       final images = await LMFeedMediaHandler.pickImages(mediaCount);
       if (images != null && images.isNotEmpty) {
+        LMFeedComposeBloc.instance.imageCount += images.length;
         LMFeedComposeBloc.instance.postMedia.addAll(images);
         emitter(LMFeedComposeAddedImageState());
       } else {

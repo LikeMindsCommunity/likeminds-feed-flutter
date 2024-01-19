@@ -41,7 +41,7 @@ class LMFeedComposeScreenStyle {
           type: LMFeedIconType.icon,
           icon: Icons.photo_outlined,
           style: LMFeedIconStyle(
-            color: primaryColor,
+            color: primaryColor ?? LikeMindsTheme.primaryColor,
             size: 32,
             boxPadding: 0,
             fit: BoxFit.contain,

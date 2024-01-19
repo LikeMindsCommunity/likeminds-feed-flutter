@@ -222,6 +222,17 @@ class LMFeedPostHeader extends StatelessWidget {
               ),
             ),
           ),
+          const Spacer(),
+          if ((postHeaderStyle?.showPinnedIcon ?? true) &&
+              postViewData.isPinned)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmPinSvg,
+                style: LMFeedIconStyle.basic(),
+              ),
+            ),
           postViewData.menuItems.isNotEmpty
               ? menuBuilder?.call(_defMenuBuilder()) ?? _defMenuBuilder()
               : const SizedBox()
@@ -266,6 +277,8 @@ class LMFeedPostHeaderStyle {
   final LMFeedTextStyle? fallbackTextStyle;
   final bool showCustomTitle;
 
+  final bool showPinnedIcon;
+
   const LMFeedPostHeaderStyle({
     this.padding,
     this.margin,
@@ -274,6 +287,7 @@ class LMFeedPostHeaderStyle {
     this.imageSize,
     this.fallbackTextStyle,
     this.showCustomTitle = true,
+    this.showPinnedIcon = true,
   });
 
   LMFeedPostHeaderStyle copyWith({
@@ -284,6 +298,7 @@ class LMFeedPostHeaderStyle {
     double? imageSize,
     LMFeedTextStyle? fallbackTextStyle,
     bool? showCustomTitle,
+    bool? showPinnedIcon,
   }) {
     return LMFeedPostHeaderStyle(
       padding: padding ?? this.padding,
@@ -293,6 +308,7 @@ class LMFeedPostHeaderStyle {
       imageSize: imageSize ?? this.imageSize,
       fallbackTextStyle: fallbackTextStyle ?? this.fallbackTextStyle,
       showCustomTitle: showCustomTitle ?? this.showCustomTitle,
+      showPinnedIcon: showPinnedIcon ?? this.showPinnedIcon,
     );
   }
 

@@ -101,6 +101,8 @@ void newPostEventHandler(
     } else {
       emit(LMFeedNewPostErrorState(message: response.errorMessage!));
     }
+
+    LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
   } catch (err) {
     emit(const LMFeedNewPostErrorState(message: 'An error occurred'));
     debugPrint(err.toString());

@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class ClientCustomScreen extends LMFeedPostDetailScreen {
   const ClientCustomScreen({

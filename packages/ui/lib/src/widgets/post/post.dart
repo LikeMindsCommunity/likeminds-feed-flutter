@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 /// {@template post_widget}
 /// A widget that displays a post on the feed.
@@ -169,6 +170,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
 
   @override
   Widget build(BuildContext context) {
+    timeago.setLocaleMessages('en', LMFeedCustomMessages());
     return InheritedPostProvider(
       post: widget.post,
       child: GestureDetector(

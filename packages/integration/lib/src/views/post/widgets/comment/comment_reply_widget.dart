@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/comment/comment_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+
 import 'package:timeago/timeago.dart' as timeago;
 
 class LMFeedCommentReplyWidget extends StatefulWidget {
@@ -92,6 +89,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   Widget build(BuildContext context) {
     feedTheme = LMFeedTheme.of(context);
     replyStyle = widget.style ?? feedTheme?.replyStyle;
+    timeago.setLocaleMessages('en', LMFeedCustomMessages());
     return BlocConsumer(
       bloc: _commentRepliesBloc,
       buildWhen: (previous, current) {
@@ -222,6 +220,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
               ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
+                padding: EdgeInsets.zero,
                 itemCount: replies.length,
                 itemBuilder: (context, index) {
                   LMCommentViewData commentViewData = replies[index];
@@ -265,39 +264,45 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
               if (replies.isNotEmpty &&
                   replies.length % 10 == 0 &&
                   replies.length != reply!.repliesCount)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    LMFeedButton(
-                      onTap: () {
-                        page++;
-                        _commentRepliesBloc!.add(LMFeedGetCommentRepliesEvent(
-                            commentDetailRequest: (GetCommentRequestBuilder()
-                                  ..commentId(reply!.id)
-                                  ..page(page)
-                                  ..postId(postId))
-                                .build(),
-                            forLoadMore: true));
-                      },
-                      text: const LMFeedText(
-                        text: 'View more replies',
-                        style: LMFeedTextStyle(
-                          textStyle: TextStyle(
-                            fontSize: 14,
+                Container(
+                  color: feedTheme?.container,
+                  padding: replyStyle?.padding,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LMFeedButton(
+                        onTap: () {
+                          page++;
+                          _commentRepliesBloc!.add(LMFeedGetCommentRepliesEvent(
+                              commentDetailRequest: (GetCommentRequestBuilder()
+                                    ..commentId(reply!.id)
+                                    ..page(page)
+                                    ..postId(postId))
+                                  .build(),
+                              forLoadMore: true));
+                        },
+                        text: LMFeedText(
+                          text: 'View more replies',
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              color: feedTheme?.primaryColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    LMFeedText(
-                      text: ' ${replies.length} of ${reply!.repliesCount}',
-                      style: const LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 11,
-                          color: LikeMindsTheme.greyColor,
+                      LMFeedText(
+                        text: ' ${replies.length} of ${reply!.repliesCount}',
+                        style: const LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontSize: 11,
+                            color: LikeMindsTheme.greyColor,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               // replies.add();
             ],
@@ -385,8 +390,11 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedButton defLikeButton(
           LMCommentViewData commentViewData, StateSetter setReplyState) =>
       LMFeedButton(
-        style: feedTheme?.replyStyle.likeButtonStyle ??
+        style: feedTheme?.replyStyle.likeButtonStyle?.copyWith(
+              showText: commentViewData.likesCount == 0 ? false : true,
+            ) ??
             LMFeedButtonStyle(
+              showText: commentViewData.likesCount == 0 ? false : true,
               icon: const LMFeedIcon(
                 type: LMFeedIconType.icon,
                 icon: Icons.thumb_up_alt_outlined,
