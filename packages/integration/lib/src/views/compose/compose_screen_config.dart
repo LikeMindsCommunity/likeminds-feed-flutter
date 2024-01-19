@@ -10,6 +10,7 @@ class LMFeedComposeScreenConfig {
     this.enableTagging = true,
     this.enableTopics = true,
     this.enableVideos = true,
+    this.topicRequiredToCreatePost = false,
   });
 
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]
@@ -39,4 +40,33 @@ class LMFeedComposeScreenConfig {
 
   /// [bool] to enable/disable link previews
   final bool enableLinkPreviews;
+
+  /// [bool] to make topic required for post creation
+  final bool topicRequiredToCreatePost;
+
+  LMFeedComposeScreenConfig copyWith({
+    SystemUiOverlayStyle? composeSystemOverlayStyle,
+    String? composeHint,
+    bool? enableDocuments,
+    bool? enableImages,
+    bool? enableLinkPreviews,
+    bool? enableTagging,
+    bool? enableTopics,
+    bool? enableVideos,
+    bool? topicRequiredToCreatePost,
+  }) {
+    return LMFeedComposeScreenConfig(
+      composeSystemOverlayStyle:
+          composeSystemOverlayStyle ?? this.composeSystemOverlayStyle,
+      composeHint: composeHint ?? this.composeHint,
+      enableDocuments: enableDocuments ?? this.enableDocuments,
+      enableImages: enableImages ?? this.enableImages,
+      enableLinkPreviews: enableLinkPreviews ?? this.enableLinkPreviews,
+      enableTagging: enableTagging ?? this.enableTagging,
+      enableTopics: enableTopics ?? this.enableTopics,
+      enableVideos: enableVideos ?? this.enableVideos,
+      topicRequiredToCreatePost:
+          topicRequiredToCreatePost ?? this.topicRequiredToCreatePost,
+    );
+  }
 }

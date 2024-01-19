@@ -1,11 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedPostDetailScreenHandler {
@@ -179,11 +175,11 @@ class LMFeedPostDetailScreenHandler {
         }
       case const (LMFeedCommentSuccessState<EditCommentReplyResponse>):
         {
-          // final LMFeedCommentSuccessState commentSuccessState =
-          //     state as LMFeedCommentSuccessState;
+          final LMFeedCommentSuccessState commentSuccessState =
+              state as LMFeedCommentSuccessState;
 
-          // EditCommentReplyResponse response = commentSuccessState
-          //     .commentActionResponse as EditCommentReplyResponse;
+          EditCommentReplyResponse response = commentSuccessState
+              .commentActionResponse as EditCommentReplyResponse;
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }

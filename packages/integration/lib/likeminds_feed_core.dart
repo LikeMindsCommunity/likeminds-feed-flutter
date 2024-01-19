@@ -8,8 +8,12 @@ import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
+import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
+
+import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
 import 'package:media_kit/media_kit.dart';
 
+export 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/views.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
 export 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
@@ -28,12 +32,16 @@ class LMFeedCore {
   /// generate link for sharing post
   String? clientDomain;
 
+  late LMFeedConfig feedConfig;
+
   static LMFeedCore? _instance;
 
   static LMFeedCore get instance => _instance ??= LMFeedCore._();
 
   static LMFeedClient get client => instance.lmFeedClient;
   static LMFeedMediaService get media => instance.mediaService!;
+
+  static LMFeedConfig get config => instance.feedConfig;
 
   static String? get domain => instance.clientDomain;
 
@@ -44,6 +52,7 @@ class LMFeedCore {
     LMFeedClient? lmFeedClient,
     ThemeData? theme,
     String? domain,
+    LMFeedConfig? config,
   }) async {
     assert(apiKey != null || lmFeedClient != null);
     this.lmFeedClient =
@@ -51,6 +60,7 @@ class LMFeedCore {
     clientDomain = domain;
     mediaService = LMFeedMediaService(false);
     await LMFeedUserLocalPreference.instance.initialize();
+    feedConfig = config ?? LMFeedConfig();
     MediaKit.ensureInitialized();
   }
 
@@ -83,5 +93,25 @@ class LMFeedCore {
           return value;
         },
       );
+  }
+}
+
+class LMFeedConfig {
+  final LMFeedScreenConfig feedScreenConfig;
+  final LMFeedComposeScreenConfig composeConfig;
+
+  LMFeedConfig({
+    this.feedScreenConfig = const LMFeedScreenConfig(),
+    this.composeConfig = const LMFeedComposeScreenConfig(),
+  });
+
+  LMFeedConfig copyWith({
+    LMFeedScreenConfig? config,
+    LMFeedComposeScreenConfig? composeConfig,
+  }) {
+    return LMFeedConfig(
+      feedScreenConfig: config ?? feedScreenConfig,
+      composeConfig: composeConfig ?? this.composeConfig,
+    );
   }
 }

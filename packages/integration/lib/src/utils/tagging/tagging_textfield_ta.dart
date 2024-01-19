@@ -15,6 +15,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
   final Function(String)? onChange;
   final int? maxLines;
   final int minLines;
+  final bool enabled;
 
   const LMTaggingAheadTextField({
     super.key,
@@ -26,6 +27,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
     required this.onChange,
     this.maxLines,
     this.minLines = 1,
+    this.enabled = true,
   });
 
   @override
@@ -166,6 +168,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         ),
         direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
         suggestionsCallback: (suggestion) async {
+          if (!widget.enabled) {
+            return Future.value(const Iterable.empty());
+          }
           return await _getSuggestions(suggestion);
         },
         keepSuggestionsOnSuggestionSelected: true,

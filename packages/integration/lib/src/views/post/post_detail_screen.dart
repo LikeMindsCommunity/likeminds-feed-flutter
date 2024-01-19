@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/add_comment_widget.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
@@ -304,18 +303,29 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       LMFeedMenuAction(
         onCommentEdit: () {
           debugPrint('Editing functionality');
-          LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-                ..commentActionEntity(LMFeedCommentType.parent)
+
+          LMCommentMetaDataBuilder commentMetaDataBuilder =
+              LMCommentMetaDataBuilder()
                 ..commentActionType(LMFeedCommentActionType.edit)
-                ..level(0)
-                ..commentId(commentViewData.id)
                 ..commentText(LMFeedTaggingHelper.convertRouteToTag(
-                    commentViewData.text)))
-              .build();
+                    commentViewData.text));
+
+          if (commentViewData.level == 0) {
+            commentMetaDataBuilder
+              ..commentActionEntity(LMFeedCommentType.parent)
+              ..level(0)
+              ..commentId(commentViewData.id);
+          } else {
+            commentMetaDataBuilder
+              ..level(1)
+              ..commentActionEntity(LMFeedCommentType.reply)
+              ..commentId(commentViewData.parentComment!.id)
+              ..replyId(commentViewData.id);
+          }
 
           _postDetailScreenHandler!.commentHandlerBloc.add(
             LMFeedCommentOngoingEvent(
-              commentMetaData: commentMetaData,
+              commentMetaData: commentMetaDataBuilder.build(),
             ),
           );
         },
@@ -435,6 +445,20 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       user: _postDetailScreenHandler!
           .users[_postDetailScreenHandler!.postData!.userId]!,
       topics: _postDetailScreenHandler!.topics,
+      onMediaTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMFeedMediaPreviewScreen(
+              postAttachments:
+                  _postDetailScreenHandler!.postData!.attachments ?? [],
+              post: _postDetailScreenHandler!.postData!,
+              user: _postDetailScreenHandler!
+                  .users[_postDetailScreenHandler!.postData!.userId]!,
+            ),
+          ),
+        );
+      },
       onPostTap: (context, post) {
         debugPrint("Post in detail screen tapped");
         widget.onPostTap?.call();
@@ -906,6 +930,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     Expanded(
                       child: LMTaggingAheadTextField(
                         isDown: false,
+                        enabled: LMFeedCore.config.composeConfig.enableTagging,
                         maxLines: 5,
                         onTagSelected: (tag) {
                           userTags.add(tag);
@@ -970,34 +995,48 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       if (state.commentMetaData
                                               .commentActionType ==
                                           LMFeedCommentActionType.edit) {
-                                        LMCommentMetaData commentMetaData =
-                                            (LMCommentMetaDataBuilder()
-                                                  ..commentActionEntity(
-                                                      LMFeedCommentType.parent)
-                                                  ..level(0)
-                                                  ..commentId(state
-                                                      .commentMetaData
-                                                      .commentId!)
-                                                  ..commentActionType(
-                                                      LMFeedCommentActionType
-                                                          .edit))
-                                                .build();
-                                        EditCommentRequest editCommentRequest =
-                                            (EditCommentRequestBuilder()
-                                                  ..postId(widget.postId)
-                                                  ..commentId(state
-                                                      .commentMetaData
-                                                      .commentId!)
-                                                  ..text(commentText))
-                                                .build();
+                                        if (state.commentMetaData
+                                                .commentActionEntity ==
+                                            LMFeedCommentType.parent) {
+                                          EditCommentRequest
+                                              editCommentRequest =
+                                              (EditCommentRequestBuilder()
+                                                    ..postId(widget.postId)
+                                                    ..commentId(state
+                                                        .commentMetaData
+                                                        .commentId!)
+                                                    ..text(commentText))
+                                                  .build();
 
-                                        _postDetailScreenHandler!
-                                            .commentHandlerBloc
-                                            .add(LMFeedCommentActionEvent(
-                                                commentActionRequest:
-                                                    editCommentRequest,
-                                                commentMetaData:
-                                                    commentMetaData));
+                                          _postDetailScreenHandler!
+                                              .commentHandlerBloc
+                                              .add(LMFeedCommentActionEvent(
+                                                  commentActionRequest:
+                                                      editCommentRequest,
+                                                  commentMetaData:
+                                                      state.commentMetaData));
+                                        } else {
+                                          EditCommentReplyRequest
+                                              editCommentReplyRequest =
+                                              (EditCommentReplyRequestBuilder()
+                                                    ..commentId(state
+                                                        .commentMetaData
+                                                        .commentId!)
+                                                    ..postId(widget.postId)
+                                                    ..replyId(state
+                                                        .commentMetaData
+                                                        .replyId!)
+                                                    ..text(commentText))
+                                                  .build();
+
+                                          _postDetailScreenHandler!
+                                              .commentHandlerBloc
+                                              .add(LMFeedCommentActionEvent(
+                                                  commentActionRequest:
+                                                      editCommentReplyRequest,
+                                                  commentMetaData:
+                                                      state.commentMetaData));
+                                        }
                                       } else if (state.commentMetaData
                                               .commentActionType ==
                                           LMFeedCommentActionType.replying) {

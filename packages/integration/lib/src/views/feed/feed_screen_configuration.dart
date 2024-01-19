@@ -26,10 +26,10 @@ enum LMFeedTopicSelectionWidgetType {
 class LMFeedScreenConfig {
   const LMFeedScreenConfig({
     this.composeSystemOverlayStyle = SystemUiOverlayStyle.dark,
-    this.enableTopics = true,
-    this.allowMultipleTopicsSelection = false,
+    this.enableTopicFiltering = true,
     this.topicSelectionWidgetType =
         LMFeedTopicSelectionWidgetType.showTopicSelectionScreen,
+    this.showCustomWidget = false,
   });
 
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]
@@ -38,14 +38,7 @@ class LMFeedScreenConfig {
   final SystemUiOverlayStyle composeSystemOverlayStyle;
 
   /// [bool] to enable/disable topic selection
-  final bool enableTopics;
-
-  /// [bool] to enable/disable multiple topic selection
-  /// if true, multiple topics can be selected
-  /// if false, only one topic can be selected
-  /// defaults to false if not provided
-  /// only applicable if [enableTopics] is true
-  final bool allowMultipleTopicsSelection;
+  final bool enableTopicFiltering;
 
   /// [LMFeedTopicSelectionWidgetType] to select the type of topic selection widget
   /// to be shown
@@ -56,4 +49,23 @@ class LMFeedScreenConfig {
   /// defaults to [LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet]
   /// if not provided
   final LMFeedTopicSelectionWidgetType topicSelectionWidgetType;
+
+  final bool showCustomWidget;
+
+  LMFeedScreenConfig copyWith({
+    SystemUiOverlayStyle? composeSystemOverlayStyle,
+    bool? enableTopicFiltering,
+    bool? allowMultipleTopicsSelection,
+    LMFeedTopicSelectionWidgetType? topicSelectionWidgetType,
+    bool? showCustomWidget,
+  }) {
+    return LMFeedScreenConfig(
+      composeSystemOverlayStyle:
+          composeSystemOverlayStyle ?? this.composeSystemOverlayStyle,
+      enableTopicFiltering: enableTopicFiltering ?? this.enableTopicFiltering,
+      topicSelectionWidgetType:
+          topicSelectionWidgetType ?? this.topicSelectionWidgetType,
+      showCustomWidget: showCustomWidget ?? this.showCustomWidget,
+    );
+  }
 }
