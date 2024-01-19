@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 addLinkPreviewEventHandler(
@@ -13,23 +12,15 @@ addLinkPreviewEventHandler(
   for (LMMediaModel media in mediaList) {
     if (media.mediaType != LMMediaType.link ||
         media.mediaType != LMMediaType.widget) {
-      if (media.mediaType == LMMediaType.document) {
-        emitter(LMFeedComposeAddedDocumentState());
-        return;
-      }
-      if (media.mediaType == LMMediaType.image) {
-        emitter(LMFeedComposeAddedImageState());
-        return;
-      }
-      if (media.mediaType == LMMediaType.video) {
-        emitter(LMFeedComposeAddedVideoState());
-        return;
-      }
       return;
     }
   }
 
-  String url = event.url;
+  String url = getFirstValidLinkFromString(event.url);
+
+  if (url.isEmpty) {
+    emitter(LMFeedComposeInitialState());
+  }
 
   DecodeUrlRequest request = (DecodeUrlRequestBuilder()..url(url)).build();
 

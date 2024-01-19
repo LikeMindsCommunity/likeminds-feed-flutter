@@ -22,7 +22,7 @@ class LMFeedComposeAddLinkPreviewEvent extends LMFeedComposeEvent {
   const LMFeedComposeAddLinkPreviewEvent({required this.url});
 
   @override
-  List<Object?> get props => [url];
+  List<Object?> get props => [url, identityHashCode(this)];
 }
 
 class LMFeedComposeRemoveAttachmentEvent extends LMFeedComposeEvent {

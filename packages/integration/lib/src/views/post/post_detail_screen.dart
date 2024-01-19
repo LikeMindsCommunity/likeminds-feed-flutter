@@ -581,19 +581,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
         style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {
-          if (!widget.openKeyboard) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LMFeedPostDetailScreen(
-                  postId: _postDetailScreenHandler!.postData!.id,
-                  openKeyboard: true,
-                  postBuilder: widget.postBuilder,
-                  commentBuilder: widget.commentBuilder,
-                ),
-              ),
-            );
-          }
+          _postDetailScreenHandler!.openOnScreenKeyboard();
         },
       );
 

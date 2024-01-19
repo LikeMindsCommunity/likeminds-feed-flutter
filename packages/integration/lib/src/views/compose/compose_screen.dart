@@ -554,10 +554,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   * and generates a preview for the link
   */
   void handleTextLinks(String text) async {
-    String link = getFirstValidLinkFromString(text);
-    if (link.isNotEmpty) {
-      composeBloc.add(LMFeedComposeAddLinkPreviewEvent(url: link));
-    }
+    composeBloc.add(LMFeedComposeAddLinkPreviewEvent(url: text));
   }
 
   Widget _defMediaPicker() {
