@@ -24,10 +24,7 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // LMFeedClient lmFeedClient = (LMFeedClientBuilder()
-  //       ..apiKey("6b51af13-ce28-444b-a571-53a3fb125444"))
-  //     .build();
-  LMFeedCore.instance.initialize(
+  await LMFeedCore.instance.initialize(
     apiKey: "6b51af13-ce28-444b-a571-53a3fb125444",
     domain: "feedsx://www.feedsx.com/",
   );

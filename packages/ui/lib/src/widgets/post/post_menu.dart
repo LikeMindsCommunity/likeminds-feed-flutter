@@ -103,14 +103,21 @@ class LMFeedMenu extends StatelessWidget {
     }
   }
 
-  LMFeedMenu copyWith(LMFeedMenu menu) {
+  LMFeedMenu copyWith({
+    Map<int, LMFeedText>? children,
+    LMFeedIcon? menuIcon,
+    List<LMPopUpMenuItemViewData>? menuItems,
+    bool? isFeed,
+    Set<int>? removeItemIds,
+    LMFeedMenuAction? action,
+  }) {
     return LMFeedMenu(
-      children: menu.children ?? children,
-      menuIcon: menu.menuIcon ?? menuIcon,
-      menuItems: menu.menuItems,
-      isFeed: menu.isFeed,
-      removeItemIds: menu.removeItemIds,
-      action: menu.action ?? action,
+      children: children ?? this.children,
+      menuIcon: menuIcon ?? this.menuIcon,
+      menuItems: menuItems ?? this.menuItems,
+      isFeed: isFeed ?? this.isFeed,
+      removeItemIds: removeItemIds ?? this.removeItemIds,
+      action: action ?? this.action,
     );
   }
 }

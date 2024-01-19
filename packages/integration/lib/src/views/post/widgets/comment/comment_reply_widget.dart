@@ -13,6 +13,10 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
   final Function() refresh;
   final LMFeedCommentStyle? style;
 
+  final LMFeedPostCommentBuilder? commentBuilder;
+
+  final LMPostViewData post;
+
   const LMFeedCommentReplyWidget({
     Key? key,
     required this.reply,
@@ -20,21 +24,30 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
     required this.postId,
     this.style,
     required this.refresh,
+    this.commentBuilder,
+    required this.post,
   }) : super(key: key);
 
   @override
   State<LMFeedCommentReplyWidget> createState() => _CommentReplyWidgetState();
 
-  LMFeedCommentReplyWidget copyWith(
-      {String? postId,
-      LMCommentViewData? reply,
-      LMUserViewData? user,
-      Function()? refresh}) {
+  LMFeedCommentReplyWidget copyWith({
+    String? postId,
+    LMCommentViewData? reply,
+    LMUserViewData? user,
+    LMFeedCommentStyle? style,
+    LMFeedPostCommentBuilder? commentBuilder,
+    LMPostViewData? post,
+    Function()? refresh,
+  }) {
     return LMFeedCommentReplyWidget(
       postId: postId ?? this.postId,
       reply: reply ?? this.reply,
       user: user ?? this.user,
       refresh: refresh ?? this.refresh,
+      style: style ?? this.style,
+      commentBuilder: commentBuilder ?? this.commentBuilder,
+      post: post ?? this.post,
     );
   }
 }
@@ -227,36 +240,11 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   LMUserViewData user = users[commentViewData.userId]!;
                   return StatefulBuilder(
                     builder: (context, setReplyState) {
-                      return LMFeedCommentWidget(
-                        style: replyStyle,
-                        comment: commentViewData,
-                        onTagTap: (String userId) {
-                          LMFeedCore.instance.lmFeedClient
-                              .routeToProfile(userId);
-                        },
-                        user: user,
-                        profilePicture: LMFeedProfilePicture(
-                          imageUrl: user.imageUrl,
-                          style: LMFeedProfilePictureStyle(
-                            size: 32,
-                            backgroundColor: feedTheme!.primaryColor,
-                          ),
-                          fallbackText: user.name,
-                          onTap: () {
-                            if (user.sdkClientInfo != null) {
-                              LMFeedCore.instance.lmFeedClient.routeToProfile(
-                                  user.sdkClientInfo!.userUniqueId);
-                            }
-                          },
-                        ),
-                        lmFeedMenuAction: defLMFeedMenuAction(
-                          commentViewData,
-                        ),
-                        likeButton: defLikeButton(
-                          commentViewData,
-                          setReplyState,
-                        ),
-                      );
+                      return widget.commentBuilder?.call(
+                              context,
+                              _defCommetWidget(commentViewData, setReplyState),
+                              widget.post) ??
+                          _defCommetWidget(commentViewData, setReplyState);
                     },
                   );
                 },
@@ -329,6 +317,39 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         }
         replyCount = replies.length;
       },
+    );
+  }
+
+  LMFeedCommentWidget _defCommetWidget(
+      LMCommentViewData commentViewData, StateSetter setReplyState) {
+    return LMFeedCommentWidget(
+      style: replyStyle,
+      comment: commentViewData,
+      onTagTap: (String userId) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
+      },
+      user: user,
+      profilePicture: LMFeedProfilePicture(
+        imageUrl: user.imageUrl,
+        style: LMFeedProfilePictureStyle(
+          size: 32,
+          backgroundColor: feedTheme!.primaryColor,
+        ),
+        fallbackText: user.name,
+        onTap: () {
+          if (user.sdkClientInfo != null) {
+            LMFeedCore.instance.lmFeedClient
+                .routeToProfile(user.sdkClientInfo!.userUniqueId);
+          }
+        },
+      ),
+      lmFeedMenuAction: defLMFeedMenuAction(
+        commentViewData,
+      ),
+      likeButton: defLikeButton(
+        commentViewData,
+        setReplyState,
+      ),
     );
   }
 

@@ -3,15 +3,8 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
-
-import '../../convertors/helper/attachment/attachment_convertor.dart';
-import '../../convertors/post/post_convertor.dart';
-import '../../convertors/post/topic_convertor.dart';
-import '../../convertors/user/user_convertor.dart';
 
 part 'post_event.dart';
 part 'post_state.dart';

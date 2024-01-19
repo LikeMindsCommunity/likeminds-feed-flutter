@@ -138,7 +138,8 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                   widget.subtitleText != null
                       ? Container(
                           padding: style?.subtitlePadding,
-                          child: widget.subtitleText)
+                          child: widget.subtitleText,
+                        )
                       : const SizedBox.shrink(),
                 ],
               ),

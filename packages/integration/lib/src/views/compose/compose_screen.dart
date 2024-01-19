@@ -36,7 +36,8 @@ class LMFeedComposeScreen extends StatefulWidget {
   final LMFeedComposeScreenStyle? style;
 
   final Function(BuildContext context)? composeDiscardDialogBuilder;
-  final Widget Function(LMFeedAppBar oldAppBar)? composeAppBarBuilder;
+  final PreferredSizeWidget Function(LMFeedAppBar oldAppBar)?
+      composeAppBarBuilder;
   final Widget Function()? composeContentBuilder;
   final Widget Function(List<LMTopicViewData>)? composeTopicSelectorBuilder;
   final Widget Function()? composeMediaPreviewBuilder;
@@ -115,6 +116,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             child: Scaffold(
               backgroundColor: feedTheme?.container,
               bottomSheet: _defMediaPicker(),
+              appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
+                  _defAppBar(),
               floatingActionButton: Padding(
                 padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
                 child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
@@ -136,16 +139,18 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 ),
               ),
               body: SafeArea(
-                child: Column(
-                  children: [
-                    widget.composeAppBarBuilder?.call(_defAppBar()) ??
-                        _defAppBar(),
-                    const SizedBox(height: 18),
-                    widget.composeContentBuilder?.call() ?? _defContentInput(),
-                    const SizedBox(height: 18),
-                    widget.composeMediaPreviewBuilder?.call() ??
-                        _defMediaPreview(),
-                  ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 18),
+                      widget.composeContentBuilder?.call() ??
+                          _defContentInput(),
+                      const SizedBox(height: 18),
+                      widget.composeMediaPreviewBuilder?.call() ??
+                          _defMediaPreview(),
+                      const SizedBox(height: 150),
+                    ],
+                  ),
                 ),
               ),
             ),

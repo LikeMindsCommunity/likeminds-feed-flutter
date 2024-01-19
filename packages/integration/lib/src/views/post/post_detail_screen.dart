@@ -230,6 +230,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     commentIdReplyId ==
                                                         commentViewData.id)
                                                 ? LMFeedCommentReplyWidget(
+                                                    post:
+                                                        _postDetailScreenHandler!
+                                                            .postData!,
                                                     refresh: () {
                                                       _pagingController
                                                           .refresh();
@@ -514,6 +517,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           _postDetailScreenHandler!.rebuildPostWidget.value =
               !_postDetailScreenHandler!.rebuildPostWidget.value;
 
+          LMFeedPostBloc.instance.add(
+              LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+
           final likePostRequest = (LikePostRequestBuilder()
                 ..postId(_postDetailScreenHandler!.postData!.id))
               .build();
@@ -530,6 +536,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     : _postDetailScreenHandler!.postData!.likeCount - 1;
             _postDetailScreenHandler!.rebuildPostWidget.value =
                 !_postDetailScreenHandler!.rebuildPostWidget.value;
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                post: _postDetailScreenHandler!.postData!));
           }
         },
       );
@@ -541,16 +549,19 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
         style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LMFeedPostDetailScreen(
-                postId: _postDetailScreenHandler!.postData!.id,
-                openKeyboard: true,
-                postBuilder: widget.postBuilder,
+          if (!widget.openKeyboard) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LMFeedPostDetailScreen(
+                  postId: _postDetailScreenHandler!.postData!.id,
+                  openKeyboard: true,
+                  postBuilder: widget.postBuilder,
+                  commentBuilder: widget.commentBuilder,
+                ),
               ),
-            ),
-          );
+            );
+          }
         },
       );
 

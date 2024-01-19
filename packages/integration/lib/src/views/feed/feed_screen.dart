@@ -9,7 +9,9 @@ import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -182,7 +184,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   void dispose() {
     _pagingController.dispose();
     _rebuildAppBar.dispose();
-    _feedBloc.close();
     super.dispose();
   }
 
@@ -944,12 +945,70 @@ class _FeedRoomViewState extends State<FeedRoomView> {
     );
   }
 
-  LMFeedPostHeader _defPostHeader(LMPostViewData post) {
+  LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: widget.universalFeedBloc.users[post.userId]!,
+      user: widget.universalFeedBloc.users[postViewData.userId]!,
       isFeed: true,
-      postViewData: post,
+      postViewData: postViewData,
       postHeaderStyle: feedTheme?.headerStyle,
+      menuBuilder: (menu) {
+        return menu.copyWith(
+          removeItemIds: {postReportId, postEditId},
+          action: LMFeedMenuAction(
+            onPostPin: () async {
+              postViewData.isPinned = !postViewData.isPinned;
+              rebuildPostWidget.value = !rebuildPostWidget.value;
+
+              final pinPostRequest =
+                  (PinPostRequestBuilder()..postId(postViewData.id)).build();
+
+              final PinPostResponse response =
+                  await LMFeedCore.client.pinPost(pinPostRequest);
+
+              LMFeedPostBloc.instance
+                  .add(LMFeedUpdatePostEvent(post: postViewData));
+
+              if (!response.success) {
+                postViewData.isPinned = !postViewData.isPinned;
+                rebuildPostWidget.value = !rebuildPostWidget.value;
+                LMFeedPostBloc.instance
+                    .add(LMFeedUpdatePostEvent(post: postViewData));
+              }
+            },
+            onPostDelete: () {
+              showDialog(
+                context: context,
+                builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                  title: 'Delete Comment',
+                  userId: postViewData.userId,
+                  content:
+                      'Are you sure you want to delete this post. This action can not be reversed.',
+                  action: (String reason) async {
+                    Navigator.of(childContext).pop();
+
+                    LMFeedAnalyticsBloc.instance.add(
+                      LMFeedFireAnalyticsEvent(
+                        eventName: LMFeedAnalyticsKeys.postDeleted,
+                        eventProperties: {
+                          "post_id": postViewData.id,
+                        },
+                      ),
+                    );
+
+                    LMFeedPostBloc.instance.add(
+                      LMFeedDeletePostEvent(
+                        postId: postViewData.id,
+                        reason: reason,
+                      ),
+                    );
+                  },
+                  actionText: 'Delete',
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
