@@ -194,8 +194,7 @@ class _LMFeedPostVideoState extends State<LMFeedPostVideo> {
                         height: widget.style?.height,
                         clipBehavior: Clip.hardEdge,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(
-                              widget.style?.borderRadius ?? 0),
+                          borderRadius: widget.style?.borderRadius,
                           border: Border.all(
                             color:
                                 widget.style?.borderColor ?? Colors.transparent,
@@ -331,7 +330,7 @@ class LMFeedPostVideoStyle {
   final double? height;
   final double? width;
   final double? aspectRatio; // defaults to 16/9
-  final double? borderRadius; // defaults to 0
+  final BorderRadius? borderRadius; // defaults to 0
   final Color? borderColor;
   final double? borderWidth;
   final BoxFit? boxFit; // defaults to BoxFit.cover
@@ -381,7 +380,7 @@ class LMFeedPostVideoStyle {
     double? height,
     double? width,
     double? aspectRatio,
-    double? borderRadius,
+    BorderRadius? borderRadius,
     Color? borderColor,
     double? borderWidth,
     BoxFit? boxFit,
@@ -424,4 +423,9 @@ class LMFeedPostVideoStyle {
       allowMuting: allowMuting ?? this.allowMuting,
     );
   }
+
+  factory LMFeedPostVideoStyle.basic({Color? primaryColor}) =>
+      const LMFeedPostVideoStyle(
+        loaderWidget: LMPostMediaShimmer(),
+      );
 }

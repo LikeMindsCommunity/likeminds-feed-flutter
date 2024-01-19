@@ -265,7 +265,7 @@ class LMFeedMediaHandler {
           'A total of 10 attachments can be added to a post',
           duration: Toast.LENGTH_LONG,
         );
-        // onUploaded(false);
+        return [];
       }
       for (PlatformFile image in list.files) {
         int fileBytes = image.size;
@@ -275,7 +275,6 @@ class LMFeedMediaHandler {
             'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
             duration: Toast.LENGTH_LONG,
           );
-          // onUploaded(false);
           return [];
         }
       }
@@ -292,17 +291,7 @@ class LMFeedMediaHandler {
 
       return mediaFiles;
     } else {
-      // onUploaded(false);
       return [];
     }
-    // } on Exception catch (err) {
-    //   toast(
-    //     'An error occurred',
-    //     duration: Toast.LENGTH_LONG,
-    //   );
-    //   // onUploaded(false);
-    //   debugPrint(err.toString());
-    //   return [];
-    // }
   }
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/compose/compose_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/media/media_handler.dart';
 
 addImageEventHandler(
@@ -12,6 +10,9 @@ addImageEventHandler(
 ) async {
   if (mediaCount == 0) {
     emitter(LMFeedComposeMediaLoadingState());
+  } else {
+    LMFeedComposeBloc.instance.postMedia
+        .removeWhere((element) => element.mediaType == LMMediaType.link);
   }
   debugPrint("Starting picking images");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(

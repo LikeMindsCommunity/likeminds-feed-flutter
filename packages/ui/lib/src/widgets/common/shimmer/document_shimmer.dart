@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_ui/src/utils/theme.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/theme/theme.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LMFeedDocumentShimmer extends StatelessWidget {

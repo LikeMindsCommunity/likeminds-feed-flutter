@@ -38,7 +38,7 @@ class LMFeedComposeMediaErrorState extends LMFeedComposeState {
 
 class LMFeedComposeAddedImageState extends LMFeedComposeState {
   @override
-  List<Object> get props => [];
+  List<Object> get props => [identityHashCode(this)];
 }
 
 class LMFeedComposeAddedLinkPreviewState extends LMFeedComposeState {
@@ -47,17 +47,17 @@ class LMFeedComposeAddedLinkPreviewState extends LMFeedComposeState {
   LMFeedComposeAddedLinkPreviewState({required this.url});
 
   @override
-  List<Object> get props => [url];
+  List<Object> get props => [url, identityHashCode(this)];
 }
 
 class LMFeedComposeAddedVideoState extends LMFeedComposeState {
   @override
-  List<Object> get props => [];
+  List<Object> get props => [identityHashCode(this)];
 }
 
 class LMFeedComposeAddedDocumentState extends LMFeedComposeState {
   @override
-  List<Object> get props => [];
+  List<Object> get props => [identityHashCode(this)];
 }
 
 // class LMFeedComposeRemovingAttachmentState extends LMFeedComposeState {

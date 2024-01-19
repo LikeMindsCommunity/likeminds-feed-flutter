@@ -335,6 +335,8 @@ class LMFeedCommentStyle {
   final EdgeInsets? titlePadding;
   final EdgeInsets? subtitlePadding;
 
+  final bool? showTimestamp;
+
   const LMFeedCommentStyle({
     this.textStyle,
     this.linkStyle,
@@ -355,6 +357,7 @@ class LMFeedCommentStyle {
     this.profilePicturePadding,
     this.titlePadding,
     this.subtitlePadding,
+    this.showTimestamp = true,
   });
 
   LMFeedCommentStyle copyWith({
@@ -377,6 +380,7 @@ class LMFeedCommentStyle {
     EdgeInsets? profilePicturePadding,
     EdgeInsets? titlePadding,
     EdgeInsets? subtitlePadding,
+    bool? showTimestamp,
   }) {
     return LMFeedCommentStyle(
       textStyle: textStyle ?? this.textStyle,
@@ -401,6 +405,7 @@ class LMFeedCommentStyle {
           profilePicturePadding ?? this.profilePicturePadding,
       titlePadding: titlePadding ?? this.titlePadding,
       subtitlePadding: subtitlePadding ?? this.subtitlePadding,
+      showTimestamp: showTimestamp ?? this.showTimestamp,
     );
   }
 

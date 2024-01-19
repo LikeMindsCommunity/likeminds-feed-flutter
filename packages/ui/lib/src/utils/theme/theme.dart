@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+export 'styles/styles.dart';
 
 class LMFeedTheme extends InheritedWidget {
   const LMFeedTheme({super.key, required this.theme, required super.child});
@@ -32,6 +33,7 @@ class LMFeedThemeData {
   final LMFeedTextFieldStyle textFieldStyle;
   final LMFeedDialogStyle dialogStyle;
   final LMFeedPopUpMenuStyle popUpMenuStyle;
+  final LMFeedComposeScreenStyle composeScreenStyle;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -74,6 +76,7 @@ class LMFeedThemeData {
     required this.textFieldStyle,
     required this.dialogStyle,
     required this.popUpMenuStyle,
+    required this.composeScreenStyle,
   });
 
   factory LMFeedThemeData.fromThemeData(ThemeData theme) {
@@ -115,6 +118,7 @@ class LMFeedThemeData {
     LMFeedTextFieldStyle? textFieldStyle,
     LMFeedDialogStyle? dialogStyle,
     LMFeedPopUpMenuStyle? popUpMenuStyle,
+    LMFeedComposeScreenStyle? composeScreenStyle,
     Color? container,
     Color? onContainer,
     Color? onPrimary,
@@ -152,6 +156,8 @@ class LMFeedThemeData {
           ),
       dialogStyle: dialogStyle ?? const LMFeedDialogStyle(),
       popUpMenuStyle: popUpMenuStyle ?? const LMFeedPopUpMenuStyle(),
+      composeScreenStyle:
+          composeScreenStyle ?? LMFeedComposeScreenStyle.basic(),
     );
   }
 
@@ -182,6 +188,7 @@ class LMFeedThemeData {
     LMFeedPostContentStyle? contentStyle,
     LMFeedPostMediaStyle? mediaStyle,
     LMFeedPostFooterStyle? footerStyle,
+    LMFeedComposeScreenStyle? composeScreenStyle,
   }) {
     return LMFeedThemeData(
       postStyle: postStyle ?? this.postStyle,
@@ -210,6 +217,7 @@ class LMFeedThemeData {
       contentStyle: contentStyle ?? this.contentStyle,
       mediaStyle: mediaStyle ?? this.mediaStyle,
       footerStyle: footerStyle ?? this.footerStyle,
+      composeScreenStyle: composeScreenStyle ?? this.composeScreenStyle,
     );
   }
 }

@@ -141,45 +141,51 @@ class _LMDocumentState extends State<LMFeedDocument> {
                           widget.title ??
                               LMFeedText(
                                 text: _fileName ?? '',
-                                style: LMFeedTextStyle(
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  textStyle: TextStyle(
-                                    fontSize: 14,
-                                    color: style!.textColor ?? Colors.grey,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                                style: widget.style?.titleStyle ??
+                                    LMFeedTextStyle(
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textStyle: TextStyle(
+                                        fontSize: 14,
+                                        color: style!.textColor ?? Colors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                               ),
                           LikeMindsTheme.kVerticalPaddingSmall,
                           widget.subtitle ??
                               Row(
                                 children: [
                                   LikeMindsTheme.kHorizontalPaddingXSmall,
-                                  Text(
-                                    _fileSize?.toUpperCase() ?? '--',
-                                    style: TextStyle(
-                                      fontSize: LikeMindsTheme.kFontSmall,
-                                      color: style!.textColor ??
-                                          Colors.grey.shade300,
+                                  LMFeedText(
+                                      text: _fileSize?.toUpperCase() ?? '--',
+                                      style: LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: LikeMindsTheme.kFontSmall,
+                                          color: style!.textColor ??
+                                              Colors.grey.shade300,
+                                        ),
+                                      )),
+                                  LikeMindsTheme.kHorizontalPaddingXSmall,
+                                  LMFeedText(
+                                    text: '·',
+                                    style: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: LikeMindsTheme.kFontSmall,
+                                        color: style!.textColor ??
+                                            Colors.grey.shade300,
+                                      ),
                                     ),
                                   ),
                                   LikeMindsTheme.kHorizontalPaddingXSmall,
-                                  Text(
-                                    '·',
-                                    style: TextStyle(
-                                      fontSize: LikeMindsTheme.kFontSmall,
-                                      color: style!.textColor ??
-                                          Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  LikeMindsTheme.kHorizontalPaddingXSmall,
-                                  Text(
-                                    _fileExtension!.toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: LikeMindsTheme.kFontSmall,
-                                      color: style!.textColor ??
-                                          Colors.grey.shade300,
+                                  LMFeedText(
+                                    text: _fileExtension!.toUpperCase(),
+                                    style: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: LikeMindsTheme.kFontSmall,
+                                        color: style!.textColor ??
+                                            Colors.grey.shade300,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -227,6 +233,8 @@ class LMFeedPostDocumentStyle {
   final LMFeedIcon? removeIcon;
   final bool showBorder;
   final Color? backgroundColor;
+  final LMFeedTextStyle? titleStyle;
+  final LMFeedTextStyle? subtitleStyle;
 
   const LMFeedPostDocumentStyle({
     this.height,
@@ -239,6 +247,8 @@ class LMFeedPostDocumentStyle {
     this.removeIcon,
     this.showBorder = true,
     this.backgroundColor,
+    this.titleStyle,
+    this.subtitleStyle,
   });
 
   LMFeedPostDocumentStyle copyWith({
@@ -252,6 +262,8 @@ class LMFeedPostDocumentStyle {
     LMFeedIcon? removeIcon,
     bool? showBorder,
     Color? backgroundColor,
+    LMFeedTextStyle? titleStyle,
+    LMFeedTextStyle? subtitleStyle,
   }) {
     return LMFeedPostDocumentStyle(
       height: height ?? this.height,
@@ -264,6 +276,40 @@ class LMFeedPostDocumentStyle {
       removeIcon: removeIcon ?? this.removeIcon,
       showBorder: showBorder ?? this.showBorder,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      titleStyle: titleStyle ?? this.titleStyle,
+      subtitleStyle: subtitleStyle ?? this.subtitleStyle,
     );
   }
+
+  factory LMFeedPostDocumentStyle.basic({Color? primaryColor}) =>
+      LMFeedPostDocumentStyle(
+        height: 72,
+        width: double.infinity,
+        borderRadius: LikeMindsTheme.kBorderRadiusMedium,
+        borderSize: 1,
+        borderColor: primaryColor ?? Colors.grey.shade300,
+        textColor: primaryColor ?? Colors.grey.shade300,
+        documentIcon: const LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.picture_as_pdf,
+          style: LMFeedIconStyle(
+            size: 24,
+            color: Colors.red,
+          ),
+        ),
+        removeIcon: const LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.close,
+        ),
+        backgroundColor: Colors.white,
+        titleStyle: const LMFeedTextStyle(
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textStyle: TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
 }

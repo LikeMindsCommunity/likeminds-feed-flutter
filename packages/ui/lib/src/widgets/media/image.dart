@@ -156,4 +156,9 @@ class LMFeedPostImageStyle {
       boxFit: boxFit ?? this.boxFit,
     );
   }
+
+  factory LMFeedPostImageStyle.basic({Color? primaryColor}) =>
+      const LMFeedPostImageStyle(
+        loaderWidget: LMPostMediaShimmer(),
+      );
 }
