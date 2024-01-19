@@ -281,7 +281,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   Widget build(BuildContext context) {
     feedThemeData = LMFeedTheme.of(context);
     return Scaffold(
-      backgroundColor: LikeMindsTheme.whiteColor,
+      backgroundColor: feedThemeData?.backgroundColor,
       appBar: widget.appBar ??
           LMFeedAppBar(
             leading: const SizedBox.shrink(),
@@ -289,13 +289,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               onTap: () {
                 _scrollToTop();
               },
-              child: const Padding(
-                padding: EdgeInsets.only(left: 4.0),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4.0),
                 child: LMFeedText(
                   text: "Feed",
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
-                      color: Colors.black,
+                      color: feedThemeData?.onContainer,
                       fontSize: 27,
                       fontWeight: FontWeight.w700,
                     ),
@@ -303,8 +303,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
             ),
-            style: const LMFeedAppBarStyle(
-              backgroundColor: LikeMindsTheme.whiteColor,
+            style: LMFeedAppBarStyle(
+              backgroundColor: feedThemeData?.backgroundColor,
             ),
           ),
       body: RefreshIndicator.adaptive(
@@ -826,63 +826,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         ],
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      floatingActionButton: ValueListenableBuilder(
-        valueListenable: rebuildPostWidget,
-        builder: (context, _, __) {
-          return LMFeedButton(
-            style: LMFeedButtonStyle(
-              icon: LMFeedIcon(
-                type: LMFeedIconType.icon,
-                icon: Icons.add,
-                style: LMFeedIconStyle(
-                  fit: BoxFit.cover,
-                  size: 18,
-                  color: feedTheme?.onPrimary,
-                ),
-              ),
-              height: 44,
-              width: 153,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-              borderRadius: 28,
-              backgroundColor:
-                  right ? feedTheme?.primaryColor : feedTheme?.disabledColor,
-              placement: LMFeedIconButtonPlacement.end,
-              margin: 5.0,
-            ),
-            text: LMFeedText(
-              text: "Create Post",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  color: feedTheme?.onPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            onTap: right
-                ? () {
-                    if (!postUploading.value) {
-                      LMFeedAnalyticsBloc.instance.add(
-                          const LMFeedFireAnalyticsEvent(
-                              eventName:
-                                  LMFeedAnalyticsKeys.postCreationStarted,
-                              eventProperties: {}));
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LMFeedComposeScreen(),
-                        ),
-                      );
-                    } else {
-                      toast(
-                        'A post is already uploading.',
-                        duration: Toast.LENGTH_LONG,
-                      );
-                    }
-                  }
-                : () => toast("You do not have permission to create a post"),
-          );
-        },
-      ),
+      floatingActionButton: defFloatingActionButton(),
     );
   }
 
@@ -1243,5 +1187,63 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             ),
           ],
         ),
+      );
+
+  Widget defFloatingActionButton() => ValueListenableBuilder(
+        valueListenable: rebuildPostWidget,
+        builder: (context, _, __) {
+          return LMFeedButton(
+            style: LMFeedButtonStyle(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.add,
+                style: LMFeedIconStyle(
+                  fit: BoxFit.cover,
+                  size: 18,
+                  color: feedTheme?.onPrimary,
+                ),
+              ),
+              height: 44,
+              width: 153,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              borderRadius: 28,
+              backgroundColor:
+                  right ? feedTheme?.primaryColor : feedTheme?.disabledColor,
+              placement: LMFeedIconButtonPlacement.end,
+              margin: 5.0,
+            ),
+            text: LMFeedText(
+              text: "Create Post",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  color: feedTheme?.onPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            onTap: right
+                ? () {
+                    if (!postUploading.value) {
+                      LMFeedAnalyticsBloc.instance.add(
+                          const LMFeedFireAnalyticsEvent(
+                              eventName:
+                                  LMFeedAnalyticsKeys.postCreationStarted,
+                              eventProperties: {}));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LMFeedComposeScreen(),
+                        ),
+                      );
+                    } else {
+                      toast(
+                        'A post is already uploading.',
+                        duration: Toast.LENGTH_LONG,
+                      );
+                    }
+                  }
+                : () => toast("You do not have permission to create a post"),
+          );
+        },
       );
 }

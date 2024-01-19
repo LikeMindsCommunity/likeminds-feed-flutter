@@ -376,7 +376,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     final theme = LMFeedTheme.of(context);
     return LMFeedAppBar(
       style: LMFeedAppBarStyle(
-        backgroundColor: Colors.white,
+        backgroundColor: feedTheme?.backgroundColor ?? Colors.white,
         height: 72,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         padding: const EdgeInsets.symmetric(
@@ -509,6 +509,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   minLines: 3,
                   // maxLines: 200,
                   decoration: const InputDecoration(
+                    
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
                     enabledBorder: InputBorder.none,
@@ -655,6 +656,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   Widget _defTopicSelector(List<LMTopicViewData> topics) {
+    if (!widget.config.enableTopics) {
+      return const SizedBox.shrink();
+    }
     return Row(
       children: [
         Align(

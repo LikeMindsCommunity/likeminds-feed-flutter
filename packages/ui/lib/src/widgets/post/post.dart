@@ -170,6 +170,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
 
   @override
   Widget build(BuildContext context) {
+    LMFeedThemeData lmFeedThemeData = LMFeedTheme.of(context);
     timeago.setLocaleMessages('en', LMFeedCustomMessages());
     return InheritedPostProvider(
       post: widget.post,
@@ -179,7 +180,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
         },
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: lmFeedThemeData.container,
             borderRadius: style?.borderRadius,
             boxShadow: style?.boxShadow,
             border: style?.border,
