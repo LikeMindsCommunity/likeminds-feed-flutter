@@ -204,16 +204,18 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                                 _defShowRepliesButton()
                             : const SizedBox.shrink())
                     : const SizedBox.shrink(),
-                const Spacer(),
-                LMFeedText(
-                  text: widget.comment.createdAt.timeAgo(),
-                  style: LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: LikeMindsTheme.kFontSmallMed,
-                      color: Colors.grey.shade300,
+                if (style?.showTimestamp ?? true) ...[
+                  const Spacer(),
+                  LMFeedText(
+                    text: widget.comment.createdAt.timeAgo(),
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        fontSize: LikeMindsTheme.kFontSmallMed,
+                        color: Colors.grey.shade300,
+                      ),
                     ),
                   ),
-                ),
+                ]
               ],
             ),
           ),
