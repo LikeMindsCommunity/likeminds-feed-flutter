@@ -38,6 +38,7 @@ class LMFeedPostWidget extends StatefulWidget {
     this.mediaBuilder,
     this.footerBuilder,
     this.style,
+    this.onMediaTap,
   });
 
   final LMFeedPostStyle? style;
@@ -68,6 +69,7 @@ class LMFeedPostWidget extends StatefulWidget {
   final Function(bool isLiked)? onLikeTap;
   final Function(bool isPinned)? onPinTap;
   final Function(bool isSaved)? onSaveTap;
+  final VoidCallback? onMediaTap;
 
   @override
   State<LMFeedPostWidget> createState() => _LMPostWidgetState();
@@ -100,6 +102,7 @@ class LMFeedPostWidget extends StatefulWidget {
     LMFeedMenu? menu,
     LMFeedPostTopic? topicWidget,
     LMFeedPostStyle? style,
+    VoidCallback? onMediaTap,
   }) {
     return LMFeedPostWidget(
       post: post ?? this.post,
@@ -125,6 +128,7 @@ class LMFeedPostWidget extends StatefulWidget {
       mediaBuilder: mediaBuilder ?? this.mediaBuilder,
       footerBuilder: footerBuilder ?? this.footerBuilder,
       style: style ?? this.style,
+      onMediaTap: onMediaTap ?? this.onMediaTap,
     );
   }
 }
@@ -178,6 +182,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
         onTap: () {
           widget.onPostTap?.call(context, widget.post);
         },
+        behavior: HitTestBehavior.translucent,
         child: Container(
           decoration: BoxDecoration(
             color: lmFeedThemeData.container,
@@ -246,6 +251,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   LMFeedPostMedia _defPostMedia() {
     return LMFeedPostMedia(
       attachments: widget.post.attachments!,
+      onMediaTap: widget.onMediaTap,
     );
   }
 }

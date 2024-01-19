@@ -14,6 +14,7 @@ class LMFeedPostMedia extends StatefulWidget {
     this.initialiseVideoController,
     this.onError,
     this.style,
+    this.onMediaTap,
   });
 
   final List<LMAttachmentViewData> attachments;
@@ -24,20 +25,29 @@ class LMFeedPostMedia extends StatefulWidget {
 
   final Function(String, StackTrace)? onError;
 
+  final VoidCallback? onMediaTap;
+
   final LMFeedPostMediaStyle? style;
 
   @override
   State<LMFeedPostMedia> createState() => _LMPostMediaState();
 
-  LMFeedPostMedia copyWith(LMFeedPostMedia postMedia) {
+  LMFeedPostMedia copyWith({
+    List<LMAttachmentViewData>? attachments,
+    LMFeedText? title,
+    LMFeedText? subtitle,
+    Function(VideoController)? initialiseVideoController,
+    Function(String, StackTrace)? onError,
+    LMFeedPostMediaStyle? style,
+  }) {
     return LMFeedPostMedia(
-      attachments: postMedia.attachments,
-      title: postMedia.title ?? title,
-      subtitle: postMedia.subtitle ?? subtitle,
-      style: postMedia.style ?? style,
+      attachments: attachments ?? this.attachments,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
       initialiseVideoController:
-          postMedia.initialiseVideoController ?? initialiseVideoController,
-      onError: postMedia.onError ?? onError,
+          initialiseVideoController ?? this.initialiseVideoController,
+      onError: onError ?? this.onError,
+      style: style ?? this.style,
     );
   }
 }
@@ -86,12 +96,15 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
       );
     } else if (attachments!.first.attachmentType == 1 ||
         attachments!.first.attachmentType == 2) {
-      return LMFeedCarousel(
-        initialiseVideoController: widget.initialiseVideoController,
-        attachments: attachments!,
-        onError: widget.onError,
-        imageStyle: widget.style?.imageStyle,
-        videoStyle: widget.style?.videoStyle,
+      return GestureDetector(
+        onTap: widget.onMediaTap,
+        child: LMFeedCarousel(
+          initialiseVideoController: widget.initialiseVideoController,
+          attachments: attachments!,
+          onError: widget.onError,
+          imageStyle: widget.style?.imageStyle,
+          videoStyle: widget.style?.videoStyle,
+        ),
       );
     } else {
       return const SizedBox.shrink();
