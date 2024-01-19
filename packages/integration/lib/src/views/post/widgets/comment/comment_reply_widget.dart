@@ -358,7 +358,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       onCommentEdit: () {
         _commentHandlerBloc!.add(LMFeedCommentCancelEvent());
         LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-              ..commentId(widget.reply.parentComment!.id)
+              ..commentId(widget.reply.id)
               ..commentActionEntity(LMFeedCommentType.reply)
               ..commentActionType(LMFeedCommentActionType.edit)
               ..level(1)
