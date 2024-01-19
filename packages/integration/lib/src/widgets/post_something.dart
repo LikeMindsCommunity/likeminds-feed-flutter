@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedPostSomething extends StatelessWidget {
@@ -32,25 +29,21 @@ class LMFeedPostSomething extends StatelessWidget {
                 eventName: LMFeedAnalyticsKeys.postCreationStarted,
                 eventProperties: {},
               ));
-              //TODO: Navigate to NewPostScreen
-              // Navigator.of(context).push(MaterialPageRoute(
-              //     builder: (context) => const NewPostScreen()));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const LMFeedComposeScreen()));
             }
           : () => toast("You do not have permission to create a post"),
-      child: Container(
+      child: SizedBox(
         width: screenSize.width,
         height: 60,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20.0,
-        ),
         child: Container(
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50.0),
-            color: backgroundColor,
+            color: feedTheme.container,
             border: Border.all(
               width: 1,
-              color: borderColor ?? LikeMindsTheme.greyColor,
+              color: feedTheme.disabledColor,
             ),
           ),
           child: Row(
