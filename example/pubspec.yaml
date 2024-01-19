@@ -16,9 +16,6 @@ dependencies:
   flutter_svg:
   dotenv: ^4.2.0
   likeminds_feed_flutter_core:
-  likeminds_feed: # 1.6.3
-    path: ../../LikeMinds-Flutter-Feed-SDK
-  likeminds_feed_flutter_ui:
   flutter_notification_channel: ^2.0.0
   firebase_core: ^2.4.1
   firebase_messaging: ^14.2.1

@@ -25,12 +25,13 @@ class LMFeedComposeAddLinkPreviewEvent extends LMFeedComposeEvent {
   List<Object?> get props => [url];
 }
 
-class LMFeedComposeRemoveImageEvent extends LMFeedComposeEvent {}
+class LMFeedComposeRemoveAttachmentEvent extends LMFeedComposeEvent {
+  final int index;
 
-class LMFeedComposeRemoveVideoEvent extends LMFeedComposeEvent {}
+  const LMFeedComposeRemoveAttachmentEvent({required this.index});
 
-class LMFeedComposeRemoveDocumentEvent extends LMFeedComposeEvent {}
-
-class LMFeedComposeRemoveLinkPreviewEvent extends LMFeedComposeEvent {}
+  @override
+  List<Object?> get props => [index, identityHashCode(this)];
+}
 
 class LMFeedComposeCloseEvent extends LMFeedComposeEvent {}

@@ -32,7 +32,7 @@ typedef LMFeedPostMenuBuilder = Widget Function(
 /// and [LMTopicViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostTopicBuilder = Widget Function(
-    BuildContext, Widget, LMPostViewData);
+    BuildContext, LMFeedPostTopic, LMPostViewData);
 
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.

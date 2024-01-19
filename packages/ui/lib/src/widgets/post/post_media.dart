@@ -184,11 +184,11 @@ class LMFeedPostMediaStyle {
     );
   }
 
-  factory LMFeedPostMediaStyle.basic() => const LMFeedPostMediaStyle(
-        carouselStyle: LMFeedPostCarouselStyle(),
-        documentStyle: LMFeedPostDocumentStyle(),
-        imageStyle: LMFeedPostImageStyle(),
-        linkStyle: LMFeedPostLinkPreviewStyle(),
-        videoStyle: LMFeedPostVideoStyle(),
+  factory LMFeedPostMediaStyle.basic() => LMFeedPostMediaStyle(
+        carouselStyle: const LMFeedPostCarouselStyle(),
+        documentStyle: const LMFeedPostDocumentStyle(),
+        imageStyle: const LMFeedPostImageStyle(),
+        linkStyle: LMFeedPostLinkPreviewStyle.basic(),
+        videoStyle: const LMFeedPostVideoStyle(),
       );
 }

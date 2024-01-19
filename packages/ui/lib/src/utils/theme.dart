@@ -228,6 +228,7 @@ class LikeMindsTheme {
   static const Color tagColor = Color.fromRGBO(0, 122, 255, 1);
   static const Color hashTagColor = Color.fromRGBO(0, 122, 255, 1);
   static const Color linkColor = Color.fromRGBO(0, 122, 255, 1);
+  static const Color headingColor = Color.fromRGBO(51, 51, 51, 1);
   static const Color container = whiteColor;
   static const Color onContainer = blackColor;
   static const Color onPrimary = whiteColor;

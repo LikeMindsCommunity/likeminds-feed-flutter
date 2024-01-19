@@ -59,30 +59,42 @@ class LMFeedPostLinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     final LMFeedPostLinkPreviewStyle style =
-        this.style ?? const LMFeedPostLinkPreviewStyle();
+        this.style ?? feedTheme.mediaStyle.linkStyle;
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        margin: style.margin,
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: feedTheme.container,
           border: style.border ??
               Border.all(
                 color: Colors.grey.shade300,
                 width: 0.5,
               ),
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: style.borderRadius ?? BorderRadius.circular(8.0),
         ),
-        height: style.height,
+        height: style.height ?? 344,
         width: style.width ?? MediaQuery.of(context).size.width,
         child: Column(
           children: <Widget>[
             checkNullMedia()
-                ? const SizedBox.shrink()
+                ? style.errorWidget ??
+                    SizedBox(
+                      height: style.imageHeight ?? 216,
+                      child: const Center(
+                        child: Icon(
+                          Icons.error,
+                          color: Colors.grey,
+                          size: 48,
+                        ),
+                      ),
+                    )
                 : LMFeedPostImage(
                     style: LMFeedPostImageStyle(
-                      height: 155,
+                      height: style.imageHeight ?? 216,
                       borderRadius: style.borderRadius,
                       errorWidget: style.errorWidget,
                     ),
@@ -93,9 +105,8 @@ class LMFeedPostLinkPreview extends StatelessWidget {
                             : attachment!.attachmentMeta.ogTags!.image!),
                   ),
             Container(
-              height: style.height != null ? (style.height! - 152) : null,
               color: style.backgroundColor,
-              padding: const EdgeInsets.all(8.0),
+              padding: style.padding ?? const EdgeInsets.all(8.0),
               child: SizedBox(
                 width: style.width ?? MediaQuery.of(context).size.width,
                 child: Column(
@@ -108,14 +119,15 @@ class LMFeedPostLinkPreview extends StatelessWidget {
                             text: linkModel != null
                                 ? linkModel!.ogTags!.title!
                                 : attachment!.attachmentMeta.ogTags!.title ??
-                                    'NOT PRODUCING',
-                            style: const LMFeedTextStyle(
-                              textStyle: TextStyle(
-                                color: Colors.grey,
-                                fontSize: LikeMindsTheme.kFontMedium,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                                    '- -',
+                            style: style.titleStyle ??
+                                const LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: LikeMindsTheme.kFontMedium,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                           ),
                     ),
                     LikeMindsTheme.kVerticalPaddingSmall,
@@ -127,14 +139,15 @@ class LMFeedPostLinkPreview extends StatelessWidget {
                                 ? linkModel!.ogTags!.description!
                                 : attachment!
                                         .attachmentMeta.ogTags!.description ??
-                                    'NOT PRODUCING',
-                            style: LMFeedTextStyle(
-                              maxLines: 2,
-                              textStyle: TextStyle(
-                                color: Colors.grey.shade300,
-                                fontSize: LikeMindsTheme.kFontSmall,
-                              ),
-                            ),
+                                    '-- --',
+                            style: style.subtitleStyle ??
+                                LMFeedTextStyle(
+                                  maxLines: 2,
+                                  textStyle: TextStyle(
+                                    color: Colors.grey.shade300,
+                                    fontSize: LikeMindsTheme.kFontSmall,
+                                  ),
+                                ),
                           ),
                     ),
                     LikeMindsTheme.kVerticalPaddingXSmall,
@@ -150,13 +163,14 @@ class LMFeedPostLinkPreview extends StatelessWidget {
                                       ? attachment!.attachmentMeta.ogTags!.url!
                                           .toLowerCase()
                                       : 'NOT PRODUCING',
-                              style: LMFeedTextStyle(
-                                maxLines: 1,
-                                textStyle: TextStyle(
-                                  color: Colors.grey.shade300,
-                                  fontSize: LikeMindsTheme.kFontXSmall,
-                                ),
-                              ),
+                              style: style.linkStyle ??
+                                  LMFeedTextStyle(
+                                    maxLines: 1,
+                                    textStyle: TextStyle(
+                                      color: Colors.grey.shade300,
+                                      fontSize: LikeMindsTheme.kFontXSmall,
+                                    ),
+                                  ),
                             ),
                           )
                         : const SizedBox(),
@@ -212,15 +226,22 @@ class LMFeedPostLinkPreviewStyle {
   // defaults to null
   final double? height;
 
+  final double? imageHeight;
+
   // defaults to null
   final Color? backgroundColor;
 
   // defaults to 8.0
   final BorderRadius? borderRadius;
-  final double? padding;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
   final bool showLinkUrl;
   final Border? border;
   final Widget? errorWidget;
+
+  final LMFeedTextStyle? titleStyle;
+  final LMFeedTextStyle? subtitleStyle;
+  final LMFeedTextStyle? linkStyle;
 
   const LMFeedPostLinkPreviewStyle({
     this.width,
@@ -231,6 +252,11 @@ class LMFeedPostLinkPreviewStyle {
     this.showLinkUrl = false,
     this.border,
     this.errorWidget,
+    this.titleStyle,
+    this.subtitleStyle,
+    this.linkStyle,
+    this.margin,
+    this.imageHeight,
   });
 
   LMFeedPostLinkPreviewStyle copyWith({
@@ -238,10 +264,15 @@ class LMFeedPostLinkPreviewStyle {
     double? height,
     Color? backgroundColor,
     BorderRadius? borderRadius,
-    double? padding,
+    EdgeInsets? padding,
     bool? showLinkUrl,
     Border? border,
     Widget? errorWidget,
+    LMFeedTextStyle? titleStyle,
+    LMFeedTextStyle? subtitleStyle,
+    LMFeedTextStyle? linkStyle,
+    EdgeInsets? margin,
+    double? imageHeight,
   }) {
     return LMFeedPostLinkPreviewStyle(
       width: width ?? this.width,
@@ -252,6 +283,47 @@ class LMFeedPostLinkPreviewStyle {
       showLinkUrl: showLinkUrl ?? this.showLinkUrl,
       border: border ?? this.border,
       errorWidget: errorWidget ?? this.errorWidget,
+      titleStyle: titleStyle ?? this.titleStyle,
+      subtitleStyle: subtitleStyle ?? this.subtitleStyle,
+      linkStyle: linkStyle ?? this.linkStyle,
+      margin: margin ?? this.margin,
+      imageHeight: imageHeight ?? this.imageHeight,
     );
   }
+
+  factory LMFeedPostLinkPreviewStyle.basic() => LMFeedPostLinkPreviewStyle(
+        backgroundColor: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        height: 344,
+        imageHeight: 216,
+        padding: const EdgeInsets.all(16.0),
+        margin: const EdgeInsets.symmetric(horizontal: 16.0),
+        showLinkUrl: true,
+        titleStyle: const LMFeedTextStyle(
+          textStyle: TextStyle(
+            color: LikeMindsTheme.headingColor,
+            fontSize: 16,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        subtitleStyle: const LMFeedTextStyle(
+          maxLines: 2,
+          textStyle: TextStyle(
+            color: LikeMindsTheme.greyColor,
+            fontSize: 14,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        linkStyle: const LMFeedTextStyle(
+          maxLines: 1,
+          textStyle: TextStyle(
+            color: LikeMindsTheme.greyColor,
+            fontSize: 12,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      );
 }

@@ -9,7 +9,9 @@ addVideoEventHandler(
   Emitter<LMFeedComposeState> emitter,
   int mediaCount,
 ) async {
-  emitter(LMFeedComposeMediaLoadingState());
+  if (mediaCount == 0) {
+    emitter(LMFeedComposeMediaLoadingState());
+  }
   debugPrint("Starting picking videos");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,

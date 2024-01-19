@@ -12,6 +12,7 @@ import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/lists/topic_list.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
   // Builder for appbar
@@ -50,6 +51,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   final User user = LMFeedUserLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
+  LMFeedThemeData? feedTheme;
 
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
@@ -93,7 +95,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = LMFeedTheme.of(context);
+    feedTheme = LMFeedTheme.of(context);
     return WillPopScope(
       onWillPop: () {
         widget.composeDiscardDialogBuilder?.call(context) ??
@@ -108,7 +110,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             bloc: composeBloc,
             listener: _composeBlocListener,
             child: Scaffold(
-              backgroundColor: theme.container,
+              backgroundColor: feedTheme?.container,
               bottomSheet: _defMediaPicker(),
               floatingActionButton: Padding(
                 padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
@@ -209,8 +211,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         if (state is LMFeedComposeMediaLoadingState) {
           return const LMFeedLoader();
         }
-        if (state is LMFeedComposeAddedImageState ||
-            state is LMFeedComposeAddedVideoState) {
+
+        if (composeBloc.postMedia.isNotEmpty) {
           return SizedBox(
             height: 240,
             width: double.infinity,
@@ -219,39 +221,31 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               shrinkWrap: true,
               itemCount: composeBloc.postMedia.length,
               itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: composeBloc.postMedia[index].mediaType ==
-                          LMMediaType.image
-                      ? LMFeedPostImage(
-                          imageFile: composeBloc.postMedia[index].mediaFile,
-                        )
-                      : composeBloc.postMedia[index].mediaType ==
-                              LMMediaType.video
-                          ? LMFeedPostVideo(
-                              videoFile: composeBloc.postMedia[index].mediaFile,
-                            )
-                          : const SizedBox(),
-                );
-              },
-            ),
-          );
-        }
-        if (state is LMFeedComposeAddedLinkPreviewState) {
-          return SizedBox(
-            height: 239,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemCount: composeBloc.postMedia.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: composeBloc.postMedia[index].mediaType ==
-                          LMMediaType.link
-                      ? LMFeedPostLinkPreview(
-                          linkModel: composeBloc.postMedia[index],
-                          style: LMFeedPostLinkPreviewStyle(
+                Widget mediaWidget;
+                switch (composeBloc.postMedia[index].mediaType) {
+                  case LMMediaType.image:
+                    mediaWidget = Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: LMFeedPostImage(
+                        imageFile: composeBloc.postMedia[index].mediaFile,
+                        style: feedTheme?.mediaStyle.imageStyle,
+                      ),
+                    );
+                    break;
+                  case LMMediaType.video:
+                    mediaWidget = Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: LMFeedPostVideo(
+                        videoFile: composeBloc.postMedia[index].mediaFile,
+                        style: feedTheme?.mediaStyle.videoStyle,
+                      ),
+                    );
+                    break;
+                  case LMMediaType.link:
+                    mediaWidget = LMFeedPostLinkPreview(
+                      linkModel: composeBloc.postMedia[index],
+                      style: feedTheme?.mediaStyle.linkStyle ??
+                          LMFeedPostLinkPreviewStyle(
                             height: 215,
                             width: 313,
                             backgroundColor: LikeMindsTheme.backgroundColor,
@@ -259,70 +253,145 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                               color: LikeMindsTheme.secondaryColor,
                             ),
                           ),
-                          onTap: () {
-                            // launchUrl(
-                            //   Uri.parse(
-                            //       composeBloc.postMedia[index].ogTags?.url ??
-                            //           ''),
-                            //   mode: LaunchMode.externalApplication,
-                            // );
-                          },
-                          title: LMFeedText(
-                            text: composeBloc.postMedia[index].ogTags?.title ??
-                                "--",
-                            style: const LMFeedTextStyle(
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textStyle: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: LikeMindsTheme.blackColor,
-                                height: 1.30,
-                              ),
-                            ),
+                      onTap: () {
+                        launchUrl(
+                          Uri.parse(
+                              composeBloc.postMedia[index].ogTags?.url ?? ''),
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                      title: LMFeedText(
+                        text:
+                            composeBloc.postMedia[index].ogTags?.title ?? "--",
+                        style: const LMFeedTextStyle(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textStyle: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: LikeMindsTheme.blackColor,
+                            height: 1.30,
                           ),
-                          subtitle: LMFeedText(
-                            text: composeBloc
-                                    .postMedia[index].ogTags?.description ??
+                        ),
+                      ),
+                      subtitle: LMFeedText(
+                        text:
+                            composeBloc.postMedia[index].ogTags?.description ??
                                 "--",
-                            style: const LMFeedTextStyle(
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textStyle: TextStyle(
-                                color: LikeMindsTheme.blackColor,
-                                fontWeight: FontWeight.w400,
-                                height: 1.30,
-                              ),
-                            ),
+                        style: const LMFeedTextStyle(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textStyle: TextStyle(
+                            color: LikeMindsTheme.blackColor,
+                            fontWeight: FontWeight.w400,
+                            height: 1.30,
                           ),
-                        )
-                      : const SizedBox(),
+                        ),
+                      ),
+                    );
+                    break;
+                  case LMMediaType.document:
+                    {
+                      mediaWidget = LMFeedDocument(
+                        documentFile: composeBloc.postMedia[index].mediaFile,
+                        size: PostHelper.getFileSizeString(
+                            bytes: composeBloc.postMedia[index].size ?? 0),
+                      );
+                      break;
+                    }
+                  default:
+                    mediaWidget = const SizedBox();
+                }
+                return Stack(
+                  children: <Widget>[
+                    mediaWidget,
+                    Positioned(
+                      top: 15,
+                      right: 15,
+                      child: GestureDetector(
+                        onTap: () {
+                          composeBloc.add(
+                            LMFeedComposeRemoveAttachmentEvent(
+                              index: index,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(500),
+                          ),
+                          width: 24,
+                          height: 24,
+                          child: Icon(
+                            Icons.cancel,
+                            color: feedTheme?.disabledColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
+
+                // return Padding(
+                //   padding: const EdgeInsets.all(12.0),
+                //   child: composeBloc.postMedia[index].mediaType ==
+                //           LMMediaType.image
+                //       ? LMFeedPostImage(
+                //           imageFile: composeBloc.postMedia[index].mediaFile,
+                //         )
+                //       : composeBloc.postMedia[index].mediaType ==
+                //               LMMediaType.video
+                //           ? LMFeedPostVideo(
+                //               videoFile: composeBloc.postMedia[index].mediaFile,
+                //             )
+                //           : const SizedBox(),
+                // );
               },
             ),
           );
         }
 
-        if (state is LMFeedComposeAddedDocumentState) {
-          return SizedBox(
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemCount: composeBloc.postMedia.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: LMFeedDocument(
-                    documentFile: composeBloc.postMedia[index].mediaFile,
-                    size: PostHelper.getFileSizeString(
-                        bytes: composeBloc.postMedia[index].size ?? 0),
-                  ),
-                );
-              },
-            ),
-          );
-        }
+        return const SizedBox();
 
-        return const SizedBox.shrink();
+        // if (state is LMFeedComposeAddedLinkPreviewState) {
+        //   return Padding(
+        //     padding: const EdgeInsets.symmetric(vertical: 12.0),
+        //     child: SizedBox(
+        //       height: feedTheme?.mediaStyle.linkStyle.height,
+        //       child: ListView.builder(
+        //         scrollDirection: Axis.horizontal,
+        //         shrinkWrap: true,
+        //         itemCount: composeBloc.postMedia.length,
+        //         itemBuilder: (context, index) {
+        //           return composeBloc.postMedia[index].mediaType ==
+        //                   LMMediaType.link
+        //               ?
+        //               : const SizedBox();
+        //         },
+        //       ),
+        //     ),
+        //   );
+        // }
+
+        // if (state is LMFeedComposeAddedDocumentState) {
+        //   return SizedBox(
+        //     child: ListView.builder(
+        //       scrollDirection: Axis.horizontal,
+        //       shrinkWrap: true,
+        //       itemCount: composeBloc.postMedia.length,
+        //       itemBuilder: (context, index) {
+        //         return Padding(
+        //           padding: const EdgeInsets.all(12.0),
+        //           child: LMFeedDocument(
+        //             documentFile: composeBloc.postMedia[index].mediaFile,
+        //             size: PostHelper.getFileSizeString(
+        //                 bytes: composeBloc.postMedia[index].size ?? 0),
+        //           ),
+        //         );
+        //       },
+        //     ),
+        //   );
+        // }
       },
     );
   }
@@ -766,5 +835,23 @@ void sendPostCreationCompletedEvent(
 }
 
 class LMFeedComposeScreenStyle {
-  const LMFeedComposeScreenStyle();
+  final EdgeInsets? mediaPadding;
+
+  const LMFeedComposeScreenStyle({
+    this.mediaPadding,
+  });
+
+  LMFeedComposeScreenStyle copyWith({
+    EdgeInsets? mediaPadding,
+  }) {
+    return LMFeedComposeScreenStyle(
+      mediaPadding: mediaPadding ?? this.mediaPadding,
+    );
+  }
+
+  factory LMFeedComposeScreenStyle.basic() => const LMFeedComposeScreenStyle(
+        mediaPadding: EdgeInsets.symmetric(
+          horizontal: 16.0,
+        ),
+      );
 }

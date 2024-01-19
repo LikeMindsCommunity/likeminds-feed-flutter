@@ -488,10 +488,19 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   LMFeedButton defLikeButton() => LMFeedButton(
         isActive: _postDetailScreenHandler!.postData!.isLiked,
         text: LMFeedText(
-          text: LMFeedPostUtils.getLikeCountTextWithCount(
-              _postDetailScreenHandler!.postData!.likeCount),
-        ),
-        style: feedTheme!.footerStyle.likeButtonStyle,
+            text: LMFeedPostUtils.getLikeCountTextWithCount(
+                _postDetailScreenHandler!.postData!.likeCount)),
+        style: feedTheme?.footerStyle.likeButtonStyle,
+        onTextTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LMFeedLikesScreen(
+                postId: _postDetailScreenHandler!.postData!.id,
+              ),
+            ),
+          );
+        },
         onTap: () async {
           if (_postDetailScreenHandler!.postData!.isLiked) {
             _postDetailScreenHandler!.postData!.isLiked = false;
@@ -502,8 +511,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           }
           _postDetailScreenHandler!.rebuildPostWidget.value =
               !_postDetailScreenHandler!.rebuildPostWidget.value;
-          LMFeedPostBloc.instance.add(
-              LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
 
           final likePostRequest = (LikePostRequestBuilder()
                 ..postId(_postDetailScreenHandler!.postData!.id))
@@ -521,11 +528,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     : _postDetailScreenHandler!.postData!.likeCount - 1;
             _postDetailScreenHandler!.rebuildPostWidget.value =
                 !_postDetailScreenHandler!.rebuildPostWidget.value;
-            LMFeedPostBloc.instance.add(
-              LMFeedUpdatePostEvent(
-                post: _postDetailScreenHandler!.postData!,
-              ),
-            );
           }
         },
       );
@@ -537,16 +539,49 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
         style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {
-          _postDetailScreenHandler!.openOnScreenKeyboard();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LMFeedPostDetailScreen(
+                postId: _postDetailScreenHandler!.postData!.id,
+                openKeyboard: true,
+                postBuilder: widget.postBuilder,
+              ),
+            ),
+          );
         },
       );
 
   LMFeedButton defSaveButton() => LMFeedButton(
-        onTap: () {},
+        onTap: () async {
+          _postDetailScreenHandler!.postData!.isSaved =
+              !_postDetailScreenHandler!.postData!.isSaved;
+          _postDetailScreenHandler!.rebuildPostWidget.value =
+              !_postDetailScreenHandler!.rebuildPostWidget.value;
+          LMFeedPostBloc.instance.add(
+              LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+
+          final savePostRequest = (SavePostRequestBuilder()
+                ..postId(_postDetailScreenHandler!.postData!.id))
+              .build();
+
+          final SavePostResponse response =
+              await LMFeedCore.client.savePost(savePostRequest);
+
+          if (!response.success) {
+            _postDetailScreenHandler!.postData!.isSaved =
+                !_postDetailScreenHandler!.postData!.isSaved;
+            _postDetailScreenHandler!.rebuildPostWidget.value =
+                !_postDetailScreenHandler!.rebuildPostWidget.value;
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                post: _postDetailScreenHandler!.postData!));
+          }
+        },
         style: feedTheme?.footerStyle.saveButtonStyle,
       );
 
   LMFeedButton defShareButton() => LMFeedButton(
+        text: const LMFeedText(text: "Share"),
         onTap: () {
           LMFeedDeepLinkHandler()
               .sharePost(_postDetailScreenHandler!.postData!.id);

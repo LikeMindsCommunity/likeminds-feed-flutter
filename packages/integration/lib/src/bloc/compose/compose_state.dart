@@ -60,17 +60,12 @@ class LMFeedComposeAddedDocumentState extends LMFeedComposeState {
   List<Object> get props => [];
 }
 
-class LMFeedComposeRemovedImageState extends LMFeedComposeState {
-  @override
-  List<Object> get props => [];
-}
+// class LMFeedComposeRemovingAttachmentState extends LMFeedComposeState {
+//   @override
+//   List<Object> get props => [DateTime.now().millisecondsSinceEpoch];
+// }
 
-class LMFeedComposeRemovedVideoState extends LMFeedComposeState {
+class LMFeedComposeRemovedAttachmentState extends LMFeedComposeState {
   @override
-  List<Object> get props => [];
-}
-
-class LMFeedComposeRemovedDocumentState extends LMFeedComposeState {
-  @override
-  List<Object> get props => [];
+  List<Object> get props => [identityHashCode(this)];
 }

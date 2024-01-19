@@ -9,7 +9,9 @@ addDocumentEventHandler(
   Emitter<LMFeedComposeState> emitter,
   int mediaCount,
 ) async {
-  emitter(LMFeedComposeMediaLoadingState());
+  if (mediaCount == 0) {
+    emitter(LMFeedComposeMediaLoadingState());
+  }
   debugPrint("Starting picking documents");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,

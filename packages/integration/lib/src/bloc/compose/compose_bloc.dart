@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_document_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_link_preview_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_video_event_handler.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/remove_attahment_event_handler.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
@@ -51,10 +52,20 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
       ),
     );
     on<LMFeedComposeAddLinkPreviewEvent>(
-      (event, emit) => addLinkPreviewEventHandler(
+      (event, emitter) => addLinkPreviewEventHandler(
         event,
-        emit,
+        emitter,
         postMedia,
+      ),
+    );
+    on<LMFeedComposeRemoveAttachmentEvent>(
+      (
+        event,
+        emitter,
+      ) =>
+          removeAttachmentEventHandler(
+        event,
+        emitter,
       ),
     );
     on<LMFeedComposeCloseEvent>(

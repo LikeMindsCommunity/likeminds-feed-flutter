@@ -42,8 +42,8 @@ dependencies:
   flutter_notification_channel: ^2.0.0
   firebase_core: ^2.4.1
   firebase_messaging: ^14.2.1
-
   likeminds_feed_flutter_ui: 1.0.0
+  url_launcher: ^6.2.3
 
 dev_dependencies:
   flutter_test:
