@@ -22,6 +22,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.likeButton,
     this.replyButton,
     this.showRepliesButton,
+    this.buttonSeparator,
     this.style,
   });
 
@@ -44,6 +45,7 @@ class LMFeedCommentWidget extends StatefulWidget {
   final LMFeedButton? likeButton;
   final LMFeedButton? replyButton;
   final LMFeedButton? showRepliesButton;
+  final Widget? buttonSeparator;
 
   final LMFeedCommentStyle? style;
 
@@ -64,6 +66,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     Widget Function(LMFeedButton)? showRepliesButtonBuilder,
     LMFeedButton? likeButton,
     LMFeedButton? replyButton,
+    Widget? buttonSeparator,
     LMFeedButton? showRepliesButton,
     LMFeedCommentStyle? style,
   }) {
@@ -83,6 +86,7 @@ class LMFeedCommentWidget extends StatefulWidget {
       likeButton: likeButton ?? this.likeButton,
       replyButton: replyButton ?? this.replyButton,
       showRepliesButton: showRepliesButton ?? this.showRepliesButton,
+      buttonSeparator: buttonSeparator ?? this.buttonSeparator,
       style: style ?? this.style,
     );
   }
@@ -126,10 +130,12 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                     child: widget.titleText ??
                         LMFeedText(
                           text: widget.user.name,
-                          style: const LMFeedTextStyle(
+                          style: LMFeedTextStyle(
                             textStyle: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
+                              color: style?.textStyle?.color ??
+                                  feedTheme.onContainer,
                             ),
                             maxLines: 1,
                           ),
@@ -181,13 +187,14 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                     child: widget.likeButtonBuilder
                             ?.call(_defLikeCommentButton()) ??
                         _defLikeCommentButton()),
-                Text(
-                  '|',
-                  style: TextStyle(
-                    fontSize: LikeMindsTheme.kFontSmallMed,
-                    color: Colors.grey.shade300,
-                  ),
-                ),
+                widget.buttonSeparator ??
+                    Text(
+                      '|',
+                      style: TextStyle(
+                        fontSize: LikeMindsTheme.kFontSmallMed,
+                        color: Colors.grey.shade300,
+                      ),
+                    ),
                 style!.showReplyButton
                     ? Padding(
                         padding: style!.replyButtonStyle?.padding ??

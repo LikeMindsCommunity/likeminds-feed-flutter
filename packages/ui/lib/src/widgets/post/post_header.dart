@@ -99,7 +99,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                           textStyle: TextStyle(
                                             fontSize:
                                                 LikeMindsTheme.kFontMedium,
-                                            color: Colors.grey[900],
+                                            color: feedTheme.onContainer,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
@@ -241,20 +241,33 @@ class LMFeedPostHeader extends StatelessWidget {
     );
   }
 
-  LMFeedPostHeader copyWith(LMFeedPostHeader header) {
+  LMFeedPostHeader copyWith({
+    LMUserViewData? user,
+    LMFeedText? titleText,
+    LMFeedText? subText,
+    LMFeedText? editedText,
+    Widget Function(LMFeedMenu)? menuBuilder,
+    LMFeedText? createdAt,
+    Function()? onProfileTap,
+    bool? isFeed,
+    LMFeedText? customTitle,
+    Widget? profilePicture,
+    LMFeedPostHeaderStyle? postHeaderStyle,
+    LMPostViewData? postViewData,
+  }) {
     return LMFeedPostHeader(
-      user: header.user,
-      titleText: header.titleText ?? titleText,
-      subText: header.subText ?? subText,
-      editedText: header.editedText ?? editedText,
-      menuBuilder: header.menuBuilder ?? menuBuilder,
-      createdAt: header.createdAt ?? createdAt,
-      onProfileTap: header.onProfileTap ?? onProfileTap,
-      isFeed: header.isFeed,
-      customTitle: header.customTitle ?? customTitle,
-      profilePicture: header.profilePicture ?? profilePicture,
-      postHeaderStyle: header.postHeaderStyle,
-      postViewData: header.postViewData,
+      user: user ?? this.user,
+      titleText: titleText ?? this.titleText,
+      subText: subText ?? this.subText,
+      editedText: editedText ?? this.editedText,
+      menuBuilder: menuBuilder ?? this.menuBuilder,
+      createdAt: createdAt ?? this.createdAt,
+      onProfileTap: onProfileTap ?? this.onProfileTap,
+      isFeed: isFeed ?? this.isFeed,
+      customTitle: customTitle ?? this.customTitle,
+      profilePicture: profilePicture ?? this.profilePicture,
+      postHeaderStyle: postHeaderStyle ?? this.postHeaderStyle,
+      postViewData: postViewData ?? this.postViewData,
     );
   }
 

@@ -7,6 +7,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/add_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
@@ -26,6 +27,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
     this.appBarBuilder,
     this.commentBuilder,
     this.bottomTextFieldBuilder,
+    this.commentSeparatorBuilder,
     this.onPostTap,
     this.onLikeClick,
     this.onCommentClick,
@@ -51,6 +53,8 @@ class LMFeedPostDetailScreen extends StatefulWidget {
   final LMFeedPostCommentBuilder? commentBuilder;
 
   final Widget Function(BuildContext, LMPostViewData)? bottomTextFieldBuilder;
+
+  final Widget Function(BuildContext)? commentSeparatorBuilder;
 
   final bool openKeyboard;
 
@@ -134,7 +138,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 builder: (context, _, __) {
                   return Scaffold(
                     resizeToAvoidBottomInset: true,
-                    backgroundColor: feedTheme!.backgroundColor,
+                    backgroundColor: feedTheme?.backgroundColor,
                     bottomSheet: widget.bottomTextFieldBuilder?.call(
                             context, _postDetailScreenHandler!.postData!) ??
                         defBottomTextField(),
@@ -253,10 +257,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                   ),
                                   padding: EdgeInsets.zero,
                                   separatorBuilder: (context, index) =>
+                                      widget.commentSeparatorBuilder
+                                          ?.call(context) ??
                                       const Divider(
-                                    thickness: 0.2,
-                                    height: 0,
-                                  ),
+                                        thickness: 0.2,
+                                        height: 0,
+                                      ),
                                 ),
                               ],
                             ),
@@ -272,11 +278,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   );
                 });
           } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: LMFeedLoader(),
+            return Scaffold(
+              backgroundColor: feedTheme?.backgroundColor,
+              body: const LMFeedLoader(),
             );
           } else if (snapshot.hasError) {
             return Scaffold(
+              backgroundColor: feedTheme?.backgroundColor,
               body: Center(
                 child: Text(
                   '${snapshot.error}',
@@ -409,8 +417,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ],
       ),
       trailing: const SizedBox(width: 36),
-      style: const LMFeedAppBarStyle(
-        backgroundColor: LikeMindsTheme.whiteColor,
+      style: LMFeedAppBarStyle(
+        backgroundColor: feedTheme?.container,
         height: 61,
         mainAxisAlignment: MainAxisAlignment.start,
       ),

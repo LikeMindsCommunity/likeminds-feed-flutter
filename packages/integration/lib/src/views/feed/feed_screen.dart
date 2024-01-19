@@ -6,9 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
@@ -281,7 +278,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   Widget build(BuildContext context) {
     feedThemeData = LMFeedTheme.of(context);
     return Scaffold(
-      backgroundColor: LikeMindsTheme.whiteColor,
+      backgroundColor: feedThemeData?.backgroundColor,
       appBar: widget.appBar ??
           LMFeedAppBar(
             leading: const SizedBox.shrink(),
@@ -289,13 +286,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               onTap: () {
                 _scrollToTop();
               },
-              child: const Padding(
-                padding: EdgeInsets.only(left: 4.0),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4.0),
                 child: LMFeedText(
                   text: "Feed",
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
-                      color: Colors.black,
+                      color: feedThemeData?.onContainer,
                       fontSize: 27,
                       fontWeight: FontWeight.w700,
                     ),
@@ -303,8 +300,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
             ),
-            style: const LMFeedAppBarStyle(
-              backgroundColor: LikeMindsTheme.whiteColor,
+            style: LMFeedAppBarStyle(
+              backgroundColor: feedThemeData?.container,
             ),
           ),
       body: RefreshIndicator.adaptive(
@@ -341,142 +338,151 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   visible: topicVisible,
                   maintainAnimation: true,
                   maintainState: true,
-                  child: FutureBuilder<GetTopicsResponse>(
-                      future: getTopicsResponse,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const SizedBox.shrink();
-                        } else if (snapshot.hasData &&
-                            snapshot.data != null &&
-                            snapshot.data!.success == true) {
-                          if (snapshot.data!.topics!.isNotEmpty) {
-                            return Container(
-                              height: 54,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20.0, vertical: 12.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  LMFeedTopicSelectionWidgetType
-                                      topicSelectionWidgetType =
-                                      widget.config.topicSelectionWidgetType;
-                                  if (topicSelectionWidgetType ==
-                                      LMFeedTopicSelectionWidgetType
-                                          .showTopicSelectionBottomSheet) {
-                                    showTopicSelectSheet();
-                                  } else if (topicSelectionWidgetType ==
-                                      LMFeedTopicSelectionWidgetType
-                                          .showTopicSelectionScreen) {
-                                    navigateToTopicSelectScreen();
-                                  }
-                                },
-                                child: Row(
-                                  children: [
-                                    _feedBloc.selectedTopics.isEmpty
-                                        ? LMFeedTopicChip(
-                                            topic: (LMTopicViewDataBuilder()
-                                                  ..id("0")
-                                                  ..isEnabled(true)
-                                                  ..name("All Topic"))
-                                                .build(),
-                                            style: feedThemeData
-                                                ?.topicStyle.inactiveChipStyle,
-                                            isSelected: false,
-                                          )
-                                        : _feedBloc.selectedTopics.length == 1
-                                            ? LMFeedTopicChip(
-                                                topic: (LMTopicViewDataBuilder()
-                                                      ..id(_feedBloc
-                                                          .selectedTopics
-                                                          .first
-                                                          .id)
-                                                      ..isEnabled(_feedBloc
-                                                          .selectedTopics
-                                                          .first
-                                                          .isEnabled)
-                                                      ..name(_feedBloc
-                                                          .selectedTopics
-                                                          .first
-                                                          .name))
-                                                    .build(),
-                                                style: feedThemeData?.topicStyle
-                                                    .inactiveChipStyle,
-                                                isSelected: false,
-                                              )
-                                            : LMFeedTopicChip(
-                                                topic: (LMTopicViewDataBuilder()
-                                                      ..id("0")
-                                                      ..isEnabled(true)
-                                                      ..name("Topics"))
-                                                    .build(),
-                                                isSelected: false,
-                                                style: feedThemeData?.topicStyle
-                                                    .inactiveChipStyle
-                                                    ?.copyWith(
-                                                  icon: Row(
-                                                    children: [
-                                                      LikeMindsTheme
-                                                          .kHorizontalPaddingXSmall,
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 4),
-                                                        decoration:
-                                                            ShapeDecoration(
-                                                          color: Colors.white,
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          4)),
-                                                        ),
-                                                        child: LMFeedText(
-                                                          text: _feedBloc
-                                                              .selectedTopics
-                                                              .length
-                                                              .toString(),
-                                                          style:
-                                                              LMFeedTextStyle(
-                                                            textStyle:
-                                                                TextStyle(
-                                                              color: feedThemeData
-                                                                  ?.primaryColor,
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
+                  child: Container(
+                    color: feedThemeData?.container,
+                    child: FutureBuilder<GetTopicsResponse>(
+                        future: getTopicsResponse,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const SizedBox.shrink();
+                          } else if (snapshot.hasData &&
+                              snapshot.data != null &&
+                              snapshot.data!.success == true) {
+                            if (snapshot.data!.topics!.isNotEmpty) {
+                              return Container(
+                                height: 54,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0, vertical: 12.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    LMFeedTopicSelectionWidgetType
+                                        topicSelectionWidgetType =
+                                        widget.config.topicSelectionWidgetType;
+                                    if (topicSelectionWidgetType ==
+                                        LMFeedTopicSelectionWidgetType
+                                            .showTopicSelectionBottomSheet) {
+                                      showTopicSelectSheet();
+                                    } else if (topicSelectionWidgetType ==
+                                        LMFeedTopicSelectionWidgetType
+                                            .showTopicSelectionScreen) {
+                                      navigateToTopicSelectScreen();
+                                    }
+                                  },
+                                  child: Row(
+                                    children: [
+                                      _feedBloc.selectedTopics.isEmpty
+                                          ? LMFeedTopicChip(
+                                              topic: (LMTopicViewDataBuilder()
+                                                    ..id("0")
+                                                    ..isEnabled(true)
+                                                    ..name("All Topic"))
+                                                  .build(),
+                                              style: feedThemeData?.topicStyle
+                                                  .inactiveChipStyle,
+                                              isSelected: false,
+                                            )
+                                          : _feedBloc.selectedTopics.length == 1
+                                              ? LMFeedTopicChip(
+                                                  topic:
+                                                      (LMTopicViewDataBuilder()
+                                                            ..id(_feedBloc
+                                                                .selectedTopics
+                                                                .first
+                                                                .id)
+                                                            ..isEnabled(_feedBloc
+                                                                .selectedTopics
+                                                                .first
+                                                                .isEnabled)
+                                                            ..name(_feedBloc
+                                                                .selectedTopics
+                                                                .first
+                                                                .name))
+                                                          .build(),
+                                                  style: feedThemeData
+                                                      ?.topicStyle
+                                                      .inactiveChipStyle,
+                                                  isSelected: false,
+                                                )
+                                              : LMFeedTopicChip(
+                                                  topic:
+                                                      (LMTopicViewDataBuilder()
+                                                            ..id("0")
+                                                            ..isEnabled(true)
+                                                            ..name("Topics"))
+                                                          .build(),
+                                                  isSelected: false,
+                                                  style: feedThemeData
+                                                      ?.topicStyle
+                                                      .inactiveChipStyle
+                                                      ?.copyWith(
+                                                    icon: Row(
+                                                      children: [
+                                                        LikeMindsTheme
+                                                            .kHorizontalPaddingXSmall,
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      4),
+                                                          decoration:
+                                                              ShapeDecoration(
+                                                            color: Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            4)),
+                                                          ),
+                                                          child: LMFeedText(
+                                                            text: _feedBloc
+                                                                .selectedTopics
+                                                                .length
+                                                                .toString(),
+                                                            style:
+                                                                LMFeedTextStyle(
+                                                              textStyle:
+                                                                  TextStyle(
+                                                                color: feedThemeData
+                                                                    ?.primaryColor,
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      LikeMindsTheme
-                                                          .kHorizontalPaddingSmall,
-                                                      LMFeedIcon(
-                                                        type:
-                                                            LMFeedIconType.icon,
-                                                        icon: CupertinoIcons
-                                                            .chevron_down,
-                                                        style: LMFeedIconStyle(
-                                                          size: 16,
-                                                          color: feedThemeData
-                                                              ?.primaryColor,
+                                                        LikeMindsTheme
+                                                            .kHorizontalPaddingSmall,
+                                                        LMFeedIcon(
+                                                          type: LMFeedIconType
+                                                              .icon,
+                                                          icon: CupertinoIcons
+                                                              .chevron_down,
+                                                          style:
+                                                              LMFeedIconStyle(
+                                                            size: 16,
+                                                            color: feedThemeData
+                                                                ?.primaryColor,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          } else {
-                            return const SizedBox.shrink();
+                              );
+                            } else {
+                              return const SizedBox.shrink();
+                            }
                           }
-                        }
-                        return const SizedBox();
-                      }),
+                          return const SizedBox();
+                        }),
+                  ),
                 );
               },
             ),
@@ -707,7 +713,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
               if (state is LMFeedEditPostUploadingState) {
                 return Container(
                   height: 60,
-                  color: feedTheme?.backgroundColor,
+                  color: feedTheme?.container,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: const Row(
@@ -826,63 +832,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         ],
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      floatingActionButton: ValueListenableBuilder(
-        valueListenable: rebuildPostWidget,
-        builder: (context, _, __) {
-          return LMFeedButton(
-            style: LMFeedButtonStyle(
-              icon: LMFeedIcon(
-                type: LMFeedIconType.icon,
-                icon: Icons.add,
-                style: LMFeedIconStyle(
-                  fit: BoxFit.cover,
-                  size: 18,
-                  color: feedTheme?.onPrimary,
-                ),
-              ),
-              height: 44,
-              width: 153,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-              borderRadius: 28,
-              backgroundColor:
-                  right ? feedTheme?.primaryColor : feedTheme?.disabledColor,
-              placement: LMFeedIconButtonPlacement.end,
-              margin: 5.0,
-            ),
-            text: LMFeedText(
-              text: "Create Post",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  color: feedTheme?.onPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            onTap: right
-                ? () {
-                    if (!postUploading.value) {
-                      LMFeedAnalyticsBloc.instance.add(
-                          const LMFeedFireAnalyticsEvent(
-                              eventName:
-                                  LMFeedAnalyticsKeys.postCreationStarted,
-                              eventProperties: {}));
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LMFeedComposeScreen(),
-                        ),
-                      );
-                    } else {
-                      toast(
-                        'A post is already uploading.',
-                        duration: Toast.LENGTH_LONG,
-                      );
-                    }
-                  }
-                : () => toast("You do not have permission to create a post"),
-          );
-        },
-      ),
+      floatingActionButton: defFloatingActionButton(),
     );
   }
 
@@ -1243,5 +1193,63 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             ),
           ],
         ),
+      );
+
+  Widget defFloatingActionButton() => ValueListenableBuilder(
+        valueListenable: rebuildPostWidget,
+        builder: (context, _, __) {
+          return LMFeedButton(
+            style: LMFeedButtonStyle(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.add,
+                style: LMFeedIconStyle(
+                  fit: BoxFit.cover,
+                  size: 18,
+                  color: feedTheme?.onPrimary,
+                ),
+              ),
+              height: 44,
+              width: 153,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              borderRadius: 28,
+              backgroundColor:
+                  right ? feedTheme?.primaryColor : feedTheme?.disabledColor,
+              placement: LMFeedIconButtonPlacement.end,
+              margin: 5.0,
+            ),
+            text: LMFeedText(
+              text: "Create Post",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  color: feedTheme?.onPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            onTap: right
+                ? () {
+                    if (!postUploading.value) {
+                      LMFeedAnalyticsBloc.instance.add(
+                          const LMFeedFireAnalyticsEvent(
+                              eventName:
+                                  LMFeedAnalyticsKeys.postCreationStarted,
+                              eventProperties: {}));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LMFeedComposeScreen(),
+                        ),
+                      );
+                    } else {
+                      toast(
+                        'A post is already uploading.',
+                        duration: Toast.LENGTH_LONG,
+                      );
+                    }
+                  }
+                : () => toast("You do not have permission to create a post"),
+          );
+        },
       );
 }
