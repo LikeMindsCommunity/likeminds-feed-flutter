@@ -64,6 +64,12 @@ class _LMButtonState extends State<LMFeedButton> {
   }
 
   @override
+  void didUpdateWidget(LMFeedButton oldWidget) {
+    _active = widget.isActive;
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final inStyle = widget.style ?? LMFeedButtonStyle.basic();
     return GestureDetector(

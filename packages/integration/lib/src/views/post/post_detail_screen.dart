@@ -236,6 +236,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     post:
                                                         _postDetailScreenHandler!
                                                             .postData!,
+                                                    commentBuilder:
+                                                        widget.commentBuilder,
                                                     refresh: () {
                                                       _pagingController
                                                           .refresh();
