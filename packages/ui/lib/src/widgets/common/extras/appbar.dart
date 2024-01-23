@@ -30,9 +30,6 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     final theme = LMFeedTheme.of(context);
 
     return Container(
-      height: inStyle.height,
-      width: inStyle.width ?? double.infinity,
-      margin: inStyle.margin ?? EdgeInsets.zero,
       decoration: BoxDecoration(
         color: inStyle.backgroundColor ?? Colors.white,
         border: inStyle.border ??
@@ -44,79 +41,84 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
         boxShadow: inStyle.shadow,
       ),
-      padding: inStyle.padding ??
-          const EdgeInsets.symmetric(
-            horizontal: 12.0,
-            vertical: 4.0,
-          ),
       child: SafeArea(
-        child: Row(
-          children: (style?.centerTitle ?? false)
-              ? [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        leading ??
-                            LMFeedButton(
-                              style: LMFeedButtonStyle(
-                                icon: LMFeedIcon(
-                                  type: LMFeedIconType.icon,
-                                  icon: Platform.isAndroid
-                                      ? Icons.chevron_left
-                                      : CupertinoIcons.chevron_back,
-                                  style: LMFeedIconStyle(
-                                    color: theme.onContainer,
-                                    size: 24,
+        child: Container(
+          height: inStyle.height,
+          width: inStyle.width ?? double.infinity,
+          margin: inStyle.margin ?? EdgeInsets.zero,
+          padding: inStyle.padding ??
+              const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 4.0,
+              ),
+          child: Row(
+            children: (style?.centerTitle ?? false)
+                ? [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          leading ??
+                              LMFeedButton(
+                                style: LMFeedButtonStyle(
+                                  icon: LMFeedIcon(
+                                    type: LMFeedIconType.icon,
+                                    icon: Platform.isAndroid
+                                        ? Icons.chevron_left
+                                        : CupertinoIcons.chevron_back,
+                                    style: LMFeedIconStyle(
+                                      color: theme.onContainer,
+                                      size: 24,
+                                    ),
                                   ),
                                 ),
+                                onTap: () {
+                                  backButtonCallback?.call() ??
+                                      Navigator.of(context).pop();
+                                },
                               ),
-                              onTap: () {
-                                backButtonCallback?.call() ??
-                                    Navigator.of(context).pop();
-                              },
-                            ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [title ?? const SizedBox.shrink()],
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [title ?? const SizedBox.shrink()],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: trailing != null
-                          ? trailing!
-                          : [const SizedBox.shrink()],
-                    ),
-                  )
-                ]
-              : [
-                  leading ??
-                      LMFeedButton(
-                        style: LMFeedButtonStyle(
-                          icon: LMFeedIcon(
-                            type: LMFeedIconType.icon,
-                            icon: Platform.isAndroid
-                                ? Icons.chevron_left
-                                : CupertinoIcons.chevron_back,
-                            style: LMFeedIconStyle(
-                              color: theme.onContainer,
-                              size: 24,
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: trailing != null
+                            ? trailing!
+                            : [const SizedBox.shrink()],
+                      ),
+                    )
+                  ]
+                : [
+                    leading ??
+                        LMFeedButton(
+                          style: LMFeedButtonStyle(
+                            icon: LMFeedIcon(
+                              type: LMFeedIconType.icon,
+                              icon: Platform.isAndroid
+                                  ? Icons.chevron_left
+                                  : CupertinoIcons.chevron_back,
+                              style: LMFeedIconStyle(
+                                color: theme.onContainer,
+                                size: 24,
+                              ),
                             ),
                           ),
+                          onTap: () {
+                            backButtonCallback?.call() ??
+                                Navigator.of(context).pop();
+                          },
                         ),
-                        onTap: () {
-                          backButtonCallback?.call() ??
-                              Navigator.of(context).pop();
-                        },
-                      ),
-                  title ?? const SizedBox.shrink(),
-                  const Spacer(),
-                  if (trailing != null) ...trailing!
-                ],
+                    title ?? const SizedBox.shrink(),
+                    const Spacer(),
+                    if (trailing != null) ...trailing!
+                  ],
+          ),
         ),
       ),
     );

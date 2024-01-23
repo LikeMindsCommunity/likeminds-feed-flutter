@@ -103,7 +103,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme?.container,
           centerTitle: Platform.isAndroid ? false : true,
-          height: 72,
+          height: 50,
         ),
         title: const LMFeedText(
           text: 'Activity',
