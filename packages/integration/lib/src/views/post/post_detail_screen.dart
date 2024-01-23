@@ -428,11 +428,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 ),
         ],
       ),
-      trailing: const SizedBox(width: 36),
+      trailing: const [SizedBox(width: 36)],
       style: LMFeedAppBarStyle(
         backgroundColor: feedTheme?.container,
         height: 61,
-        mainAxisAlignment: MainAxisAlignment.start,
       ),
     );
   }

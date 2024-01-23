@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedTopicSelectScreen extends StatefulWidget {
@@ -150,7 +149,6 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
           backgroundColor: feedThemeData.container,
           height: 60,
         ),
-        centerTitle: false,
         title: ValueListenableBuilder(
           valueListenable: rebuildTopicsScreen,
           builder: (context, _, __) {
@@ -191,52 +189,54 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                   );
           },
         ),
-        trailing: ValueListenableBuilder(
-          valueListenable: rebuildTopicsScreen,
-          builder: (context, _, __) {
-            return GestureDetector(
-              onTap: () {
-                if (isSearching) {
-                  if (keyboardNode.hasFocus) {
-                    keyboardNode.unfocus();
+        trailing: [
+          ValueListenableBuilder(
+            valueListenable: rebuildTopicsScreen,
+            builder: (context, _, __) {
+              return GestureDetector(
+                onTap: () {
+                  if (isSearching) {
+                    if (keyboardNode.hasFocus) {
+                      keyboardNode.unfocus();
+                    }
+                    searchController.clear();
+                    search = "";
+                    searchType = "";
+                    _page = 1;
+                    topicsPagingController.itemList?.clear();
+                    topicsPagingController.itemList = selectedTopics;
+                    topicBloc.add(
+                      LMFeedGetTopicEvent(
+                        getTopicFeedRequest: (GetTopicsRequestBuilder()
+                              ..page(_page)
+                              ..isEnabled(widget.isEnabled)
+                              ..pageSize(pageSize)
+                              ..search(search)
+                              ..searchType(searchType))
+                            .build(),
+                      ),
+                    );
+                  } else {
+                    if (keyboardNode.canRequestFocus) {
+                      keyboardNode.requestFocus();
+                    }
                   }
-                  searchController.clear();
-                  search = "";
-                  searchType = "";
-                  _page = 1;
-                  topicsPagingController.itemList?.clear();
-                  topicsPagingController.itemList = selectedTopics;
-                  topicBloc.add(
-                    LMFeedGetTopicEvent(
-                      getTopicFeedRequest: (GetTopicsRequestBuilder()
-                            ..page(_page)
-                            ..isEnabled(widget.isEnabled)
-                            ..pageSize(pageSize)
-                            ..search(search)
-                            ..searchType(searchType))
-                          .build(),
-                    ),
-                  );
-                } else {
-                  if (keyboardNode.canRequestFocus) {
-                    keyboardNode.requestFocus();
-                  }
-                }
-                isSearching = !isSearching;
-                rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
-              },
-              child: Container(
-                color: Colors.transparent,
-                padding: const EdgeInsets.all(10.0),
-                child: Icon(
-                  isSearching ? CupertinoIcons.xmark : Icons.search,
-                  size: 18,
-                  color: feedThemeData.onContainer,
+                  isSearching = !isSearching;
+                  rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  padding: const EdgeInsets.all(10.0),
+                  child: Icon(
+                    isSearching ? CupertinoIcons.xmark : Icons.search,
+                    size: 18,
+                    color: feedThemeData.onContainer,
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
+              );
+            },
+          ),
+        ],
         leading: GestureDetector(
           onTap: () {
             Navigator.of(context).pop();

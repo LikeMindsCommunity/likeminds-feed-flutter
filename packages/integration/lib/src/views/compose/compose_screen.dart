@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/cupertino.dart';
@@ -372,106 +373,108 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMFeedAppBar _defAppBar() {
     final theme = LMFeedTheme.of(context);
     return LMFeedAppBar(
-      style: LMFeedAppBarStyle(
-        backgroundColor: feedTheme?.container ?? Colors.white,
-        height: 72,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 18.0,
-          vertical: 8.0,
-        ),
-        shadow: [
-          BoxShadow(
-            color: Colors.grey.shade300,
-            blurRadius: 1.0,
-            offset: const Offset(0.0, 1.0), // shadow direction: bottom right
+        style: LMFeedAppBarStyle(
+          backgroundColor: feedTheme?.container ?? Colors.white,
+          height: 72,
+          centerTitle: true,
+          padding: const EdgeInsets.symmetric(
+            horizontal: 18.0,
+            vertical: 8.0,
           ),
-        ],
-      ),
-      leading: LMFeedButton(
-        text: LMFeedText(
-          text: "Cancel",
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(color: theme.primaryColor),
-          ),
+          shadow: [
+            BoxShadow(
+              color: Colors.grey.shade300,
+              blurRadius: 1.0,
+              offset: const Offset(0.0, 1.0), // shadow direction: bottom right
+            ),
+          ],
         ),
-        onTap: () {
-          widget.composeDiscardDialogBuilder?.call(context) ??
-              _showDefaultDiscardDialog(context);
-        },
-        style: const LMFeedButtonStyle(),
-      ),
-      title: LMFeedText(
-        text: "Create Post",
-        style: LMFeedTextStyle(
-          textStyle: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: theme.onContainer,
+        leading: LMFeedButton(
+          text: LMFeedText(
+            text: "Cancel",
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(color: theme.primaryColor),
+            ),
           ),
+          onTap: () {
+            widget.composeDiscardDialogBuilder?.call(context) ??
+                _showDefaultDiscardDialog(context);
+          },
+          style: const LMFeedButtonStyle(),
         ),
-      ),
-      trailing: LMFeedButton(
-        text: LMFeedText(
-          text: "Post",
+        title: LMFeedText(
+          text: "Create Post",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
-              color: theme.onPrimary,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: theme.onContainer,
             ),
           ),
         ),
-        style: LMFeedButtonStyle(
-          backgroundColor: theme.primaryColor,
-          width: 48,
-          height: 32,
-          borderRadius: 6,
-        ),
-        onTap: () {
-          _focusNode.unfocus();
+        trailing: [
+          LMFeedButton(
+            text: LMFeedText(
+              text: "Post",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  color: theme.onPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            style: LMFeedButtonStyle(
+              backgroundColor: theme.primaryColor,
+              width: 48,
+              borderRadius: 6,
+              height: 20,
+            ),
+            onTap: () {
+              _focusNode.unfocus();
 
-          String postText = _controller.text;
-          postText = postText.trim();
-          if (postText.isNotEmpty || composeBloc.postMedia.isNotEmpty) {
-            List<LMUserTagViewData> userTags = composeBloc.userTags;
-            List<LMTopicViewData> selectedTopics = composeBloc.selectedTopics;
+              String postText = _controller.text;
+              postText = postText.trim();
+              if (postText.isNotEmpty || composeBloc.postMedia.isNotEmpty) {
+                List<LMUserTagViewData> userTags = composeBloc.userTags;
+                List<LMTopicViewData> selectedTopics =
+                    composeBloc.selectedTopics;
 
-            if (config!.topicRequiredToCreatePost &&
-                selectedTopics.isEmpty &&
-                config!.enableTopics) {
-              toast(
-                "Can't create a post without topic",
-                duration: Toast.LENGTH_LONG,
-              );
-              return;
-            }
-            userTags =
-                LMFeedTaggingHelper.matchTags(_controller.text, userTags);
+                if (config!.topicRequiredToCreatePost &&
+                    selectedTopics.isEmpty &&
+                    config!.enableTopics) {
+                  toast(
+                    "Can't create a post without topic",
+                    duration: Toast.LENGTH_LONG,
+                  );
+                  return;
+                }
+                userTags =
+                    LMFeedTaggingHelper.matchTags(_controller.text, userTags);
 
-            result =
-                LMFeedTaggingHelper.encodeString(_controller.text, userTags);
+                result = LMFeedTaggingHelper.encodeString(
+                    _controller.text, userTags);
 
-            sendPostCreationCompletedEvent(
-                composeBloc.postMedia, userTags, selectedTopics);
+                sendPostCreationCompletedEvent(
+                    composeBloc.postMedia, userTags, selectedTopics);
 
-            LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-              user: user,
-              postText: result!,
-              selectedTopics: selectedTopics,
-              postMedia: composeBloc.postMedia,
-            ));
+                LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
+                  user: user,
+                  postText: result!,
+                  selectedTopics: selectedTopics,
+                  postMedia: composeBloc.postMedia,
+                ));
 
-            Navigator.pop(context);
-          } else {
-            toast(
-              "Can't create a post without text or attachments",
-              duration: Toast.LENGTH_LONG,
-            );
-          }
-        },
-      ),
-    );
+                Navigator.pop(context);
+              } else {
+                toast(
+                  "Can't create a post without text or attachments",
+                  duration: Toast.LENGTH_LONG,
+                );
+              }
+            },
+          ),
+        ]);
   }
 
   Widget _defContentInput() {

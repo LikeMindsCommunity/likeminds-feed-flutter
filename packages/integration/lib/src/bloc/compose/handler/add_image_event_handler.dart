@@ -35,8 +35,10 @@ addImageEventHandler(
           emitter(LMFeedComposeAddedImageState());
         }
       }
-    } on Error catch (e) {
-      emitter(LMFeedComposeMediaErrorState(e));
+    } on Exception catch (err, stacktrace) {
+      LMFeedLogger.instance.handleException(err, stacktrace);
+
+      emitter(LMFeedComposeMediaErrorState(err));
     }
   }
 }

@@ -28,7 +28,7 @@ class LMFeedComposeFetchedTopicsState extends LMFeedComposeState {
 }
 
 class LMFeedComposeMediaErrorState extends LMFeedComposeState {
-  final Error error;
+  final Exception error;
 
   LMFeedComposeMediaErrorState(this.error);
 

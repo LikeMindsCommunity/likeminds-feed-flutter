@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,18 +14,15 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.style,
     this.backButtonCallback,
-    this.centerTitle = true,
   });
 
   final Widget? leading;
-  final Widget? trailing;
+  final List<Widget>? trailing;
   final Widget? title;
 
   final Function? backButtonCallback;
 
   final LMFeedAppBarStyle? style;
-
-  final centerTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -32,55 +30,93 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     final theme = LMFeedTheme.of(context);
 
     return Container(
-      color: inStyle.backgroundColor ?? Colors.white,
-      child: SafeArea(
-        bottom: false,
-        child: Container(
-          margin: inStyle.margin ?? EdgeInsets.zero,
-          decoration: BoxDecoration(
-            color: inStyle.backgroundColor ?? Colors.white,
-            border: inStyle.border ??
-                const Border(
-                  bottom: BorderSide(
-                    width: 0.1,
-                    color: Colors.grey,
-                  ),
-                ),
-            boxShadow: inStyle.shadow,
-          ),
-          padding: inStyle.padding ??
-              const EdgeInsets.symmetric(
-                horizontal: 12.0,
-                vertical: 4.0,
+      height: inStyle.height,
+      width: inStyle.width ?? double.infinity,
+      margin: inStyle.margin ?? EdgeInsets.zero,
+      decoration: BoxDecoration(
+        color: inStyle.backgroundColor ?? Colors.white,
+        border: inStyle.border ??
+            const Border(
+              bottom: BorderSide(
+                width: 0.1,
+                color: Colors.grey,
               ),
-          child: Row(
-            mainAxisAlignment:
-                inStyle.mainAxisAlignment ?? MainAxisAlignment.start,
-            children: [
-              leading ??
-                  LMFeedButton(
-                    style: LMFeedButtonStyle(
-                      icon: LMFeedIcon(
-                        type: LMFeedIconType.icon,
-                        icon: Platform.isAndroid
-                            ? Icons.chevron_left
-                            : CupertinoIcons.chevron_back,
-                        style: LMFeedIconStyle(
-                          color: theme.onContainer,
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                    onTap: () {
-                      backButtonCallback?.call() ?? Navigator.of(context).pop();
-                    },
-                  ),
-              const SizedBox.shrink(),
-              title ?? const SizedBox(),
-              !centerTitle ? const Spacer() : const SizedBox.shrink(),
-              trailing ?? const SizedBox(),
-            ],
+            ),
+        boxShadow: inStyle.shadow,
+      ),
+      padding: inStyle.padding ??
+          const EdgeInsets.symmetric(
+            horizontal: 12.0,
+            vertical: 4.0,
           ),
+      child: SafeArea(
+        child: Row(
+          children: (style?.centerTitle ?? false)
+              ? [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        leading ??
+                            LMFeedButton(
+                              style: LMFeedButtonStyle(
+                                icon: LMFeedIcon(
+                                  type: LMFeedIconType.icon,
+                                  icon: Platform.isAndroid
+                                      ? Icons.chevron_left
+                                      : CupertinoIcons.chevron_back,
+                                  style: LMFeedIconStyle(
+                                    color: theme.onContainer,
+                                    size: 24,
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                backButtonCallback?.call() ??
+                                    Navigator.of(context).pop();
+                              },
+                            ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [title ?? const SizedBox.shrink()],
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: trailing != null
+                          ? trailing!
+                          : [const SizedBox.shrink()],
+                    ),
+                  )
+                ]
+              : [
+                  leading ??
+                      LMFeedButton(
+                        style: LMFeedButtonStyle(
+                          icon: LMFeedIcon(
+                            type: LMFeedIconType.icon,
+                            icon: Platform.isAndroid
+                                ? Icons.chevron_left
+                                : CupertinoIcons.chevron_back,
+                            style: LMFeedIconStyle(
+                              color: theme.onContainer,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          backButtonCallback?.call() ??
+                              Navigator.of(context).pop();
+                        },
+                      ),
+                  title ?? const SizedBox.shrink(),
+                  const Spacer(),
+                  if (trailing != null) ...trailing!
+                ],
         ),
       ),
     );
@@ -88,8 +124,8 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   LMFeedAppBar copyWith({
     Widget? leading,
-    Widget? trailing,
-    LMFeedText? title,
+    List<Widget>? trailing,
+    Widget? title,
     Function? backButtonCallback,
     LMFeedAppBarStyle? style,
   }) {
@@ -113,18 +149,18 @@ class LMFeedAppBarStyle {
   final Border? border;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
-  final MainAxisAlignment? mainAxisAlignment;
   final List<BoxShadow>? shadow;
+  final bool centerTitle;
 
   const LMFeedAppBarStyle({
     this.backgroundColor,
     this.border,
-    this.mainAxisAlignment,
     this.margin,
     this.padding,
     this.height,
     this.width,
     this.shadow,
+    this.centerTitle = false,
   });
 
   LMFeedAppBarStyle copyWith({
@@ -134,8 +170,8 @@ class LMFeedAppBarStyle {
     Border? border,
     EdgeInsets? padding,
     EdgeInsets? margin,
-    MainAxisAlignment? mainAxisAlignment,
     List<BoxShadow>? shadow,
+    bool? centerTitle,
   }) {
     return LMFeedAppBarStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -143,26 +179,16 @@ class LMFeedAppBarStyle {
       width: width ?? this.width,
       margin: margin ?? this.margin,
       padding: padding ?? this.padding,
-      mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
       border: border ?? this.border,
       shadow: shadow ?? this.shadow,
+      centerTitle: centerTitle ?? this.centerTitle,
     );
   }
 
   factory LMFeedAppBarStyle.basic() {
     return const LMFeedAppBarStyle(
       backgroundColor: Colors.transparent,
-      height: 72,
       width: double.infinity,
-      padding: EdgeInsets.all(12),
-      mainAxisAlignment: MainAxisAlignment.start,
-      shadow: [
-        BoxShadow(
-          color: Colors.grey,
-          blurRadius: 2.0,
-          offset: Offset(0.0, 1.0), // shadow direction: bottom right
-        )
-      ],
     );
   }
 }

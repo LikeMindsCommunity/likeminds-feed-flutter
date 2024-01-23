@@ -37,7 +37,9 @@ void editPostEventHandler(
         ),
       );
     }
-  } catch (err) {
+  } on Exception catch (err, stacktrace) {
+    LMFeedLogger.instance.handleException(err, stacktrace);
+
     emit(
       const LMFeedNewPostErrorState(
         message: 'An error occurred while saving the post',

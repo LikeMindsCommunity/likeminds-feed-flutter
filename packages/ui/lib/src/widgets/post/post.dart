@@ -39,6 +39,7 @@ class LMFeedPostWidget extends StatefulWidget {
     this.footerBuilder,
     this.style,
     this.onMediaTap,
+    this.activityHeader,
   });
 
   final LMFeedPostStyle? style;
@@ -56,6 +57,7 @@ class LMFeedPostWidget extends StatefulWidget {
   final LMFeedPostMedia? media;
   final LMFeedPostContent? content;
   final LMFeedPostTopic? topicWidget;
+  final Widget? activityHeader;
 
   // Required variables
   final LMPostViewData post;
@@ -142,39 +144,11 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
 
   LMFeedPostStyle? style;
-  LMFeedPostHeader? _postHeader;
-  LMFeedPostFooter? _postFooter;
-  LMFeedPostContent? _postContent;
-  LMFeedPostMedia? _postMedia;
-  LMFeedPostTopic? _postTopic;
-  LMFeedMenu? _postMenu;
-
-  @override
-  void initState() {
-    super.initState();
-    style = widget.style ?? LMFeedTheme.of(context).postStyle;
-    _postHeader = widget.header ?? _defPostHeader();
-    _postFooter = widget.footer ?? _defFooterWidget();
-    _postContent = widget.content ?? _defContentWidget();
-    _postMedia = widget.media ?? _defPostMedia();
-    _postTopic = widget.topicWidget ?? _defTopicWidget();
-    _postMenu = widget.menu;
-  }
-
-  @override
-  void didUpdateWidget(covariant LMFeedPostWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _postHeader = widget.header ?? _defPostHeader();
-    _postFooter = widget.footer ?? _defFooterWidget();
-    _postContent = widget.content ?? _defContentWidget();
-    _postMedia = widget.media ?? _defPostMedia();
-    _postTopic = widget.topicWidget ?? _defTopicWidget();
-    _postMenu = widget.menu;
-  }
 
   @override
   Widget build(BuildContext context) {
     LMFeedThemeData lmFeedThemeData = LMFeedTheme.of(context);
+    style = widget.style ?? LMFeedTheme.of(context).postStyle;
     timeago.setLocaleMessages('en', LMFeedCustomMessages());
     return InheritedPostProvider(
       post: widget.post,
@@ -196,26 +170,29 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              widget.headerBuilder?.call(context, _postHeader!, widget.post) ??
-                  _postHeader!,
+              if (widget.activityHeader != null) widget.activityHeader!,
+              widget.headerBuilder
+                      ?.call(context, _defPostHeader(), widget.post) ??
+                  _defPostHeader(),
               widget.post.topics.isEmpty
                   ? const SizedBox.shrink()
                   : widget.topicBuilder
-                          ?.call(context, _postTopic!, widget.post) ??
-                      _postTopic!,
+                          ?.call(context, _defTopicWidget(), widget.post) ??
+                      _defTopicWidget(),
               widget.post.text.isEmpty
                   ? const SizedBox.shrink()
                   : widget.contentBuilder
-                          ?.call(context, _postContent!, widget.post) ??
-                      _postContent!,
+                          ?.call(context, _defContentWidget(), widget.post) ??
+                      _defContentWidget(),
               widget.post.attachments != null &&
                       widget.post.attachments!.isNotEmpty
                   ? widget.mediaBuilder
-                          ?.call(context, _postMedia!, widget.post) ??
-                      _postMedia!
+                          ?.call(context, _defPostMedia(), widget.post) ??
+                      _defPostMedia()
                   : const SizedBox.shrink(),
-              widget.footerBuilder?.call(context, _postFooter!, widget.post) ??
-                  _postFooter!,
+              widget.footerBuilder
+                      ?.call(context, _defFooterWidget(), widget.post) ??
+                  _defFooterWidget(),
             ],
           ),
         ),
@@ -224,35 +201,39 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   }
 
   LMFeedPostTopic _defTopicWidget() {
-    return LMFeedPostTopic(
-      topics: widget.topics,
-      post: widget.post,
-    );
+    return widget.topicWidget ??
+        LMFeedPostTopic(
+          topics: widget.topics,
+          post: widget.post,
+        );
   }
 
   LMFeedPostContent _defContentWidget() {
-    return LMFeedPostContent(
-      onTagTap: widget.onTagTap,
-    );
+    return widget.content ??
+        LMFeedPostContent(
+          onTagTap: widget.onTagTap,
+        );
   }
 
   LMFeedPostFooter _defFooterWidget() {
-    return LMFeedPostFooter();
+    return widget.footer ?? LMFeedPostFooter();
   }
 
   LMFeedPostHeader _defPostHeader() {
-    return LMFeedPostHeader(
-      user: widget.user,
-      isFeed: widget.isFeed,
-      postViewData: widget.post,
-    );
+    return widget.header ??
+        LMFeedPostHeader(
+          user: widget.user,
+          isFeed: widget.isFeed,
+          postViewData: widget.post,
+        );
   }
 
   LMFeedPostMedia _defPostMedia() {
-    return LMFeedPostMedia(
-      attachments: widget.post.attachments!,
-      onMediaTap: widget.onMediaTap,
-    );
+    return widget.media ??
+        LMFeedPostMedia(
+          attachments: widget.post.attachments!,
+          onMediaTap: widget.onMediaTap,
+        );
   }
 }
 

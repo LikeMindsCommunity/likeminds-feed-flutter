@@ -95,7 +95,6 @@ class LMFeedPostLinkPreview extends StatelessWidget {
                 : LMFeedPostImage(
                     style: LMFeedPostImageStyle(
                       height: style.imageHeight ?? 216,
-                      borderRadius: style.borderRadius,
                       errorWidget: style.errorWidget,
                     ),
                     onError: onError,

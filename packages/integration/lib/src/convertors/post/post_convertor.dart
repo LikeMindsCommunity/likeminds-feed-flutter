@@ -85,7 +85,7 @@ class LMPostViewDataConvertor {
       replies: postViewData.replies
           .map((e) => LMCommentViewDataConvertor.toComment(e))
           .toList(),
-      isRepost: postViewData.isReposted,
+      isRepost: postViewData.isRepost,
       isRepostedByUser: postViewData.isRepostedByUser,
       repostCount: postViewData.repostCount,
       isDeleted: postViewData.isDeleted,

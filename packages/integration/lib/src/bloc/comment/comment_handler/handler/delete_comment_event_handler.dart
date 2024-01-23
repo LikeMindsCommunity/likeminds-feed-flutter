@@ -71,7 +71,8 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
         commentMetaData: event.commentMetaData,
       ));
     }
-  } catch (err) {
+  } on Exception catch (err, stacktrace) {
+    LMFeedLogger.instance.handleException(err, stacktrace);
     toast(
       'An error occcurred while deleting comment',
       duration: Toast.LENGTH_LONG,

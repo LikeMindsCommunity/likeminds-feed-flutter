@@ -27,6 +27,7 @@ export 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
   late final LMFeedMediaService? mediaService;
+  bool initiateUserCalled = false;
 
   /// This is the domain of the client. This is used to show
   /// generate link for sharing post
@@ -75,6 +76,7 @@ class LMFeedCore {
     return lmFeedClient.initiateUser(request)
       ..then((value) async {
         if (value.success) {
+          initiateUserCalled = true;
           await LMFeedUserLocalPreference.instance
               .setUserDataFromInitiateUserResponse(value);
         }

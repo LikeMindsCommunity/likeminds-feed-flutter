@@ -103,7 +103,9 @@ void newPostEventHandler(
     }
 
     LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
-  } catch (err) {
+  } on Exception catch (err, stacktrace) {
+    LMFeedLogger.instance.handleException(err, stacktrace);
+
     emit(const LMFeedNewPostErrorState(message: 'An error occurred'));
     debugPrint(err.toString());
   }

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/credentials/credentials.dart';
 import 'package:path/path.dart' as path;
 
@@ -38,7 +39,10 @@ class LMFeedMediaService {
       );
 
       return result;
-    } on SimpleS3Errors catch (e) {
+    } on SimpleS3Errors catch (e, stacktrace) {
+      Exception exception = Exception(e.toString());
+
+      LMFeedLogger.instance.handleException(exception, stacktrace);
       debugPrint(e.name);
       debugPrint(e.index.toString());
       return null;

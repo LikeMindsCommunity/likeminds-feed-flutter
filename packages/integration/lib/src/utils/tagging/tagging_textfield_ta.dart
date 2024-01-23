@@ -114,7 +114,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       } else {
         return const Iterable.empty();
       }
-    } catch (e) {
+    } on Exception catch (err, stacktrace) {
+      LMFeedLogger.instance.handleException(err, stacktrace);
+
       return const Iterable.empty();
     }
   }

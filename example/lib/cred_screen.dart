@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:likeminds_feed_example/app.dart';
 import 'package:likeminds_feed_example/main.dart';
+import 'package:likeminds_feed_example/tab_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -20,48 +21,50 @@ class MyApp extends StatelessWidget {
         textColor: Colors.white,
         alignment: Alignment.bottomCenter,
       ),
-      child: LMFeedTheme(
-        theme: LMFeedThemeData.light(
-          primaryColor: Colors.red[300],
-          tagColor: Colors.red[300],
-          linkColor: Colors.red[300],
-        ),
-        child: MaterialApp(
-          title: 'Integration App for UI + SDK package',
-          navigatorKey: rootNavigatorKey,
-          scaffoldMessengerKey: rootScaffoldMessengerKey,
-          theme: ThemeData(
-            useMaterial3: true,
-            primaryColor: Colors.deepPurple,
-            inputDecorationTheme: InputDecorationTheme(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              outlineBorder: const BorderSide(
+      child:
+          //  LMFeedTheme(
+          //   theme: LMFeedThemeData.light(
+          //     primaryColor: Colors.red[300],
+          //     tagColor: Colors.red[300],
+          //     linkColor: Colors.red[300],
+          //   ),
+          //   child:
+          MaterialApp(
+        title: 'Integration App for UI + SDK package',
+        navigatorKey: rootNavigatorKey,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
+        theme: ThemeData(
+          useMaterial3: true,
+          primaryColor: Colors.deepPurple,
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            outlineBorder: const BorderSide(
+              color: Colors.deepPurple,
+              width: 2,
+            ),
+            activeIndicatorBorder: const BorderSide(
+              color: Colors.deepPurple,
+              width: 2,
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
                 color: Colors.deepPurple,
                 width: 2,
               ),
-              activeIndicatorBorder: const BorderSide(
+            ),
+            enabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
                 color: Colors.deepPurple,
                 width: 2,
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.deepPurple,
-                  width: 2,
-                ),
-              ),
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.deepPurple,
-                  width: 2,
-                ),
               ),
             ),
           ),
-          home: const CredScreen(),
         ),
+        home: const CredScreen(),
       ),
+      //  ),
     );
   }
 }
@@ -271,7 +274,10 @@ class _CredScreenState extends State<CredScreen> {
 
                     MaterialPageRoute route = MaterialPageRoute(
                       // INIT - Get the LMFeed instance and pass the credentials (if any)
-                      builder: (context) => lmFeed!,
+                      builder: (context) => ExampleTabScreen(
+                        feedWidget: lmFeed!,
+                        userId: userId,
+                      ),
                     );
                     Navigator.of(context).push(route);
                   },

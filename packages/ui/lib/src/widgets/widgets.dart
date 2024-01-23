@@ -23,5 +23,6 @@ export 'topic/topic_chip.dart';
 export 'topic/topic_feed_bar.dart';
 export 'topic/topic_feed_grid.dart';
 export 'topic/topic_tile.dart';
+export 'topic/feed_topic_bar.dart';
 
 export 'common/shimmer/user_tile_shimmer.dart';

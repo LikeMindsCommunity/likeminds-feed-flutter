@@ -5,47 +5,51 @@ addLinkPreviewEventHandler(
   LMFeedComposeAddLinkPreviewEvent event,
   Emitter<LMFeedComposeState> emitter,
 ) async {
-  List<LMMediaModel> mediaList = LMFeedComposeBloc.instance.postMedia;
+  try {
+    List<LMMediaModel> mediaList = LMFeedComposeBloc.instance.postMedia;
 
-  mediaList.removeWhere((element) => element.mediaType == LMMediaType.link);
+    mediaList.removeWhere((element) => element.mediaType == LMMediaType.link);
 
-  for (LMMediaModel media in mediaList) {
-    if (media.mediaType != LMMediaType.link ||
-        media.mediaType != LMMediaType.widget) {
-      return;
+    for (LMMediaModel media in mediaList) {
+      if (media.mediaType != LMMediaType.link ||
+          media.mediaType != LMMediaType.widget) {
+        return;
+      }
     }
-  }
 
-  String url = getFirstValidLinkFromString(event.url);
+    String url = getFirstValidLinkFromString(event.url);
 
-  if (url.isEmpty) {
-    emitter(LMFeedComposeInitialState());
-  }
+    if (url.isEmpty) {
+      emitter(LMFeedComposeInitialState());
+    }
 
-  DecodeUrlRequest request = (DecodeUrlRequestBuilder()..url(url)).build();
+    DecodeUrlRequest request = (DecodeUrlRequestBuilder()..url(url)).build();
 
-  DecodeUrlResponse response = await LMFeedCore.client.decodeUrl(request);
+    DecodeUrlResponse response = await LMFeedCore.client.decodeUrl(request);
 
-  if (response.success == true) {
-    OgTags responseTags = response.ogTags!;
+    if (response.success == true) {
+      OgTags responseTags = response.ogTags!;
 
-    LMMediaModel linkModel = LMMediaModel(
-      mediaType: LMMediaType.link,
-      link: url,
-      ogTags: LMOgTagsViewDataConvertor.fromAttachmentsMetaOgTags(
-        responseTags,
-      ),
-    );
+      LMMediaModel linkModel = LMMediaModel(
+        mediaType: LMMediaType.link,
+        link: url,
+        ogTags: LMOgTagsViewDataConvertor.fromAttachmentsMetaOgTags(
+          responseTags,
+        ),
+      );
 
-    LMFeedComposeBloc.instance.postMedia.add(linkModel);
+      LMFeedComposeBloc.instance.postMedia.add(linkModel);
 
-    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-      eventName: LMFeedAnalyticsKeys.linkAttachedInPost,
-      eventProperties: {
-        'link': event.url,
-      },
-    ));
+      LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.linkAttachedInPost,
+        eventProperties: {
+          'link': event.url,
+        },
+      ));
 
-    emitter(LMFeedComposeAddedLinkPreviewState(url: event.url));
+      emitter(LMFeedComposeAddedLinkPreviewState(url: event.url));
+    }
+  } on Exception catch (err, stacktrace) {
+    LMFeedLogger.instance.handleException(err, stacktrace);
   }
 }

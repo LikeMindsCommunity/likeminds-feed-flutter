@@ -174,13 +174,14 @@ class LMFeedMediaHandler {
         // onUploadedMedia(false);
         return null;
       }
-    } on Exception catch (e) {
+    } on Exception catch (err, stacktrace) {
+      LMFeedLogger.instance.handleException(err, stacktrace);
       toast(
         'An error occurred',
         duration: Toast.LENGTH_LONG,
       );
       // onUploadedMedia(false);
-      debugPrint(e.toString());
+      debugPrint(err.toString());
       return null;
     }
   }
@@ -226,7 +227,8 @@ class LMFeedMediaHandler {
       } else {
         return null;
       }
-    } catch (e) {
+    } on Exception catch (err, stacktrace) {
+      LMFeedLogger.instance.handleException(err, stacktrace);
       toast(
         'An error occurred',
         duration: Toast.LENGTH_LONG,

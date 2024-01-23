@@ -41,10 +41,10 @@ class LMPostViewData {
 
   List<LMCommentViewData> replies;
 
-  bool isReposted;
+  bool isRepost;
   bool isRepostedByUser;
   int repostCount;
-  bool isDeleted;
+  bool? isDeleted;
 
   /// {@macro post_view_data}
   LMPostViewData._({
@@ -64,10 +64,10 @@ class LMPostViewData {
     required this.commentCount,
     required this.isEdited,
     required this.replies,
-    required this.isReposted,
+    required this.isRepost,
     required this.isRepostedByUser,
     required this.repostCount,
-    required this.isDeleted,
+    this.isDeleted = false,
   });
 }
 
@@ -169,7 +169,7 @@ class LMPostViewDataBuilder {
     _repostCount = repostCount;
   }
 
-  void isDeleted(bool isDeleted) {
+  void isDeleted([bool isDeleted = false]) {
     _isDeleted = isDeleted;
   }
 
@@ -191,8 +191,8 @@ class LMPostViewDataBuilder {
       updatedAt: _updatedAt!,
       isEdited: _isEdited!,
       replies: _replies!,
-      isDeleted: _isDeleted!,
-      isReposted: _isReposted!,
+      isDeleted: _isDeleted ?? false,
+      isRepost: _isReposted!,
       isRepostedByUser: _isRepostedByUser!,
       repostCount: _repostCount!,
     );

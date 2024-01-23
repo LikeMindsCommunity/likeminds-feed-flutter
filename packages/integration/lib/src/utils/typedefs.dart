@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/analytics/analytics_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 /// {@template lm_analytics_bloc_listener}
 /// State changes listener function for [LMFeedAnalyticsBloc]
