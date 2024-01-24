@@ -21,50 +21,48 @@ class MyApp extends StatelessWidget {
         textColor: Colors.white,
         alignment: Alignment.bottomCenter,
       ),
-      child:
-          //  LMFeedTheme(
-          //   theme: LMFeedThemeData.light(
-          //     primaryColor: Colors.red[300],
-          //     tagColor: Colors.red[300],
-          //     linkColor: Colors.red[300],
-          //   ),
-          //   child:
-          MaterialApp(
-        title: 'Integration App for UI + SDK package',
-        navigatorKey: rootNavigatorKey,
-        scaffoldMessengerKey: rootScaffoldMessengerKey,
-        theme: ThemeData(
-          useMaterial3: false,
-          primaryColor: Colors.deepPurple,
-          inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            outlineBorder: const BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-            activeIndicatorBorder: const BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
+      child: LMFeedTheme(
+        theme: LMFeedThemeData.light(
+          primaryColor: Colors.red[300],
+          tagColor: Colors.red[300],
+          linkColor: Colors.red[300],
+        ),
+        child: MaterialApp(
+          title: 'Integration App for UI + SDK package',
+          navigatorKey: rootNavigatorKey,
+          scaffoldMessengerKey: rootScaffoldMessengerKey,
+          theme: ThemeData(
+            useMaterial3: false,
+            primaryColor: Colors.deepPurple,
+            inputDecorationTheme: InputDecorationTheme(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              outlineBorder: const BorderSide(
                 color: Colors.deepPurple,
                 width: 2,
               ),
-            ),
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
+              activeIndicatorBorder: const BorderSide(
                 color: Colors.deepPurple,
                 width: 2,
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.deepPurple,
+                  width: 2,
+                ),
+              ),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.deepPurple,
+                  width: 2,
+                ),
               ),
             ),
           ),
+          home: const CredScreen(),
         ),
-        home: const CredScreen(),
       ),
-      //  ),
     );
   }
 }
@@ -187,6 +185,7 @@ class _CredScreenState extends State<CredScreen> {
 
   @override
   Widget build(BuildContext context) {
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     // return lmFeed;
     userId = null; // UserLocalPreference.instance.fetchUserId();
     // If the local prefs have user id stored
@@ -199,7 +198,7 @@ class _CredScreenState extends State<CredScreen> {
       );
     } else {
       return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 6, 92, 193),
+        backgroundColor: feedTheme.primaryColor,
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18.0),

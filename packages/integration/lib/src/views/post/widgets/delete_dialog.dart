@@ -33,6 +33,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
 
     return Dialog(
+      backgroundColor: feedTheme.container,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6.0),
       ),
@@ -86,7 +87,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                 enableDrag: true,
                                                 clipBehavior: Clip.hardEdge,
                                                 backgroundColor:
-                                                    LikeMindsTheme.whiteColor,
+                                                    feedTheme.container,
                                                 useSafeArea: true,
                                                 shape:
                                                     const RoundedRectangleBorder(
@@ -266,7 +267,9 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    if (user.userUniqueId != userId && isCm) {
+                    if (user.userUniqueId != userId &&
+                        isCm &&
+                        reasonForDeletion == null) {
                       toast('Please select a reason for deletion');
                       return;
                     }

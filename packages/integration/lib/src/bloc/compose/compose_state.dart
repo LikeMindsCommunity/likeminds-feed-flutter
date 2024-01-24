@@ -60,11 +60,6 @@ class LMFeedComposeAddedDocumentState extends LMFeedComposeState {
   List<Object> get props => [identityHashCode(this)];
 }
 
-// class LMFeedComposeRemovingAttachmentState extends LMFeedComposeState {
-//   @override
-//   List<Object> get props => [DateTime.now().millisecondsSinceEpoch];
-// }
-
 class LMFeedComposeRemovedAttachmentState extends LMFeedComposeState {
   @override
   List<Object> get props => [identityHashCode(this)];

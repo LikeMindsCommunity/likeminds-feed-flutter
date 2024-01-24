@@ -763,6 +763,17 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           textStyle: TextStyle(color: feedTheme?.primaryColor, fontSize: 12),
         ),
       ),
+      onTextTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMFeedLikesScreen(
+              postId: _postDetailScreenHandler!.postData!.id,
+              commentId: commentViewData.id,
+            ),
+          ),
+        );
+      },
       onTap: () async {
         commentViewData.likesCount = commentViewData.isLiked
             ? commentViewData.likesCount - 1

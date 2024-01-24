@@ -56,7 +56,7 @@ class LMFeedUserTile extends LMFeedTile {
       subtitle: subtitle ??
           (user.sdkClientInfo != null
               ? LMFeedText(
-                  text: user.sdkClientInfo!.userUniqueId,
+                  text: "@${user.name.toLowerCase().split(' ').join()} ",
                   style: const LMFeedTextStyle(
                     textStyle: TextStyle(
                       fontSize: LikeMindsTheme.kFontSmall,

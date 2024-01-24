@@ -457,6 +457,17 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
             ),
           ),
         ),
+        onTextTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LMFeedLikesScreen(
+                postId: widget.postId,
+                commentId: commentViewData.id,
+              ),
+            ),
+          );
+        },
         onTap: () async {
           LMCommentViewData commentFromList =
               replies.firstWhere((element) => element.id == commentViewData.id);
