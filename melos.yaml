@@ -1,0 +1,15 @@
+name: likeminds_feed_flutter
+
+packages:
+  - packages/*
+  - example/
+
+scripts:
+  analyze:
+    exec: dart analyze .
+
+  clean:
+    exec: flutter clean .
+
+  dry-run:
+    exec: flutter pub publish --dry-run
