@@ -715,6 +715,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedCommentWidget(
       user: userViewData,
       comment: commentViewData,
+      menu: (menu) {
+        return menu.copyWith(
+          removeItemIds: {
+            commentEditId,
+            commentReportId,
+          },
+        );
+      },
       style: feedTheme?.commentStyle ??
           const LMFeedCommentStyle(
             padding: EdgeInsets.all(16.0),
@@ -1032,6 +1040,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         ),
                         focusNode: _postDetailScreenHandler!.focusNode,
                         onChange: (String p0) {},
+                        scrollPhysics: const FixedExtentScrollPhysics(),
                       ),
                     ),
                     const SizedBox(width: 6),
