@@ -1,1 +1,1 @@
-Integration for Feeds from LikeMinds. More content to follow.
+Core package of LikeMinds Feed Flutter SDK, provides access to screens, BLoCs, and other utilities.
