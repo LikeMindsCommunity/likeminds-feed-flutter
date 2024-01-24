@@ -12,6 +12,7 @@ import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 part 'feed_screen_configuration.dart';
@@ -747,6 +748,7 @@ class _FeedRoomViewState extends State<FeedRoomView> {
 
   LMFeedPostWidget defPostWidget(
       LMFeedThemeData? feedTheme, LMPostViewData post) {
+    VideoController? postVideoController;
     return LMFeedPostWidget(
       post: post,
       topics: widget.universalFeedBloc.topics,
@@ -760,8 +762,10 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         );
       },
       style: feedTheme?.postStyle,
-      onMediaTap: () {
-        Navigator.push(
+      onMediaTap: () async {
+        // ignore: dead_code
+        postVideoController?.player.pause();
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => LMFeedMediaPreviewScreen(
@@ -771,8 +775,12 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             ),
           ),
         );
+        // ignore: dead_code
+        postVideoController?.player.play();
       },
       onPostTap: (context, post) {
+        // ignore: dead_code
+        postVideoController?.player.pause();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -782,11 +790,13 @@ class _FeedRoomViewState extends State<FeedRoomView> {
             ),
           ),
         );
+        // ignore: dead_code
+        postVideoController?.player.play();
       },
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
       content: _defContentWidget(post),
-      media: _defPostMedia(post),
+      media: _defPostMedia(post, postVideoController),
       topicWidget: _defTopicWidget(post),
     );
   }
@@ -883,10 +893,14 @@ class _FeedRoomViewState extends State<FeedRoomView> {
     );
   }
 
-  LMFeedPostMedia _defPostMedia(LMPostViewData post) {
+  LMFeedPostMedia _defPostMedia(
+      LMPostViewData post, VideoController? videoController) {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       style: feedTheme?.mediaStyle,
+      initialiseVideoController: (controller) {
+        videoController = controller;
+      },
       onMediaTap: () {
         Navigator.push(
           context,
