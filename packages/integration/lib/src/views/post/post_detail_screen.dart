@@ -590,6 +590,20 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedPostMedia(
       attachments: _postDetailScreenHandler!.postData!.attachments!,
       style: feedTheme?.mediaStyle,
+      onMediaTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMFeedMediaPreviewScreen(
+              postAttachments:
+                  _postDetailScreenHandler!.postData!.attachments ?? [],
+              post: _postDetailScreenHandler!.postData!,
+              user: _postDetailScreenHandler!
+                  .users[_postDetailScreenHandler!.postData!.userId]!,
+            ),
+          ),
+        );
+      },
     );
   }
 
