@@ -228,7 +228,12 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             height: screenSize?.width,
             width: screenSize?.width,
             child: ListView.builder(
-              scrollDirection: Axis.horizontal,
+              scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
+                  ? Axis.vertical
+                  : Axis.horizontal,
+              physics: LMFeedComposeBloc.instance.documentCount > 0
+                  ? const NeverScrollableScrollPhysics()
+                  : null,
               shrinkWrap: true,
               itemCount: composeBloc.postMedia.length,
               itemBuilder: (context, index) {
