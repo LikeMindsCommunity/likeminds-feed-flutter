@@ -689,89 +689,95 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     if (!config!.enableTopics) {
       return const SizedBox.shrink();
     }
-    return Row(
-      children: [
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: ValueListenableBuilder(
-              valueListenable: rebuildTopicFloatingButton,
-              builder: (context, _, __) {
-                return GestureDetector(
-                  onTap: () async {
-                    if (_focusNode.hasFocus) {
-                      FocusScopeNode currentFocus = FocusScope.of(context);
-                      currentFocus.unfocus();
-                      await Future.delayed(const Duration(milliseconds: 500));
-                    }
-                    _controllerPopUp.showMenu();
-                  },
-                  child: AbsorbPointer(
-                    child: CustomPopupMenu(
-                      controller: _controllerPopUp,
-                      showArrow: false,
-                      horizontalMargin: 16.0,
-                      pressType: PressType.singleClick,
-                      menuBuilder: () => LMFeedTopicList(
-                        selectedTopics: composeBloc.selectedTopics,
-                        isEnabled: true,
-                        onTopicSelected: (updatedTopics, tappedTopic) {
-                          if (composeBloc.selectedTopics.isEmpty) {
-                            composeBloc.selectedTopics.add(tappedTopic);
-                          } else {
-                            if (composeBloc.selectedTopics.first.id ==
-                                tappedTopic.id) {
-                              composeBloc.selectedTopics.clear();
-                            } else {
-                              composeBloc.selectedTopics.clear();
+
+    return Container(
+      margin: const EdgeInsets.only(
+        bottom: 25,
+      ),
+      child: Row(
+        children: [
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: ValueListenableBuilder(
+                valueListenable: rebuildTopicFloatingButton,
+                builder: (context, _, __) {
+                  return GestureDetector(
+                    onTap: () async {
+                      if (_focusNode.hasFocus) {
+                        FocusScopeNode currentFocus = FocusScope.of(context);
+                        currentFocus.unfocus();
+                        await Future.delayed(const Duration(milliseconds: 500));
+                      }
+                      _controllerPopUp.showMenu();
+                    },
+                    child: AbsorbPointer(
+                      child: CustomPopupMenu(
+                        controller: _controllerPopUp,
+                        showArrow: false,
+                        horizontalMargin: 16.0,
+                        pressType: PressType.singleClick,
+                        menuBuilder: () => LMFeedTopicList(
+                          selectedTopics: composeBloc.selectedTopics,
+                          isEnabled: true,
+                          onTopicSelected: (updatedTopics, tappedTopic) {
+                            if (composeBloc.selectedTopics.isEmpty) {
                               composeBloc.selectedTopics.add(tappedTopic);
+                            } else {
+                              if (composeBloc.selectedTopics.first.id ==
+                                  tappedTopic.id) {
+                                composeBloc.selectedTopics.clear();
+                              } else {
+                                composeBloc.selectedTopics.clear();
+                                composeBloc.selectedTopics.add(tappedTopic);
+                              }
                             }
-                          }
-                          _controllerPopUp.hideMenu();
-                          rebuildTopicFloatingButton.value =
-                              !rebuildTopicFloatingButton.value;
-                        },
-                      ),
-                      child: Container(
-                        height: 36,
-                        alignment: Alignment.bottomLeft,
-                        margin: const EdgeInsets.only(left: 16.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(500),
-                          color: LMFeedTheme.of(context).container,
-                          border: Border.all(
-                            color: LMFeedTheme.of(context).primaryColor,
-                          ),
+                            _controllerPopUp.hideMenu();
+                            rebuildTopicFloatingButton.value =
+                                !rebuildTopicFloatingButton.value;
+                          },
                         ),
-                        child: LMFeedTopicChip(
-                          isSelected: false,
-                          topic: composeBloc.selectedTopics.isEmpty
-                              ? (LMTopicViewDataBuilder()
-                                    ..id("0")
-                                    ..isEnabled(true)
-                                    ..name("Topic"))
-                                  .build()
-                              : composeBloc.selectedTopics.first,
-                          style: LMFeedTopicChipStyle(
-                            textStyle: TextStyle(
+                        child: Container(
+                          height: 36,
+                          alignment: Alignment.bottomLeft,
+                          margin: const EdgeInsets.only(left: 16.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(500),
+                            color: LMFeedTheme.of(context).container,
+                            border: Border.all(
                               color: LMFeedTheme.of(context).primaryColor,
                             ),
-                            icon: LMFeedIcon(
-                              type: LMFeedIconType.icon,
-                              icon: CupertinoIcons.chevron_down,
-                              style: LMFeedIconStyle(
-                                size: 16,
+                          ),
+                          child: LMFeedTopicChip(
+                            isSelected: false,
+                            topic: composeBloc.selectedTopics.isEmpty
+                                ? (LMTopicViewDataBuilder()
+                                      ..id("0")
+                                      ..isEnabled(true)
+                                      ..name("Topic"))
+                                    .build()
+                                : composeBloc.selectedTopics.first,
+                            style: LMFeedTopicChipStyle(
+                              textStyle: TextStyle(
                                 color: LMFeedTheme.of(context).primaryColor,
+                              ),
+                              icon: LMFeedIcon(
+                                type: LMFeedIconType.icon,
+                                icon: CupertinoIcons.chevron_down,
+                                style: LMFeedIconStyle(
+                                  size: 16,
+                                  color: LMFeedTheme.of(context).primaryColor,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              }),
-        ),
-      ],
+                  );
+                }),
+          ),
+        ],
+      ),
     );
   }
 }
