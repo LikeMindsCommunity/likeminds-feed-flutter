@@ -10,3 +10,6 @@ scripts:
 
   clean:
     exec: flutter clean .
+
+  dry-run:
+    exec: flutter pub publish --dry-run

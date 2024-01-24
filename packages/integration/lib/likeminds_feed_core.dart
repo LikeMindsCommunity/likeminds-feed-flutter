@@ -7,6 +7,7 @@ import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
@@ -87,6 +88,7 @@ class LMFeedCore {
           initiateUserCalled = true;
           await LMFeedUserLocalPreference.instance
               .setUserDataFromInitiateUserResponse(value);
+          LMNotificationHandler.instance.registerDevice(value.user!.id);
         }
         return value;
       });

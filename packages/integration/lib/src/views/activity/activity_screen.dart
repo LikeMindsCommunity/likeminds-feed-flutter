@@ -220,16 +220,21 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width,
             ),
-            child: RichText(
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              text: TextSpan(
-                children: LMFeedPostUtils.extractNotificationTags(
-                    item.activityText, widget.uuid),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 6.0,
+                top: 12.0,
+              ),
+              child: RichText(
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                text: TextSpan(
+                  children: LMFeedPostUtils.extractNotificationTags(
+                      item.activityText, widget.uuid),
+                ),
               ),
             ),
           ),
-          LikeMindsTheme.kVerticalPaddingMedium,
           Divider(
             color: feedTheme?.onContainer.withOpacity(0.1),
             thickness: 1,

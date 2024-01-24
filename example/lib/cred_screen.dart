@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:likeminds_feed_example/app.dart';
-import 'package:likeminds_feed_example/main.dart';
-import 'package:likeminds_feed_example/tab_screen.dart';
+import 'package:likeminds_feed_sample/app.dart';
+import 'package:likeminds_feed_sample/main.dart';
+import 'package:likeminds_feed_sample/tab_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';

@@ -105,7 +105,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                   vertical: LikeMindsTheme.kPaddingSmall,
                 ),
                 width: style?.width ?? screenSize.width - 40,
-                height: style?.height ?? 80,
+                height: style?.height ?? 72,
                 decoration: BoxDecoration(
                   color: style!.backgroundColor,
                   border: style!.showBorder
@@ -147,7 +147,8 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                       overflow: TextOverflow.ellipsis,
                                       textStyle: TextStyle(
                                         fontSize: 14,
-                                        color: style!.textColor ?? Colors.grey,
+                                        color: style!.textColor ??
+                                            Colors.grey.shade700,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -163,7 +164,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                         textStyle: TextStyle(
                                           fontSize: LikeMindsTheme.kFontSmall,
                                           color: style!.textColor ??
-                                              Colors.grey.shade300,
+                                              Colors.grey.shade500,
                                         ),
                                       )),
                                   LikeMindsTheme.kHorizontalPaddingXSmall,
@@ -173,7 +174,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                       textStyle: TextStyle(
                                         fontSize: LikeMindsTheme.kFontSmall,
                                         color: style!.textColor ??
-                                            Colors.grey.shade300,
+                                            Colors.grey.shade500,
                                       ),
                                     ),
                                   ),
@@ -184,7 +185,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                                       textStyle: TextStyle(
                                         fontSize: LikeMindsTheme.kFontSmall,
                                         color: style!.textColor ??
-                                            Colors.grey.shade300,
+                                            Colors.grey.shade500,
                                       ),
                                     ),
                                   ),

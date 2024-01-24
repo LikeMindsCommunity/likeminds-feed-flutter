@@ -1,10 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:overlay_support/overlay_support.dart';
-
-//TODO: Check for LM notifications
 
 /// This class handles all the notification related logic
 /// It registers the device for notifications in the SDK
@@ -12,8 +9,8 @@ import 'package:overlay_support/overlay_support.dart';
 /// It routes the notification to the appropriate screen
 /// Since this is a singleton class, it is initialized on the client side
 class LMNotificationHandler {
-  late final String deviceId;
-  late final String fcmToken;
+  String? deviceId;
+  String? fcmToken;
   int? memberId;
 
   static LMNotificationHandler? _instance;
@@ -40,10 +37,13 @@ class LMNotificationHandler {
   /// It initializes the [memberId] which is used to route the notification
   /// If the registration is successful, it prints success message
   void registerDevice(int memberId) async {
+    if (fcmToken == null || deviceId == null) {
+      return;
+    }
     RegisterDeviceRequest request = (RegisterDeviceRequestBuilder()
-          ..token(fcmToken)
+          ..token(fcmToken!)
           ..memberId(memberId)
-          ..deviceId(deviceId))
+          ..deviceId(deviceId!))
         .build();
     this.memberId = memberId;
     final response = await LMFeedCore.client.registerDevice(request);
@@ -60,36 +60,37 @@ class LMNotificationHandler {
   Future<void> handleNotification(RemoteMessage message, bool show,
       GlobalKey<NavigatorState> navigatorKey) async {
     debugPrint("--- Notification received in LEVEL 2 ---");
-    message.toMap().forEach((key, value) {
-      debugPrint("$key: $value");
-      if (key == "data") {
-        message.data.forEach((key, value) {
-          debugPrint("$key: $value");
-        });
-      }
-    });
+    if (message.data["category"] == "Feed") {
+      message.toMap().forEach((key, value) {
+        debugPrint("$key: $value");
+        if (key == "data") {
+          message.data.forEach((key, value) {
+            debugPrint("$key: $value");
+          });
+        }
+      });
 
-    // First, check if the message contains a data payload.
-    if (show && message.data.isNotEmpty) {
-      //TODO: Add LM check for showing LM notifications
-      showNotification(message, navigatorKey);
-    } else if (message.data.isNotEmpty) {
-      // Second, extract the notification data and routes to the appropriate screen
-      routeNotification(message, navigatorKey);
+      // First, check if the message contains a data payload.
+      if (show && message.data.isNotEmpty) {
+        //TODO: Add LM check for showing LM notifications
+        showNotification(message, navigatorKey);
+      } else if (message.data.isNotEmpty) {
+        // Second, extract the notification data and routes to the appropriate screen
+        routeNotification(message, navigatorKey);
+      }
     }
-    // Third, check if the message contains a notification payload.
-    // else if (message.notification != null) {
-    //   print("Notification data is empty");
-    //   message.toMap().forEach((key, value) {
-    //     print("$key: $value");
-    //   });
-    // }
   }
 
   void routeNotification(
       RemoteMessage message, GlobalKey<NavigatorState> navigatorKey) async {
     Map<String, String> queryParams = {};
     String host = "";
+
+    LMFeedAnalyticsBloc.instance.add(
+      const LMFeedFireAnalyticsEvent(
+          eventName: LMFeedAnalyticsKeys.notificationClicked,
+          eventProperties: {}),
+    );
 
     // Only notifications with data payload are handled
     if (message.data.isNotEmpty) {
@@ -116,13 +117,20 @@ class LMNotificationHandler {
     // If the notification is post related, route to the post detail screen
     if (host == "post_detail") {
       final String postId = queryParams["post_id"]!;
-      navigatorKey.currentState!.push(
-        MaterialPageRoute(
-          builder: (context) => LMFeedPostDetailScreen(
-            postId: postId,
-          ),
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: LMFeedAnalyticsKeys.commentListOpen,
+          eventProperties: {
+            'postId': postId,
+          },
         ),
       );
+
+      navigatorKey.currentState!.push(MaterialPageRoute(
+        builder: (context) {
+          return LMFeedPostDetailScreen(postId: postId);
+        },
+      ));
     }
   }
 
@@ -130,16 +138,16 @@ class LMNotificationHandler {
   /// This is a dismissable notification shown on the top of the screen
   /// It is shown when the notification is received in foreground
   void showNotification(
-      RemoteMessage message, GlobalKey<NavigatorState> navigator) {
+    RemoteMessage message,
+    GlobalKey<NavigatorState> navigatorKey,
+  ) {
     if (message.data.isNotEmpty) {
-      LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
-          eventName: LMFeedAnalyticsKeys.notificationReceived,
-          eventProperties: {}));
       showSimpleNotification(
         GestureDetector(
           onTap: () {
-            routeNotification(message, navigator);
+            routeNotification(message, navigatorKey);
           },
+          behavior: HitTestBehavior.opaque,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -173,9 +181,12 @@ class LMNotificationHandler {
           color: Colors.grey.shade400,
           size: 18,
         ),
-        position: NotificationPosition.top,
         slideDismissDirection: DismissDirection.horizontal,
       );
+      LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.notificationReceived,
+        eventProperties: {},
+      ));
     }
   }
 }
