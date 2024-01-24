@@ -887,6 +887,18 @@ class _FeedRoomViewState extends State<FeedRoomView> {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       style: feedTheme?.mediaStyle,
+      onMediaTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMFeedMediaPreviewScreen(
+              postAttachments: post.attachments ?? [],
+              post: post,
+              user: widget.universalFeedBloc.users[post.userId]!,
+            ),
+          ),
+        );
+      },
     );
   }
 

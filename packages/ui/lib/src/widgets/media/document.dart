@@ -137,6 +137,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           widget.title ??
                               LMFeedText(

@@ -79,7 +79,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
               icon: CupertinoIcons.xmark,
               style: LMFeedIconStyle(
                 color: feedTheme.container,
-                size: 28,
+                size: 24,
                 boxSize: 64,
                 boxPadding: 12,
               ),
