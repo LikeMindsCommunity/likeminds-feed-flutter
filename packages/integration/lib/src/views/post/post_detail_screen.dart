@@ -116,6 +116,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   @override
+  void dispose() {
+    LMFeedCommentHandlerBloc.instance.add(LMFeedCommentCancelEvent());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     feedTheme = LMFeedTheme.of(context);
     return RefreshIndicator.adaptive(
