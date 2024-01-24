@@ -1017,7 +1017,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         ),
                         focusNode: _postDetailScreenHandler!.focusNode,
                         onChange: (String p0) {},
-                        scrollPhysics: const FixedExtentScrollPhysics(),
+                        scrollPhysics: const AlwaysScrollableScrollPhysics(),
                       ),
                     ),
                     const SizedBox(width: 6),
