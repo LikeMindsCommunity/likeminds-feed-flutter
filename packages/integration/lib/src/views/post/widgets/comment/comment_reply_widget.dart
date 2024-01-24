@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 
 import 'package:timeago/timeago.dart' as timeago;
@@ -350,6 +351,11 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         commentViewData,
         setReplyState,
       ),
+      menu: (menu) {
+        return menu.copyWith(
+          removeItemIds: {commentEditId, commentReportId},
+        );
+      },
     );
   }
 
