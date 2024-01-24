@@ -11,9 +11,6 @@ addVideoEventHandler(
 
   if (mediaCount == 0) {
     emitter(LMFeedComposeMediaLoadingState());
-  } else {
-    LMFeedComposeBloc.instance.postMedia
-        .removeWhere((element) => element.mediaType == LMMediaType.link);
   }
   debugPrint("Starting picking videos");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
@@ -27,6 +24,8 @@ addVideoEventHandler(
       if (videos != null && videos.isNotEmpty) {
         LMFeedComposeBloc.instance.videoCount += videos.length;
         LMFeedComposeBloc.instance.postMedia.addAll(videos);
+        LMFeedComposeBloc.instance.postMedia
+            .removeWhere((element) => element.mediaType == LMMediaType.link);
         emitter(LMFeedComposeAddedVideoState());
       } else {
         emitter(LMFeedComposeInitialState());

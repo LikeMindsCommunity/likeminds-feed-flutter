@@ -11,9 +11,6 @@ addDocumentEventHandler(
 
   if (mediaCount == 0) {
     emitter(LMFeedComposeMediaLoadingState());
-  } else {
-    LMFeedComposeBloc.instance.postMedia
-        .removeWhere((element) => element.mediaType == LMMediaType.link);
   }
   debugPrint("Starting picking documents");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
@@ -27,6 +24,8 @@ addDocumentEventHandler(
       if (documents != null && documents.isNotEmpty) {
         LMFeedComposeBloc.instance.documentCount += documents.length;
         LMFeedComposeBloc.instance.postMedia.addAll(documents);
+        LMFeedComposeBloc.instance.postMedia
+            .removeWhere((element) => element.mediaType == LMMediaType.link);
         emitter(LMFeedComposeAddedDocumentState());
       } else {
         emitter(LMFeedComposeInitialState());

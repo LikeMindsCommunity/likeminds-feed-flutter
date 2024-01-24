@@ -103,6 +103,7 @@ class LMFeedPostLinkPreview extends StatelessWidget {
                             ? linkModel!.ogTags!.image!
                             : attachment!.attachmentMeta.ogTags!.image!),
                   ),
+            const Spacer(),
             Container(
               color: style.backgroundColor,
               padding: style.padding ?? const EdgeInsets.all(8.0),

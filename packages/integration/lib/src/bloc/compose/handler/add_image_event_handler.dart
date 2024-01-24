@@ -11,9 +11,6 @@ addImageEventHandler(
 
   if (mediaCount == 0) {
     emitter(LMFeedComposeMediaLoadingState());
-  } else {
-    LMFeedComposeBloc.instance.postMedia
-        .removeWhere((element) => element.mediaType == LMMediaType.link);
   }
   debugPrint("Starting picking images");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
@@ -32,6 +29,8 @@ addImageEventHandler(
         if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
           emitter(LMFeedComposeInitialState());
         } else {
+          LMFeedComposeBloc.instance.postMedia
+              .removeWhere((element) => element.mediaType == LMMediaType.link);
           emitter(LMFeedComposeAddedImageState());
         }
       }

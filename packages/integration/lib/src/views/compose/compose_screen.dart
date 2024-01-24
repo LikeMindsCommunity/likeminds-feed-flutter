@@ -273,10 +273,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   case LMMediaType.link:
                     mediaWidget = LMFeedPostLinkPreview(
                       linkModel: composeBloc.postMedia[index],
-                      style: style?.mediaStyle?.linkStyle ??
+                      style: style?.mediaStyle?.linkStyle?.copyWith(
+                            width: style?.mediaStyle?.linkStyle?.width ??
+                                MediaQuery.of(context).size.width - 84,
+                          ) ??
                           LMFeedPostLinkPreviewStyle(
                             height: 215,
-                            width: 313,
+                            width: MediaQuery.of(context).size.width - 84,
+                            imageHeight: 138,
                             backgroundColor: LikeMindsTheme.backgroundColor,
                             border: Border.all(
                               color: LikeMindsTheme.secondaryColor,
@@ -321,8 +325,22 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   case LMMediaType.document:
                     {
                       mediaWidget = LMFeedDocument(
+                        onRemove: () {
+                          composeBloc.add(
+                            LMFeedComposeRemoveAttachmentEvent(
+                              index: index,
+                            ),
+                          );
+                        },
                         documentFile: composeBloc.postMedia[index].mediaFile,
-                        style: style?.mediaStyle?.documentStyle,
+                        style: style?.mediaStyle?.documentStyle?.copyWith(
+                              width: style?.mediaStyle?.documentStyle?.width ??
+                                  MediaQuery.of(context).size.width - 84,
+                            ) ??
+                            LMFeedPostDocumentStyle(
+                              width: screenSize!.width - 84,
+                              height: 90,
+                            ),
                         size: PostHelper.getFileSizeString(
                             bytes: composeBloc.postMedia[index].size ?? 0),
                       );
@@ -336,31 +354,33 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   child: Stack(
                     children: <Widget>[
                       mediaWidget,
-                      Positioned(
-                        top: 7.5,
-                        right: 7.5,
-                        child: GestureDetector(
-                          onTap: () {
-                            composeBloc.add(
-                              LMFeedComposeRemoveAttachmentEvent(
-                                index: index,
+                      if (composeBloc.postMedia[index].mediaType !=
+                          LMMediaType.document)
+                        Positioned(
+                          top: 7.5,
+                          right: 7.5,
+                          child: GestureDetector(
+                            onTap: () {
+                              composeBloc.add(
+                                LMFeedComposeRemoveAttachmentEvent(
+                                  index: index,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(500),
                               ),
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(500),
-                            ),
-                            width: 24,
-                            height: 24,
-                            child: Icon(
-                              Icons.cancel,
-                              color: feedTheme?.disabledColor,
+                              width: 24,
+                              height: 24,
+                              child: Icon(
+                                Icons.cancel,
+                                color: feedTheme?.disabledColor,
+                              ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 );

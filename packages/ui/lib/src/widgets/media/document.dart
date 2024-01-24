@@ -105,7 +105,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                   vertical: LikeMindsTheme.kPaddingSmall,
                 ),
                 width: style?.width ?? screenSize.width - 40,
-                height: 72, //style!.height ?? 72,
+                height: style?.height ?? 80,
                 decoration: BoxDecoration(
                   color: style!.backgroundColor,
                   border: style!.showBorder
@@ -123,7 +123,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                   children: [
                     Container(
                       alignment: Alignment.center,
-                      child: style!.documentIcon ??
+                      child: style?.documentIcon ??
                           const LMFeedIcon(
                             type: LMFeedIconType.icon,
                             icon: Icons.picture_as_pdf,

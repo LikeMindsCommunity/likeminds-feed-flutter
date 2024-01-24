@@ -58,42 +58,46 @@ class LMFeedMediaHandler {
             }
           }
         } else if (mediaType == 3) {
-          permissionStatus = await Permission.manageExternalStorage.status;
-          if (permissionStatus == PermissionStatus.granted) {
-            return true;
-          } else if (permissionStatus == PermissionStatus.denied) {
-            permissionStatus = await Permission.storage.request();
-            if (permissionStatus == PermissionStatus.permanentlyDenied) {
-              toast(
-                'Permissions denied, change app settings',
-                duration: Toast.LENGTH_LONG,
-              );
-              return false;
-            } else if (permissionStatus == PermissionStatus.granted) {
-              return true;
-            } else {
-              return false;
-            }
-          }
+          // permissionStatus = await Permission.manageExternalStorage.status;
+          // if (permissionStatus == PermissionStatus.granted) {
+          //   return true;
+          // } else if (permissionStatus == PermissionStatus.denied) {
+          //   permissionStatus = await Permission.storage.request();
+          //   if (permissionStatus == PermissionStatus.permanentlyDenied) {
+          //     toast(
+          //       'Permissions denied, change app settings',
+          //       duration: Toast.LENGTH_LONG,
+          //     );
+          //     return false;
+          //   } else if (permissionStatus == PermissionStatus.granted) {
+          //     return true;
+          //   } else {
+          //     return false;
+          //   }
+          // }
+          // on android 33, storage permission always returns PermissionStatus.denied, since it is deprecated in android 30 and fully removed in android 33
+          return true;
         }
       } else {
-        permissionStatus = await Permission.storage.status;
-        if (permissionStatus == PermissionStatus.granted) {
-          return true;
-        } else {
-          permissionStatus = await Permission.storage.request();
-          if (permissionStatus == PermissionStatus.granted) {
-            return true;
-          } else if (permissionStatus == PermissionStatus.denied) {
-            return false;
-          } else if (permissionStatus == PermissionStatus.permanentlyDenied) {
-            toast(
-              'Permissions denied, change app settings',
-              duration: Toast.LENGTH_LONG,
-            );
-            return false;
-          }
-        }
+        // permissionStatus = await Permission.storage.status;
+        // if (permissionStatus == PermissionStatus.granted) {
+        //   return true;
+        // } else {
+        //   permissionStatus = await Permission.storage.request();
+        //   if (permissionStatus == PermissionStatus.granted) {
+        //     return true;
+        //   } else if (permissionStatus == PermissionStatus.denied) {
+        //     return false;
+        //   } else if (permissionStatus == PermissionStatus.permanentlyDenied) {
+        //     toast(
+        //       'Permissions denied, change app settings',
+        //       duration: Toast.LENGTH_LONG,
+        //     );
+        //     return false;
+        //   }
+        // }
+        // on android 33, storage permission always returns PermissionStatus.denied, since it is deprecated in android 30 and fully removed in android 33
+        return true;
       }
     }
     return true;

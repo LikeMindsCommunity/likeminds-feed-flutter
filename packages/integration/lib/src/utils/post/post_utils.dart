@@ -183,7 +183,7 @@ class LMFeedPostUtils {
                   [])
               ..communityId(activity.activityEntityData.communityId)
               ..isPinned(activity.activityEntityData.isPinned!)
-              ..topics(activity.activityEntityData.topics!)
+              ..topics(activity.activityEntityData.topics??[])
               ..userId(activity.activityEntityData.userId!)
               ..likeCount(activity.activityEntityData.likesCount!)
               ..commentCount(activity.activityEntityData.commentsCount!)
