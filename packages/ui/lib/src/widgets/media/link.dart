@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/theme/theme.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /*
 * Topic chip widget
@@ -63,7 +64,14 @@ class LMFeedPostLinkPreview extends StatelessWidget {
     final LMFeedPostLinkPreviewStyle style =
         this.style ?? feedTheme.mediaStyle.linkStyle;
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        onTap?.call();
+        String uri = linkModel?.link ??
+            linkModel?.ogTags!.url ??
+            attachment?.attachmentMeta.ogTags?.url ??
+            '';
+        launchUrl(Uri.parse(uri));
+      },
       child: Container(
         margin: style.margin,
         clipBehavior: Clip.hardEdge,
