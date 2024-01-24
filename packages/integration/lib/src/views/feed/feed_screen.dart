@@ -36,7 +36,7 @@ class LMFeedScreen extends StatefulWidget {
   });
 
   //Builder for appbar
-  final LMFeedAppBar? appBar;
+  final LMFeedPostAppBarBuilder? appBar;
 
   //Callback for activity
 
@@ -283,30 +283,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
     return Scaffold(
       backgroundColor: feedThemeData?.backgroundColor,
-      appBar: widget.appBar ??
-          LMFeedAppBar(
-            title: GestureDetector(
-              onTap: () {
-                _scrollToTop();
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: LMFeedText(
-                  text: "Feed",
-                  style: LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      color: feedThemeData?.onContainer,
-                      fontSize: 27,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            style: LMFeedAppBarStyle.basic().copyWith(
-              backgroundColor: feedThemeData?.container,
-            ),
-          ),
+      appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
           refresh();
@@ -390,6 +367,33 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  LMFeedAppBar _defAppBar() {
+    return LMFeedAppBar(
+      leading: const SizedBox.shrink(),
+      title: GestureDetector(
+        onTap: () {
+          _scrollToTop();
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(left: 4.0),
+          child: LMFeedText(
+            text: "Feed",
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                color: feedThemeData?.onContainer,
+                fontSize: 27,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ),
+      style: LMFeedAppBarStyle.basic().copyWith(
+        backgroundColor: feedThemeData?.container,
       ),
     );
   }

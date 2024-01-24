@@ -304,6 +304,23 @@ class LMFeedTextFieldStyle {
   }
 }
 
+class LMFeedTextTheme {
+  final String fontFamily;
+
+  const LMFeedTextTheme({
+    required this.fontFamily,
+  });
+
+  factory LMFeedTextTheme.basic() =>
+      const LMFeedTextTheme(fontFamily: 'Roboto');
+
+  LMFeedTextTheme copyWith({
+    String? fontFamily,
+  }) {
+    return LMFeedTextTheme(fontFamily: fontFamily ?? this.fontFamily);
+  }
+}
+
 class LMFeedDialogStyle {
   final Color? backgroundColor;
 

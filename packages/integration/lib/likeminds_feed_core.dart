@@ -12,6 +12,7 @@ import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_con
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
 import 'package:media_kit/media_kit.dart';
+import 'dart:async';
 
 export 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/views.dart';
@@ -29,6 +30,10 @@ class LMFeedCore {
   late final LMFeedMediaService? mediaService;
   bool initiateUserCalled = false;
 
+  /// This is stream is used to listen to
+  /// deep links while the app is in active state
+  StreamSubscription? deepLinkStreamListener;
+
   /// This is the domain of the client. This is used to show
   /// generate link for sharing post
   String? clientDomain;
@@ -45,6 +50,9 @@ class LMFeedCore {
   static LMFeedConfig get config => instance.feedConfig;
 
   static String? get domain => instance.clientDomain;
+
+  static set deepLinkStream(StreamSubscription deepLinkStream) =>
+      instance.deepLinkStreamListener = deepLinkStream;
 
   LMFeedCore._();
 

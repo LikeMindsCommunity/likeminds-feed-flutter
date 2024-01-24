@@ -30,6 +30,7 @@ class LMFeedDeepLinkHandler {
     Share.share(postUrl);
   }
 
+  @deprecated
   Future<LMFeedDeepLinkResponse> parseDeepLink(
     LMFeedDeepLinkRequest request,
     GlobalKey<NavigatorState> navigatorKey,
@@ -49,6 +50,7 @@ class LMFeedDeepLinkHandler {
     }
   }
 
+  @deprecated
   Future<LMFeedDeepLinkResponse> handleOpenPostDeepLink(
     LMFeedDeepLinkRequest request,
     GlobalKey<NavigatorState> navigatorKey,
@@ -83,6 +85,7 @@ class LMFeedDeepLinkHandler {
     }
   }
 
+  @deprecated
   Future<LMFeedDeepLinkResponse> handleCreatePostDeepLink(
     LMFeedDeepLinkRequest request,
     GlobalKey<NavigatorState> navigatorKey,
@@ -109,6 +112,7 @@ class LMFeedDeepLinkHandler {
     }
   }
 
+  @deprecated
   Future<LMFeedDeepLinkResponse> handleOpenCommentDeepLink(
     LMFeedDeepLinkRequest request,
     GlobalKey<NavigatorState> navigatorKey,
