@@ -164,49 +164,56 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       builder: (dialogContext) => DefaultTextStyle(
         style: const TextStyle(),
         child: AlertDialog.adaptive(
+          backgroundColor: feedTheme?.container,
           title: const Text('Discard Post'),
           content:
               const Text('Are you sure you want to discard the current post?'),
           actionsAlignment: MainAxisAlignment.center,
           actionsPadding: const EdgeInsets.all(8),
           actions: <Widget>[
-            LMFeedButton(
-              text: LMFeedText(
-                text: "No",
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    color: LMFeedTheme.of(context).primaryColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
+            Row(
+              children: [
+                LMFeedButton(
+                  text: LMFeedText(
+                    text: "No",
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        color: LMFeedTheme.of(context).primaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
                   ),
+                  style: const LMFeedButtonStyle(height: 42),
+                  onTap: () {
+                    LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
+                    Navigator.of(dialogContext).pop();
+                  },
                 ),
-              ),
-              style: const LMFeedButtonStyle(height: 42),
-              onTap: () {
-                LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-            LMFeedButton(
-              text: LMFeedText(
-                text: "Yes",
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    color: LMFeedTheme.of(context).primaryColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
+                LikeMindsTheme.kHorizontalPaddingMedium,
+                LMFeedButton(
+                  text: LMFeedText(
+                    text: "Yes",
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        color: LMFeedTheme.of(context).primaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              style: const LMFeedButtonStyle(height: 42),
-              onTap: () {
-                composeBloc.postMedia.clear();
-                composeBloc.selectedTopics.clear();
-                composeBloc.userTags.clear();
+                  style: const LMFeedButtonStyle(height: 42),
+                  onTap: () {
+                    composeBloc.postMedia.clear();
+                    composeBloc.selectedTopics.clear();
+                    composeBloc.userTags.clear();
 
-                Navigator.of(dialogContext).pop();
-                Navigator.of(context).pop();
-              },
+                    Navigator.of(dialogContext).pop();
+                    Navigator.of(context).pop();
+                  },
+                ),
+                LikeMindsTheme.kHorizontalPaddingSmall,
+              ],
             ),
           ],
         ),
