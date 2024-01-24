@@ -183,6 +183,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               ),
               style: const LMFeedButtonStyle(height: 42),
               onTap: () {
+                LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
                 Navigator.of(dialogContext).pop();
               },
             ),
