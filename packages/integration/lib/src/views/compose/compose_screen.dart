@@ -172,6 +172,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           actionsPadding: const EdgeInsets.all(8),
           actions: <Widget>[
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 LMFeedButton(
                   text: LMFeedText(
