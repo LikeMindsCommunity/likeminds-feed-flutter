@@ -1,0 +1,6 @@
+# melos_managed_dependency_overrides: likeminds_feed_flutter_ui
+dependency_overrides:
+  likeminds_feed_flutter_ui:
+    path: ../ui
+  likeminds_feed:
+    path: ../../../LikeMinds-Flutter-Feed-SDK
