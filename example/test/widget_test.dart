@@ -6,7 +6,7 @@
 // // tree, read text, and verify that the values of widget properties are correct.
 
 // import 'package:flutter_test/flutter_test.dart';
-// import 'package:likeminds_feed_example/app.dart';
+// import 'package:likeminds_feed_sample/app.dart';
 
 // void main() {
 //   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

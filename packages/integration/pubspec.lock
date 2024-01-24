@@ -726,7 +726,7 @@ packages:
       path: "../../../LikeMinds-Flutter-Feed-SDK"
       relative: true
     source: path
-    version: "1.6.7"
+    version: "1.7.0"
   likeminds_feed_flutter_ui:
     dependency: "direct main"
     description:

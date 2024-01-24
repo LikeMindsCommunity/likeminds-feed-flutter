@@ -2,8 +2,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_example/cred_screen.dart';
+import 'package:likeminds_feed_sample/cred_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_sample/firebase_options.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 /// First level notification handler
@@ -40,7 +41,9 @@ void main() async {
 /// 5. Listen for FG and BG notifications
 /// 6. Handle notifications - [_handleNotification]
 void setupNotifications() async {
-  await Firebase.initializeApp();
+  final app = await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   final devId = await deviceId();
   final fcmToken = await setupMessaging();
   if (fcmToken == null) {

@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "likeminds_feed_example",
+      "name": "likeminds_feed_sample",
       "cwd": "example",
       "request": "launch",
       "type": "dart",
@@ -15,7 +15,7 @@
       ]
     },
     {
-      "name": "likeminds_feed_example (profile mode)",
+      "name": "likeminds_feed_sample (profile mode)",
       "cwd": "example",
       "request": "launch",
       "type": "dart",
@@ -26,7 +26,7 @@
       ]
     },
     {
-      "name": "likeminds_feed_example (release mode)",
+      "name": "likeminds_feed_sample (release mode)",
       "cwd": "example",
       "request": "launch",
       "type": "dart",
