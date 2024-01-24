@@ -654,6 +654,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         onTap: () {
           _postDetailScreenHandler!.openOnScreenKeyboard();
         },
+        onTextTap: () {
+          _postDetailScreenHandler!.openOnScreenKeyboard();
+        },
       );
 
   LMFeedButton defSaveButton() => LMFeedButton(

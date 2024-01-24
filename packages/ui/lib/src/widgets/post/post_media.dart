@@ -85,7 +85,10 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
     if (attachments!.first.attachmentType == 3) {
       /// If the attachment is a document,
       /// we need to call the method 'getDocumentList'
-      return getPostDocuments();
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: getPostDocuments(),
+      );
     } else if (attachments!.first.attachmentType == 4) {
       return LMFeedPostLinkPreview(
         attachment: attachments![0],

@@ -399,7 +399,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return LMFeedTopicBar(
       selectedTopics: _feedBloc.selectedTopics,
       openTopicSelector: openTopicSelector,
-      style: LMFeedTopicBarStyle(
+      style: const LMFeedTopicBarStyle(
         height: 60,
       ),
     );
@@ -939,6 +939,18 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         ),
         style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LMFeedPostDetailScreen(
+                postId: postViewData.id,
+                openKeyboard: true,
+                postBuilder: widget.postBuilder,
+              ),
+            ),
+          );
+        },
+        onTextTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(

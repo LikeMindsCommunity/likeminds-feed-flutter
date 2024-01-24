@@ -101,9 +101,12 @@ class _LMDocumentState extends State<LMFeedDocument> {
             return GestureDetector(
               onTap: widget.onTap == null ? null : () => widget.onTap!(),
               child: Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: LikeMindsTheme.kPaddingSmall,
-                ),
+                margin: style?.margin ??
+                    const EdgeInsets.symmetric(
+                      vertical: LikeMindsTheme.kPaddingSmall,
+                    ),
+                padding: style?.padding ??
+                    const EdgeInsets.all(LikeMindsTheme.kPaddingLarge),
                 width: style?.width ?? screenSize.width - 40,
                 height: style?.height ?? 72,
                 decoration: BoxDecoration(
@@ -118,7 +121,6 @@ class _LMDocumentState extends State<LMFeedDocument> {
                     style!.borderRadius ?? LikeMindsTheme.kBorderRadiusMedium,
                   ),
                 ),
-                padding: const EdgeInsets.all(LikeMindsTheme.kPaddingLarge),
                 child: Row(
                   children: [
                     Container(
@@ -237,6 +239,9 @@ class LMFeedPostDocumentStyle {
   final LMFeedTextStyle? titleStyle;
   final LMFeedTextStyle? subtitleStyle;
 
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+
   const LMFeedPostDocumentStyle({
     this.height,
     this.width,
@@ -250,6 +255,8 @@ class LMFeedPostDocumentStyle {
     this.backgroundColor,
     this.titleStyle,
     this.subtitleStyle,
+    this.padding,
+    this.margin,
   });
 
   LMFeedPostDocumentStyle copyWith({
@@ -265,6 +272,8 @@ class LMFeedPostDocumentStyle {
     Color? backgroundColor,
     LMFeedTextStyle? titleStyle,
     LMFeedTextStyle? subtitleStyle,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
   }) {
     return LMFeedPostDocumentStyle(
       height: height ?? this.height,
@@ -279,6 +288,8 @@ class LMFeedPostDocumentStyle {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       titleStyle: titleStyle ?? this.titleStyle,
       subtitleStyle: subtitleStyle ?? this.subtitleStyle,
+      margin: margin ?? this.margin,
+      padding: padding ?? this.padding,
     );
   }
 
