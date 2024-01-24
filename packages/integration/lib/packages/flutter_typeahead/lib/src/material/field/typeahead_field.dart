@@ -431,6 +431,8 @@ class TypeAheadField<T> extends StatefulWidget {
   /// that the TypeAhead widget displays
   final TextFieldConfiguration textFieldConfiguration;
 
+  final ScrollPhysics scrollPhysics;
+
   /// How far below the text field should the suggestions box be
   ///
   /// Defaults to 5.0
@@ -531,6 +533,7 @@ class TypeAheadField<T> extends StatefulWidget {
     required this.suggestionsCallback,
     required this.itemBuilder,
     required this.onSuggestionSelected,
+    this.scrollPhysics = const NeverScrollableScrollPhysics(),
     this.onTagTap,
     this.tagColor,
     this.textFieldConfiguration = const TextFieldConfiguration(),
@@ -862,7 +865,8 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
           onTagTap: widget.onTagTap,
           tagColor: widget.tagColor,
         ),
-        scrollPhysics: const NeverScrollableScrollPhysics(),
+        scrollPhysics:
+            widget.scrollPhysics ?? const NeverScrollableScrollPhysics(),
         focusNode: this._effectiveFocusNode,
         controller: this._effectiveController,
         decoration: widget.textFieldConfiguration.decoration,

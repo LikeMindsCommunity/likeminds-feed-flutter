@@ -16,6 +16,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
   final int? maxLines;
   final int minLines;
   final bool enabled;
+  final ScrollPhysics scrollPhysics;
 
   const LMTaggingAheadTextField({
     super.key,
@@ -28,6 +29,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
     this.maxLines,
     this.minLines = 1,
     this.enabled = true,
+    this.scrollPhysics = const NeverScrollableScrollPhysics(),
   });
 
   @override
@@ -129,6 +131,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       child: TypeAheadField<LMUserTagViewData>(
         onTagTap: (p) {},
         tagColor: feedTheme.tagColor,
+        scrollPhysics: widget.scrollPhysics,
         suggestionsBoxController: _suggestionsBoxController,
         suggestionsBoxDecoration: SuggestionsBoxDecoration(
           color: feedTheme.container,
