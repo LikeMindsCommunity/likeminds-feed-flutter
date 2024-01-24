@@ -191,7 +191,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     Navigator.of(dialogContext).pop();
                   },
                 ),
-                LikeMindsTheme.kHorizontalPaddingMedium,
+                LikeMindsTheme.kHorizontalPaddingXLarge,
                 LMFeedButton(
                   text: LMFeedText(
                     text: "Yes",
@@ -213,7 +213,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     Navigator.of(context).pop();
                   },
                 ),
-                LikeMindsTheme.kHorizontalPaddingSmall,
+                LikeMindsTheme.kHorizontalPaddingLarge,
               ],
             ),
           ],
