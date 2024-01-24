@@ -602,7 +602,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     return BlocBuilder(
       bloc: composeBloc,
       builder: (context, state) {
-        if (composeBloc.postMedia.length == 10) {
+        if (composeBloc.postMedia.length == 10 || composeBloc.videoCount == 1) {
           return const SizedBox();
         }
         return Container(
@@ -645,7 +645,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     composeBloc.add(LMFeedComposeAddImageEvent());
                   },
                 ),
-              if (composeBloc.documentCount == 0 && config!.enableVideos)
+              if (composeBloc.documentCount == 0 &&
+                  composeBloc.imageCount == 0 &&
+                  composeBloc.videoCount == 0 &&
+                  config!.enableVideos)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
