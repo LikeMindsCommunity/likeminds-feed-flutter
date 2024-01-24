@@ -22,7 +22,6 @@ class LMFeedScreen extends StatefulWidget {
     this.appBar,
     this.customWidgetBuilder,
     this.topicChipBuilder,
-    this.topicWidgetBuilder,
     this.postBuilder,
     this.floatingActionButton,
     this.emptyFeedViewBuilder,
@@ -45,8 +44,6 @@ class LMFeedScreen extends StatefulWidget {
   //Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
-
-  final Widget Function(BuildContext context)? topicWidgetBuilder;
 
   // Builder for post item
   // {@macro post_widget_builder}
@@ -298,7 +295,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     valueListenable: postSomethingNotifier,
                     builder: (context, _, __) {
                       return AnimatedContainer(
-                        margin: const EdgeInsets.all(16.0),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
                         duration: const Duration(milliseconds: 160),
                         height: iconContainerHeight,
                         clipBehavior: Clip.hardEdge,
@@ -322,28 +322,25 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         visible: topicVisible,
                         maintainAnimation: true,
                         maintainState: true,
-                        child: Container(
-                          color: feedThemeData?.container,
-                          child: FutureBuilder<GetTopicsResponse>(
-                            future: getTopicsResponse,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
+                        child: FutureBuilder<GetTopicsResponse>(
+                          future: getTopicsResponse,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            } else if (snapshot.hasData &&
+                                snapshot.data != null &&
+                                snapshot.data!.success == true) {
+                              if (snapshot.data!.topics!.isNotEmpty) {
+                                return widget.topicBarBuilder
+                                        ?.call(_defTopicBar()) ??
+                                    _defTopicBar();
+                              } else {
                                 return const SizedBox.shrink();
-                              } else if (snapshot.hasData &&
-                                  snapshot.data != null &&
-                                  snapshot.data!.success == true) {
-                                if (snapshot.data!.topics!.isNotEmpty) {
-                                  return widget.topicBarBuilder
-                                          ?.call(_defTopicBar()) ??
-                                      _defTopicBar();
-                                } else {
-                                  return const SizedBox.shrink();
-                                }
                               }
-                              return const SizedBox();
-                            },
-                          ),
+                            }
+                            return const SizedBox();
+                          },
                         ),
                       );
                     },
@@ -402,6 +399,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return LMFeedTopicBar(
       selectedTopics: _feedBloc.selectedTopics,
       openTopicSelector: openTopicSelector,
+      style: LMFeedTopicBarStyle(
+        height: 60,
+      ),
     );
   }
 

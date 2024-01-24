@@ -58,9 +58,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
                     return const LMFeedScreen();
                   } else if (snapshot.connectionState ==
                       ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator.adaptive(),
-                    );
+                    return const LMFeedLoader();
                   } else {
                     return const Center(
                       child: Text("An error occurred"),
@@ -68,9 +66,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
                   }
                 });
           } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
+            return const LMFeedLoader();
           } else {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,

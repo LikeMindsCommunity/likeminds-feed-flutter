@@ -111,6 +111,7 @@ class _LMButtonState extends State<LMFeedButton> {
                           decoration: const BoxDecoration(
                             color: Colors.transparent,
                           ),
+                          padding: inStyle.textPadding,
                           child: _active
                               ? widget.activeText ??
                                   widget.text ??
@@ -174,6 +175,8 @@ class LMFeedButtonStyle {
   /// Icon to be displayed in the button if the button is active
   final LMFeedIcon? activeIcon;
 
+  final EdgeInsets? textPadding;
+
   const LMFeedButtonStyle({
     this.padding,
     this.backgroundColor,
@@ -187,6 +190,7 @@ class LMFeedButtonStyle {
     this.showText = true,
     this.icon,
     this.activeIcon,
+    this.textPadding,
   });
 
   factory LMFeedButtonStyle.basic() {
@@ -196,6 +200,7 @@ class LMFeedButtonStyle {
       borderRadius: 8,
       height: 28,
       margin: 4,
+      textPadding: EdgeInsets.zero,
     );
   }
 
@@ -212,6 +217,7 @@ class LMFeedButtonStyle {
     bool? showText,
     LMFeedIcon? icon,
     LMFeedIcon? activeIcon,
+    EdgeInsets? textPadding,
   }) {
     return LMFeedButtonStyle(
       padding: padding ?? this.padding,
@@ -226,6 +232,7 @@ class LMFeedButtonStyle {
       showText: showText ?? this.showText,
       icon: icon ?? this.icon,
       activeIcon: activeIcon ?? this.activeIcon,
+      textPadding: textPadding ?? this.textPadding,
     );
   }
 

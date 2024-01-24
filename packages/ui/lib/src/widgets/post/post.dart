@@ -105,6 +105,7 @@ class LMFeedPostWidget extends StatefulWidget {
     LMFeedPostTopic? topicWidget,
     LMFeedPostStyle? style,
     VoidCallback? onMediaTap,
+    Widget? activityHeader,
   }) {
     return LMFeedPostWidget(
       post: post ?? this.post,
@@ -131,6 +132,7 @@ class LMFeedPostWidget extends StatefulWidget {
       footerBuilder: footerBuilder ?? this.footerBuilder,
       style: style ?? this.style,
       onMediaTap: onMediaTap ?? this.onMediaTap,
+      activityHeader: activityHeader ?? this.activityHeader,
     );
   }
 }

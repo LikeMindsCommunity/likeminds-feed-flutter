@@ -123,7 +123,7 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
               width: 43.67,
               height: 7.23,
               decoration: ShapeDecoration(
-                //color: LikeMindsTheme.onSurface,
+                color: feedTheme?.onContainer.withOpacity(0.1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(99),
                 ),

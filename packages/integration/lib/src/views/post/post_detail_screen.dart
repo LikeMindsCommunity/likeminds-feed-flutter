@@ -513,6 +513,70 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       isFeed: true,
       postViewData: _postDetailScreenHandler!.postData!,
       postHeaderStyle: feedTheme?.headerStyle,
+      menuBuilder: (menu) {
+        return menu.copyWith(
+          removeItemIds: {postReportId, postEditId},
+          action: LMFeedMenuAction(
+            onPostPin: () async {
+              _postDetailScreenHandler!.postData!.isPinned =
+                  !_postDetailScreenHandler!.postData!.isPinned;
+              _postDetailScreenHandler!.rebuildPostWidget.value =
+                  !_postDetailScreenHandler!.rebuildPostWidget.value;
+
+              final pinPostRequest = (PinPostRequestBuilder()
+                    ..postId(_postDetailScreenHandler!.postData!.id))
+                  .build();
+
+              final PinPostResponse response =
+                  await LMFeedCore.client.pinPost(pinPostRequest);
+
+              LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                  post: _postDetailScreenHandler!.postData!));
+
+              if (!response.success) {
+                _postDetailScreenHandler!.postData!.isPinned =
+                    !_postDetailScreenHandler!.postData!.isPinned;
+                _postDetailScreenHandler!.rebuildPostWidget.value =
+                    !_postDetailScreenHandler!.rebuildPostWidget.value;
+                LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                    post: _postDetailScreenHandler!.postData!));
+              }
+            },
+            onPostDelete: () {
+              showDialog(
+                context: context,
+                builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                  title: 'Delete Comment',
+                  userId: _postDetailScreenHandler!.postData!.userId,
+                  content:
+                      'Are you sure you want to delete this post. This action can not be reversed.',
+                  action: (String reason) async {
+                    Navigator.of(childContext).pop();
+
+                    LMFeedAnalyticsBloc.instance.add(
+                      LMFeedFireAnalyticsEvent(
+                        eventName: LMFeedAnalyticsKeys.postDeleted,
+                        eventProperties: {
+                          "post_id": _postDetailScreenHandler!.postData!.id,
+                        },
+                      ),
+                    );
+
+                    LMFeedPostBloc.instance.add(
+                      LMFeedDeletePostEvent(
+                        postId: _postDetailScreenHandler!.postData!.id,
+                        reason: reason,
+                      ),
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  actionText: 'Delete',
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 

@@ -154,9 +154,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 children: [
                   widget.postBuilder?.call(
                           context,
-                          defPostWidget(feedTheme, postViewData),
+                          defPostWidget(feedTheme, postViewData, item),
                           postViewData) ??
-                      defPostWidget(feedTheme, postViewData),
+                      defPostWidget(feedTheme, postViewData, item),
                   if (item.action == 7)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -211,8 +211,32 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   }
 
   LMFeedPostWidget defPostWidget(
-      LMFeedThemeData? feedTheme, LMPostViewData post) {
+      LMFeedThemeData? feedTheme, LMPostViewData post, UserActivityItem item) {
     return LMFeedPostWidget(
+      activityHeader: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width,
+            ),
+            child: RichText(
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                children: LMFeedPostUtils.extractNotificationTags(
+                    item.activityText, widget.uuid),
+              ),
+            ),
+          ),
+          LikeMindsTheme.kVerticalPaddingMedium,
+          Divider(
+            color: feedTheme?.onContainer.withOpacity(0.1),
+            thickness: 1,
+          ),
+          LikeMindsTheme.kVerticalPaddingMedium,
+        ],
+      ),
       post: post,
       topics: topics,
       user: users[post.userId]!,
@@ -590,22 +614,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           fontSize: 12,
         )),
       ),
-      onTap: () {
-        // LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-        //       ..commentActionEntity(LMFeedCommentType.parent)
-        //       ..commentActionType(LMFeedCommentActionType.replying)
-        //       ..level(0)
-        //       ..user(_postDetailScreenHandler!.users[commentViewData.userId]!)
-        //       ..commentId(commentViewData.id))
-        //     .build();
-
-        // _postDetailScreenHandler!.commentHandlerBloc
-        //     .add(LMFeedCommentOngoingEvent(
-        //   commentMetaData: commentMetaData,
-        // ));
-
-        // _postDetailScreenHandler!.openOnScreenKeyboard();
-      },
+      onTap: () {},
     );
   }
 
