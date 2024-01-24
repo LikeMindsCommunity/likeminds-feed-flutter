@@ -523,31 +523,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         return menu.copyWith(
           removeItemIds: {postReportId, postEditId},
           action: LMFeedMenuAction(
-            onPostPin: () async {
-              _postDetailScreenHandler!.postData!.isPinned =
-                  !_postDetailScreenHandler!.postData!.isPinned;
-              _postDetailScreenHandler!.rebuildPostWidget.value =
-                  !_postDetailScreenHandler!.rebuildPostWidget.value;
-
-              final pinPostRequest = (PinPostRequestBuilder()
-                    ..postId(_postDetailScreenHandler!.postData!.id))
-                  .build();
-
-              final PinPostResponse response =
-                  await LMFeedCore.client.pinPost(pinPostRequest);
-
-              LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-                  post: _postDetailScreenHandler!.postData!));
-
-              if (!response.success) {
-                _postDetailScreenHandler!.postData!.isPinned =
-                    !_postDetailScreenHandler!.postData!.isPinned;
-                _postDetailScreenHandler!.rebuildPostWidget.value =
-                    !_postDetailScreenHandler!.rebuildPostWidget.value;
-                LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-                    post: _postDetailScreenHandler!.postData!));
-              }
-            },
+            onPostPin: () => handlePostPinAction(),
+            onPostUnpin: () => handlePostPinAction(),
             onPostDelete: () {
               showDialog(
                 context: context,
@@ -1206,5 +1183,31 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
       ),
     );
+  }
+
+  void handlePostPinAction() async {
+    _postDetailScreenHandler!.postData!.isPinned =
+        !_postDetailScreenHandler!.postData!.isPinned;
+    _postDetailScreenHandler!.rebuildPostWidget.value =
+        !_postDetailScreenHandler!.rebuildPostWidget.value;
+
+    final pinPostRequest = (PinPostRequestBuilder()
+          ..postId(_postDetailScreenHandler!.postData!.id))
+        .build();
+
+    final PinPostResponse response =
+        await LMFeedCore.client.pinPost(pinPostRequest);
+
+    LMFeedPostBloc.instance
+        .add(LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+
+    if (!response.success) {
+      _postDetailScreenHandler!.postData!.isPinned =
+          !_postDetailScreenHandler!.postData!.isPinned;
+      _postDetailScreenHandler!.rebuildPostWidget.value =
+          !_postDetailScreenHandler!.rebuildPostWidget.value;
+      LMFeedPostBloc.instance.add(
+          LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+    }
   }
 }

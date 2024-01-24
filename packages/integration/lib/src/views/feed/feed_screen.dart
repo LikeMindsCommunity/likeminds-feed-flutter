@@ -836,26 +836,8 @@ class _FeedRoomViewState extends State<FeedRoomView> {
         return menu.copyWith(
           removeItemIds: {postReportId, postEditId},
           action: LMFeedMenuAction(
-            onPostPin: () async {
-              postViewData.isPinned = !postViewData.isPinned;
-              rebuildPostWidget.value = !rebuildPostWidget.value;
-
-              final pinPostRequest =
-                  (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-              final PinPostResponse response =
-                  await LMFeedCore.client.pinPost(pinPostRequest);
-
-              LMFeedPostBloc.instance
-                  .add(LMFeedUpdatePostEvent(post: postViewData));
-
-              if (!response.success) {
-                postViewData.isPinned = !postViewData.isPinned;
-                rebuildPostWidget.value = !rebuildPostWidget.value;
-                LMFeedPostBloc.instance
-                    .add(LMFeedUpdatePostEvent(post: postViewData));
-              }
-            },
+            onPostUnpin: () => handlePostPinAction(postViewData),
+            onPostPin: () => handlePostPinAction(postViewData),
             onPostDelete: () {
               showDialog(
                 context: context,
@@ -1211,4 +1193,23 @@ class _FeedRoomViewState extends State<FeedRoomView> {
           );
         },
       );
+
+  void handlePostPinAction(LMPostViewData postViewData) async {
+    postViewData.isPinned = !postViewData.isPinned;
+    rebuildPostWidget.value = !rebuildPostWidget.value;
+
+    final pinPostRequest =
+        (PinPostRequestBuilder()..postId(postViewData.id)).build();
+
+    final PinPostResponse response =
+        await LMFeedCore.client.pinPost(pinPostRequest);
+
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+
+    if (!response.success) {
+      postViewData.isPinned = !postViewData.isPinned;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    }
+  }
 }
