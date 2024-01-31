@@ -5,13 +5,13 @@ homepage: "https://www.likeminds.community/"
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=1.17.0"
+  flutter: ">=3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  timeago: any
+  intl:
   collection: any
   path: any
   shimmer: any

@@ -126,11 +126,13 @@ class LMNotificationHandler {
         ),
       );
 
-      navigatorKey.currentState!.push(MaterialPageRoute(
-        builder: (context) {
-          return LMFeedPostDetailScreen(postId: postId);
-        },
-      ));
+      navigatorKey.currentState!.push(
+        MaterialPageRoute(
+          builder: (context) {
+            return LMFeedPostDetailScreen(postId: postId);
+          },
+        ),
+      );
     }
   }
 

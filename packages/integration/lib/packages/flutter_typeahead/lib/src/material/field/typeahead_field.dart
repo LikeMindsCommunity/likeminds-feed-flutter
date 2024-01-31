@@ -865,8 +865,7 @@ class _TypeAheadFieldState<T> extends State<TypeAheadField<T>>
           onTagTap: widget.onTagTap,
           tagColor: widget.tagColor,
         ),
-        scrollPhysics:
-            widget.scrollPhysics ?? const NeverScrollableScrollPhysics(),
+        scrollPhysics: widget.scrollPhysics,
         focusNode: this._effectiveFocusNode,
         controller: this._effectiveController,
         decoration: widget.textFieldConfiguration.decoration,

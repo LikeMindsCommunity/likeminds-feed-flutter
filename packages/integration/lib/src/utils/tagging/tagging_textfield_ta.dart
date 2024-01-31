@@ -52,7 +52,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
   @override
   void dispose() {
     _controller.dispose();
-    _scrollController.dispose();
     _suggestionsBoxController.close();
     super.dispose();
   }
@@ -66,7 +65,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       // page++;
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        page++;
         final taggingData =
             await LMFeedCore.instance.lmFeedClient.getTaggingList(
           request: (GetTaggingListRequestBuilder()
@@ -77,6 +75,8 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         if (taggingData.success &&
             taggingData.members != null &&
             taggingData.members!.isNotEmpty) {
+          page++;
+
           userTags.addAll(taggingData.members!.map((e) => e).toList());
           // return userTags;
         }
@@ -96,7 +96,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         final taggingData =
             await LMFeedCore.instance.lmFeedClient.getTaggingList(
           request: (GetTaggingListRequestBuilder()
-                ..page(1)
+                ..page(page)
                 ..pageSize(fixedSize)
                 ..searchQuery(tag))
               .build(),
@@ -104,6 +104,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         if (taggingData.success &&
             taggingData.members != null &&
             taggingData.members!.isNotEmpty) {
+          page += 1;
           userTags = taggingData.members!.map((e) => e).toList();
           return userTags
               .map((e) => LMUserTagViewDataConvertor.fromUserTag(e))
@@ -127,6 +128,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       padding: const EdgeInsets.symmetric(horizontal: 6.0),
       child: TypeAheadField<LMUserTagViewData>(
         onTagTap: (p) {},
+        scrollController: _scrollController,
         tagColor: feedTheme.tagColor,
         scrollPhysics: widget.scrollPhysics,
         suggestionsBoxController: _suggestionsBoxController,
@@ -140,7 +142,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         noItemsFoundBuilder: (context) => const SizedBox.shrink(),
         hideOnEmpty: true,
         debounceDuration: const Duration(milliseconds: 500),
-        scrollController: _scrollController,
         textFieldConfiguration: TextFieldConfiguration(
           keyboardType: TextInputType.multiline,
           cursorColor: feedTheme.primaryColor,
@@ -153,7 +154,8 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
                 hintText: 'Write something here...',
                 border: InputBorder.none,
               ),
-          onChanged: ((value) {
+          onChanged: (value) {
+            page = 1;
             widget.onChange!(value);
             final int newTagCount = '@'.allMatches(value).length;
             final int completeCount = '~'.allMatches(value).length;
@@ -166,7 +168,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
               tagValue = value.substring(value.lastIndexOf('@'));
               textValue = value.substring(0, value.lastIndexOf('@'));
             }
-          }),
+          },
         ),
         direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
         suggestionsCallback: (suggestion) async {
@@ -176,6 +178,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
           return await _getSuggestions(suggestion);
         },
         keepSuggestionsOnSuggestionSelected: true,
+        keepSuggestionsOnLoading: false,
         itemBuilder: (context, opt) {
           return Container(
             decoration: const BoxDecoration(
@@ -235,7 +238,10 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
             }
             _controller.text = '$textValue ';
             _controller.selection = TextSelection.fromPosition(
-                TextPosition(offset: _controller.text.length));
+              TextPosition(
+                offset: _controller.text.length,
+              ),
+            );
             tagValue = '';
             textValue = _controller.value.text;
 
