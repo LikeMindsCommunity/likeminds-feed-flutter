@@ -8,7 +8,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedCarousel extends StatefulWidget {
   final List<LMAttachmentViewData> attachments;
-  final Function(VideoController)? initialiseVideoController;
+  final String postId;
 
   final LMFeedPostImage? imageItem;
   final LMFeedPostVideo? videoItem;
@@ -25,9 +25,9 @@ class LMFeedCarousel extends StatefulWidget {
   const LMFeedCarousel({
     Key? key,
     required this.attachments,
+    required this.postId,
     this.imageItem,
     this.videoItem,
-    this.initialiseVideoController,
     this.onError,
     this.imageBuilder,
     this.videoBuilder,
@@ -40,18 +40,19 @@ class LMFeedCarousel extends StatefulWidget {
   State<LMFeedCarousel> createState() => _LMCarouselState();
 
   static LMFeedCarousel defCarousel(
-    List<LMAttachmentViewData> attachments, {
+    List<LMAttachmentViewData> attachments,
+    String postId, {
     LMFeedPostImage? imageItem,
     LMFeedPostVideo? videoItem,
     Function(String, StackTrace)? onError,
     Function(VideoController)? initialiseVideoController,
   }) {
     return LMFeedCarousel(
+      postId: postId,
       attachments: attachments,
       imageItem: imageItem,
       videoItem: videoItem,
       onError: onError,
-      initialiseVideoController: initialiseVideoController,
     );
   }
 }
@@ -100,9 +101,9 @@ class _LMCarouselState extends State<LMFeedCarousel> {
           width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
           child: widget.videoItem ??
               LMFeedPostVideo(
-                initialiseVideoController: widget.initialiseVideoController,
                 videoUrl: e.attachmentMeta.url,
                 style: widget.videoStyle,
+                postId: widget.postId,
               ),
         );
       } else {

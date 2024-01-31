@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/cupertino.dart';
@@ -81,6 +80,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   void dispose() {
     _debounce?.cancel();
+    if (composeBloc.videoCount > 0) {
+      LMFeedVideoProvider.instance.clearPostController(
+          composeBloc.postMedia.first.mediaFile?.uri.toString() ?? '');
+    }
     super.dispose();
   }
 
@@ -280,6 +283,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       child: LMFeedPostVideo(
                         videoFile: composeBloc.postMedia[index].mediaFile,
                         style: style?.mediaStyle?.videoStyle,
+                        postId: composeBloc.postMedia[index].mediaFile!.uri
+                            .toString(),
                       ),
                     );
                     break;

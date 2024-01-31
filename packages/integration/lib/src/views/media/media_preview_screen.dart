@@ -139,6 +139,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                     if (postAttachments[index].attachmentType == 2) {
                       return LMFeedPostVideo(
                         videoUrl: postAttachments[index].attachmentMeta.url,
+                        postId: widget.post.id,
                         style: LMFeedPostVideoStyle.basic().copyWith(
                           showControls: true,
                         ),

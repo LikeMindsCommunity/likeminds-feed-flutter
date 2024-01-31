@@ -8,17 +8,17 @@ import 'package:url_launcher/url_launcher.dart';
 class LMFeedPostMedia extends StatefulWidget {
   const LMFeedPostMedia({
     super.key,
+    required this.postId,
     required this.attachments,
     this.title,
     this.subtitle,
-    this.initialiseVideoController,
     this.onError,
     this.style,
     this.onMediaTap,
   });
 
   final List<LMAttachmentViewData> attachments;
-  final Function(VideoController)? initialiseVideoController;
+  final String postId;
 
   final LMFeedText? title;
   final LMFeedText? subtitle;
@@ -34,6 +34,7 @@ class LMFeedPostMedia extends StatefulWidget {
 
   LMFeedPostMedia copyWith({
     List<LMAttachmentViewData>? attachments,
+    String? postId,
     LMFeedText? title,
     LMFeedText? subtitle,
     Function(VideoController)? initialiseVideoController,
@@ -42,10 +43,9 @@ class LMFeedPostMedia extends StatefulWidget {
   }) {
     return LMFeedPostMedia(
       attachments: attachments ?? this.attachments,
+      postId: postId ?? this.postId,
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
-      initialiseVideoController:
-          initialiseVideoController ?? this.initialiseVideoController,
       onError: onError ?? this.onError,
       style: style ?? this.style,
     );
@@ -102,7 +102,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
       return GestureDetector(
         onTap: widget.onMediaTap,
         child: LMFeedCarousel(
-          initialiseVideoController: widget.initialiseVideoController,
+          postId: widget.postId,
           attachments: attachments!,
           onError: widget.onError,
           imageStyle: widget.style?.imageStyle,

@@ -392,6 +392,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       style: feedTheme?.mediaStyle,
+      postId: post.id,
     );
   }
 

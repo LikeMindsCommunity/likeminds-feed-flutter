@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 /// {@template post_widget}
 /// A widget that displays a post on the feed.
@@ -40,6 +39,7 @@ class LMFeedPostWidget extends StatefulWidget {
     this.style,
     this.onMediaTap,
     this.activityHeader,
+    this.disposeVideoPlayerOnInActive,
   });
 
   final LMFeedPostStyle? style;
@@ -72,6 +72,8 @@ class LMFeedPostWidget extends StatefulWidget {
   final Function(bool isPinned)? onPinTap;
   final Function(bool isSaved)? onSaveTap;
   final VoidCallback? onMediaTap;
+
+  final VoidCallback? disposeVideoPlayerOnInActive;
 
   @override
   State<LMFeedPostWidget> createState() => _LMPostWidgetState();
@@ -148,10 +150,15 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   LMFeedPostStyle? style;
 
   @override
+  void dispose() {
+    widget.disposeVideoPlayerOnInActive?.call();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     LMFeedThemeData lmFeedThemeData = LMFeedTheme.of(context);
     style = widget.style ?? LMFeedTheme.of(context).postStyle;
-    timeago.setLocaleMessages('en', LMFeedCustomMessages());
     return InheritedPostProvider(
       post: widget.post,
       child: GestureDetector(
@@ -233,6 +240,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   LMFeedPostMedia _defPostMedia() {
     return widget.media ??
         LMFeedPostMedia(
+          postId: widget.post.id,
           attachments: widget.post.attachments!,
           onMediaTap: widget.onMediaTap,
         );

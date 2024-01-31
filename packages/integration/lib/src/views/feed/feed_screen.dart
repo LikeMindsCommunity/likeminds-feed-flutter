@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -127,12 +125,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedBloc.instance;
-    _feedBloc.add(
-      LMFeedGetUniversalFeedEvent(
-        offset: 1,
-        topics: _feedBloc.selectedTopics,
-      ),
-    );
     userPostingRights = checkPostCreationRights();
   }
 
@@ -277,7 +269,33 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               child: config!.showCustomWidget
                   ? widget.customWidgetBuilder == null
                       ? LMFeedPostSomething(
-                          enabled: userPostingRights,
+                          onTap: userPostingRights
+                              ? () async {
+                                  LMFeedAnalyticsBloc.instance
+                                      .add(const LMFeedFireAnalyticsEvent(
+                                    eventName:
+                                        LMFeedAnalyticsKeys.postCreationStarted,
+                                    eventProperties: {},
+                                  ));
+                                  String? currentVisiblePost =
+                                      LMFeedVideoProvider
+                                          .instance.currentVisiblePostId;
+
+                                  VideoController? postVideoController =
+                                      LMFeedVideoProvider.instance
+                                          .getVideoController(
+                                              currentVisiblePost ?? '');
+
+                                  await postVideoController?.player.pause();
+                                  // ignore: use_build_context_synchronously
+                                  await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LMFeedComposeScreen()));
+                                  await postVideoController?.player.play();
+                                }
+                              : () => toast(
+                                  "You do not have permission to create a post"),
                         )
                       : widget.customWidgetBuilder!(context)
                   : const SizedBox(),
@@ -594,7 +612,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   LMFeedPostWidget defPostWidget(
       LMFeedThemeData? feedThemeData, LMPostViewData post) {
-    VideoController? postVideoController;
     return LMFeedPostWidget(
       post: post,
       topics: _feedBloc.topics,
@@ -607,10 +624,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           ),
         );
       },
+      disposeVideoPlayerOnInActive: () {
+        LMFeedVideoProvider.instance.clearPostController(post.id);
+      },
       style: feedThemeData?.postStyle,
       onMediaTap: () async {
-        // ignore: dead_code
-        postVideoController?.player.pause();
+        VideoController? postVideoController =
+            LMFeedVideoProvider.instance.getVideoController(post.id);
+
+        await postVideoController?.player.pause();
+        // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
           MaterialPageRoute(
@@ -621,13 +644,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         );
-        // ignore: dead_code
-        postVideoController?.player.play();
+        await postVideoController?.player.play();
       },
-      onPostTap: (context, post) {
-        // ignore: dead_code
-        postVideoController?.player.pause();
-        Navigator.of(context, rootNavigator: true).push(
+      onPostTap: (context, post) async {
+        VideoController? postVideoController =
+            LMFeedVideoProvider.instance.getVideoController(post.id);
+
+        await postVideoController?.player.pause();
+        // ignore: use_build_context_synchronously
+        await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) => LMFeedPostDetailScreen(
               postId: post.id,
@@ -635,13 +660,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         );
-        // ignore: dead_code
-        postVideoController?.player.play();
+        await postVideoController?.player.play();
       },
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
       content: _defContentWidget(post),
-      media: _defPostMedia(post, postVideoController),
+      media: _defPostMedia(post),
       topicWidget: _defTopicWidget(post),
     );
   }
@@ -721,15 +745,19 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   }
 
   LMFeedPostMedia _defPostMedia(
-      LMPostViewData post, VideoController? videoController) {
+    LMPostViewData post,
+  ) {
     return LMFeedPostMedia(
       attachments: post.attachments!,
+      postId: post.id,
       style: feedThemeData?.mediaStyle,
-      initialiseVideoController: (controller) {
-        videoController = controller;
-      },
-      onMediaTap: () {
-        Navigator.push(
+      onMediaTap: () async {
+        VideoController? postVideoController =
+            LMFeedVideoProvider.instance.getVideoController(post.id);
+
+        await postVideoController?.player.pause();
+        // ignore: use_build_context_synchronously
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => LMFeedMediaPreviewScreen(
@@ -739,6 +767,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         );
+        await postVideoController?.player.play();
       },
     );
   }
@@ -791,33 +820,44 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         },
       );
 
-  LMFeedButton defCommentButton(LMPostViewData postViewData) => LMFeedButton(
+  LMFeedButton defCommentButton(LMPostViewData post) => LMFeedButton(
         text: LMFeedText(
-          text: LMFeedPostUtils.getCommentCountTextWithCount(
-              postViewData.commentCount),
+          text: LMFeedPostUtils.getCommentCountTextWithCount(post.commentCount),
         ),
         style: feedThemeData?.footerStyle.commentButtonStyle,
-        onTap: () {
-          Navigator.of(context, rootNavigator: true).push(
+        onTap: () async {
+          VideoController? postVideoController =
+              LMFeedVideoProvider.instance.getVideoController(post.id);
+
+          await postVideoController?.player.pause();
+          // ignore: use_build_context_synchronously
+          await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedPostDetailScreen(
-                postId: postViewData.id,
+                postId: post.id,
                 openKeyboard: true,
                 postBuilder: widget.postBuilder,
               ),
             ),
           );
+          await postVideoController?.player.play();
         },
-        onTextTap: () {
-          Navigator.of(context, rootNavigator: true).push(
+        onTextTap: () async {
+          VideoController? postVideoController =
+              LMFeedVideoProvider.instance.getVideoController(post.id);
+
+          await postVideoController?.player.pause();
+          // ignore: use_build_context_synchronously
+          await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedPostDetailScreen(
-                postId: postViewData.id,
+                postId: post.id,
                 openKeyboard: true,
                 postBuilder: widget.postBuilder,
               ),
             ),
           );
+          await postVideoController?.player.play();
         },
       );
 
@@ -959,19 +999,30 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
               onTap: right
-                  ? () {
+                  ? () async {
                       if (!postUploading.value) {
                         LMFeedAnalyticsBloc.instance.add(
                             const LMFeedFireAnalyticsEvent(
                                 eventName:
                                     LMFeedAnalyticsKeys.postCreationStarted,
                                 eventProperties: {}));
-                        Navigator.push(
+
+                        String? currentVisiblePost =
+                            LMFeedVideoProvider.instance.currentVisiblePostId;
+
+                        VideoController? postVideoController =
+                            LMFeedVideoProvider.instance
+                                .getVideoController(currentVisiblePost ?? '');
+
+                        await postVideoController?.player.pause();
+                        // ignore: use_build_context_synchronously
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const LMFeedComposeScreen(),
                           ),
                         );
+                        await postVideoController?.player.pause();
                       } else {
                         toast(
                           'A post is already uploading.',
@@ -1019,19 +1070,28 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ),
             ),
             onTap: right
-                ? () {
+                ? () async {
                     if (!postUploading.value) {
                       LMFeedAnalyticsBloc.instance.add(
                           const LMFeedFireAnalyticsEvent(
                               eventName:
                                   LMFeedAnalyticsKeys.postCreationStarted,
                               eventProperties: {}));
-                      Navigator.push(
+                      String? currentVisiblePost =
+                          LMFeedVideoProvider.instance.currentVisiblePostId;
+
+                      VideoController? postVideoController = LMFeedVideoProvider
+                          .instance
+                          .getVideoController(currentVisiblePost ?? '');
+                      await postVideoController?.player.pause();
+                      // ignore: use_build_context_synchronously
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const LMFeedComposeScreen(),
                         ),
                       );
+                      await postVideoController?.player.play();
                     } else {
                       toast(
                         'A post is already uploading.',

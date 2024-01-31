@@ -4,14 +4,14 @@ import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_pre
 import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedPostSomething extends StatelessWidget {
-  final bool enabled;
+  final VoidCallback? onTap;
   final Color? borderColor;
   final Color? backgroundColor;
   final Color? primaryColor;
 
   const LMFeedPostSomething({
     Key? key,
-    required this.enabled,
+    this.onTap,
     this.borderColor,
     this.backgroundColor,
     this.primaryColor,
@@ -23,20 +23,12 @@ class LMFeedPostSomething extends StatelessWidget {
     Size screenSize = MediaQuery.of(context).size;
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return GestureDetector(
-      onTap: enabled
-          ? () {
-              LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
-                eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                eventProperties: {},
-              ));
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const LMFeedComposeScreen()));
-            }
-          : () => toast("You do not have permission to create a post"),
+      onTap: onTap,
       child: SizedBox(
         width: screenSize.width,
-        height: 60,
         child: Container(
+          margin: const EdgeInsets.only(left: 16.0, right: 16.0, top: 12.0),
+          height: 60,
           padding: const EdgeInsets.all(12.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50.0),
