@@ -99,7 +99,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     return Scaffold(
       backgroundColor: feedTheme?.backgroundColor,
       appBar: LMFeedAppBar(
-        leading: const SizedBox.shrink(),
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme?.container,
           centerTitle: Platform.isAndroid ? false : true,
