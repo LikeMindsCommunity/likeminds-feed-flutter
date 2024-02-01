@@ -304,26 +304,30 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
             SliverToBoxAdapter(
               child: config!.enableTopicFiltering
-                  ? FutureBuilder<GetTopicsResponse>(
-                      future: getTopicsResponse,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const SizedBox.shrink();
-                        } else if (snapshot.hasData &&
-                            snapshot.data != null &&
-                            snapshot.data!.success == true) {
-                          if (snapshot.data!.topics!.isNotEmpty) {
-                            return widget.topicBarBuilder
-                                    ?.call(_defTopicBar()) ??
-                                _defTopicBar();
-                          } else {
-                            return const SizedBox.shrink();
-                          }
-                        }
-                        return const SizedBox();
-                      },
-                    )
+                  ? ValueListenableBuilder(
+                      valueListenable: rebuildTopicFeed,
+                      builder: (context, _, __) {
+                        return FutureBuilder<GetTopicsResponse>(
+                          future: getTopicsResponse,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            } else if (snapshot.hasData &&
+                                snapshot.data != null &&
+                                snapshot.data!.success == true) {
+                              if (snapshot.data!.topics!.isNotEmpty) {
+                                return widget.topicBarBuilder
+                                        ?.call(_defTopicBar()) ??
+                                    _defTopicBar();
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            }
+                            return const SizedBox();
+                          },
+                        );
+                      })
                   : const SizedBox(),
             ),
             SliverToBoxAdapter(
