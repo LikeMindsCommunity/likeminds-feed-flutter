@@ -351,6 +351,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 LMFeedAnalyticsBloc.instance.add(
                   LMFeedFireAnalyticsEvent(
                     eventName: LMFeedAnalyticsKeys.commentDeleted,
+                    deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
                     eventProperties: {
                       "post_id": widget.postId,
                       "comment_id": commentViewData.id,
@@ -539,6 +540,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
+                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": _postDetailScreenHandler!.postData!.id,
                         },

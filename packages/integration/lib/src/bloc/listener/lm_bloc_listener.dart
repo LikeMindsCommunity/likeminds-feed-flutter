@@ -17,19 +17,19 @@ import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 class LMFeedBlocListener extends StatefulWidget {
   final Widget child;
   // {@macro lm_analytics_bloc_listener}
-  final LMFeedAnalyticsBlocListener analyticsListener;
+  final LMFeedAnalyticsBlocListener? analyticsListener;
   // {@macro lm_routing_bloc_listener}
-  final LMFeedRoutingBlocListener routingListener;
+  final LMFeedRoutingBlocListener? routingListener;
   // {@macro lm_profile_bloc_listener}
-  final LMFeedProfileBlocListener profileListener;
+  final LMFeedProfileBlocListener? profileListener;
 
   /// {@macro lm_bloc_listener}
   const LMFeedBlocListener({
     super.key,
     required this.child,
-    required this.analyticsListener,
-    required this.profileListener,
-    required this.routingListener,
+    this.analyticsListener,
+    this.profileListener,
+    this.routingListener,
   });
 
   @override
@@ -48,15 +48,18 @@ class _LMFeedBlocListenerState extends State<LMFeedBlocListener> {
     return MultiBlocListener(
       listeners: [
         BlocListener(
-          listener: widget.profileListener,
+          listener: (context, LMFeedProfileState state) =>
+              widget.profileListener?.call(context, state),
           bloc: LMFeedProfileBloc.instance,
         ),
         BlocListener(
-          listener: widget.analyticsListener,
+          listener: (context, LMFeedAnalyticsState state) =>
+              widget.analyticsListener?.call(context, state),
           bloc: LMFeedAnalyticsBloc.instance,
         ),
         BlocListener(
-          listener: widget.routingListener,
+          listener: (context, LMFeedRoutingState state) =>
+              widget.routingListener?.call(context, state),
           bloc: LMFeedRoutingBloc.instance,
         ),
       ],

@@ -28,11 +28,14 @@ class LMFeedFireAnalyticsEvent extends LMFeedAnalyticsEvent {
   final String eventName;
   // Properties of the event to be fired
   // i.e. likes count, post id, etc.
+  @deprecated
+  final String deprecatedEventName;
   final Map<String, dynamic> eventProperties;
 
   /// {@macro lm_fire_analytic_event}
   const LMFeedFireAnalyticsEvent({
     required this.eventName,
+    required this.deprecatedEventName,
     required this.eventProperties,
   });
 

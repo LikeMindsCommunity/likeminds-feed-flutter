@@ -247,6 +247,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
 
             LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+              deprecatedEventName: LMFeedAnalyticsKeysDep.userTaggedInPost,
               eventProperties: {
                 'tagged_user_id': suggestion.sdkClientInfo?.userUniqueId,
                 'tagged_user_count': tagCount,

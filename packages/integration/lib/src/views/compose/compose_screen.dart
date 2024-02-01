@@ -876,6 +876,7 @@ void sendPostCreationCompletedEvent(
 
   LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.postCreationCompleted,
+    deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationCompleted,
     eventProperties: propertiesMap,
   ));
 }

@@ -25,6 +25,7 @@ export 'package:likeminds_feed/likeminds_feed.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handler.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
+export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
