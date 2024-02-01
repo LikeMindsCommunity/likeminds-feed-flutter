@@ -74,6 +74,7 @@ class LMFeedVideoProvider {
       configuration: PlayerConfiguration(
         bufferSize: 24 * 1024 * 1024,
         ready: () {},
+        muted: true,
       ),
     );
     controller = VideoController(

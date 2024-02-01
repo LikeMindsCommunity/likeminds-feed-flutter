@@ -99,15 +99,13 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
       );
     } else if (attachments!.first.attachmentType == 1 ||
         attachments!.first.attachmentType == 2) {
-      return GestureDetector(
-        onTap: widget.onMediaTap,
-        child: LMFeedCarousel(
-          postId: widget.postId,
-          attachments: attachments!,
-          onError: widget.onError,
-          imageStyle: widget.style?.imageStyle,
-          videoStyle: widget.style?.videoStyle,
-        ),
+      return LMFeedCarousel(
+        postId: widget.postId,
+        attachments: attachments!,
+        onError: widget.onError,
+        imageStyle: widget.style?.imageStyle,
+        videoStyle: widget.style?.videoStyle,
+        onMediaTap: widget.onMediaTap,
       );
     } else {
       return const SizedBox.shrink();

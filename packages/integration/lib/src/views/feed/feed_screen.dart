@@ -275,6 +275,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                       .add(const LMFeedFireAnalyticsEvent(
                                     eventName:
                                         LMFeedAnalyticsKeys.postCreationStarted,
+                                    deprecatedEventName: LMFeedAnalyticsKeysDep
+                                        .postCreationStarted,
                                     eventProperties: {},
                                   ));
                                   String? currentVisiblePost =
@@ -629,8 +631,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       },
       style: feedThemeData?.postStyle,
       onMediaTap: () async {
-        VideoController? postVideoController =
-            LMFeedVideoProvider.instance.getVideoController(post.id);
+        VideoController? postVideoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
         await postVideoController?.player.pause();
         // ignore: use_build_context_synchronously
@@ -647,8 +650,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         await postVideoController?.player.play();
       },
       onPostTap: (context, post) async {
-        VideoController? postVideoController =
-            LMFeedVideoProvider.instance.getVideoController(post.id);
+        VideoController? postVideoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
         await postVideoController?.player.pause();
         // ignore: use_build_context_synchronously
@@ -721,6 +725,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
+                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": postViewData.id,
                         },
@@ -752,8 +757,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       postId: post.id,
       style: feedThemeData?.mediaStyle,
       onMediaTap: () async {
-        VideoController? postVideoController =
-            LMFeedVideoProvider.instance.getVideoController(post.id);
+        VideoController? postVideoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
         await postVideoController?.player.pause();
         // ignore: use_build_context_synchronously
@@ -803,6 +809,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           LMFeedAnalyticsBloc.instance.add(
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
+              deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -826,8 +833,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         ),
         style: feedThemeData?.footerStyle.commentButtonStyle,
         onTap: () async {
-          VideoController? postVideoController =
-              LMFeedVideoProvider.instance.getVideoController(post.id);
+          VideoController? postVideoController = LMFeedVideoProvider.instance
+              .getVideoController(
+                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
           await postVideoController?.player.pause();
           // ignore: use_build_context_synchronously
@@ -843,8 +851,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           await postVideoController?.player.play();
         },
         onTextTap: () async {
-          VideoController? postVideoController =
-              LMFeedVideoProvider.instance.getVideoController(post.id);
+          VideoController? postVideoController = LMFeedVideoProvider.instance
+              .getVideoController(
+                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
           await postVideoController?.player.pause();
           // ignore: use_build_context_synchronously
@@ -1005,6 +1014,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                             const LMFeedFireAnalyticsEvent(
                                 eventName:
                                     LMFeedAnalyticsKeys.postCreationStarted,
+                                deprecatedEventName:
+                                    LMFeedAnalyticsKeysDep.postCreationStarted,
                                 eventProperties: {}));
 
                         String? currentVisiblePost =
@@ -1076,6 +1087,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                           const LMFeedFireAnalyticsEvent(
                               eventName:
                                   LMFeedAnalyticsKeys.postCreationStarted,
+                              deprecatedEventName:
+                                  LMFeedAnalyticsKeysDep.postCreationStarted,
                               eventProperties: {}));
                       String? currentVisiblePost =
                           LMFeedVideoProvider.instance.currentVisiblePostId;

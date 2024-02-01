@@ -21,6 +21,7 @@ class LMFeedCarousel extends StatefulWidget {
   final LMFeedPostCarouselStyle? style;
 
   final Function(String, StackTrace)? onError;
+  final VoidCallback? onMediaTap;
 
   const LMFeedCarousel({
     Key? key,
@@ -34,6 +35,7 @@ class LMFeedCarousel extends StatefulWidget {
     this.videoStyle,
     this.imageStyle,
     this.style,
+    this.onMediaTap,
   }) : super(key: key);
 
   @override
@@ -46,6 +48,10 @@ class LMFeedCarousel extends StatefulWidget {
     LMFeedPostVideo? videoItem,
     Function(String, StackTrace)? onError,
     Function(VideoController)? initialiseVideoController,
+    LMFeedPostVideoStyle? videoStyle,
+    LMFeedPostImageStyle? imageStyle,
+    LMFeedPostCarouselStyle? style,
+    VoidCallback? onMediaTap,
   }) {
     return LMFeedCarousel(
       postId: postId,
@@ -53,6 +59,10 @@ class LMFeedCarousel extends StatefulWidget {
       imageItem: imageItem,
       videoItem: videoItem,
       onError: onError,
+      videoStyle: videoStyle,
+      imageStyle: imageStyle,
+      style: style,
+      onMediaTap: onMediaTap,
     );
   }
 }
@@ -104,6 +114,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 videoUrl: e.attachmentMeta.url,
                 style: widget.videoStyle,
                 postId: widget.postId,
+                onMediaTap: widget.onMediaTap,
               ),
         );
       } else {

@@ -12,6 +12,7 @@ class LMFeedPostImage extends StatefulWidget {
     this.imageFile,
     this.onError,
     this.style,
+    this.onMediaTap,
   }) : assert(imageUrl != null || imageFile != null);
 
   final String? imageUrl;
@@ -21,6 +22,8 @@ class LMFeedPostImage extends StatefulWidget {
 
   final LMFeedPostImageStyle? style;
 
+  final VoidCallback? onMediaTap;
+
   @override
   State<LMFeedPostImage> createState() => _LMImageState();
 
@@ -29,12 +32,14 @@ class LMFeedPostImage extends StatefulWidget {
     File? imageFile,
     LMFeedPostImageStyle? style,
     Function(String, StackTrace)? onError,
+    VoidCallback? onMediaTap,
   }) {
     return LMFeedPostImage(
       imageUrl: imageUrl ?? this.imageUrl,
       imageFile: imageFile ?? this.imageFile,
       style: style ?? this.style,
       onError: onError ?? this.onError,
+      onMediaTap: onMediaTap ?? this.onMediaTap,
     );
   }
 }
@@ -45,66 +50,69 @@ class _LMImageState extends State<LMFeedPostImage> {
   @override
   Widget build(BuildContext context) {
     style = widget.style ?? LMFeedTheme.of(context).mediaStyle.imageStyle;
-    return widget.imageUrl != null
-        ? ClipRRect(
-            clipBehavior: Clip.hardEdge,
-            borderRadius: style!.borderRadius ?? BorderRadius.zero,
-            child: CachedNetworkImage(
-              cacheKey: widget.imageUrl!,
-              height: style!.height,
-              width: style!.width,
-              imageUrl: widget.imageUrl!,
-              fit: style!.boxFit ?? BoxFit.contain,
-              fadeInDuration: const Duration(
-                milliseconds: 100,
-              ),
-              errorWidget: (context, url, error) {
-                if (widget.onError != null) {
-                  widget.onError!(error.toString(), StackTrace.empty);
-                }
-                return style!.errorWidget ??
-                    Container(
-                      color: Colors.grey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          LMFeedIcon(
-                            type: LMFeedIconType.icon,
-                            icon: Icons.error_outline,
-                            style: LMFeedIconStyle(
-                              size: 24,
-                              color: Colors.grey.shade300,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          const LMFeedText(
-                            text: "An error occurred fetching media",
-                            style: LMFeedTextStyle(
-                              textStyle: TextStyle(
-                                fontSize: 14,
+    return GestureDetector(
+      onTap: () => widget.onMediaTap?.call(),
+      child: widget.imageUrl != null
+          ? ClipRRect(
+              clipBehavior: Clip.hardEdge,
+              borderRadius: style!.borderRadius ?? BorderRadius.zero,
+              child: CachedNetworkImage(
+                cacheKey: widget.imageUrl!,
+                height: style!.height,
+                width: style!.width,
+                imageUrl: widget.imageUrl!,
+                fit: style!.boxFit ?? BoxFit.contain,
+                fadeInDuration: const Duration(
+                  milliseconds: 100,
+                ),
+                errorWidget: (context, url, error) {
+                  if (widget.onError != null) {
+                    widget.onError!(error.toString(), StackTrace.empty);
+                  }
+                  return style!.errorWidget ??
+                      Container(
+                        color: Colors.grey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            LMFeedIcon(
+                              type: LMFeedIconType.icon,
+                              icon: Icons.error_outline,
+                              style: LMFeedIconStyle(
+                                size: 24,
+                                color: Colors.grey.shade300,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-              },
-              progressIndicatorBuilder: (context, url, progress) =>
-                  style!.shimmerWidget ?? const LMPostMediaShimmer(),
-            ),
-          )
-        : widget.imageFile != null
-            ? ClipRRect(
-                clipBehavior: Clip.hardEdge,
-                borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                child: Image.file(
-                  widget.imageFile!,
-                  height: style!.height,
-                  width: style!.width,
-                  fit: style!.boxFit ?? BoxFit.contain,
-                ),
-              )
-            : const SizedBox();
+                            const SizedBox(height: 24),
+                            const LMFeedText(
+                              text: "An error occurred fetching media",
+                              style: LMFeedTextStyle(
+                                textStyle: TextStyle(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                },
+                progressIndicatorBuilder: (context, url, progress) =>
+                    style!.shimmerWidget ?? const LMPostMediaShimmer(),
+              ),
+            )
+          : widget.imageFile != null
+              ? ClipRRect(
+                  clipBehavior: Clip.hardEdge,
+                  borderRadius: style!.borderRadius ?? BorderRadius.zero,
+                  child: Image.file(
+                    widget.imageFile!,
+                    height: style!.height,
+                    width: style!.width,
+                    fit: style!.boxFit ?? BoxFit.contain,
+                  ),
+                )
+              : const SizedBox(),
+    );
   }
 }
 

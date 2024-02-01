@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 
-enum LMMediaType { video, image, document, link, widget, repost }
+enum LMMediaType { none, video, image, document, link, widget, repost }
 
 class LMMediaModel {
   // defines the type of media
@@ -57,6 +57,6 @@ LMMediaType mapIntToMediaType(int attachmentType) {
   } else if (attachmentType == 5) {
     return LMMediaType.widget;
   } else {
-    throw 'no valid media type provided';
+    return LMMediaType.none;
   }
 }

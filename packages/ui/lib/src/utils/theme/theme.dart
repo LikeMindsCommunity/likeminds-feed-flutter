@@ -124,40 +124,43 @@ class LMFeedThemeData {
     Color? onPrimary,
   }) {
     return LMFeedThemeData(
-        backgroundColor: backgroundColor ?? LikeMindsTheme.backgroundColor,
-        primaryColor: primaryColor ?? LikeMindsTheme.primaryColor,
-        secondaryColor: secondaryColor ?? LikeMindsTheme.secondaryColor,
-        shadowColor: shadowColor ?? LikeMindsTheme.shadowColor,
-        disabledColor: disabledColor ?? LikeMindsTheme.disabledColor,
-        errorColor: errorColor ?? LikeMindsTheme.errorColor,
-        inActiveColor: inActiveColor ?? LikeMindsTheme.inactiveColor,
-        container: container ?? LikeMindsTheme.container,
-        onContainer: onContainer ?? LikeMindsTheme.onContainer,
-        onPrimary: onPrimary ?? LikeMindsTheme.onPrimary,
-        postStyle: postStyle ?? LMFeedPostStyle.basic(),
-        topicStyle: topicStyle ??
-            LMFeedPostTopicStyle.basic(primaryColor: primaryColor),
-        contentStyle: contentStyle ??
-            LMFeedPostContentStyle.basic(onContainer: onContainer),
-        mediaStyle: mediaStyle ?? LMFeedPostMediaStyle.basic(),
-        footerStyle: footerStyle ??
-            LMFeedPostFooterStyle.basic(primaryColor: primaryColor),
-        headerStyle: headerStyle ?? LMFeedPostHeaderStyle.basic(),
-        hashTagColor: hashTagColor ?? LikeMindsTheme.hashTagColor,
-        linkColor: linkColor ?? LikeMindsTheme.linkColor,
-        tagColor: tagColor ?? LikeMindsTheme.tagColor,
-        commentStyle: commentStyle ?? LMFeedCommentStyle.basic(),
-        replyStyle: replyStyle ?? LMFeedCommentStyle.basic(isReply: true),
-        feedButtonStyle: feedButtonStyle ?? const LMFeedButtonStyle(),
-        feedIconStyle: feedIconStyle ?? const LMFeedIconStyle(),
-        textFieldStyle: textFieldStyle ??
-            LMFeedTextFieldStyle.basic(
-              backgroundColor: LikeMindsTheme.backgroundColor,
-            ),
-        dialogStyle: dialogStyle ?? const LMFeedDialogStyle(),
-        popUpMenuStyle: popUpMenuStyle ?? const LMFeedPopUpMenuStyle(),
-        composeScreenStyle: composeScreenStyle ??
-            LMFeedComposeScreenStyle.basic(primaryColor: primaryColor));
+      backgroundColor: backgroundColor ?? LikeMindsTheme.backgroundColor,
+      primaryColor: primaryColor ?? LikeMindsTheme.primaryColor,
+      secondaryColor: secondaryColor ?? LikeMindsTheme.secondaryColor,
+      shadowColor: shadowColor ?? LikeMindsTheme.shadowColor,
+      disabledColor: disabledColor ?? LikeMindsTheme.disabledColor,
+      errorColor: errorColor ?? LikeMindsTheme.errorColor,
+      inActiveColor: inActiveColor ?? LikeMindsTheme.inactiveColor,
+      container: container ?? LikeMindsTheme.container,
+      onContainer: onContainer ?? LikeMindsTheme.onContainer,
+      onPrimary: onPrimary ?? LikeMindsTheme.onPrimary,
+      postStyle: postStyle ?? LMFeedPostStyle.basic(),
+      topicStyle:
+          topicStyle ?? LMFeedPostTopicStyle.basic(primaryColor: primaryColor),
+      contentStyle: contentStyle ??
+          LMFeedPostContentStyle.basic(onContainer: onContainer),
+      mediaStyle: mediaStyle ?? LMFeedPostMediaStyle.basic(),
+      footerStyle: footerStyle ??
+          LMFeedPostFooterStyle.basic(primaryColor: primaryColor),
+      headerStyle: headerStyle ?? LMFeedPostHeaderStyle.basic(),
+      hashTagColor: hashTagColor ?? LikeMindsTheme.hashTagColor,
+      linkColor: linkColor ?? LikeMindsTheme.linkColor,
+      tagColor: tagColor ?? LikeMindsTheme.tagColor,
+      commentStyle: commentStyle ?? LMFeedCommentStyle.basic(),
+      replyStyle: replyStyle ?? LMFeedCommentStyle.basic(isReply: true),
+      feedButtonStyle: feedButtonStyle ?? const LMFeedButtonStyle(),
+      feedIconStyle: feedIconStyle ?? const LMFeedIconStyle(),
+      textFieldStyle: textFieldStyle ??
+          LMFeedTextFieldStyle.basic(
+            backgroundColor: LikeMindsTheme.backgroundColor,
+          ),
+      dialogStyle: dialogStyle ?? const LMFeedDialogStyle(),
+      popUpMenuStyle: popUpMenuStyle ?? const LMFeedPopUpMenuStyle(),
+      composeScreenStyle: composeScreenStyle ??
+          LMFeedComposeScreenStyle.basic(
+            primaryColor: primaryColor,
+          ),
+    );
   }
 
   LMFeedThemeData copyWith({
@@ -301,23 +304,6 @@ class LMFeedTextFieldStyle {
         focusedBorder: InputBorder.none,
       ),
     );
-  }
-}
-
-class LMFeedTextTheme {
-  final String fontFamily;
-
-  const LMFeedTextTheme({
-    required this.fontFamily,
-  });
-
-  factory LMFeedTextTheme.basic() =>
-      const LMFeedTextTheme(fontFamily: 'Roboto');
-
-  LMFeedTextTheme copyWith({
-    String? fontFamily,
-  }) {
-    return LMFeedTextTheme(fontFamily: fontFamily ?? this.fontFamily);
   }
 }
 

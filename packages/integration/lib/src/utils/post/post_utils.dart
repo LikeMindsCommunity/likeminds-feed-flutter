@@ -129,7 +129,7 @@ class LMFeedPostUtils {
             style: const TextStyle(
               fontWeight: FontWeight.w400,
               fontSize: 14,
-              color: LikeMindsTheme.greyColor,
+              color: LikeMindsTheme.blackColor,
             ),
           ),
         );
@@ -139,7 +139,7 @@ class LMFeedPostUtils {
         TextSpan(
           text: decodeNotificationString(link!, currentUserId).keys.first,
           style: const TextStyle(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             fontSize: 14,
             color: LikeMindsTheme.greyColor,
           ),
@@ -183,7 +183,7 @@ class LMFeedPostUtils {
                   [])
               ..communityId(activity.activityEntityData.communityId)
               ..isPinned(activity.activityEntityData.isPinned!)
-              ..topics(activity.activityEntityData.topics??[])
+              ..topics(activity.activityEntityData.topics ?? [])
               ..userId(activity.activityEntityData.userId!)
               ..likeCount(activity.activityEntityData.likesCount!)
               ..commentCount(activity.activityEntityData.commentsCount!)
