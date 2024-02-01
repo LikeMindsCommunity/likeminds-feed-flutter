@@ -75,7 +75,7 @@ class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
   ValueNotifier<bool> rebuildOverlay = ValueNotifier(false);
   bool _onTouch = true;
   bool initialiseOverlay = false;
-  bool isMuted = true;
+  bool? isMuted;
   ValueNotifier<bool> rebuildVideo = ValueNotifier(false);
   VideoController? controller;
 
@@ -104,6 +104,7 @@ class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    isMuted = widget.isMute;
     initialiseVideo = initialiseControllers();
   }
 
@@ -112,6 +113,7 @@ class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.videoUrl != widget.videoUrl) {
       controller?.player.pause();
+      isMuted = widget.isMute;
       initialiseVideo = initialiseControllers();
     }
   }
@@ -132,18 +134,16 @@ class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
 
     requestBuilder.postId(widget.postId);
 
-    isMuted = widget.isMute;
-
     if (widget.videoUrl != null) {
       requestBuilder
         ..autoPlay(widget.autoPlay)
-        ..isMuted(widget.isMute)
+        ..isMuted(isMuted!)
         ..videoSource(widget.videoUrl!)
         ..videoType(LMFeedVideoSourceType.network);
     } else {
       requestBuilder
         ..autoPlay(widget.autoPlay)
-        ..isMuted(widget.isMute)
+        ..isMuted(isMuted!)
         ..videoSource(widget.videoFile!.uri.toString())
         ..videoType(LMFeedVideoSourceType.file);
     }
@@ -201,7 +201,7 @@ class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
                       if (visiblePercentage < 90 && visiblePercentage > 0) {
                         controller?.player.pause();
                       }
-                      if (visiblePercentage >= 90) {
+                      if (visiblePercentage >= 90 && widget.autoPlay) {
                         LMFeedVideoProvider.instance.currentVisiblePostId =
                             widget.postId;
                         controller?.player.play();
@@ -311,13 +311,13 @@ class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
                           builder: (context, setChildState) {
                             return IconButton(
                               onPressed: () {
-                                if (!isMuted) {
+                                if (!isMuted!) {
                                   controller!.player.setVolume(0);
                                 } else {
                                   controller!.player.setVolume(100);
                                 }
                                 setChildState(() {
-                                  isMuted = !isMuted;
+                                  isMuted = !isMuted!;
                                 });
                               },
                               icon: LMFeedIcon(
@@ -325,7 +325,7 @@ class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
                                 style: const LMFeedIconStyle(
                                   color: Colors.white,
                                 ),
-                                icon: isMuted
+                                icon: isMuted!
                                     ? Icons.volume_off
                                     : Icons.volume_up,
                               ),
