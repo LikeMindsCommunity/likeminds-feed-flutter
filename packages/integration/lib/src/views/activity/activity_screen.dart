@@ -172,7 +172,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                       child: Column(
                         children: [
                           Divider(
-                            color: feedTheme?.onContainer.withOpacity(0.1),
+                            color: feedTheme?.onContainer.withOpacity(0.05),
                             thickness: 1,
                           ),
                           StatefulBuilder(
@@ -235,7 +235,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             ),
           ),
           Divider(
-            color: feedTheme?.onContainer.withOpacity(0.1),
+            color: feedTheme?.onContainer.withOpacity(0.05),
             thickness: 1,
           ),
           LikeMindsTheme.kVerticalPaddingMedium,
