@@ -98,6 +98,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                   imageUrl: e.attachmentMeta.url,
                   style: widget.imageStyle,
                   onError: widget.onError,
+                  onMediaTap: widget.onMediaTap,
                 ),
           ),
         );
