@@ -281,7 +281,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       content: _defContentWidget(feedTheme, post),
       media: _defPostMedia(feedTheme, post),
       topicWidget: _defTopicWidget(feedTheme, post),
-      style: feedTheme?.postStyle.copyWith(),
+      style: feedTheme?.postStyle.copyWith(
+        margin: EdgeInsets.zero,
+      ),
     );
   }
 
