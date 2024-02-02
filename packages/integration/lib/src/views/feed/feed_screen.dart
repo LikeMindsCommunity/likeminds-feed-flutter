@@ -279,22 +279,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                         .postCreationStarted,
                                     eventProperties: {},
                                   ));
-                                  String? currentVisiblePost =
-                                      LMFeedVideoProvider
-                                          .instance.currentVisiblePostId;
 
-                                  VideoController? postVideoController =
-                                      LMFeedVideoProvider.instance
-                                          .getVideoController(
-                                              currentVisiblePost ?? '');
-
-                                  await postVideoController?.player.pause();
+                                  LMFeedVideoProvider.instance
+                                      .forcePauseAllControllers();
                                   // ignore: use_build_context_synchronously
                                   await Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               const LMFeedComposeScreen()));
-                                  await postVideoController?.player.play();
                                 }
                               : () => toast(
                                   "You do not have permission to create a post"),
@@ -304,26 +296,30 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
             SliverToBoxAdapter(
               child: config!.enableTopicFiltering
-                  ? FutureBuilder<GetTopicsResponse>(
-                      future: getTopicsResponse,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const SizedBox.shrink();
-                        } else if (snapshot.hasData &&
-                            snapshot.data != null &&
-                            snapshot.data!.success == true) {
-                          if (snapshot.data!.topics!.isNotEmpty) {
-                            return widget.topicBarBuilder
-                                    ?.call(_defTopicBar()) ??
-                                _defTopicBar();
-                          } else {
-                            return const SizedBox.shrink();
-                          }
-                        }
-                        return const SizedBox();
-                      },
-                    )
+                  ? ValueListenableBuilder(
+                      valueListenable: rebuildTopicFeed,
+                      builder: (context, _, __) {
+                        return FutureBuilder<GetTopicsResponse>(
+                          future: getTopicsResponse,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            } else if (snapshot.hasData &&
+                                snapshot.data != null &&
+                                snapshot.data!.success == true) {
+                              if (snapshot.data!.topics!.isNotEmpty) {
+                                return widget.topicBarBuilder
+                                        ?.call(_defTopicBar()) ??
+                                    _defTopicBar();
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            }
+                            return const SizedBox();
+                          },
+                        );
+                      })
                   : const SizedBox(),
             ),
             SliverToBoxAdapter(
@@ -620,6 +616,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       user: _feedBloc.users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             userUniqueId: userId,
@@ -705,6 +702,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData?.headerStyle,
+      onProfileTap: () {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(
+            _feedBloc.users[postViewData.userId]!.sdkClientInfo!.userUniqueId);
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            userUniqueId: _feedBloc
+                .users[postViewData.userId]!.sdkClientInfo!.userUniqueId,
+          ),
+        );
+      },
       menuBuilder: (menu) {
         return menu.copyWith(
           removeItemIds: {postReportId, postEditId},
@@ -785,6 +792,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 postViewData.likeCount)),
         style: feedThemeData?.footerStyle.likeButtonStyle,
         onTextTap: () {
+          VideoController? videoController =
+              LMFeedVideoProvider.instance.getVideoController(postViewData.id);
+
+          videoController?.player.pause();
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
@@ -1018,14 +1030,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                     LMFeedAnalyticsKeysDep.postCreationStarted,
                                 eventProperties: {}));
 
-                        String? currentVisiblePost =
-                            LMFeedVideoProvider.instance.currentVisiblePostId;
-
-                        VideoController? postVideoController =
-                            LMFeedVideoProvider.instance
-                                .getVideoController(currentVisiblePost ?? '');
-
-                        await postVideoController?.player.pause();
+                        LMFeedVideoProvider.instance.forcePauseAllControllers();
                         // ignore: use_build_context_synchronously
                         await Navigator.push(
                           context,
@@ -1033,7 +1038,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                             builder: (context) => const LMFeedComposeScreen(),
                           ),
                         );
-                        await postVideoController?.player.pause();
                       } else {
                         toast(
                           'A post is already uploading.',
@@ -1090,13 +1094,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                               deprecatedEventName:
                                   LMFeedAnalyticsKeysDep.postCreationStarted,
                               eventProperties: {}));
-                      String? currentVisiblePost =
-                          LMFeedVideoProvider.instance.currentVisiblePostId;
 
-                      VideoController? postVideoController = LMFeedVideoProvider
-                          .instance
-                          .getVideoController(currentVisiblePost ?? '');
-                      await postVideoController?.player.pause();
+                      LMFeedVideoProvider.instance.forcePauseAllControllers();
                       // ignore: use_build_context_synchronously
                       await Navigator.push(
                         context,
@@ -1104,7 +1103,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                           builder: (context) => const LMFeedComposeScreen(),
                         ),
                       );
-                      await postVideoController?.player.play();
                     } else {
                       toast(
                         'A post is already uploading.',

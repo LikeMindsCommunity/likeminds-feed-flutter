@@ -42,11 +42,19 @@ class LMFeedVideoProvider {
   Future<VideoController> videoControllerProvider(
       LMFeedGetPostVideoControllerRequest request) async {
     String postId = request.postId;
+    VideoController videoController;
     if (_videoControllers.containsKey(postId)) {
-      return _videoControllers[postId]!;
+      videoController = _videoControllers[postId]!;
+    } else {
+      videoController = _videoControllers[postId] =
+          await initialisePostVideoController(request);
     }
-    return _videoControllers[postId] =
-        await initialisePostVideoController(request);
+
+    if (request.isMuted) {
+      videoController.player.setVolume(0.0);
+    }
+
+    return videoController;
   }
 
   /// Disposes the video controller for the given postId and removes it from
@@ -74,7 +82,7 @@ class LMFeedVideoProvider {
       configuration: PlayerConfiguration(
         bufferSize: 24 * 1024 * 1024,
         ready: () {},
-        muted: true,
+        muted: request.isMuted,
       ),
     );
     controller = VideoController(
@@ -90,16 +98,30 @@ class LMFeedVideoProvider {
       // if the video source type is network, then the video source is a url
       await player.open(
         Media(request.videoSource),
-        play: false,
+        play: request.autoPlay,
       );
     } else {
       // if the video source type is file, then the video source is a file path
       await player.open(
         Media(request.videoSource),
-        play: false,
+        play: request.autoPlay,
       );
     }
 
     return controller;
+  }
+
+  /// This functions mutes all the controller in the map.
+  void forceMuteAllControllers() {
+    for (var controller in _videoControllers.values) {
+      controller.player.setVolume(0.0);
+    }
+  }
+
+  /// This functions pause all the controller in the map.
+  void forcePauseAllControllers() {
+    for (var controller in _videoControllers.values) {
+      controller.player.pause();
+    }
   }
 }

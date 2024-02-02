@@ -11,6 +11,7 @@ import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comme
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 /// {@template post_detail_screen}
@@ -473,6 +474,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       },
       isFeed: false,
       onTagTap: (String userId) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             userUniqueId: userId,
@@ -498,7 +500,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedPostContent _defContentWidget() {
     return LMFeedPostContent(
-      onTagTap: (String? userId) {},
+      onTagTap: (String userId) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            userUniqueId: userId,
+          ),
+        );
+      },
       style: feedTheme?.contentStyle,
     );
   }
@@ -520,6 +529,21 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       isFeed: true,
       postViewData: _postDetailScreenHandler!.postData!,
       postHeaderStyle: feedTheme?.headerStyle,
+      onProfileTap: () {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(
+            _postDetailScreenHandler!
+                .users[_postDetailScreenHandler!.postData!.userId]!
+                .sdkClientInfo!
+                .userUniqueId);
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            userUniqueId: _postDetailScreenHandler!
+                .users[_postDetailScreenHandler!.postData!.userId]!
+                .sdkClientInfo!
+                .userUniqueId,
+          ),
+        );
+      },
       menuBuilder: (menu) {
         return menu.copyWith(
           removeItemIds: {postReportId, postEditId},
@@ -594,6 +618,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 _postDetailScreenHandler!.postData!.likeCount)),
         style: feedTheme?.footerStyle.likeButtonStyle,
         onTextTap: () {
+          VideoController? videoController = LMFeedVideoProvider.instance
+              .getVideoController(_postDetailScreenHandler!.postData!.id);
+
+          videoController?.player.pause();
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
@@ -722,6 +751,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             LMFeedCore.instance.lmFeedClient.routeToProfile(
                 _postDetailScreenHandler!.users[commentViewData.userId]!
                     .sdkClientInfo!.userUniqueId);
+
+            LMFeedProfileBloc.instance.add(
+              LMFeedRouteToUserProfileEvent(
+                userUniqueId: _postDetailScreenHandler!
+                    .users[commentViewData.userId]!.sdkClientInfo!.userUniqueId,
+              ),
+            );
           }
         },
         imageUrl:
@@ -732,6 +768,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       showRepliesButton: defCommentShowRepliesButton(commentViewData),
       onTagTap: (String userId) {
         LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            userUniqueId: userId,
+          ),
+        );
       },
     );
   }
@@ -774,6 +815,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
       ),
       onTextTap: () {
+        VideoController? videoController = LMFeedVideoProvider.instance
+            .getVideoController(_postDetailScreenHandler!.postData!.id);
+
+        videoController?.player.pause();
+
         Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) => LMFeedLikesScreen(

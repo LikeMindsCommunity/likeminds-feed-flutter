@@ -141,7 +141,7 @@ class LMFeedPostUtils {
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 14,
-            color: LikeMindsTheme.greyColor,
+            color: LikeMindsTheme.blackColor,
           ),
         ),
       );
@@ -156,7 +156,7 @@ class LMFeedPostUtils {
         style: const TextStyle(
           fontWeight: FontWeight.w400,
           fontSize: 14,
-          color: LikeMindsTheme.greyColor,
+          color: LikeMindsTheme.blackColor,
         ),
       ));
     }
