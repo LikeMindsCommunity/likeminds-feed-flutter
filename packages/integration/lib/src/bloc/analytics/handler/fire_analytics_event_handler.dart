@@ -10,6 +10,7 @@ fireAnalyticsEventHandler(
     LMFeedFireAnalyticsEvent event, Emitter<LMFeedAnalyticsState> emit) async {
   emit(LMFeedAnalyticsEventFired(
     eventName: event.eventName,
+    deprecatedEventName: event.deprecatedEventName,
     eventProperties: event.eventProperties,
   ));
 }

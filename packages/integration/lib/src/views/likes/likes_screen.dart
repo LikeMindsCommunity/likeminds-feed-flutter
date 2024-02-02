@@ -2,8 +2,9 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/likes/handler/likes_screen_handler.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+
+part 'handler/likes_screen_handler.dart';
 
 class LMFeedLikesScreen extends StatefulWidget {
   static const String route = "/likes_screen";

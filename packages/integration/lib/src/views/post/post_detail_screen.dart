@@ -351,6 +351,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 LMFeedAnalyticsBloc.instance.add(
                   LMFeedFireAnalyticsEvent(
                     eventName: LMFeedAnalyticsKeys.commentDeleted,
+                    deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
                     eventProperties: {
                       "post_id": widget.postId,
                       "comment_id": commentViewData.id,
@@ -539,6 +540,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
+                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": _postDetailScreenHandler!.postData!.id,
                         },
@@ -565,6 +567,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedPostMedia _defPostMedia() {
     return LMFeedPostMedia(
+      postId: _postDetailScreenHandler!.postData!.id,
       attachments: _postDetailScreenHandler!.postData!.attachments!,
       style: feedTheme?.mediaStyle,
       onMediaTap: () {
@@ -591,8 +594,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 _postDetailScreenHandler!.postData!.likeCount)),
         style: feedTheme?.footerStyle.likeButtonStyle,
         onTextTap: () {
-          Navigator.push(
-            context,
+          Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: _postDetailScreenHandler!.postData!.id,
@@ -772,8 +774,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
       ),
       onTextTap: () {
-        Navigator.push(
-          context,
+        Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) => LMFeedLikesScreen(
               postId: _postDetailScreenHandler!.postData!.id,

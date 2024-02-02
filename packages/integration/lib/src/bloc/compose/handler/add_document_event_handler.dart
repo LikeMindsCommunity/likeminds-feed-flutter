@@ -15,6 +15,7 @@ addDocumentEventHandler(
   debugPrint("Starting picking documents");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
+    deprecatedEventName: LMFeedAnalyticsKeysDep.clickedOnAttachment,
     eventProperties: {'type': 'document'},
   ));
   final result = await LMFeedMediaHandler.handlePermissions(3);

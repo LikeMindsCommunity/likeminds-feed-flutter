@@ -266,8 +266,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         );
       },
       onPostTap: (context, post) {
-        Navigator.push(
-          context,
+        Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) => LMFeedPostDetailScreen(
               postId: post.id,
@@ -393,6 +392,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       style: feedTheme?.mediaStyle,
+      postId: post.id,
     );
   }
 
@@ -405,8 +405,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 postViewData.likeCount)),
         style: feedTheme?.footerStyle.likeButtonStyle,
         onTextTap: () {
-          Navigator.push(
-            context,
+          Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
@@ -449,8 +448,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         ),
         style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {
-          Navigator.push(
-            context,
+          Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedPostDetailScreen(
                 postId: postViewData.id,

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/utils/feed_time_ago/feed_time_ago.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class LMFeedCommentWidget extends StatefulWidget {
   const LMFeedCommentWidget({
@@ -99,7 +99,6 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     style = widget.style ?? feedTheme.commentStyle;
-    timeago.setLocaleMessages('en', LMFeedCustomMessages());
     return Container(
       decoration: BoxDecoration(
         color: style!.backgroundColor ?? Colors.white,
@@ -216,7 +215,8 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                 if (style?.showTimestamp ?? true) ...[
                   const Spacer(),
                   LMFeedText(
-                    text: widget.comment.createdAt.timeAgo(),
+                    text:
+                        LMFeedTimeAgo.instance.format(widget.comment.createdAt),
                     style: LMFeedTextStyle(
                       textStyle: TextStyle(
                         fontSize: LikeMindsTheme.kFontSmallMed,

@@ -5,8 +5,6 @@ import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants
 import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 
-import 'package:timeago/timeago.dart' as timeago;
-
 class LMFeedCommentReplyWidget extends StatefulWidget {
   final String postId;
   final LMCommentViewData reply;
@@ -103,7 +101,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   Widget build(BuildContext context) {
     feedTheme = LMFeedTheme.of(context);
     replyStyle = widget.style ?? feedTheme?.replyStyle;
-    timeago.setLocaleMessages('en', LMFeedCustomMessages());
     return BlocConsumer(
       bloc: _commentRepliesBloc,
       buildWhen: (previous, current) {
@@ -464,8 +461,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
           ),
         ),
         onTextTap: () {
-          Navigator.push(
-            context,
+          Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: widget.postId,

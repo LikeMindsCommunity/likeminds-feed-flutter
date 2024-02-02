@@ -67,10 +67,10 @@ class _ExampleTabScreenState extends State<ExampleTabScreen>
         children: [
           HomeScreen(
             feedWidget: widget.feedWidget,
-          ), // First tab content
-          LMFeedActivityScreen(
+          ),
+          LMFeedActivityWidget(
             uuid: widget.userId,
-          ), // Second tab content
+          ),
         ],
       ),
     );

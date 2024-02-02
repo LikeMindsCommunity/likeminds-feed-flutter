@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+part of '../likes_screen.dart';
 
 class LMLikesScreenHandler {
   late PagingController<int, LMLikeViewData> _pagingController;
@@ -42,6 +40,7 @@ class LMLikesScreenHandler {
   void logLikeListEvent(totalLikes) {
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
       eventName: LMFeedAnalyticsKeys.likeListOpen,
+      deprecatedEventName: LMFeedAnalyticsKeysDep.likeListOpen,
       eventProperties: {
         "post_id": postId,
         "total_likes": totalLikes,

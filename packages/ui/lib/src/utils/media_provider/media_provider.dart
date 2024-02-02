@@ -1,6 +1,5 @@
-import 'dart:io';
-
-import 'package:video_player/video_player.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 part 'get_post_video_controller_response.dart';
 part 'get_post_video_controller_request.dart';
@@ -14,13 +13,22 @@ class LMFeedVideoProvider {
   /// This map holds all the video controllers that are currently in use.
   /// The video controllers are disposed when they are removed from this map.
   /// This map is also used to check if a video controller is already in use.
-  final Map<String, VideoPlayerController> _videoControllers = {};
+  final Map<String, VideoController> _videoControllers = {};
+
+  /// This variable holds the postId of the post that is currently visible.
+  /// It variable is used to pause the video when the post is not visible
+  /// or to resume the video when the post becomes visible.
+  String? currentVisiblePostId;
 
   static LMFeedVideoProvider? _instance;
 
-  static LMFeedVideoProvider get() => _instance ??= LMFeedVideoProvider._();
-
+  static LMFeedVideoProvider get instance =>
+      _instance ??= LMFeedVideoProvider._();
   LMFeedVideoProvider._();
+
+  VideoController? getVideoController(String postId) {
+    return _videoControllers[postId];
+  }
 
   /// Returns a VideoPlayerController for the given postId.
   /// If a controller is already in use for the given postId, then the same
@@ -31,7 +39,7 @@ class LMFeedVideoProvider {
   ///
   /// The video controller must be disposed and removed from the map.
   /// when not in use anymore using [clearPostController] method
-  Future<VideoPlayerController> getPostVideoController(
+  Future<VideoController> videoControllerProvider(
       LMFeedGetPostVideoControllerRequest request) async {
     String postId = request.postId;
     if (_videoControllers.containsKey(postId)) {
@@ -48,7 +56,7 @@ class LMFeedVideoProvider {
   ///
   void clearPostController(String postId) {
     // dispose the controller if it exists
-    _videoControllers[postId]?.dispose();
+    _videoControllers[postId]?.player.dispose();
     // remove the controller from the map
     _videoControllers.remove(postId);
   }
@@ -58,23 +66,39 @@ class LMFeedVideoProvider {
   /// The video source type can be network or file.
   /// If the video source type is network, then the video source is a url.
   /// If the video source type is file, then the video source is a file path.
-  Future<VideoPlayerController> initialisePostVideoController(
+  Future<VideoController> initialisePostVideoController(
       LMFeedGetPostVideoControllerRequest request) async {
-    VideoPlayerController controller;
+    VideoController controller;
+
+    Player player = Player(
+      configuration: PlayerConfiguration(
+        bufferSize: 24 * 1024 * 1024,
+        ready: () {},
+        muted: true,
+      ),
+    );
+    controller = VideoController(
+      player,
+      configuration: const VideoControllerConfiguration(
+        scale: 0.2,
+      ),
+    );
 
     // initialise the controller based on the video source type
     // network or file
     if (request.videoType == LMFeedVideoSourceType.network) {
       // if the video source type is network, then the video source is a url
-      controller =
-          VideoPlayerController.networkUrl(Uri.parse(request.videoSource));
+      await player.open(
+        Media(request.videoSource),
+        play: false,
+      );
     } else {
       // if the video source type is file, then the video source is a file path
-      controller = VideoPlayerController.file(File(request.videoSource));
+      await player.open(
+        Media(request.videoSource),
+        play: false,
+      );
     }
-
-    // initialise the controller and return
-    await controller.initialize();
 
     return controller;
   }
