@@ -170,7 +170,7 @@ packages:
     source: hosted
     version: "2.0.1"
   carousel_slider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: carousel_slider
       sha256: "9c695cc963bf1d04a47bd6021f68befce8970bcd61d24938e1fb0918cf5d9c42"
@@ -330,13 +330,13 @@ packages:
     source: hosted
     version: "4.2.0"
   envied:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: envied
-      sha256: c4af8bb99203d7f216cea41f2ec70874f9dd826b2a5782cdc5bd25389c5adcc1
+      sha256: dab29e21452c3d57ec10889d96b06b4a006b01375d4df10b33c9704800c208c4
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.2"
+    version: "0.5.3"
   equatable:
     dependency: "direct main"
     description:
@@ -346,7 +346,7 @@ packages:
     source: hosted
     version: "2.0.5"
   extended_image:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: extended_image
       sha256: b4d72a27851751cfadaf048936d42939db7cd66c08fdcfe651eeaa1179714ee6
@@ -681,13 +681,13 @@ packages:
     source: hosted
     version: "4.0.0"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
-      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
+      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
       url: "https://pub.dev"
     source: hosted
-    version: "0.18.1"
+    version: "0.19.0"
   io:
     dependency: transitive
     description:
@@ -839,7 +839,7 @@ packages:
     source: hosted
     version: "1.2.4"
   meta:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: meta
       sha256: "3c74dbf8763d36539f114c799d8a2d87343b5067e9d796ca22b5eb8437090ee3"
@@ -1436,13 +1436,13 @@ packages:
     source: hosted
     version: "0.6.0"
   timeago:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: timeago
-      sha256: c44b80cbc6b44627c00d76960f2af571f6f50e5dbedef4d9215d455e4335165b
+      sha256: d3204eb4c788214883380253da7f23485320a58c11d145babc82ad16bf4e7764
       url: "https://pub.dev"
     source: hosted
-    version: "3.6.0"
+    version: "3.6.1"
   timing:
     dependency: transitive
     description:
