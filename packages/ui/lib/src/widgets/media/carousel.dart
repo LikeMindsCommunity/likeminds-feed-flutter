@@ -8,7 +8,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedCarousel extends StatefulWidget {
   final List<LMAttachmentViewData> attachments;
-  final Function(VideoController)? initialiseVideoController;
+  final String postId;
 
   final LMFeedPostImage? imageItem;
   final LMFeedPostVideo? videoItem;
@@ -21,37 +21,48 @@ class LMFeedCarousel extends StatefulWidget {
   final LMFeedPostCarouselStyle? style;
 
   final Function(String, StackTrace)? onError;
+  final VoidCallback? onMediaTap;
 
   const LMFeedCarousel({
     Key? key,
     required this.attachments,
+    required this.postId,
     this.imageItem,
     this.videoItem,
-    this.initialiseVideoController,
     this.onError,
     this.imageBuilder,
     this.videoBuilder,
     this.videoStyle,
     this.imageStyle,
     this.style,
+    this.onMediaTap,
   }) : super(key: key);
 
   @override
   State<LMFeedCarousel> createState() => _LMCarouselState();
 
   static LMFeedCarousel defCarousel(
-    List<LMAttachmentViewData> attachments, {
+    List<LMAttachmentViewData> attachments,
+    String postId, {
     LMFeedPostImage? imageItem,
     LMFeedPostVideo? videoItem,
     Function(String, StackTrace)? onError,
     Function(VideoController)? initialiseVideoController,
+    LMFeedPostVideoStyle? videoStyle,
+    LMFeedPostImageStyle? imageStyle,
+    LMFeedPostCarouselStyle? style,
+    VoidCallback? onMediaTap,
   }) {
     return LMFeedCarousel(
+      postId: postId,
       attachments: attachments,
       imageItem: imageItem,
       videoItem: videoItem,
       onError: onError,
-      initialiseVideoController: initialiseVideoController,
+      videoStyle: videoStyle,
+      imageStyle: imageStyle,
+      style: style,
+      onMediaTap: onMediaTap,
     );
   }
 }
@@ -87,6 +98,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                   imageUrl: e.attachmentMeta.url,
                   style: widget.imageStyle,
                   onError: widget.onError,
+                  onMediaTap: widget.onMediaTap,
                 ),
           ),
         );
@@ -100,9 +112,10 @@ class _LMCarouselState extends State<LMFeedCarousel> {
           width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
           child: widget.videoItem ??
               LMFeedPostVideo(
-                initialiseVideoController: widget.initialiseVideoController,
                 videoUrl: e.attachmentMeta.url,
                 style: widget.videoStyle,
+                postId: widget.postId,
+                onMediaTap: widget.onMediaTap,
               ),
         );
       } else {

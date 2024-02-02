@@ -63,7 +63,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                                   icon: LMFeedIcon(
                                     type: LMFeedIconType.icon,
                                     icon: Platform.isAndroid
-                                        ? Icons.chevron_left
+                                        ? Icons.arrow_back
                                         : CupertinoIcons.chevron_back,
                                     style: LMFeedIconStyle(
                                       color: theme.onContainer,

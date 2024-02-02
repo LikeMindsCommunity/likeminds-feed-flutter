@@ -15,6 +15,7 @@ addVideoEventHandler(
   debugPrint("Starting picking videos");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
+    deprecatedEventName: LMFeedAnalyticsKeysDep.clickedOnAttachment,
     eventProperties: {'type': 'video'},
   ));
   final result = await LMFeedMediaHandler.handlePermissions(2);

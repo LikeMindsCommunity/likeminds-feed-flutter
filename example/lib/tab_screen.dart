@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_sample/activity_widget_screen.dart';
 
 class ExampleTabScreen extends StatefulWidget {
   final Widget feedWidget;
@@ -67,10 +68,10 @@ class _ExampleTabScreenState extends State<ExampleTabScreen>
         children: [
           HomeScreen(
             feedWidget: widget.feedWidget,
-          ), // First tab content
-          LMFeedActivityScreen(
+          ),
+          LMFeedActivityWidgetScreen(
             uuid: widget.userId,
-          ), // Second tab content
+          ),
         ],
       ),
     );

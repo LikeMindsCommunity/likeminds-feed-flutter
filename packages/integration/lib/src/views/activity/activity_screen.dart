@@ -5,6 +5,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -88,7 +89,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   @override
   void dispose() {
-    _commentHandlerBloc.close();
     _pagingController.dispose();
     super.dispose();
   }
@@ -99,7 +99,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     return Scaffold(
       backgroundColor: feedTheme?.backgroundColor,
       appBar: LMFeedAppBar(
-        leading: const SizedBox.shrink(),
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme?.container,
           centerTitle: Platform.isAndroid ? false : true,
@@ -173,7 +172,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                       child: Column(
                         children: [
                           Divider(
-                            color: feedTheme?.onContainer.withOpacity(0.1),
+                            color: feedTheme?.onContainer.withOpacity(0.05),
                             thickness: 1,
                           ),
                           StatefulBuilder(
@@ -236,7 +235,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             ),
           ),
           Divider(
-            color: feedTheme?.onContainer.withOpacity(0.1),
+            color: feedTheme?.onContainer.withOpacity(0.05),
             thickness: 1,
           ),
           LikeMindsTheme.kVerticalPaddingMedium,
@@ -247,14 +246,21 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       user: users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             userUniqueId: userId,
           ),
         );
       },
-      onMediaTap: () {
-        Navigator.push(
+      onMediaTap: () async {
+        VideoController? videoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
+
+        await videoController?.player.pause();
+
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => LMFeedMediaPreviewScreen(
@@ -264,17 +270,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             ),
           ),
         );
+
+        await videoController?.player.play();
       },
       onPostTap: (context, post) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LMFeedPostDetailScreen(
-              postId: post.id,
-              // postBuilder: widget.postBuilder,
-            ),
-          ),
-        );
+        navigateToLMFeedPostDetailsScreen(post.id);
       },
       footer: _defFooterWidget(feedTheme, post),
       header: _defPostHeader(feedTheme, post),
@@ -323,6 +323,22 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       user: users[postViewData.userId]!,
       isFeed: true,
       postViewData: postViewData,
+      onProfileTap: () {
+        if (users[postViewData.userId]!.sdkClientInfo != null) {
+          LMFeedCore.instance.lmFeedClient.routeToProfile(
+              users[postViewData.userId]!.sdkClientInfo!.userUniqueId);
+          LMFeedProfileBloc.instance.add(
+            LMFeedRouteToUserProfileEvent(
+              userUniqueId:
+                  users[postViewData.userId]!.sdkClientInfo!.userUniqueId,
+            ),
+          );
+        }
+      },
+      subText: LMFeedText(
+        text:
+            "@${users[postViewData.userId]!.name.toLowerCase().split(' ').join()} ",
+      ),
       menuBuilder: (menu) {
         return menu.copyWith(
           removeItemIds: {
@@ -364,6 +380,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
+                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": postViewData.id,
                         },
@@ -393,6 +410,27 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       style: feedTheme?.mediaStyle,
+      postId: post.id,
+      onMediaTap: () async {
+        VideoController? videoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
+
+        await videoController?.player.pause();
+
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMFeedMediaPreviewScreen(
+              postAttachments: post.attachments ?? [],
+              post: post,
+              user: users[post.userId]!,
+            ),
+          ),
+        );
+
+        await videoController?.player.play();
+      },
     );
   }
 
@@ -405,8 +443,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 postViewData.likeCount)),
         style: feedTheme?.footerStyle.likeButtonStyle,
         onTextTap: () {
-          Navigator.push(
-            context,
+          Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
@@ -448,18 +485,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               postViewData.commentCount),
         ),
         style: feedTheme?.footerStyle.commentButtonStyle,
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LMFeedPostDetailScreen(
-                postId: postViewData.id,
-                openKeyboard: true,
-                // postBuilder: widget.postBuilder,
-              ),
-            ),
-          );
-        },
+        onTap: () => navigateToLMFeedPostDetailsScreen(postViewData.id),
       );
 
   LMFeedButton defSaveButton(
@@ -503,6 +529,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     return LMFeedCommentWidget(
       user: userViewData,
       comment: commentViewData,
+      subtitleText: LMFeedText(
+        text: "@${userViewData.name.toLowerCase().split(' ').join()} ",
+      ),
       style: feedTheme?.commentStyle ??
           const LMFeedCommentStyle(
             padding: EdgeInsets.all(16.0),
@@ -526,10 +555,30 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       ),
       likeButton:
           defCommentLikeButton(feedTheme, commentViewData, postViewData),
-      replyButton: defCommentReplyButton(feedTheme, commentViewData),
+      replyButton:
+          defCommentReplyButton(feedTheme, postViewData, commentViewData),
+      showRepliesButton:
+          defCommentShowRepliesButton(postViewData, commentViewData),
       onTagTap: (String userId) {
         LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
       },
+    );
+  }
+
+  LMFeedButton defCommentShowRepliesButton(
+      LMPostViewData postViewData, LMCommentViewData commentViewData) {
+    return LMFeedButton(
+      onTap: () => navigateToLMFeedPostDetailsScreen(postViewData.id),
+      text: LMFeedText(
+        text:
+            "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            color: feedTheme?.primaryColor,
+          ),
+        ),
+      ),
+      style: feedTheme?.commentStyle.showRepliesButtonStyle,
     );
   }
 
@@ -598,8 +647,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     );
   }
 
-  LMFeedButton defCommentReplyButton(
-      LMFeedThemeData? feedTheme, LMCommentViewData commentViewData) {
+  LMFeedButton defCommentReplyButton(LMFeedThemeData? feedTheme,
+      LMPostViewData postViewData, LMCommentViewData commentViewData) {
     return LMFeedButton(
       style: feedTheme?.commentStyle.replyButtonStyle ??
           const LMFeedButtonStyle(
@@ -619,7 +668,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           fontSize: 12,
         )),
       ),
-      onTap: () {},
+      onTap: () => navigateToLMFeedPostDetailsScreen(postViewData.id),
     );
   }
 
@@ -647,12 +696,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               ..commentId(commentViewData.parentComment!.id)
               ..replyId(commentViewData.id);
           }
-
-          // _postDetailScreenHandler!.commentHandlerBloc.add(
-          //   LMFeedCommentOngoingEvent(
-          //     commentMetaData: commentMetaDataBuilder.build(),
-          //   ),
-          // );
         },
         onCommentDelete: () {
           showDialog(
@@ -668,6 +711,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 LMFeedAnalyticsBloc.instance.add(
                   LMFeedFireAnalyticsEvent(
                     eventName: LMFeedAnalyticsKeys.commentDeleted,
+                    deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
                     eventProperties: {
                       "post_id": postViewData,
                       "comment_id": commentViewData.id,
@@ -689,15 +733,31 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                       ..level(0)
                       ..commentId(commentViewData.id))
                     .build();
-
-                // _postDetailScreenHandler!.commentHandlerBloc.add(
-                //     LMFeedCommentActionEvent(
-                //         commentActionRequest: deleteCommentRequest,
-                //         commentMetaData: commentMetaData));
               },
               actionText: 'Delete',
             ),
           );
         },
       );
+
+  void navigateToLMFeedPostDetailsScreen(String postId) async {
+    VideoController? videoController = LMFeedVideoProvider.instance
+        .getVideoController(
+            LMFeedVideoProvider.instance.currentVisiblePostId ?? postId);
+
+    await videoController?.player.pause();
+
+    await Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedPostDetailScreen(
+          postId: postId,
+          openKeyboard: true,
+          commentBuilder: widget.commentBuilder,
+          postBuilder: widget.postBuilder,
+        ),
+      ),
+    );
+
+    await videoController?.player.play();
+  }
 }

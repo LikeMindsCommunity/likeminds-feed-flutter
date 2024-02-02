@@ -9,8 +9,6 @@ export 'constants/analytics/keys_dep.dart';
 export 'media/media_handler.dart';
 export 'media/media_utils.dart';
 
-export 'media/media_provider/media_provider.dart';
-
 export 'typedefs.dart';
 export 'notification_handler.dart';
 

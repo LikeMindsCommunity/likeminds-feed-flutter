@@ -35,7 +35,6 @@ class LMFeedTopicBar extends StatelessWidget {
   Widget build(BuildContext context) {
     LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
     return Container(
-      height: style?.height ?? 54,
       width: style?.width,
       decoration: BoxDecoration(
         color: style?.backgroundColor ?? feedThemeData.container,

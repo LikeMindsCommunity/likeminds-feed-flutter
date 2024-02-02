@@ -89,6 +89,7 @@ class LMNotificationHandler {
     LMFeedAnalyticsBloc.instance.add(
       const LMFeedFireAnalyticsEvent(
           eventName: LMFeedAnalyticsKeys.notificationClicked,
+          deprecatedEventName: LMFeedAnalyticsKeysDep.notificationClicked,
           eventProperties: {}),
     );
 
@@ -120,17 +121,20 @@ class LMNotificationHandler {
       LMFeedAnalyticsBloc.instance.add(
         LMFeedFireAnalyticsEvent(
           eventName: LMFeedAnalyticsKeys.commentListOpen,
+          deprecatedEventName: LMFeedAnalyticsKeysDep.commentListOpen,
           eventProperties: {
             'postId': postId,
           },
         ),
       );
 
-      navigatorKey.currentState!.push(MaterialPageRoute(
-        builder: (context) {
-          return LMFeedPostDetailScreen(postId: postId);
-        },
-      ));
+      navigatorKey.currentState!.push(
+        MaterialPageRoute(
+          builder: (context) {
+            return LMFeedPostDetailScreen(postId: postId);
+          },
+        ),
+      );
     }
   }
 
@@ -185,6 +189,7 @@ class LMNotificationHandler {
       );
       LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.notificationReceived,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.notificationReceived,
         eventProperties: {},
       ));
     }

@@ -45,6 +45,7 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
       // Fire the analytic event for comment deleted
       LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.commentDeleted,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
         eventProperties: {
           "post_id": deleteCommentRequest.postId,
           "comment_id": deleteCommentRequest.commentId,

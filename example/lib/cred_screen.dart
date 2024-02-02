@@ -60,7 +60,26 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
-          home: const CredScreen(),
+          home: LMFeedBlocListener(
+            analyticsListener:
+                (BuildContext context, LMFeedAnalyticsState state) {
+              if (state is LMFeedAnalyticsEventFired) {
+                debugPrint("////////////////");
+                debugPrint("\n\n");
+                debugPrint(state.eventName);
+                debugPrint("////////////////");
+                debugPrint("\n\n");
+                debugPrint(state.eventProperties.toString());
+                debugPrint("////////////////");
+                debugPrint("\n\n");
+              }
+            },
+            profileListener:
+                (BuildContext context, LMFeedProfileState state) {},
+            routingListener:
+                (BuildContext context, LMFeedRoutingState state) {},
+            child: const CredScreen(),
+          ),
         ),
       ),
     );
