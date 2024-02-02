@@ -246,6 +246,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       user: users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             userUniqueId: userId,
@@ -280,9 +281,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       content: _defContentWidget(feedTheme, post),
       media: _defPostMedia(feedTheme, post),
       topicWidget: _defTopicWidget(feedTheme, post),
-      style: feedTheme?.postStyle.copyWith(
-        margin: EdgeInsets.zero,
-      ),
+      style: feedTheme?.postStyle.copyWith(),
     );
   }
 
@@ -322,6 +321,18 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       user: users[postViewData.userId]!,
       isFeed: true,
       postViewData: postViewData,
+      onProfileTap: () {
+        if (users[postViewData.userId]!.sdkClientInfo != null) {
+          LMFeedCore.instance.lmFeedClient.routeToProfile(
+              users[postViewData.userId]!.sdkClientInfo!.userUniqueId);
+          LMFeedProfileBloc.instance.add(
+            LMFeedRouteToUserProfileEvent(
+              userUniqueId:
+                  users[postViewData.userId]!.sdkClientInfo!.userUniqueId,
+            ),
+          );
+        }
+      },
       subText: LMFeedText(
         text:
             "@${users[postViewData.userId]!.name.toLowerCase().split(' ').join()} ",

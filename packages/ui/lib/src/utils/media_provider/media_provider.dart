@@ -110,4 +110,18 @@ class LMFeedVideoProvider {
 
     return controller;
   }
+
+  /// This functions mutes all the controller in the map.
+  void forceMuteAllControllers() {
+    for (var controller in _videoControllers.values) {
+      controller.player.setVolume(0.0);
+    }
+  }
+
+  /// This functions pause all the controller in the map.
+  void forcePauseAllControllers() {
+    for (var controller in _videoControllers.values) {
+      controller.player.pause();
+    }
+  }
 }
