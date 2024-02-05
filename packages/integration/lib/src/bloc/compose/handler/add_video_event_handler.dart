@@ -23,10 +23,23 @@ addVideoEventHandler(
     try {
       final videos = await LMFeedMediaHandler.pickVideos(mediaCount);
       if (videos != null && videos.isNotEmpty) {
+        int countOfPickedVideos = videos.length;
+
         LMFeedComposeBloc.instance.videoCount += videos.length;
         LMFeedComposeBloc.instance.postMedia.addAll(videos);
         LMFeedComposeBloc.instance.postMedia
             .removeWhere((element) => element.mediaType == LMMediaType.link);
+
+        LMFeedAnalyticsBloc.instance.add(
+          LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.videoAttachedToPost,
+            deprecatedEventName: LMFeedAnalyticsKeysDep.videoAttachedToPost,
+            eventProperties: {
+              'imageCount': countOfPickedVideos,
+            },
+          ),
+        );
+
         emitter(LMFeedComposeAddedVideoState());
       } else {
         emitter(LMFeedComposeInitialState());

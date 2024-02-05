@@ -41,16 +41,6 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
         'Comment Deleted',
         duration: Toast.LENGTH_LONG,
       );
-
-      // Fire the analytic event for comment deleted
-      LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-        eventName: LMFeedAnalyticsKeys.commentDeleted,
-        deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
-        eventProperties: {
-          "post_id": deleteCommentRequest.postId,
-          "comment_id": deleteCommentRequest.commentId,
-        },
-      ));
       // Notify the UI to change the view to Success
       // and remove the comment from the UI
       // and update the comment count
@@ -58,6 +48,20 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
         LMFeedCommentSuccessState(
           commentActionResponse: response,
           commentMetaData: event.commentMetaData,
+        ),
+      );
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: LMFeedAnalyticsKeys.commentDeleted,
+          deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
+          eventProperties: {
+            "post_id": event.commentMetaData.postId,
+            "comment_id": event.commentMetaData.commentId,
+            if (event.commentMetaData.commentActionEntity ==
+                LMFeedCommentType.reply)
+              "comment_reply_id": event.commentMetaData.replyId,
+          },
         ),
       );
     } else {

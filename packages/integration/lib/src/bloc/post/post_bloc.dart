@@ -12,7 +12,6 @@ part 'handler/new_post_event_handler.dart';
 part 'handler/edit_post_event_handler.dart';
 part 'handler/delete_post_event_handler.dart';
 part 'handler/update_post_event_handler.dart';
-part 'handler/toggle_pin_post_event_handler.dart';
 
 class LMFeedPostBloc extends Bloc<LMFeedPostEvents, LMFeedPostState> {
   static LMFeedPostBloc? _lmPostBloc;
@@ -24,6 +23,5 @@ class LMFeedPostBloc extends Bloc<LMFeedPostEvents, LMFeedPostState> {
     on<LMFeedEditPostEvent>(editPostEventHandler);
     on<LMFeedDeletePostEvent>(deletePostEventHandler);
     on<LMFeedUpdatePostEvent>(updatePostEventHandler);
-    on<LMFeedTogglePinPostEvent>(togglePinPostEventHandler);
   }
 }

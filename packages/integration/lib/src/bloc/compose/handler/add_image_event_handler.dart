@@ -23,8 +23,20 @@ addImageEventHandler(
     try {
       final images = await LMFeedMediaHandler.pickImages(mediaCount);
       if (images != null && images.isNotEmpty) {
-        LMFeedComposeBloc.instance.imageCount += images.length;
+        int countOfPickedImages = images.length;
+        LMFeedComposeBloc.instance.imageCount += countOfPickedImages;
         LMFeedComposeBloc.instance.postMedia.addAll(images);
+
+        LMFeedAnalyticsBloc.instance.add(
+          LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.imageAttachedToPost,
+            deprecatedEventName: LMFeedAnalyticsKeysDep.imageAttachedToPost,
+            eventProperties: {
+              'imageCount': countOfPickedImages,
+            },
+          ),
+        );
+
         emitter(LMFeedComposeAddedImageState());
       } else {
         if (LMFeedComposeBloc.instance.postMedia.isEmpty) {

@@ -2,7 +2,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 part 'handler/likes_screen_handler.dart';
 
@@ -32,6 +31,16 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
     super.initState();
     handler = LMLikesScreenHandler.instance;
     handler?.initialise(postId: widget.postId, commentId: widget.commentId);
+
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.likeListOpen,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.likeListOpen,
+        eventProperties: {
+          'postId': widget.postId,
+        },
+      ),
+    );
   }
 
   @override

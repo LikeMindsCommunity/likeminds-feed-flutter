@@ -8,7 +8,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/lists/topic_list.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -565,6 +564,19 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   ),
                   onTagSelected: (tag) {
                     composeBloc.userTags.add(tag);
+                    LMFeedAnalyticsBloc.instance.add(
+                      LMFeedFireAnalyticsEvent(
+                        eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+                        deprecatedEventName:
+                            LMFeedAnalyticsKeysDep.userTaggedInPost,
+                        eventProperties: {
+                          'tagged_user_id': tag.sdkClientInfo?.userUniqueId ??
+                              tag.userUniqueId,
+                          'tagged_user_count':
+                              composeBloc.userTags.length.toString(),
+                        },
+                      ),
+                    );
                   },
                   controller: _controller,
 

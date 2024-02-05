@@ -1,3 +1,7 @@
-## 0.0.1
+## 1.0.0
 
-* TODO: Describe initial release.
+Initial release of LikeMinds Feed Flutter UI library
+
+## 1.0.1
+
+Patch update wuth dependency update

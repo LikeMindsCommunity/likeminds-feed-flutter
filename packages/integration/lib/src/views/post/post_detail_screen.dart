@@ -75,6 +75,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   bool replyShown = false;
   LMFeedThemeData? feedTheme;
 
+  bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
+
   bool right = true;
   List<LMUserTagViewData> userTags = [];
 
@@ -96,6 +98,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     if (widget.openKeyboard) {
       _postDetailScreenHandler!.openOnScreenKeyboard();
     }
+
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.commentListOpen,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.commentListOpen,
+        eventProperties: {
+          'postId': widget.postId,
+        },
+      ),
+    );
   }
 
   @override
@@ -315,6 +327,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
           LMCommentMetaDataBuilder commentMetaDataBuilder =
               LMCommentMetaDataBuilder()
+                ..postId(_postDetailScreenHandler!.postData!.id)
                 ..commentActionType(LMFeedCommentActionType.edit)
                 ..commentText(LMFeedTaggingHelper.convertRouteToTag(
                     commentViewData.text));
@@ -349,17 +362,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               action: (String reason) async {
                 Navigator.of(childContext).pop();
 
-                LMFeedAnalyticsBloc.instance.add(
-                  LMFeedFireAnalyticsEvent(
-                    eventName: LMFeedAnalyticsKeys.commentDeleted,
-                    deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
-                    eventProperties: {
-                      "post_id": widget.postId,
-                      "comment_id": commentViewData.id,
-                    },
-                  ),
-                );
-
                 DeleteCommentRequest deleteCommentRequest =
                     (DeleteCommentRequestBuilder()
                           ..postId(widget.postId)
@@ -370,6 +372,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
                 LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
                       ..commentActionEntity(LMFeedCommentType.parent)
+                      ..postId(_postDetailScreenHandler!.postData!.id)
                       ..commentActionType(LMFeedCommentActionType.delete)
                       ..level(0)
                       ..commentId(commentViewData.id))
@@ -561,12 +564,18 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
+                    String postType = LMFeedPostUtils.getPostType(
+                        _postDetailScreenHandler!.postData!.attachments);
+
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": _postDetailScreenHandler!.postData!.id,
+                          "post_type": postType,
+                          "user_id": _postDetailScreenHandler!.postData!.userId,
+                          "user_state": isCm ? "CM" : "member",
                         },
                       ),
                     );
@@ -884,6 +893,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       onTap: () {
         LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
               ..commentActionEntity(LMFeedCommentType.parent)
+              ..postId(widget.postId)
               ..commentActionType(LMFeedCommentActionType.replying)
               ..level(0)
               ..user(_postDetailScreenHandler!.users[commentViewData.userId]!)
@@ -1165,6 +1175,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                   ..commentActionEntity(
                                                       LMFeedCommentType.reply)
                                                   ..level(0)
+                                                  ..postId(widget.postId)
                                                   ..commentId(state
                                                       .commentMetaData
                                                       .commentId!)
@@ -1195,6 +1206,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                 ..commentActionEntity(
                                                     LMFeedCommentType.parent)
                                                 ..level(0)
+                                                ..postId(widget.postId)
                                                 ..commentActionType(
                                                     LMFeedCommentActionType
                                                         .add))
@@ -1253,8 +1265,28 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           !_postDetailScreenHandler!.postData!.isPinned;
       _postDetailScreenHandler!.rebuildPostWidget.value =
           !_postDetailScreenHandler!.rebuildPostWidget.value;
+
       LMFeedPostBloc.instance.add(
           LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+    } else {
+      String postType = LMFeedPostUtils.getPostType(
+          _postDetailScreenHandler!.postData!.attachments);
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: _postDetailScreenHandler!.postData!.isPinned
+              ? LMFeedAnalyticsKeys.postPinned
+              : LMFeedAnalyticsKeys.postUnpinned,
+          deprecatedEventName: _postDetailScreenHandler!.postData!.isPinned
+              ? LMFeedAnalyticsKeysDep.postPinned
+              : LMFeedAnalyticsKeysDep.postUnpinned,
+          eventProperties: {
+            'created_by_id': _postDetailScreenHandler!.postData!.userId,
+            'post_id': _postDetailScreenHandler!.postData!.id,
+            'post_type': postType,
+          },
+        ),
+      );
     }
   }
 }
