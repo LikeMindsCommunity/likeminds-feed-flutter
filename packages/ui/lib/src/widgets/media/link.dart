@@ -8,7 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 * Topic chip widget
 * This widget is used to display link preview
 * A [LMFeedLinkPreview] displays link heading, description and URL
-* The [LMFeedLinkPreview] can be customized by passing in the required parameters
+* The [LMFeedLinkPreview] can be customized 
+* by passing in the required parameters
 */
 class LMFeedPostLinkPreview extends StatelessWidget {
   const LMFeedPostLinkPreview({
