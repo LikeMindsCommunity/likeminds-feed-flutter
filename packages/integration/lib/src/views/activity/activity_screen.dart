@@ -29,6 +29,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       PagingController(firstPageKey: 1);
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
+  Map<String, WidgetModel> widgets = {};
 
   LMFeedThemeData? feedTheme;
 
@@ -68,6 +69,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             {};
 
         this.users.addAll(users);
+        widgets.addAll(userActivityResponse.widgets ?? {});
 
         final isLastPage = userActivityResponse.activities == null ||
             userActivityResponse.activities!.length < 10;
@@ -146,7 +148,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             },
             itemBuilder: (context, item, index) {
               final LMPostViewData postViewData =
-                  LMFeedPostUtils.postViewDataFromActivity(item);
+                  LMFeedPostUtils.postViewDataFromActivity(item, widgets);
               final user = users[item.activityEntityData.uuid]!;
 
               return Column(

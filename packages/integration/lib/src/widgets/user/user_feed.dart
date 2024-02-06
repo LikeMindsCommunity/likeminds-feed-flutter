@@ -49,7 +49,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
-  Map<String, LMWidgetViewData> widgets = {};
+  Map<String, WidgetModel> widgets = {};
   Map<String, Post> repostedPosts = {};
 
   int _pageFeed = 1;
@@ -95,14 +95,6 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
   void updatePagingControllers(GetUserFeedResponse response) {
     if (response.success) {
       _pageFeed++;
-      List<LMPostViewData> listOfPosts = response.posts!
-          .map((e) => LMPostViewDataConvertor.fromPost(post: e))
-          .toList();
-      if (listOfPosts.length < 10) {
-        _pagingController.appendLastPage(listOfPosts);
-      } else {
-        _pagingController.appendPage(listOfPosts, _pageFeed);
-      }
       if (response.topics != null) {
         topics.addAll(response.topics!.map((key, value) =>
             MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
@@ -112,11 +104,19 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
       }
       if (response.widgets != null) {
-        widgets.addAll(response.widgets!.map((key, value) =>
-            MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value))));
+        widgets.addAll(response.widgets!);
       }
       if (response.repostedPosts != null) {
         repostedPosts.addAll(response.repostedPosts!);
+      }
+      List<LMPostViewData> listOfPosts = response.posts!
+          .map((e) =>
+              LMPostViewDataConvertor.fromPost(post: e, widgets: widgets))
+          .toList();
+      if (listOfPosts.length < 10) {
+        _pagingController.appendLastPage(listOfPosts);
+      } else {
+        _pagingController.appendPage(listOfPosts, _pageFeed);
       }
     } else {
       _pagingController.appendLastPage([]);
@@ -168,7 +168,8 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
           //todo: add repostedPost data in state
           users.addAll(state.userData);
           topics.addAll(state.topics);
-          widgets.addAll(state.widgets);
+          widgets.addAll(state.widgets.map((key, value) =>
+              MapEntry(key, LMWidgetViewDataConvertor.toWidgetModel(value))));
           // repostedPosts.addAll(state.repostedPosts);
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }

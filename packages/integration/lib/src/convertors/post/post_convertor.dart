@@ -1,12 +1,13 @@
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/comment/comment_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/common/popup_menu_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/attachment_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMPostViewDataConvertor {
-  static LMPostViewData fromPost({required Post post}) {
+  static LMPostViewData fromPost({
+    required Post post,
+    required Map<String, WidgetModel>? widgets,
+  }) {
     LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
+    Map<String, LMWidgetViewData> widgetMap = {};
 
     postViewDataBuilder.id(post.id);
 
@@ -15,10 +16,17 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.topics(post.topics ?? []);
 
     if (post.attachments != null) {
-      postViewDataBuilder.attachments(post.attachments!
-          .map((e) =>
-              LMAttachmentViewDataConvertor.fromAttachment(attachment: e))
-          .toList());
+      postViewDataBuilder.attachments(post.attachments!.map((e) {
+        debugPrint('Attachment type: $widgets');
+        if (e.attachmentType == 5 && widgets != null) {
+          String? key = e.attachmentMeta.meta?['entity_id'];
+          if (key != null) {
+            widgetMap[key] =
+                LMWidgetViewDataConvertor.fromWidgetModel(widgets[key]!);
+          }
+        }
+        return LMAttachmentViewDataConvertor.fromAttachment(attachment: e);
+      }).toList());
     }
 
     postViewDataBuilder.communityId(post.communityId);
@@ -57,6 +65,8 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.repostCount(post.repostCount);
 
     postViewDataBuilder.isDeleted(post.isDeleted ?? false);
+
+    postViewDataBuilder.widgets(widgetMap);
 
     return postViewDataBuilder.build();
   }

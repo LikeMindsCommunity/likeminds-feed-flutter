@@ -76,12 +76,17 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
           MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
       topics.addAll(response.topics.map((key, value) =>
           MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
+      widgets.addAll(response.widgets.map((key, value) =>
+          MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value))));
 
       emit(
         LMFeedUniversalFeedLoadedState(
           topics: topics,
           posts: response.posts
-              .map((e) => LMPostViewDataConvertor.fromPost(post: e))
+              .map((e) => LMPostViewDataConvertor.fromPost(
+                    post: e,
+                    widgets: response.widgets,
+                  ))
               .toList(),
           users: users,
           widgets: widgets,

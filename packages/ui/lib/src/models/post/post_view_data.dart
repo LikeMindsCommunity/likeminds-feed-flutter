@@ -46,6 +46,9 @@ class LMPostViewData {
   int repostCount;
   bool? isDeleted;
 
+  /// widget map to hold custom widget data
+  Map<String, LMWidgetViewData>? widgets;
+
   /// {@macro post_view_data}
   LMPostViewData._({
     required this.id,
@@ -68,6 +71,7 @@ class LMPostViewData {
     required this.isRepostedByUser,
     required this.repostCount,
     this.isDeleted = false,
+    this.widgets,
   });
 }
 
@@ -92,6 +96,7 @@ class LMPostViewDataBuilder {
   bool? _isRepostedByUser;
   int? _repostCount;
   bool? _isDeleted;
+  Map<String, LMWidgetViewData>? _widgets;
 
   void id(String id) {
     _id = id;
@@ -173,6 +178,10 @@ class LMPostViewDataBuilder {
     _isDeleted = isDeleted;
   }
 
+  void widgets(Map<String, LMWidgetViewData> widgets) {
+    _widgets = widgets;
+  }
+
   LMPostViewData build() {
     return LMPostViewData._(
       id: _id!,
@@ -195,6 +204,7 @@ class LMPostViewDataBuilder {
       isRepost: _isReposted!,
       isRepostedByUser: _isRepostedByUser!,
       repostCount: _repostCount!,
+      widgets: _widgets,
     );
   }
 }

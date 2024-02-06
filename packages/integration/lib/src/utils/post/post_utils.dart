@@ -164,10 +164,11 @@ class LMFeedPostUtils {
     return textSpans;
   }
 
-  static LMPostViewData postViewDataFromActivity(UserActivityItem activity) {
+  static LMPostViewData postViewDataFromActivity(
+      UserActivityItem activity, Map<String, WidgetModel>? widgets) {
     return activity.action == 7
         ? LMPostViewDataConvertor.fromPost(
-            post: activity.activityEntityData.postData!)
+            post: activity.activityEntityData.postData!, widgets: widgets)
         : (LMPostViewDataBuilder()
               ..id(activity.activityEntityData.id)
               ..isEdited(activity.activityEntityData.isEdited!)
@@ -201,7 +202,10 @@ class LMFeedPostUtils {
               ..repostCount(activity.activityEntityData.repostCount ?? 0)
               ..isDeleted(activity.activityEntityData.isDeleted ?? false)
               ..updatedAt(DateTime.fromMillisecondsSinceEpoch(
-                  activity.activityEntityData.updatedAt!)))
+                  activity.activityEntityData.updatedAt!))
+              ..widgets(widgets?.map((key, value) => MapEntry(
+                      key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+                  {}))
             .build();
   }
 

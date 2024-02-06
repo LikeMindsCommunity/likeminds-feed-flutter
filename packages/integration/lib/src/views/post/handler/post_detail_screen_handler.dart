@@ -13,6 +13,7 @@ class LMFeedPostDetailScreenHandler {
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   Map<String, LMTopicViewData> topics = {};
+  Map<String, WidgetModel> widgets = {};
   LMPostViewData? postData;
 
   LMFeedPostDetailScreenHandler(this.commetListPagingController, this.postId) {
@@ -37,8 +38,10 @@ class LMFeedPostDetailScreenHandler {
       topics.addAll(response.topics!.map((key, value) =>
           MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
 
-      final LMPostViewData postViewData =
-          LMPostViewDataConvertor.fromPost(post: response.post!);
+      widgets.addAll(response.widgets ?? {});
+
+      final LMPostViewData postViewData = LMPostViewDataConvertor.fromPost(
+          post: response.post!, widgets: widgets);
 
       final List<LMCommentViewData> commentList = postViewData.replies;
 
