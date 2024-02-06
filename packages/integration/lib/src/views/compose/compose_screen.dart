@@ -161,11 +161,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   _showDefaultDiscardDialog(BuildContext context) {
-    showAdaptiveDialog(
+    showDialog(
       context: context,
       builder: (dialogContext) => DefaultTextStyle(
         style: const TextStyle(),
-        child: AlertDialog.adaptive(
+        child: AlertDialog(
           backgroundColor: feedTheme?.container,
           title: const Text('Discard Post'),
           content:

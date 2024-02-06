@@ -41,12 +41,9 @@ class LMFeedIcon extends StatelessWidget {
           height: style.size?.abs() ?? 24,
           child: SvgPicture.asset(
             assetPath!,
-            colorFilter: style.color == null
-                ? null
-                : ColorFilter.mode(
-                    style.color!,
-                    BlendMode.srcATop,
-                  ),
+            color: style.color,
+            colorBlendMode:
+                style.color == null ? BlendMode.srcIn : BlendMode.srcATop,
             fit: style.fit ?? BoxFit.contain,
           ),
         );

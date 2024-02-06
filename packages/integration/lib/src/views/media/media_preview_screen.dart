@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
@@ -151,20 +150,12 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                         color: Colors.black,
                         width: MediaQuery.of(context).size.width,
                         child: Center(
-                          child: ExtendedImage.network(
-                            postAttachments[index].attachmentMeta.url!,
-                            fit: BoxFit.contain,
-                            mode: ExtendedImageMode.gesture,
-                            initGestureConfigHandler: (state) {
-                              return GestureConfig(
-                                hitTestBehavior: HitTestBehavior.opaque,
-                                minScale: 0.9,
-                                animationMinScale: 0.7,
-                                maxScale: 3.0,
-                                animationMaxScale: 3.5,
-                                inPageView: true,
-                              );
-                            },
+                          child: LMFeedPostImage(
+                            imageUrl:
+                                postAttachments[index].attachmentMeta.url!,
+                            style: LMFeedPostImageStyle(
+                              boxFit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       );
