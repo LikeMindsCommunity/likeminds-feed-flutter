@@ -434,7 +434,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   if (state is LMFeedNewPostUploadingState) {
                     return Container(
                       height: 60,
-                      color: LikeMindsTheme.whiteColor,
+                      color: feedThemeData?.backgroundColor ??
+                          LikeMindsTheme.whiteColor,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
@@ -1066,6 +1067,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
               width: 153,
+              height: 44,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               borderRadius: 28,
               backgroundColor: right

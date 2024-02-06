@@ -28,6 +28,9 @@ void editPostEventHandler(
               LMTopicViewDataConvertor.fromTopic(value),
             ),
           ),
+          widgets: (response.widgets ?? <String, WidgetModel>{}).map((key,
+                  value) =>
+              MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value))),
         ),
       );
     } else {

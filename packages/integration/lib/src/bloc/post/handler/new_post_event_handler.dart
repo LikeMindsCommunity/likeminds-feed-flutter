@@ -37,6 +37,15 @@ void newPostEventHandler(
                   )),
             ),
           );
+        } else if (media.mediaType == LMMediaType.widget) {
+          attachments.add(
+            Attachment(
+              attachmentType: 5,
+              attachmentMeta: AttachmentMeta(
+                meta: media.widgetsMeta,
+              ),
+            ),
+          );
         } else {
           File mediaFile = media.mediaFile!;
           final String? response = await LMFeedCore.media
@@ -87,16 +96,21 @@ void newPostEventHandler(
     if (response.success) {
       emit(
         LMFeedNewPostUploadedState(
-          postData: LMPostViewDataConvertor.fromPost(post: response.post!),
-          userData: (response.user ?? <String, User>{}).map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
-          topics: (response.topics ?? <String, Topic>{}).map(
-            (key, value) => MapEntry(
-              key,
-              LMTopicViewDataConvertor.fromTopic(value),
+            postData: LMPostViewDataConvertor.fromPost(post: response.post!),
+            userData: (response.user ?? <String, User>{}).map((key, value) =>
+                MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
+            topics: (response.topics ?? <String, Topic>{}).map(
+              (key, value) => MapEntry(
+                key,
+                LMTopicViewDataConvertor.fromTopic(value),
+              ),
             ),
-          ),
-        ),
+            widgets: (response.widgets ?? <String, WidgetModel>{}).map(
+              (key, value) => MapEntry(
+                key,
+                LMWidgetViewDataConvertor.fromWidgetModel(value),
+              ),
+            )),
       );
     } else {
       emit(LMFeedNewPostErrorState(message: response.errorMessage!));

@@ -955,7 +955,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         bloc: _postDetailScreenHandler!.commentHandlerBloc,
         builder: (context, state) => Container(
           decoration: BoxDecoration(
-            color: LikeMindsTheme.whiteColor,
+            color: feedTheme?.container ?? LikeMindsTheme.whiteColor,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -979,11 +979,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     LMFeedCommentActionType.edit
                                 ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'}"
                                 : "Replying to",
-                            style: const LMFeedTextStyle(
+                            style: LMFeedTextStyle(
                               textStyle: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: LikeMindsTheme.greyColor,
+                                color: feedTheme?.onContainer ??
+                                    LikeMindsTheme.greyColor,
                               ),
                             ),
                           ),

@@ -28,6 +28,9 @@ class LMFeedComposeScreen extends StatefulWidget {
     //Config for the screen
     this.config,
     this.style,
+    this.attachments,
+    this.displayName,
+    this.displayUrl,
   });
 
   final LMFeedComposeScreenConfig? config;
@@ -40,6 +43,9 @@ class LMFeedComposeScreen extends StatefulWidget {
   final Widget Function()? composeContentBuilder;
   final Widget Function(List<LMTopicViewData>)? composeTopicSelectorBuilder;
   final Widget Function()? composeMediaPreviewBuilder;
+  final List<LMAttachmentViewData>? attachments;
+  final String? displayName;
+  final String? displayUrl;
 
   @override
   State<LMFeedComposeScreen> createState() => _LMFeedComposeScreenState();
@@ -53,6 +59,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMFeedThemeData? feedTheme;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
+  bool isCustomWidget = false;
 
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
@@ -71,6 +78,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   void initState() {
     super.initState();
+    isCustomWidget = _checkForCustomWidget();
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
@@ -85,6 +93,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           composeBloc.postMedia.first.mediaFile?.uri.toString() ?? '');
     }
     super.dispose();
+  }
+
+  bool _checkForCustomWidget() {
+    if (widget.attachments != null) {
+      for (LMAttachmentViewData attachment in widget.attachments!) {
+        if (attachment.attachmentType == 5) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /// Bloc listener for the compose bloc
@@ -499,7 +518,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
                 sendPostCreationCompletedEvent(
                     composeBloc.postMedia, userTags, selectedTopics);
-
+                if (widget.attachments != null &&
+                    widget.attachments!.isNotEmpty &&
+                    widget.attachments!.first.attachmentType == 5) {
+                  composeBloc.postMedia.add(
+                    LMMediaModel(
+                      mediaType: LMMediaType.widget,
+                      widgetsMeta:
+                          widget.attachments?.first.attachmentMeta.meta,
+                    ),
+                  );
+                }
                 LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
                   user: user,
                   postText: result!,
@@ -532,8 +561,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 4.0),
             child: LMFeedProfilePicture(
-              fallbackText: user.name,
-              imageUrl: user.imageUrl,
+              fallbackText: widget.displayName ?? user.name,
+              imageUrl: widget.displayUrl ?? user.imageUrl,
               style: LMFeedProfilePictureStyle(
                 backgroundColor: theme.primaryColor,
                 size: 36,
