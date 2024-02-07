@@ -286,4 +286,24 @@ class LMFeedButtonStyle {
         ),
         padding: const EdgeInsets.only(right: 8.0),
       );
+
+  factory LMFeedButtonStyle.repost({Color? primaryColor}) => LMFeedButtonStyle(
+        padding: const EdgeInsets.only(right: 16.0),
+        icon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmRepostSvg,
+          style: LMFeedIconStyle.basic().copyWith(
+            color: primaryColor,
+          ),
+         
+        ),
+        height: 44,
+        activeIcon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmRepostSvg,
+          style: LMFeedIconStyle.basic().copyWith(
+            color: primaryColor,
+          ),
+        ),
+      );
 }

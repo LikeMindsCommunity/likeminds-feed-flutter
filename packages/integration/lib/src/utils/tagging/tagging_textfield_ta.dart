@@ -181,9 +181,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         keepSuggestionsOnLoading: false,
         itemBuilder: (context, opt) {
           return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
+            decoration: BoxDecoration(
+              color: feedTheme.container,
+              border: const Border(
                 bottom: BorderSide(
                   color: LikeMindsTheme.greyColor,
                   width: 0.5,

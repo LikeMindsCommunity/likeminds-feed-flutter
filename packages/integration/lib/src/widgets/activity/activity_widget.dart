@@ -78,6 +78,8 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                                   LMFeedPostUtils.postViewDataFromActivity(
                                 activity,
                                 activityResponse.widgets,
+                                activityResponse.users,
+                                activityResponse.topics,
                               );
                               late final VideoPlayerController controller;
                               late final Future<void> futureValue;

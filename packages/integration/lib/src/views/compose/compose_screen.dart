@@ -60,6 +60,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   bool isCustomWidget = false;
+  LMPostViewData? repost;
 
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
@@ -78,7 +79,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   void initState() {
     super.initState();
+    _checkForRepost();
     isCustomWidget = _checkForCustomWidget();
+
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
@@ -104,6 +107,24 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       }
     }
     return false;
+  }
+
+  void _checkForRepost() {
+    if (widget.attachments != null) {
+      for (LMAttachmentViewData attachment in widget.attachments!) {
+        if (attachment.attachmentType == 8) {
+          repost = attachment.attachmentMeta.repost;
+          composeBloc.postMedia.add(
+            LMMediaModel(
+              mediaType: LMMediaType.repost,
+              postId: repost?.id,
+              post: repost,
+            ),
+          );
+          return;
+        }
+      }
+    }
   }
 
   /// Bloc listener for the compose bloc
@@ -253,6 +274,72 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         }
 
         if (composeBloc.postMedia.isNotEmpty) {
+          if (composeBloc.postMedia.first.mediaType == LMMediaType.repost) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Stack(
+                children: <Widget>[
+                  Container(
+                    clipBehavior: Clip.hardEdge,
+                    width: screenSize?.width,
+                    decoration: const BoxDecoration(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: LMFeedPostWidget(
+                        post: repost!,
+                        user: repost!.user!,
+                        isFeed: false,
+                        topics: repost?.topics ?? [],
+                        footerBuilder: (context, footer, footerData) =>
+                            const SizedBox.shrink(),
+                        headerBuilder: (context, header, headerData) {
+                          return header.copyWith(menuBuilder: (_) {
+                            return const SizedBox.shrink();
+                          });
+                        },
+                        style: LMFeedPostStyle.basic().copyWith(
+                            borderRadius: BorderRadius.circular(8),
+                            padding: const EdgeInsets.all(8),
+                            border: Border.all(
+                              color: LMFeedTheme.of(context)
+                                  .onContainer
+                                  .withOpacity(0.1),
+                            )),
+                        onPostTap: (context, postData) {
+                          debugPrint('Post tapped');
+                        },
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 20,
+                    right: 20,
+                    child: GestureDetector(
+                      onTap: () {
+                        composeBloc.add(
+                          const LMFeedComposeRemoveAttachmentEvent(
+                            index: 0,
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(500),
+                        ),
+                        width: 24,
+                        height: 24,
+                        child: Icon(
+                          Icons.cancel,
+                          color: feedTheme?.disabledColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
             height: screenSize?.width,
@@ -637,6 +724,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       bloc: composeBloc,
       builder: (context, state) {
         if (composeBloc.postMedia.length == 10 || composeBloc.videoCount == 1) {
+          return const SizedBox();
+        }
+        if (composeBloc.postMedia.isNotEmpty &&
+            composeBloc.postMedia.first.mediaType == LMMediaType.repost) {
           return const SizedBox();
         }
         return Container(

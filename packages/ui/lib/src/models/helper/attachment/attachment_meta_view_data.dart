@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_flutter_ui/src/models/helper/og_tags_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMAttachmentMetaViewData {
   final String? url;
@@ -10,6 +10,7 @@ class LMAttachmentMetaViewData {
   final double? height;
   final double? width;
   final double? aspectRatio;
+  final LMPostViewData? repost;
   final Map<String, dynamic>? meta;
 
   LMAttachmentMetaViewData._({
@@ -22,6 +23,7 @@ class LMAttachmentMetaViewData {
     this.aspectRatio,
     this.width,
     this.height,
+    this.repost,
     this.meta,
   });
 }
@@ -37,6 +39,7 @@ class LMAttachmentMetaViewDataBuilder {
   double? _width;
   double? _aspectRatio;
   Map<String, dynamic>? _meta;
+  LMPostViewData? _repost;
 
   void url(String url) {
     _url = url;
@@ -78,6 +81,10 @@ class LMAttachmentMetaViewDataBuilder {
     _meta = meta;
   }
 
+  void repost(LMPostViewData repost) {
+    _repost = repost;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -90,6 +97,7 @@ class LMAttachmentMetaViewDataBuilder {
       width: _width,
       aspectRatio: _aspectRatio,
       meta: _meta,
+      repost: _repost,
     );
   }
 }

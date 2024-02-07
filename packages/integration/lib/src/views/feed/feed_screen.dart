@@ -8,8 +8,6 @@ import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -613,7 +611,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       LMFeedThemeData? feedThemeData, LMPostViewData post) {
     return LMFeedPostWidget(
       post: post,
-      topics: _feedBloc.topics,
+      topics: post.topics,
       user: _feedBloc.users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
@@ -674,7 +672,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
     return LMFeedPostTopic(
-      topics: _feedBloc.topics,
+      topics: post.topics,
       post: post,
       style: feedThemeData?.topicStyle,
     );
@@ -693,7 +691,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       commentButton: defCommentButton(post),
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
+      repostButton: defRepostButton(post),
       postFooterStyle: feedThemeData?.footerStyle,
+      showRepostButton: !post.isRepost,
     );
   }
 
@@ -744,6 +744,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
+                        isRepost: postViewData.isRepost,
                       ),
                     );
                   },
@@ -912,6 +913,74 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
         style: feedThemeData?.footerStyle.shareButtonStyle,
+      );
+
+  LMFeedButton defRepostButton(LMPostViewData postViewData) => LMFeedButton(
+        text: LMFeedText(
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: postViewData.isRepostedByUser
+                  ? feedThemeData?.primaryColor
+                  : null,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          text: postViewData.repostCount == 0
+              ? ''
+              : postViewData.repostCount.toString(),
+        ),
+        onTap: right
+            ? () async {
+                if (!postUploading.value) {
+                  LMFeedAnalyticsBloc.instance.add(
+                      const LMFeedFireAnalyticsEvent(
+                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          deprecatedEventName:
+                              LMFeedAnalyticsKeysDep.postCreationStarted,
+                          eventProperties: {}));
+
+                  LMFeedVideoProvider.instance.forcePauseAllControllers();
+                  // ignore: use_build_context_synchronously
+                  LMAttachmentViewData attachmentViewData =
+                      (LMAttachmentViewDataBuilder()
+                            ..attachmentType(8)
+                            ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                                  ..repost(postViewData))
+                                .build()))
+                          .build();
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMFeedComposeScreen(
+                        attachments: [attachmentViewData],
+                      ),
+                    ),
+                  );
+                } else {
+                  toast(
+                    'A post is already uploading.',
+                    duration: Toast.LENGTH_LONG,
+                  );
+                }
+              }
+            : () => toast("You do not have permission to create a post"),
+        style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color: postViewData.isRepostedByUser
+                          ? feedThemeData?.primaryColor
+                          : null),
+            ),
+            activeIcon:
+                feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color: postViewData.isRepostedByUser
+                          ? feedThemeData?.primaryColor
+                          : null),
+            )),
       );
 
   Widget noPostUnderTopicWidget() => Center(

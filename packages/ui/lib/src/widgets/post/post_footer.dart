@@ -10,10 +10,13 @@ class LMFeedPostFooter extends StatelessWidget {
     this.commentButtonBuilder,
     this.saveButtonBuilder,
     this.shareButtonBuilder,
+    this.repostButtonBuilder,
     this.likeButton,
     this.commentButton,
     this.saveButton,
     this.shareButton,
+    this.repostButton,
+    this.showRepostButton = false,
   });
 
   final LMFeedPostFooterStyle? postFooterStyle;
@@ -22,11 +25,14 @@ class LMFeedPostFooter extends StatelessWidget {
   final Widget Function(LMFeedButton)? commentButtonBuilder;
   final Widget Function(LMFeedButton)? saveButtonBuilder;
   final Widget Function(LMFeedButton)? shareButtonBuilder;
+  final Widget Function(LMFeedButton)? repostButtonBuilder;
 
   final LMFeedButton? likeButton;
   final LMFeedButton? commentButton;
   final LMFeedButton? saveButton;
   final LMFeedButton? shareButton;
+  final LMFeedButton? repostButton;
+  final bool showRepostButton;
 
   final _footerChildren = <Widget>[];
 
@@ -74,6 +80,7 @@ class LMFeedPostFooter extends StatelessWidget {
 
     bool showSave = (postFooterStyle.showSaveButton ?? true);
     bool showShare = (postFooterStyle.showShareButton ?? true);
+    bool showRepost = (postFooterStyle.showRepostButton ?? false);
 
     if (showSave || showShare) {
       if (postFooterStyle.alignment == MainAxisAlignment.start) {
@@ -98,6 +105,12 @@ class LMFeedPostFooter extends StatelessWidget {
         Widget lmButton = shareButtonBuilder?.call(shareButton) ?? shareButton;
         _footerChildren.add(lmButton);
       }
+    }
+    if (showRepostButton && showRepost) {
+      LMFeedButton repostButton =
+          this.repostButton ?? defRepostButton(postFooterStyle);
+      _footerChildren
+          .add(repostButtonBuilder?.call(repostButton) ?? repostButton);
     }
   }
 
@@ -157,16 +170,34 @@ class LMFeedPostFooter extends StatelessWidget {
         onTap: () {},
       );
 
+  LMFeedButton defRepostButton(LMFeedPostFooterStyle postFooterStyle) =>
+      LMFeedButton(
+        isActive: true,
+        text: const LMFeedText(text: "Repost"),
+        style: postFooterStyle.repostButtonStyle ??
+            const LMFeedButtonStyle(
+              margin: 0,
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmRepostSvg,
+              ),
+            ),
+        onTap: () {},
+      );
+
   LMFeedPostFooter copyWith({
     LMFeedPostFooterStyle? postFooterStyle,
     Widget Function(LMFeedButton)? likeButtonBuilder,
     Widget Function(LMFeedButton)? commentButtonBuilder,
     Widget Function(LMFeedButton)? saveButtonBuilder,
     Widget Function(LMFeedButton)? shareButtonBuilder,
+    Widget Function(LMFeedButton)? repostButtonBuilder,
     LMFeedButton? likeButton,
     LMFeedButton? commentButton,
     LMFeedButton? saveButton,
     LMFeedButton? shareButton,
+    LMFeedButton? repostButton,
+    bool? showRepostButton,
   }) {
     return LMFeedPostFooter(
       postFooterStyle: postFooterStyle ?? this.postFooterStyle,
@@ -174,10 +205,13 @@ class LMFeedPostFooter extends StatelessWidget {
       commentButtonBuilder: commentButtonBuilder ?? this.commentButtonBuilder,
       saveButtonBuilder: saveButtonBuilder ?? this.saveButtonBuilder,
       shareButtonBuilder: shareButtonBuilder ?? this.shareButtonBuilder,
+      repostButtonBuilder: repostButtonBuilder ?? this.repostButtonBuilder,
       likeButton: likeButton ?? this.likeButton,
       commentButton: commentButton ?? this.commentButton,
       saveButton: saveButton ?? this.saveButton,
       shareButton: shareButton ?? this.shareButton,
+      repostButton: repostButton ?? this.repostButton,
+      showRepostButton: showRepostButton ?? this.showRepostButton,
     );
   }
 }
@@ -187,6 +221,7 @@ class LMFeedPostFooterStyle {
   final bool? showLikeButton;
   final bool? showCommentButton;
   final bool? showShareButton;
+  final bool? showRepostButton;
 
   final double? width;
   final double? height;
@@ -199,12 +234,14 @@ class LMFeedPostFooterStyle {
   final LMFeedButtonStyle? commentButtonStyle;
   final LMFeedButtonStyle? saveButtonStyle;
   final LMFeedButtonStyle? shareButtonStyle;
+  final LMFeedButtonStyle? repostButtonStyle;
 
   const LMFeedPostFooterStyle({
     this.showSaveButton,
     this.showLikeButton,
     this.showCommentButton,
     this.showShareButton,
+    this.showRepostButton,
     this.alignment,
     this.width,
     this.height,
@@ -214,6 +251,7 @@ class LMFeedPostFooterStyle {
     this.commentButtonStyle,
     this.saveButtonStyle,
     this.shareButtonStyle,
+    this.repostButtonStyle,
   });
 
   LMFeedPostFooterStyle copyWith({
@@ -221,6 +259,7 @@ class LMFeedPostFooterStyle {
     bool? showLikeButton,
     bool? showCommentButton,
     bool? showShareButton,
+    bool? showRepostButton,
     MainAxisAlignment? alignment,
     double? width,
     double? height,
@@ -230,12 +269,14 @@ class LMFeedPostFooterStyle {
     LMFeedButtonStyle? commentButtonStyle,
     LMFeedButtonStyle? saveButtonStyle,
     LMFeedButtonStyle? shareButtonStyle,
+    LMFeedButtonStyle? repostButtonStyle,
   }) {
     return LMFeedPostFooterStyle(
       showSaveButton: showSaveButton ?? showSaveButton,
       showLikeButton: showLikeButton ?? showLikeButton,
       showCommentButton: showCommentButton ?? showCommentButton,
       showShareButton: showShareButton ?? this.showShareButton,
+      showRepostButton: showRepostButton ?? this.showRepostButton,
       alignment: alignment ?? this.alignment,
       width: width ?? this.width,
       height: height ?? this.height,
@@ -245,6 +286,7 @@ class LMFeedPostFooterStyle {
       likeButtonStyle: likeButtonStyle ?? this.likeButtonStyle,
       saveButtonStyle: saveButtonStyle ?? this.saveButtonStyle,
       shareButtonStyle: shareButtonStyle ?? this.shareButtonStyle,
+      repostButtonStyle: repostButtonStyle ?? this.repostButtonStyle,
     );
   }
 
@@ -254,10 +296,12 @@ class LMFeedPostFooterStyle {
         showCommentButton: true,
         showShareButton: true,
         showSaveButton: true,
+        showRepostButton: true,
         likeButtonStyle: LMFeedButtonStyle.like(primaryColor: primaryColor),
         commentButtonStyle: LMFeedButtonStyle.comment(),
         shareButtonStyle: LMFeedButtonStyle.share(),
         saveButtonStyle: LMFeedButtonStyle.save(primaryColor: primaryColor),
+        repostButtonStyle: LMFeedButtonStyle.repost(primaryColor: primaryColor),
         alignment: MainAxisAlignment.start,
         padding: const EdgeInsets.symmetric(
           horizontal: 16.0,

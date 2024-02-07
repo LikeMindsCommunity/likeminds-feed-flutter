@@ -86,6 +86,9 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
               .map((e) => LMPostViewDataConvertor.fromPost(
                     post: e,
                     widgets: response.widgets,
+                    repostedPosts: response.repostedPosts,
+                    users: response.users,
+                    topics: response.topics,
                   ))
               .toList(),
           users: users,

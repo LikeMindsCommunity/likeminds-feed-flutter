@@ -62,7 +62,7 @@ class LMFeedPostWidget extends StatefulWidget {
   // Required variables
   final LMPostViewData post;
   final LMUserViewData user;
-  final Map<String, LMTopicViewData> topics;
+  final List<LMTopicViewData> topics;
   final bool isFeed;
   final LMFeedOnPostTap? onPostTap;
   final Function(String)? onTagTap;
@@ -89,7 +89,7 @@ class LMFeedPostWidget extends StatefulWidget {
     BorderRadiusGeometry? borderRadius,
     LMPostViewData? post,
     LMUserViewData? user,
-    Map<String, LMTopicViewData>? topics,
+    List<LMTopicViewData>? topics,
     bool? isFeed,
     LMFeedOnPostTap? onPostTap,
     Function(String)? onTagTap,

@@ -165,17 +165,39 @@ class LMFeedPostUtils {
   }
 
   static LMPostViewData postViewDataFromActivity(
-      UserActivityItem activity, Map<String, WidgetModel>? widgets) {
+    UserActivityItem activity,
+    Map<String, WidgetModel>? widgets,
+    Map<String, User>? users,
+    Map<String, Topic>? topics,
+  ) {
+    List<LMTopicViewData> topicViewData = [];
+
+    if (activity.activityEntityData.topics != null &&
+        topics != null &&
+        activity.activityEntityData.topics!.isNotEmpty) {
+      for (var topicId in activity.activityEntityData.topics!) {
+        if (topics[topicId] != null) {
+          topicViewData
+              .add(LMTopicViewDataConvertor.fromTopic(topics[topicId]!));
+        }
+      }
+    }
+
     return activity.action == 7
         ? LMPostViewDataConvertor.fromPost(
-            post: activity.activityEntityData.postData!, widgets: widgets)
+            post: activity.activityEntityData.postData!,
+            widgets: widgets,
+            users: users ?? {},
+            topics: topics ?? {},
+          )
         : (LMPostViewDataBuilder()
               ..id(activity.activityEntityData.id)
               ..isEdited(activity.activityEntityData.isEdited!)
               ..text(activity.activityEntityData.text)
               ..attachments(activity.activityEntityData.attachments
                       ?.map((e) => LMAttachmentViewDataConvertor.fromAttachment(
-                          attachment: e))
+                            attachment: e,
+                          ))
                       .toList() ??
                   [])
               ..replies(activity.activityEntityData.replies
@@ -184,7 +206,7 @@ class LMFeedPostUtils {
                   [])
               ..communityId(activity.activityEntityData.communityId)
               ..isPinned(activity.activityEntityData.isPinned!)
-              ..topics(activity.activityEntityData.topics ?? [])
+              ..topics(topicViewData)
               ..userId(activity.activityEntityData.userId!)
               ..likeCount(activity.activityEntityData.likesCount!)
               ..commentCount(activity.activityEntityData.commentsCount!)

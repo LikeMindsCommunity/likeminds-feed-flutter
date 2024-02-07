@@ -110,8 +110,14 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         repostedPosts.addAll(response.repostedPosts!);
       }
       List<LMPostViewData> listOfPosts = response.posts!
-          .map((e) =>
-              LMPostViewDataConvertor.fromPost(post: e, widgets: widgets))
+          .map((e) => LMPostViewDataConvertor.fromPost(
+              post: e,
+              widgets: widgets,
+              repostedPosts: repostedPosts,
+              topics: topics.map((key, value) =>
+                  MapEntry(key, LMTopicViewDataConvertor.toTopic(value))),
+              users: users.map((key, value) =>
+                  MapEntry(key, LMUserViewDataConvertor.toUser(value)))))
           .toList();
       if (listOfPosts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
@@ -139,6 +145,43 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
     return BlocListener(
       bloc: newPostBloc,
       listener: (context, state) {
+        if (state is LMFeedNewPostErrorState) {
+          postUploading.value = false;
+          toast(
+            state.message,
+            duration: Toast.LENGTH_LONG,
+          );
+        }
+        if (state is LMFeedNewPostUploadedState) {
+          debugPrint('New post uploaded------${state.postData.text}---------------');
+          LMPostViewData? item = state.postData;
+          int length = _pagingController.itemList?.length ?? 0;
+          List<LMPostViewData> feedRoomItemList =
+              _pagingController.itemList ?? [];
+          for (int i = 0; i < feedRoomItemList.length; i++) {
+            if (!feedRoomItemList[i].isPinned) {
+              feedRoomItemList.insert(i, item);
+              break;
+            }
+          }
+          if (length == feedRoomItemList.length) {
+            feedRoomItemList.add(item);
+          }
+          if (feedRoomItemList.isNotEmpty && feedRoomItemList.length > 10) {
+            feedRoomItemList.removeLast();
+            users.addAll(state.userData);
+            topics.addAll(state.topics);
+            _pagingController.itemList = feedRoomItemList;
+            postUploading.value = false;
+            rebuildPostWidget.value = !rebuildPostWidget.value;
+          } else {
+            users.addAll(state.userData);
+            topics.addAll(state.topics);
+            _pagingController.itemList = feedRoomItemList;
+            postUploading.value = false;
+            rebuildPostWidget.value = !rebuildPostWidget.value;
+          }
+        }
         if (state is LMFeedPostDeletedState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           feedRoomItemList?.removeWhere((item) => item.id == state.postId);
@@ -165,12 +208,10 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
           if (index != -1) {
             feedRoomItemList?[index] = item;
           }
-          //todo: add repostedPost data in state
           users.addAll(state.userData);
           topics.addAll(state.topics);
           widgets.addAll(state.widgets.map((key, value) =>
               MapEntry(key, LMWidgetViewDataConvertor.toWidgetModel(value))));
-          // repostedPosts.addAll(state.repostedPosts);
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
 
@@ -263,7 +304,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
       LMFeedThemeData? feedThemeData, LMPostViewData post) {
     return LMFeedPostWidget(
       post: post,
-      topics: topics,
+      topics: post.topics,
       user: users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
@@ -323,7 +364,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
 
   LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
     return LMFeedPostTopic(
-      topics: topics,
+      topics: post.topics,
       post: post,
       style: feedThemeData?.topicStyle,
     );
@@ -343,6 +384,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
       postFooterStyle: feedThemeData?.footerStyle,
+      showRepostButton: !post.isRepost,
     );
   }
 
@@ -383,6 +425,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
+                        isRepost: postViewData.isRepost,
                       ),
                     );
                   },

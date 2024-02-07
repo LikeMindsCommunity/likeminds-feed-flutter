@@ -445,7 +445,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   LMFeedPostFooter defPostFooter() {
-    return LMFeedPostFooter();
+    return LMFeedPostFooter(
+      showRepostButton: !_postDetailScreenHandler!.postData!.isRepost,
+    );
   }
 
   LMFeedPostWidget defPostWidget() {
@@ -453,7 +455,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       post: _postDetailScreenHandler!.postData!,
       user: _postDetailScreenHandler!
           .users[_postDetailScreenHandler!.postData!.userId]!,
-      topics: _postDetailScreenHandler!.topics,
+      topics: _postDetailScreenHandler!.postData!.topics,
       onMediaTap: () {
         Navigator.push(
           context,
@@ -492,7 +494,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedPostTopic _defTopicWidget() {
     return LMFeedPostTopic(
-      topics: _postDetailScreenHandler!.topics,
+      topics: _postDetailScreenHandler!.postData!.topics,
       post: _postDetailScreenHandler!.postData!,
       style: feedTheme?.topicStyle,
     );
@@ -518,7 +520,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       commentButton: defCommentButton(),
       shareButton: defShareButton(),
       saveButton: defSaveButton(),
+      repostButton: defRepostButton(),
       postFooterStyle: feedTheme?.footerStyle,
+      showRepostButton: !_postDetailScreenHandler!.postData!.isRepost,
     );
   }
 
@@ -575,6 +579,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       LMFeedDeletePostEvent(
                         postId: _postDetailScreenHandler!.postData!.id,
                         reason: reason,
+                        isRepost: _postDetailScreenHandler!.postData!.isRepost,
                       ),
                     );
                     Navigator.of(context).pop();
@@ -716,6 +721,76 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               .sharePost(_postDetailScreenHandler!.postData!.id);
         },
         style: feedTheme?.footerStyle.shareButtonStyle,
+      );
+  LMFeedButton defRepostButton() => LMFeedButton(
+        text: LMFeedText(
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: _postDetailScreenHandler!.postData!.isRepostedByUser
+                  ? feedTheme?.primaryColor
+                  : null,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          text: _postDetailScreenHandler!.postData!.repostCount == 0
+              ? ''
+              : _postDetailScreenHandler!.postData!.repostCount.toString(),
+        ),
+        onTap: right
+            ? () async {
+                if (LMFeedPostBloc.instance.state
+                    is! LMFeedEditPostUploadingState) {
+                  LMFeedAnalyticsBloc.instance.add(
+                      const LMFeedFireAnalyticsEvent(
+                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          deprecatedEventName:
+                              LMFeedAnalyticsKeysDep.postCreationStarted,
+                          eventProperties: {}));
+
+                  LMFeedVideoProvider.instance.forcePauseAllControllers();
+                  // ignore: use_build_context_synchronously
+                  LMAttachmentViewData attachmentViewData =
+                      (LMAttachmentViewDataBuilder()
+                            ..attachmentType(8)
+                            ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                                  ..repost(_postDetailScreenHandler!.postData!))
+                                .build()))
+                          .build();
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMFeedComposeScreen(
+                        attachments: [attachmentViewData],
+                      ),
+                    ),
+                  );
+                } else {
+                  toast(
+                    'A post is already uploading.',
+                    duration: Toast.LENGTH_LONG,
+                  );
+                }
+              }
+            : () => toast("You do not have permission to create a post"),
+        style: feedTheme?.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color:
+                          _postDetailScreenHandler!.postData!.isRepostedByUser
+                              ? feedTheme?.primaryColor
+                              : null),
+            ),
+            activeIcon:
+                feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color:
+                          _postDetailScreenHandler!.postData!.isRepostedByUser
+                              ? feedTheme?.primaryColor
+                              : null),
+            )),
       );
 
   LMFeedCommentWidget defCommentTile(

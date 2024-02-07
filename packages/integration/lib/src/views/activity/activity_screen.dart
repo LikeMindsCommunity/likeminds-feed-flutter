@@ -30,6 +30,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
   Map<String, WidgetModel> widgets = {};
+  Map<String, Post> repostedPosts = {};
 
   LMFeedThemeData? feedTheme;
 
@@ -148,7 +149,14 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             },
             itemBuilder: (context, item, index) {
               final LMPostViewData postViewData =
-                  LMFeedPostUtils.postViewDataFromActivity(item, widgets);
+                  LMFeedPostUtils.postViewDataFromActivity(
+                item,
+                widgets,
+                users.map((key, value) =>
+                    MapEntry(key, LMUserViewDataConvertor.toUser(value))),
+                topics.map((key, value) =>
+                    MapEntry(key, LMTopicViewDataConvertor.toTopic(value))),
+              );
               final user = users[item.activityEntityData.uuid]!;
 
               return Column(
@@ -244,7 +252,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         ],
       ),
       post: post,
-      topics: topics,
+      topics: post.topics,
       user: users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
@@ -292,7 +300,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   LMFeedPostTopic _defTopicWidget(
       LMFeedThemeData? feedTheme, LMPostViewData post) {
     return LMFeedPostTopic(
-      topics: topics,
+      topics: post.topics,
       post: post,
       style: feedTheme?.topicStyle,
     );
@@ -316,6 +324,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       postFooterStyle: feedTheme?.footerStyle.copyWith(
         margin: EdgeInsets.zero,
       ),
+      showRepostButton: false,
     );
   }
 
@@ -393,6 +402,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
+                        isRepost: postViewData.isRepost,
                       ),
                     );
                   },

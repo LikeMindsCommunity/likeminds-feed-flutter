@@ -20,7 +20,12 @@ void editPostEventHandler(
       emit(
         LMFeedEditPostUploadedState(
           postData: LMPostViewDataConvertor.fromPost(
-              post: response.post!, widgets: response.widgets ?? {}),
+            post: response.post!,
+            widgets: response.widgets ?? {},
+            repostedPosts: response.repostedPosts ?? {},
+            users: response.user ?? {}, 
+            topics: response.topics ?? {},
+          ),
           userData: (response.user ?? <String, User>{}).map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
           topics: (response.topics ?? <String, Topic>{}).map(

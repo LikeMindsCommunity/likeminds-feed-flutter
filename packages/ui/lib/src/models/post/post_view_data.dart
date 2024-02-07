@@ -13,7 +13,7 @@ class LMPostViewData {
   String text;
 
   /// topics of the post [nullable]
-  List<String> topics;
+  List<LMTopicViewData> topics;
 
   /// attachments of the post [nullable]
   /// can be of type image, video, file
@@ -26,6 +26,9 @@ class LMPostViewData {
 
   /// user id of the user who created the post
   final String userId;
+
+  /// user dat of the user who created the post
+  final LMUserViewData? user;
 
   int likeCount;
 
@@ -57,6 +60,7 @@ class LMPostViewData {
     required this.communityId,
     required this.isPinned,
     required this.userId,
+    this.user,
     required this.likeCount,
     required this.isSaved,
     required this.topics,
@@ -78,11 +82,12 @@ class LMPostViewData {
 class LMPostViewDataBuilder {
   String? _id;
   String? _text;
-  List<String>? _topics;
+  List<LMTopicViewData>? _topics;
   List<LMAttachmentViewData>? _attachments;
   int? _communityId;
   bool? _isPinned;
   String? _userId;
+  LMUserViewData? _user;
   int? _likeCount;
   int? _commentCount;
   bool? _isSaved;
@@ -106,7 +111,7 @@ class LMPostViewDataBuilder {
     _text = text;
   }
 
-  void topics(List<String> topics) {
+  void topics(List<LMTopicViewData>? topics) {
     _topics = topics;
   }
 
@@ -124,6 +129,10 @@ class LMPostViewDataBuilder {
 
   void userId(String userId) {
     _userId = userId;
+  }
+
+  void user(LMUserViewData user) {
+    _user = user;
   }
 
   void likeCount(int likeCount) {
@@ -191,6 +200,7 @@ class LMPostViewDataBuilder {
       communityId: _communityId!,
       isPinned: _isPinned!,
       userId: _userId!,
+      user: _user,
       likeCount: _likeCount!,
       commentCount: _commentCount!,
       isSaved: _isSaved!,

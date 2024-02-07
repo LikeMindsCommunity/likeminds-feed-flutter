@@ -37,15 +37,17 @@ class LMFeedDeletePostEvent extends LMFeedPostEvents {
   final String postId;
   final String reason;
   final int? feedRoomId;
+  final bool isRepost;
 
   LMFeedDeletePostEvent({
     required this.postId,
     required this.reason,
     this.feedRoomId,
+    this.isRepost = false,
   });
 
   @override
-  List<Object> get props => [postId, reason];
+  List<Object> get props => [postId, reason, isRepost];
 }
 
 class LMFeedUpdatePostEvent extends LMFeedPostEvents {
