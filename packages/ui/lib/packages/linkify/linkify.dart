@@ -5,7 +5,6 @@ import 'src/url.dart';
 export 'src/email.dart' show EmailLinkifier, EmailElement;
 export 'src/url.dart' show UrlLinkifier, UrlElement;
 
-
 abstract class LinkifyElement {
   final String text;
   final String originText;

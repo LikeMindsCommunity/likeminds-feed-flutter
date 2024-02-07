@@ -172,7 +172,7 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                                           ? ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(4),
-                                              child: LMFeedPostImage(
+                                              child: LMFeedImage(
                                                 imageUrl: postData
                                                     .attachments![0]
                                                     .attachmentMeta

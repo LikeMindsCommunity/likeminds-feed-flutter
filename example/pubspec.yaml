@@ -5,7 +5,7 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.1.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -17,9 +17,9 @@ dependencies:
   dotenv: ^4.2.0
   likeminds_feed_flutter_core:
   flutter_notification_channel: ^2.0.0
-  firebase_core: ^2.4.1
-  firebase_messaging: ^14.2.1
-  device_info_plus:
+  firebase_core: ^2.24.0
+  firebase_messaging: ^14.7.6
+  device_info_plus: ^8.2.2
   uni_links:
 
 dev_dependencies:

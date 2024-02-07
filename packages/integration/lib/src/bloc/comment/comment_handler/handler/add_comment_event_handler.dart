@@ -106,17 +106,18 @@ Future<void> _handleAddReplyAction(LMFeedCommentActionEvent event,
   } else {
     // Fire the analytics event for reply posted
     // and send the [postId], [commentId] and [commentReplyId] as the parameters
-    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-      eventName: LMFeedAnalyticsKeys.replyPosted,
-      deprecatedEventName: LMFeedAnalyticsKeysDep.replyPosted,
-      eventProperties: {
-        "post_id": addCommentReplyRequest.postId,
-        "comment_id": addCommentReplyRequest.commentId,
-        "comment_reply_id": response.reply?.id,
-        // TODO: Add user details
-        // "user_id": event.userId,
-      },
-    ));
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.replyPosted,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.replyPosted,
+        eventProperties: {
+          "post_id": addCommentReplyRequest.postId,
+          "comment_id": addCommentReplyRequest.commentId,
+          "comment_reply_id": response.reply?.id,
+          "user_id": event.commentMetaData.user?.id,
+        },
+      ),
+    );
     // If the response is successful then emit the success state
     // and send the [response] and [commentMetaData] as the parameters
     //  to the state

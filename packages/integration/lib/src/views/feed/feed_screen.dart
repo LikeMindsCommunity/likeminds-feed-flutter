@@ -8,8 +8,6 @@ import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -126,6 +124,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedBloc.instance;
     userPostingRights = checkPostCreationRights();
+
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.feedOpened,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.feedOpened,
+        eventProperties: {
+          'feed_type': 'universal_feed',
+        },
+      ),
+    );
   }
 
   bool checkPostCreationRights() {
@@ -583,7 +591,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             color: Colors.black,
             borderRadius: BorderRadius.circular(6.0),
           ),
-          child: LMFeedPostImage(
+          child: LMFeedImage(
             imageFile: media.mediaFile!,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
@@ -729,12 +737,18 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
+                    String postType =
+                        LMFeedPostUtils.getPostType(postViewData.attachments);
+
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": postViewData.id,
+                          "post_type": postType,
+                          "user_id": postViewData.userId,
+                          "user_state": isCm ? "CM" : "member",
                         },
                       ),
                     );
@@ -1066,6 +1080,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
               width: 153,
+              height: 56,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               borderRadius: 28,
               backgroundColor: right
@@ -1121,15 +1136,34 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
 
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
 
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;
       rebuildPostWidget.value = !rebuildPostWidget.value;
+
       LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    } else {
+      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeys.postPinned
+              : LMFeedAnalyticsKeys.postUnpinned,
+          deprecatedEventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeysDep.postPinned
+              : LMFeedAnalyticsKeysDep.postUnpinned,
+          eventProperties: {
+            'created_by_id': postViewData.userId,
+            'post_id': postViewData.id,
+            'post_type': postType,
+          },
+        ),
+      );
     }
   }
 }

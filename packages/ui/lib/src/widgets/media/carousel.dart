@@ -10,11 +10,11 @@ class LMFeedCarousel extends StatefulWidget {
   final List<LMAttachmentViewData> attachments;
   final String postId;
 
-  final LMFeedPostImage? imageItem;
-  final LMFeedPostVideo? videoItem;
+  final LMFeedImage? imageItem;
+  final LMFeedVideo? videoItem;
 
-  final Widget Function(LMFeedPostImage)? imageBuilder;
-  final Widget Function(LMFeedPostVideo)? videoBuilder;
+  final Widget Function(LMFeedImage)? imageBuilder;
+  final Widget Function(LMFeedVideo)? videoBuilder;
 
   final LMFeedPostVideoStyle? videoStyle;
   final LMFeedPostImageStyle? imageStyle;
@@ -44,8 +44,8 @@ class LMFeedCarousel extends StatefulWidget {
   static LMFeedCarousel defCarousel(
     List<LMAttachmentViewData> attachments,
     String postId, {
-    LMFeedPostImage? imageItem,
-    LMFeedPostVideo? videoItem,
+    LMFeedImage? imageItem,
+    LMFeedVideo? videoItem,
     Function(String, StackTrace)? onError,
     Function(VideoController)? initialiseVideoController,
     LMFeedPostVideoStyle? videoStyle,
@@ -94,7 +94,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
           width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
           child: Center(
             child: widget.imageItem ??
-                LMFeedPostImage(
+                LMFeedImage(
                   imageUrl: e.attachmentMeta.url,
                   style: widget.imageStyle,
                   onError: widget.onError,
@@ -111,7 +111,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
           ),
           width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
           child: widget.videoItem ??
-              LMFeedPostVideo(
+              LMFeedVideo(
                 videoUrl: e.attachmentMeta.url,
                 style: widget.videoStyle,
                 postId: widget.postId,

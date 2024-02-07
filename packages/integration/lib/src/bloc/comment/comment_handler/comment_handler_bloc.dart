@@ -32,8 +32,8 @@ class LMFeedCommentHandlerBloc
       (event, emit) async {
         switch (event.commentMetaData.commentActionType) {
           // Add comment or reply to comment
-          case (LMFeedCommentActionType.add ||
-                LMFeedCommentActionType.replying):
+          case LMFeedCommentActionType.add:
+          case LMFeedCommentActionType.replying:
             // @{macro add_comment_event_handler}
             await handleAddActionEvent(event, emit);
             break;

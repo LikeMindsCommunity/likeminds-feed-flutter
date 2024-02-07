@@ -10,8 +10,8 @@ import 'package:visibility_aware_state/visibility_aware_state.dart';
 import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart'
     as media_kit_video_controls;
 
-class LMFeedPostVideo extends StatefulWidget {
-  const LMFeedPostVideo({
+class LMFeedVideo extends StatefulWidget {
+  const LMFeedVideo({
     super.key,
     required this.postId,
     this.videoUrl,
@@ -44,9 +44,9 @@ class LMFeedPostVideo extends StatefulWidget {
   final VoidCallback? onMediaTap;
 
   @override
-  State<LMFeedPostVideo> createState() => _LMFeedPostVideoState();
+  State<LMFeedVideo> createState() => _LMFeedVideoState();
 
-  LMFeedPostVideo copyWith({
+  LMFeedVideo copyWith({
     String? postId,
     String? videoUrl,
     File? videoFile,
@@ -57,7 +57,7 @@ class LMFeedPostVideo extends StatefulWidget {
     LMFeedPostVideoStyle? style,
     VoidCallback? onMediaTap,
   }) {
-    return LMFeedPostVideo(
+    return LMFeedVideo(
       postId: postId ?? this.postId,
       videoUrl: videoUrl ?? this.videoUrl,
       videoFile: videoFile ?? this.videoFile,
@@ -71,7 +71,7 @@ class LMFeedPostVideo extends StatefulWidget {
   }
 }
 
-class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
+class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   ValueNotifier<bool> rebuildOverlay = ValueNotifier(false);
   bool _onTouch = true;
   bool initialiseOverlay = false;
@@ -109,7 +109,7 @@ class _LMFeedPostVideoState extends VisibilityAwareState<LMFeedPostVideo> {
   }
 
   @override
-  void didUpdateWidget(LMFeedPostVideo oldWidget) {
+  void didUpdateWidget(LMFeedVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.videoUrl != widget.videoUrl) {
       controller?.player.pause();
