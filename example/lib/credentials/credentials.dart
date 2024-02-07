@@ -7,8 +7,10 @@ part 'credentials.g.dart';
 abstract class FBCreds {
   @EnviedField(varName: 'API_KEY', obfuscate: true)
   static final String apiKey = _FBCreds.apiKey;
-  @EnviedField(varName: 'APP_ID', obfuscate: true)
-  static final String appId = _FBCreds.appId;
+  @EnviedField(varName: 'APP_ID_AN', obfuscate: true)
+  static final String appIdAN = _FBCreds.appIdAN;
+  @EnviedField(varName: 'APP_ID_IOS', obfuscate: true)
+  static final String appIdIOS = _FBCreds.appIdIOS;
   @EnviedField(varName: 'MESSAGING_SENDER_ID', obfuscate: true)
   static final String messagingSenderId = _FBCreds.messagingSenderId;
   @EnviedField(varName: 'PROJECT_ID', obfuscate: true)
