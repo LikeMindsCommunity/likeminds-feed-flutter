@@ -1131,6 +1131,25 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;
+
+    if (postViewData.isPinned) {
+      int index = postViewData.menuItems
+          .indexWhere((element) => element.id == postUnpinId);
+      if (index != -1) {
+        postViewData.menuItems[index].title = "Unpin This Post";
+        postViewData.menuItems[index].id = postUnpinId;
+      }
+    } else {
+      int index = postViewData.menuItems
+          .indexWhere((element) => element.id == postPinId);
+
+      if (index != -1) {
+        postViewData.menuItems[index]
+          ..title = "Pin This Post"
+          ..id = postPinId;
+      }
+    }
+
     rebuildPostWidget.value = !rebuildPostWidget.value;
 
     final pinPostRequest =
@@ -1143,6 +1162,26 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;
+
+      if (postViewData.isPinned) {
+        int index = postViewData.menuItems
+            .indexWhere((element) => element.id == postUnpinId);
+        if (index != -1) {
+          postViewData.menuItems[index]
+            ..title = "Unpin This Post"
+            ..id = postUnpinId;
+        }
+      } else {
+        int index = postViewData.menuItems
+            .indexWhere((element) => element.id == postPinId);
+
+        if (index != -1) {
+          postViewData.menuItems[index]
+            ..title = "Pin This Post"
+            ..id = postPinId;
+        }
+      }
+
       rebuildPostWidget.value = !rebuildPostWidget.value;
 
       LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
