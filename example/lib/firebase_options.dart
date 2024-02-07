@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:likeminds_feed_sample/credentials/credentials.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,22 +50,21 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCp2HimWufInSMnLc7ndFBEpeSDTj7Fxsw',
-    appId: '1:317419981427:android:363c6b0cb7755690d2f806',
-    messagingSenderId: '317419981427',
-    projectId: 'likeminds-sdk-app',
-    storageBucket: 'likeminds-sdk-app.appspot.com',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: FBCreds.apiKey,
+    appId: FBCreds.appId,
+    messagingSenderId: FBCreds.messagingSenderId,
+    projectId: FBCreds.projectId,
+    storageBucket: FBCreds.storageBucket,
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAVmbe-8jgnO2MUnFotMdp2tmDVnwTZqfE',
-    appId: '1:317419981427:ios:237be42bf46d966fd2f806',
-    messagingSenderId: '317419981427',
-    projectId: 'likeminds-sdk-app',
-    storageBucket: 'likeminds-sdk-app.appspot.com',
-    iosClientId:
-        '317419981427-g0kdob11etdsnql322ll5ksa6h4jj1db.apps.googleusercontent.com',
-    iosBundleId: 'com.likeminds.feed-ss-sample',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: FBCreds.apiKey,
+    appId: FBCreds.appId,
+    messagingSenderId: FBCreds.messagingSenderId,
+    projectId: FBCreds.projectId,
+    storageBucket: FBCreds.storageBucket,
+    iosClientId: FBCreds.iosClientId,
+    iosBundleId: FBCreds.iosBundleId,
   );
 }

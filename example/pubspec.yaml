@@ -21,10 +21,13 @@ dependencies:
   firebase_messaging: ^14.7.6
   device_info_plus: ^8.2.2
   uni_links:
+  envied: ^0.3.0+3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  envied_generator:
+  build_runner:
 
   flutter_lints: ^2.0.0
 
