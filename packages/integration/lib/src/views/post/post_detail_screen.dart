@@ -1254,11 +1254,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           ..postId(_postDetailScreenHandler!.postData!.id))
         .build();
 
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
     LMFeedPostBloc.instance
         .add(LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+
+    final PinPostResponse response =
+        await LMFeedCore.client.pinPost(pinPostRequest);
 
     if (!response.success) {
       _postDetailScreenHandler!.postData!.isPinned =

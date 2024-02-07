@@ -11,8 +11,8 @@ import 'package:url_launcher/url_launcher.dart';
 * The [LMFeedLinkPreview] can be customized 
 * by passing in the required parameters
 */
-class LMFeedPostLinkPreview extends StatelessWidget {
-  const LMFeedPostLinkPreview({
+class LMFeedLinkPreview extends StatelessWidget {
+  const LMFeedLinkPreview({
     super.key,
     this.attachment,
     this.linkModel,
@@ -101,7 +101,7 @@ class LMFeedPostLinkPreview extends StatelessWidget {
                         ),
                       ),
                     )
-                : LMFeedPostImage(
+                : LMFeedImage(
                     style: LMFeedPostImageStyle(
                       height: style.imageHeight ?? 216,
                       errorWidget: style.errorWidget,
@@ -193,9 +193,9 @@ class LMFeedPostLinkPreview extends StatelessWidget {
     );
   }
 
-  /// copyWith function to get a new object of [LMFeedPostLinkPreview]
+  /// copyWith function to get a new object of [LMFeedLinkPreview]
   /// with specific single values passed
-  LMFeedPostLinkPreview copyWith({
+  LMFeedLinkPreview copyWith({
     LMMediaModel? linkModel,
     LMAttachmentViewData? attachment,
     double? width,
@@ -214,7 +214,7 @@ class LMFeedPostLinkPreview extends StatelessWidget {
     Function(String, StackTrace)? onError,
     LMFeedPostLinkPreviewStyle? style,
   }) {
-    return LMFeedPostLinkPreview(
+    return LMFeedLinkPreview(
       linkModel: linkModel ?? this.linkModel,
       attachment: attachment ?? this.attachment,
       onTap: onTap ?? this.onTap,

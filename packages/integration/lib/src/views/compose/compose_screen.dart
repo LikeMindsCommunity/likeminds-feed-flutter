@@ -261,7 +261,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           screenSize?.width,
                       width: style?.mediaStyle?.imageStyle?.width ??
                           screenSize?.width,
-                      child: LMFeedPostImage(
+                      child: LMFeedImage(
                         imageFile: composeBloc.postMedia[index].mediaFile,
                         style: style?.mediaStyle?.imageStyle,
                       ),
@@ -279,7 +279,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         borderRadius:
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),
-                      child: LMFeedPostVideo(
+                      child: LMFeedVideo(
                         videoFile: composeBloc.postMedia[index].mediaFile,
                         style: style?.mediaStyle?.videoStyle,
                         postId: composeBloc.postMedia[index].mediaFile!.uri
@@ -288,7 +288,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     );
                     break;
                   case LMMediaType.link:
-                    mediaWidget = LMFeedPostLinkPreview(
+                    mediaWidget = LMFeedLinkPreview(
                       linkModel: composeBloc.postMedia[index],
                       style: style?.mediaStyle?.linkStyle?.copyWith(
                             width: style?.mediaStyle?.linkStyle?.width ??

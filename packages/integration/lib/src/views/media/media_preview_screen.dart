@@ -136,7 +136,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                   itemCount: postAttachments.length,
                   itemBuilder: (context, index, realIndex) {
                     if (postAttachments[index].attachmentType == 2) {
-                      return LMFeedPostVideo(
+                      return LMFeedVideo(
                         videoUrl: postAttachments[index].attachmentMeta.url,
                         postId: widget.post.id,
                         isMute: false,
@@ -150,7 +150,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                         color: Colors.black,
                         width: MediaQuery.of(context).size.width,
                         child: Center(
-                          child: LMFeedPostImage(
+                          child: LMFeedImage(
                             imageUrl:
                                 postAttachments[index].attachmentMeta.url!,
                             style: LMFeedPostImageStyle(

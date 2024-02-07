@@ -758,10 +758,10 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
 
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
 
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;

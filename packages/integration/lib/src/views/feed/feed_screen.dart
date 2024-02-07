@@ -591,7 +591,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             color: Colors.black,
             borderRadius: BorderRadius.circular(6.0),
           ),
-          child: LMFeedPostImage(
+          child: LMFeedImage(
             imageFile: media.mediaFile!,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
@@ -1136,10 +1136,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
 
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
 
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;
