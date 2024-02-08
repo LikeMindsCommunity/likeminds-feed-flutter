@@ -272,6 +272,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         color: feedThemeData?.primaryColor,
         backgroundColor: feedThemeData?.container,
         child: CustomScrollView(
+          controller: _controller,
           slivers: [
             SliverToBoxAdapter(
               child: config!.showCustomWidget
@@ -625,7 +626,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       user: _feedBloc.users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             userUniqueId: userId,
@@ -690,7 +690,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
-      onTagTap: (String? userId) {},
+      onTagTap: (String? userId) {
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            userUniqueId: userId ?? post.userId,
+          ),
+        );
+      },
       style: feedThemeData?.contentStyle,
     );
   }
