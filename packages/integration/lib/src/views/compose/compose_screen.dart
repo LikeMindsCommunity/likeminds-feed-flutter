@@ -583,8 +583,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               postText = postText.trim();
               if (postText.isNotEmpty || composeBloc.postMedia.isNotEmpty) {
                 List<LMUserTagViewData> userTags = [...composeBloc.userTags];
-                List<LMTopicViewData> selectedTopics =
-                    [...composeBloc.selectedTopics];
+                List<LMTopicViewData> selectedTopics = [
+                  ...composeBloc.selectedTopics
+                ];
 
                 if (config!.topicRequiredToCreatePost &&
                     selectedTopics.isEmpty &&
@@ -598,11 +599,12 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 userTags =
                     LMFeedTaggingHelper.matchTags(_controller.text, userTags);
 
-                result = LMFeedTaggingHelper.encodeString(
-                    _controller.text, userTags);
+                result =
+                    LMFeedTaggingHelper.encodeString(_controller.text, userTags)
+                        .trim();
 
                 sendPostCreationCompletedEvent(
-                   [...composeBloc.postMedia], userTags, selectedTopics);
+                    [...composeBloc.postMedia], userTags, selectedTopics);
                 if (widget.attachments != null &&
                     widget.attachments!.isNotEmpty &&
                     widget.attachments!.first.attachmentType == 5) {
