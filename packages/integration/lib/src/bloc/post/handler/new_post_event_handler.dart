@@ -60,7 +60,7 @@ void newPostEventHandler(
           );
         } else {
           File mediaFile = media.mediaFile!;
-          final String? response = await LMFeedCore.media
+          final String? response = await LMFeedMediaService.instance
               .uploadFile(mediaFile, event.user.userUniqueId);
           if (response != null) {
             attachments.add(
