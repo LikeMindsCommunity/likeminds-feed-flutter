@@ -17,4 +17,3 @@ export 'persistence/user_local_preference.dart';
 export 'post/post_utils.dart';
 
 export 'tagging/tagging_textfield_ta.dart';
-export 'tagging/helpers/tagging_helper.dart';

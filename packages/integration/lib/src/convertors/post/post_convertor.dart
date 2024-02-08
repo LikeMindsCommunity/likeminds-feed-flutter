@@ -1,24 +1,57 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/comment/comment_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/common/popup_menu_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/attachment_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMPostViewDataConvertor {
-  static LMPostViewData fromPost({required Post post}) {
+  static LMPostViewData fromPost({
+    required Post post,
+    Map<String, WidgetModel>? widgets,
+    Map<String, Post>? repostedPosts,
+    Map<String, User>? users,
+    Map<String, Topic>? topics,
+  }) {
     LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
+    Map<String, LMWidgetViewData> widgetMap = {};
 
     postViewDataBuilder.id(post.id);
 
     postViewDataBuilder.text(post.text);
 
-    postViewDataBuilder.topics(post.topics ?? []);
+    List<LMTopicViewData> topicViewData = [];
+    if (topics != null) {
+      post.topics?.forEach((element) {
+        if (topics[element] != null) {
+          topicViewData
+              .add(LMTopicViewDataConvertor.fromTopic(topics[element]!));
+        }
+      });
+    }
+    postViewDataBuilder.topics(topicViewData);
 
     if (post.attachments != null) {
-      postViewDataBuilder.attachments(post.attachments!
-          .map((e) =>
-              LMAttachmentViewDataConvertor.fromAttachment(attachment: e))
-          .toList());
+      postViewDataBuilder.attachments(post.attachments!.map((e) {
+        LMPostViewData? repost;
+
+        if (e.attachmentType == 5 && widgets != null) {
+          String? key = e.attachmentMeta.meta?['entity_id'];
+          if (key != null && widgets[key] != null) {
+            widgetMap[key] =
+                LMWidgetViewDataConvertor.fromWidgetModel(widgets[key]!);
+          }
+        } else if (e.attachmentType == 8 &&
+            repostedPosts != null &&
+            repostedPosts[e.attachmentMeta.entityId] != null) {
+          repost = LMPostViewDataConvertor.fromPost(
+            post: repostedPosts[e.attachmentMeta.entityId]!,
+            widgets: widgets,
+            users: users,
+            topics: topics,
+          );
+        }
+
+        return LMAttachmentViewDataConvertor.fromAttachment(
+            attachment: e, repost: repost);
+      }).toList());
     }
 
     postViewDataBuilder.communityId(post.communityId);
@@ -26,6 +59,10 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.isPinned(post.isPinned);
 
     postViewDataBuilder.userId(post.userId);
+    if (users != null && users[post.userId] != null) {
+      postViewDataBuilder
+          .user(LMUserViewDataConvertor.fromUser(users[post.userId]!));
+    }
 
     postViewDataBuilder.likeCount(post.likeCount);
 
@@ -58,6 +95,8 @@ class LMPostViewDataConvertor {
 
     postViewDataBuilder.isDeleted(post.isDeleted ?? false);
 
+    postViewDataBuilder.widgets(widgetMap);
+
     return postViewDataBuilder.build();
   }
 
@@ -71,7 +110,7 @@ class LMPostViewDataConvertor {
           .toList(),
       communityId: postViewData.communityId,
       isPinned: postViewData.isPinned,
-      topics: postViewData.topics,
+      topics: postViewData.topics.map((e) => e.id).toList(),
       userId: postViewData.userId,
       likeCount: postViewData.likeCount,
       commentCount: postViewData.commentCount,

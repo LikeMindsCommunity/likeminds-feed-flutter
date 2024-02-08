@@ -213,7 +213,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                 child: Container(
                                     padding: const EdgeInsets.all(14.0),
                                     decoration: BoxDecoration(
-                                        color: LikeMindsTheme.whiteColor,
+                                        color: feedTheme.container,
                                         borderRadius:
                                             BorderRadius.circular(8.0),
                                         boxShadow: const [
@@ -233,8 +233,9 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                               ? 'Reason for deletion'
                                               : reasonForDeletion!.name,
                                         ),
-                                        const Icon(
+                                         Icon(
                                           Icons.arrow_drop_down,
+                                          color: feedTheme.onContainer,
                                         )
                                       ],
                                     )),
@@ -255,10 +256,10 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text(
+                  child:  Text(
                     'Cancel',
                     style: TextStyle(
-                      color: LikeMindsTheme.greyColor,
+                      color: feedTheme.onContainer.withOpacity(0.8),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -283,7 +284,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                   child: Text(
                     actionText,
                     style: TextStyle(
-                      color: feedTheme.linkColor,
+                      color: feedTheme.primaryColor,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

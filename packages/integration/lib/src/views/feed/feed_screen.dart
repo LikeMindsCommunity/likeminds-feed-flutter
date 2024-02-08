@@ -272,6 +272,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         color: feedThemeData?.primaryColor,
         backgroundColor: feedThemeData?.container,
         child: CustomScrollView(
+          controller: _controller,
           slivers: [
             SliverToBoxAdapter(
               child: config!.showCustomWidget
@@ -442,7 +443,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   if (state is LMFeedNewPostUploadingState) {
                     return Container(
                       height: 60,
-                      color: LikeMindsTheme.whiteColor,
+                      color: feedThemeData?.backgroundColor ??
+                          LikeMindsTheme.whiteColor,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
@@ -620,11 +622,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       LMFeedThemeData? feedThemeData, LMPostViewData post) {
     return LMFeedPostWidget(
       post: post,
-      topics: _feedBloc.topics,
+      topics: post.topics,
       user: _feedBloc.users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             userUniqueId: userId,
@@ -681,7 +682,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
     return LMFeedPostTopic(
-      topics: _feedBloc.topics,
+      topics: post.topics,
       post: post,
       style: feedThemeData?.topicStyle,
     );
@@ -689,7 +690,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
-      onTagTap: (String? userId) {},
+      onTagTap: (String? userId) {
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            userUniqueId: userId ?? post.userId,
+          ),
+        );
+      },
       style: feedThemeData?.contentStyle,
     );
   }
@@ -700,7 +707,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       commentButton: defCommentButton(post),
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
+      repostButton: defRepostButton(post),
       postFooterStyle: feedThemeData?.footerStyle,
+      showRepostButton: !post.isRepost,
     );
   }
 
@@ -757,6 +766,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
+                        isRepost: postViewData.isRepost,
                       ),
                     );
                   },
@@ -927,6 +937,74 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         style: feedThemeData?.footerStyle.shareButtonStyle,
       );
 
+  LMFeedButton defRepostButton(LMPostViewData postViewData) => LMFeedButton(
+        text: LMFeedText(
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: postViewData.isRepostedByUser
+                  ? feedThemeData?.primaryColor
+                  : null,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          text: postViewData.repostCount == 0
+              ? ''
+              : postViewData.repostCount.toString(),
+        ),
+        onTap: right
+            ? () async {
+                if (!postUploading.value) {
+                  LMFeedAnalyticsBloc.instance.add(
+                      const LMFeedFireAnalyticsEvent(
+                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          deprecatedEventName:
+                              LMFeedAnalyticsKeysDep.postCreationStarted,
+                          eventProperties: {}));
+
+                  LMFeedVideoProvider.instance.forcePauseAllControllers();
+                  // ignore: use_build_context_synchronously
+                  LMAttachmentViewData attachmentViewData =
+                      (LMAttachmentViewDataBuilder()
+                            ..attachmentType(8)
+                            ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                                  ..repost(postViewData))
+                                .build()))
+                          .build();
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMFeedComposeScreen(
+                        attachments: [attachmentViewData],
+                      ),
+                    ),
+                  );
+                } else {
+                  toast(
+                    'A post is already uploading.',
+                    duration: Toast.LENGTH_LONG,
+                  );
+                }
+              }
+            : () => toast("You do not have permission to create a post"),
+        style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color: postViewData.isRepostedByUser
+                          ? feedThemeData?.primaryColor
+                          : null),
+            ),
+            activeIcon:
+                feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color: postViewData.isRepostedByUser
+                          ? feedThemeData?.primaryColor
+                          : null),
+            )),
+      );
+
   Widget noPostUnderTopicWidget() => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1080,7 +1158,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
               width: 153,
-              height: 56,
+              height: 44,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               borderRadius: 28,
               backgroundColor: right
@@ -1095,6 +1173,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 textStyle: TextStyle(
                   color: feedThemeData?.onPrimary,
                   fontWeight: FontWeight.w500,
+                  fontSize: 14,
                 ),
               ),
             ),

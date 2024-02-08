@@ -15,7 +15,7 @@ class LMFeedRouteToUserProfileState extends LMFeedProfileState {
   const LMFeedRouteToUserProfileState({required this.userUniqueId});
 
   @override
-  List<Object> get props => [userUniqueId];
+  List<Object> get props => [userUniqueId, identityHashCode(this)];
 }
 
 class LMFeedLoginRequiredState extends LMFeedProfileState {}
@@ -28,5 +28,5 @@ class LMFeedRouteToCompanyProfileState extends LMFeedProfileState {
   const LMFeedRouteToCompanyProfileState({required this.companyId});
 
   @override
-  List<Object> get props => [companyId];
+  List<Object> get props => [companyId, identityHashCode(this)];
 }

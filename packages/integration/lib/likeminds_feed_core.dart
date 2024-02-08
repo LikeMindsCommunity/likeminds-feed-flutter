@@ -47,7 +47,6 @@ class LMFeedCore {
   static LMFeedCore get instance => _instance ??= LMFeedCore._();
 
   static LMFeedClient get client => instance.lmFeedClient;
-  static LMFeedMediaService get media => instance.mediaService!;
 
   static LMFeedConfig get config => instance.feedConfig;
 
@@ -69,7 +68,6 @@ class LMFeedCore {
     this.lmFeedClient =
         lmFeedClient ?? (LMFeedClientBuilder()..apiKey(apiKey!)).build();
     clientDomain = domain;
-    mediaService = LMFeedMediaService(false);
     await LMFeedUserLocalPreference.instance.initialize();
     feedConfig = config ?? LMFeedConfig();
     MediaKit.ensureInitialized();

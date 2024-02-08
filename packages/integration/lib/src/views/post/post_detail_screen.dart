@@ -448,7 +448,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   LMFeedPostFooter defPostFooter() {
-    return LMFeedPostFooter();
+    return LMFeedPostFooter(
+      showRepostButton: !_postDetailScreenHandler!.postData!.isRepost,
+    );
   }
 
   LMFeedPostWidget defPostWidget() {
@@ -456,7 +458,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       post: _postDetailScreenHandler!.postData!,
       user: _postDetailScreenHandler!
           .users[_postDetailScreenHandler!.postData!.userId]!,
-      topics: _postDetailScreenHandler!.topics,
+      topics: _postDetailScreenHandler!.postData!.topics,
       onMediaTap: () {
         Navigator.push(
           context,
@@ -495,7 +497,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedPostTopic _defTopicWidget() {
     return LMFeedPostTopic(
-      topics: _postDetailScreenHandler!.topics,
+      topics: _postDetailScreenHandler!.postData!.topics,
       post: _postDetailScreenHandler!.postData!,
       style: feedTheme?.topicStyle,
     );
@@ -521,7 +523,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       commentButton: defCommentButton(),
       shareButton: defShareButton(),
       saveButton: defSaveButton(),
+      repostButton: defRepostButton(),
       postFooterStyle: feedTheme?.footerStyle,
+      showRepostButton: !_postDetailScreenHandler!.postData!.isRepost,
     );
   }
 
@@ -584,6 +588,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       LMFeedDeletePostEvent(
                         postId: _postDetailScreenHandler!.postData!.id,
                         reason: reason,
+                        isRepost: _postDetailScreenHandler!.postData!.isRepost,
                       ),
                     );
                     Navigator.of(context).pop();
@@ -725,6 +730,76 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               .sharePost(_postDetailScreenHandler!.postData!.id);
         },
         style: feedTheme?.footerStyle.shareButtonStyle,
+      );
+  LMFeedButton defRepostButton() => LMFeedButton(
+        text: LMFeedText(
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: _postDetailScreenHandler!.postData!.isRepostedByUser
+                  ? feedTheme?.primaryColor
+                  : null,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          text: _postDetailScreenHandler!.postData!.repostCount == 0
+              ? ''
+              : _postDetailScreenHandler!.postData!.repostCount.toString(),
+        ),
+        onTap: right
+            ? () async {
+                if (LMFeedPostBloc.instance.state
+                    is! LMFeedEditPostUploadingState) {
+                  LMFeedAnalyticsBloc.instance.add(
+                      const LMFeedFireAnalyticsEvent(
+                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          deprecatedEventName:
+                              LMFeedAnalyticsKeysDep.postCreationStarted,
+                          eventProperties: {}));
+
+                  LMFeedVideoProvider.instance.forcePauseAllControllers();
+                  // ignore: use_build_context_synchronously
+                  LMAttachmentViewData attachmentViewData =
+                      (LMAttachmentViewDataBuilder()
+                            ..attachmentType(8)
+                            ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                                  ..repost(_postDetailScreenHandler!.postData!))
+                                .build()))
+                          .build();
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMFeedComposeScreen(
+                        attachments: [attachmentViewData],
+                      ),
+                    ),
+                  );
+                } else {
+                  toast(
+                    'A post is already uploading.',
+                    duration: Toast.LENGTH_LONG,
+                  );
+                }
+              }
+            : () => toast("You do not have permission to create a post"),
+        style: feedTheme?.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color:
+                          _postDetailScreenHandler!.postData!.isRepostedByUser
+                              ? feedTheme?.primaryColor
+                              : null),
+            ),
+            activeIcon:
+                feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color:
+                          _postDetailScreenHandler!.postData!.isRepostedByUser
+                              ? feedTheme?.primaryColor
+                              : null),
+            )),
       );
 
   LMFeedCommentWidget defCommentTile(
@@ -952,6 +1027,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             color: feedTheme?.primaryColor,
+            fontSize: 14,
           ),
         ),
       ),
@@ -965,7 +1041,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         bloc: _postDetailScreenHandler!.commentHandlerBloc,
         builder: (context, state) => Container(
           decoration: BoxDecoration(
-            color: LikeMindsTheme.whiteColor,
+            color: feedTheme?.container ?? LikeMindsTheme.whiteColor,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -987,18 +1063,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                           LMFeedText(
                             text: state.commentMetaData.commentActionType ==
                                     LMFeedCommentActionType.edit
-                                ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'}"
-                                : "Replying to",
-                            style: const LMFeedTextStyle(
+                                ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'} "
+                                : "Replying to ",
+                            style: LMFeedTextStyle(
                               textStyle: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: LikeMindsTheme.greyColor,
+                                color: feedTheme?.onContainer ??
+                                    LikeMindsTheme.greyColor,
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            width: 8,
                           ),
                           state.commentMetaData.commentActionType ==
                                   LMFeedCommentActionType.edit
@@ -1038,15 +1112,26 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     color: feedTheme?.primaryColor.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(24)),
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                padding: const EdgeInsets.all(6.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
                 child: Row(
                   children: [
                     LMFeedProfilePicture(
                       fallbackText: currentUser.name,
                       imageUrl: currentUser.imageUrl,
-                      style: LMFeedProfilePictureStyle(
+                      style: LMFeedProfilePictureStyle.basic().copyWith(
                         backgroundColor: feedTheme?.primaryColor,
                         size: 36,
+                        fallbackTextStyle: LMFeedProfilePictureStyle.basic()
+                            .fallbackTextStyle
+                            ?.copyWith(
+                              textStyle: LMFeedProfilePictureStyle.basic()
+                                  .fallbackTextStyle
+                                  ?.textStyle
+                                  ?.copyWith(
+                                    fontSize: 14,
+                                  ),
+                            ),
                       ),
                       onTap: () {
                         if (currentUser.sdkClientInfo != null) {
@@ -1055,7 +1140,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         }
                       },
                     ),
-                    const SizedBox(width: 6),
                     Expanded(
                       child: LMTaggingAheadTextField(
                         isDown: false,
@@ -1077,7 +1161,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         scrollPhysics: const AlwaysScrollableScrollPhysics(),
                       ),
                     ),
-                    const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: !right
@@ -1108,7 +1191,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       _postDetailScreenHandler!
                                           .commentController.text,
                                       userTags,
-                                    );
+                                    ).trim();
                                     commentText = commentText.trim();
                                     if (commentText.isEmpty) {
                                       toast("Please write something to post");

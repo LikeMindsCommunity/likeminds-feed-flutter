@@ -9,3 +9,7 @@ Patch update wuth dependency update
 ## 1.0.2
 
 Migrating to Flutter v3.10.6
+
+## 1.0.3
+
+Added support for repost and user profile feed

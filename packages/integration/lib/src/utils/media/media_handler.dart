@@ -153,20 +153,13 @@ class LMFeedMediaHandler {
               );
             } else {
               File video = File(file.path);
-              VideoPlayerController controller = VideoPlayerController.file(
-                video,
-                videoPlayerOptions: VideoPlayerOptions(),
-              );
-              await controller.initialize();
-              Duration videoDuration = controller.value.duration;
               LMMediaModel videoFile = LMMediaModel(
                 mediaType: LMMediaType.video,
                 mediaFile: video,
-                duration: videoDuration.inSeconds,
                 size: fileBytes,
+                duration: 0,
               );
               videoFiles.add(videoFile);
-              controller.dispose();
             }
           }
           // onUploadedMedia(true);

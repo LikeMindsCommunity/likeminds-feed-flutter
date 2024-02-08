@@ -185,7 +185,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
                                         color: isTopicSelected
                                             ? LMFeedTheme.of(context)
                                                 .primaryColor
-                                            : Colors.white,
+                                            : LMFeedTheme.of(context).container,
                                       ),
                                       alignment: Alignment.topLeft,
                                       clipBehavior: Clip.hardEdge,

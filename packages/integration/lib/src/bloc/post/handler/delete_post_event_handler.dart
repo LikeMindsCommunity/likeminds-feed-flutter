@@ -5,7 +5,9 @@ void deletePostEventHandler(
   final response = await LMFeedCore.instance.lmFeedClient.deletePost(
     (DeletePostRequestBuilder()
           ..postId(event.postId)
-          ..deleteReason(event.reason))
+          ..deleteReason(event.reason)
+          ..isRepost(event.isRepost)
+          )
         .build(),
   );
 

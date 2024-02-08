@@ -68,12 +68,14 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
     );
 
     if (!response.success) {
-      emit(const LMFeedUniversalFeedErrorState(
-          message: "An error occurred, please check your network connection"));
+      emit(LMFeedUniversalFeedErrorState(
+          message: response.errorMessage ??
+              "An error occurred, please check your network connection"));
     } else {
       users.addAll(response.users?.map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
           {});
+
       topics.addAll(response.topics?.map((key, value) =>
               MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))) ??
           {});
@@ -86,7 +88,13 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
         LMFeedUniversalFeedLoadedState(
           topics: topics,
           posts: response.posts
-                  ?.map((e) => LMPostViewDataConvertor.fromPost(post: e))
+                  ?.map((e) => LMPostViewDataConvertor.fromPost(
+                        post: e,
+                        widgets: response.widgets,
+                        repostedPosts: response.repostedPosts,
+                        users: response.users,
+                        topics: response.topics,
+                      ))
                   .toList() ??
               [],
           users: users,

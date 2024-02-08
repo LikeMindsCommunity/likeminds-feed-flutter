@@ -3,7 +3,7 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedPostTopic extends StatelessWidget {
   final LMPostViewData post;
-  final Map<String, LMTopicViewData> topics;
+  final List<LMTopicViewData> topics;
 
   final Widget Function(BuildContext, LMFeedTopicChip)? topicChipBuilder;
 
@@ -28,8 +28,8 @@ class LMFeedPostTopic extends StatelessWidget {
         children: post.topics
             .map((e) =>
                 topicChipBuilder?.call(
-                    context, defTopicChip(topics[e]!, topicStyle)) ??
-                defTopicChip(topics[e]!, topicStyle))
+                    context, defTopicChip(e, topicStyle)) ??
+                defTopicChip(e, topicStyle))
             .toList(),
       ),
     );
@@ -45,7 +45,7 @@ class LMFeedPostTopic extends StatelessWidget {
 
   LMFeedPostTopic copyWith({
     LMPostViewData? post,
-    Map<String, LMTopicViewData>? topics,
+    List<LMTopicViewData>? topics,
     Widget Function(BuildContext, LMFeedTopicChip)? topicChipBuilder,
     LMFeedPostTopicStyle? style,
   }) {

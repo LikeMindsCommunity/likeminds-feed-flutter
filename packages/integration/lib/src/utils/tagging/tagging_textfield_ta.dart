@@ -124,129 +124,127 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
   @override
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6.0),
-      child: TypeAheadField<LMUserTagViewData>(
-        onTagTap: (p) {},
-        scrollController: _scrollController,
-        tagColor: feedTheme.tagColor,
-        scrollPhysics: widget.scrollPhysics,
-        suggestionsBoxController: _suggestionsBoxController,
-        suggestionsBoxDecoration: SuggestionsBoxDecoration(
-          color: feedTheme.container,
-          elevation: 4,
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.22,
-          ),
+    return TypeAheadField<LMUserTagViewData>(
+      onTagTap: (p) {},
+      scrollController: _scrollController,
+      tagColor: feedTheme.tagColor,
+      scrollPhysics: widget.scrollPhysics,
+      suggestionsBoxController: _suggestionsBoxController,
+      suggestionsBoxDecoration: SuggestionsBoxDecoration(
+        color: feedTheme.container,
+        elevation: 4,
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.22,
         ),
-        noItemsFoundBuilder: (context) => const SizedBox.shrink(),
-        hideOnEmpty: true,
-        debounceDuration: const Duration(milliseconds: 500),
-        textFieldConfiguration: TextFieldConfiguration(
-          keyboardType: TextInputType.multiline,
-          cursorColor: feedTheme.primaryColor,
-          controller: _controller,
-          focusNode: _focusNode,
-          minLines: widget.minLines,
-          maxLines: widget.maxLines,
-          decoration: widget.decoration ??
-              const InputDecoration(
-                hintText: 'Write something here...',
-                border: InputBorder.none,
-              ),
-          onChanged: (value) {
-            page = 1;
-            widget.onChange!(value);
-            final int newTagCount = '@'.allMatches(value).length;
-            final int completeCount = '~'.allMatches(value).length;
-            if (newTagCount == completeCount) {
-              textValue = _controller.value.text;
-              tagComplete = true;
-            } else if (newTagCount > completeCount) {
-              tagComplete = false;
-              tagCount = completeCount;
-              tagValue = value.substring(value.lastIndexOf('@'));
-              textValue = value.substring(0, value.lastIndexOf('@'));
-            }
-          },
-        ),
-        direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
-        suggestionsCallback: (suggestion) async {
-          if (!widget.enabled) {
-            return Future.value(const Iterable.empty());
+      ),
+      noItemsFoundBuilder: (context) => const SizedBox.shrink(),
+      hideOnEmpty: true,
+      debounceDuration: const Duration(milliseconds: 500),
+      textFieldConfiguration: TextFieldConfiguration(
+        keyboardType: TextInputType.multiline,
+        cursorColor: feedTheme.primaryColor,
+        controller: _controller,
+        focusNode: _focusNode,
+        minLines: widget.minLines,
+        maxLines: widget.maxLines,
+        style: TextStyle(fontWeight: FontWeight.w400),
+        decoration: widget.decoration ??
+            const InputDecoration(
+              hintText: 'Write something here...',
+              border: InputBorder.none,
+            ),
+        onChanged: (value) {
+          page = 1;
+          widget.onChange!(value);
+          final int newTagCount = '@'.allMatches(value).length;
+          final int completeCount = '~'.allMatches(value).length;
+          if (newTagCount == completeCount) {
+            textValue = _controller.value.text;
+            tagComplete = true;
+          } else if (newTagCount > completeCount) {
+            tagComplete = false;
+            tagCount = completeCount;
+            tagValue = value.substring(value.lastIndexOf('@'));
+            textValue = value.substring(0, value.lastIndexOf('@'));
           }
-          return await _getSuggestions(suggestion);
         },
-        keepSuggestionsOnSuggestionSelected: true,
-        keepSuggestionsOnLoading: false,
-        itemBuilder: (context, opt) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                bottom: BorderSide(
-                  color: LikeMindsTheme.greyColor,
-                  width: 0.5,
-                ),
+      ),
+      direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
+      suggestionsCallback: (suggestion) async {
+        if (!widget.enabled) {
+          return Future.value(const Iterable.empty());
+        }
+        return await _getSuggestions(suggestion);
+      },
+      keepSuggestionsOnSuggestionSelected: true,
+      keepSuggestionsOnLoading: false,
+      itemBuilder: (context, opt) {
+        return Container(
+          decoration: BoxDecoration(
+            color: feedTheme.container,
+            border: const Border(
+              bottom: BorderSide(
+                color: LikeMindsTheme.greyColor,
+                width: 0.5,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    AbsorbPointer(
-                      absorbing: true,
-                      child: LMFeedProfilePicture(
-                        fallbackText: opt.name!,
-                        style: LMFeedProfilePictureStyle(
-                          size: 32,
-                          backgroundColor: feedTheme.primaryColor,
-                        ),
-                        imageUrl: opt.imageUrl!,
-                        onTap: null,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  AbsorbPointer(
+                    absorbing: true,
+                    child: LMFeedProfilePicture(
+                      fallbackText: opt.name!,
+                      style: LMFeedProfilePictureStyle(
+                        size: 32,
+                        backgroundColor: feedTheme.primaryColor,
                       ),
+                      imageUrl: opt.imageUrl!,
+                      onTap: null,
                     ),
-                    const SizedBox(width: 12),
-                    LMFeedText(
-                      text: opt.name!,
-                      style: const LMFeedTextStyle(
-                          textStyle: TextStyle(
-                        fontSize: 14,
-                      )),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  LMFeedText(
+                    text: opt.name!,
+                    style: const LMFeedTextStyle(
+                        textStyle: TextStyle(
+                      fontSize: 14,
+                    )),
+                  ),
+                ],
               ),
+            ),
+          ),
+        );
+      },
+      onSuggestionSelected: ((suggestion) {
+        debugPrint(suggestion.toString());
+        widget.onTagSelected.call(suggestion);
+        setState(() {
+          tagComplete = true;
+          tagCount = '@'.allMatches(_controller.text).length;
+          // _controller.text.substring(_controller.text.lastIndexOf('@'));
+          if (textValue.length > 2 &&
+              textValue.substring(textValue.length - 1) == '~') {
+            textValue += " @${suggestion.name!}~";
+          } else {
+            textValue += "@${suggestion.name!}~";
+          }
+          _controller.text = '$textValue ';
+          _controller.selection = TextSelection.fromPosition(
+            TextPosition(
+              offset: _controller.text.length,
             ),
           );
-        },
-        onSuggestionSelected: ((suggestion) {
-          debugPrint(suggestion.toString());
-          widget.onTagSelected.call(suggestion);
-          setState(() {
-            tagComplete = true;
-            tagCount = '@'.allMatches(_controller.text).length;
-            // _controller.text.substring(_controller.text.lastIndexOf('@'));
-            if (textValue.length > 2 &&
-                textValue.substring(textValue.length - 1) == '~') {
-              textValue += " @${suggestion.name!}~";
-            } else {
-              textValue += "@${suggestion.name!}~";
-            }
-            _controller.text = '$textValue ';
-            _controller.selection = TextSelection.fromPosition(
-              TextPosition(
-                offset: _controller.text.length,
-              ),
-            );
-            tagValue = '';
-            textValue = _controller.value.text;
-          });
-        }),
-      ),
+          tagValue = '';
+          textValue = _controller.value.text;
+        });
+      }),
     );
   }
 }

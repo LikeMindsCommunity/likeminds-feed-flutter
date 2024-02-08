@@ -59,7 +59,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
 
   void initialiseAttachments() {
     attachments = [...widget.attachments];
-    attachments?.removeWhere((element) => element.attachmentType == 5);
+    attachments?.removeWhere((element) =>
+        (element.attachmentType == 5 || element.attachmentType == 9));
   }
 
   @override
@@ -106,6 +107,46 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         imageStyle: widget.style?.imageStyle,
         videoStyle: widget.style?.videoStyle,
         onMediaTap: widget.onMediaTap,
+      );
+    } else if (attachments!.first.attachmentType == 8) {
+      final repostData = attachments!.first.attachmentMeta.repost!;
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: repostData.isDeleted ?? false
+            ? Container(
+                decoration: BoxDecoration(
+                  color: LMFeedTheme.of(context).onContainer.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                height: 120,
+                width: double.infinity,
+                child: const Center(
+                  child: LMFeedText(
+                    text: "This post was deleted",
+                  ),
+                ),
+              )
+            : LMFeedPostWidget(
+                post: repostData,
+                user: repostData.user!,
+                isFeed: true,
+                topics: repostData.topics,
+                footerBuilder: (context, footer, footerData) =>
+                    const SizedBox.shrink(),
+                headerBuilder: (context, header, headerData) {
+                  return header.copyWith(menuBuilder: (_) {
+                    return const SizedBox.shrink();
+                  });
+                },
+                style: LMFeedTheme.of(context).postStyle.copyWith(
+                    borderRadius: BorderRadius.circular(8),
+                    padding: const EdgeInsets.all(8),
+                    border: Border.all(
+                      color:
+                          LMFeedTheme.of(context).onContainer.withOpacity(0.1),
+                    )),
+                onPostTap: (context, postData) {},
+              ),
       );
     } else {
       return const SizedBox.shrink();

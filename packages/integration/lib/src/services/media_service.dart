@@ -6,13 +6,21 @@ import 'package:path/path.dart' as path;
 
 import 'package:simple_s3/simple_s3.dart';
 
+/// Flutter flavour/environment manager v0.0.1
+const _prod = !bool.fromEnvironment('DEBUG');
+
 class LMFeedMediaService {
   late final String _bucketName;
   late final String _poolId;
   final _region = AWSRegions.apSouth1;
   final SimpleS3 _s3Client = SimpleS3();
 
-  LMFeedMediaService(bool isProd) {
+  static LMFeedMediaService? _instance;
+
+  static LMFeedMediaService get instance =>
+      _instance ??= LMFeedMediaService._(_prod);
+
+  LMFeedMediaService._(bool isProd) {
     _bucketName = isProd ? CredsProd.bucketName : CredsDev.bucketName;
     _poolId = isProd ? CredsProd.poolId : CredsDev.poolId;
   }

@@ -159,7 +159,7 @@ class LMFeedLinkPreview extends StatelessWidget {
                                 ),
                           ),
                     ),
-                    LikeMindsTheme.kVerticalPaddingXSmall,
+                    LikeMindsTheme.kVerticalPaddingMedium,
                     style.showLinkUrl
                         ? SizedBox(
                             width: style.width ??
