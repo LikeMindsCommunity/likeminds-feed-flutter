@@ -33,15 +33,27 @@ class LMFeedUserTile extends LMFeedTile {
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return LMFeedTile(
-      style: LMFeedTileStyle(
-        backgroundColor: feedTheme.container,
-      ),
+      onTap: onTap,
+      style: style ??
+          LMFeedTileStyle(
+            backgroundColor: feedTheme.container,
+            margin: 12,
+          ),
       leading: LMFeedProfilePicture(
-        style: LMFeedProfilePictureStyle(
+        style: LMFeedProfilePictureStyle.basic().copyWith(
           backgroundColor: feedTheme.primaryColor,
+          size: 42,
+          fallbackTextStyle: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: LikeMindsTheme.kFontMedium,
+              fontWeight: FontWeight.w500,
+              color: feedTheme.onPrimary,
+            ),
+          ),
         ),
         fallbackText: user.name,
         imageUrl: user.imageUrl,
+        onTap: onTap,
       ),
       title: title ??
           LMFeedText(

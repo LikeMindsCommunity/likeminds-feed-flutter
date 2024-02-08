@@ -1027,6 +1027,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             color: feedTheme?.primaryColor,
+            fontSize: 14,
           ),
         ),
       ),
@@ -1062,8 +1063,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                           LMFeedText(
                             text: state.commentMetaData.commentActionType ==
                                     LMFeedCommentActionType.edit
-                                ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'}"
-                                : "Replying to",
+                                ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'} "
+                                : "Replying to ",
                             style: LMFeedTextStyle(
                               textStyle: TextStyle(
                                 fontSize: 14,
@@ -1072,9 +1073,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     LikeMindsTheme.greyColor,
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            width: 8,
                           ),
                           state.commentMetaData.commentActionType ==
                                   LMFeedCommentActionType.edit
@@ -1114,15 +1112,26 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     color: feedTheme?.primaryColor.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(24)),
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                padding: const EdgeInsets.all(6.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 2.0, horizontal: 6.0),
                 child: Row(
                   children: [
                     LMFeedProfilePicture(
                       fallbackText: currentUser.name,
                       imageUrl: currentUser.imageUrl,
-                      style: LMFeedProfilePictureStyle(
+                      style: LMFeedProfilePictureStyle.basic().copyWith(
                         backgroundColor: feedTheme?.primaryColor,
                         size: 36,
+                        fallbackTextStyle: LMFeedProfilePictureStyle.basic()
+                            .fallbackTextStyle
+                            ?.copyWith(
+                              textStyle: LMFeedProfilePictureStyle.basic()
+                                  .fallbackTextStyle
+                                  ?.textStyle
+                                  ?.copyWith(
+                                    fontSize: 14,
+                                  ),
+                            ),
                       ),
                       onTap: () {
                         if (currentUser.sdkClientInfo != null) {
@@ -1131,7 +1140,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         }
                       },
                     ),
-                    const SizedBox(width: 6),
                     Expanded(
                       child: LMTaggingAheadTextField(
                         isDown: false,
@@ -1153,7 +1161,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         scrollPhysics: const AlwaysScrollableScrollPhysics(),
                       ),
                     ),
-                    const SizedBox(width: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: !right
@@ -1184,7 +1191,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       _postDetailScreenHandler!
                                           .commentController.text,
                                       userTags,
-                                    );
+                                    ).trim();
                                     commentText = commentText.trim();
                                     if (commentText.isEmpty) {
                                       toast("Please write something to post");

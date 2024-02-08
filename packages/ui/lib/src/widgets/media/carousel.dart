@@ -129,109 +129,115 @@ class _LMCarouselState extends State<LMFeedCarousel> {
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     style = widget.style ?? feedTheme.mediaStyle.carouselStyle;
     mapAttachmentsToWidget();
-    return Container(
-      width: style!.carouselWidth ?? MediaQuery.of(context).size.width,
-      height: style!.carouselHeight,
-      padding: style!.carouselPadding,
-      margin: style!.carouselMargin,
-      decoration: BoxDecoration(
-        borderRadius: style!.carouselBorderRadius,
-        border: style!.carouselBorder ??
-            Border.all(
-              color: Colors.transparent,
-              width: 0,
+    return GestureDetector(
+      onTap: () => widget.onMediaTap?.call(),
+      child: Container(
+        width: style!.carouselWidth ?? MediaQuery.of(context).size.width,
+        height: style!.carouselHeight,
+        padding: style!.carouselPadding,
+        margin: style!.carouselMargin,
+        decoration: BoxDecoration(
+          borderRadius: style!.carouselBorderRadius,
+          border: style!.carouselBorder ??
+              Border.all(
+                color: Colors.transparent,
+                width: 0,
+              ),
+          boxShadow: style!.carouselShadow,
+        ),
+        child: Column(
+          children: [
+            ClipRRect(
+              clipBehavior: Clip.hardEdge,
+              borderRadius: style!.carouselBorderRadius ?? BorderRadius.zero,
+              child: CarouselSlider.builder(
+                itemCount: mediaWidgets.length,
+                itemBuilder: (context, index, _) => mediaWidgets[index],
+                options: style!.carouselOptions?.copyWith(
+                      onPageChanged: (index, reason) {
+                        currPosition = index;
+                        rebuildCurr.value = !rebuildCurr.value;
+                      },
+                    ) ??
+                    CarouselOptions(
+                      animateToClosest: false,
+                      aspectRatio: 1,
+                      enableInfiniteScroll: false,
+                      enlargeFactor: 0.0,
+                      viewportFraction: 1.0,
+                      onPageChanged: (index, reason) {
+                        currPosition = index;
+                        rebuildCurr.value = !rebuildCurr.value;
+                      },
+                    ),
+              ),
             ),
-        boxShadow: style!.carouselShadow,
-      ),
-      child: Column(
-        children: [
-          ClipRRect(
-            clipBehavior: Clip.hardEdge,
-            borderRadius: style!.carouselBorderRadius ?? BorderRadius.zero,
-            child: CarouselSlider.builder(
-              itemCount: mediaWidgets.length,
-              itemBuilder: (context, index, _) => mediaWidgets[index],
-              options: style!.carouselOptions?.copyWith(
-                    onPageChanged: (index, reason) {
-                      currPosition = index;
-                      rebuildCurr.value = !rebuildCurr.value;
+            (style!.showIndicator ?? true)
+                ? ValueListenableBuilder(
+                    valueListenable: rebuildCurr,
+                    builder: (context, _, __) {
+                      return Column(
+                        children: [
+                          checkIfMultipleAttachments()
+                              ? LikeMindsTheme.kVerticalPaddingMedium
+                              : const SizedBox(),
+                          checkIfMultipleAttachments()
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: widget.attachments.map((url) {
+                                    int index = widget.attachments.indexOf(url);
+                                    return currPosition == index
+                                        ? Container(
+                                            width:
+                                                style!.indicatorWidth ?? 16.0,
+                                            height:
+                                                style!.indicatorHeight ?? 8.0,
+                                            padding: style!.indicatorPadding,
+                                            margin: style!.indicatorMargin ??
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 7.0,
+                                                    horizontal: 2.0),
+                                            decoration: BoxDecoration(
+                                              borderRadius: style!
+                                                      .indicatorBorderRadius ??
+                                                  const BorderRadius.all(
+                                                    Radius.circular(4),
+                                                  ),
+                                              color:
+                                                  style!.activeIndicatorColor ??
+                                                      feedTheme.primaryColor,
+                                            ),
+                                          )
+                                        : Container(
+                                            width: style!.indicatorWidth ?? 8.0,
+                                            height:
+                                                style!.indicatorHeight ?? 8.0,
+                                            padding: style!.indicatorPadding,
+                                            margin: style!.indicatorMargin ??
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 7.0,
+                                                    horizontal: 2.0),
+                                            decoration: BoxDecoration(
+                                              borderRadius: style!
+                                                      .indicatorBorderRadius ??
+                                                  const BorderRadius.all(
+                                                    Radius.circular(4),
+                                                  ),
+                                              color: style!
+                                                      .inActiveIndicatorColor ??
+                                                  feedTheme.inActiveColor,
+                                            ),
+                                          );
+                                  }).toList(),
+                                )
+                              : const SizedBox(),
+                        ],
+                      );
                     },
-                  ) ??
-                  CarouselOptions(
-                    animateToClosest: false,
-                    aspectRatio: 1,
-                    enableInfiniteScroll: false,
-                    enlargeFactor: 0.0,
-                    viewportFraction: 1.0,
-                    onPageChanged: (index, reason) {
-                      currPosition = index;
-                      rebuildCurr.value = !rebuildCurr.value;
-                    },
-                  ),
-            ),
-          ),
-          (style!.showIndicator ?? true)
-              ? ValueListenableBuilder(
-                  valueListenable: rebuildCurr,
-                  builder: (context, _, __) {
-                    return Column(
-                      children: [
-                        checkIfMultipleAttachments()
-                            ? LikeMindsTheme.kVerticalPaddingMedium
-                            : const SizedBox(),
-                        checkIfMultipleAttachments()
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: widget.attachments.map((url) {
-                                  int index = widget.attachments.indexOf(url);
-                                  return currPosition == index
-                                      ? Container(
-                                          width: style!.indicatorWidth ?? 16.0,
-                                          height: style!.indicatorHeight ?? 8.0,
-                                          padding: style!.indicatorPadding,
-                                          margin: style!.indicatorMargin ??
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 7.0,
-                                                  horizontal: 2.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                style!.indicatorBorderRadius ??
-                                                    const BorderRadius.all(
-                                                      Radius.circular(4),
-                                                    ),
-                                            color:
-                                                style!.activeIndicatorColor ??
-                                                    feedTheme.primaryColor,
-                                          ),
-                                        )
-                                      : Container(
-                                          width: style!.indicatorWidth ?? 8.0,
-                                          height: style!.indicatorHeight ?? 8.0,
-                                          padding: style!.indicatorPadding,
-                                          margin: style!.indicatorMargin ??
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 7.0,
-                                                  horizontal: 2.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                style!.indicatorBorderRadius ??
-                                                    const BorderRadius.all(
-                                                      Radius.circular(4),
-                                                    ),
-                                            color:
-                                                style!.inActiveIndicatorColor ??
-                                                    feedTheme.inActiveColor,
-                                          ),
-                                        );
-                                }).toList(),
-                              )
-                            : const SizedBox(),
-                      ],
-                    );
-                  },
-                )
-              : const SizedBox.shrink(),
-        ],
+                  )
+                : const SizedBox.shrink(),
+          ],
+        ),
       ),
     );
   }
