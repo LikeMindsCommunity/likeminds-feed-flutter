@@ -153,8 +153,6 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
           );
         }
         if (state is LMFeedNewPostUploadedState) {
-          debugPrint(
-              'New post uploaded------${state.postData.text}---------------');
           LMPostViewData? item = state.postData;
           int length = _pagingController.itemList?.length ?? 0;
           List<LMPostViewData> feedRoomItemList =
@@ -771,8 +769,8 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
       postViewData.isPinned = !postViewData.isPinned;
       rebuildPostWidget.value = !rebuildPostWidget.value;
       LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
-    }else{
-        String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
+    } else {
+      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 
       LMFeedAnalyticsBloc.instance.add(
         LMFeedFireAnalyticsEvent(

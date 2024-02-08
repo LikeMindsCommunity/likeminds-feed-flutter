@@ -138,16 +138,14 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
                     return const SizedBox.shrink();
                   });
                 },
-                style: LMFeedPostStyle.basic().copyWith(
+                style: LMFeedTheme.of(context).postStyle.copyWith(
                     borderRadius: BorderRadius.circular(8),
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     border: Border.all(
                       color:
                           LMFeedTheme.of(context).onContainer.withOpacity(0.1),
                     )),
-                onPostTap: (context, postData) {
-                  debugPrint('Post tapped');
-                },
+                onPostTap: (context, postData) {},
               ),
       );
     } else {
