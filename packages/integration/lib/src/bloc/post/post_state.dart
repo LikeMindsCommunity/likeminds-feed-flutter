@@ -23,11 +23,13 @@ class LMFeedNewPostUploadedState extends LMFeedPostState {
   final LMPostViewData postData;
   final Map<String, LMUserViewData> userData;
   final Map<String, LMTopicViewData> topics;
+  final Map<String, LMWidgetViewData> widgets;
 
   const LMFeedNewPostUploadedState({
     required this.postData,
     required this.userData,
     required this.topics,
+    required this.widgets,
   });
 }
 
@@ -35,11 +37,13 @@ class LMFeedEditPostUploadedState extends LMFeedPostState {
   final LMPostViewData postData;
   final Map<String, LMUserViewData> userData;
   final Map<String, LMTopicViewData> topics;
+  final Map<String, LMWidgetViewData> widgets;
 
   const LMFeedEditPostUploadedState({
     required this.postData,
     required this.userData,
     required this.topics,
+    required this.widgets,
   });
 }
 

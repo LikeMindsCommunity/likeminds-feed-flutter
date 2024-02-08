@@ -37,15 +37,17 @@ class LMFeedDeletePostEvent extends LMFeedPostEvents {
   final String postId;
   final String reason;
   final int? feedRoomId;
+  final bool isRepost;
 
   LMFeedDeletePostEvent({
     required this.postId,
     required this.reason,
     this.feedRoomId,
+    this.isRepost = false,
   });
 
   @override
-  List<Object> get props => [postId, reason];
+  List<Object> get props => [postId, reason, isRepost];
 }
 
 class LMFeedUpdatePostEvent extends LMFeedPostEvents {
@@ -57,17 +59,4 @@ class LMFeedUpdatePostEvent extends LMFeedPostEvents {
 
   @override
   List<Object> get props => [post, DateTime.now().millisecondsSinceEpoch];
-}
-
-class LMFeedTogglePinPostEvent extends LMFeedPostEvents {
-  final String postId;
-  final bool isPinned;
-
-  LMFeedTogglePinPostEvent({
-    required this.postId,
-    required this.isPinned,
-  });
-
-  @override
-  List<Object> get props => [postId, isPinned];
 }

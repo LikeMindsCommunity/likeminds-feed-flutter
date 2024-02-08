@@ -8,8 +8,6 @@ import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post_something.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/topic_bottom_sheet.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -126,6 +124,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedBloc.instance;
     userPostingRights = checkPostCreationRights();
+
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.feedOpened,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.feedOpened,
+        eventProperties: {
+          'feed_type': 'universal_feed',
+        },
+      ),
+    );
   }
 
   bool checkPostCreationRights() {
@@ -434,7 +442,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   if (state is LMFeedNewPostUploadingState) {
                     return Container(
                       height: 60,
-                      color: LikeMindsTheme.whiteColor,
+                      color: feedThemeData?.backgroundColor ??
+                          LikeMindsTheme.whiteColor,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
@@ -583,7 +592,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             color: Colors.black,
             borderRadius: BorderRadius.circular(6.0),
           ),
-          child: LMFeedPostImage(
+          child: LMFeedImage(
             imageFile: media.mediaFile!,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
@@ -612,7 +621,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       LMFeedThemeData? feedThemeData, LMPostViewData post) {
     return LMFeedPostWidget(
       post: post,
-      topics: _feedBloc.topics,
+      topics: post.topics,
       user: _feedBloc.users[post.userId]!,
       isFeed: false,
       onTagTap: (String userId) {
@@ -673,7 +682,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
     return LMFeedPostTopic(
-      topics: _feedBloc.topics,
+      topics: post.topics,
       post: post,
       style: feedThemeData?.topicStyle,
     );
@@ -692,7 +701,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       commentButton: defCommentButton(post),
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
+      repostButton: defRepostButton(post),
       postFooterStyle: feedThemeData?.footerStyle,
+      showRepostButton: !post.isRepost,
     );
   }
 
@@ -729,12 +740,18 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
+                    String postType =
+                        LMFeedPostUtils.getPostType(postViewData.attachments);
+
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": postViewData.id,
+                          "post_type": postType,
+                          "user_id": postViewData.userId,
+                          "user_state": isCm ? "CM" : "member",
                         },
                       ),
                     );
@@ -743,6 +760,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
+                        isRepost: postViewData.isRepost,
                       ),
                     );
                   },
@@ -913,6 +931,74 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         style: feedThemeData?.footerStyle.shareButtonStyle,
       );
 
+  LMFeedButton defRepostButton(LMPostViewData postViewData) => LMFeedButton(
+        text: LMFeedText(
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: postViewData.isRepostedByUser
+                  ? feedThemeData?.primaryColor
+                  : null,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          text: postViewData.repostCount == 0
+              ? ''
+              : postViewData.repostCount.toString(),
+        ),
+        onTap: right
+            ? () async {
+                if (!postUploading.value) {
+                  LMFeedAnalyticsBloc.instance.add(
+                      const LMFeedFireAnalyticsEvent(
+                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          deprecatedEventName:
+                              LMFeedAnalyticsKeysDep.postCreationStarted,
+                          eventProperties: {}));
+
+                  LMFeedVideoProvider.instance.forcePauseAllControllers();
+                  // ignore: use_build_context_synchronously
+                  LMAttachmentViewData attachmentViewData =
+                      (LMAttachmentViewDataBuilder()
+                            ..attachmentType(8)
+                            ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                                  ..repost(postViewData))
+                                .build()))
+                          .build();
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMFeedComposeScreen(
+                        attachments: [attachmentViewData],
+                      ),
+                    ),
+                  );
+                } else {
+                  toast(
+                    'A post is already uploading.',
+                    duration: Toast.LENGTH_LONG,
+                  );
+                }
+              }
+            : () => toast("You do not have permission to create a post"),
+        style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color: postViewData.isRepostedByUser
+                          ? feedThemeData?.primaryColor
+                          : null),
+            ),
+            activeIcon:
+                feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color: postViewData.isRepostedByUser
+                          ? feedThemeData?.primaryColor
+                          : null),
+            )),
+      );
+
   Widget noPostUnderTopicWidget() => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1066,6 +1152,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
               width: 153,
+              height: 56,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               borderRadius: 28,
               backgroundColor: right
@@ -1116,20 +1203,78 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;
+
+    if (postViewData.isPinned) {
+      int index = postViewData.menuItems
+          .indexWhere((element) => element.id == postUnpinId);
+      if (index != -1) {
+        postViewData.menuItems[index].title = "Unpin This Post";
+        postViewData.menuItems[index].id = postUnpinId;
+      }
+    } else {
+      int index = postViewData.menuItems
+          .indexWhere((element) => element.id == postPinId);
+
+      if (index != -1) {
+        postViewData.menuItems[index]
+          ..title = "Pin This Post"
+          ..id = postPinId;
+      }
+    }
+
     rebuildPostWidget.value = !rebuildPostWidget.value;
 
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
 
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
-
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;
+
+      if (postViewData.isPinned) {
+        int index = postViewData.menuItems
+            .indexWhere((element) => element.id == postUnpinId);
+        if (index != -1) {
+          postViewData.menuItems[index]
+            ..title = "Unpin This Post"
+            ..id = postUnpinId;
+        }
+      } else {
+        int index = postViewData.menuItems
+            .indexWhere((element) => element.id == postPinId);
+
+        if (index != -1) {
+          postViewData.menuItems[index]
+            ..title = "Pin This Post"
+            ..id = postPinId;
+        }
+      }
+
       rebuildPostWidget.value = !rebuildPostWidget.value;
+
       LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    } else {
+      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeys.postPinned
+              : LMFeedAnalyticsKeys.postUnpinned,
+          deprecatedEventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeysDep.postPinned
+              : LMFeedAnalyticsKeysDep.postUnpinned,
+          eventProperties: {
+            'created_by_id': postViewData.userId,
+            'post_id': postViewData.id,
+            'post_type': postType,
+          },
+        ),
+      );
     }
   }
 }

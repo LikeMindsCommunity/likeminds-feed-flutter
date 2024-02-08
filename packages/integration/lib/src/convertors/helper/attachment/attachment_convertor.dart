@@ -6,14 +6,17 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 class LMAttachmentViewDataConvertor {
   static LMAttachmentViewData fromAttachment({
     required Attachment attachment,
+    LMPostViewData? repost,
   }) {
     LMAttachmentViewDataBuilder attachmentViewDataBuilder =
         LMAttachmentViewDataBuilder();
 
     attachmentViewDataBuilder.attachmentType(attachment.attachmentType);
-    attachmentViewDataBuilder.attachmentMeta(
-        LMAttachmentMetaViewDataConvertor.attachmentMeta(
-            attachmentMeta: attachment.attachmentMeta));
+    attachmentViewDataBuilder
+        .attachmentMeta(LMAttachmentMetaViewDataConvertor.attachmentMeta(
+      attachmentMeta: attachment.attachmentMeta,
+      repost: repost,
+    ));
 
     return attachmentViewDataBuilder.build();
   }

@@ -13,7 +13,7 @@ class LMPostViewData {
   String text;
 
   /// topics of the post [nullable]
-  List<String> topics;
+  List<LMTopicViewData> topics;
 
   /// attachments of the post [nullable]
   /// can be of type image, video, file
@@ -26,6 +26,9 @@ class LMPostViewData {
 
   /// user id of the user who created the post
   final String userId;
+
+  /// user dat of the user who created the post
+  final LMUserViewData? user;
 
   int likeCount;
 
@@ -46,6 +49,9 @@ class LMPostViewData {
   int repostCount;
   bool? isDeleted;
 
+  /// widget map to hold custom widget data
+  Map<String, LMWidgetViewData>? widgets;
+
   /// {@macro post_view_data}
   LMPostViewData._({
     required this.id,
@@ -54,6 +60,7 @@ class LMPostViewData {
     required this.communityId,
     required this.isPinned,
     required this.userId,
+    this.user,
     required this.likeCount,
     required this.isSaved,
     required this.topics,
@@ -68,17 +75,19 @@ class LMPostViewData {
     required this.isRepostedByUser,
     required this.repostCount,
     this.isDeleted = false,
+    this.widgets,
   });
 }
 
 class LMPostViewDataBuilder {
   String? _id;
   String? _text;
-  List<String>? _topics;
+  List<LMTopicViewData>? _topics;
   List<LMAttachmentViewData>? _attachments;
   int? _communityId;
   bool? _isPinned;
   String? _userId;
+  LMUserViewData? _user;
   int? _likeCount;
   int? _commentCount;
   bool? _isSaved;
@@ -92,6 +101,7 @@ class LMPostViewDataBuilder {
   bool? _isRepostedByUser;
   int? _repostCount;
   bool? _isDeleted;
+  Map<String, LMWidgetViewData>? _widgets;
 
   void id(String id) {
     _id = id;
@@ -101,7 +111,7 @@ class LMPostViewDataBuilder {
     _text = text;
   }
 
-  void topics(List<String> topics) {
+  void topics(List<LMTopicViewData>? topics) {
     _topics = topics;
   }
 
@@ -119,6 +129,10 @@ class LMPostViewDataBuilder {
 
   void userId(String userId) {
     _userId = userId;
+  }
+
+  void user(LMUserViewData user) {
+    _user = user;
   }
 
   void likeCount(int likeCount) {
@@ -173,6 +187,10 @@ class LMPostViewDataBuilder {
     _isDeleted = isDeleted;
   }
 
+  void widgets(Map<String, LMWidgetViewData> widgets) {
+    _widgets = widgets;
+  }
+
   LMPostViewData build() {
     return LMPostViewData._(
       id: _id!,
@@ -182,6 +200,7 @@ class LMPostViewDataBuilder {
       communityId: _communityId!,
       isPinned: _isPinned!,
       userId: _userId!,
+      user: _user,
       likeCount: _likeCount!,
       commentCount: _commentCount!,
       isSaved: _isSaved!,
@@ -195,6 +214,7 @@ class LMPostViewDataBuilder {
       isRepost: _isReposted!,
       isRepostedByUser: _isRepostedByUser!,
       repostCount: _repostCount!,
+      widgets: _widgets,
     );
   }
 }

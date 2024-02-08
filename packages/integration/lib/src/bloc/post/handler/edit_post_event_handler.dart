@@ -19,7 +19,13 @@ void editPostEventHandler(
     if (response.success) {
       emit(
         LMFeedEditPostUploadedState(
-          postData: LMPostViewDataConvertor.fromPost(post: response.post!),
+          postData: LMPostViewDataConvertor.fromPost(
+            post: response.post!,
+            widgets: response.widgets ?? {},
+            repostedPosts: response.repostedPosts ?? {},
+            users: response.user ?? {}, 
+            topics: response.topics ?? {},
+          ),
           userData: (response.user ?? <String, User>{}).map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
           topics: (response.topics ?? <String, Topic>{}).map(
@@ -28,6 +34,9 @@ void editPostEventHandler(
               LMTopicViewDataConvertor.fromTopic(value),
             ),
           ),
+          widgets: (response.widgets ?? <String, WidgetModel>{}).map((key,
+                  value) =>
+              MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value))),
         ),
       );
     } else {

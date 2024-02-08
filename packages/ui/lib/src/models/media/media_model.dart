@@ -15,6 +15,8 @@ class LMMediaModel {
   int? size; // required for documents
   LMOgTagsViewData? ogTags; // required for links (attachment type 4)
   Map<String, dynamic>? widgetsMeta; //required for widgets (attachment type 5)
+  String? postId; // required for repost (attachment type 8)
+  LMPostViewData? post; // required for repost (attachment type 8)
 
   LMMediaModel({
     required this.mediaType,
@@ -25,6 +27,8 @@ class LMMediaModel {
     this.size,
     this.ogTags,
     this.widgetsMeta,
+    this.postId,
+    this.post,
   });
 
   // convert
@@ -38,7 +42,7 @@ class LMMediaModel {
     } else if (mediaType == LMMediaType.link) {
       return 4;
     } else if (mediaType == LMMediaType.widget) {
-      return 5;
+      return 8;
     } else {
       throw 'no valid media type provided';
     }
@@ -54,7 +58,7 @@ LMMediaType mapIntToMediaType(int attachmentType) {
     return LMMediaType.document;
   } else if (attachmentType == 4) {
     return LMMediaType.link;
-  } else if (attachmentType == 5) {
+  } else if (attachmentType == 8) {
     return LMMediaType.widget;
   } else {
     return LMMediaType.none;

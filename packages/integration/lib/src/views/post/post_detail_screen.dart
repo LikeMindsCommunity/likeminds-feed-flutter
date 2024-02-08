@@ -75,6 +75,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   bool replyShown = false;
   LMFeedThemeData? feedTheme;
 
+  bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
+
   bool right = true;
   List<LMUserTagViewData> userTags = [];
 
@@ -96,6 +98,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     if (widget.openKeyboard) {
       _postDetailScreenHandler!.openOnScreenKeyboard();
     }
+
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.commentListOpen,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.commentListOpen,
+        eventProperties: {
+          'postId': widget.postId,
+        },
+      ),
+    );
   }
 
   @override
@@ -315,6 +327,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
           LMCommentMetaDataBuilder commentMetaDataBuilder =
               LMCommentMetaDataBuilder()
+                ..postId(_postDetailScreenHandler!.postData!.id)
                 ..commentActionType(LMFeedCommentActionType.edit)
                 ..commentText(LMFeedTaggingHelper.convertRouteToTag(
                     commentViewData.text));
@@ -349,17 +362,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               action: (String reason) async {
                 Navigator.of(childContext).pop();
 
-                LMFeedAnalyticsBloc.instance.add(
-                  LMFeedFireAnalyticsEvent(
-                    eventName: LMFeedAnalyticsKeys.commentDeleted,
-                    deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
-                    eventProperties: {
-                      "post_id": widget.postId,
-                      "comment_id": commentViewData.id,
-                    },
-                  ),
-                );
-
                 DeleteCommentRequest deleteCommentRequest =
                     (DeleteCommentRequestBuilder()
                           ..postId(widget.postId)
@@ -370,6 +372,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
                 LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
                       ..commentActionEntity(LMFeedCommentType.parent)
+                      ..postId(_postDetailScreenHandler!.postData!.id)
                       ..commentActionType(LMFeedCommentActionType.delete)
                       ..level(0)
                       ..commentId(commentViewData.id))
@@ -445,7 +448,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   LMFeedPostFooter defPostFooter() {
-    return LMFeedPostFooter();
+    return LMFeedPostFooter(
+      showRepostButton: !_postDetailScreenHandler!.postData!.isRepost,
+    );
   }
 
   LMFeedPostWidget defPostWidget() {
@@ -453,7 +458,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       post: _postDetailScreenHandler!.postData!,
       user: _postDetailScreenHandler!
           .users[_postDetailScreenHandler!.postData!.userId]!,
-      topics: _postDetailScreenHandler!.topics,
+      topics: _postDetailScreenHandler!.postData!.topics,
       onMediaTap: () {
         Navigator.push(
           context,
@@ -492,7 +497,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedPostTopic _defTopicWidget() {
     return LMFeedPostTopic(
-      topics: _postDetailScreenHandler!.topics,
+      topics: _postDetailScreenHandler!.postData!.topics,
       post: _postDetailScreenHandler!.postData!,
       style: feedTheme?.topicStyle,
     );
@@ -518,7 +523,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       commentButton: defCommentButton(),
       shareButton: defShareButton(),
       saveButton: defSaveButton(),
+      repostButton: defRepostButton(),
       postFooterStyle: feedTheme?.footerStyle,
+      showRepostButton: !_postDetailScreenHandler!.postData!.isRepost,
     );
   }
 
@@ -561,12 +568,18 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
+                    String postType = LMFeedPostUtils.getPostType(
+                        _postDetailScreenHandler!.postData!.attachments);
+
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": _postDetailScreenHandler!.postData!.id,
+                          "post_type": postType,
+                          "user_id": _postDetailScreenHandler!.postData!.userId,
+                          "user_state": isCm ? "CM" : "member",
                         },
                       ),
                     );
@@ -575,6 +588,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       LMFeedDeletePostEvent(
                         postId: _postDetailScreenHandler!.postData!.id,
                         reason: reason,
+                        isRepost: _postDetailScreenHandler!.postData!.isRepost,
                       ),
                     );
                     Navigator.of(context).pop();
@@ -716,6 +730,76 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               .sharePost(_postDetailScreenHandler!.postData!.id);
         },
         style: feedTheme?.footerStyle.shareButtonStyle,
+      );
+  LMFeedButton defRepostButton() => LMFeedButton(
+        text: LMFeedText(
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: _postDetailScreenHandler!.postData!.isRepostedByUser
+                  ? feedTheme?.primaryColor
+                  : null,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          text: _postDetailScreenHandler!.postData!.repostCount == 0
+              ? ''
+              : _postDetailScreenHandler!.postData!.repostCount.toString(),
+        ),
+        onTap: right
+            ? () async {
+                if (LMFeedPostBloc.instance.state
+                    is! LMFeedEditPostUploadingState) {
+                  LMFeedAnalyticsBloc.instance.add(
+                      const LMFeedFireAnalyticsEvent(
+                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          deprecatedEventName:
+                              LMFeedAnalyticsKeysDep.postCreationStarted,
+                          eventProperties: {}));
+
+                  LMFeedVideoProvider.instance.forcePauseAllControllers();
+                  // ignore: use_build_context_synchronously
+                  LMAttachmentViewData attachmentViewData =
+                      (LMAttachmentViewDataBuilder()
+                            ..attachmentType(8)
+                            ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                                  ..repost(_postDetailScreenHandler!.postData!))
+                                .build()))
+                          .build();
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMFeedComposeScreen(
+                        attachments: [attachmentViewData],
+                      ),
+                    ),
+                  );
+                } else {
+                  toast(
+                    'A post is already uploading.',
+                    duration: Toast.LENGTH_LONG,
+                  );
+                }
+              }
+            : () => toast("You do not have permission to create a post"),
+        style: feedTheme?.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color:
+                          _postDetailScreenHandler!.postData!.isRepostedByUser
+                              ? feedTheme?.primaryColor
+                              : null),
+            ),
+            activeIcon:
+                feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color:
+                          _postDetailScreenHandler!.postData!.isRepostedByUser
+                              ? feedTheme?.primaryColor
+                              : null),
+            )),
       );
 
   LMFeedCommentWidget defCommentTile(
@@ -884,6 +968,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       onTap: () {
         LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
               ..commentActionEntity(LMFeedCommentType.parent)
+              ..postId(widget.postId)
               ..commentActionType(LMFeedCommentActionType.replying)
               ..level(0)
               ..user(_postDetailScreenHandler!.users[commentViewData.userId]!)
@@ -955,7 +1040,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         bloc: _postDetailScreenHandler!.commentHandlerBloc,
         builder: (context, state) => Container(
           decoration: BoxDecoration(
-            color: LikeMindsTheme.whiteColor,
+            color: feedTheme?.container ?? LikeMindsTheme.whiteColor,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -979,11 +1064,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     LMFeedCommentActionType.edit
                                 ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'}"
                                 : "Replying to",
-                            style: const LMFeedTextStyle(
+                            style: LMFeedTextStyle(
                               textStyle: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: LikeMindsTheme.greyColor,
+                                color: feedTheme?.onContainer ??
+                                    LikeMindsTheme.greyColor,
                               ),
                             ),
                           ),
@@ -1165,6 +1251,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                   ..commentActionEntity(
                                                       LMFeedCommentType.reply)
                                                   ..level(0)
+                                                  ..postId(widget.postId)
                                                   ..commentId(state
                                                       .commentMetaData
                                                       .commentId!)
@@ -1195,6 +1282,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                 ..commentActionEntity(
                                                     LMFeedCommentType.parent)
                                                 ..level(0)
+                                                ..postId(widget.postId)
                                                 ..commentActionType(
                                                     LMFeedCommentActionType
                                                         .add))
@@ -1242,19 +1330,39 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           ..postId(_postDetailScreenHandler!.postData!.id))
         .build();
 
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
     LMFeedPostBloc.instance
         .add(LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+
+    final PinPostResponse response =
+        await LMFeedCore.client.pinPost(pinPostRequest);
 
     if (!response.success) {
       _postDetailScreenHandler!.postData!.isPinned =
           !_postDetailScreenHandler!.postData!.isPinned;
       _postDetailScreenHandler!.rebuildPostWidget.value =
           !_postDetailScreenHandler!.rebuildPostWidget.value;
+
       LMFeedPostBloc.instance.add(
           LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+    } else {
+      String postType = LMFeedPostUtils.getPostType(
+          _postDetailScreenHandler!.postData!.attachments);
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: _postDetailScreenHandler!.postData!.isPinned
+              ? LMFeedAnalyticsKeys.postPinned
+              : LMFeedAnalyticsKeys.postUnpinned,
+          deprecatedEventName: _postDetailScreenHandler!.postData!.isPinned
+              ? LMFeedAnalyticsKeysDep.postPinned
+              : LMFeedAnalyticsKeysDep.postUnpinned,
+          eventProperties: {
+            'created_by_id': _postDetailScreenHandler!.postData!.userId,
+            'post_id': _postDetailScreenHandler!.postData!.id,
+            'post_type': postType,
+          },
+        ),
+      );
     }
   }
 }

@@ -181,9 +181,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         keepSuggestionsOnLoading: false,
         itemBuilder: (context, opt) {
           return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
+            decoration: BoxDecoration(
+              color: feedTheme.container,
+              border: const Border(
                 bottom: BorderSide(
                   color: LikeMindsTheme.greyColor,
                   width: 0.5,
@@ -244,15 +244,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
             );
             tagValue = '';
             textValue = _controller.value.text;
-
-            LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.userTaggedInPost,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.userTaggedInPost,
-              eventProperties: {
-                'tagged_user_id': suggestion.sdkClientInfo?.userUniqueId,
-                'tagged_user_count': tagCount,
-              },
-            ));
           });
         }),
       ),

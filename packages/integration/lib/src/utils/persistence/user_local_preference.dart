@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,7 +40,7 @@ class LMFeedUserLocalPreference {
   }
 
   bool fetchMemberState() {
-    return _sharedPreferences!.getBool(_memberStateKey)!;
+    return _sharedPreferences!.getBool(_memberStateKey) ?? true;
   }
 
   Future<void> storeMemberRights(MemberStateResponse response) async {

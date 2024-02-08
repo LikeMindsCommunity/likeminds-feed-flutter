@@ -6,6 +6,7 @@ void newPostEventHandler(
     List<LMMediaModel>? postMedia = event.postMedia;
     List<Attachment> attachments = [];
     int index = 0;
+    bool? isRepost;
 
     StreamController<double> progress = StreamController<double>.broadcast();
     progress.add(0);
@@ -23,7 +24,18 @@ void newPostEventHandler(
         ),
       );
       for (final media in postMedia) {
-        if (media.mediaType == LMMediaType.link) {
+        if (media.mediaType == LMMediaType.repost) {
+          attachments.add(
+            Attachment(
+              attachmentType: 8,
+              attachmentMeta: AttachmentMeta(
+                entityId: media.postId,
+              ),
+            ),
+          );
+          isRepost = true;
+          break;
+        } else if (media.mediaType == LMMediaType.link) {
           attachments.add(
             Attachment(
               attachmentType: 4,
@@ -35,6 +47,15 @@ void newPostEventHandler(
                     title: media.ogTags!.title,
                     url: media.ogTags!.url,
                   )),
+            ),
+          );
+        } else if (media.mediaType == LMMediaType.widget) {
+          attachments.add(
+            Attachment(
+              attachmentType: 5,
+              attachmentMeta: AttachmentMeta(
+                meta: media.widgetsMeta,
+              ),
             ),
           );
         } else {
@@ -75,28 +96,41 @@ void newPostEventHandler(
     List<Topic> postTopics = event.selectedTopics
         .map((e) => LMTopicViewDataConvertor.toTopic(e))
         .toList();
-    final AddPostRequest request = (AddPostRequestBuilder()
-          ..text(event.postText)
-          ..attachments(attachments)
-          ..topics(postTopics))
-        .build();
+    final requestBuilder = AddPostRequestBuilder()
+      ..text(event.postText)
+      ..attachments(attachments)
+      ..topics(postTopics);
 
+    if (isRepost != null) {
+      requestBuilder.isRepost(isRepost);
+    }
     final AddPostResponse response =
-        await LMFeedCore.instance.lmFeedClient.addPost(request);
+        await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
 
     if (response.success) {
       emit(
         LMFeedNewPostUploadedState(
-          postData: LMPostViewDataConvertor.fromPost(post: response.post!),
-          userData: (response.user ?? <String, User>{}).map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
-          topics: (response.topics ?? <String, Topic>{}).map(
-            (key, value) => MapEntry(
-              key,
-              LMTopicViewDataConvertor.fromTopic(value),
+            postData: LMPostViewDataConvertor.fromPost(
+              post: response.post!,
+              widgets: response.widgets ?? {},
+              repostedPosts: response.repostedPosts ?? {},
+              users: response.user ?? {},
+              topics: response.topics ?? {},
             ),
-          ),
-        ),
+            userData: (response.user ?? <String, User>{}).map((key, value) =>
+                MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
+            topics: (response.topics ?? <String, Topic>{}).map(
+              (key, value) => MapEntry(
+                key,
+                LMTopicViewDataConvertor.fromTopic(value),
+              ),
+            ),
+            widgets: (response.widgets ?? <String, WidgetModel>{}).map(
+              (key, value) => MapEntry(
+                key,
+                LMWidgetViewDataConvertor.fromWidgetModel(value),
+              ),
+            )),
       );
     } else {
       emit(LMFeedNewPostErrorState(message: response.errorMessage!));

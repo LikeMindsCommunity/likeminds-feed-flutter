@@ -19,3 +19,5 @@ const String lmPinSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/pin.svg";
 const String kAssetNoPostsIcon =
     "packages/likeminds_feed_flutter_ui/assets/icons/mistery-box.svg";
+const String lmRepostSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/repost.svg";

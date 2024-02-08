@@ -1,6 +1,6 @@
 class LMPopUpMenuItemViewData {
-  final String title;
-  final int id;
+  String title;
+  int id;
 
   LMPopUpMenuItemViewData._({
     required this.title,

@@ -23,6 +23,7 @@ class LMFeedActivityWidget extends StatefulWidget {
 
 class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
   late Future<GetUserActivityResponse> _activityResponse;
+  Map<String, WidgetModel>? widgets;
 
   @override
   void initState() {
@@ -75,7 +76,11 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                                   activityResponse.activities![index];
                               final LMPostViewData postData =
                                   LMFeedPostUtils.postViewDataFromActivity(
-                                      activity);
+                                activity,
+                                activityResponse.widgets,
+                                activityResponse.users,
+                                activityResponse.topics,
+                              );
                               late final VideoPlayerController controller;
                               late final Future<void> futureValue;
                               if (postData.attachments!.isNotEmpty &&
@@ -172,7 +177,7 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                                           ? ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(4),
-                                              child: LMFeedPostImage(
+                                              child: LMFeedImage(
                                                 imageUrl: postData
                                                     .attachments![0]
                                                     .attachmentMeta

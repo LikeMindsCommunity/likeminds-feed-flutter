@@ -3,8 +3,10 @@ import 'package:likeminds_feed_flutter_core/src/convertors/helper/og_tag_convert
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMAttachmentMetaViewDataConvertor {
-  static LMAttachmentMetaViewData attachmentMeta(
-      {required AttachmentMeta attachmentMeta}) {
+  static LMAttachmentMetaViewData attachmentMeta({
+    required AttachmentMeta attachmentMeta,
+    required LMPostViewData? repost,
+  }) {
     LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
         LMAttachmentMetaViewDataBuilder();
     if (attachmentMeta.url != null) {
@@ -39,6 +41,9 @@ class LMAttachmentMetaViewDataConvertor {
     }
     if (attachmentMeta.meta != null) {
       attachmentMetaViewDataBuilder.meta(attachmentMeta.meta!);
+    }
+    if (repost != null) {
+      attachmentMetaViewDataBuilder.repost(repost);
     }
 
     return attachmentMetaViewDataBuilder.build();
