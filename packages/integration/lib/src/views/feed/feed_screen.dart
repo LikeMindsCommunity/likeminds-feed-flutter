@@ -1152,7 +1152,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
               ),
               width: 153,
-              height: 56,
+              height: 44,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
               borderRadius: 28,
               backgroundColor: right
@@ -1167,6 +1167,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 textStyle: TextStyle(
                   color: feedThemeData?.onPrimary,
                   fontWeight: FontWeight.w500,
+                  fontSize: 14,
                 ),
               ),
             ),
