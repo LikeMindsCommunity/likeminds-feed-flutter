@@ -656,11 +656,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               ),
             ),
           ),
-          const SizedBox(width: 18),
+          const SizedBox(width: 12),
           Column(
             children: [
               Container(
-                width: MediaQuery.of(context).size.width - 84,
+                width: MediaQuery.of(context).size.width - 82,
                 decoration: BoxDecoration(
                   color: theme.container,
                 ),
