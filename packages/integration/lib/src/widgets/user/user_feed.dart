@@ -771,6 +771,24 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
       postViewData.isPinned = !postViewData.isPinned;
       rebuildPostWidget.value = !rebuildPostWidget.value;
       LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    }else{
+        String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeys.postPinned
+              : LMFeedAnalyticsKeys.postUnpinned,
+          deprecatedEventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeysDep.postPinned
+              : LMFeedAnalyticsKeysDep.postUnpinned,
+          eventProperties: {
+            'created_by_id': postViewData.userId,
+            'post_id': postViewData.id,
+            'post_type': postType,
+          },
+        ),
+      );
     }
   }
 }
