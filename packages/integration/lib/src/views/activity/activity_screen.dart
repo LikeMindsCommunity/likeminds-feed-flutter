@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -30,13 +31,12 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
 
-  LMFeedThemeData? feedTheme;
+  bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
 
-  late final LMFeedCommentHandlerBloc _commentHandlerBloc;
+  LMFeedThemeData? feedTheme;
 
   @override
   void initState() {
-    _commentHandlerBloc = LMFeedCommentHandlerBloc.instance;
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });
@@ -346,26 +346,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             LMFeedMenuAction.postEditId
           },
           action: LMFeedMenuAction(
-            onPostPin: () async {
-              postViewData.isPinned = !postViewData.isPinned;
-              // rebuildPostWidget.value = !rebuildPostWidget.value;
-
-              final pinPostRequest =
-                  (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-              final PinPostResponse response =
-                  await LMFeedCore.client.pinPost(pinPostRequest);
-
-              LMFeedPostBloc.instance
-                  .add(LMFeedUpdatePostEvent(post: postViewData));
-
-              if (!response.success) {
-                postViewData.isPinned = !postViewData.isPinned;
-                // rebuildPostWidget.value = !rebuildPostWidget.value;
-                LMFeedPostBloc.instance
-                    .add(LMFeedUpdatePostEvent(post: postViewData));
-              }
-            },
+            onPostPin: () => handlePostPinAction(postViewData),
+            onPostUnpin: () => handlePostPinAction(postViewData),
             onPostDelete: () {
               showDialog(
                 context: context,
@@ -377,12 +359,18 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
+                    String postType =
+                        LMFeedPostUtils.getPostType(postViewData.attachments);
+
                     LMFeedAnalyticsBloc.instance.add(
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                         eventProperties: {
                           "post_id": postViewData.id,
+                          "post_type": postType,
+                          "user_id": postViewData.userId,
+                          "user_state": isCm ? "CM" : "member",
                         },
                       ),
                     );
@@ -526,6 +514,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       LMCommentViewData commentViewData,
       LMPostViewData postViewData,
       LMUserViewData userViewData) {
+    commentViewData.menuItems = [];
     return LMFeedCommentWidget(
       user: userViewData,
       comment: commentViewData,
@@ -680,6 +669,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
           LMCommentMetaDataBuilder commentMetaDataBuilder =
               LMCommentMetaDataBuilder()
+                ..postId(postViewData.id)
                 ..commentActionType(LMFeedCommentActionType.edit)
                 ..commentText(LMFeedTaggingHelper.convertRouteToTag(
                     commentViewData.text));
@@ -729,6 +719,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
                 LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
                       ..commentActionEntity(LMFeedCommentType.parent)
+                      ..postId(postViewData.id)
                       ..commentActionType(LMFeedCommentActionType.delete)
                       ..level(0)
                       ..commentId(commentViewData.id))
@@ -759,5 +750,41 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     );
 
     await videoController?.player.play();
+  }
+
+  void handlePostPinAction(LMPostViewData postViewData) async {
+    postViewData.isPinned = !postViewData.isPinned;
+
+    final pinPostRequest =
+        (PinPostRequestBuilder()..postId(postViewData.id)).build();
+
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+
+    final PinPostResponse response =
+        await LMFeedCore.client.pinPost(pinPostRequest);
+
+    if (!response.success) {
+      postViewData.isPinned = !postViewData.isPinned;
+
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    } else {
+      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeys.postPinned
+              : LMFeedAnalyticsKeys.postUnpinned,
+          deprecatedEventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeysDep.postPinned
+              : LMFeedAnalyticsKeysDep.postUnpinned,
+          eventProperties: {
+            'created_by_id': postViewData.userId,
+            'post_id': postViewData.id,
+            'post_type': postType,
+          },
+        ),
+      );
+    }
   }
 }

@@ -5,7 +5,8 @@ import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 // This widget is used to display a topic feed bar
 // A [LMFeedTopicFeedBar] displays a list of selected topics
-// The [LMFeedTopicFeedBar] can be customized by passing in the required parameters
+// The [LMFeedTopicFeedBar] can be customized by 
+// passing in the required parameters
 class LMFeedTopicFeedBar extends StatelessWidget {
   // Required parameters
   // List of selected topic [pass empty list if no topic is selected]

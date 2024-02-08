@@ -1,7 +1,7 @@
 part of 'compose_bloc.dart';
 
 @immutable
-sealed class LMFeedComposeEvent extends Equatable {
+class LMFeedComposeEvent extends Equatable {
   const LMFeedComposeEvent();
 
   @override

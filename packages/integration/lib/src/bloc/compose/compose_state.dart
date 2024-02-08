@@ -1,9 +1,14 @@
 part of 'compose_bloc.dart';
 
 @immutable
-sealed class LMFeedComposeState extends Equatable {}
+class LMFeedComposeState extends Equatable {
+  const LMFeedComposeState();
 
-final class LMFeedComposeInitialState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [];
+}
+
+class LMFeedComposeInitialState extends LMFeedComposeState {
   @override
   List<Object> get props => [];
 }

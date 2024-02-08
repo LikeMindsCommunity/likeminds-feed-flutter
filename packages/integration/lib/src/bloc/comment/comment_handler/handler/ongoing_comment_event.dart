@@ -5,6 +5,7 @@ part of '../comment_handler_bloc.dart';
 /// i.e. A user is editing a comment/reply
 /// [LMFeedCommentOngoingEvent] is used to send the request to the handler
 /// or replying to a existing comment
+/// {@endtemplate}
 void handleOngoingCommentEvent(LMFeedCommentOngoingEvent event,
         Emitter<LMFeedCommentHandlerState> emit) =>
     emit(

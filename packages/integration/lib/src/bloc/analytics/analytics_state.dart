@@ -2,6 +2,7 @@ part of 'analytics_bloc.dart';
 
 /// {@template lm_fire_analytic_state}
 /// LMFeedAnalyticsState defines the states which are emitted by LMFeedAnalyticsBloc.
+/// {@endtemplate}
 abstract class LMFeedAnalyticsState extends Equatable {
   const LMFeedAnalyticsState();
 
@@ -25,7 +26,8 @@ class LMFeedAnalyticsEventFired extends LMFeedAnalyticsState {
   final String eventName;
   // Properties of the event fired
   // i.e. likes count, post id, etc.
-  @deprecated
+  @Deprecated(
+      "Previous version of event name have been deprecated, consider migrating to new event name.")
   final String deprecatedEventName;
   final Map<String, dynamic> eventProperties;
 

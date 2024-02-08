@@ -1,9 +1,10 @@
 name: likeminds_feed_flutter
-version: 1.0.1
+version: 1.0.2
 description: Monorepo workspace for managing LikeMinds Feed Flutter packages
 homepage: https://likeminds.community
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 dev_dependencies:
   melos: ^3.0.1

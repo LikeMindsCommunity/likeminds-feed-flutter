@@ -9,6 +9,7 @@ part of 'feed_screen.dart';
 /// screen with a list of topics
 /// defaults to [LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet]
 /// if not provided
+/// {@endtemplate}
 enum LMFeedTopicSelectionWidgetType {
   showTopicSelectionBottomSheet,
   showTopicSelectionScreen,
@@ -23,6 +24,7 @@ enum LMFeedTopicSelectionWidgetType {
 /// to enable/disable multiple topic selection
 /// to select the type of topic selection widget
 /// to be shown
+/// {@endtemplate}
 class LMFeedScreenConfig {
   const LMFeedScreenConfig({
     this.composeSystemOverlayStyle = SystemUiOverlayStyle.dark,

@@ -90,7 +90,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         child: getPostDocuments(),
       );
     } else if (attachments!.first.attachmentType == 4) {
-      return LMFeedPostLinkPreview(
+      return LMFeedLinkPreview(
         attachment: attachments![0],
         title: widget.title,
         subtitle: widget.subtitle,
