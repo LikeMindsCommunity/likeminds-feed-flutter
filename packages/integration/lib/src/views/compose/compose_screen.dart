@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/lists/topic_list.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -95,6 +95,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       LMFeedVideoProvider.instance.clearPostController(
           composeBloc.postMedia.first.mediaFile?.uri.toString() ?? '');
     }
+    composeBloc.add(LMFeedComposeCloseEvent());
     super.dispose();
   }
 
@@ -202,11 +203,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   _showDefaultDiscardDialog(BuildContext context) {
-    showAdaptiveDialog(
+    showDialog(
       context: context,
       builder: (dialogContext) => DefaultTextStyle(
         style: const TextStyle(),
-        child: AlertDialog.adaptive(
+        child: AlertDialog(
           backgroundColor: feedTheme?.container,
           title: const Text('Discard Post'),
           content:
@@ -230,7 +231,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   ),
                   style: const LMFeedButtonStyle(height: 42),
                   onTap: () {
-                    LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
                     Navigator.of(dialogContext).pop();
                   },
                 ),
@@ -248,9 +248,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   ),
                   style: const LMFeedButtonStyle(height: 42),
                   onTap: () {
-                    composeBloc.postMedia.clear();
-                    composeBloc.selectedTopics.clear();
-                    composeBloc.userTags.clear();
+                    LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
 
                     Navigator.of(dialogContext).pop();
                     Navigator.of(context).pop();
@@ -368,7 +366,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           screenSize?.width,
                       width: style?.mediaStyle?.imageStyle?.width ??
                           screenSize?.width,
-                      child: LMFeedPostImage(
+                      child: LMFeedImage(
                         imageFile: composeBloc.postMedia[index].mediaFile,
                         style: style?.mediaStyle?.imageStyle,
                       ),
@@ -386,7 +384,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         borderRadius:
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),
-                      child: LMFeedPostVideo(
+                      child: LMFeedVideo(
                         videoFile: composeBloc.postMedia[index].mediaFile,
                         style: style?.mediaStyle?.videoStyle,
                         postId: composeBloc.postMedia[index].mediaFile!.uri
@@ -395,7 +393,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     );
                     break;
                   case LMMediaType.link:
-                    mediaWidget = LMFeedPostLinkPreview(
+                    mediaWidget = LMFeedLinkPreview(
                       linkModel: composeBloc.postMedia[index],
                       style: style?.mediaStyle?.linkStyle?.copyWith(
                             width: style?.mediaStyle?.linkStyle?.width ??
@@ -584,9 +582,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               String postText = _controller.text;
               postText = postText.trim();
               if (postText.isNotEmpty || composeBloc.postMedia.isNotEmpty) {
-                List<LMUserTagViewData> userTags = composeBloc.userTags;
+                List<LMUserTagViewData> userTags = [...composeBloc.userTags];
                 List<LMTopicViewData> selectedTopics =
-                    composeBloc.selectedTopics;
+                    [...composeBloc.selectedTopics];
 
                 if (config!.topicRequiredToCreatePost &&
                     selectedTopics.isEmpty &&
@@ -604,7 +602,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     _controller.text, userTags);
 
                 sendPostCreationCompletedEvent(
-                    composeBloc.postMedia, userTags, selectedTopics);
+                   [...composeBloc.postMedia], userTags, selectedTopics);
                 if (widget.attachments != null &&
                     widget.attachments!.isNotEmpty &&
                     widget.attachments!.first.attachmentType == 5) {
@@ -620,7 +618,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   user: user,
                   postText: result!,
                   selectedTopics: selectedTopics,
-                  postMedia: composeBloc.postMedia,
+                  postMedia: [...composeBloc.postMedia],
                 ));
 
                 Navigator.pop(context);
@@ -681,6 +679,19 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   ),
                   onTagSelected: (tag) {
                     composeBloc.userTags.add(tag);
+                    LMFeedAnalyticsBloc.instance.add(
+                      LMFeedFireAnalyticsEvent(
+                        eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+                        deprecatedEventName:
+                            LMFeedAnalyticsKeysDep.userTaggedInPost,
+                        eventProperties: {
+                          'tagged_user_id': tag.sdkClientInfo?.userUniqueId ??
+                              tag.userUniqueId,
+                          'tagged_user_count':
+                              composeBloc.userTags.length.toString(),
+                        },
+                      ),
+                    );
                   },
                   controller: _controller,
 

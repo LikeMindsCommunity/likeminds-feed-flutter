@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
-class LMFeedPostImage extends StatefulWidget {
-  const LMFeedPostImage({
+class LMFeedImage extends StatefulWidget {
+  const LMFeedImage({
     super.key,
     this.imageUrl,
     this.imageFile,
@@ -25,16 +25,16 @@ class LMFeedPostImage extends StatefulWidget {
   final VoidCallback? onMediaTap;
 
   @override
-  State<LMFeedPostImage> createState() => _LMImageState();
+  State<LMFeedImage> createState() => _LMImageState();
 
-  LMFeedPostImage copyWith({
+  LMFeedImage copyWith({
     String? imageUrl,
     File? imageFile,
     LMFeedPostImageStyle? style,
     Function(String, StackTrace)? onError,
     VoidCallback? onMediaTap,
   }) {
-    return LMFeedPostImage(
+    return LMFeedImage(
       imageUrl: imageUrl ?? this.imageUrl,
       imageFile: imageFile ?? this.imageFile,
       style: style ?? this.style,
@@ -44,7 +44,7 @@ class LMFeedPostImage extends StatefulWidget {
   }
 }
 
-class _LMImageState extends State<LMFeedPostImage> {
+class _LMImageState extends State<LMFeedImage> {
   LMFeedPostImageStyle? style;
 
   @override

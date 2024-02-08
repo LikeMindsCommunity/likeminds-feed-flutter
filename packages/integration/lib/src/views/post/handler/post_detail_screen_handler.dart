@@ -148,6 +148,7 @@ class LMFeedPostDetailScreenHandler {
               LMFeedCommentType.parent) {
             deleteCommentFromController(
                 commentSuccessState.commentMetaData.commentId!);
+            postData!.commentCount -= 1;
           } else {
             LMCommentViewData? commentViewData =
                 commetListPagingController.itemList?.firstWhere((element) =>
@@ -157,8 +158,6 @@ class LMFeedPostDetailScreenHandler {
               updateCommentInController(commentViewData);
             }
           }
-
-          postData!.commentCount -= 1;
 
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
 

@@ -296,7 +296,7 @@ class LMFeedPostFooterStyle {
         showCommentButton: true,
         showShareButton: true,
         showSaveButton: true,
-        showRepostButton: true,
+        showRepostButton: false,
         likeButtonStyle: LMFeedButtonStyle.like(primaryColor: primaryColor),
         commentButtonStyle: LMFeedButtonStyle.comment(),
         shareButtonStyle: LMFeedButtonStyle.share(),

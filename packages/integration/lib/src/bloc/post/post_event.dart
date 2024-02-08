@@ -60,16 +60,3 @@ class LMFeedUpdatePostEvent extends LMFeedPostEvents {
   @override
   List<Object> get props => [post, DateTime.now().millisecondsSinceEpoch];
 }
-
-class LMFeedTogglePinPostEvent extends LMFeedPostEvents {
-  final String postId;
-  final bool isPinned;
-
-  LMFeedTogglePinPostEvent({
-    required this.postId,
-    required this.isPinned,
-  });
-
-  @override
-  List<Object> get props => [postId, isPinned];
-}

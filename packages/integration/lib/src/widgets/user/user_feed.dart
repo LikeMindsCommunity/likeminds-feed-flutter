@@ -153,7 +153,8 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
           );
         }
         if (state is LMFeedNewPostUploadedState) {
-          debugPrint('New post uploaded------${state.postData.text}---------------');
+          debugPrint(
+              'New post uploaded------${state.postData.text}---------------');
           LMPostViewData? item = state.postData;
           int length = _pagingController.itemList?.length ?? 0;
           List<LMPostViewData> feedRoomItemList =
@@ -275,7 +276,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             color: Colors.black,
             borderRadius: BorderRadius.circular(6.0),
           ),
-          child: LMFeedPostImage(
+          child: LMFeedImage(
             imageFile: media.mediaFile!,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
@@ -383,6 +384,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
       commentButton: defCommentButton(post),
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
+      repostButton: defRepostButton(post),
       postFooterStyle: feedThemeData?.footerStyle,
       showRepostButton: !post.isRepost,
     );
@@ -589,6 +591,70 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
         style: feedThemeData?.footerStyle.shareButtonStyle,
+      );
+
+  LMFeedButton defRepostButton(LMPostViewData postViewData) => LMFeedButton(
+        text: LMFeedText(
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: postViewData.isRepostedByUser
+                  ? feedThemeData?.primaryColor
+                  : null,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          text: postViewData.repostCount == 0
+              ? ''
+              : postViewData.repostCount.toString(),
+        ),
+        onTap: () async {
+          if (!postUploading.value) {
+            LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
+                eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
+                eventProperties: {}));
+
+            LMFeedVideoProvider.instance.forcePauseAllControllers();
+            // ignore: use_build_context_synchronously
+            LMAttachmentViewData attachmentViewData =
+                (LMAttachmentViewDataBuilder()
+                      ..attachmentType(8)
+                      ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                            ..repost(postViewData))
+                          .build()))
+                    .build();
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LMFeedComposeScreen(
+                  attachments: [attachmentViewData],
+                ),
+              ),
+            );
+          } else {
+            toast(
+              'A post is already uploading.',
+              duration: Toast.LENGTH_LONG,
+            );
+          }
+        },
+        style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color: postViewData.isRepostedByUser
+                          ? feedThemeData?.primaryColor
+                          : null),
+            ),
+            activeIcon:
+                feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                  ?.copyWith(
+                      color: postViewData.isRepostedByUser
+                          ? feedThemeData?.primaryColor
+                          : null),
+            )),
       );
 
   Widget noPostInFeedWidget() => Center(

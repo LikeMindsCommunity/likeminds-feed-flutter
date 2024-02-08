@@ -20,9 +20,10 @@ class LMFeedPostUtils {
     return (bytes / pow(1024, 2));
   }
 
-  static String? getPostType(int postType) {
-    String? postTypeString;
-    switch (postType) {
+  static String getPostType(List<LMAttachmentViewData>? attachments) {
+    String postTypeString;
+    if (attachments == null || attachments.isEmpty) return 'text';
+    switch (attachments.first.attachmentType) {
       case 1: // Image
         postTypeString = "image";
         break;
@@ -35,6 +36,8 @@ class LMFeedPostUtils {
       case 4: // Link
         postTypeString = "link";
         break;
+      default:
+        postTypeString = "text";
     }
     return postTypeString;
   }

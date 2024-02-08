@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 part 'universal_feed_event.dart';
@@ -60,7 +59,7 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
           .map((e) => LMTopicViewDataConvertor.toTopic(e))
           .toList();
     }
-    GetFeedResponse? response = await LMFeedCore.instance.lmFeedClient.getFeed(
+    GetFeedResponse response = await LMFeedCore.instance.lmFeedClient.getFeed(
       (GetFeedRequestBuilder()
             ..page(event.offset)
             ..topics(selectedTopics)
@@ -68,21 +67,32 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
           .build(),
     );
 
-    if (response == null) {
+    if (!response.success) {
       emit(const LMFeedUniversalFeedErrorState(
           message: "An error occurred, please check your network connection"));
     } else {
-      users.addAll(response.users.map((key, value) =>
-          MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
-      topics.addAll(response.topics.map((key, value) =>
-          MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
-      widgets.addAll(response.widgets.map((key, value) =>
-          MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value))));
-
+      if (response.users != null) {
+        users.addAll(response.users!.map((key, value) =>
+            MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
+      }
+      if (response.topics != null) {
+        topics.addAll(response.topics!.map((key, value) =>
+            MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
+      }
+      if (response.widgets != null) {
+        widgets.addAll(response.widgets!.map((key, value) =>
+            MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value))));
+      }
+      if (response.posts == null) {
+        emit(const LMFeedUniversalFeedErrorState(
+            message:
+                "An error occurred, please check your network connection"));
+        return;
+      }
       emit(
         LMFeedUniversalFeedLoadedState(
           topics: topics,
-          posts: response.posts
+          posts: response.posts!
               .map((e) => LMPostViewDataConvertor.fromPost(
                     post: e,
                     widgets: response.widgets,

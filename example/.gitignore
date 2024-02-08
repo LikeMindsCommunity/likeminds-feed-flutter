@@ -34,6 +34,7 @@ migrate_working_dir/
 *.env
 *.env.dev
 *.env.prod
+.fvm
 
 # Symbolication related
 app.*.symbols
@@ -48,6 +49,3 @@ app.*.map.json
 
 
 google-services.json
-
-lib/firebase_options.dart
-
