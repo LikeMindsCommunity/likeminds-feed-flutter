@@ -1184,7 +1184,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       _postDetailScreenHandler!
                                           .commentController.text,
                                       userTags,
-                                    );
+                                    ).trim();
                                     commentText = commentText.trim();
                                     if (commentText.isEmpty) {
                                       toast("Please write something to post");
