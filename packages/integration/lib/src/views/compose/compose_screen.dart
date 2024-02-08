@@ -664,8 +664,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 decoration: BoxDecoration(
                   color: theme.container,
                 ),
-                // constraints: BoxConstraints(
-                //     maxHeight: screenSize.height * 0.8),
                 child: LMTaggingAheadTextField(
                   isDown: true,
                   minLines: 3,
@@ -696,7 +694,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     );
                   },
                   controller: _controller,
-
                   focusNode: _focusNode,
                   onChange: _onTextChanged,
                 ),

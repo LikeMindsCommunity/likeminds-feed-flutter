@@ -40,5 +40,9 @@ class LMFeedFireAnalyticsEvent extends LMFeedAnalyticsEvent {
   });
 
   @override
-  List<Object> get props => [eventName, eventProperties];
+  List<Object> get props => [
+        eventName,
+        eventProperties,
+        identityHashCode(this),
+      ];
 }

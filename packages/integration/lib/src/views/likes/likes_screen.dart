@@ -191,7 +191,7 @@ class LikesTile extends StatelessWidget {
   Widget build(BuildContext context) {
     if (user != null) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: user!.isDeleted != null && user!.isDeleted!
             ? const DeletedLikesTile()
             : LMFeedUserTile(
@@ -200,11 +200,18 @@ class LikesTile extends StatelessWidget {
                   padding: EdgeInsets.only(
                     left: 16.0,
                     top: 16.0,
-                    bottom: 16.0,
                     right: 8.0,
                   ),
                 ),
-                onTap: () {},
+                onTap: () {
+                  LMFeedProfileBloc.instance.add(
+                    LMFeedRouteToUserProfileEvent(
+                      userUniqueId: user?.sdkClientInfo?.userUniqueId ??
+                          user?.userUniqueId ??
+                          '',
+                    ),
+                  );
+                },
               ),
       );
     } else {

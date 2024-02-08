@@ -155,7 +155,8 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    style = widget.style ?? LMFeedTheme.of(context).mediaStyle.videoStyle;
+    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    style = widget.style ?? feedTheme.mediaStyle.videoStyle;
     return GestureDetector(
       onTap: () {
         if (_onTouch) {
@@ -226,16 +227,15 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                         alignment: Alignment.center,
                         child: MaterialVideoControlsTheme(
                           normal: MaterialVideoControlsThemeData(
-                            displaySeekBar: false,
                             bottomButtonBar: [],
                             seekBarMargin: const EdgeInsets.symmetric(
                               horizontal: 4,
                               vertical: 8,
                             ),
                             seekBarPositionColor: widget.style?.seekBarColor ??
-                                const Color.fromARGB(255, 0, 137, 123),
+                                feedTheme.primaryColor,
                             seekBarThumbColor: widget.style?.seekBarColor ??
-                                const Color.fromARGB(255, 0, 137, 123),
+                                feedTheme.primaryColor,
                           ),
                           fullscreen: const MaterialVideoControlsThemeData(),
                           child: Video(
@@ -248,7 +248,8 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                                       valueListenable: rebuildOverlay,
                                       builder: (context, _, __) {
                                         return Visibility(
-                                          visible: _onTouch,
+                                          visible: _onTouch ||
+                                              !controller!.player.state.playing,
                                           child: Container(
                                             alignment: Alignment.center,
                                             child: TextButton(
