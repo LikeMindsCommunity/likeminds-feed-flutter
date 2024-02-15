@@ -18,6 +18,7 @@ class LMFeedPostHeader extends StatelessWidget {
     this.profilePicture,
     this.postHeaderStyle,
     required this.postViewData,
+    this.menu,
   });
 
   final LMFeedText? titleText;
@@ -26,6 +27,7 @@ class LMFeedPostHeader extends StatelessWidget {
   final LMFeedText? editedText;
 
   final Widget Function(LMFeedMenu)? menuBuilder;
+  final LMFeedMenu? menu;
   final LMFeedText? createdAt;
   final Function()? onProfileTap;
 
@@ -255,6 +257,7 @@ class LMFeedPostHeader extends StatelessWidget {
     Widget? profilePicture,
     LMFeedPostHeaderStyle? postHeaderStyle,
     LMPostViewData? postViewData,
+    LMFeedMenu? menu,
   }) {
     return LMFeedPostHeader(
       user: user ?? this.user,
@@ -269,11 +272,12 @@ class LMFeedPostHeader extends StatelessWidget {
       profilePicture: profilePicture ?? this.profilePicture,
       postHeaderStyle: postHeaderStyle ?? this.postHeaderStyle,
       postViewData: postViewData ?? this.postViewData,
+      menu: menu ?? this.menu,
     );
   }
 
   LMFeedMenu _defMenuBuilder() {
-    return LMFeedMenu(
+    return menu ?? LMFeedMenu(
       menuItems: postViewData.menuItems,
       isFeed: isFeed,
       removeItemIds: const {},

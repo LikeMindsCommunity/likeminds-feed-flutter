@@ -551,55 +551,55 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           ),
         );
       },
-      menuBuilder: (menu) {
-        return menu.copyWith(
-          removeItemIds: {postReportId, postEditId},
-          action: LMFeedMenuAction(
-            onPostPin: () => handlePostPinAction(),
-            onPostUnpin: () => handlePostPinAction(),
-            onPostDelete: () {
-              showDialog(
-                context: context,
-                builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Comment',
-                  userId: _postDetailScreenHandler!.postData!.userId,
-                  content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
-                  action: (String reason) async {
-                    Navigator.of(childContext).pop();
+      menu: LMFeedMenu(
+        menuItems: _postDetailScreenHandler!.postData?.menuItems ?? [],
+        isFeed: false,
+        removeItemIds: {postReportId, postEditId},
+        action: LMFeedMenuAction(
+          onPostPin: () => handlePostPinAction(),
+          onPostUnpin: () => handlePostPinAction(),
+          onPostDelete: () {
+            showDialog(
+              context: context,
+              builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                title: 'Delete Comment',
+                userId: _postDetailScreenHandler!.postData!.userId,
+                content:
+                    'Are you sure you want to delete this post. This action can not be reversed.',
+                action: (String reason) async {
+                  Navigator.of(childContext).pop();
 
-                    String postType = LMFeedPostUtils.getPostType(
-                        _postDetailScreenHandler!.postData!.attachments);
+                  String postType = LMFeedPostUtils.getPostType(
+                      _postDetailScreenHandler!.postData!.attachments);
 
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        eventProperties: {
-                          "post_id": _postDetailScreenHandler!.postData!.id,
-                          "post_type": postType,
-                          "user_id": _postDetailScreenHandler!.postData!.userId,
-                          "user_state": isCm ? "CM" : "member",
-                        },
-                      ),
-                    );
+                  LMFeedAnalyticsBloc.instance.add(
+                    LMFeedFireAnalyticsEvent(
+                      eventName: LMFeedAnalyticsKeys.postDeleted,
+                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      eventProperties: {
+                        "post_id": _postDetailScreenHandler!.postData!.id,
+                        "post_type": postType,
+                        "user_id": _postDetailScreenHandler!.postData!.userId,
+                        "user_state": isCm ? "CM" : "member",
+                      },
+                    ),
+                  );
 
-                    LMFeedPostBloc.instance.add(
-                      LMFeedDeletePostEvent(
-                        postId: _postDetailScreenHandler!.postData!.id,
-                        reason: reason,
-                        isRepost: _postDetailScreenHandler!.postData!.isRepost,
-                      ),
-                    );
-                    Navigator.of(context).pop();
-                  },
-                  actionText: 'Delete',
-                ),
-              );
-            },
-          ),
-        );
-      },
+                  LMFeedPostBloc.instance.add(
+                    LMFeedDeletePostEvent(
+                      postId: _postDetailScreenHandler!.postData!.id,
+                      reason: reason,
+                      isRepost: _postDetailScreenHandler!.postData!.isRepost,
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                },
+                actionText: 'Delete',
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 

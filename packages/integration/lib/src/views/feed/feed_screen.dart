@@ -729,54 +729,53 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           ),
         );
       },
-      menuBuilder: (menu) {
-        return menu.copyWith(
+      menu: LMFeedMenu(
+          menuItems: postViewData.menuItems,
+          isFeed: true,
           removeItemIds: {postReportId, postEditId},
           action: LMFeedMenuAction(
-            onPostUnpin: () => handlePostPinAction(postViewData),
-            onPostPin: () => handlePostPinAction(postViewData),
-            onPostDelete: () {
-              showDialog(
-                context: context,
-                builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Comment',
-                  userId: postViewData.userId,
-                  content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
-                  action: (String reason) async {
-                    Navigator.of(childContext).pop();
+              onPostUnpin: () => handlePostPinAction(postViewData),
+              onPostPin: () => handlePostPinAction(postViewData),
+              onPostDelete: () {
+                showDialog(
+                  context: context,
+                  builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                    title: 'Delete Comment',
+                    userId: postViewData.userId,
+                    content:
+                        'Are you sure you want to delete this post. This action can not be reversed.',
+                    action: (String reason) async {
+                      Navigator.of(childContext).pop();
 
-                    String postType =
-                        LMFeedPostUtils.getPostType(postViewData.attachments);
+                      String postType =
+                          LMFeedPostUtils.getPostType(postViewData.attachments);
 
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                          "post_type": postType,
-                          "user_id": postViewData.userId,
-                          "user_state": isCm ? "CM" : "member",
-                        },
-                      ),
-                    );
+                      LMFeedAnalyticsBloc.instance.add(
+                        LMFeedFireAnalyticsEvent(
+                          eventName: LMFeedAnalyticsKeys.postDeleted,
+                          deprecatedEventName:
+                              LMFeedAnalyticsKeysDep.postDeleted,
+                          eventProperties: {
+                            "post_id": postViewData.id,
+                            "post_type": postType,
+                            "user_id": postViewData.userId,
+                            "user_state": isCm ? "CM" : "member",
+                          },
+                        ),
+                      );
 
-                    LMFeedPostBloc.instance.add(
-                      LMFeedDeletePostEvent(
-                        postId: postViewData.id,
-                        reason: reason,
-                        isRepost: postViewData.isRepost,
-                      ),
-                    );
-                  },
-                  actionText: 'Delete',
-                ),
-              );
-            },
-          ),
-        );
-      },
+                      LMFeedPostBloc.instance.add(
+                        LMFeedDeletePostEvent(
+                          postId: postViewData.id,
+                          reason: reason,
+                          isRepost: postViewData.isRepost,
+                        ),
+                      );
+                    },
+                    actionText: 'Delete',
+                  ),
+                );
+              })),
     );
   }
 
