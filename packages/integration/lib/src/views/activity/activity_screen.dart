@@ -491,6 +491,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   LMFeedButton defSaveButton(
           LMFeedThemeData? feedTheme, LMPostViewData postViewData) =>
       LMFeedButton(
+        isActive: postViewData.isSaved,
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           LMFeedPostBloc.instance

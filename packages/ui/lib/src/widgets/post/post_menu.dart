@@ -168,3 +168,43 @@ class LMFeedMenuAction {
     );
   }
 }
+
+class LMFeedMenuStyle {
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final LMFeedIcon? menuIcon;
+  final LMFeedMenuType menuType;
+
+  const LMFeedMenuStyle({
+    this.padding,
+    this.margin,
+    this.menuIcon,
+    this.menuType = LMFeedMenuType.showPopupMenu,
+  });
+
+  LMFeedMenuStyle copyWith({
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    Color? iconColor,
+    double? iconSize,
+    LMFeedMenuType? menuType,
+    LMFeedIcon? menuIcon,
+  }) {
+    return LMFeedMenuStyle(
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      menuIcon: menuIcon ?? this.menuIcon,
+      menuType: menuType ?? this.menuType,
+    );
+  }
+
+  factory LMFeedMenuStyle.basic() => const LMFeedMenuStyle(
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.zero,
+      );
+}
+
+enum LMFeedMenuType {
+  showPopupMenu,
+  showBottomSheetMenu,
+}

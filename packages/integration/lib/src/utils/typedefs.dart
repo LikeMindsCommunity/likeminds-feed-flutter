@@ -30,3 +30,10 @@ typedef LMFeedProfileBlocListener = Function(
 /// Takes [BuildContext] as parameter and returns [Widget]
 /// {@endtemplate}
 typedef LMFeedContextWidgetBuilder = Widget Function(BuildContext context);
+
+/// {@template context_button_builder}
+/// Button builder function for [BuildContext]
+/// Takes [BuildContext] and [LMFeedButton] as parameters and returns [Widget]
+/// {@endtemplate}
+typedef LMFeedContextButtonBuilder = Widget Function(
+    BuildContext, LMFeedButton);

@@ -12,6 +12,10 @@ class LMPostViewData {
   /// might contain tags and mentions
   String text;
 
+  /// post heading [nullable]
+  /// might contain tags and mentions
+  String? heading;
+
   /// topics of the post [nullable]
   List<LMTopicViewData> topics;
 
@@ -43,6 +47,8 @@ class LMPostViewData {
   bool isEdited;
 
   List<LMCommentViewData> replies;
+
+  List<LMCommentViewData>? topResponse;
 
   bool isRepost;
   bool isRepostedByUser;
@@ -76,6 +82,8 @@ class LMPostViewData {
     required this.repostCount,
     this.isDeleted = false,
     this.widgets,
+    this.topResponse,
+    this.heading,
   });
 }
 
@@ -102,6 +110,8 @@ class LMPostViewDataBuilder {
   int? _repostCount;
   bool? _isDeleted;
   Map<String, LMWidgetViewData>? _widgets;
+  String? _heading;
+  List<LMCommentViewData>? _topResponse;
 
   void id(String id) {
     _id = id;
@@ -191,6 +201,14 @@ class LMPostViewDataBuilder {
     _widgets = widgets;
   }
 
+  void heading(String heading) {
+    _heading = heading;
+  }
+
+  void topResponse(List<LMCommentViewData> topResponse) {
+    _topResponse = topResponse;
+  }
+
   LMPostViewData build() {
     return LMPostViewData._(
       id: _id!,
@@ -215,6 +233,8 @@ class LMPostViewDataBuilder {
       isRepostedByUser: _isRepostedByUser!,
       repostCount: _repostCount!,
       widgets: _widgets,
+      heading: _heading,
+      topResponse: _topResponse,
     );
   }
 }

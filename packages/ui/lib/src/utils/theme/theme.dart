@@ -34,6 +34,7 @@ class LMFeedThemeData {
   final LMFeedDialogStyle dialogStyle;
   final LMFeedPopUpMenuStyle popUpMenuStyle;
   final LMFeedComposeScreenStyle composeScreenStyle;
+  final LMFeedLoaderStyle loaderStyle;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -77,6 +78,7 @@ class LMFeedThemeData {
     required this.dialogStyle,
     required this.popUpMenuStyle,
     required this.composeScreenStyle,
+    required this.loaderStyle,
   });
 
   factory LMFeedThemeData.fromThemeData(ThemeData theme) {
@@ -160,6 +162,9 @@ class LMFeedThemeData {
           LMFeedComposeScreenStyle.basic(
             primaryColor: primaryColor,
           ),
+      loaderStyle: LMFeedLoaderStyle(
+        color: primaryColor ?? LikeMindsTheme.primaryColor,
+      ),
     );
   }
 
@@ -191,6 +196,7 @@ class LMFeedThemeData {
     LMFeedPostMediaStyle? mediaStyle,
     LMFeedPostFooterStyle? footerStyle,
     LMFeedComposeScreenStyle? composeScreenStyle,
+    LMFeedLoaderStyle? loaderStyle,
   }) {
     return LMFeedThemeData(
       postStyle: postStyle ?? this.postStyle,
@@ -220,6 +226,7 @@ class LMFeedThemeData {
       mediaStyle: mediaStyle ?? this.mediaStyle,
       footerStyle: footerStyle ?? this.footerStyle,
       composeScreenStyle: composeScreenStyle ?? this.composeScreenStyle,
+      loaderStyle: loaderStyle ?? this.loaderStyle,
     );
   }
 }

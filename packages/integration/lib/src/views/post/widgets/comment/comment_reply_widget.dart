@@ -133,7 +133,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 height: 20,
                 width: 20,
                 child: LMFeedLoader(
-                  color: feedTheme!.primaryColor,
+                  style: feedTheme!.loaderStyle,
                 ),
               ),
             );

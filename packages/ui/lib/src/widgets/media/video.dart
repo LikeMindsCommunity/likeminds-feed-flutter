@@ -176,173 +176,181 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
           },
         );
       },
-      child: ValueListenableBuilder(
-        valueListenable: rebuildVideo,
-        builder: (context, _, __) {
-          return FutureBuilder(
-            future: initialiseVideo,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LMPostMediaShimmer();
-              } else if (snapshot.connectionState == ConnectionState.done) {
-                if (!initialiseOverlay) {
-                  _timer =
-                      Timer.periodic(const Duration(milliseconds: 3000), (_) {
-                    initialiseOverlay = true;
-                    _onTouch = false;
-                    rebuildOverlay.value = !rebuildOverlay.value;
-                  });
-                }
-                return VisibilityDetector(
-                  key: ObjectKey(controller!.player),
-                  onVisibilityChanged: (visibilityInfo) {
-                    if (mounted) {
-                      var visiblePercentage =
-                          visibilityInfo.visibleFraction * 100;
-                      if (visiblePercentage < 90 && visiblePercentage > 0) {
-                        controller?.player.pause();
+      child: Container(
+        padding: style?.padding,
+        margin: style?.margin,
+        child: ValueListenableBuilder(
+          valueListenable: rebuildVideo,
+          builder: (context, _, __) {
+            return FutureBuilder(
+              future: initialiseVideo,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const LMPostMediaShimmer();
+                } else if (snapshot.connectionState == ConnectionState.done) {
+                  if (!initialiseOverlay) {
+                    _timer =
+                        Timer.periodic(const Duration(milliseconds: 3000), (_) {
+                      initialiseOverlay = true;
+                      _onTouch = false;
+                      rebuildOverlay.value = !rebuildOverlay.value;
+                    });
+                  }
+                  return VisibilityDetector(
+                    key: ObjectKey(controller!.player),
+                    onVisibilityChanged: (visibilityInfo) {
+                      if (mounted) {
+                        var visiblePercentage =
+                            visibilityInfo.visibleFraction * 100;
+                        if (visiblePercentage < 90 && visiblePercentage > 0) {
+                          controller?.player.pause();
+                        }
+                        if (visiblePercentage >= 90 && widget.autoPlay) {
+                          LMFeedVideoProvider.instance.currentVisiblePostId =
+                              widget.postId;
+                          controller?.player.play();
+                          rebuildOverlay.value = !rebuildOverlay.value;
+                        }
                       }
-                      if (visiblePercentage >= 90 && widget.autoPlay) {
-                        LMFeedVideoProvider.instance.currentVisiblePostId =
-                            widget.postId;
-                        controller?.player.play();
-                        rebuildOverlay.value = !rebuildOverlay.value;
-                      }
-                    }
-                  },
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: widget.style?.width ?? screenSize.width,
-                        height: widget.style?.height,
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          borderRadius: widget.style?.borderRadius,
-                          border: Border.all(
-                            color:
-                                widget.style?.borderColor ?? Colors.transparent,
-                            width: 0,
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: MaterialVideoControlsTheme(
-                          normal: MaterialVideoControlsThemeData(
-                            bottomButtonBar: [],
-                            seekBarMargin: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 8,
+                    },
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: widget.style?.width ?? screenSize.width,
+                          height: widget.style?.height,
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                            borderRadius: widget.style?.borderRadius,
+                            border: Border.all(
+                              color: widget.style?.borderColor ??
+                                  Colors.transparent,
+                              width: 0,
                             ),
-                            seekBarPositionColor: widget.style?.seekBarColor ??
-                                feedTheme.primaryColor,
-                            seekBarThumbColor: widget.style?.seekBarColor ??
-                                feedTheme.primaryColor,
                           ),
-                          fullscreen: const MaterialVideoControlsThemeData(),
-                          child: Video(
-                            controller: controller!,
-                            controls: widget.style?.showControls != null &&
-                                    widget.style!.showControls!
-                                ? media_kit_video_controls.AdaptiveVideoControls
-                                : (state) {
-                                    return ValueListenableBuilder(
-                                      valueListenable: rebuildOverlay,
-                                      builder: (context, _, __) {
-                                        return Visibility(
-                                          visible: _onTouch ||
-                                              !controller!.player.state.playing,
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: TextButton(
-                                              style: ButtonStyle(
-                                                shape:
-                                                    MaterialStateProperty.all(
-                                                  const CircleBorder(
-                                                    side: BorderSide(
-                                                      color: Colors.white,
+                          alignment: Alignment.center,
+                          child: MaterialVideoControlsTheme(
+                            normal: MaterialVideoControlsThemeData(
+                              bottomButtonBar: [],
+                              seekBarMargin: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 8,
+                              ),
+                              seekBarPositionColor:
+                                  widget.style?.seekBarColor ??
+                                      feedTheme.primaryColor,
+                              seekBarThumbColor: widget.style?.seekBarColor ??
+                                  feedTheme.primaryColor,
+                            ),
+                            fullscreen: const MaterialVideoControlsThemeData(),
+                            child: Video(
+                              controller: controller!,
+                              controls: widget.style?.showControls != null &&
+                                      widget.style!.showControls!
+                                  ? media_kit_video_controls
+                                      .AdaptiveVideoControls
+                                  : (state) {
+                                      return ValueListenableBuilder(
+                                        valueListenable: rebuildOverlay,
+                                        builder: (context, _, __) {
+                                          return Visibility(
+                                            visible: _onTouch ||
+                                                !controller!
+                                                    .player.state.playing,
+                                            child: Container(
+                                              alignment: Alignment.center,
+                                              child: TextButton(
+                                                style: ButtonStyle(
+                                                  shape:
+                                                      MaterialStateProperty.all(
+                                                    const CircleBorder(
+                                                      side: BorderSide(
+                                                        color: Colors.white,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
+                                                child: Icon(
+                                                  controller != null &&
+                                                          controller!.player
+                                                              .state.playing
+                                                      ? Icons.pause
+                                                      : Icons.play_arrow,
+                                                  size: 28,
+                                                  color: Colors.white,
+                                                ),
+                                                onPressed: () {
+                                                  _timer?.cancel();
+                                                  if (controller == null) {
+                                                    return;
+                                                  }
+                                                  controller!
+                                                          .player.state.playing
+                                                      ? state.widget.controller
+                                                          .player
+                                                          .pause()
+                                                      : state.widget.controller
+                                                          .player
+                                                          .play();
+                                                  rebuildOverlay.value =
+                                                      !rebuildOverlay.value;
+                                                  _timer = Timer.periodic(
+                                                    const Duration(
+                                                        milliseconds: 2500),
+                                                    (_) {
+                                                      _onTouch = false;
+                                                      rebuildOverlay.value =
+                                                          !rebuildOverlay.value;
+                                                    },
+                                                  );
+                                                },
                                               ),
-                                              child: Icon(
-                                                controller != null &&
-                                                        controller!.player.state
-                                                            .playing
-                                                    ? Icons.pause
-                                                    : Icons.play_arrow,
-                                                size: 28,
-                                                color: Colors.white,
-                                              ),
-                                              onPressed: () {
-                                                _timer?.cancel();
-                                                if (controller == null) {
-                                                  return;
-                                                }
-                                                controller!.player.state.playing
-                                                    ? state.widget.controller
-                                                        .player
-                                                        .pause()
-                                                    : state.widget.controller
-                                                        .player
-                                                        .play();
-                                                rebuildOverlay.value =
-                                                    !rebuildOverlay.value;
-                                                _timer = Timer.periodic(
-                                                  const Duration(
-                                                      milliseconds: 2500),
-                                                  (_) {
-                                                    _onTouch = false;
-                                                    rebuildOverlay.value =
-                                                        !rebuildOverlay.value;
-                                                  },
-                                                );
-                                              },
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
+                                          );
+                                        },
+                                      );
+                                    },
+                            ),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: StatefulBuilder(
-                          builder: (context, setChildState) {
-                            return IconButton(
-                              onPressed: () {
-                                if (!isMuted!) {
-                                  controller!.player.setVolume(0);
-                                } else {
-                                  controller!.player.setVolume(100);
-                                }
-                                setChildState(() {
-                                  isMuted = !isMuted!;
-                                });
-                              },
-                              icon: LMFeedIcon(
-                                type: LMFeedIconType.icon,
-                                style: const LMFeedIconStyle(
-                                  color: Colors.white,
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: StatefulBuilder(
+                            builder: (context, setChildState) {
+                              return IconButton(
+                                onPressed: () {
+                                  if (!isMuted!) {
+                                    controller!.player.setVolume(0);
+                                  } else {
+                                    controller!.player.setVolume(100);
+                                  }
+                                  setChildState(() {
+                                    isMuted = !isMuted!;
+                                  });
+                                },
+                                icon: LMFeedIcon(
+                                  type: LMFeedIconType.icon,
+                                  style: const LMFeedIconStyle(
+                                    color: Colors.white,
+                                  ),
+                                  icon: isMuted!
+                                      ? Icons.volume_off
+                                      : Icons.volume_up,
                                 ),
-                                icon: isMuted!
-                                    ? Icons.volume_off
-                                    : Icons.volume_up,
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              } else {
-                return widget.style?.errorWidget ?? const SizedBox();
-              }
-            },
-          );
-        },
+                              );
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                } else {
+                  return widget.style?.errorWidget ?? const SizedBox();
+                }
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -357,6 +365,8 @@ class LMFeedPostVideoStyle {
   final Color? borderColor;
   final double? borderWidth;
   final BoxFit? boxFit; // defaults to BoxFit.cover
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
 
   // Video styling variables
   final Color? seekBarColor;
@@ -397,6 +407,8 @@ class LMFeedPostVideoStyle {
     this.looping,
     this.allowFullScreen,
     this.allowMuting,
+    this.padding,
+    this.margin,
   });
 
   LMFeedPostVideoStyle copyWith({
@@ -421,6 +433,8 @@ class LMFeedPostVideoStyle {
     bool? looping,
     bool? allowFullScreen,
     bool? allowMuting,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
   }) {
     return LMFeedPostVideoStyle(
       height: height ?? this.height,
@@ -444,6 +458,8 @@ class LMFeedPostVideoStyle {
       looping: looping ?? this.looping,
       allowFullScreen: allowFullScreen ?? this.allowFullScreen,
       allowMuting: allowMuting ?? this.allowMuting,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
     );
   }
 
