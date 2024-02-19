@@ -137,6 +137,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     feedTheme = LMFeedTheme.of(context);
+    Size screenSize = MediaQuery.of(context).size;
     return RefreshIndicator.adaptive(
       onRefresh: () {
         _pagingController.itemList?.clear();
@@ -164,12 +165,27 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         defAppBar(),
                     body: CustomScrollView(
                       slivers: [
+                        SliverAppBar(
+                          pinned: true,
+                          floating: true,
+                          title: widget.postBuilder?.call(
+                                  context,
+                                  defPostWidget(),
+                                  _postDetailScreenHandler!.postData!) ??
+                              defPostWidget(),
+                        ),
                         SliverToBoxAdapter(
-                            child: widget.postBuilder?.call(
-                                    context,
-                                    defPostWidget(),
-                                    _postDetailScreenHandler!.postData!) ??
-                                defPostWidget()),
+                          child: SizedBox(
+                            height: 10000,
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: widget.postBuilder?.call(
+                                  context,
+                                  defPostWidget(),
+                                  _postDetailScreenHandler!.postData!) ??
+                              defPostWidget(),
+                        ),
                         SliverToBoxAdapter(
                           child: BlocListener<LMFeedCommentHandlerBloc,
                               LMFeedCommentHandlerState>(
@@ -696,6 +712,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       );
 
   LMFeedButton defSaveButton() => LMFeedButton(
+        isActive: _postDetailScreenHandler!.postData!.isSaved,
         onTap: () async {
           _postDetailScreenHandler!.postData!.isSaved =
               !_postDetailScreenHandler!.postData!.isSaved;
@@ -1167,7 +1184,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                           ? null
                           : state is LMFeedCommentLoadingState
                               ? LMFeedLoader(
-                                  color: feedTheme?.primaryColor,
+                                  style: feedTheme?.loaderStyle,
                                 )
                               : LMFeedButton(
                                   style: const LMFeedButtonStyle(

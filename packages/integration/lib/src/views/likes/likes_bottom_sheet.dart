@@ -20,51 +20,92 @@ class LMFeedLikesBottomSheet extends StatefulWidget {
 }
 
 class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
-  final PagingController<int, LMLikeViewData> pagingController =
-      PagingController(firstPageKey: 1);
+  LMLikesScreenHandler? handler;
+  LMFeedThemeData? feedTheme;
 
   @override
   void initState() {
     super.initState();
+
+    handler = LMLikesScreenHandler.instance;
+    handler?.initialise(postId: widget.postId, commentId: widget.commentId);
+
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.likeListOpen,
+        deprecatedEventName: LMFeedAnalyticsKeysDep.likeListOpen,
+        eventProperties: {
+          'postId': widget.postId,
+        },
+      ),
+    );
+  }
+
+  @override
+  void didUpdateWidget(LMFeedLikesBottomSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.postId != oldWidget.postId ||
+        widget.commentId != oldWidget.commentId) {
+      handler?.initialise(postId: widget.postId, commentId: widget.commentId);
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    handler?.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     LMFeedThemeData theme = LMFeedTheme.of(context);
-    return Container(
-      constraints: BoxConstraints(
-          minHeight: screenSize.height * 0.4, minWidth: screenSize.width),
-      decoration: BoxDecoration(
-        color: theme.container,
-      ),
-      child: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              title: Container(
-                width: 40,
-                height: 5,
-                margin: EdgeInsets.symmetric(vertical: 10.0),
-                decoration: BoxDecoration(
-                  color: theme.disabledColor,
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
+    return handler == null
+        ? const SizedBox()
+        : Container(
+            constraints: BoxConstraints(
+              maxHeight: screenSize.height * 0.4,
+              minWidth: screenSize.width,
+            ),
+            decoration: BoxDecoration(
+              color: theme.container,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
               ),
             ),
-            PagedSliverList(
-              pagingController: pagingController,
-              builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
-                itemBuilder: (context, like, index) =>
-                    widget.likeTileBuilder?.call() ??
-                    LMFeedLikeTile(like: like),
+            child: SafeArea(
+              child: CustomScrollView(
+                physics: const FixedExtentScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    leading: null,
+                    backgroundColor: theme.container,
+                    centerTitle: true,
+                    title: Container(
+                      width: 40,
+                      height: 5,
+                      margin: EdgeInsets.symmetric(vertical: 10.0),
+                      decoration: BoxDecoration(
+                        color: theme.disabledColor,
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                    ),
+                  ),
+                  PagedSliverList(
+                    pagingController: handler!.pagingController,
+                    builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
+                      itemBuilder: (context, like, index) =>
+                          LikesTile(user: handler!.userData[like.userId]),
+                      // widget.likeTileBuilder?.call() ??
+                      // LMFeedLikeTile(like: like),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 }
 
@@ -78,4 +119,40 @@ class LMFeedLikesBottomSheetStyle {
   final BorderRadius? borderRadius;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
+
+  const LMFeedLikesBottomSheetStyle({
+    this.backgroundColor,
+    this.topNotchColor,
+    this.usertitleStyle,
+    this.usersubtitleStyle,
+    this.headingStyle,
+    this.profilePictureStyle,
+    this.borderRadius,
+    this.padding,
+    this.margin,
+  });
+
+  LMFeedLikesBottomSheetStyle copyWith({
+    Color? backgroundColor,
+    Color? topNotchColor,
+    LMFeedTextStyle? usertitleStyle,
+    LMFeedTextStyle? usersubtitleStyle,
+    LMFeedTextStyle? headingStyle,
+    LMFeedProfilePictureStyle? profilePictureStyle,
+    BorderRadius? borderRadius,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+  }) {
+    return LMFeedLikesBottomSheetStyle(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      topNotchColor: topNotchColor ?? this.topNotchColor,
+      usertitleStyle: usertitleStyle ?? this.usertitleStyle,
+      usersubtitleStyle: usersubtitleStyle ?? this.usersubtitleStyle,
+      headingStyle: headingStyle ?? this.headingStyle,
+      profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,
+      borderRadius: borderRadius ?? this.borderRadius,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+    );
+  }
 }

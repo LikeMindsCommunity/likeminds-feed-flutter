@@ -6,6 +6,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/likes/likes_bottom_sheet.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -846,13 +847,30 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
           videoController?.player.pause();
 
-          Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedLikesScreen(
-                postId: postViewData.id,
+          showModalBottomSheet(
+            context: context,
+            elevation: 10,
+            enableDrag: true,
+            backgroundColor: Colors.transparent,
+            clipBehavior: Clip.hardEdge,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
               ),
             ),
+            builder: (context) =>
+                LMFeedLikesBottomSheet(postId: postViewData.id),
           );
+
+          // TODO: Implement LMFeedLikesScreen
+          // Navigator.of(context, rootNavigator: true).push(
+          //   MaterialPageRoute(
+          //     builder: (context) => LMFeedLikesScreen(
+          //       postId: postViewData.id,
+          //     ),
+          //   ),
+          // );
         },
         onTap: () async {
           if (postViewData.isLiked) {
