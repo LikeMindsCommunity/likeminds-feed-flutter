@@ -8,7 +8,7 @@ abstract class LMFeedPostEvents extends Equatable {
 class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
   final List<LMMediaModel>? postMedia;
   final String postText;
-  final User user;
+  final LMUserViewData user;
   final List<LMTopicViewData> selectedTopics;
 
   LMFeedCreateNewPostEvent({

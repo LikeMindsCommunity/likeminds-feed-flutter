@@ -27,7 +27,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     ValueNotifier<bool> rebuildReasonBox = ValueNotifier(false);
     DeleteReason? reasonForDeletion;
     bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
-    User? user = LMFeedUserLocalPreference.instance.fetchUserData();
+    LMUserViewData? user = LMFeedUserLocalPreference.instance.fetchUserData();
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
 
     return Dialog(
@@ -100,7 +100,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                 builder: (context) {
                                                   return Container(
                                                     padding: const EdgeInsets
-                                                        .symmetric(
+                                                            .symmetric(
                                                         horizontal: 20.0,
                                                         vertical: 30.0),
                                                     width: screenSize.width,
@@ -139,7 +139,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                                       Container(
                                                                 margin:
                                                                     const EdgeInsets
-                                                                        .only(
+                                                                            .only(
                                                                         left:
                                                                             50),
                                                                 child:
@@ -233,7 +233,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                               ? 'Reason for deletion'
                                               : reasonForDeletion!.name,
                                         ),
-                                         Icon(
+                                        Icon(
                                           Icons.arrow_drop_down,
                                           color: feedTheme.onContainer,
                                         )
@@ -256,7 +256,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child:  Text(
+                  child: Text(
                     'Cancel',
                     style: TextStyle(
                       color: feedTheme.onContainer.withOpacity(0.8),

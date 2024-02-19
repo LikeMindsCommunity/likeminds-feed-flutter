@@ -28,11 +28,12 @@ class LMFeedUserLocalPreference {
     await _sharedPreferences!.setString(_userKey, userString);
   }
 
-  User fetchUserData() {
+  LMUserViewData fetchUserData() {
     String? userDataString = _sharedPreferences!.getString(_userKey);
 
     Map<String, dynamic> userData = jsonDecode(userDataString!);
-    return User.fromEntity(UserEntity.fromJson(userData));
+    return LMUserViewDataConvertor.fromUser(
+        User.fromEntity(UserEntity.fromJson(userData)));
   }
 
   Future<void> storeMemberState(bool isCm) async {

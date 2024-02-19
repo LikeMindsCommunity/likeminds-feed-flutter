@@ -69,8 +69,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       LMFeedFetchCommentReplyBloc.instance;
   LMFeedPostDetailScreenHandler? _postDetailScreenHandler;
   Future<LMPostViewData?>? getPostData;
-  LMUserViewData currentUser = LMUserViewDataConvertor.fromUser(
-      LMFeedUserLocalPreference.instance.fetchUserData());
+  LMUserViewData currentUser =
+      LMFeedUserLocalPreference.instance.fetchUserData();
   String? commentIdReplyId;
   bool replyShown = false;
   LMFeedThemeData? feedTheme;

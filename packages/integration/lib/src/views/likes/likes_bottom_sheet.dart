@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/widgets.dart';
 
 class LMFeedLikesBottomSheet extends StatefulWidget {
   final String postId;
   final String? commentId;
+  final LMFeedBottomSheetStyle? style;
+  final LMFeedTileBuilder? likeTileBuilder;
 
-  final Widget Function(BuildContext, LMLikeViewData)? likeTileBuilder;
+  final LMFeedContextWidgetBuilder? noNewItemBuilder;
+  final LMFeedContextWidgetBuilder? noItemBuilder;
+  final LMFeedContextWidgetBuilder? newPageProgressBuilder;
+  final LMFeedContextWidgetBuilder? firstPageProgressBuilder;
 
   const LMFeedLikesBottomSheet({
     super.key,
     required this.postId,
     this.commentId,
+    this.style,
     this.likeTileBuilder,
+    this.noNewItemBuilder,
+    this.noItemBuilder,
+    this.newPageProgressBuilder,
+    this.firstPageProgressBuilder,
   });
 
   @override
@@ -22,6 +34,8 @@ class LMFeedLikesBottomSheet extends StatefulWidget {
 class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
   LMLikesScreenHandler? handler;
   LMFeedThemeData? feedTheme;
+  LMUserViewData currentUser =
+      LMFeedUserLocalPreference.instance.fetchUserData();
 
   @override
   void initState() {
@@ -60,114 +74,105 @@ class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     LMFeedThemeData theme = LMFeedTheme.of(context);
+    LMFeedBottomSheetStyle bottomSheetStyle =
+        widget.style ?? theme.bottomSheetStyle;
+
     return handler == null
         ? const SizedBox()
-        : Container(
-            constraints: BoxConstraints(
-              maxHeight: screenSize.height * 0.4,
-              minWidth: screenSize.width,
-            ),
-            decoration: BoxDecoration(
-              color: theme.container,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-            ),
-            child: SafeArea(
-              child: CustomScrollView(
-                physics: const FixedExtentScrollPhysics(),
-                slivers: [
-                  SliverAppBar(
-                    pinned: true,
-                    leading: null,
-                    backgroundColor: theme.container,
-                    centerTitle: true,
-                    title: Container(
-                      width: 40,
-                      height: 5,
-                      margin: EdgeInsets.symmetric(vertical: 10.0),
-                      decoration: BoxDecoration(
-                        color: theme.disabledColor,
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 5.0),
-                      padding: EdgeInsets.symmetric(horizontal: 20.0),
-                      child: LMFeedText(
-                        text: "Likes",
-                        style: LMFeedTextStyle(
-                          textStyle: TextStyle(
+        : CustomScrollView(
+            shrinkWrap: true,
+            slivers: [
+              SliverToBoxAdapter(
+                child: Container(
+                  alignment: Alignment.topLeft,
+                  margin: const EdgeInsets.only(bottom: 5.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: LMFeedText(
+                    text: "Likes",
+                    style: bottomSheetStyle.titleStyle ??
+                        LMFeedTextStyle(
+                          textStyle: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 20,
                           ),
                         ),
-                      ),
-                    ),
                   ),
-                  PagedSliverList(
-                    pagingController: handler!.pagingController,
-                    builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
-                      itemBuilder: (context, like, index) =>
-                          LikesTile(user: handler!.userData[like.userId]),
-                      // widget.likeTileBuilder?.call() ??
-                      // LMFeedLikeTile(like: like),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+              PagedSliverList(
+                pagingController: handler!.pagingController,
+                shrinkWrapFirstPageIndicators: true,
+                builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
+                  itemBuilder: (context, like, index) =>
+                      widget.likeTileBuilder
+                          ?.call(context, defLikesTile(like)) ??
+                      defLikesTile(like),
+                  firstPageProgressIndicatorBuilder: (context) =>
+                      widget.firstPageProgressBuilder?.call(context) ??
+                      newPageProgressLikesView(),
+                  newPageProgressIndicatorBuilder: (context) =>
+                      widget.newPageProgressBuilder?.call(context) ??
+                      newPageProgressLikesView(),
+                  noItemsFoundIndicatorBuilder: (context) =>
+                      widget.noItemBuilder?.call(context) ?? noItemLikesView(),
+                  noMoreItemsIndicatorBuilder: (context) =>
+                      widget.noNewItemBuilder?.call(context) ??
+                      const SizedBox(height: 20),
+                ),
+              ),
+            ],
           );
   }
-}
 
-class LMFeedLikesBottomSheetStyle {
-  final Color? backgroundColor;
-  final Color? topNotchColor;
-  final LMFeedTextStyle? usertitleStyle;
-  final LMFeedTextStyle? usersubtitleStyle;
-  final LMFeedTextStyle? headingStyle;
-  final LMFeedProfilePictureStyle? profilePictureStyle;
-  final BorderRadius? borderRadius;
-  final EdgeInsets? padding;
-  final EdgeInsets? margin;
+  void onUserTap(LMLikeViewData likeViewData) async {
+    if (likeViewData.userId != currentUser.userUniqueId) {
+      LMFeedProfileBloc.instance.add(LMFeedRouteToUserProfileEvent(
+        userUniqueId: likeViewData.userId,
+      ));
+    } else {
+      List<LMLikeViewData>? likesList = handler!.pagingController.itemList;
 
-  const LMFeedLikesBottomSheetStyle({
-    this.backgroundColor,
-    this.topNotchColor,
-    this.usertitleStyle,
-    this.usersubtitleStyle,
-    this.headingStyle,
-    this.profilePictureStyle,
-    this.borderRadius,
-    this.padding,
-    this.margin,
-  });
+      int index = likesList?.indexWhere(
+              (element) => element.userId == currentUser.userUniqueId) ??
+          -1;
 
-  LMFeedLikesBottomSheetStyle copyWith({
-    Color? backgroundColor,
-    Color? topNotchColor,
-    LMFeedTextStyle? usertitleStyle,
-    LMFeedTextStyle? usersubtitleStyle,
-    LMFeedTextStyle? headingStyle,
-    LMFeedProfilePictureStyle? profilePictureStyle,
-    BorderRadius? borderRadius,
-    EdgeInsets? padding,
-    EdgeInsets? margin,
-  }) {
-    return LMFeedLikesBottomSheetStyle(
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      topNotchColor: topNotchColor ?? this.topNotchColor,
-      usertitleStyle: usertitleStyle ?? this.usertitleStyle,
-      usersubtitleStyle: usersubtitleStyle ?? this.usersubtitleStyle,
-      headingStyle: headingStyle ?? this.headingStyle,
-      profilePictureStyle: profilePictureStyle ?? this.profilePictureStyle,
-      borderRadius: borderRadius ?? this.borderRadius,
-      padding: padding ?? this.padding,
-      margin: margin ?? this.margin,
+      if (index != -1) {
+        handler!.pagingController.itemList?.removeAt(index);
+        setState(() {});
+        if (widget.commentId == null) {
+          LikePostRequest likePostRequest =
+              (LikePostRequestBuilder()..postId(widget.postId)).build();
+          await LMFeedCore.client.likePost(likePostRequest);
+        } else {
+          ToggleLikeCommentRequest likeCommentRequest =
+              (ToggleLikeCommentRequestBuilder()
+                    ..postId(widget.postId)
+                    ..commentId(widget.commentId!))
+                  .build();
+          await LMFeedCore.client.likeComment(likeCommentRequest);
+        }
+        LMFeedBloc.instance.add(LMFeedUpdatePostEvent(post: ));
+      }
+    }
+  }
+
+  LMFeedTile defLikesTile(LMLikeViewData like) {
+    return LMFeedTile(
+      onTap: () => onUserTap(like),
+      style: LMFeedTileStyle(
+          backgroundColor: feedTheme?.container,
+          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0)),
+      title: LMFeedText(
+        text: handler!.userData[like.userId]!.name,
+      ),
+      leading: LMFeedProfilePicture(
+        fallbackText: handler!.userData[like.userId]!.name,
+        imageUrl: handler!.userData[like.userId]!.imageUrl,
+        onTap: () => onUserTap(like),
+      ),
+      subtitle: like.userId == currentUser.userUniqueId
+          ? LMFeedText(text: "Tap to remove")
+          : null,
     );
   }
 }

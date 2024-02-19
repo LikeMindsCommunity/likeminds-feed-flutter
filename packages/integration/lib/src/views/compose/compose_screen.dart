@@ -51,7 +51,8 @@ class LMFeedComposeScreen extends StatefulWidget {
 
 class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Required blocs and data for basic functionality, or state management
-  final User user = LMFeedUserLocalPreference.instance.fetchUserData();
+  final LMUserViewData user =
+      LMFeedUserLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData? feedTheme;

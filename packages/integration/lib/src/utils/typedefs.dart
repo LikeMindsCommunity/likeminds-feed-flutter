@@ -37,3 +37,9 @@ typedef LMFeedContextWidgetBuilder = Widget Function(BuildContext context);
 /// {@endtemplate}
 typedef LMFeedContextButtonBuilder = Widget Function(
     BuildContext, LMFeedButton);
+
+/// {@template lm_feed_tile_builder}
+/// Tile builder function for [LMFeedTile]
+/// Takes [BuildContext] and [LMFeedTile] as parameters and returns [Widget]
+/// {@endtemplate}
+typedef LMFeedTileBuilder = Widget Function(BuildContext, LMFeedTile);

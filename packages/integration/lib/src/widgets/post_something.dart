@@ -18,7 +18,7 @@ class LMFeedPostSomething extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    User user = LMFeedUserLocalPreference.instance.fetchUserData();
+    LMUserViewData user = LMFeedUserLocalPreference.instance.fetchUserData();
     Size screenSize = MediaQuery.of(context).size;
     LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     return GestureDetector(

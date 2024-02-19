@@ -98,8 +98,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   bool isCm = LMFeedUserLocalPreference.instance
       .fetchMemberState(); // whether the logged in user is a community manager or not
 
-  LMUserViewData user = LMUserViewDataConvertor.fromUser(
-      LMFeedUserLocalPreference.instance.fetchUserData());
+  LMUserViewData user = LMFeedUserLocalPreference.instance.fetchUserData();
 
   // future to get the unread notification count
   late Future<GetUnreadNotificationCountResponse> getUnreadNotificationCount;
@@ -849,9 +848,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
           showModalBottomSheet(
             context: context,
+            useRootNavigator: true,
+            useSafeArea: true,
+            isScrollControlled: true,
             elevation: 10,
             enableDrag: true,
-            backgroundColor: Colors.transparent,
+            showDragHandle: true,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              minHeight: MediaQuery.of(context).size.height * 0.3,
+            ),
+            backgroundColor: feedThemeData?.container,
             clipBehavior: Clip.hardEdge,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
