@@ -14,7 +14,7 @@ class LMFeedMenu extends StatelessWidget {
     this.action,
   });
 
-  final Map<int, LMFeedText>? children;
+  final Map<int, Widget>? children;
   final LMFeedIcon? menuIcon;
   final List<LMPopUpMenuItemViewData> menuItems;
   final bool isFeed;
@@ -104,7 +104,7 @@ class LMFeedMenu extends StatelessWidget {
   }
 
   LMFeedMenu copyWith({
-    Map<int, LMFeedText>? children,
+    Map<int, Widget>? children,
     LMFeedIcon? menuIcon,
     List<LMPopUpMenuItemViewData>? menuItems,
     bool? isFeed,

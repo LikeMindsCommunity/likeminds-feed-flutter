@@ -9,6 +9,7 @@ class LMFeedPostHeader extends StatelessWidget {
     required this.user,
     this.titleText,
     this.subText,
+    this.subTextSeparator,
     this.menuBuilder,
     this.editedText,
     this.createdAt,
@@ -24,6 +25,7 @@ class LMFeedPostHeader extends StatelessWidget {
   final LMFeedText? titleText;
   final LMFeedText? customTitle;
   final LMFeedText? subText;
+  final Widget? subTextSeparator;
   final LMFeedText? editedText;
 
   final Widget Function(LMFeedMenu)? menuBuilder;
@@ -75,7 +77,7 @@ class LMFeedPostHeader extends StatelessWidget {
                         imageUrl: user.imageUrl,
                         onTap: onProfileTap,
                       ),
-                  LikeMindsTheme.kHorizontalPaddingLarge,
+                  LikeMindsTheme.kHorizontalPaddingMedium,
                   Container(
                     constraints: BoxConstraints(
                       maxWidth: screenSize.width * 0.66,
@@ -167,15 +169,16 @@ class LMFeedPostHeader extends StatelessWidget {
                               subText != null
                                   ? LikeMindsTheme.kHorizontalPaddingXSmall
                                   : const SizedBox(),
-                              LMFeedText(
-                                text: subText != null ? '·' : '',
-                                style: LMFeedTextStyle(
-                                  textStyle: TextStyle(
-                                    fontSize: LikeMindsTheme.kFontSmall,
-                                    color: Colors.grey[700],
+                              subTextSeparator ??
+                                  LMFeedText(
+                                    text: subText != null ? '·' : '',
+                                    style: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: LikeMindsTheme.kFontSmall,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
                               subText != null
                                   ? LikeMindsTheme.kHorizontalPaddingXSmall
                                   : const SizedBox(),
@@ -191,15 +194,17 @@ class LMFeedPostHeader extends StatelessWidget {
                                     ),
                                   ),
                               LikeMindsTheme.kHorizontalPaddingSmall,
-                              LMFeedText(
-                                text: postViewData.isEdited ? '·' : '',
-                                style: LMFeedTextStyle(
-                                  textStyle: TextStyle(
-                                    fontSize: LikeMindsTheme.kFontSmall,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                              ),
+                              if (postViewData.isEdited)
+                                subTextSeparator ??
+                                    LMFeedText(
+                                      text: postViewData.isEdited ? '·' : '',
+                                      style: LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: LikeMindsTheme.kFontSmall,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
                               LikeMindsTheme.kHorizontalPaddingSmall,
                               postViewData.isEdited
                                   ? editedText ??
@@ -248,6 +253,7 @@ class LMFeedPostHeader extends StatelessWidget {
     LMUserViewData? user,
     LMFeedText? titleText,
     LMFeedText? subText,
+    Widget? subTextSeparator,
     LMFeedText? editedText,
     Widget Function(LMFeedMenu)? menuBuilder,
     LMFeedText? createdAt,
@@ -263,6 +269,7 @@ class LMFeedPostHeader extends StatelessWidget {
       user: user ?? this.user,
       titleText: titleText ?? this.titleText,
       subText: subText ?? this.subText,
+      subTextSeparator: subTextSeparator ?? this.subTextSeparator,
       editedText: editedText ?? this.editedText,
       menuBuilder: menuBuilder ?? this.menuBuilder,
       createdAt: createdAt ?? this.createdAt,
@@ -277,12 +284,13 @@ class LMFeedPostHeader extends StatelessWidget {
   }
 
   LMFeedMenu _defMenuBuilder() {
-    return menu ?? LMFeedMenu(
-      menuItems: postViewData.menuItems,
-      isFeed: isFeed,
-      removeItemIds: const {},
-      action: LMFeedMenuAction(),
-    );
+    return menu ??
+        LMFeedMenu(
+          menuItems: postViewData.menuItems,
+          isFeed: isFeed,
+          removeItemIds: const {},
+          action: LMFeedMenuAction(),
+        );
   }
 }
 
