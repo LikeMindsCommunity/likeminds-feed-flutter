@@ -93,6 +93,21 @@ class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
                       ),
                     ),
                   ),
+                  SliverToBoxAdapter(
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 5.0),
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: LMFeedText(
+                        text: "Likes",
+                        style: LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   PagedSliverList(
                     pagingController: handler!.pagingController,
                     builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
