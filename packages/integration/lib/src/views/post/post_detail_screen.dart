@@ -14,6 +14,8 @@ import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
+part 'post_detail_screen_configuration.dart';
+
 /// {@template post_detail_screen}
 /// A screen that displays a post in detail
 /// with comments and likes
@@ -32,6 +34,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
     this.onLikeClick,
     this.onCommentClick,
     this.openKeyboard = false,
+    this.config,
   });
   // Required variables
   final String postId;
@@ -58,6 +61,8 @@ class LMFeedPostDetailScreen extends StatefulWidget {
 
   final bool openKeyboard;
 
+  final LMPostDetailScreenConfig? config;
+
   @override
   State<LMFeedPostDetailScreen> createState() => _LMFeedPostDetailScreenState();
 }
@@ -79,6 +84,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   bool right = true;
   List<LMUserTagViewData> userTags = [];
+  LMPostDetailScreenConfig? config;
 
   void onLikeTap() {}
 
@@ -108,6 +114,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         },
       ),
     );
+    config = widget.config ?? LMFeedCore.config.postDetailConfig;
   }
 
   @override
@@ -126,6 +133,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         return value;
       });
     }
+    config = widget.config ?? LMFeedConfig().postDetailConfig;
   }
 
   @override
@@ -181,8 +189,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                             child: Column(
                               children: [
                                 _postDetailScreenHandler!
-                                            .postData!.commentCount ==
-                                        0
+                                                .postData!.commentCount ==
+                                            0 ||
+                                        !config!.showCommentCountOnList
                                     ? const SizedBox.shrink()
                                     : Container(
                                         decoration: BoxDecoration(
@@ -1153,7 +1162,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                             feedTheme?.textFieldStyle.decoration?.copyWith(
                           enabled: right,
                           hintText: right
-                              ? 'Write a comment'
+                              ? feedTheme
+                                      ?.textFieldStyle.decoration?.hintText ??
+                                  'Write a comment'
                               : "You do not have permission to comment.",
                         ),
                         focusNode: _postDetailScreenHandler!.focusNode,
@@ -1178,7 +1189,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     style: LMFeedTextStyle(
                                       textAlign: TextAlign.center,
                                       textStyle: TextStyle(
-                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: feedTheme
+                                                ?.textFieldStyle
+                                                .decoration
+                                                ?.hintStyle
+                                                ?.fontSize ??
+                                            13,
                                         color: feedTheme?.primaryColor,
                                       ),
                                     ),
