@@ -75,7 +75,7 @@ void newPostEventHandler(
                         ? media.format
                         : null,
                     duration: media.mediaType == LMMediaType.video
-                        ? media.duration
+                        ? 10
                         : null),
               ),
             );
