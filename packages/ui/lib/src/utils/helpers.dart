@@ -8,9 +8,9 @@ import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 class LMFeedTaggingHelper {
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
   static const String notificationTagRoute =
-      r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>';
+      r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9_]+)>>';
   static const String tagRoute =
-      r'<<([^<>]+)\|route://member/([a-zA-Z-0-9]+)>>';
+      r'<<([^<>]+)\|route://member/([a-zA-Z-0-9_]+)>>';
   static const String linkRoute =
       r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)';
 
