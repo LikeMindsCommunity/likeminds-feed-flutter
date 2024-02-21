@@ -12,6 +12,7 @@ import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_pre
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
 import 'package:media_kit/media_kit.dart';
 import 'dart:async';
 
@@ -110,19 +111,23 @@ class LMFeedCore {
 class LMFeedConfig {
   final LMFeedScreenConfig feedScreenConfig;
   final LMFeedComposeScreenConfig composeConfig;
+  final LMPostDetailScreenConfig postDetailConfig;
 
   LMFeedConfig({
     this.feedScreenConfig = const LMFeedScreenConfig(),
     this.composeConfig = const LMFeedComposeScreenConfig(),
+    this.postDetailConfig = const LMPostDetailScreenConfig(),
   });
 
   LMFeedConfig copyWith({
     LMFeedScreenConfig? config,
     LMFeedComposeScreenConfig? composeConfig,
+    LMPostDetailScreenConfig? postDetailConfig,
   }) {
     return LMFeedConfig(
       feedScreenConfig: config ?? feedScreenConfig,
       composeConfig: composeConfig ?? this.composeConfig,
+      postDetailConfig: postDetailConfig ?? this.postDetailConfig,
     );
   }
 }
