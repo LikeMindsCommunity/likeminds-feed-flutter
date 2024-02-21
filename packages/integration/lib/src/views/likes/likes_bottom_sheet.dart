@@ -151,7 +151,6 @@ class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
                   .build();
           await LMFeedCore.client.likeComment(likeCommentRequest);
         }
-        LMFeedBloc.instance.add(LMFeedUpdatePostEvent(post: ));
       }
     }
   }

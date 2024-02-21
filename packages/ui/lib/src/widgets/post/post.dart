@@ -186,11 +186,9 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
                 : widget.topicBuilder
                         ?.call(context, _defTopicWidget(), widget.post) ??
                     _defTopicWidget(),
-            widget.post.text.isEmpty
-                ? const SizedBox.shrink()
-                : widget.contentBuilder
-                        ?.call(context, _defContentWidget(), widget.post) ??
-                    _defContentWidget(),
+            widget.contentBuilder
+                    ?.call(context, _defContentWidget(), widget.post) ??
+                _defContentWidget(),
             widget.post.attachments != null &&
                     widget.post.attachments!.isNotEmpty
                 ? widget.mediaBuilder
@@ -252,9 +250,9 @@ class LMFeedPostStyle {
   final BorderRadiusGeometry? borderRadius;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
-
   final BoxBorder? border;
   final Color? backgroundColor;
+  final LMFeedPostLikesListType likesListType;
 
   LMFeedPostStyle({
     this.boxShadow,
@@ -263,6 +261,7 @@ class LMFeedPostStyle {
     this.margin,
     this.border,
     this.backgroundColor,
+    this.likesListType = LMFeedPostLikesListType.screen,
   });
 
   LMFeedPostStyle copyWith({
@@ -277,6 +276,7 @@ class LMFeedPostStyle {
     LMFeedPostMediaStyle? mediaStyle,
     BoxBorder? border,
     Color? backgroundColor,
+    LMFeedPostLikesListType? likesListType,
   }) {
     return LMFeedPostStyle(
       boxShadow: boxShadow ?? this.boxShadow,
@@ -285,6 +285,7 @@ class LMFeedPostStyle {
       margin: margin ?? this.margin,
       border: border ?? this.border,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      likesListType: likesListType ?? this.likesListType,
     );
   }
 

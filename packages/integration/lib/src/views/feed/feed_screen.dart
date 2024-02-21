@@ -6,7 +6,6 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/likes/likes_bottom_sheet.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -721,8 +720,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       },
       style: feedThemeData?.contentStyle,
       text: post.text,
-      heading: post.heading ??
-          "What are some essential tips for international travelers to ensure a smooth and enjoyable journey?",
+      heading: post.heading,
     );
   }
 
@@ -754,54 +752,53 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           ),
         );
       },
-      menuBuilder: (menu) {
-        return menu.copyWith(
-          removeItemIds: {postReportId, postEditId},
-          action: LMFeedMenuAction(
-            onPostUnpin: () => handlePostPinAction(postViewData),
-            onPostPin: () => handlePostPinAction(postViewData),
-            onPostDelete: () {
-              showDialog(
-                context: context,
-                builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Comment',
-                  userId: postViewData.userId,
-                  content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
-                  action: (String reason) async {
-                    Navigator.of(childContext).pop();
+      menu: LMFeedMenu(
+        menuItems: postViewData.menuItems,
+        removeItemIds: {postReportId, postEditId},
+        action: LMFeedMenuAction(
+          onPostUnpin: () => handlePostPinAction(postViewData),
+          onPostPin: () => handlePostPinAction(postViewData),
+          onPostDelete: () {
+            showDialog(
+              context: context,
+              builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                title: 'Delete Comment',
+                userId: postViewData.userId,
+                content:
+                    'Are you sure you want to delete this post. This action can not be reversed.',
+                action: (String reason) async {
+                  Navigator.of(childContext).pop();
 
-                    String postType =
-                        LMFeedPostUtils.getPostType(postViewData.attachments);
+                  String postType =
+                      LMFeedPostUtils.getPostType(postViewData.attachments);
 
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                          "post_type": postType,
-                          "user_id": postViewData.userId,
-                          "user_state": isCm ? "CM" : "member",
-                        },
-                      ),
-                    );
+                  LMFeedAnalyticsBloc.instance.add(
+                    LMFeedFireAnalyticsEvent(
+                      eventName: LMFeedAnalyticsKeys.postDeleted,
+                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      eventProperties: {
+                        "post_id": postViewData.id,
+                        "post_type": postType,
+                        "user_id": postViewData.userId,
+                        "user_state": isCm ? "CM" : "member",
+                      },
+                    ),
+                  );
 
-                    LMFeedPostBloc.instance.add(
-                      LMFeedDeletePostEvent(
-                        postId: postViewData.id,
-                        reason: reason,
-                        isRepost: postViewData.isRepost,
-                      ),
-                    );
-                  },
-                  actionText: 'Delete',
-                ),
-              );
-            },
-          ),
-        );
-      },
+                  LMFeedPostBloc.instance.add(
+                    LMFeedDeletePostEvent(
+                      postId: postViewData.id,
+                      reason: reason,
+                      isRepost: postViewData.isRepost,
+                    ),
+                  );
+                },
+                actionText: 'Delete',
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 

@@ -60,6 +60,7 @@ class _LMBottomSheetState extends State<LMFeedBottomSheet> {
       padding:
           widget.style?.padding ?? const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 12),
           widget.style?.dragBar ??
@@ -76,12 +77,21 @@ class _LMBottomSheetState extends State<LMFeedBottomSheet> {
                 ),
               ),
           const SizedBox(height: 24),
-          Expanded(
+          widget.title != null
+              ? Container(
+                  alignment: Alignment.topLeft,
+                  margin: const EdgeInsets.only(bottom: 15),
+                  child: widget.title)
+              : const SizedBox.shrink(),
+          Flexible(
             child: ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
               itemBuilder: (context, index) => widget.children[index],
               itemCount: widget.children.length,
             ),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );

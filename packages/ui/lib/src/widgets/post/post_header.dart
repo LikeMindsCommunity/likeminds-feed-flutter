@@ -18,6 +18,7 @@ class LMFeedPostHeader extends StatelessWidget {
     this.profilePicture,
     this.postHeaderStyle,
     required this.postViewData,
+    this.menu,
   });
 
   final LMFeedText? titleText;
@@ -26,6 +27,7 @@ class LMFeedPostHeader extends StatelessWidget {
   final LMFeedText? editedText;
 
   final Widget Function(LMFeedMenu)? menuBuilder;
+  final LMFeedMenu? menu;
   final LMFeedText? createdAt;
   final Function()? onProfileTap;
 
@@ -251,7 +253,8 @@ class LMFeedPostHeader extends StatelessWidget {
               ),
             ),
           postViewData.menuItems.isNotEmpty
-              ? menuBuilder?.call(_defMenuBuilder()) ?? _defMenuBuilder()
+              ? menuBuilder?.call(_defMenuBuilder(feedTheme)) ??
+                  _defMenuBuilder(feedTheme)
               : const SizedBox()
         ],
       ),
@@ -271,6 +274,7 @@ class LMFeedPostHeader extends StatelessWidget {
     Widget? profilePicture,
     LMFeedPostHeaderStyle? postHeaderStyle,
     LMPostViewData? postViewData,
+    LMFeedMenu? menu,
   }) {
     return LMFeedPostHeader(
       user: user ?? this.user,
@@ -285,16 +289,17 @@ class LMFeedPostHeader extends StatelessWidget {
       profilePicture: profilePicture ?? this.profilePicture,
       postHeaderStyle: postHeaderStyle ?? this.postHeaderStyle,
       postViewData: postViewData ?? this.postViewData,
+      menu: menu ?? this.menu,
     );
   }
 
-  LMFeedMenu _defMenuBuilder() {
-    return LMFeedMenu(
-      menuItems: postViewData.menuItems,
-      isFeed: isFeed,
-      removeItemIds: const {},
-      action: LMFeedMenuAction(),
-    );
+  LMFeedMenu _defMenuBuilder(LMFeedThemeData feedTheme) {
+    return menu ??
+        LMFeedMenu(
+          menuItems: postViewData.menuItems,
+          removeItemIds: const {},
+          action: LMFeedMenuAction(),
+        );
   }
 }
 
@@ -309,6 +314,7 @@ class LMFeedPostHeaderStyle {
   final LMFeedTextStyle? titleTextStyle;
   final LMFeedTextStyle? subTextStyle;
   final LMFeedTextStyle? customTitleTextStyle;
+  final LMFeedMenuStyle? menuStyle;
 
   final bool showPinnedIcon;
 
@@ -324,6 +330,7 @@ class LMFeedPostHeaderStyle {
     this.titleTextStyle,
     this.subTextStyle,
     this.customTitleTextStyle,
+    this.menuStyle,
   });
 
   LMFeedPostHeaderStyle copyWith({
@@ -338,6 +345,7 @@ class LMFeedPostHeaderStyle {
     LMFeedTextStyle? titleTextStyle,
     LMFeedTextStyle? subTextStyle,
     LMFeedTextStyle? customTitleTextStyle,
+    LMFeedMenuStyle? menuStyle,
   }) {
     return LMFeedPostHeaderStyle(
       padding: padding ?? this.padding,
@@ -351,6 +359,7 @@ class LMFeedPostHeaderStyle {
       titleTextStyle: titleTextStyle ?? this.titleTextStyle,
       subTextStyle: subTextStyle ?? this.subTextStyle,
       customTitleTextStyle: customTitleTextStyle ?? this.customTitleTextStyle,
+      menuStyle: menuStyle ?? this.menuStyle,
     );
   }
 

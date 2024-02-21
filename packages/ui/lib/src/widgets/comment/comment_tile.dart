@@ -234,7 +234,6 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
 
   LMFeedMenu _defPostMenu() {
     return LMFeedMenu(
-      isFeed: false,
       menuItems: widget.comment.menuItems,
       action: widget.lmFeedMenuAction,
     );

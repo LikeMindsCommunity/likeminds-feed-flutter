@@ -9,3 +9,9 @@ enum LMFeedAlignment { left, centre, right }
 
 /// enum to describe type of icon for any LMFeedIcon
 enum LMFeedIconType { icon, svg, png }
+
+/// enum to describe type of list for LMFeedPostLikesList
+enum LMFeedPostLikesListType { screen, bottomSheet }
+
+/// enum to describe type of menu for LMFeedPostMenu
+enum LMFeedPostMenuType { popUp, bottomSheet }

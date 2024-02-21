@@ -165,20 +165,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         defAppBar(),
                     body: CustomScrollView(
                       slivers: [
-                        SliverAppBar(
-                          pinned: true,
-                          floating: true,
-                          title: widget.postBuilder?.call(
-                                  context,
-                                  defPostWidget(),
-                                  _postDetailScreenHandler!.postData!) ??
-                              defPostWidget(),
-                        ),
-                        SliverToBoxAdapter(
-                          child: SizedBox(
-                            height: 10000,
-                          ),
-                        ),
                         SliverToBoxAdapter(
                           child: widget.postBuilder?.call(
                                   context,

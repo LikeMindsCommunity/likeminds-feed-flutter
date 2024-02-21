@@ -97,6 +97,8 @@ class LMPostViewDataConvertor {
 
     postViewDataBuilder.widgets(widgetMap);
 
+    if (post.heading != null) postViewDataBuilder.heading(post.heading!);
+
     return postViewDataBuilder.build();
   }
 
@@ -128,6 +130,7 @@ class LMPostViewDataConvertor {
       isRepostedByUser: postViewData.isRepostedByUser,
       repostCount: postViewData.repostCount,
       isDeleted: postViewData.isDeleted,
+      heading: postViewData.heading,
     );
   }
 }
