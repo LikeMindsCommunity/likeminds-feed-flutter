@@ -4,7 +4,7 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMNotificationFeedItemViewDataConvertor {
   static LMNotificationFeedItemViewData fromNotificationFeedItem(
-      NotificationFeedItem notificationFeedItem) {
+      NotificationFeedItem notificationFeedItem, Map<String, User> users) {
     LMNotificationFeedItemViewDataBuilder notificationFeedItemViewDataBuilder =
         LMNotificationFeedItemViewDataBuilder();
 
@@ -18,7 +18,7 @@ class LMNotificationFeedItemViewDataConvertor {
 
     notificationFeedItemViewDataBuilder.activityEntityViewData(
         LMActivityEntityViewDataConvertor.fromActivityEntity(
-            notificationFeedItem.activityEntityData));
+            notificationFeedItem.activityEntityData, users));
 
     notificationFeedItemViewDataBuilder
         .activityText(notificationFeedItem.activityText);

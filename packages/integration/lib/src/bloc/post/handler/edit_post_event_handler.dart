@@ -23,7 +23,7 @@ void editPostEventHandler(
             post: response.post!,
             widgets: response.widgets ?? {},
             repostedPosts: response.repostedPosts ?? {},
-            users: response.user ?? {}, 
+            users: response.user ?? {},
             topics: response.topics ?? {},
           ),
           userData: (response.user ?? <String, User>{}).map((key, value) =>

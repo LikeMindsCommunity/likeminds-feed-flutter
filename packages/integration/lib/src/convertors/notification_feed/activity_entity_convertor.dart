@@ -1,11 +1,8 @@
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/comment/comment_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/attachment_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMActivityEntityViewDataConvertor {
   static LMActivityEntityViewData fromActivityEntity(
-      ActivityEntityData activityEntityData) {
+      ActivityEntityData activityEntityData, Map<String, User> users) {
     LMActivityEntityViewDataBuilder activityEntityViewDataBuilder =
         LMActivityEntityViewDataBuilder();
 
@@ -63,7 +60,10 @@ class LMActivityEntityViewDataConvertor {
 
     if (activityEntityData.replies != null) {
       activityEntityViewDataBuilder.replies(activityEntityData.replies!
-          .map((e) => LMCommentViewDataConvertor.fromComment(e))
+          .map((e) => LMCommentViewDataConvertor.fromComment(
+              e,
+              users.map((key, value) =>
+                  MapEntry(key, LMUserViewDataConvertor.fromUser(value)))))
           .toList());
     }
 

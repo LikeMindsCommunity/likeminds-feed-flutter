@@ -94,6 +94,7 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
                         repostedPosts: response.repostedPosts,
                         users: response.users,
                         topics: response.topics,
+                        filteredComments: response.filteredComments,
                       ))
                   .toList() ??
               [],

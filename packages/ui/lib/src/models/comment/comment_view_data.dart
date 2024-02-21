@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_flutter_ui/src/models/commons/popup_menu_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMCommentViewData {
   String id;
@@ -16,6 +16,7 @@ class LMCommentViewData {
   List<LMCommentViewData>? replies;
   String uuid;
   String? tempId;
+  LMUserViewData user;
 
   LMCommentViewData._({
     required this.id,
@@ -33,6 +34,7 @@ class LMCommentViewData {
     required this.uuid,
     this.tempId,
     this.replies,
+    required this.user,
   });
 }
 
@@ -52,6 +54,7 @@ class LMCommentViewDataBuilder {
   String? _uuid;
   String? _tempId;
   List<LMCommentViewData>? _replies;
+  LMUserViewData? _user;
 
   void id(String id) {
     _id = id;
@@ -113,6 +116,10 @@ class LMCommentViewDataBuilder {
     _replies = replies;
   }
 
+  void user(LMUserViewData user) {
+    _user = user;
+  }
+
   LMCommentViewData build() {
     return LMCommentViewData._(
       id: _id!,
@@ -130,6 +137,7 @@ class LMCommentViewDataBuilder {
       uuid: _uuid!,
       tempId: _tempId,
       replies: _replies,
+      user: _user!,
     );
   }
 }

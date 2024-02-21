@@ -9,6 +9,7 @@ class LMPostViewDataConvertor {
     Map<String, Post>? repostedPosts,
     Map<String, User>? users,
     Map<String, Topic>? topics,
+    Map<String, Comment>? filteredComments,
   }) {
     LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
     Map<String, LMWidgetViewData> widgetMap = {};
@@ -81,7 +82,10 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.isEdited(post.isEdited);
 
     postViewDataBuilder.replies(post.replies
-            ?.map((e) => LMCommentViewDataConvertor.fromComment(e))
+            ?.map((e) => LMCommentViewDataConvertor.fromComment(
+                e,
+                users!.map((key, value) =>
+                    MapEntry(key, LMUserViewDataConvertor.fromUser(value)))))
             .toList() ??
         []);
 
@@ -98,6 +102,23 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.widgets(widgetMap);
 
     if (post.heading != null) postViewDataBuilder.heading(post.heading!);
+
+    if (post.commentIds != null && post.commentIds!.isNotEmpty) {
+      postViewDataBuilder.commentIds(post.commentIds!);
+
+      List<LMCommentViewData> topComments = [];
+      if (filteredComments != null && filteredComments.isNotEmpty) {
+        post.commentIds?.forEach((element) {
+          if (filteredComments[element] != null)
+            topComments.add(LMCommentViewDataConvertor.fromComment(
+                filteredComments[element]!,
+                users!.map((key, value) =>
+                    MapEntry(key, LMUserViewDataConvertor.fromUser(value)))));
+        });
+      }
+
+      postViewDataBuilder.topComments(topComments);
+    }
 
     return postViewDataBuilder.build();
   }

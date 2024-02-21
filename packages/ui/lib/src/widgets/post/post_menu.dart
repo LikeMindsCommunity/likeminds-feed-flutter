@@ -266,6 +266,7 @@ class LMFeedMenuStyle {
   final BorderRadius? borderRadius;
   final Border? border;
   final bool? showBottomSheetTitle;
+  final Map<int, LMFeedMenuItemStyle>? menuItemStyle;
 
   const LMFeedMenuStyle({
     this.padding,
@@ -279,6 +280,7 @@ class LMFeedMenuStyle {
     this.borderRadius,
     this.border,
     this.showBottomSheetTitle = true,
+    this.menuItemStyle,
   });
 
   LMFeedMenuStyle copyWith({
@@ -295,6 +297,7 @@ class LMFeedMenuStyle {
     BorderRadius? borderRadius,
     Border? border,
     bool? showBottomSheetTitle,
+    Map<int, LMFeedMenuItemStyle>? menuItemStyle,
   }) {
     return LMFeedMenuStyle(
       padding: padding ?? this.padding,
@@ -308,6 +311,27 @@ class LMFeedMenuStyle {
       borderRadius: borderRadius ?? this.borderRadius,
       border: border ?? this.border,
       showBottomSheetTitle: showBottomSheetTitle ?? this.showBottomSheetTitle,
+      menuItemStyle: menuItemStyle ?? this.menuItemStyle,
+    );
+  }
+}
+
+class LMFeedMenuItemStyle {
+  LMFeedIcon icon;
+  LMFeedTextStyle titleStyle;
+
+  LMFeedMenuItemStyle({
+    required this.icon,
+    required this.titleStyle,
+  });
+
+  LMFeedMenuItemStyle copyWith({
+    LMFeedIcon? icon,
+    LMFeedTextStyle? titleStyle,
+  }) {
+    return LMFeedMenuItemStyle(
+      icon: icon ?? this.icon,
+      titleStyle: titleStyle ?? this.titleStyle,
     );
   }
 }

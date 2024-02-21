@@ -510,7 +510,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                 .isNotEmpty) {
                           return noPostUnderTopicWidget();
                         }
-                        return noPostInFeedWidget();
+                        return noPostInFeedWidget(feedThemeData);
                       },
                       noMoreItemsIndicatorBuilder: (context) {
                         return widget.noNewPageWidgetBuilder?.call(context) ??
@@ -1101,61 +1101,65 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         ),
       );
 
-  Widget noPostInFeedWidget() => Center(
+  Widget noPostInFeedWidget(LMFeedThemeData? feedThemeData) => Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const LMFeedIcon(
+            LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.post_add,
               style: LMFeedIconStyle(
                 size: 48,
+                color: feedThemeData?.onContainer,
               ),
             ),
             const SizedBox(height: 12),
-            const LMFeedText(
+            LMFeedText(
               text: 'No posts to show',
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: feedThemeData?.onContainer,
                 ),
               ),
             ),
             const SizedBox(height: 12),
-            const LMFeedText(
+            LMFeedText(
               text: "Be the first one to post here",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w300,
-                  color: LikeMindsTheme.greyColor,
+                  color: feedThemeData?.onContainer,
                 ),
               ),
             ),
             const SizedBox(height: 28),
             LMFeedButton(
               style: LMFeedButtonStyle(
-                icon: const LMFeedIcon(
+                icon: LMFeedIcon(
                   type: LMFeedIconType.icon,
                   icon: Icons.add,
                   style: LMFeedIconStyle(
                     size: 18,
+                    color: feedThemeData?.onPrimary,
                   ),
                 ),
                 borderRadius: 28,
                 backgroundColor: feedThemeData?.primaryColor,
                 height: 44,
-                width: 153,
+                width: 160,
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 placement: LMFeedIconButtonPlacement.end,
               ),
-              text: const LMFeedText(
+              text: LMFeedText(
                 text: "Create Post",
                 style: LMFeedTextStyle(
                   textStyle: TextStyle(
                     fontWeight: FontWeight.bold,
+                    color: feedThemeData?.onPrimary,
                   ),
                 ),
               ),

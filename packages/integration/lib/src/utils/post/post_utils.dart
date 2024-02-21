@@ -171,8 +171,10 @@ class LMFeedPostUtils {
     UserActivityItem activity,
     Map<String, WidgetModel>? widgets,
     Map<String, User>? users,
-    Map<String, Topic>? topics,
-  ) {
+    Map<String, Topic>? topics, {
+    Map<String, Comment>? filteredComments,
+    Map<String, Post>? repostedPosts,
+  }) {
     List<LMTopicViewData> topicViewData = [];
 
     if (activity.activityEntityData.topics != null &&
@@ -192,6 +194,8 @@ class LMFeedPostUtils {
             widgets: widgets,
             users: users ?? {},
             topics: topics ?? {},
+            filteredComments: filteredComments ?? {},
+            repostedPosts: repostedPosts ?? {},
           )
         : (LMPostViewDataBuilder()
               ..id(activity.activityEntityData.id)
@@ -204,7 +208,11 @@ class LMFeedPostUtils {
                       .toList() ??
                   [])
               ..replies(activity.activityEntityData.replies
-                      ?.map((e) => LMCommentViewDataConvertor.fromComment(e))
+                      ?.map((e) => LMCommentViewDataConvertor.fromComment(
+                          e,
+                          users?.map((key, value) => MapEntry(key,
+                                  LMUserViewDataConvertor.fromUser(value))) ??
+                              {}))
                       .toList() ??
                   [])
               ..communityId(activity.activityEntityData.communityId)
@@ -235,7 +243,7 @@ class LMFeedPostUtils {
   }
 
   static LMCommentViewData commentViewDataFromActivity(
-      UserActivityEntityData commentData) {
+      UserActivityEntityData commentData, Map<String, User> users) {
     LMCommentViewDataBuilder commentViewDataBuilder = LMCommentViewDataBuilder()
       ..userId(commentData.userId!)
       ..text(commentData.text)
@@ -251,7 +259,10 @@ class LMFeedPostUtils {
       ..isLiked(commentData.isLiked!)
       ..id(commentData.id)
       ..replies(commentData.replies
-              ?.map((e) => LMCommentViewDataConvertor.fromComment(e))
+              ?.map((e) => LMCommentViewDataConvertor.fromComment(
+                  e,
+                  users.map((key, value) =>
+                      MapEntry(key, LMUserViewDataConvertor.fromUser(value)))))
               .toList() ??
           [])
       ..isEdited(commentData.isEdited);

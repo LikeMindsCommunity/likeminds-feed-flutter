@@ -490,7 +490,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       },
       style: feedTheme!.postStyle,
       header: _defPostHeader(),
-      content: _defContentWidget(),
+      content: _defContentWidget(_postDetailScreenHandler!.postData!),
       footer: _defFooterWidget(),
       topicWidget: _defTopicWidget(),
       media: _defPostMedia(),
@@ -505,7 +505,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     );
   }
 
-  LMFeedPostContent _defContentWidget() {
+  LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
       onTagTap: (String userId) {
         LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
@@ -516,6 +516,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         );
       },
       style: feedTheme?.contentStyle,
+      text: post.text,
+      heading: post.heading,
     );
   }
 

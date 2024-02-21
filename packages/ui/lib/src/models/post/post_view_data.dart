@@ -48,7 +48,7 @@ class LMPostViewData {
 
   List<LMCommentViewData> replies;
 
-  List<LMCommentViewData>? topResponse;
+  List<String>? commentIds;
 
   bool isRepost;
   bool isRepostedByUser;
@@ -57,6 +57,8 @@ class LMPostViewData {
 
   /// widget map to hold custom widget data
   Map<String, LMWidgetViewData>? widgets;
+
+  List<LMCommentViewData>? topComments;
 
   /// {@macro post_view_data}
   LMPostViewData._({
@@ -82,8 +84,9 @@ class LMPostViewData {
     required this.repostCount,
     this.isDeleted = false,
     this.widgets,
-    this.topResponse,
+    this.commentIds,
     this.heading,
+    this.topComments,
   });
 }
 
@@ -111,7 +114,8 @@ class LMPostViewDataBuilder {
   bool? _isDeleted;
   Map<String, LMWidgetViewData>? _widgets;
   String? _heading;
-  List<LMCommentViewData>? _topResponse;
+  List<String>? _commentIds;
+  List<LMCommentViewData>? _topComments;
 
   void id(String id) {
     _id = id;
@@ -205,8 +209,12 @@ class LMPostViewDataBuilder {
     _heading = heading;
   }
 
-  void topResponse(List<LMCommentViewData> topResponse) {
-    _topResponse = topResponse;
+  void commentIds(List<String> commentIds) {
+    _commentIds = commentIds;
+  }
+
+  void topComments(List<LMCommentViewData> topComments) {
+    _topComments = topComments;
   }
 
   LMPostViewData build() {
@@ -234,7 +242,8 @@ class LMPostViewDataBuilder {
       repostCount: _repostCount!,
       widgets: _widgets,
       heading: _heading,
-      topResponse: _topResponse,
+      commentIds: _commentIds,
+      topComments: _topComments,
     );
   }
 }

@@ -38,10 +38,13 @@ class LMFeedPostDetailScreenHandler {
 
       topics.addAll(response.topics!.map((key, value) =>
           MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
-      repostedPosts.addAll(response.repostedPosts?.map((key, value) => MapEntry(key, LMPostViewDataConvertor.fromPost(post: value) )) ?? 
-      {});
+      repostedPosts.addAll(response.repostedPosts?.map((key, value) =>
+              MapEntry(key, LMPostViewDataConvertor.fromPost(post: value))) ??
+          {});
 
-      widgets.addAll(response.widgets?.map((key, value) => MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value) ) ) ?? {});
+      widgets.addAll(response.widgets?.map((key, value) => MapEntry(
+              key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+          {});
       final LMPostViewData postViewData = LMPostViewDataConvertor.fromPost(
         post: response.post!,
         widgets: response.widgets,
@@ -112,7 +115,7 @@ class LMFeedPostDetailScreenHandler {
               commentSuccessState.commentActionResponse as AddCommentResponse;
 
           LMCommentViewData commentViewData =
-              LMCommentViewDataConvertor.fromComment(response.reply!);
+              LMCommentViewDataConvertor.fromComment(response.reply!, users);
 
           postData!.commentCount += 1;
 
@@ -132,7 +135,7 @@ class LMFeedPostDetailScreenHandler {
               commentSuccessState.commentActionResponse as EditCommentResponse;
 
           LMCommentViewData commentViewData =
-              LMCommentViewDataConvertor.fromComment(response.reply!);
+              LMCommentViewDataConvertor.fromComment(response.reply!, users);
 
           updateCommentInController(commentViewData);
 
@@ -174,7 +177,7 @@ class LMFeedPostDetailScreenHandler {
               .commentActionResponse as AddCommentReplyResponse;
 
           LMCommentViewData commentViewData =
-              LMCommentViewDataConvertor.fromComment(response.reply!);
+              LMCommentViewDataConvertor.fromComment(response.reply!, users);
 
           if (response.reply!.parentComment != null) {
             updateCommentInController(commentViewData.parentComment!);
