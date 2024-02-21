@@ -59,7 +59,8 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
           .map((e) => LMTopicViewDataConvertor.toTopic(e))
           .toList();
     }
-    GetFeedResponse response = await LMFeedCore.instance.lmFeedClient.getFeed(
+    GetFeedResponse response =
+        await LMFeedCore.instance.lmFeedClient.getUniversalFeed(
       (GetFeedRequestBuilder()
             ..page(event.offset)
             ..topics(selectedTopics)

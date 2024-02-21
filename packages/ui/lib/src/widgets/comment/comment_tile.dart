@@ -154,6 +154,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
           LikeMindsTheme.kVerticalPaddingMedium,
           Container(
             padding: style!.actionsPadding ?? EdgeInsets.zero,
+            color: style!.contentBackgroundColor ?? Colors.white,
             child: LMFeedExpandableText(
               widget.comment.text,
               onTagTap: widget.onTagTap,
