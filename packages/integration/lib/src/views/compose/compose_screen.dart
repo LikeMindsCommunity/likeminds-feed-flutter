@@ -23,6 +23,7 @@ class LMFeedComposeScreen extends StatefulWidget {
     this.composeContentBuilder,
     this.composeTopicSelectorBuilder,
     this.composeMediaPreviewBuilder,
+    this.composeUserHeaderBuilder,
     //Config for the screen
     this.config,
     this.style,
@@ -41,6 +42,7 @@ class LMFeedComposeScreen extends StatefulWidget {
   final Widget Function()? composeContentBuilder;
   final Widget Function(List<LMTopicViewData>)? composeTopicSelectorBuilder;
   final Widget Function()? composeMediaPreviewBuilder;
+  final Widget Function(LMUserViewData user)? composeUserHeaderBuilder;
   final List<LMAttachmentViewData>? attachments;
   final String? displayName;
   final String? displayUrl;
@@ -64,6 +66,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
+  TextEditingController? _headingController;
   final CustomPopupMenuController _controllerPopUp =
       CustomPopupMenuController();
   Timer? _debounce;
@@ -80,6 +83,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     super.initState();
     _checkForRepost();
     isCustomWidget = _checkForCustomWidget();
+    _headingController =
+        config?.enableHeading ?? false ? TextEditingController() : null;
 
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     if (_focusNode.canRequestFocus) {
@@ -183,6 +188,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      const SizedBox(height: 18),
+                      widget.composeUserHeaderBuilder?.call(user) ??
+                          SizedBox.shrink(),
                       const SizedBox(height: 18),
                       widget.composeContentBuilder?.call() ??
                           _defContentInput(),
@@ -639,65 +647,87 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
-        vertical: 4,
+        vertical: 6,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 4.0),
-            child: LMFeedProfilePicture(
-              fallbackText: widget.displayName ?? user.name,
-              imageUrl: widget.displayUrl ?? user.imageUrl,
-              style: LMFeedProfilePictureStyle(
-                backgroundColor: theme.primaryColor,
-                size: 36,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width - 82,
-                decoration: BoxDecoration(
-                  color: theme.container,
-                ),
-                child: LMTaggingAheadTextField(
-                  isDown: true,
-                  minLines: 3,
-                  enabled: config!.enableTagging,
-                  // maxLines: 200,
-                  decoration: const InputDecoration(
+          config?.enableHeading ?? false
+              ? TextField(
+                  controller: _headingController,
+                  decoration: InputDecoration(
+                    hintText: config?.headingHint ?? "Add a Title",
+                    hintStyle: TextStyle(
+                      color: theme.onContainer.withOpacity(0.5),
+                    ),
                     border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
                   ),
-                  onTagSelected: (tag) {
-                    composeBloc.userTags.add(tag);
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.userTaggedInPost,
-                        deprecatedEventName:
-                            LMFeedAnalyticsKeysDep.userTaggedInPost,
-                        eventProperties: {
-                          'tagged_user_id': tag.sdkClientInfo?.userUniqueId ??
-                              tag.userUniqueId,
-                          'tagged_user_count':
-                              composeBloc.userTags.length.toString(),
-                        },
-                      ),
-                    );
-                  },
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  onChange: _onTextChanged,
+                  style: TextStyle(
+                    color: theme.onContainer,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                )
+              : const SizedBox.shrink(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: LMFeedProfilePicture(
+                  fallbackText: widget.displayName ?? user.name,
+                  imageUrl: widget.displayUrl ?? user.imageUrl,
+                  style: LMFeedProfilePictureStyle(
+                    backgroundColor: theme.primaryColor,
+                    size: 36,
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(width: 12),
+              Column(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width - 82,
+                    decoration: BoxDecoration(
+                      color: theme.container,
+                    ),
+                    child: LMTaggingAheadTextField(
+                      isDown: true,
+                      minLines: 3,
+                      enabled: config!.enableTagging,
+                      // maxLines: 200,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                      ),
+                      onTagSelected: (tag) {
+                        composeBloc.userTags.add(tag);
+                        LMFeedAnalyticsBloc.instance.add(
+                          LMFeedFireAnalyticsEvent(
+                            eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+                            deprecatedEventName:
+                                LMFeedAnalyticsKeysDep.userTaggedInPost,
+                            eventProperties: {
+                              'tagged_user_id':
+                                  tag.sdkClientInfo?.userUniqueId ??
+                                      tag.userUniqueId,
+                              'tagged_user_count':
+                                  composeBloc.userTags.length.toString(),
+                            },
+                          ),
+                        );
+                      },
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      onChange: _onTextChanged,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ],
           ),
         ],
