@@ -133,7 +133,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         return value;
       });
     }
-    config = widget.config ?? LMFeedConfig().postDetailConfig;
+    config = widget.config ??  LMFeedCore.config.postDetailConfig;
   }
 
   @override
