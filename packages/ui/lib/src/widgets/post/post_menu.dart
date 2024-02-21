@@ -240,16 +240,25 @@ class LMFeedMenuAction {
     this.onCommentEdit,
   });
 
-  LMFeedMenuAction copyWith(LMFeedMenuAction action) {
+  LMFeedMenuAction copyWith({
+    VoidCallback? onPostDelete,
+    VoidCallback? onPostPin,
+    VoidCallback? onPostUnpin,
+    VoidCallback? onPostReport,
+    VoidCallback? onPostEdit,
+    VoidCallback? onCommentDelete,
+    VoidCallback? onCommentReport,
+    VoidCallback? onCommentEdit,
+  }) {
     return LMFeedMenuAction(
-      onPostDelete: action.onPostDelete ?? onPostDelete,
-      onPostPin: action.onPostPin ?? onPostPin,
-      onPostUnpin: action.onPostUnpin ?? onPostUnpin,
-      onPostReport: action.onPostReport ?? onPostReport,
-      onPostEdit: action.onPostEdit ?? onPostEdit,
-      onCommentDelete: action.onCommentDelete ?? onCommentDelete,
-      onCommentReport: action.onCommentReport ?? onCommentReport,
-      onCommentEdit: action.onCommentEdit ?? onCommentEdit,
+      onPostDelete: onPostDelete ?? this.onPostDelete,
+      onPostPin: onPostPin ?? this.onPostPin,
+      onPostUnpin: onPostUnpin ?? this.onPostUnpin,
+      onPostReport: onPostReport ?? this.onPostReport,
+      onPostEdit: onPostEdit ?? this.onPostEdit,
+      onCommentDelete: onCommentDelete ?? this.onCommentDelete,
+      onCommentReport: onCommentReport ?? this.onCommentReport,
+      onCommentEdit: onCommentEdit ?? this.onCommentEdit,
     );
   }
 }

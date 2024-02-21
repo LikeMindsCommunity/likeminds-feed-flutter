@@ -231,6 +231,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
           user: widget.user,
           isFeed: widget.isFeed,
           postViewData: widget.post,
+          menu: widget.menu,
         );
   }
 

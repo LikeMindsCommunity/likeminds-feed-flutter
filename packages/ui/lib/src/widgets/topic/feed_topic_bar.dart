@@ -54,9 +54,10 @@ class LMFeedTopicBar extends StatelessWidget {
                     topic: (LMTopicViewDataBuilder()
                           ..id("0")
                           ..isEnabled(true)
-                          ..name("All Topic"))
+                          ..name(style?.topicChipText ?? "All Topic"))
                         .build(),
-                    style: feedThemeData.topicStyle.inactiveChipStyle,
+                    style: style?.topicChipStyle ??
+                        feedThemeData.topicStyle.inactiveChipStyle,
                     isSelected: false,
                   )
                 : selectedTopics.length == 1
@@ -133,6 +134,8 @@ class LMFeedTopicBarStyle {
 
   final double? height;
   final double? width;
+  final String? topicChipText;
+  final LMFeedTopicChipStyle? topicChipStyle;
 
   const LMFeedTopicBarStyle({
     this.backgroundColor,
@@ -143,6 +146,8 @@ class LMFeedTopicBarStyle {
     this.boxShadow,
     this.height,
     this.width,
+    this.topicChipText,
+    this.topicChipStyle,
   });
 
   LMFeedTopicBarStyle copyWith({
@@ -154,6 +159,8 @@ class LMFeedTopicBarStyle {
     BorderRadius? borderRadius,
     double? height,
     double? width,
+    String? topicChipText,
+    LMFeedTopicChipStyle? topicChipStyle,
   }) {
     return LMFeedTopicBarStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -164,6 +171,8 @@ class LMFeedTopicBarStyle {
       margin: margin ?? this.margin,
       height: height ?? this.height,
       width: width ?? this.width,
+      topicChipText: topicChipText ?? this.topicChipText,
+      topicChipStyle: topicChipStyle ?? this.topicChipStyle,
     );
   }
 }
