@@ -16,4 +16,4 @@ Added support for repost and user profile feed
 
 ## 1.0.4
 
-bugfix and improvements
+Fixed minor bug and ui issues
