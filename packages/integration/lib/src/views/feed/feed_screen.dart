@@ -13,6 +13,14 @@ import 'package:overlay_support/overlay_support.dart';
 
 part 'feed_screen_configuration.dart';
 
+/// {@template feed_screen}
+/// A screen to display the feed.
+/// The feed can be customized by passing in the required parameters
+/// Post creation can be enabled or disabled
+/// Post Builder can be used to customize the post widget
+/// Topic Chip Builder can be used to customize the topic chip widget
+///
+/// {@endtemplate}
 class LMFeedScreen extends StatefulWidget {
   const LMFeedScreen({
     super.key,
@@ -526,17 +534,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         if (_feedBloc.users[item.userId] == null) {
                           return const SizedBox();
                         }
-                        return widget.postBuilder?.call(
-                                context,
-                                defPostWidget(
-                                  feedThemeData,
-                                  item,
-                                ),
-                                item) ??
-                            defPostWidget(
-                              feedThemeData,
-                              item,
-                            );
+                        LMFeedPostWidget postWidget =
+                            defPostWidget(feedThemeData, item);
+                        return widget.postBuilder
+                                ?.call(context, postWidget, item) ??
+                            LMFeedCore.widgets?.postWidgetBuilder
+                                .call(context, postWidget, item) ??
+                            postWidget;
                       },
                       firstPageProgressIndicatorBuilder: (context) =>
                           widget.firstPageLoaderBuilder?.call(context) ??
@@ -843,38 +847,41 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
           videoController?.player.pause();
 
-          showModalBottomSheet(
-            context: context,
-            useRootNavigator: true,
-            useSafeArea: true,
-            isScrollControlled: true,
-            elevation: 10,
-            enableDrag: true,
-            showDragHandle: true,
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.7,
-              minHeight: MediaQuery.of(context).size.height * 0.3,
-            ),
-            backgroundColor: feedThemeData?.container,
-            clipBehavior: Clip.hardEdge,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
+          if ((feedThemeData?.postStyle.likesListType ??
+                  LMFeedPostLikesListType.screen) ==
+              LMFeedPostLikesListType.screen) {
+            Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute(
+                builder: (context) => LMFeedLikesScreen(
+                  postId: postViewData.id,
+                ),
               ),
-            ),
-            builder: (context) =>
-                LMFeedLikesBottomSheet(postId: postViewData.id),
-          );
-
-          // TODO: Implement LMFeedLikesScreen
-          // Navigator.of(context, rootNavigator: true).push(
-          //   MaterialPageRoute(
-          //     builder: (context) => LMFeedLikesScreen(
-          //       postId: postViewData.id,
-          //     ),
-          //   ),
-          // );
+            );
+          } else {
+            showModalBottomSheet(
+              context: context,
+              useRootNavigator: true,
+              useSafeArea: true,
+              isScrollControlled: true,
+              elevation: 10,
+              enableDrag: true,
+              showDragHandle: true,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+                minHeight: MediaQuery.of(context).size.height * 0.3,
+              ),
+              backgroundColor: feedThemeData?.container,
+              clipBehavior: Clip.hardEdge,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0),
+                ),
+              ),
+              builder: (context) =>
+                  LMFeedLikesBottomSheet(postId: postViewData.id),
+            );
+          }
         },
         onTap: () async {
           if (postViewData.isLiked) {

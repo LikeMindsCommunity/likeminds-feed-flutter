@@ -1,27 +1,31 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_ui/src/models/helper/attachment/attachment_view_data.dart';
-import 'package:likeminds_feed_flutter_ui/src/utils/theme/theme.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/media/image.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/media/video.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedCarousel extends StatefulWidget {
   final List<LMAttachmentViewData> attachments;
   final String postId;
 
+  /// {@macro feed_image}
   final LMFeedImage? imageItem;
   final LMFeedVideo? videoItem;
 
-  final Widget Function(LMFeedImage)? imageBuilder;
-  final Widget Function(LMFeedVideo)? videoBuilder;
-  final Widget Function(int)? carouselIndicatorBuilder;
+  /// {@macro feed_image_builder}
+  final LMFeedImageBuilder? imageBuilder;
+
+  /// {@macro feed_video_builder}
+  final LMFeedVideoBuilder? videoBuilder;
+
+  /// {@macro feed_carousel_indicator_builder}
+  final LMFeedCarouselIndicatorBuilder? carouselIndicatorBuilder;
 
   final LMFeedPostVideoStyle? videoStyle;
   final LMFeedPostImageStyle? imageStyle;
   final LMFeedPostCarouselStyle? style;
 
-  final Function(String, StackTrace)? onError;
+  /// {@macro feed_error_handler}
+  final LMFeedErrorHandler? onError;
   final VoidCallback? onMediaTap;
 
   const LMFeedCarousel({

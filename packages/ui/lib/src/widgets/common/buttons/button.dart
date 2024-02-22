@@ -107,6 +107,7 @@ class _LMButtonState extends State<LMFeedButton> {
               inStyle.showText
                   ? GestureDetector(
                       onTap: widget.onTextTap,
+                      behavior: HitTestBehavior.translucent,
                       child: Container(
                           decoration: const BoxDecoration(
                             color: Colors.transparent,
@@ -295,7 +296,6 @@ class LMFeedButtonStyle {
           style: LMFeedIconStyle.basic().copyWith(
             color: primaryColor,
           ),
-         
         ),
         height: 44,
         activeIcon: LMFeedIcon(

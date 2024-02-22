@@ -15,7 +15,7 @@ class LMFeedPostContent extends StatelessWidget {
   final String? text;
   final String? heading;
 
-  final Function(String)? onTagTap;
+  final LMFeedOnTagTap? onTagTap;
   final bool expanded;
 
   final LMFeedPostContentStyle? style;

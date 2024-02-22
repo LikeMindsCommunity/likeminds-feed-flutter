@@ -5,6 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
+/// {@template feed_image}
+/// A widget to display an image in a post.
+/// The image can be fetched from a URL or from a file.
+/// The [LMFeedImage] can be customized by passing in the required parameters
+/// and can be used in a post.
+/// The image can be tapped to perform an action.
+/// The image can be customized by passing in the required parameters
+/// and can be used in a post.
+/// {@endtemplate}
 class LMFeedImage extends StatefulWidget {
   const LMFeedImage({
     super.key,
@@ -18,7 +27,8 @@ class LMFeedImage extends StatefulWidget {
   final String? imageUrl;
   final File? imageFile;
 
-  final Function(String, StackTrace)? onError;
+  /// {@macro feed_error_handler}
+  final LMFeedErrorHandler? onError;
 
   final LMFeedPostImageStyle? style;
 

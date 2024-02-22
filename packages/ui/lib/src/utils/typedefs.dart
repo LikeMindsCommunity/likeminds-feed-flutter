@@ -55,6 +55,25 @@ typedef LMFeedPostContentBuilder = Widget Function(
 typedef LMFeedPostWidgetBuilder = Widget Function(
     BuildContext, LMFeedPostWidget, LMPostViewData);
 
+/// {@template feed_image_builder}
+/// Builder function to build the image widget.
+/// must return a widget, takes in [LMFeedImage] as params
+/// {@endtemplate}
+typedef LMFeedImageBuilder = Widget Function(LMFeedImage);
+
+/// {@template feed_video_builder}
+/// Builder function to build the video widget.
+/// must return a widget, takes in [LMFeedVideo] as params
+/// {@endtemplate}
+typedef LMFeedVideoBuilder = Widget Function(LMFeedVideo);
+
+/// {@template feed_carousel_indicator_builder}
+/// Builder function to build the carousel indicator widget.
+/// must return a widget, takes in [int] as params
+/// [int] is the current index of the carousel
+/// {@endtemplate}
+typedef LMFeedCarouselIndicatorBuilder = Widget Function(int);
+
 ///{@template post_callback}
 /// A callback to handle interactions with the post.
 /// {@endtemplate}
@@ -77,3 +96,19 @@ typedef LMFeedPostCommentBuilder = Widget Function(
     BuildContext, LMFeedCommentWidget, LMPostViewData);
 
 typedef LMFeedTopicBarBuilder = Widget Function(LMFeedTopicBar topicBar);
+
+/// {@template feed_error_handler}
+/// A callback to handle errors in the feed.
+/// {@endtemplate}
+typedef LMFeedErrorHandler = Function(String, StackTrace);
+
+/// {@template feed_on_tag_tap}
+/// A callback to handle tag tap in the feed.
+/// {@endtemplate}
+typedef LMFeedOnTagTap = void Function(String);
+
+/// {@template feed_button_builder}
+/// Builder function to build the button widget.
+/// must return a widget, takes in [LMFeedButton] as params
+/// {@endtemplate}
+typedef LMFeedButtonBuilder = Widget Function(LMFeedButton);

@@ -6,10 +6,11 @@ Widget noItemLikesView() => Center(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          SizedBox(height: 12),
           Text(
             "No likes to show",
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -17,7 +18,7 @@ Widget noItemLikesView() => Center(
           Text(
             "Be the first one to like this post",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w300,
               color: LikeMindsTheme.greyColor,
             ),
