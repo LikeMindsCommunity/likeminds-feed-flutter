@@ -14,3 +14,4 @@ export 'package:likeminds_feed_flutter_core/src/convertors/post/topic_convertor.
 export 'package:likeminds_feed_flutter_core/src/convertors/sdk/sdk_client_info_convertor.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/widget/widget_convertor.dart';
+export 'package:likeminds_feed_flutter_core/src/convertors/delete/delete_reason_convertor.dart';

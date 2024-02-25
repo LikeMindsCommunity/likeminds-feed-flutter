@@ -23,3 +23,5 @@ export 'sdk/sdk_client_info_view_data.dart';
 export 'user/user_view_data.dart';
 
 export 'widget/widget_view_data.dart';
+
+export 'delete/delete_reason_view_data.dart';
