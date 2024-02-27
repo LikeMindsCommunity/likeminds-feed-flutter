@@ -280,7 +280,7 @@ class _CredScreenState extends State<CredScreen> {
 
                     if (userName.isEmpty && userId.isEmpty) {
                       LMFeedCore.showSnackBar(
-                        LMFeedSnackBar(
+                        SnackBar(
                           content: Container(
                             child: const LMFeedText(
                               text: "Username cannot be empty",
@@ -288,7 +288,6 @@ class _CredScreenState extends State<CredScreen> {
                                   textStyle: TextStyle(color: Colors.black)),
                             ),
                           ),
-                          style: LMFeedSnackBarStyle.basic(),
                         ),
                       );
                       //toast("Username cannot be empty");

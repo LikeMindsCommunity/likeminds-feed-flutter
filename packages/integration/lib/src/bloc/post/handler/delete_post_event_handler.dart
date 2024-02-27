@@ -14,7 +14,7 @@ void deletePostEventHandler(
     LMFeedCore.showSnackBar(
       SnackBar(
         content: LMFeedText(
-          text: 'Comment Deleted',
+          text: 'Post Deleted',
         ),
       ),
     );

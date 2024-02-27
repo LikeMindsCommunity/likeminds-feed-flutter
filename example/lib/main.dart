@@ -113,10 +113,13 @@ Future<String?> setupMessaging() async {
     //   'User declined or has not accepted notification permissions',
     //   duration: Toast.LENGTH_LONG,
     // );
-    LMFeedCore.showSnackBar(const SnackBar(
-        content: Text(
-      'User declined or has not accepted notification permissions',
-    )));
+    LMFeedCore.showSnackBar(
+      SnackBar(
+        content: const Text(
+          'User declined or has not accepted notification permissions',
+        ),
+      ),
+    );
     return null;
   }
 }
