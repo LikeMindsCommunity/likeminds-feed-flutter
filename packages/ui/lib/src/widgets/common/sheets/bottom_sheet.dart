@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedBottomSheet extends StatefulWidget {
   final LMFeedText? title;
@@ -43,17 +43,17 @@ class _LMBottomSheetState extends State<LMFeedBottomSheet> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    ThemeData theme = Theme.of(context);
+    LMFeedThemeData theme = LMFeedTheme.of(context);
     return Container(
       width: screenSize.width,
       height: widget.style?.height,
       decoration: BoxDecoration(
-        color: widget.style?.backgroundColor ?? theme.colorScheme.background,
+        color: widget.style?.backgroundColor ?? theme.container,
         borderRadius: widget.style?.borderRadius,
         boxShadow: widget.style?.boxShadow,
       ),
       constraints: BoxConstraints(
-        maxHeight: widget.style?.height ?? 300,
+        maxHeight: widget.style?.height ?? screenSize.height * 0.8,
         minHeight: screenSize.height * 0.2,
       ),
       margin: widget.style?.margin,
@@ -68,9 +68,8 @@ class _LMBottomSheetState extends State<LMFeedBottomSheet> {
                 width: 48,
                 height: 8,
                 decoration: ShapeDecoration(
-                  color:
-                      widget.style?.dragBarColor ?? theme.colorScheme.background
-                        ..withAlpha(200),
+                  color: widget.style?.dragBarColor ?? theme.disabledColor
+                    ..withAlpha(200),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(99),
                   ),

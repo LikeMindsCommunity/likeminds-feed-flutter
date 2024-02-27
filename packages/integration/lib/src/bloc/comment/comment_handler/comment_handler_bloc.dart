@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 part 'comment_handler_event.dart';
 part 'comment_handler_state.dart';

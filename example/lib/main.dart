@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/cred_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
@@ -109,10 +108,15 @@ Future<String?> setupMessaging() async {
     debugPrint("Token - $token");
     return token.toString();
   } else {
-    toast(
+    // TODO: remove after testing
+    // toast(
+    //   'User declined or has not accepted notification permissions',
+    //   duration: Toast.LENGTH_LONG,
+    // );
+    LMFeedCore.showSnackBar(const SnackBar(
+        content: Text(
       'User declined or has not accepted notification permissions',
-      duration: Toast.LENGTH_LONG,
-    );
+    )));
     return null;
   }
 }

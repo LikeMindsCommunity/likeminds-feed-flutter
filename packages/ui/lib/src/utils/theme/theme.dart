@@ -169,7 +169,7 @@ class LMFeedThemeData {
       loaderStyle: LMFeedLoaderStyle(
         color: primaryColor ?? LikeMindsTheme.primaryColor,
       ),
-      bottomSheetStyle: const LMFeedBottomSheetStyle(),
+      bottomSheetStyle: bottomSheetStyle ?? const LMFeedBottomSheetStyle(),
     );
   }
 

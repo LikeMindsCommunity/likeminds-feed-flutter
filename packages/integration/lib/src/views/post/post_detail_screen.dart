@@ -12,7 +12,6 @@ import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/defau
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 part 'post_detail_screen_configuration.dart';
 
@@ -178,7 +177,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                   context,
                                   defPostWidget(),
                                   _postDetailScreenHandler!.postData!) ??
-                              LMFeedCore.widgets?.postWidgetBuilder.call(
+                              LMFeedCore.widgetUtility.postWidgetBuilder.call(
                                   context,
                                   defPostWidget(),
                                   _postDetailScreenHandler!.postData!) ??
@@ -263,9 +262,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     commentWidget,
                                                     _postDetailScreenHandler!
                                                         .postData!) ??
-                                                LMFeedCore
-                                                    .widgets?.commentBuilder
-                                                    ?.call(
+                                                LMFeedCore.widgetUtility
+                                                    .commentBuilder
+                                                    .call(
                                                         context,
                                                         commentWidget,
                                                         _postDetailScreenHandler!
@@ -278,10 +277,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     post:
                                                         _postDetailScreenHandler!
                                                             .postData!,
-                                                    commentBuilder: widget
-                                                            .commentBuilder ??
-                                                        LMFeedCore.widgets
-                                                            ?.commentBuilder,
+                                                    commentBuilder:
+                                                        widget.commentBuilder ??
+                                                            LMFeedCore
+                                                                .widgetUtility
+                                                                .commentBuilder,
                                                     refresh: () {
                                                       _pagingController
                                                           .refresh();
@@ -634,6 +634,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       postId: _postDetailScreenHandler!.postData!.id,
       attachments: _postDetailScreenHandler!.postData!.attachments!,
       style: feedTheme?.mediaStyle,
+      carouselIndicatorBuilder:
+          LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
+      imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
+      videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
       onMediaTap: () {
         Navigator.push(
           context,
@@ -664,8 +668,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           videoController?.player.pause();
 
           if ((feedTheme?.postStyle.likesListType ??
-                  LMFeedPostLikesListType.screen) ==
-              LMFeedPostLikesListType.screen) {
+                  LMFeedPostLikesListViewType.screen) ==
+              LMFeedPostLikesListViewType.screen) {
             Navigator.of(context, rootNavigator: true).push(
               MaterialPageRoute(
                 builder: (context) => LMFeedLikesScreen(
@@ -830,13 +834,31 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     ),
                   );
                 } else {
-                  toast(
-                    'A post is already uploading.',
-                    duration: Toast.LENGTH_LONG,
+                  LMFeedCore.showSnackBar(
+                    SnackBar(
+                      content: LMFeedText(
+                        text: 'A post is already uploading.',
+                      ),
+                    ),
                   );
+                  // TODO: remove old toast
+                  // toast(
+                  //   'A post is already uploading.',
+                  //   duration: Toast.LENGTH_LONG,
+                  // );
                 }
               }
-            : () => toast("You do not have permission to create a post"),
+            : () {
+                LMFeedCore.showSnackBar(
+                  SnackBar(
+                    content: LMFeedText(
+                      text: 'You do not have permission to create a post',
+                    ),
+                  ),
+                );
+                // TODO: remove old toast
+                // toast("You do not have permission to create a post");
+              },
         style: feedTheme?.footerStyle.repostButtonStyle?.copyWith(
             icon: feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
               style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
@@ -1257,7 +1279,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     ).trim();
                                     commentText = commentText.trim();
                                     if (commentText.isEmpty) {
-                                      toast("Please write something to post");
+                                      LMFeedCore.showSnackBar(
+                                        SnackBar(
+                                          content: LMFeedText(
+                                            text:
+                                                "Please write something to post",
+                                          ),
+                                        ),
+                                      );
+                                      // TODO: remove old toast
+                                      // toast("Please write something to post");
 
                                       return;
                                     }

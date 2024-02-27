@@ -16,6 +16,8 @@ class LMFeedPostMedia extends StatefulWidget {
     this.style,
     this.onMediaTap,
     this.carouselIndicatorBuilder,
+    this.videoBuilder,
+    this.imageBuilder,
   });
 
   final List<LMAttachmentViewData> attachments;
@@ -29,7 +31,10 @@ class LMFeedPostMedia extends StatefulWidget {
   final VoidCallback? onMediaTap;
 
   final LMFeedPostMediaStyle? style;
-  final Widget Function(int)? carouselIndicatorBuilder;
+  final LMFeedCarouselIndicatorBuilder? carouselIndicatorBuilder;
+
+  final LMFeedVideoBuilder? videoBuilder;
+  final LMFeedImageBuilder? imageBuilder;
 
   @override
   State<LMFeedPostMedia> createState() => _LMPostMediaState();
@@ -42,7 +47,7 @@ class LMFeedPostMedia extends StatefulWidget {
     Function(VideoController)? initialiseVideoController,
     Function(String, StackTrace)? onError,
     LMFeedPostMediaStyle? style,
-    Widget Function(int)? carouselIndicatorBuilder,
+    Widget Function(int, Widget)? carouselIndicatorBuilder,
     VoidCallback? onMediaTap,
   }) {
     return LMFeedPostMedia(
@@ -114,6 +119,9 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         videoStyle: widget.style?.videoStyle,
         onMediaTap: widget.onMediaTap,
         carouselIndicatorBuilder: widget.carouselIndicatorBuilder,
+        imageBuilder: widget.imageBuilder,
+        videoBuilder: widget.videoBuilder,
+        style: widget.style?.carouselStyle,
       );
     } else if (attachments!.first.attachmentType == 8) {
       final repostData = attachments!.first.attachmentMeta.repost!;

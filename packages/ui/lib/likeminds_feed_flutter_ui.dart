@@ -5,3 +5,4 @@ export 'src/utils/index.dart';
 export 'src/models/models.dart';
 export 'packages/expandable_text/expandable_text.dart';
 export 'packages/linkify/linkify.dart';
+export 'src/widgets/common/snackbar/snackbar.dart';

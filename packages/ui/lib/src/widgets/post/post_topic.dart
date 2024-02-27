@@ -27,8 +27,7 @@ class LMFeedPostTopic extends StatelessWidget {
       child: Wrap(
         children: post.topics
             .map((e) =>
-                topicChipBuilder?.call(
-                    context, defTopicChip(e, topicStyle)) ??
+                topicChipBuilder?.call(context, defTopicChip(e, topicStyle)) ??
                 defTopicChip(e, topicStyle))
             .toList(),
       ),

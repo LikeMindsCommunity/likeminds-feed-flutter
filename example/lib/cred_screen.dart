@@ -195,7 +195,8 @@ class _CredScreenState extends State<CredScreen> {
       }
     }, onError: (err) {
       // Handle exception by warning the user their action did not succeed
-      toast('An error occurred');
+      LMFeedCore.showSnackBar(
+          const SnackBar(content: Text('An error occurred')));
     });
   }
 
@@ -278,7 +279,19 @@ class _CredScreenState extends State<CredScreen> {
                     String userName = _usernameController.text;
 
                     if (userName.isEmpty && userId.isEmpty) {
-                      toast("Username cannot be empty");
+                      LMFeedCore.showSnackBar(
+                        LMFeedSnackBar(
+                          content: Container(
+                            child: const LMFeedText(
+                              text: "Username cannot be empty",
+                              style: LMFeedTextStyle(
+                                  textStyle: TextStyle(color: Colors.black)),
+                            ),
+                          ),
+                          style: LMFeedSnackBarStyle.basic(),
+                        ),
+                      );
+                      //toast("Username cannot be empty");
                       return;
                     }
 

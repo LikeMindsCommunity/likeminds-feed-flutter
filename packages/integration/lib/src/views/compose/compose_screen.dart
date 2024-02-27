@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
@@ -17,14 +16,14 @@ class LMFeedComposeScreen extends StatefulWidget {
   // Builder for bottom bar for buttons
   const LMFeedComposeScreen({
     super.key,
-    //Widget builder functions for customizations
+    // Widget builder functions for customizations
     this.composeDiscardDialogBuilder,
     this.composeAppBarBuilder,
     this.composeContentBuilder,
     this.composeTopicSelectorBuilder,
     this.composeMediaPreviewBuilder,
     this.composeUserHeaderBuilder,
-    //Config for the screen
+    // Config for the screen
     this.config,
     this.style,
     this.attachments,
@@ -42,7 +41,8 @@ class LMFeedComposeScreen extends StatefulWidget {
   final Widget Function()? composeContentBuilder;
   final Widget Function(List<LMTopicViewData>)? composeTopicSelectorBuilder;
   final Widget Function()? composeMediaPreviewBuilder;
-  final Widget Function(LMUserViewData user)? composeUserHeaderBuilder;
+  final Widget Function(BuildContext context, LMUserViewData user)?
+      composeUserHeaderBuilder;
   final List<LMAttachmentViewData>? attachments;
   final String? displayName;
   final String? displayUrl;
@@ -53,6 +53,7 @@ class LMFeedComposeScreen extends StatefulWidget {
 
 class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Required blocs and data for basic functionality, or state management
+
   final LMUserViewData user =
       LMFeedUserLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
@@ -83,13 +84,26 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     super.initState();
     _checkForRepost();
     isCustomWidget = _checkForCustomWidget();
+    config = widget.config ?? LMFeedCore.config.composeConfig;
     _headingController =
-        config?.enableHeading ?? false ? TextEditingController() : null;
-
+        (config?.enableHeading ?? false) ? TextEditingController() : null;
+    style = widget.style ?? feedTheme?.composeScreenStyle;
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
     }
+  }
+
+  @override
+  void didUpdateWidget(LMFeedComposeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _checkForRepost();
+    isCustomWidget = _checkForCustomWidget();
+    config = widget.config ?? LMFeedCore.config.composeConfig;
+    _headingController =
+        (config?.enableHeading ?? false) ? TextEditingController() : null;
+    style = widget.style ?? feedTheme?.composeScreenStyle;
+    composeBloc.add(LMFeedComposeFetchTopicsEvent());
   }
 
   @override
@@ -136,16 +150,23 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Handles all the events and states emitted by the compose bloc
   _composeBlocListener(BuildContext context, LMFeedComposeState state) {
     if (state is LMFeedComposeMediaErrorState) {
-      toast("Error while selecting media, please try again");
+      LMFeedCore.showSnackBar(
+        SnackBar(
+          content: LMFeedText(
+            text: 'Error while selecting media, please try again',
+          ),
+        ),
+      );
+      // TODO: remove old toast
+      // toast("Error while selecting media, please try again");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     feedTheme = LMFeedTheme.of(context);
-    style = widget.style ?? feedTheme?.composeScreenStyle;
     screenSize = MediaQuery.of(context).size;
-    config = widget.config ?? LMFeedCore.config.composeConfig;
+    LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
     return WillPopScope(
       onWillPop: () {
         widget.composeDiscardDialogBuilder?.call(context) ??
@@ -189,8 +210,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 18),
-                      widget.composeUserHeaderBuilder?.call(user) ??
-                          SizedBox.shrink(),
+                      widget.composeUserHeaderBuilder?.call(context, user) ??
+                          widgetUtility.composeScreenUserHeaderBuilder(
+                              context, user),
                       const SizedBox(height: 18),
                       widget.composeContentBuilder?.call() ??
                           _defContentInput(),
@@ -586,9 +608,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             onTap: () {
               _focusNode.unfocus();
 
+              String? heading = _headingController?.text;
+              heading = heading?.trim();
+
               String postText = _controller.text;
               postText = postText.trim();
-              if (postText.isNotEmpty || composeBloc.postMedia.isNotEmpty) {
+              if ((heading?.isNotEmpty ?? false) ||
+                  postText.isNotEmpty ||
+                  composeBloc.postMedia.isNotEmpty) {
                 List<LMUserTagViewData> userTags = [...composeBloc.userTags];
                 List<LMTopicViewData> selectedTopics = [
                   ...composeBloc.selectedTopics
@@ -597,10 +624,19 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 if (config!.topicRequiredToCreatePost &&
                     selectedTopics.isEmpty &&
                     config!.enableTopics) {
-                  toast(
-                    "Can't create a post without topic",
-                    duration: Toast.LENGTH_LONG,
+                  LMFeedCore.showSnackBar(
+                    SnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without topic",
+                      ),
+                      behavior: SnackBarBehavior.floating,
+                    ),
                   );
+                  // TODO: remove old toast
+                  // toast(
+                  //   "Can't create a post without topic",
+                  //   duration: Toast.LENGTH_LONG,
+                  // );
                   return;
                 }
                 userTags =
@@ -628,14 +664,26 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   postText: result!,
                   selectedTopics: selectedTopics,
                   postMedia: [...composeBloc.postMedia],
+                  heading: _headingController?.text,
                 ));
 
                 Navigator.pop(context);
               } else {
-                toast(
-                  "Can't create a post without text or attachments",
-                  duration: Toast.LENGTH_LONG,
+                LMFeedCore.showSnackBar(
+                  SnackBar(
+                    content: LMFeedText(
+                      text: "Can't create a post without text or attachments",
+                    ),
+                    behavior: SnackBarBehavior.floating,
+                    padding: EdgeInsets.all(10.0),
+                    margin: EdgeInsets.symmetric(horizontal: 20),
+                  ),
                 );
+                // TODO: remove old toast
+                // toast(
+                //   "Can't create a post without text or attachments",
+                //   duration: Toast.LENGTH_LONG,
+                // );
               }
             },
           ),
@@ -651,7 +699,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       ),
       child: Column(
         children: [
-          config?.enableHeading ?? false
+          (config?.enableHeading ?? false)
               ? TextField(
                   controller: _headingController,
                   decoration: InputDecoration(
@@ -671,18 +719,20 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 4.0),
-                child: LMFeedProfilePicture(
-                  fallbackText: widget.displayName ?? user.name,
-                  imageUrl: widget.displayUrl ?? user.imageUrl,
-                  style: LMFeedProfilePictureStyle(
-                    backgroundColor: theme.primaryColor,
-                    size: 36,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
+              !(config?.enableHeading ?? false)
+                  ? Container(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      margin: const EdgeInsets.only(right: 12),
+                      child: LMFeedProfilePicture(
+                        fallbackText: widget.displayName ?? user.name,
+                        imageUrl: widget.displayUrl ?? user.imageUrl,
+                        style: LMFeedProfilePictureStyle(
+                          backgroundColor: theme.primaryColor,
+                          size: 36,
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
               Column(
                 children: [
                   Container(
@@ -695,13 +745,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       minLines: 3,
                       enabled: config!.enableTagging,
                       // maxLines: 200,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         errorBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
                         focusedErrorBorder: InputBorder.none,
+                        hintText: config?.composeHint,
                       ),
                       onTagSelected: (tag) {
                         composeBloc.userTags.add(tag);
