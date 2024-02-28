@@ -41,6 +41,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   LMFeedNotificationsBloc? _notificationsBloc;
 
   int _page = 1;
+  LMFeedThemeData? _theme;
 
   @override
   void initState() {
@@ -55,8 +56,6 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
       ),
     );
   }
-
-  var kWhiteColor = Colors.white;
 
   void addPageRequestListener() {
     pagingController.addPageRequestListener(
@@ -82,14 +81,15 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
 
   bool todayFlag = true;
   bool earlierFlag = true;
+  String? _todayNotificationId;
+  String? _earlierNotificationId;
 
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
-    todayFlag = true;
-    earlierFlag = true;
+    _theme = LMFeedTheme.of(context);
     return Scaffold(
-      backgroundColor: kWhiteColor,
+      backgroundColor: _theme?.backgroundColor,
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       body: BlocConsumer(
         bloc: _notificationsBloc,
@@ -131,12 +131,12 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
       style: LMFeedAppBarStyle(
-        backgroundColor: Colors.white,
+        backgroundColor: _theme?.backgroundColor,
         border: Border(),
         padding: EdgeInsets.zero,
       ),
       leading: BackButton(
-        color: Colors.black,
+        color: _theme?.onContainer,
       ),
     );
   }
@@ -144,6 +144,8 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   Widget getNotificationsLoadedView({
     LMFeedNotificationsLoadedState? state,
   }) {
+    todayFlag = true;
+    earlierFlag = true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -157,20 +159,27 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
               noMoreItemsIndicatorBuilder: (context) => const SizedBox(
                 height: 20,
               ),
-              noItemsFoundIndicatorBuilder: (context) => Scaffold(
-                backgroundColor: kWhiteColor,
-                body: Center(
-                  child:
-                      widget.emptyNotificationFeedViewBuilder?.call(context) ??
-                          _defEmptyNotificationFeedView(),
-                ),
+              newPageProgressIndicatorBuilder: (context) =>
+                  widget.loaderBuilder?.call(context) ?? _defLoader(),
+              noItemsFoundIndicatorBuilder: (context) => Center(
+                child: widget.emptyNotificationFeedViewBuilder?.call(context) ??
+                    _defEmptyNotificationFeedView(),
               ),
               itemBuilder: (context, item, index) {
+                if (_todayNotificationId == null &&
+                    DateTime.now().day == item.createdAt.day) {
+                  _todayNotificationId = item.id;
+                }
+                if (_earlierNotificationId == null &&
+                    DateTime.now().day != item.createdAt.day) {
+                  _earlierNotificationId = item.id;
+                }
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    widget.timeStampBuilder?.call(context) ??
-                        _defTimeStampWidget(item.createdAt),
+                    // widget.timeStampBuilder?.call(context) ??
+                    //     _defTimeStampWidget(item.createdAt),
+                    // _defTime(item.createdAt, item.id),
                     widget.notificationTileBuilder
                             ?.call(context, item, _defNotificationTile(item)) ??
                         _defNotificationTile(item),
@@ -204,8 +213,11 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
       LMNotificationFeedItemViewData item) {
     return LMFeedNotificationTile(
       notificationItemViewData: item,
-      style: LMFeedTileStyle.basic()
-          .copyWith(crossAxisAlignment: CrossAxisAlignment.start),
+      style: LMFeedNotificationTileStyle.basic().copyWith(
+        activeBackgroundColor: _theme?.disabledColor.withOpacity(0.5),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      ),
       onTap: () {
         if (!item.isRead) {
           _notificationsBloc?.add(
@@ -214,15 +226,17 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
             ),
           );
         }
+        debugPrint(item.cta ?? 'no cta');
+        routeNotification(item.cta ?? '');
       },
     );
   }
 
   Padding _defCustomWidget() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 5),
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
       child: LMFeedText(
-          text: 'Activities',
+          text: 'Notifications',
           style: LMFeedTextStyle(
               textStyle: TextStyle(
             fontFamily: 'Inter',
@@ -230,6 +244,37 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
             fontWeight: FontWeight.w600,
           ))),
     );
+  }
+
+  Widget _defTime(DateTime createdAt, String postId) {
+    if (postId == _todayNotificationId) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+        child: LMFeedText(
+          text: "Today",
+          style: LMFeedTextStyle(
+              textStyle: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          )),
+        ),
+      );
+    } else if (postId == _earlierNotificationId) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+        child: LMFeedText(
+          text: "Earlier",
+          style: LMFeedTextStyle(
+              textStyle: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          )),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
   }
 
   Widget _defTimeStampWidget(DateTime createdAt) {
@@ -281,5 +326,32 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
         ),
       ),
     );
+  }
+
+  void routeNotification(String route) async {
+    Map<String, String> queryParams = {};
+    String host = "";
+
+    // If the notification is a feed notification, extract the route params
+    final Uri routeUri = Uri.parse(route);
+    final Map<String, String> routeParams =
+        routeUri.hasQuery ? routeUri.queryParameters : {};
+    final String routeHost = routeUri.host;
+    host = routeHost;
+    debugPrint("The route host is $routeHost");
+    queryParams.addAll(routeParams);
+    queryParams.forEach((key, value) {
+      debugPrint("$key: $value");
+    });
+
+    // Route the notification to the appropriate screen
+    // If the notification is post related, route to the post detail screen
+    if (host == "post_detail") {
+      final String postId = queryParams["post_id"]!;
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => LMFeedPostDetailScreen(postId: postId)));
+    }
   }
 }
