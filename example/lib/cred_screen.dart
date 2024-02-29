@@ -22,61 +22,52 @@ class MyApp extends StatelessWidget {
         textColor: Colors.white,
         alignment: Alignment.bottomCenter,
       ),
-      child: LMFeedTheme(
-        theme: LMFeedThemeData.light(
-          primaryColor: Colors.red[300],
-          tagColor: Colors.red[300],
-          linkColor: Colors.red[300],
-        ),
-        child: MaterialApp(
-          title: 'Integration App for UI + SDK package',
-          debugShowCheckedModeBanner: _isProd,
-          navigatorKey: rootNavigatorKey,
-          scaffoldMessengerKey: rootScaffoldMessengerKey,
-          theme: ThemeData(
-            useMaterial3: false,
-            primaryColor: Colors.deepPurple,
-            inputDecorationTheme: InputDecorationTheme(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              outlineBorder: const BorderSide(
+      child: MaterialApp(
+        title: 'Integration App for UI + SDK package',
+        debugShowCheckedModeBanner: _isProd,
+        navigatorKey: rootNavigatorKey,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
+        theme: ThemeData(
+          useMaterial3: false,
+          primaryColor: Colors.deepPurple,
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            outlineBorder: const BorderSide(
+              color: Colors.deepPurple,
+              width: 2,
+            ),
+            activeIndicatorBorder: const BorderSide(
+              color: Colors.deepPurple,
+              width: 2,
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
                 color: Colors.deepPurple,
                 width: 2,
               ),
-              activeIndicatorBorder: const BorderSide(
+            ),
+            enabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
                 color: Colors.deepPurple,
                 width: 2,
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.deepPurple,
-                  width: 2,
-                ),
-              ),
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.deepPurple,
-                  width: 2,
-                ),
               ),
             ),
           ),
-          home: LMFeedBlocListener(
-            analyticsListener:
-                (BuildContext context, LMFeedAnalyticsState state) {
-              if (state is LMFeedAnalyticsEventFired) {
-                debugPrint("Bloc Listened for event, - ${state.eventName}");
-                debugPrint("////////////////");
-                debugPrint("With properties - ${state.eventProperties}");
-              }
-            },
-            profileListener:
-                (BuildContext context, LMFeedProfileState state) {},
-            routingListener:
-                (BuildContext context, LMFeedRoutingState state) {},
-            child: const CredScreen(),
-          ),
+        ),
+        home: LMFeedBlocListener(
+          analyticsListener:
+              (BuildContext context, LMFeedAnalyticsState state) {
+            if (state is LMFeedAnalyticsEventFired) {
+              debugPrint("Bloc Listened for event, - ${state.eventName}");
+              debugPrint("////////////////");
+              debugPrint("With properties - ${state.eventProperties}");
+            }
+          },
+          profileListener: (BuildContext context, LMFeedProfileState state) {},
+          routingListener: (BuildContext context, LMFeedRoutingState state) {},
+          child: const CredScreen(),
         ),
       ),
     );
@@ -196,13 +187,13 @@ class _CredScreenState extends State<CredScreen> {
     }, onError: (err) {
       // Handle exception by warning the user their action did not succeed
       LMFeedCore.showSnackBar(
-          const SnackBar(content: Text('An error occurred')));
+          LMFeedSnackBar(content: const Text('An error occurred')));
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     // return lmFeed;
     userId = null; // UserLocalPreference.instance.fetchUserId();
     // If the local prefs have user id stored
@@ -280,7 +271,7 @@ class _CredScreenState extends State<CredScreen> {
 
                     if (userName.isEmpty && userId.isEmpty) {
                       LMFeedCore.showSnackBar(
-                        SnackBar(
+                        LMFeedSnackBar(
                           content: Container(
                             child: const LMFeedText(
                               text: "Username cannot be empty",

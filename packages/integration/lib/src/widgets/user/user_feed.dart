@@ -143,7 +143,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
 
   @override
   Widget build(BuildContext context) {
-    feedThemeData = LMFeedTheme.of(context);
+    feedThemeData = LMFeedCore.theme;
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
     return BlocListener(
       bloc: newPostBloc,
@@ -151,7 +151,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         if (state is LMFeedNewPostErrorState) {
           postUploading.value = false;
           LMFeedCore.showSnackBar(
-            SnackBar(
+            LMFeedSnackBar(
               content: LMFeedText(
                 text: state.errorMessage,
               ),
@@ -647,7 +647,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             );
           } else {
             LMFeedCore.showSnackBar(
-              SnackBar(
+              LMFeedSnackBar(
                 content: LMFeedText(
                   text: 'A post is already uploading.',
                 ),
@@ -730,7 +730,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
                 await postVideoController?.player.pause();
               } else {
                 LMFeedCore.showSnackBar(
-                  SnackBar(
+                  LMFeedSnackBar(
                     content: LMFeedText(
                       text: 'A post is already uploading.',
                     ),
@@ -745,7 +745,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             }
           : () {
               LMFeedCore.showSnackBar(
-                SnackBar(
+                LMFeedSnackBar(
                   content: LMFeedText(
                     text: 'You do not have permission to create a post',
                   ),

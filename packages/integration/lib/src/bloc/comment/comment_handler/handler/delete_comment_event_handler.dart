@@ -38,7 +38,7 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
     if (response.success) {
       // Show the toast message for comment deleted
       LMFeedCore.showSnackBar(
-        SnackBar(
+        LMFeedSnackBar(
           content: LMFeedText(
             text: 'Comment Deleted',
           ),
@@ -77,7 +77,7 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
       // and show the error message
       if (response.errorMessage != null) {
         LMFeedCore.showSnackBar(
-          SnackBar(
+          LMFeedSnackBar(
             content: LMFeedText(text: response.errorMessage!),
           ),
         );
@@ -85,7 +85,7 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
       // TODO: remove old toast
       if (response.errorMessage != null) {
         LMFeedCore.showSnackBar(
-          SnackBar(
+          LMFeedSnackBar(
             content: LMFeedText(
               text: response.errorMessage!,
             ),

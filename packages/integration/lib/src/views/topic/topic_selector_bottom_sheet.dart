@@ -41,7 +41,7 @@ class _LMFeedTopicSelectBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return LMFeedBottomSheet(
       style: widget.style,
       title: LMFeedText(

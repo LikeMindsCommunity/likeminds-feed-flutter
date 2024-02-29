@@ -33,7 +33,7 @@ class LMFeedTopicBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
+    LMFeedThemeData feedThemeData = LMFeedTheme.instance.theme;
     return Container(
       width: style?.width,
       decoration: BoxDecoration(

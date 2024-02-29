@@ -144,8 +144,8 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData lmFeedThemeData = LMFeedTheme.of(context);
-    style = widget.style ?? LMFeedTheme.of(context).postStyle;
+    LMFeedThemeData lmFeedThemeData = LMFeedTheme.instance.theme;
+    style = widget.style ?? LMFeedTheme.instance.theme.postStyle;
     return GestureDetector(
       onTap: () {
         widget.onPostTap?.call(context, widget.post);

@@ -139,7 +139,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     style = widget.style ?? feedTheme.mediaStyle.carouselStyle;
     mapAttachmentsToWidget();
     return GestureDetector(

@@ -12,7 +12,7 @@ void deletePostEventHandler(
 
   if (response.success) {
     LMFeedCore.showSnackBar(
-      SnackBar(
+      LMFeedSnackBar(
         content: LMFeedText(
           text: 'Post Deleted',
         ),
@@ -26,7 +26,7 @@ void deletePostEventHandler(
     emit(LMFeedPostDeletedState(postId: event.postId));
   } else {
     LMFeedCore.showSnackBar(
-      SnackBar(
+      LMFeedSnackBar(
         content: LMFeedText(text: response.errorMessage ?? "An error occurred"),
       ),
     );

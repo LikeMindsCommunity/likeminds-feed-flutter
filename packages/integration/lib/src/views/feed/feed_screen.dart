@@ -269,7 +269,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   @override
   Widget build(BuildContext context) {
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
-    feedThemeData = LMFeedTheme.of(context);
+    feedThemeData = LMFeedCore.theme;
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
     return Scaffold(
       backgroundColor: feedThemeData?.backgroundColor,
@@ -318,7 +318,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                 }
                               : () {
                                   LMFeedCore.showSnackBar(
-                                    SnackBar(
+                                    LMFeedSnackBar(
                                       content: LMFeedText(
                                         text:
                                             "You do not have permission to create a post",
@@ -428,7 +428,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   if (curr is LMFeedNewPostErrorState) {
                     postUploading.value = false;
                     LMFeedCore.showSnackBar(
-                      SnackBar(
+                      LMFeedSnackBar(
                         content: LMFeedText(
                           text: curr.errorMessage,
                         ),
@@ -1154,7 +1154,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    SnackBar(
+                    LMFeedSnackBar(
                       content: LMFeedText(
                         text: 'A post is already uploading.',
                       ),
@@ -1169,7 +1169,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  SnackBar(
+                  LMFeedSnackBar(
                     content: LMFeedText(
                       text: "You do not have permission to create a post",
                     ),
@@ -1265,7 +1265,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 );
               } else {
                 LMFeedCore.showSnackBar(
-                  SnackBar(
+                  LMFeedSnackBar(
                     content: LMFeedText(
                       text: 'A post is already uploading.',
                     ),
@@ -1280,7 +1280,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             }
           : () {
               LMFeedCore.showSnackBar(
-                SnackBar(
+                LMFeedSnackBar(
                   content: LMFeedText(
                     text: "You do not have permission to create a post",
                   ),
@@ -1397,7 +1397,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    SnackBar(
+                    LMFeedSnackBar(
                       content: LMFeedText(
                         text: 'A post is already uploading.',
                       ),
@@ -1412,7 +1412,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  SnackBar(
+                  LMFeedSnackBar(
                     content: LMFeedText(
                       text: "You do not have permission to create a post",
                     ),

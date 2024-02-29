@@ -61,7 +61,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMFeedThemeData? feedTheme;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
-  bool isCustomWidget = false;
   LMPostViewData? repost;
 
   /// Controllers and other helper classes' objects
@@ -83,7 +82,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   void initState() {
     super.initState();
     _checkForRepost();
-    isCustomWidget = _checkForCustomWidget();
     config = widget.config ?? LMFeedCore.config.composeConfig;
     _headingController =
         (config?.enableHeading ?? false) ? TextEditingController() : null;
@@ -98,7 +96,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   void didUpdateWidget(LMFeedComposeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     _checkForRepost();
-    isCustomWidget = _checkForCustomWidget();
     config = widget.config ?? LMFeedCore.config.composeConfig;
     _headingController =
         (config?.enableHeading ?? false) ? TextEditingController() : null;
@@ -115,17 +112,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     }
     composeBloc.add(LMFeedComposeCloseEvent());
     super.dispose();
-  }
-
-  bool _checkForCustomWidget() {
-    if (widget.attachments != null) {
-      for (LMAttachmentViewData attachment in widget.attachments!) {
-        if (attachment.attachmentType == 5) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   void _checkForRepost() {
@@ -151,7 +137,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   _composeBlocListener(BuildContext context, LMFeedComposeState state) {
     if (state is LMFeedComposeMediaErrorState) {
       LMFeedCore.showSnackBar(
-        SnackBar(
+        LMFeedSnackBar(
           content: LMFeedText(
             text: 'Error while selecting media, please try again',
           ),
@@ -164,7 +150,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     screenSize = MediaQuery.of(context).size;
     LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
     return WillPopScope(
@@ -252,7 +238,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     text: "No",
                     style: LMFeedTextStyle(
                       textStyle: TextStyle(
-                        color: LMFeedTheme.of(context).primaryColor,
+                        color: LMFeedCore.theme.primaryColor,
                         fontSize: 16,
                         fontWeight: FontWeight.normal,
                       ),
@@ -269,7 +255,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     text: "Yes",
                     style: LMFeedTextStyle(
                       textStyle: TextStyle(
-                        color: LMFeedTheme.of(context).primaryColor,
+                        color: LMFeedCore.theme.primaryColor,
                         fontSize: 16,
                         fontWeight: FontWeight.normal,
                       ),
@@ -328,9 +314,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                             borderRadius: BorderRadius.circular(8),
                             padding: const EdgeInsets.all(8),
                             border: Border.all(
-                              color: LMFeedTheme.of(context)
-                                  .onContainer
-                                  .withOpacity(0.1),
+                              color:
+                                  LMFeedCore.theme.onContainer.withOpacity(0.1),
                             )),
                         onPostTap: (context, postData) {
                           debugPrint('Post tapped');
@@ -546,7 +531,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   LMFeedAppBar _defAppBar() {
-    final theme = LMFeedTheme.of(context);
+    final theme = LMFeedCore.theme;
     return LMFeedAppBar(
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme?.container ?? Colors.white,
@@ -625,11 +610,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     selectedTopics.isEmpty &&
                     config!.enableTopics) {
                   LMFeedCore.showSnackBar(
-                    SnackBar(
+                    LMFeedSnackBar(
                       content: LMFeedText(
                         text: "Can't create a post without topic",
                       ),
-                      behavior: SnackBarBehavior.floating,
                     ),
                   );
                   // TODO: remove old toast
@@ -670,13 +654,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 Navigator.pop(context);
               } else {
                 LMFeedCore.showSnackBar(
-                  SnackBar(
+                  LMFeedSnackBar(
                     content: LMFeedText(
                       text: "Can't create a post without text or attachments",
                     ),
-                    behavior: SnackBarBehavior.floating,
-                    padding: EdgeInsets.all(10.0),
-                    margin: EdgeInsets.symmetric(horizontal: 20),
                   ),
                 );
                 // TODO: remove old toast
@@ -691,7 +672,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   Widget _defContentInput() {
-    final theme = LMFeedTheme.of(context);
+    final theme = LMFeedCore.theme;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
@@ -809,7 +790,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   Widget _defMediaPicker() {
-    final theme = LMFeedTheme.of(context);
+    final theme = LMFeedCore.theme;
     return BlocBuilder(
       bloc: composeBloc,
       builder: (context, state) {
@@ -973,9 +954,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           margin: const EdgeInsets.only(left: 16.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(500),
-                            color: LMFeedTheme.of(context).container,
+                            color: LMFeedCore.theme.container,
                             border: Border.all(
-                              color: LMFeedTheme.of(context).primaryColor,
+                              color: LMFeedCore.theme.primaryColor,
                             ),
                           ),
                           child: LMFeedTopicChip(
@@ -989,14 +970,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                                 : composeBloc.selectedTopics.first,
                             style: LMFeedTopicChipStyle(
                               textStyle: TextStyle(
-                                color: LMFeedTheme.of(context).primaryColor,
+                                color: LMFeedCore.theme.primaryColor,
                               ),
                               icon: LMFeedIcon(
                                 type: LMFeedIconType.icon,
                                 icon: CupertinoIcons.chevron_down,
                                 style: LMFeedIconStyle(
                                   size: 16,
-                                  color: LMFeedTheme.of(context).primaryColor,
+                                  color: LMFeedCore.theme.primaryColor,
                                 ),
                               ),
                             ),

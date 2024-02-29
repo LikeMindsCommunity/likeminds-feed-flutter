@@ -90,7 +90,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
-    style = widget.style ?? LMFeedTheme.of(context).mediaStyle;
+    style = widget.style ?? LMFeedTheme.instance.theme.mediaStyle;
     if (attachments == null || attachments!.isEmpty) {
       return const SizedBox();
     }
@@ -130,7 +130,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         child: repostData.isDeleted ?? false
             ? Container(
                 decoration: BoxDecoration(
-                  color: LMFeedTheme.of(context).onContainer.withOpacity(0.2),
+                  color:
+                      LMFeedTheme.instance.theme.onContainer.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 height: 120,
@@ -153,12 +154,12 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
                     return const SizedBox.shrink();
                   });
                 },
-                style: LMFeedTheme.of(context).postStyle.copyWith(
+                style: LMFeedTheme.instance.theme.postStyle.copyWith(
                     borderRadius: BorderRadius.circular(8),
                     padding: const EdgeInsets.all(8),
                     border: Border.all(
-                      color:
-                          LMFeedTheme.of(context).onContainer.withOpacity(0.1),
+                      color: LMFeedTheme.instance.theme.onContainer
+                          .withOpacity(0.1),
                     )),
                 onPostTap: (context, postData) {},
               ),

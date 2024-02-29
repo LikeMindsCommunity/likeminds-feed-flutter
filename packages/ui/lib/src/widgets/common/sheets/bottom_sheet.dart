@@ -43,7 +43,7 @@ class _LMBottomSheetState extends State<LMFeedBottomSheet> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    LMFeedThemeData theme = LMFeedTheme.of(context);
+    LMFeedThemeData theme = LMFeedTheme.instance.theme;
     return Container(
       width: screenSize.width,
       height: widget.style?.height,

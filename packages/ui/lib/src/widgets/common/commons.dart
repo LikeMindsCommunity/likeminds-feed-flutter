@@ -13,3 +13,4 @@ export 'shimmer/document_shimmer.dart';
 export 'shimmer/feed_shimmer.dart';
 export 'shimmer/post_shimmer.dart';
 export 'shimmer/user_tile_shimmer.dart';
+export 'snackbar/snackbar.dart';

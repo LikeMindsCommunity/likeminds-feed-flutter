@@ -24,7 +24,7 @@ class LMFeedMediaHandler {
             permissionStatus = await Permission.photos.request();
             if (permissionStatus == PermissionStatus.permanentlyDenied) {
               LMFeedCore.showSnackBar(
-                SnackBar(
+                LMFeedSnackBar(
                   content: LMFeedText(
                     text: 'Permissions denied, change app settings',
                   ),
@@ -50,7 +50,7 @@ class LMFeedMediaHandler {
             permissionStatus = await Permission.videos.request();
             if (permissionStatus == PermissionStatus.permanentlyDenied) {
               LMFeedCore.showSnackBar(
-                SnackBar(
+                LMFeedSnackBar(
                   content: LMFeedText(
                     text: 'Permissions denied, change app settings',
                   ),
@@ -149,7 +149,7 @@ class LMFeedMediaHandler {
       if (pickedFiles.files.isNotEmpty) {
         if (currentMediaLength + 1 > 10) {
           LMFeedCore.showSnackBar(
-            SnackBar(
+            LMFeedSnackBar(
               content: LMFeedText(
                 text: 'A total of 10 attachments can be added to a post',
               ),
@@ -169,7 +169,7 @@ class LMFeedMediaHandler {
             double fileSize = getFileSizeInDouble(fileBytes);
             if (fileSize > sizeLimit) {
               LMFeedCore.showSnackBar(
-                SnackBar(
+                LMFeedSnackBar(
                   content: LMFeedText(
                     text:
                         'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
@@ -202,7 +202,7 @@ class LMFeedMediaHandler {
     } on Exception catch (err, stacktrace) {
       LMFeedLogger.instance.handleException(err, stacktrace);
       LMFeedCore.showSnackBar(
-        SnackBar(
+        LMFeedSnackBar(
           content: LMFeedText(
             text: 'An error occurred',
           ),
@@ -233,7 +233,7 @@ class LMFeedMediaHandler {
       if (pickedFiles != null) {
         if (currentMediaLength + pickedFiles.files.length > 3) {
           LMFeedCore.showSnackBar(
-            SnackBar(
+            LMFeedSnackBar(
               content: LMFeedText(
                 text: 'A total of 3 documents can be added to a post',
               ),
@@ -250,7 +250,7 @@ class LMFeedMediaHandler {
         for (var pickedFile in pickedFiles.files) {
           if (getFileSizeInDouble(pickedFile.size) > 100) {
             LMFeedCore.showSnackBar(
-              SnackBar(
+              LMFeedSnackBar(
                 content: LMFeedText(
                   text: 'File size should be smaller than 100MB',
                 ),
@@ -279,7 +279,7 @@ class LMFeedMediaHandler {
     } on Exception catch (err, stacktrace) {
       LMFeedLogger.instance.handleException(err, stacktrace);
       LMFeedCore.showSnackBar(
-        SnackBar(
+        LMFeedSnackBar(
           content: LMFeedText(
             text: 'An error occurred',
           ),
@@ -321,7 +321,7 @@ class LMFeedMediaHandler {
     if (list != null && list.files.isNotEmpty) {
       if (mediaCount + list.files.length > 10) {
         LMFeedCore.showSnackBar(
-          SnackBar(
+          LMFeedSnackBar(
             content: LMFeedText(
               text: 'A total of 10 attachments can be added to a post',
             ),
@@ -339,7 +339,7 @@ class LMFeedMediaHandler {
         double fileSize = getFileSizeInDouble(fileBytes);
         if (fileSize > sizeLimit) {
           LMFeedCore.showSnackBar(
-            SnackBar(
+            LMFeedSnackBar(
               content: LMFeedText(
                 text:
                     'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',

@@ -30,7 +30,7 @@ class _ExampleTabScreenState extends State<ExampleTabScreen>
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData lmFeedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData lmFeedTheme = LMFeedCore.theme;
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         selectedIndex: tabController.index,

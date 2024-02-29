@@ -143,7 +143,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     Size screenSize = MediaQuery.of(context).size;
     return RefreshIndicator.adaptive(
       onRefresh: () {
@@ -835,7 +835,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    SnackBar(
+                    LMFeedSnackBar(
                       content: LMFeedText(
                         text: 'A post is already uploading.',
                       ),
@@ -850,7 +850,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  SnackBar(
+                  LMFeedSnackBar(
                     content: LMFeedText(
                       text: 'You do not have permission to create a post',
                     ),
@@ -1280,7 +1280,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     commentText = commentText.trim();
                                     if (commentText.isEmpty) {
                                       LMFeedCore.showSnackBar(
-                                        SnackBar(
+                                        LMFeedSnackBar(
                                           content: LMFeedText(
                                             text:
                                                 "Please write something to post",

@@ -59,7 +59,7 @@ class LMFeedPostDetailScreenHandler {
       return postViewData;
     } else {
       LMFeedCore.showSnackBar(
-        SnackBar(
+        LMFeedSnackBar(
           content: LMFeedText(
             text: response.errorMessage ?? "An error occurred",
           ),

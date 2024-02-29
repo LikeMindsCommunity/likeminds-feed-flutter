@@ -83,7 +83,7 @@ class LMFeedWidgetUtility {
 
   Widget noItemsFoundIndicatorBuilderFeed(BuildContext context,
       {LMFeedButton? createPostButton}) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
+    LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -154,14 +154,14 @@ class LMFeedWidgetUtility {
   }
 
   Widget firstPageProgressIndicatorBuilderFeed(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
+    LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return LMFeedLoader(
       style: feedThemeData.loaderStyle,
     );
   }
 
   Widget newPageProgressIndicatorBuilderFeed(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
+    LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return LMFeedLoader(
       style: feedThemeData.loaderStyle,
     );

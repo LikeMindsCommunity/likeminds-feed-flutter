@@ -27,7 +27,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     DeleteReason? reasonForDeletion;
     bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
     LMUserViewData? user = LMFeedUserLocalPreference.instance.fetchUserData();
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
 
     return Dialog(
       backgroundColor: feedTheme.container,
@@ -202,7 +202,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                             });
                                           } else {
                                             LMFeedCore.showSnackBar(
-                                              SnackBar(
+                                              LMFeedSnackBar(
                                                 content: LMFeedText(
                                                   text: value.errorMessage ??
                                                       "An error occurred",
@@ -278,7 +278,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                         isCm &&
                         reasonForDeletion == null) {
                       LMFeedCore.showSnackBar(
-                        SnackBar(
+                        LMFeedSnackBar(
                           content: LMFeedText(
                             text: 'Please select a reason for deletion',
                           ),

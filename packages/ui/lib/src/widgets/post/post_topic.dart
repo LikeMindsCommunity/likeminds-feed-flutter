@@ -20,7 +20,7 @@ class LMFeedPostTopic extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     LMFeedPostTopicStyle topicStyle =
-        style ?? LMFeedTheme.of(context).topicStyle;
+        style ?? LMFeedTheme.instance.theme.topicStyle;
     return Container(
       margin: topicStyle.margin,
       padding: topicStyle.padding,

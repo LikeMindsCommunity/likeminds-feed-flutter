@@ -114,7 +114,7 @@ Future<String?> setupMessaging() async {
     //   duration: Toast.LENGTH_LONG,
     // );
     LMFeedCore.showSnackBar(
-      SnackBar(
+      LMFeedSnackBar(
         content: const Text(
           'User declined or has not accepted notification permissions',
         ),

@@ -99,7 +99,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     return Scaffold(
       backgroundColor: feedTheme?.backgroundColor,
       appBar: LMFeedAppBar(

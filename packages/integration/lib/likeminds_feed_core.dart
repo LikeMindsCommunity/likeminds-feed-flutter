@@ -13,6 +13,7 @@ import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_con
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit/media_kit.dart';
 import 'dart:async';
 
@@ -55,7 +56,14 @@ class LMFeedCore {
 
   static String? get domain => instance.clientDomain;
 
+  static LMFeedThemeData get theme => LMFeedTheme.instance.theme;
+
   static LMFeedWidgetUtility get widgetUtility => instance._widgetUtility;
+
+  static void showSnackBar(LMFeedSnackBar snackBar) {
+    snackBar = snackBar.copyWith(style: theme.snackBarTheme);
+    instance._scaffoldMessengerKey?.currentState?.showSnackBar(snackBar);
+  }
 
   static GlobalKey<ScaffoldMessengerState>? get scaffoldMessengerKey =>
       instance._scaffoldMessengerKey;
@@ -68,11 +76,11 @@ class LMFeedCore {
   Future<void> initialize({
     String? apiKey,
     LMFeedClient? lmFeedClient,
-    ThemeData? theme,
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
     GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
+    LMFeedThemeData? theme,
   }) async {
     assert(apiKey != null || lmFeedClient != null);
     this.lmFeedClient =
@@ -82,6 +90,7 @@ class LMFeedCore {
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
     _scaffoldMessengerKey = scaffoldMessengerKey;
+    LMFeedTheme.instance.initialise(theme: theme ?? LMFeedThemeData.light());
     MediaKit.ensureInitialized();
   }
 
@@ -116,10 +125,6 @@ class LMFeedCore {
           return value;
         },
       );
-  }
-
-  static showSnackBar(SnackBar snackBar) {
-    scaffoldMessengerKey?.currentState?.showSnackBar(snackBar);
   }
 }
 

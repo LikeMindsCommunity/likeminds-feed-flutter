@@ -26,7 +26,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final inStyle = style ?? LMFeedAppBarStyle.basic();
-    final theme = LMFeedTheme.of(context);
+    final theme = LMFeedTheme.instance.theme;
 
     return Container(
       decoration: BoxDecoration(

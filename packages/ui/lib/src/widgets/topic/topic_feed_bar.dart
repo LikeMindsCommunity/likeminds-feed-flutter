@@ -5,7 +5,7 @@ import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
 // This widget is used to display a topic feed bar
 // A [LMFeedTopicFeedBar] displays a list of selected topics
-// The [LMFeedTopicFeedBar] can be customized by 
+// The [LMFeedTopicFeedBar] can be customized by
 // passing in the required parameters
 class LMFeedTopicFeedBar extends StatelessWidget {
   // Required parameters
@@ -148,7 +148,7 @@ class LMFeedTopicFeedBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     return GestureDetector(
       onTap: () => onTap(),
       child: Container(

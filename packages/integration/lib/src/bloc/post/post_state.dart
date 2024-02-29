@@ -22,7 +22,7 @@ class LMFeedPostSuccessState extends LMFeedPostState {
 /// When a post is successfully fetched from the server
 /// [LMFeedGetPostSuccessState] is emitted to update the UI
 /// [post] contains the post details and is of type [LMPostViewData]
-class LMFeedGetPostSuccessState extends LMFeedPostState {
+class LMFeedGetPostSuccessState extends LMFeedPostSuccessState {
   final LMPostViewData post;
 
   const LMFeedGetPostSuccessState({required this.post});

@@ -34,7 +34,7 @@ class _LMFeedTopicLevelBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return LMFeedBottomSheet(
       style: widget.style ??
           feedTheme.bottomSheetStyle.copyWith(padding: EdgeInsets.zero),

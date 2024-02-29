@@ -61,7 +61,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     return WillPopScope(
       onWillPop: () {
         Navigator.of(context).pop();

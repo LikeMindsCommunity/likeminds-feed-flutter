@@ -22,7 +22,7 @@ class LMFeedPostContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    final LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     final LMFeedPostContentStyle contentStyle = style ?? feedTheme.contentStyle;
     return ((heading?.isEmpty ?? true) && (text?.isEmpty ?? true))
         ? const SizedBox()
