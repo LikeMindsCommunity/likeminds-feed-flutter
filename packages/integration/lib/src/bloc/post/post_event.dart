@@ -62,7 +62,6 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
 /// and is of type [List<LMTopicViewData>]
 /// {@endtemplate}
 class LMFeedEditPostEvent extends LMFeedPostEvents {
-  final List<LMAttachmentViewData>? attachments;
   final String? postText;
   final String postId;
   final String? heading;
@@ -71,11 +70,10 @@ class LMFeedEditPostEvent extends LMFeedPostEvents {
   ///{@macro lm_feed_edit_post_event}
   LMFeedEditPostEvent({
     this.postText,
-    this.attachments,
     required this.postId,
     required this.selectedTopics,
     this.heading,
-  }) : assert(attachments != null || postText != null || heading != null);
+  }) : assert(postText != null || heading != null);
 }
 
 class LMFeedDeletePostEvent extends LMFeedPostEvents {

@@ -152,6 +152,15 @@ class LMFeedPostDetailScreenHandler {
         }
       case const (LMFeedCommentSuccessState<DeleteCommentResponse>):
         {
+          // Show the toast message for comment deleted
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                text: 'Comment Deleted',
+              ),
+            ),
+          );
+
           final LMFeedCommentSuccessState commentSuccessState =
               state as LMFeedCommentSuccessState;
 
