@@ -43,3 +43,8 @@ typedef LMFeedContextButtonBuilder = Widget Function(
 /// Takes [BuildContext] and [LMFeedTile] as parameters and returns [Widget]
 /// {@endtemplate}
 typedef LMFeedTileBuilder = Widget Function(BuildContext, LMFeedTile);
+
+/// {@template feed_fab_location}
+/// FloatingActionButtonLocation for Feed
+/// {@endtemplate}
+typedef LMFeedFABLocation = FloatingActionButtonLocation;

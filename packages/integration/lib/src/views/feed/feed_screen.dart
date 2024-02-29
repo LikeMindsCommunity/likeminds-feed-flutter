@@ -63,7 +63,7 @@ class LMFeedScreen extends StatefulWidget {
 
   final LMFeedTopicBarBuilder? topicBarBuilder;
 
-  final FloatingActionButtonLocation? floatingActionButtonLocation;
+  final LMFeedFABLocation? floatingActionButtonLocation;
 
   final bool enablePostCreation;
 
