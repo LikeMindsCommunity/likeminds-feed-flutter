@@ -119,6 +119,9 @@ class LMPostViewDataConvertor {
 
       postViewDataBuilder.topComments(topComments);
     }
+    if (post.tempId != null) {
+      postViewDataBuilder.tempId(post.tempId!);
+    }
 
     return postViewDataBuilder.build();
   }
@@ -152,6 +155,7 @@ class LMPostViewDataConvertor {
       repostCount: postViewData.repostCount,
       isDeleted: postViewData.isDeleted,
       heading: postViewData.heading,
+      tempId: postViewData.tempId,
     );
   }
 }

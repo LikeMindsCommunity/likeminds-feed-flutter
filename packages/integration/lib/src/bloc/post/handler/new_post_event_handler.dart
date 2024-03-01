@@ -74,9 +74,7 @@ void newPostEventHandler(
                     format: media.mediaType == LMMediaType.document
                         ? media.format
                         : null,
-                    duration: media.mediaType == LMMediaType.video
-                        ? 10
-                        : null),
+                    duration: media.mediaType == LMMediaType.video ? 10 : null),
               ),
             );
             progress.add(index / postMedia.length);
@@ -99,7 +97,8 @@ void newPostEventHandler(
     final requestBuilder = AddPostRequestBuilder()
       ..text(event.postText)
       ..attachments(attachments)
-      ..topics(postTopics);
+      ..topics(postTopics)
+      ..tempId('${-DateTime.now().millisecondsSinceEpoch}');
 
     if (isRepost != null) {
       requestBuilder.isRepost(isRepost);
@@ -108,7 +107,7 @@ void newPostEventHandler(
         await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
 
     if (response.success) {
-      emit(
+            emit(
         LMFeedNewPostUploadedState(
             postData: LMPostViewDataConvertor.fromPost(
               post: response.post!,

@@ -60,6 +60,8 @@ class LMPostViewData {
 
   List<LMCommentViewData>? topComments;
 
+  String? tempId;
+
   /// {@macro post_view_data}
   LMPostViewData._({
     required this.id,
@@ -87,6 +89,7 @@ class LMPostViewData {
     this.commentIds,
     this.heading,
     this.topComments,
+    this.tempId,
   });
 }
 
@@ -116,6 +119,7 @@ class LMPostViewDataBuilder {
   String? _heading;
   List<String>? _commentIds;
   List<LMCommentViewData>? _topComments;
+  String? _tempId;
 
   void id(String id) {
     _id = id;
@@ -217,6 +221,10 @@ class LMPostViewDataBuilder {
     _topComments = topComments;
   }
 
+  void tempId(String tempId) {
+    _tempId = tempId;
+  }
+
   LMPostViewData build() {
     return LMPostViewData._(
       id: _id!,
@@ -244,6 +252,7 @@ class LMPostViewDataBuilder {
       heading: _heading,
       commentIds: _commentIds,
       topComments: _topComments,
+      tempId: _tempId,
     );
   }
 }
