@@ -273,7 +273,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
     feedThemeData = LMFeedCore.theme;
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
-    return Scaffold(
+    return LMFeedCore.widgetUtility.scaffold(
       backgroundColor: feedThemeData?.backgroundColor,
       appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
       floatingActionButton: ValueListenableBuilder(
