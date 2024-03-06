@@ -60,16 +60,6 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
         ),
       );
     } else {
-      // Notify the UI to change the view to Error
-      // show the error message
-      if (response.errorMessage != null) {
-        LMFeedCore.showSnackBar(
-          LMFeedSnackBar(
-            content: LMFeedText(text: response.errorMessage!),
-          ),
-        );
-      }
-
       emit(LMFeedCommentErrorState(
         commentActionResponse: response,
         commentMetaData: event.commentMetaData,

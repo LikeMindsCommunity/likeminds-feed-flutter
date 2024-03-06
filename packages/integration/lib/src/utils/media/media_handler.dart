@@ -30,11 +30,6 @@ class LMFeedMediaHandler {
                   ),
                 ),
               );
-              // TODO: remove old toast
-              // toast(
-              //   'Permissions denied, change app settings',
-              //   duration: Toast.LENGTH_LONG,
-              // );
               return false;
             } else if (permissionStatus == PermissionStatus.granted) {
               return true;
@@ -56,11 +51,6 @@ class LMFeedMediaHandler {
                   ),
                 ),
               );
-              // TODO: remove old toast
-              // toast(
-              //   'Permissions denied, change app settings',
-              //   duration: Toast.LENGTH_LONG,
-              // );
               return false;
             } else if (permissionStatus == PermissionStatus.granted) {
               return true;
@@ -155,12 +145,6 @@ class LMFeedMediaHandler {
               ),
             ),
           );
-          // TODO: remove old toast
-          // toast(
-          //   'A total of 10 attachments can be added to a post',
-          //   duration: Toast.LENGTH_LONG,
-          // );
-          // onUploadedMedia(false);
           return null;
         } else {
           for (PlatformFile pFile in pickedFiles.files) {
@@ -176,11 +160,6 @@ class LMFeedMediaHandler {
                   ),
                 ),
               );
-              // TODO: remove old toast
-              // toast(
-              //   'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-              //   duration: Toast.LENGTH_LONG,
-              // );
             } else {
               File video = File(file.path);
               LMMediaModel videoFile = LMMediaModel(
@@ -192,11 +171,9 @@ class LMFeedMediaHandler {
               videoFiles.add(videoFile);
             }
           }
-          // onUploadedMedia(true);
           return videoFiles;
         }
       } else {
-        // onUploadedMedia(false);
         return null;
       }
     } on Exception catch (err, stacktrace) {
@@ -208,12 +185,6 @@ class LMFeedMediaHandler {
           ),
         ),
       );
-      // TODO: remove old toast
-      // toast(
-      //   'An error occurred',
-      //   duration: Toast.LENGTH_LONG,
-      // );
-      // onUploadedMedia(false);
       debugPrint(err.toString());
       return null;
     }
@@ -239,11 +210,6 @@ class LMFeedMediaHandler {
               ),
             ),
           );
-          // TODO: remove old toast
-          // toast(
-          //   'A total of 3 documents can be added to a post',
-          //   duration: Toast.LENGTH_LONG,
-          // );
           return null;
         }
         List<LMMediaModel> attachedFiles = [];
@@ -256,11 +222,6 @@ class LMFeedMediaHandler {
                 ),
               ),
             );
-            // TODO: remove old toast
-            // toast(
-            //   'File size should be smaller than 100MB',
-            //   duration: Toast.LENGTH_LONG,
-            // );
           } else {
             LMMediaModel documentFile = LMMediaModel(
               mediaType: LMMediaType.document,
@@ -285,11 +246,6 @@ class LMFeedMediaHandler {
           ),
         ),
       );
-      // TODO: remove old toast
-      // toast(
-      //   'An error occurred',
-      //   duration: Toast.LENGTH_LONG,
-      // );
       return null;
     }
   }
@@ -327,11 +283,6 @@ class LMFeedMediaHandler {
             ),
           ),
         );
-        // TODO: remove old toast
-        // toast(
-        //   'A total of 10 attachments can be added to a post',
-        //   duration: Toast.LENGTH_LONG,
-        // );
         return [];
       }
       for (PlatformFile image in list.files) {
@@ -346,11 +297,6 @@ class LMFeedMediaHandler {
               ),
             ),
           );
-          // TODO: remove old toast
-          // toast(
-          //   'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-          //   duration: Toast.LENGTH_LONG,
-          // );
           return [];
         }
       }
@@ -363,7 +309,6 @@ class LMFeedMediaHandler {
             ),
           )
           .toList();
-      // onUploaded(true);
 
       return mediaFiles;
     } else {

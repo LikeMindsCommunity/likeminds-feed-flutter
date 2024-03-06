@@ -11,30 +11,8 @@ void deletePostEventHandler(
   );
 
   if (response.success) {
-    LMFeedCore.showSnackBar(
-      LMFeedSnackBar(
-        content: LMFeedText(
-          text: 'Post Deleted',
-        ),
-      ),
-    );
-    // TODO: remove old toast
-    // toast(
-    //   'Post Deleted',
-    //   duration: Toast.LENGTH_LONG,
-    // );
     emit(LMFeedPostDeletedState(postId: event.postId));
   } else {
-    LMFeedCore.showSnackBar(
-      LMFeedSnackBar(
-        content: LMFeedText(text: response.errorMessage ?? "An error occurred"),
-      ),
-    );
-    // TODO: remove old toast
-    // toast(
-    //   response.errorMessage ?? 'An error occurred',
-    //   duration: Toast.LENGTH_LONG,
-    // );
     emit(LMFeedPostDeletionErrorState(
         message: response.errorMessage ?? 'An error occurred'));
   }

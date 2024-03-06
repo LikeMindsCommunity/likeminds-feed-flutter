@@ -364,6 +364,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 bloc: newPostBloc,
                 listener: (prev, curr) {
                   if (curr is LMFeedPostDeletedState) {
+                    // show a snackbar when post is deleted
+                    // will only be shown if a messenger key is provided
+                    LMFeedCore.showSnackBar(
+                      LMFeedSnackBar(
+                        content: LMFeedText(
+                          text: 'Post Deleted',
+                        ),
+                      ),
+                    );
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     feedRoomItemList
@@ -444,6 +453,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       feedRoomItemList![index] = curr.post;
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
+                  }
+                  if (curr is LMFeedPostDeletionErrorState) {
+                    LMFeedCore.showSnackBar(
+                      LMFeedSnackBar(
+                        content: LMFeedText(text: (curr).message),
+                      ),
+                    );
                   }
                 },
                 builder: (context, state) {

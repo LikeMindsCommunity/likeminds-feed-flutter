@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 
 class LMFeedPostDetailScreenHandler {
   final Map<String, LMUserViewData> users = {};
   final PagingController<int, LMCommentViewData> commetListPagingController;
   final String postId;
-  late final LMFeedCommentHandlerBloc commentHandlerBloc;
+  late final LMFeedCommentBloc commentHandlerBloc;
   late final FocusNode focusNode;
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -17,7 +18,7 @@ class LMFeedPostDetailScreenHandler {
   LMPostViewData? postData;
 
   LMFeedPostDetailScreenHandler(this.commetListPagingController, this.postId) {
-    commentHandlerBloc = LMFeedCommentHandlerBloc.instance;
+    commentHandlerBloc = LMFeedCommentBloc.instance;
     addCommentListPaginationListener();
     commentController = TextEditingController();
     focusNode = FocusNode();
@@ -229,6 +230,16 @@ class LMFeedPostDetailScreenHandler {
               .commentActionResponse as EditCommentReplyResponse;
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
+        }
+      case const (LMFeedCommentErrorState<DeleteCommentResponse>):
+        {
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                  text: (state as DeleteCommentResponse).errorMessage ??
+                      "An error occurred"),
+            ),
+          );
         }
     }
   }

@@ -53,7 +53,7 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
 
 class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedFetchCommentReplyBloc? _commentRepliesBloc;
-  LMFeedCommentHandlerBloc? _commentHandlerBloc;
+  LMFeedCommentBloc? _commentHandlerBloc;
   ValueNotifier<bool> rebuildLikeButton = ValueNotifier(false);
   ValueNotifier<bool> rebuildReplyList = ValueNotifier(false);
   List<LMCommentViewData> replies = [];
@@ -75,7 +75,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     likeCount = reply!.likesCount;
     replyCount = reply!.repliesCount;
     refresh = widget.refresh;
-    _commentHandlerBloc = LMFeedCommentHandlerBloc.instance;
+    _commentHandlerBloc = LMFeedCommentBloc.instance;
     _commentRepliesBloc = LMFeedFetchCommentReplyBloc.instance;
   }
 
@@ -148,8 +148,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
             return const SizedBox();
           }
         }
-        return BlocConsumer<LMFeedCommentHandlerBloc,
-            LMFeedCommentHandlerState>(
+        return BlocConsumer<LMFeedCommentBloc, LMFeedCommentHandlerState>(
           bloc: _commentHandlerBloc,
           listener: (context, state) {
             switch (state.runtimeType) {

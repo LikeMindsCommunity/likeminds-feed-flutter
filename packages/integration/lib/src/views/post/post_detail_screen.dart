@@ -135,7 +135,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   @override
   void dispose() {
-    LMFeedCommentHandlerBloc.instance.add(LMFeedCommentCancelEvent());
+    LMFeedCommentBloc.instance.add(LMFeedCommentCancelEvent());
     super.dispose();
   }
 
@@ -181,7 +181,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                   _postDetailScreenHandler!.postData!),
                         ),
                         SliverToBoxAdapter(
-                          child: BlocListener<LMFeedCommentHandlerBloc,
+                          child: BlocListener<LMFeedCommentBloc,
                               LMFeedCommentHandlerState>(
                             bloc: _postDetailScreenHandler!.commentHandlerBloc,
                             listener: (context, state) {
@@ -1110,7 +1110,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   Widget defBottomTextField() {
     return SafeArea(
-      child: BlocBuilder<LMFeedCommentHandlerBloc, LMFeedCommentHandlerState>(
+      child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
         bloc: _postDetailScreenHandler!.commentHandlerBloc,
         builder: (context, state) => Container(
           decoration: BoxDecoration(
