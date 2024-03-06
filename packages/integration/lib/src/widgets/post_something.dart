@@ -48,9 +48,7 @@ class LMFeedPostSomething extends StatelessWidget {
                 ),
                 imageUrl: user.imageUrl,
                 onTap: () {
-                  if (user.sdkClientInfo != null) {
-                    LMFeedCore.client.routeToProfile(user.sdkClientInfo!.uuid);
-                  }
+                  LMFeedCore.client.routeToProfile(user.sdkClientInfo.uuid);
                 },
               ),
               LikeMindsTheme.kHorizontalPaddingMedium,

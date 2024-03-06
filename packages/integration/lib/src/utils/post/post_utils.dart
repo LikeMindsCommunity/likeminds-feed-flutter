@@ -170,7 +170,7 @@ class LMFeedPostUtils {
   static LMPostViewData postViewDataFromActivity(
     UserActivityItem activity,
     Map<String, WidgetModel>? widgets,
-    Map<String, User>? users,
+    Map<String, User> users,
     Map<String, Topic>? topics, {
     Map<String, Comment>? filteredComments,
     Map<String, Post>? repostedPosts,
@@ -192,7 +192,7 @@ class LMFeedPostUtils {
         ? LMPostViewDataConvertor.fromPost(
             post: activity.activityEntityData.postData!,
             widgets: widgets,
-            users: users ?? {},
+            users: users,
             topics: topics ?? {},
             filteredComments: filteredComments ?? {},
             repostedPosts: repostedPosts ?? {},
@@ -210,7 +210,7 @@ class LMFeedPostUtils {
               ..replies(activity.activityEntityData.replies
                       ?.map((e) => LMCommentViewDataConvertor.fromComment(
                           e,
-                          users?.map((key, value) => MapEntry(key,
+                          users.map((key, value) => MapEntry(key,
                                   LMUserViewDataConvertor.fromUser(value))) ??
                               {}))
                       .toList() ??
@@ -219,6 +219,8 @@ class LMFeedPostUtils {
               ..isPinned(activity.activityEntityData.isPinned!)
               ..topics(topicViewData)
               ..uuid(activity.activityEntityData.uuid!)
+              ..user(LMUserViewDataConvertor.fromUser(
+                  users[activity.activityEntityData.uuid!]!))
               ..likeCount(activity.activityEntityData.likesCount!)
               ..commentCount(activity.activityEntityData.commentsCount!)
               ..isSaved(activity.activityEntityData.isSaved!)
@@ -269,6 +271,11 @@ class LMFeedPostUtils {
 
     if (commentData.uuid != null) {
       commentViewDataBuilder.uuid(commentData.uuid!);
+
+      LMUserViewData user =
+          LMUserViewDataConvertor.fromUser(users[commentData.uuid]!);
+
+      commentViewDataBuilder.user(user);
     }
 
     if (commentData.updatedAt != null) {

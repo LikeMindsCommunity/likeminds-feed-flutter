@@ -163,13 +163,14 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               );
               final user = users[item.activityEntityData.uuid]!;
 
+              LMFeedPostWidget postWidget =
+                  defPostWidget(feedTheme, postViewData, item);
+
               return Column(
                 children: [
-                  widget.postBuilder?.call(
-                          context,
-                          defPostWidget(feedTheme, postViewData, item),
-                          postViewData) ??
-                      defPostWidget(feedTheme, postViewData, item),
+                  widget.postBuilder?.call(context, postWidget, postViewData) ??
+                      LMFeedCore.widgetUtility
+                          .postWidgetBuilder(context, postWidget, postViewData),
                   if (item.action == 7)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -205,13 +206,14 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                                       LMFeedMenuAction.commentReportId ||
                                   element.id == LMFeedMenuAction.commentEditId);
 
-                              return widget.commentBuilder?.call(
-                                      context,
-                                      defCommentTile(feedTheme, commentViewData,
-                                          postViewData, user),
-                                      postViewData) ??
+                              LMFeedCommentWidget commentWidget =
                                   defCommentTile(feedTheme, commentViewData,
                                       postViewData, user);
+
+                              return widget.commentBuilder?.call(
+                                      context, commentWidget, postViewData) ??
+                                  LMFeedCore.widgetUtility.commentBuilder(
+                                      context, commentWidget, postViewData);
                             },
                           ),
                         ],
