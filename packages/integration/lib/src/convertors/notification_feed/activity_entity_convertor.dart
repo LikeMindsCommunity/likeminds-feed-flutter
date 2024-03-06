@@ -71,7 +71,7 @@ class LMActivityEntityViewDataConvertor {
       activityEntityViewDataBuilder.updatedAt(activityEntityData.updatedAt!);
     }
 
-    activityEntityViewDataBuilder.userId(activityEntityData.userId);
+    activityEntityViewDataBuilder.uuid(activityEntityData.uuid);
 
     return activityEntityViewDataBuilder.build();
   }
@@ -99,7 +99,7 @@ class LMActivityEntityViewDataConvertor {
           .toList(),
       text: activityEntityViewData.text,
       updatedAt: activityEntityViewData.updatedAt,
-      userId: activityEntityViewData.userId,
+      uuid: activityEntityViewData.uuid,
     );
   }
 }

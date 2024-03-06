@@ -7,7 +7,7 @@ class LMCommentViewDataConvertor {
         LMCommentViewDataBuilder();
     commentViewDataBuilder
       ..id(comment.id)
-      ..userId(comment.userId)
+      ..uuid(comment.uuid)
       ..text(comment.text)
       ..level(comment.level ?? 0)
       ..likesCount(comment.likesCount)
@@ -19,7 +19,6 @@ class LMCommentViewDataConvertor {
       ..updatedAt(DateTime.fromMillisecondsSinceEpoch(comment.updatedAt))
       ..isLiked(comment.isLiked)
       ..isEdited(comment.isEdited)
-      ..uuid(comment.uuid)
       ..user(users[comment.uuid]!)
       ..parentComment(comment.parentComment != null
           ? LMCommentViewDataConvertor.fromComment(
@@ -31,7 +30,7 @@ class LMCommentViewDataConvertor {
 
   static Comment toComment(LMCommentViewData commentViewData) {
     return Comment(
-      userId: commentViewData.userId,
+      uuid: commentViewData.uuid,
       text: commentViewData.text,
       level: commentViewData.level,
       likesCount: commentViewData.likesCount,
@@ -50,7 +49,6 @@ class LMCommentViewDataConvertor {
       replies: commentViewData.replies
           ?.map((e) => LMCommentViewDataConvertor.toComment(e))
           .toList(),
-      uuid: commentViewData.uuid,
       tempId: commentViewData.tempId,
     );
   }

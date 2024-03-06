@@ -18,7 +18,7 @@ class LMActivityEntityViewData {
   String text;
   List<LMCommentViewData>? replies;
   int? updatedAt;
-  String userId;
+  String uuid;
 
   LMActivityEntityViewData._({
     required this.id,
@@ -37,7 +37,7 @@ class LMActivityEntityViewData {
     required this.text,
     this.replies,
     this.updatedAt,
-    required this.userId,
+    required this.uuid,
   });
 }
 
@@ -59,7 +59,7 @@ class LMActivityEntityViewDataBuilder {
 
   List<LMCommentViewData>? _replies;
   int? _updatedAt;
-  String? _userId;
+  String? _uuid;
 
   void id(String id) {
     _id = id;
@@ -125,8 +125,8 @@ class LMActivityEntityViewDataBuilder {
     _updatedAt = updatedAt;
   }
 
-  void userId(String userId) {
-    _userId = userId;
+  void uuid(String uuid) {
+    _uuid = uuid;
   }
 
   LMActivityEntityViewData build() {
@@ -147,7 +147,7 @@ class LMActivityEntityViewDataBuilder {
       text: _text!,
       replies: _replies,
       updatedAt: _updatedAt,
-      userId: _userId!,
+      uuid: _uuid!,
     );
   }
 }

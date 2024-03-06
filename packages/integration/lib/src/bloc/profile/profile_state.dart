@@ -10,12 +10,12 @@ abstract class LMFeedProfileState extends Equatable {
 class LMFeedProfileStateInitState extends LMFeedProfileState {}
 
 class LMFeedRouteToUserProfileState extends LMFeedProfileState {
-  final String userUniqueId;
+  final String uuid;
 
-  const LMFeedRouteToUserProfileState({required this.userUniqueId});
+  const LMFeedRouteToUserProfileState({required this.uuid});
 
   @override
-  List<Object> get props => [userUniqueId, identityHashCode(this)];
+  List<Object> get props => [uuid, identityHashCode(this)];
 }
 
 class LMFeedLoginRequiredState extends LMFeedProfileState {}

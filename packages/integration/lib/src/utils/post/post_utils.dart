@@ -218,7 +218,7 @@ class LMFeedPostUtils {
               ..communityId(activity.activityEntityData.communityId)
               ..isPinned(activity.activityEntityData.isPinned!)
               ..topics(topicViewData)
-              ..userId(activity.activityEntityData.userId!)
+              ..uuid(activity.activityEntityData.uuid!)
               ..likeCount(activity.activityEntityData.likesCount!)
               ..commentCount(activity.activityEntityData.commentsCount!)
               ..isSaved(activity.activityEntityData.isSaved!)
@@ -245,7 +245,7 @@ class LMFeedPostUtils {
   static LMCommentViewData commentViewDataFromActivity(
       UserActivityEntityData commentData, Map<String, User> users) {
     LMCommentViewDataBuilder commentViewDataBuilder = LMCommentViewDataBuilder()
-      ..userId(commentData.userId!)
+      ..uuid(commentData.uuid!)
       ..text(commentData.text)
       ..level(commentData.level!)
       ..likesCount(commentData.likesCount!)
@@ -267,8 +267,8 @@ class LMFeedPostUtils {
           [])
       ..isEdited(commentData.isEdited);
 
-    if (commentData.userId != null) {
-      commentViewDataBuilder.uuid(commentData.userId!);
+    if (commentData.uuid != null) {
+      commentViewDataBuilder.uuid(commentData.uuid!);
     }
 
     if (commentData.updatedAt != null) {

@@ -49,8 +49,7 @@ class LMFeedPostSomething extends StatelessWidget {
                 imageUrl: user.imageUrl,
                 onTap: () {
                   if (user.sdkClientInfo != null) {
-                    LMFeedCore.client
-                        .routeToProfile(user.sdkClientInfo!.userUniqueId);
+                    LMFeedCore.client.routeToProfile(user.sdkClientInfo!.uuid);
                   }
                 },
               ),

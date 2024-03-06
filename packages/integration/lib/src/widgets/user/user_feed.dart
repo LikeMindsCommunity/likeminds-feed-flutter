@@ -13,7 +13,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 class LMFeedUserFeedWidget extends StatefulWidget {
   const LMFeedUserFeedWidget({
     Key? key,
-    required this.userId,
+    required this.uuid,
     this.postBuilder,
     this.noItemsFoundIndicatorBuilder,
     this.firstPageProgressIndicatorBuilder,
@@ -24,7 +24,7 @@ class LMFeedUserFeedWidget extends StatefulWidget {
   }) : super(key: key);
 
   // The user id for which the user feed is to be shown
-  final String userId;
+  final String uuid;
   // Builder for post item
   // {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
@@ -84,7 +84,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
       final userFeedRequest = (GetUserFeedRequestBuilder()
             ..page(pageKey)
             ..pageSize(pageSize)
-            ..userId(widget.userId))
+            ..uuid(widget.uuid))
           .build();
       GetUserFeedResponse response =
           await LMFeedCore.instance.lmFeedClient.getUserFeed(userFeedRequest);
@@ -243,7 +243,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
               pagingController: _pagingController,
               builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
                 itemBuilder: (context, item, index) {
-                  if (!users.containsKey(item.userId)) {
+                  if (!users.containsKey(item.uuid)) {
                     return const SizedBox();
                   }
                   LMFeedPostWidget postWidget =
@@ -316,12 +316,12 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: users[post.userId]!,
+      user: users[post.uuid]!,
       isFeed: false,
-      onTagTap: (String userId) {
+      onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
           ),
         );
       },
@@ -342,7 +342,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: users[post.userId]!,
+              user: users[post.uuid]!,
             ),
           ),
         );
@@ -383,7 +383,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
-      onTagTap: (String? userId) {},
+      onTagTap: (String? uuid) {},
       style: feedThemeData?.contentStyle,
       text: post.text,
       heading: post.heading,
@@ -404,7 +404,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
 
   LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: users[postViewData.userId]!,
+      user: users[postViewData.uuid]!,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData?.headerStyle,
@@ -419,7 +419,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
                   title: 'Delete Comment',
-                  userId: postViewData.userId,
+                  uuid: postViewData.uuid,
                   content:
                       'Are you sure you want to delete this post. This action can not be reversed.',
                   action: (String reason) async {
@@ -473,7 +473,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: users[post.userId]!,
+              user: users[post.uuid]!,
             ),
           ),
         );
@@ -785,7 +785,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
-            'created_by_id': postViewData.userId,
+            'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,
             'post_type': postType,
           },

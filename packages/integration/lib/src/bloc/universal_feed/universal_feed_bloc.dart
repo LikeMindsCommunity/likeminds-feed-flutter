@@ -93,7 +93,7 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
                         post: e,
                         widgets: response.widgets,
                         repostedPosts: response.repostedPosts,
-                        users: response.users,
+                        users: response.users ?? {},
                         topics: response.topics,
                         filteredComments: response.filteredComments,
                       ))

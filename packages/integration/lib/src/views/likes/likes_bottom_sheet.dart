@@ -124,15 +124,15 @@ class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
   }
 
   void onUserTap(LMLikeViewData likeViewData) async {
-    if (likeViewData.userId != currentUser.userUniqueId) {
+    if (likeViewData.uuid != currentUser.uuid) {
       LMFeedProfileBloc.instance.add(LMFeedRouteToUserProfileEvent(
-        userUniqueId: likeViewData.userId,
+        uuid: likeViewData.uuid,
       ));
     } else {
       List<LMLikeViewData>? likesList = handler!.pagingController.itemList;
 
-      int index = likesList?.indexWhere(
-              (element) => element.userId == currentUser.userUniqueId) ??
+      int index = likesList
+              ?.indexWhere((element) => element.uuid == currentUser.uuid) ??
           -1;
 
       if (index != -1) {
@@ -161,14 +161,14 @@ class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
           backgroundColor: feedTheme?.container,
           padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0)),
       title: LMFeedText(
-        text: handler!.userData[like.userId]!.name,
+        text: handler!.userData[like.uuid]!.name,
       ),
       leading: LMFeedProfilePicture(
-        fallbackText: handler!.userData[like.userId]!.name,
-        imageUrl: handler!.userData[like.userId]!.imageUrl,
+        fallbackText: handler!.userData[like.uuid]!.name,
+        imageUrl: handler!.userData[like.uuid]!.imageUrl,
         onTap: () => onUserTap(like),
       ),
-      subtitle: like.userId == currentUser.userUniqueId
+      subtitle: like.uuid == currentUser.uuid
           ? LMFeedText(text: "Tap to remove")
           : null,
     );

@@ -83,15 +83,14 @@ class CredScreen extends StatefulWidget {
 
 class _CredScreenState extends State<CredScreen> {
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _userIdController = TextEditingController();
+  final TextEditingController _uuidController = TextEditingController();
   StreamSubscription? _streamSubscription;
   LMSampleApp? lmFeed;
-  String? userId;
+  String? uuid;
 
   @override
   void initState() {
     super.initState();
-    // userId = UserLocalPreference.instance.fetchUserId();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       initUniLinks(context);
     });
@@ -100,7 +99,7 @@ class _CredScreenState extends State<CredScreen> {
   @override
   void dispose() {
     _usernameController.dispose();
-    _userIdController.dispose();
+    _uuidController.dispose();
     _streamSubscription?.cancel();
     super.dispose();
   }
@@ -121,7 +120,7 @@ class _CredScreenState extends State<CredScreen> {
       final uriLink = Uri.parse(initialLink);
       if (uriLink.isAbsolute) {
         final deepLinkRequestBuilder = LMFeedDeepLinkRequestBuilder()
-          ..userId(userId ?? "Test-User-Id")
+          ..uuid(uuid ?? "Test-User-Id")
           ..userName("Test User");
         if (uriLink.path == '/post') {
           List secondPathSegment = initialLink.split('post_id=');
@@ -159,7 +158,7 @@ class _CredScreenState extends State<CredScreen> {
         final uriLink = Uri.parse(link);
         if (uriLink.isAbsolute) {
           final deepLinkRequestBuilder = LMFeedDeepLinkRequestBuilder()
-            ..userId(userId ?? "Test-User-Id")
+            ..uuid(uuid ?? "Test-User-Id")
             ..userName("Test User");
 
           if (uriLink.path == '/post') {
@@ -195,13 +194,13 @@ class _CredScreenState extends State<CredScreen> {
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedCore.theme;
     // return lmFeed;
-    userId = null; // UserLocalPreference.instance.fetchUserId();
+    uuid = null; // UserLocalPreference.instance.fetchuuid();
     // If the local prefs have user id stored
     // Login using that user Id
     // otherwise show the cred screen for login
-    if (userId != null && userId!.isNotEmpty) {
+    if (uuid != null && uuid!.isNotEmpty) {
       return lmFeed = LMSampleApp(
-        userId: userId,
+        uuid: uuid,
         userName: 'Test User',
       );
     } else {
@@ -250,7 +249,7 @@ class _CredScreenState extends State<CredScreen> {
                 const SizedBox(height: 12),
                 TextField(
                   cursorColor: Colors.white,
-                  controller: _userIdController,
+                  controller: _uuidController,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                       fillColor: Colors.white,
@@ -266,10 +265,10 @@ class _CredScreenState extends State<CredScreen> {
                 const SizedBox(height: 36),
                 GestureDetector(
                   onTap: () {
-                    String userId = _userIdController.text;
+                    String uuid = _uuidController.text;
                     String userName = _usernameController.text;
 
-                    if (userName.isEmpty && userId.isEmpty) {
+                    if (userName.isEmpty && uuid.isEmpty) {
                       LMFeedCore.showSnackBar(
                         LMFeedSnackBar(
                           content: Container(
@@ -286,7 +285,7 @@ class _CredScreenState extends State<CredScreen> {
                     }
 
                     lmFeed = LMSampleApp(
-                      userId: _userIdController.text,
+                      uuid: _uuidController.text,
                       userName: _usernameController.text,
                     );
 
@@ -294,7 +293,7 @@ class _CredScreenState extends State<CredScreen> {
                       // INIT - Get the LMFeed instance and pass the credentials (if any)
                       builder: (context) => ExampleTabScreen(
                         feedWidget: lmFeed!,
-                        userId: userId,
+                        uuid: uuid,
                       ),
                     );
                     Navigator.of(context).push(route);

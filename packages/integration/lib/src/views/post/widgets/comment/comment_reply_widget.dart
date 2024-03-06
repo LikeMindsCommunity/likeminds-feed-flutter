@@ -235,7 +235,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 itemCount: replies.length,
                 itemBuilder: (context, index) {
                   LMCommentViewData commentViewData = replies[index];
-                  LMUserViewData user = users[commentViewData.userId]!;
+                  LMUserViewData user = users[commentViewData.uuid]!;
                   return StatefulBuilder(
                     builder: (context, setReplyState) {
                       return widget.commentBuilder?.call(
@@ -299,7 +299,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         if (state is LMFeedCommentRepliesLoadedState) {
           users = state.commentDetails.users!.map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
-          users.putIfAbsent(user.userUniqueId, () => user);
+          users.putIfAbsent(user.uuid, () => user);
           replies = state.commentDetails.postReplies!.replies
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
@@ -307,7 +307,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         } else if (state is LMFeedPaginatedCommentRepliesLoadingState) {
           users = state.prevCommentDetails.users!.map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
-          users.putIfAbsent(user.userUniqueId, () => user);
+          users.putIfAbsent(user.uuid, () => user);
           replies = state.prevCommentDetails.postReplies!.replies
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
@@ -323,10 +323,10 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     return LMFeedCommentWidget(
       style: replyStyle,
       comment: commentViewData,
-      onTagTap: (String userId) {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
+      onTagTap: (String uuid) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(uuid);
       },
-      user: user,
+      user: commentViewData.user,
       profilePicture: LMFeedProfilePicture(
         imageUrl: user.imageUrl,
         style: LMFeedProfilePictureStyle(
@@ -335,10 +335,8 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         ),
         fallbackText: user.name,
         onTap: () {
-          if (user.sdkClientInfo != null) {
-            LMFeedCore.instance.lmFeedClient
-                .routeToProfile(user.sdkClientInfo!.userUniqueId);
-          }
+          LMFeedCore.instance.lmFeedClient
+              .routeToProfile(user.sdkClientInfo.uuid);
         },
       ),
       lmFeedMenuAction: defLMFeedMenuAction(
@@ -376,12 +374,13 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       },
       onCommentDelete: () {
         _commentHandlerBloc!.add(LMFeedCommentCancelEvent());
+        String commentCreatorUUID = commentViewData.user.sdkClientInfo.uuid;
 
         showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete Comment',
-                userId: commentViewData.userId,
+                uuid: commentCreatorUUID,
                 content:
                     'Are you sure you want to delete this comment. This action can not be reversed.',
                 action: (String reason) async {

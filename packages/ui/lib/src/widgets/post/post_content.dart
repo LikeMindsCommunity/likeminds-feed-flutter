@@ -62,8 +62,8 @@ class LMFeedPostContent extends StatelessWidget {
                 if (text != null && text!.isNotEmpty)
                   LMFeedExpandableText(
                     text!,
-                    onTagTap: (String userId) {
-                      onTagTap?.call(userId);
+                    onTagTap: (String uuid) {
+                      onTagTap?.call(uuid);
                     },
                     expandText: contentStyle.expandText ?? "see more",
                     animation: contentStyle.animation ?? true,

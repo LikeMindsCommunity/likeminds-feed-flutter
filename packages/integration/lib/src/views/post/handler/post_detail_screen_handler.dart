@@ -32,18 +32,37 @@ class LMFeedPostDetailScreenHandler {
     final response = await LMFeedCore.client.getPostDetails(postDetailRequest);
 
     if (response.success) {
+      // Convert [User] to [LMUserViewData]
+      // Add users to the map
       users.addAll(response.users!.map((key, value) =>
           MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
 
+      // Convert [Topic] to [LMTopicViewData]
+      // Add topics to the map
       topics.addAll(response.topics!.map((key, value) =>
           MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
-      repostedPosts.addAll(response.repostedPosts?.map((key, value) =>
-              MapEntry(key, LMPostViewDataConvertor.fromPost(post: value))) ??
+
+      // Convert [Post] to [LMPostViewData]
+      // Add reposted posts to the map
+      repostedPosts.addAll(response.repostedPosts?.map((key, value) => MapEntry(
+              key,
+              LMPostViewDataConvertor.fromPost(
+                post: value,
+                widgets: response.widgets,
+                repostedPosts: response.repostedPosts,
+                users: response.users ?? {},
+                topics: response.topics ?? {},
+              ))) ??
           {});
 
+      // Convert [WidgetModel] to [LMWidgetViewData]
+      // Add widgets to the map
       widgets.addAll(response.widgets?.map((key, value) => MapEntry(
               key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
           {});
+
+      // Convert [Post] to [LMPostViewData]
+      // Add post data, and all supporting data to the map
       final LMPostViewData postViewData = LMPostViewDataConvertor.fromPost(
         post: response.post!,
         widgets: response.widgets,

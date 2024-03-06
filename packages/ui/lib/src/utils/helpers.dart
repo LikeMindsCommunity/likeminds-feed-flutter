@@ -10,7 +10,7 @@ class LMFeedTaggingHelper {
   static const String notificationTagRoute =
       r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9_]+)>>';
   static const String tagRoute =
-      r'<<([^<>]+)\|route://member/([a-zA-Z-0-9_]+)>>';
+      r'<<([^<>]+)\|route://user_profile/([a-zA-Z-0-9_]+)>>';
   static const String linkRoute =
       r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)';
 
@@ -23,7 +23,7 @@ class LMFeedTaggingHelper {
           userTags.firstWhereOrNull((element) => element.name! == tag);
       if (userTag != null) {
         string = string.replaceAll('@$tag~',
-            '<<${userTag.name}|route://member/${userTag.sdkClientInfo?.userUniqueId ?? userTag.userUniqueId}>>');
+            '<<${userTag.name}|route://user_profile/${userTag.sdkClientInfo?.uuid ?? userTag.uuid}>>');
       }
     }
     return string;
@@ -37,7 +37,7 @@ class LMFeedTaggingHelper {
     for (final match in matches) {
       final String tag = match.group(1)!;
       final String id = match.group(3)!;
-      string = string.replaceAll('<<$tag|route://member/$id>>', '@$tag');
+      string = string.replaceAll('<<$tag|route://user_profile/$id>>', '@$tag');
       result.addAll({tag: id});
     }
     return result;
@@ -73,8 +73,8 @@ class LMFeedTaggingHelper {
     return tags;
   }
 
-  static void routeToProfile(String userId) {
-    debugPrint(userId);
+  static void routeToProfile(String uuid) {
+    debugPrint(uuid);
   }
 
   static String convertRouteToTag(String text, {bool withTilde = true}) {
@@ -122,7 +122,7 @@ class LMFeedTaggingHelper {
 
       userTagViewDataBuilder
         ..name(tag)
-        ..userUniqueId(id);
+        ..uuid(id);
 
       userTags.add(userTagViewDataBuilder.build());
     }
@@ -143,7 +143,7 @@ class LMFeedTaggingHelper {
 
       userTagViewDataBuilder
         ..name(tag)
-        ..userUniqueId(id);
+        ..uuid(id);
 
       userTags.add(userTagViewDataBuilder.build());
     }

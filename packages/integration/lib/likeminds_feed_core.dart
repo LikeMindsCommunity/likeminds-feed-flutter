@@ -108,7 +108,9 @@ class LMFeedCore {
           initiateUserCalled = true;
           await LMFeedUserLocalPreference.instance
               .setUserDataFromInitiateUserResponse(value);
-          LMNotificationHandler.instance.registerDevice(value.user!.id);
+          LMNotificationHandler.instance.registerDevice(
+            value.user!.sdkClientInfo.uuid,
+          );
         }
         return value;
       });
