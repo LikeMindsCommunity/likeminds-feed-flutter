@@ -148,7 +148,9 @@ class LMFeedPostDetailScreenHandler {
 
           addCommentToController(commentViewData);
 
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postData!.id,
+              actionType: LMFeedPostActionType.commentAdded));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
@@ -199,7 +201,13 @@ class LMFeedPostDetailScreenHandler {
             }
           }
 
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postData!.id,
+              actionType:
+                  commentSuccessState.commentMetaData.commentActionEntity ==
+                          LMFeedCommentType.parent
+                      ? LMFeedPostActionType.commentDeleted
+                      : LMFeedPostActionType.replyDeleted));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;

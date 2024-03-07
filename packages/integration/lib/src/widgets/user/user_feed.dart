@@ -201,10 +201,12 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post.id) ??
+                  ?.indexWhere((element) => element.id == state.postId) ??
               -1;
           if (index != -1) {
-            feedRoomItemList![index] = state.post;
+            LMPostViewData updatePostViewData = feedRoomItemList![index];
+            updatePostViewData = LMFeedPostUtils.updatePostData(
+                updatePostViewData, state.actionType);
           }
           _pagingController.itemList = feedRoomItemList;
           rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -228,10 +230,13 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post.id) ??
+                  ?.indexWhere((element) => element.id == state.postId) ??
               -1;
           if (index != -1) {
-            feedRoomItemList?[index] = state.post;
+            LMPostViewData? postViewData = feedRoomItemList?[index];
+            if (postViewData != null) {
+              LMFeedPostUtils.updatePostData(postViewData, state.actionType);
+            }
           }
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
@@ -579,8 +584,12 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+            postId: postViewData.id,
+            actionType: postViewData.isSaved
+                ? LMFeedPostActionType.saved
+                : LMFeedPostActionType.unsaved,
+          ));
 
           final savePostRequest =
               (SavePostRequestBuilder()..postId(postViewData.id)).build();
@@ -591,8 +600,14 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
           if (!response.success) {
             postViewData.isSaved = !postViewData.isSaved;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
+            LMFeedPostBloc.instance.add(
+              LMFeedUpdatePostEvent(
+                postId: postViewData.id,
+                actionType: postViewData.isSaved
+                    ? LMFeedPostActionType.saved
+                    : LMFeedPostActionType.unsaved,
+              ),
+            );
           }
         },
         style: feedThemeData?.footerStyle.saveButtonStyle,
@@ -767,12 +782,20 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postViewData.id,
+        actionType: postViewData.isPinned
+            ? LMFeedPostActionType.pinned
+            : LMFeedPostActionType.unpinned));
 
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;
       rebuildPostWidget.value = !rebuildPostWidget.value;
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          postId: postViewData.id,
+          actionType: postViewData.isPinned
+              ? LMFeedPostActionType.pinned
+              : LMFeedPostActionType.unpinned));
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 

@@ -234,7 +234,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 itemCount: replies.length,
                 itemBuilder: (context, index) {
                   LMCommentViewData commentViewData = replies[index];
-                  LMUserViewData user = users[commentViewData.uuid]!;
+
                   return StatefulBuilder(
                     builder: (context, setReplyState) {
                       return widget.commentBuilder?.call(

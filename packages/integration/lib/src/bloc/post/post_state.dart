@@ -97,12 +97,15 @@ class LMFeedPostDeletedState extends LMFeedPostState {
 /// [post] contains the updated post data and
 /// is of type [LMPostViewData]
 class LMFeedPostUpdateState extends LMFeedPostState {
-  final LMPostViewData post;
+  final LMPostViewData? post;
+  final LMFeedPostActionType actionType;
+  final String postId;
 
-  const LMFeedPostUpdateState({required this.post});
+  const LMFeedPostUpdateState(
+      {this.post, required this.postId, required this.actionType});
 
   @override
-  List<Object> get props => [post];
+  List<Object> get props => [identityHashCode(this)];
 }
 
 /// Error States

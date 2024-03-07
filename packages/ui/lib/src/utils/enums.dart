@@ -26,3 +26,20 @@ enum LMFeedWidgetSourceScreen {
   userFeed,
   userActivityFeed,
 }
+
+/// enum to describe the type of action on a post
+enum LMFeedPostActionType {
+  like,
+  unlike,
+  commentAdded,
+  commentEdited,
+  commentDeleted,
+  replyAdded,
+  replyEdited,
+  replyDeleted,
+  saved,
+  unsaved,
+  pinned,
+  unpinned,
+  edited,
+}

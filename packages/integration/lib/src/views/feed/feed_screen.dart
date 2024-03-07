@@ -41,14 +41,12 @@ class LMFeedScreen extends StatefulWidget {
     this.newPageErrorIndicatorBuilder,
   });
 
-  //Builder for appbar
+  // Builder for appbar
   final LMFeedPostAppBarBuilder? appBar;
 
-  //Callback for activity
-
-  //Builder for custom widget on top
+  // Builder for custom widget on top
   final LMFeedContextWidgetBuilder? customWidgetBuilder;
-  //Builder for topic chip [Button]
+  // Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
 
@@ -447,10 +445,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     int index = feedRoomItemList?.indexWhere(
-                            (element) => element.id == curr.post.id) ??
+                            (element) => element.id == curr.postId) ??
                         -1;
                     if (index != -1) {
-                      feedRoomItemList![index] = curr.post;
+                      feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
+                          feedRoomItemList[index], curr.actionType);
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }
@@ -822,81 +821,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           onPostDelete: () {
             String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
 
-            (feedThemeData?.postStyle.deleteSheetType ??
-                        LMFeedPostDeleteViewType.dialog) ==
-                    LMFeedPostDeleteViewType.bottomSheet
-                ? showDeleteSheet(context, postViewData)
-                : showDialog(
-                    context: context,
-                    builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                      title: 'Delete Comment',
-                      uuid: postCreatorUUID,
-                      content:
-                          'Are you sure you want to delete this post. This action can not be reversed.',
-                      action: (String reason) async {
-                        Navigator.of(childContext).pop();
-
-                        String postType = LMFeedPostUtils.getPostType(
-                            postViewData.attachments);
-
-                        LMFeedAnalyticsBloc.instance.add(
-                          LMFeedFireAnalyticsEvent(
-                            eventName: LMFeedAnalyticsKeys.postDeleted,
-                            deprecatedEventName:
-                                LMFeedAnalyticsKeysDep.postDeleted,
-                            eventProperties: {
-                              "post_id": postViewData.id,
-                              "post_type": postType,
-                              "user_id": currentUser.sdkClientInfo.uuid,
-                              "user_state": isCm ? "CM" : "member",
-                            },
-                          ),
-                        );
-
-                        LMFeedPostBloc.instance.add(
-                          LMFeedDeletePostEvent(
-                            postId: postViewData.id,
-                            reason: reason,
-                            isRepost: postViewData.isRepost,
-                          ),
-                        );
-                      },
-                      actionText: 'Delete',
-                    ),
-                  );
-          },
-        ),
-      ),
-    );
-  }
-
-  void showDeleteSheet(BuildContext context, LMPostViewData postViewData) {
-    showModalBottomSheet(
-      context: context,
-      builder: (childContext) => LMFeedBottomSheet(
-        children: [
-          LMFeedText(text: "Are you sure?"),
-          LMFeedText(
-              text:
-                  "You will not be able to recover this post once you delete it"),
-          Row(
-            children: <Widget>[
-              LMFeedButton(
-                onTap: () {},
-                text: LMFeedText(
-                  text: "Go back",
-                ),
-                style: LMFeedButtonStyle(
-                  borderRadius: 50,
-                  border: Border.all(
-                    width: 1,
-                  ),
-                  padding: EdgeInsets.all(15.0),
-                ),
-              ),
-              LMFeedButton(
-                onTap: () {
-                  String? reason;
+            showDialog(
+              context: context,
+              builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                title: 'Delete Comment',
+                uuid: postCreatorUUID,
+                content:
+                    'Are you sure you want to delete this post. This action can not be reversed.',
+                action: (String reason) async {
                   Navigator.of(childContext).pop();
 
                   String postType =
@@ -909,7 +841,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
-                        "user_id": postViewData.uuid,
+                        "user_id": currentUser.sdkClientInfo.uuid,
                         "user_state": isCm ? "CM" : "member",
                       },
                     ),
@@ -918,31 +850,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   LMFeedPostBloc.instance.add(
                     LMFeedDeletePostEvent(
                       postId: postViewData.id,
-                      reason: reason ?? "",
+                      reason: reason,
                       isRepost: postViewData.isRepost,
                     ),
                   );
                 },
-                text: LMFeedText(
-                  text: "Delete",
-                  style: LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      color: feedThemeData?.errorColor ?? Colors.red,
-                    ),
-                  ),
-                ),
-                style: LMFeedButtonStyle(
-                  borderRadius: 50,
-                  border: Border.all(
-                    width: 1,
-                    color: feedThemeData?.errorColor ?? Colors.red,
-                  ),
-                  padding: EdgeInsets.all(15.0),
-                ),
+                actionText: 'Delete',
               ),
-            ],
-          )
-        ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -995,41 +912,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
           videoController?.player.pause();
 
-          if ((feedThemeData?.postStyle.likesListType ??
-                  LMFeedPostLikesListViewType.screen) ==
-              LMFeedPostLikesListViewType.screen) {
-            Navigator.of(context, rootNavigator: true).push(
-              MaterialPageRoute(
-                builder: (context) => LMFeedLikesScreen(
-                  postId: postViewData.id,
-                ),
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(
+              builder: (context) => LMFeedLikesScreen(
+                postId: postViewData.id,
               ),
-            );
-          } else {
-            showModalBottomSheet(
-              context: context,
-              useRootNavigator: true,
-              useSafeArea: true,
-              isScrollControlled: true,
-              elevation: 10,
-              enableDrag: true,
-              showDragHandle: true,
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.7,
-                minHeight: MediaQuery.of(context).size.height * 0.3,
-              ),
-              backgroundColor: feedThemeData?.container,
-              clipBehavior: Clip.hardEdge,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
-                ),
-              ),
-              builder: (context) =>
-                  LMFeedLikesBottomSheet(postId: postViewData.id),
-            );
-          }
+            ),
+          );
         },
         onTap: () async {
           if (postViewData.isLiked) {
@@ -1114,8 +1003,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postViewData.id,
+              actionType: postViewData.isSaved
+                  ? LMFeedPostActionType.saved
+                  : LMFeedPostActionType.unsaved));
 
           final savePostRequest =
               (SavePostRequestBuilder()..postId(postViewData.id)).build();
@@ -1126,8 +1018,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           if (!response.success) {
             postViewData.isSaved = !postViewData.isSaved;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                postId: postViewData.id,
+                actionType: postViewData.isSaved
+                    ? LMFeedPostActionType.saved
+                    : LMFeedPostActionType.unsaved));
           }
         },
         style: feedThemeData?.footerStyle.saveButtonStyle,
@@ -1438,6 +1333,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;
 
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postViewData.id,
+        actionType: postViewData.isPinned
+            ? LMFeedPostActionType.pinned
+            : LMFeedPostActionType.unpinned));
+
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
           .indexWhere((element) => element.id == postUnpinId);
@@ -1460,8 +1361,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
 
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
@@ -1490,7 +1389,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
       rebuildPostWidget.value = !rebuildPostWidget.value;
 
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          postId: postViewData.id,
+          actionType: postViewData.isPinned
+              ? LMFeedPostActionType.pinned
+              : LMFeedPostActionType.unpinned));
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 

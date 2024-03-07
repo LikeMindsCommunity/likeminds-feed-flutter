@@ -504,9 +504,12 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       LMFeedButton(
         isActive: postViewData.isSaved,
         onTap: () async {
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postViewData.id,
+              actionType: postViewData.isSaved
+                  ? LMFeedPostActionType.unsaved
+                  : LMFeedPostActionType.saved));
           postViewData.isSaved = !postViewData.isSaved;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
 
           final savePostRequest =
               (SavePostRequestBuilder()..postId(postViewData.id)).build();
@@ -515,9 +518,12 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               await LMFeedCore.client.savePost(savePostRequest);
 
           if (!response.success) {
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                postId: postViewData.id,
+                actionType: postViewData.isSaved
+                    ? LMFeedPostActionType.unsaved
+                    : LMFeedPostActionType.saved));
             postViewData.isSaved = !postViewData.isSaved;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
           }
         },
         style: feedTheme?.footerStyle.saveButtonStyle,
@@ -777,20 +783,27 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postViewData.id,
+        actionType: postViewData.isPinned
+            ? LMFeedPostActionType.unpinned
+            : LMFeedPostActionType.pinned));
     postViewData.isPinned = !postViewData.isPinned;
 
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
-
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
     if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          postId: postViewData.id,
+          actionType: postViewData.isPinned
+              ? LMFeedPostActionType.unpinned
+              : LMFeedPostActionType.pinned));
 
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+      postViewData.isPinned = !postViewData.isPinned;
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 
