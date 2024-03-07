@@ -17,3 +17,5 @@ export 'persistence/user_local_preference.dart';
 export 'post/post_utils.dart';
 
 export 'tagging/tagging_textfield_ta.dart';
+
+export 'deep_link/deep_link_handler.dart';
