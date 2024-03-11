@@ -1,13 +1,13 @@
-part of 'notification_bloc.dart';
+part of 'moderation_bloc.dart';
 
-abstract class LMFeedNotificationsEvent extends Equatable {
-  const LMFeedNotificationsEvent();
+abstract class LMFeedModerationEvent extends Equatable {
+  const LMFeedModerationEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class LMFeedGetNotificationsEvent extends LMFeedNotificationsEvent {
+class LMFeedGetNotificationsEvent extends LMFeedModerationEvent {
   final int offset;
   final int pageSize;
 
@@ -20,7 +20,7 @@ class LMFeedGetNotificationsEvent extends LMFeedNotificationsEvent {
   List<Object> get props => [offset, pageSize];
 }
 
-class LMFeedMarkNotificationAsReadEvent extends LMFeedNotificationsEvent {
+class LMFeedMarkNotificationAsReadEvent extends LMFeedModerationEvent {
   final String activityId;
 
   const LMFeedMarkNotificationAsReadEvent({

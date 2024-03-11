@@ -11,8 +11,10 @@ class LMFeedProfileStateInitState extends LMFeedProfileState {}
 
 class LMFeedRouteToUserProfileState extends LMFeedProfileState {
   final String userUniqueId;
+  final BuildContext context;
 
-  const LMFeedRouteToUserProfileState({required this.userUniqueId});
+  const LMFeedRouteToUserProfileState(
+      {required this.userUniqueId, required this.context});
 
   @override
   List<Object> get props => [userUniqueId, identityHashCode(this)];

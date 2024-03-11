@@ -38,7 +38,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
       PagingController<int, LMNotificationFeedItemViewData>(
     firstPageKey: 1,
   );
-  LMFeedNotificationsBloc? _notificationsBloc;
+  LMFeedModerationBloc? _notificationsBloc;
 
   int _page = 1;
   LMFeedThemeData? _theme;
@@ -46,7 +46,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   @override
   void initState() {
     super.initState();
-    _notificationsBloc = LMFeedNotificationsBloc();
+    _notificationsBloc = LMFeedModerationBloc();
     addPageRequestListener();
 
     _notificationsBloc!.add(
@@ -232,7 +232,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     );
   }
 
-  Padding _defCustomWidget() {
+  Widget _defCustomWidget() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
       child: LMFeedText(

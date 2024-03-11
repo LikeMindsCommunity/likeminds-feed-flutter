@@ -2,12 +2,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-part 'notification_event.dart';
-part 'notification_state.dart';
+part 'moderation_event.dart';
+part 'moderation_state.dart';
 
-class LMFeedNotificationsBloc
-    extends Bloc<LMFeedNotificationsEvent, LMFeedNotificationsState> {
-  LMFeedNotificationsBloc() : super(LMFeedNotificationsInitialState()) {
+class LMFeedModerationBloc
+    extends Bloc<LMFeedModerationEvent, LMFeedModerationState> {
+  LMFeedModerationBloc() : super(LMFeedModerationInitialState()) {
     on<LMFeedGetNotificationsEvent>(_mapGetNotificationsToState);
     on<LMFeedMarkNotificationAsReadEvent>(_mapMarkReadNotificationToState);
   }
@@ -20,7 +20,7 @@ class LMFeedNotificationsBloc
   }
 
   _mapGetNotificationsToState(LMFeedGetNotificationsEvent event,
-      Emitter<LMFeedNotificationsState> emit) async {
+      Emitter<LMFeedModerationState> emit) async {
     if (event.offset > 1) {
       emit(LMFeedNotificationsPaginationLoadingState());
     } else {

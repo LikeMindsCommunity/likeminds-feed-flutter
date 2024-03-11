@@ -186,6 +186,7 @@ class LikesTile extends StatelessWidget {
                       userUniqueId: user?.sdkClientInfo?.userUniqueId ??
                           user?.userUniqueId ??
                           '',
+                          context: context,
                     ),
                   );
                 },

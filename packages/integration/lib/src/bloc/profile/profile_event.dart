@@ -11,8 +11,9 @@ class LMFeedProfileEventInitEvent extends LMFeedProfileEvent {}
 
 class LMFeedRouteToUserProfileEvent extends LMFeedProfileEvent {
   final String userUniqueId;
+  final BuildContext context;
 
-  const LMFeedRouteToUserProfileEvent({required this.userUniqueId});
+  const LMFeedRouteToUserProfileEvent({required this.userUniqueId, required this.context});
 
   @override
   List<Object> get props => [userUniqueId, identityHashCode(this)];

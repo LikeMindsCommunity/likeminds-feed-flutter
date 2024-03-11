@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
@@ -11,8 +12,8 @@ import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-class LMFeedUserCreatedPostListView extends StatefulWidget {
-  const LMFeedUserCreatedPostListView({
+class LMFeedUserCreatedCommentListView extends StatefulWidget {
+  const LMFeedUserCreatedCommentListView({
     Key? key,
     required this.userId,
     this.postBuilder,
@@ -41,31 +42,36 @@ class LMFeedUserCreatedPostListView extends StatefulWidget {
   final LMFeedContextWidgetBuilder? noNewPageWidgetBuilder;
 
   @override
-  State<LMFeedUserCreatedPostListView> createState() =>
-      _LMFeedUserCreatedPostListViewState();
+  State<LMFeedUserCreatedCommentListView> createState() =>
+      _LMFeedUserCreatedCommentListViewState();
 }
 
-class _LMFeedUserCreatedPostListViewState
-    extends State<LMFeedUserCreatedPostListView> {
-  static const int pageSize = 10;
+class _LMFeedUserCreatedCommentListViewState
+    extends State<LMFeedUserCreatedCommentListView> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
-  Map<String, LMUserViewData> users = {};
-  Map<String, LMTopicViewData> topics = {};
-  Map<String, WidgetModel> widgets = {};
-  Map<String, Post> repostedPosts = {};
-
-  int _pageFeed = 1;
-  final PagingController<int, LMPostViewData> _pagingController =
+  int _page = 1;
+  static const int pageSize = 10;
+  final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
   bool userPostingRights = true;
   LMFeedThemeData? feedThemeData;
   final ValueNotifier postUploading = ValueNotifier(false);
+  final LMFeedUserCreatedCommentBloc _userCreatedCommentBloc =
+      LMFeedUserCreatedCommentBloc();
+  final Map<String, LMPostViewData> _posts = {};
 
   @override
   void initState() {
     super.initState();
     userPostingRights = checkPostCreationRights();
-    addPaginationListener();
+    addPageRequestListener();
+    _userCreatedCommentBloc.add(
+      LMFeedUserCreatedCommentGetEvent(
+        uuid: widget.userId,
+        page: _page,
+        pageSize: pageSize,
+      ),
+    );
   }
 
   bool checkPostCreationRights() {
@@ -78,56 +84,31 @@ class _LMFeedUserCreatedPostListViewState
     return memberRights;
   }
 
-  void addPaginationListener() {
-    _pagingController.addPageRequestListener((pageKey) async {
-      final userFeedRequest = (GetUserPostRequestBuilder()
-            ..page(pageKey)
-            ..pageSize(pageSize)
-            ..userId(widget.userId))
-          .build();
-      GetUserPostResponse response = await LMFeedCore.instance.lmFeedClient
-          .getUserCreatedPosts(userFeedRequest);
-      updatePagingControllers(response);
-    });
+  void addPageRequestListener() {
+    _pagingController.addPageRequestListener(
+      (pageKey) {
+        _userCreatedCommentBloc.add(
+          LMFeedUserCreatedCommentGetEvent(
+            uuid: widget.userId,
+            page: _page,
+            pageSize: pageSize,
+          ),
+        );
+      },
+    );
   }
 
   void refresh() => _pagingController.refresh();
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(GetUserPostResponse response) {
-    if (response.success) {
-      _pageFeed++;
-      if (response.topics != null) {
-        topics.addAll(response.topics!.map((key, value) =>
-            MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
-      }
-      if (response.users != null) {
-        users.addAll(response.users!.map((key, value) =>
-            MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
-      }
-      if (response.widgets != null) {
-        widgets.addAll(response.widgets!);
-      }
-      if (response.repostedPosts != null) {
-        repostedPosts.addAll(response.repostedPosts!);
-      }
-      List<LMPostViewData> listOfPosts = response.posts!
-          .map((e) => LMPostViewDataConvertor.fromPost(
-              post: e,
-              widgets: widgets,
-              repostedPosts: repostedPosts,
-              topics: topics.map((key, value) =>
-                  MapEntry(key, LMTopicViewDataConvertor.toTopic(value))),
-              users: users.map((key, value) =>
-                  MapEntry(key, LMUserViewDataConvertor.toUser(value)))))
-          .toList();
-      if (listOfPosts.length < 10) {
-        _pagingController.appendLastPage(listOfPosts);
-      } else {
-        _pagingController.appendPage(listOfPosts, _pageFeed);
-      }
+  void updatePagingControllers(UserCreatedCommentLoadedState state) {
+    if (state.comments.length < 10) {
+      _pagingController.appendLastPage(state.comments);
+      _posts.addAll(state.posts);
     } else {
-      _pagingController.appendLastPage([]);
+      _pagingController.appendPage(state.comments, _page + 1);
+      _posts.addAll(state.posts);
+      _page++;
     }
   }
 
@@ -137,131 +118,75 @@ class _LMFeedUserCreatedPostListViewState
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
     if (_pagingController.itemList != null) _pagingController.itemList?.clear();
-    _pageFeed = 1;
+    _page = 1;
   }
 
   @override
   Widget build(BuildContext context) {
     feedThemeData = LMFeedTheme.of(context);
-    LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
-    return BlocListener(
-      bloc: newPostBloc,
-      listener: (context, state) {
-        if (state is LMFeedNewPostErrorState) {
-          postUploading.value = false;
-          toast(
-            state.message,
-            duration: Toast.LENGTH_LONG,
-          );
-        }
-        if (state is LMFeedNewPostUploadedState) {
-          LMPostViewData? item = state.postData;
-          int length = _pagingController.itemList?.length ?? 0;
-          List<LMPostViewData> feedRoomItemList =
-              _pagingController.itemList ?? [];
-          for (int i = 0; i < feedRoomItemList.length; i++) {
-            if (!feedRoomItemList[i].isPinned) {
-              feedRoomItemList.insert(i, item);
-              break;
-            }
-          }
-          if (length == feedRoomItemList.length) {
-            feedRoomItemList.add(item);
-          }
-          if (feedRoomItemList.isNotEmpty && feedRoomItemList.length > 10) {
-            feedRoomItemList.removeLast();
-            users.addAll(state.userData);
-            topics.addAll(state.topics);
-            _pagingController.itemList = feedRoomItemList;
-            postUploading.value = false;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
-          } else {
-            users.addAll(state.userData);
-            topics.addAll(state.topics);
-            _pagingController.itemList = feedRoomItemList;
-            postUploading.value = false;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
-          }
-        }
-        if (state is LMFeedPostDeletedState) {
-          List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-          feedRoomItemList?.removeWhere((item) => item.id == state.postId);
-          _pagingController.itemList = feedRoomItemList;
-          rebuildPostWidget.value = !rebuildPostWidget.value;
-        }
-        if (state is LMFeedPostUpdateState) {
-          List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-          int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post.id) ??
-              -1;
-          if (index != -1) {
-            feedRoomItemList![index] = state.post;
-          }
-          _pagingController.itemList = feedRoomItemList;
-          rebuildPostWidget.value = !rebuildPostWidget.value;
-        }
-        if (state is LMFeedEditPostUploadedState) {
-          LMPostViewData? item = state.postData;
-          List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-          int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == item.id) ??
-              -1;
-          if (index != -1) {
-            feedRoomItemList?[index] = item;
-          }
-          users.addAll(state.userData);
-          topics.addAll(state.topics);
-          widgets.addAll(state.widgets.map((key, value) =>
-              MapEntry(key, LMWidgetViewDataConvertor.toWidgetModel(value))));
-          rebuildPostWidget.value = !rebuildPostWidget.value;
-        }
-
-        if (state is LMFeedPostUpdateState) {
-          List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-          int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post.id) ??
-              -1;
-          if (index != -1) {
-            feedRoomItemList?[index] = state.post;
-          }
-          rebuildPostWidget.value = !rebuildPostWidget.value;
-        }
+    return BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
+      bloc: LMFeedPostBloc.instance,
+      listener: (context,state){
+        
       },
-      child: ValueListenableBuilder(
-          valueListenable: rebuildPostWidget,
-          builder: (context, _, __) {
-            return PagedSliverList(
-              pagingController: _pagingController,
-              builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
-                noItemsFoundIndicatorBuilder: (context) {
-                  return widget.emptyFeedViewBuilder?.call(context) ??
-                      noPostInFeedWidget();
-                },
-                itemBuilder: (context, item, index) {
-                  if (!users.containsKey(item.userId)) {
-                    return const SizedBox();
-                  }
-                  return Column(
-                    children: [
-                      const SizedBox(height: 2),
-                      widget.postBuilder?.call(
-                            context,
-                            defPostWidget(feedThemeData, item),
-                            item,
-                          ) ??
-                          defPostWidget(feedThemeData, item),
-                    ],
-                  );
-                },
-                firstPageProgressIndicatorBuilder: (context) =>
-                    const LMFeedShimmer(),
-                newPageProgressIndicatorBuilder: (context) => const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: CircularProgressIndicator()),
+      builder: (context, state) {
+        return BlocConsumer<LMFeedUserCreatedCommentBloc,
+            LMFeedUserCreatedCommentState>(
+          bloc: _userCreatedCommentBloc,
+          buildWhen: (previous, current) {
+            if (current is UserCreatedCommentPaginationLoadingState &&
+                (previous is UserCreatedCommentLoadingState ||
+                    previous is UserCreatedCommentLoadedState)) {
+              return false;
+            }
+            return true;
+          },
+          listener: (context, state) {
+            if (state is UserCreatedCommentLoadedState) {
+              updatePagingControllers(state);
+            }
+          },
+          builder: (context, state) {
+            if (state is UserCreatedCommentLoadingState) {
+              return widget.firstPageLoaderBuilder?.call(context) ??
+                  const LMFeedLoader();
+            }
+            if (state is UserCreatedCommentLoadedState) {
+              return PagedListView(
+                pagingController: _pagingController,
+                builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
+                  noItemsFoundIndicatorBuilder: (context) {
+                    return widget.emptyFeedViewBuilder?.call(context) ??
+                        noPostInFeedWidget();
+                  },
+                  itemBuilder: (context, item, index) {
+                    LMFeedPostWidget postWidget =
+                        defPostWidget(feedThemeData, _posts[item.postId]!);
+                    return Column(
+                      children: [
+                        const SizedBox(height: 2),
+                        widget.postBuilder?.call(
+                                context, postWidget, _posts[item.postId]!) ??
+                            LMFeedCore.widgets?.postWidgetBuilder.call(
+                                context, postWidget, _posts[item.postId]!) ??
+                            postWidget,
+                        const Divider(),
+                      ],
+                    );
+                  },
+                  firstPageProgressIndicatorBuilder: (context) =>
+                      const LMFeedShimmer(),
+                  newPageProgressIndicatorBuilder: (context) => const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
                 ),
-              ),
-            );
-          }),
+              );
+            }
+            return SizedBox.shrink();
+          },
+        );
+      },
     );
   }
 
@@ -306,7 +231,7 @@ class _LMFeedUserCreatedPostListViewState
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: users[post.userId]!,
+      user: post.user!,
       isFeed: false,
       onTagTap: (String userId) {
         LMFeedProfileBloc.instance.add(
@@ -333,7 +258,7 @@ class _LMFeedUserCreatedPostListViewState
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: users[post.userId]!,
+              user: post.user!,
             ),
           ),
         );
@@ -395,7 +320,7 @@ class _LMFeedUserCreatedPostListViewState
 
   LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: users[postViewData.userId]!,
+      user: postViewData.user!,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData?.headerStyle,
@@ -464,7 +389,7 @@ class _LMFeedUserCreatedPostListViewState
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: users[post.userId]!,
+              user: post.user!,
             ),
           ),
         );

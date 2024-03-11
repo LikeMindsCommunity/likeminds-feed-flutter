@@ -9,7 +9,7 @@ class LMPostViewData {
   final String id;
 
   /// content of the post [nullable]
-  /// might contain tags and mentions
+  /// might contain tags and mentions>
   String text;
 
   /// post heading [nullable]

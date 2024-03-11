@@ -1,9 +1,11 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/sdk/sdk_client_info_convertor.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMUserViewDataConvertor {
-  static LMUserViewData fromUser(User user) {
+  static LMUserViewData fromUser(User user,
+      {Map<String, WidgetModel>? widgets}) {
     LMUserViewDataBuilder userViewDataBuilder = LMUserViewDataBuilder();
 
     userViewDataBuilder.id(user.id);
@@ -54,7 +56,10 @@ class LMUserViewDataConvertor {
     if (user.createdAt != null) {
       userViewDataBuilder.createdAt(user.createdAt!);
     }
-
+    if (widgets != null && widgets[user.sdkClientInfo?.widgetId] != null) {
+      userViewDataBuilder.widget(LMWidgetViewDataConvertor.fromWidgetModel(
+          widgets[user.sdkClientInfo?.widgetId]!));
+    }
     return userViewDataBuilder.build();
   }
 

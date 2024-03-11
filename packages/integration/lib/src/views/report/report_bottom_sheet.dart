@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/report/report_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:overlay_support/overlay_support.dart';
 

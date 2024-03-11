@@ -128,6 +128,7 @@ class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
     if (likeViewData.userId != currentUser.userUniqueId) {
       LMFeedProfileBloc.instance.add(LMFeedRouteToUserProfileEvent(
         userUniqueId: likeViewData.userId,
+        context: context
       ));
     } else {
       List<LMLikeViewData>? likesList = handler!.pagingController.itemList;
