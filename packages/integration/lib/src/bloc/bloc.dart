@@ -19,3 +19,4 @@ export 'universal_feed/universal_feed_bloc.dart';
 export 'report/report_bloc.dart';
 export 'moderation/moderation_bloc.dart';
 export 'user_created_comment/user_created_comment_bloc.dart';
+export 'search/search_bloc.dart';

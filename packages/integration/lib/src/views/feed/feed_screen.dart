@@ -10,6 +10,7 @@ import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_flutter_core/src/views/report/report_bottom_sheet.dart';
 import 'package:likeminds_feed_flutter_core/src/views/report/report_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/search/search_screen.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -584,6 +585,24 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       style: LMFeedAppBarStyle.basic().copyWith(
         backgroundColor: feedThemeData?.container,
       ),
+      trailing: [
+        LMFeedButton(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LMFeedSearchScreen(),
+              ),
+            );
+          },
+          style: LMFeedButtonStyle.basic().copyWith(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.search,
+            ),
+          ),
+        )
+      ],
     );
   }
 
@@ -757,7 +776,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           LMFeedRouteToUserProfileEvent(
             userUniqueId: _feedBloc
                 .users[postViewData.userId]!.sdkClientInfo!.userUniqueId,
-                context: context,
+            context: context,
           ),
         );
       },
