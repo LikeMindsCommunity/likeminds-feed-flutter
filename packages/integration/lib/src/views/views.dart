@@ -7,3 +7,5 @@ export 'feed/feed_screen.dart';
 export 'activity/activity_screen.dart';
 export 'activity/user_activity_screen.dart';
 export 'activity/notification_screen.dart';
+
+export 'search/search_screen.dart';

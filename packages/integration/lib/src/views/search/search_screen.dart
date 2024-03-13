@@ -157,6 +157,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   Widget build(BuildContext context) {
     theme = LMFeedTheme.of(context);
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: theme?.backgroundColor,
         appBar: AppBar(
           elevation: 2,

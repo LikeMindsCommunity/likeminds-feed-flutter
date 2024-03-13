@@ -9,7 +9,6 @@ import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.d
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_flutter_core/src/views/report/report_bottom_sheet.dart';
-import 'package:likeminds_feed_flutter_core/src/views/report/report_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/search/search_screen.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -591,7 +590,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => LMFeedSearchScreen(),
+                builder: (context) => LMFeedSearchScreen(
+                  postBuilder: widget.postBuilder,
+                  emptyFeedViewBuilder: widget.emptyFeedViewBuilder,
+                  paginationLoaderBuilder: widget.paginationLoaderBuilder,
+                  feedErrorViewBuilder: widget.feedErrorViewBuilder,
+                  noNewPageWidgetBuilder: widget.noNewPageWidgetBuilder,
+                  firstPageLoaderBuilder: widget.firstPageLoaderBuilder,
+                ),
               ),
             );
           },
