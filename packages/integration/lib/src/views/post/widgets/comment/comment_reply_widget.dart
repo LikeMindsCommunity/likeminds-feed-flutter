@@ -119,6 +119,77 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         return true;
       },
       builder: ((context, state) {
+        if (state is LMFeedAddLocalReplyState) {
+          if (replies.isEmpty) {
+            replies.add(state.comment);
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: replies.length,
+                itemBuilder: (context, index) {
+                  LMCommentViewData commentViewData = replies[index];
+                  return StatefulBuilder(
+                    builder: (context, setReplyState) {
+                      return widget.commentBuilder?.call(
+                              context,
+                              _defCommetWidget(commentViewData, setReplyState),
+                              widget.post) ??
+                          _defCommetWidget(commentViewData, setReplyState);
+                    },
+                  );
+                },
+              ),
+              if (replies.length != reply!.repliesCount)
+                Container(
+                  color: feedTheme?.container,
+                  padding: replyStyle?.padding,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LMFeedButton(
+                        onTap: () {
+                          _commentRepliesBloc!.add(LMFeedGetCommentRepliesEvent(
+                              commentDetailRequest: (GetCommentRequestBuilder()
+                                    ..commentId(reply!.id)
+                                    ..page(page)
+                                    ..postId(postId))
+                                  .build(),
+                              forLoadMore: true));
+                          page++;
+                        },
+                        text: LMFeedText(
+                          text: 'View more replies',
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              color: feedTheme?.primaryColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      LMFeedText(
+                        text: ' ${replies.length} of ${reply!.repliesCount}',
+                        style: const LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontSize: 11,
+                            color: LikeMindsTheme.greyColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              // replies.add();
+            ],
+          );
+        }
         if (state is LMFeedClearedCommentRepliesState) {
           replies = [];
           users = {};
@@ -164,11 +235,12 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                           LMFeedCommentType.reply) {
                     AddCommentReplyResponse response =
                         state.commentActionResponse;
-                    if (response.reply!.parentComment!.id == widget.reply.id) {
-                      replies.insert(
-                          0,
-                          LMCommentViewDataConvertor.fromComment(
-                              response.reply!, users));
+                    if (response.reply!.parentComment!.tempId ==
+                        widget.reply.tempId) {
+                      replies.replaceRange(0, 1, [
+                        LMCommentViewDataConvertor.fromComment(
+                            response.reply!, users)
+                      ]);
                     }
                   }
                   break;
@@ -235,7 +307,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 itemCount: replies.length,
                 itemBuilder: (context, index) {
                   LMCommentViewData commentViewData = replies[index];
-                  LMUserViewData user = users[commentViewData.userId]!;
                   return StatefulBuilder(
                     builder: (context, setReplyState) {
                       return widget.commentBuilder?.call(
@@ -312,6 +383,8 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
               [];
+        } else if (state is LMFeedAddLocalReplyState) {
+          replies.insert(0, state.comment);
         }
         replyCount = replies.length;
       },
@@ -319,25 +392,27 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   }
 
   LMFeedCommentWidget _defCommetWidget(
-      LMCommentViewData commentViewData, StateSetter setReplyState) {
+    LMCommentViewData commentViewData,
+    StateSetter setReplyState,
+  ) {
     return LMFeedCommentWidget(
       style: replyStyle,
       comment: commentViewData,
       onTagTap: (String userId) {
         LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
       },
-      user: user,
+      user: commentViewData.user,
       profilePicture: LMFeedProfilePicture(
-        imageUrl: user.imageUrl,
+        imageUrl: commentViewData.user.imageUrl,
         style: LMFeedProfilePictureStyle(
           size: 32,
           backgroundColor: feedTheme!.primaryColor,
         ),
-        fallbackText: user.name,
+        fallbackText: commentViewData.user.name,
         onTap: () {
-          if (user.sdkClientInfo != null) {
-            LMFeedCore.instance.lmFeedClient
-                .routeToProfile(user.sdkClientInfo!.userUniqueId);
+          if (commentViewData.user.sdkClientInfo != null) {
+            LMFeedCore.instance.lmFeedClient.routeToProfile(
+                commentViewData.user.sdkClientInfo!.userUniqueId);
           }
         },
       ),
@@ -350,7 +425,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       ),
       menu: (menu) {
         return menu.copyWith(
-          removeItemIds: {commentEditId, commentReportId},
+          removeItemIds: {},
         );
       },
     );
@@ -370,7 +445,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
               ..commentText(
                   LMFeedTaggingHelper.convertRouteToTag(commentViewData.text)))
             .build();
-
         _commentHandlerBloc!
             .add(LMFeedCommentOngoingEvent(commentMetaData: commentMetaData));
       },

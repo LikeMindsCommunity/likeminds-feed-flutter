@@ -68,6 +68,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
 }
 
 class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
+  final ValueNotifier _rebuildComment = ValueNotifier(false);
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
   final LMFeedFetchCommentReplyBloc _commentRepliesBloc =
@@ -226,7 +227,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       ),
                                 PagedListView.separated(
                                   pagingController: _postDetailScreenHandler!
-                                      .commetListPagingController,
+                                      .commentListPagingController,
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
                                   builderDelegate: PagedChildBuilderDelegate<
@@ -430,7 +431,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       ..level(0)
                       ..commentId(commentViewData.id))
                     .build();
-
+                _postDetailScreenHandler!
+                    .deleteCommentFromController(commentViewData.id);
+                _postDetailScreenHandler!.postData!.commentCount -= 1;
+                _postDetailScreenHandler!.rebuildPostWidget.value =
+                    !_postDetailScreenHandler!.rebuildPostWidget.value;
                 _postDetailScreenHandler!.commentHandlerBloc.add(
                     LMFeedCommentActionEvent(
                         commentActionRequest: deleteCommentRequest,
@@ -916,7 +921,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       menu: (menu) {
         return menu.copyWith(
           removeItemIds: {
-            commentEditId,
+            // commentEditId,
             // commentReportId,
           },
         );
@@ -1316,8 +1321,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                           ),
                                         ),
                                       );
-                                      // TODO: remove old toast
-                                      // toast("Please write something to post");
 
                                       return;
                                     }
@@ -1343,7 +1346,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                         .commentId!)
                                                     ..text(commentText))
                                                   .build();
-
+                                          _postDetailScreenHandler!
+                                              .addTempEditingComment(
+                                                  state.commentMetaData
+                                                          .commentId ??
+                                                      '',
+                                                  commentText);
                                           _postDetailScreenHandler!
                                               .commentHandlerBloc
                                               .add(LMFeedCommentActionEvent(
@@ -1380,7 +1388,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                             (LMCommentMetaDataBuilder()
                                                   ..commentActionEntity(
                                                       LMFeedCommentType.reply)
-                                                  ..level(0)
+                                                  ..level(1)
                                                   ..postId(widget.postId)
                                                   ..commentId(state
                                                       .commentMetaData
@@ -1393,11 +1401,26 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                             (AddCommentReplyRequestBuilder()
                                                   ..postId(widget.postId)
                                                   ..text(commentText)
+                                                  ..tempId(
+                                                      '${-DateTime.now().millisecondsSinceEpoch}')
                                                   ..commentId(state
                                                       .commentMetaData
                                                       .commentId!))
                                                 .build();
 
+                                        _postDetailScreenHandler!
+                                            .addTempReplyCommentToController(
+                                          addReplyRequest.tempId ?? '',
+                                          commentText,
+                                          1,
+                                          state.commentMetaData.commentId!,
+                                          replyShown,
+                                        );
+                                        commentIdReplyId =
+                                            state.commentMetaData.commentId;
+                                        replyShown = true;
+                                        _rebuildComment.value =
+                                            !_rebuildComment.value;
                                         _postDetailScreenHandler!
                                             .commentHandlerBloc
                                             .add(LMFeedCommentActionEvent(
@@ -1420,9 +1443,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       AddCommentRequest addCommentRequest =
                                           (AddCommentRequestBuilder()
                                                 ..postId(widget.postId)
-                                                ..text(commentText))
+                                                ..text(commentText)
+                                                ..tempId(
+                                                    '${-DateTime.now().millisecondsSinceEpoch}'))
                                               .build();
-
+                                      _postDetailScreenHandler!
+                                          .addTempCommentToController(
+                                        addCommentRequest.tempId ?? '',
+                                        commentText,
+                                        0,
+                                      );
                                       _postDetailScreenHandler!
                                           .commentHandlerBloc
                                           .add(LMFeedCommentActionEvent(

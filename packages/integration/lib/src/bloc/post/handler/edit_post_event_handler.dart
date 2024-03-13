@@ -12,7 +12,8 @@ void editPostEventHandler(
     emit(LMFeedEditPostUploadingState());
     // Mapping [LMAttachmentViewData] to [Attachment]
     List<Attachment>? attachments = LMFeedComposeBloc.instance.postMedia
-        .map((e) => LMAttachmentViewDataConvertor.toAttachment(e.toAttachmentViewData()))
+        .map((e) => LMAttachmentViewDataConvertor.toAttachment(
+            e.toAttachmentViewData()))
         .toList();
     // Text associated with the post
     // can be null [either heading or attachments should be present though]
@@ -29,7 +30,7 @@ void editPostEventHandler(
       ..postId(event.postId)
       // topics associated to the post
       ..topics(event.selectedTopics
-          .map((e) => e.id)
+          .map((e) => LMTopicViewDataConvertor.toTopic(e))
           .toList());
 
     // If postText is not null, add postText in request

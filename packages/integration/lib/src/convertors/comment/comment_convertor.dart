@@ -20,7 +20,8 @@ class LMCommentViewDataConvertor {
       ..isLiked(comment.isLiked)
       ..isEdited(comment.isEdited)
       ..uuid(comment.uuid)
-      ..user(users[comment.uuid]!)
+      ..user(users[comment.userId]!)
+      ..tempId(comment.tempId ?? '')
       ..parentComment(comment.parentComment != null
           ? LMCommentViewDataConvertor.fromComment(
               comment.parentComment!, users)
