@@ -23,7 +23,7 @@ class LMPostViewDataConvertor {
 
     List<LMTopicViewData> topicViewData = [];
     if (topics != null) {
-      post.topics?.forEach((element) {
+      post.topicIds?.forEach((element) {
         if (topics[element] != null) {
           topicViewData.add(LMTopicViewDataConvertor.fromTopic(topics[element]!,
               widgets: widgetMap));
@@ -140,7 +140,7 @@ class LMPostViewDataConvertor {
           .toList(),
       communityId: postViewData.communityId,
       isPinned: postViewData.isPinned,
-      topics: postViewData.topics.map((e) => e.id).toList(),
+      topicIds: postViewData.topics.map((e) => e.id).toList(),
       uuid: postViewData.uuid,
       likeCount: postViewData.likeCount,
       commentCount: postViewData.commentCount,

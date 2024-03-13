@@ -3,9 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
@@ -367,7 +365,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             builder: (context) => LMFeedReportBottomSheet(
               entityId: commentViewData.id,
               entityType: 6,
-              entityCreatorId: commentViewData.userId,
+              entityCreatorId: commentViewData.uuid,
             ),
           );
         },
@@ -1485,7 +1483,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       builder: (context) => LMFeedReportBottomSheet(
         entityId: _postDetailScreenHandler!.postId,
         entityType: 5,
-        entityCreatorId: _postDetailScreenHandler!.postData!.userId,
+        entityCreatorId: _postDetailScreenHandler!.postData!.uuid,
       ),
     );
   }
