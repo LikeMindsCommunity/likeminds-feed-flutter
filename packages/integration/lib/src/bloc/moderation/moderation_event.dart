@@ -1,33 +1,33 @@
-part of 'report_bloc.dart';
+part of 'moderation_bloc.dart';
 
-abstract class LMFeedReportEvent extends Equatable {
-  const LMFeedReportEvent();
+abstract class LMFeedModerationEvent extends Equatable {
+  const LMFeedModerationEvent();
 
   @override
   List<Object> get props => [];
 }
 
-class LMReportFetchEvent extends LMFeedReportEvent {
-  LMReportFetchEvent();
+class LMFeedReportReasonFetchEvent extends LMFeedModerationEvent {
+  LMFeedReportReasonFetchEvent();
 }
 
-class LMReportReasonSelectEvent extends LMFeedReportEvent {
+class LMFeedReportReasonSelectEvent extends LMFeedModerationEvent {
   final LMDeleteReasonViewData reason;
 
-  LMReportReasonSelectEvent({required this.reason});
+  LMFeedReportReasonSelectEvent({required this.reason});
 
   @override
   List<Object> get props => [reason];
 }
 
-class LMReportSubmitEvent extends LMFeedReportEvent {
+class LMFeedReportSubmitEvent extends LMFeedModerationEvent {
   final String entityCreatorId;
   final String entityId;
   final int entityType;
   final String reason;
   final int tagId;
 
-  LMReportSubmitEvent({
+  LMFeedReportSubmitEvent({
     required this.entityCreatorId,
     required this.entityId,
     required this.entityType,

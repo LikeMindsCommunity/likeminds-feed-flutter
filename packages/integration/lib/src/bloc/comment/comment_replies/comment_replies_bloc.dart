@@ -27,12 +27,11 @@ class LMFeedFetchCommentReplyBloc
             emit: emit,
             lmFeedIntegration: lmFeedIntegration);
       }
-    });
-    on<LMFeedClearCommentRepliesEvent>(
-      (event, emit) {
+      else if(event is LMFeedClearCommentRepliesEvent)
         emit(LMFeedClearedCommentRepliesState());
-      },
-    );
+      else if(event is LMFeedAddLocalReplyEvent)
+        emit(LMFeedAddLocalReplyState(comment:event.comment));
+    });
   }
 
   FutureOr<void> _mapGetCommentRepliesToState(

@@ -1,25 +1,24 @@
-part of 'report_bloc.dart';
+part of 'moderation_bloc.dart';
 
-abstract class LMFeedReportState extends Equatable {
-  const LMFeedReportState();
+abstract class LMFeedModerationState extends Equatable {
+  const LMFeedModerationState();
 
   @override
   List<Object> get props => [];
 }
 
-final class LMFeedReportInitialState extends LMFeedReportState {}
+final class LMFeedReportInitialState extends LMFeedModerationState {}
 
-final class LMFeedReportLoadingState extends LMFeedReportState {}
+final class LMFeedReportLoadingState extends LMFeedModerationState {}
 
-final class LMFeedReportSuccessState extends LMFeedReportState {
+final class LMFeedReportSuccessState extends LMFeedModerationState {
   final List<LMDeleteReasonViewData> reasons;
   LMFeedReportSuccessState({required this.reasons});
   @override
   List<Object> get props => [reasons];
 }
 
-final class LMFeedReportFailureState extends LMFeedReportState {
-
+final class LMFeedReportFailureState extends LMFeedModerationState {
   final String error;
 
   const LMFeedReportFailureState({required this.error});
@@ -28,7 +27,7 @@ final class LMFeedReportFailureState extends LMFeedReportState {
   List<Object> get props => [error];
 }
 
-final class LMFeedReportReasonSelectedState extends LMFeedReportState {
+final class LMFeedReportReasonSelectedState extends LMFeedModerationState {
   final LMDeleteReasonViewData reason;
 
   const LMFeedReportReasonSelectedState({required this.reason});
@@ -37,9 +36,9 @@ final class LMFeedReportReasonSelectedState extends LMFeedReportState {
   List<Object> get props => [reason];
 }
 
-final class LMFeedReportSubmittedState extends LMFeedReportState {}
+final class LMFeedReportSubmittedState extends LMFeedModerationState {}
 
-final class LMFeedReportSubmitFailedState extends LMFeedReportState {
+final class LMFeedReportSubmitFailedState extends LMFeedModerationState {
   final String error;
 
   const LMFeedReportSubmitFailedState({required this.error});
