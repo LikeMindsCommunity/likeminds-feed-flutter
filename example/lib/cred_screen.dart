@@ -9,6 +9,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
+const _isProd = !bool.fromEnvironment('DEBUG');
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         ),
         child: MaterialApp(
           title: 'Integration App for UI + SDK package',
+          debugShowCheckedModeBanner: _isProd,
           navigatorKey: rootNavigatorKey,
           scaffoldMessengerKey: rootScaffoldMessengerKey,
           theme: ThemeData(
@@ -64,14 +66,9 @@ class MyApp extends StatelessWidget {
             analyticsListener:
                 (BuildContext context, LMFeedAnalyticsState state) {
               if (state is LMFeedAnalyticsEventFired) {
+                debugPrint("Bloc Listened for event, - ${state.eventName}");
                 debugPrint("////////////////");
-                debugPrint("\n\n");
-                debugPrint(state.eventName);
-                debugPrint("////////////////");
-                debugPrint("\n\n");
-                debugPrint(state.eventProperties.toString());
-                debugPrint("////////////////");
-                debugPrint("\n\n");
+                debugPrint("With properties - ${state.eventProperties}");
               }
             },
             profileListener:

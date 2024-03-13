@@ -9,7 +9,6 @@ import 'package:likeminds_feed_flutter_core/src/utils/media/media_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:video_player/video_player.dart';
 
 class LMFeedMediaHandler {
   static Future<bool> handlePermissions(int mediaType) async {

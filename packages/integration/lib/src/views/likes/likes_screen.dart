@@ -2,6 +2,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/widgets.dart';
 
 part 'handler/likes_screen_handler.dart';
 
@@ -130,31 +131,9 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
                 noMoreItemsIndicatorBuilder: (context) => const SizedBox(
                   height: 20,
                 ),
-                noItemsFoundIndicatorBuilder: (context) => const Scaffold(
+                noItemsFoundIndicatorBuilder: (context) => Scaffold(
                   backgroundColor: LikeMindsTheme.whiteColor,
-                  body: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Text("No likes to show",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            )),
-                        SizedBox(height: 12),
-                        Text(
-                          "Be the first one to like this post",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w300,
-                            color: LikeMindsTheme.greyColor,
-                          ),
-                        ),
-                        SizedBox(height: 28),
-                      ],
-                    ),
-                  ),
+                  body: noItemLikesView(),
                 ),
                 itemBuilder: (context, item, index) =>
                     LikesTile(user: handler!.userData[item.userId]),
@@ -167,10 +146,8 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
                             const LMFeedUserTileShimmer()),
                   ),
                 ),
-                newPageProgressIndicatorBuilder: (context) => const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20.0),
-                  child: LMFeedLoader(),
-                ),
+                newPageProgressIndicatorBuilder: (context) =>
+                    newPageProgressLikesView(),
               ),
             ),
           )

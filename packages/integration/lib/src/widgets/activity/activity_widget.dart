@@ -142,7 +142,8 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 2,
                                         ),
-                                        child: ExpandableText(postData.text,
+                                        child: LMFeedExpandableText(
+                                            postData.text,
                                             expandText: 'Read More',
                                             maxLines: 2, onTagTap: (tag) {
                                           debugPrint(tag);

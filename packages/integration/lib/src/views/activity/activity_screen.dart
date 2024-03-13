@@ -32,6 +32,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   Map<String, LMTopicViewData> topics = {};
   Map<String, WidgetModel> widgets = {};
   Map<String, Post> repostedPosts = {};
+  Map<String, Comment> filteredComments = {};
 
   bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
 
@@ -190,7 +191,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                               final commentData = item.activityEntityData;
                               final LMCommentViewData commentViewData =
                                   LMFeedPostUtils.commentViewDataFromActivity(
-                                      commentData);
+                                      commentData,
+                                      users.map((key, value) => MapEntry(
+                                          key,
+                                          LMUserViewDataConvertor.toUser(
+                                              value))));
 
                               commentData.menuItems?.removeWhere((element) =>
                                   element.id ==
@@ -311,6 +316,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     return LMFeedPostContent(
       onTagTap: (String? userId) {},
       style: feedTheme?.contentStyle,
+      text: post.text,
+      heading: post.heading,
     );
   }
 
@@ -491,6 +498,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   LMFeedButton defSaveButton(
           LMFeedThemeData? feedTheme, LMPostViewData postViewData) =>
       LMFeedButton(
+        isActive: postViewData.isSaved,
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           LMFeedPostBloc.instance

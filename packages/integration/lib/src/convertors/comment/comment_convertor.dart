@@ -1,9 +1,8 @@
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/common/popup_menu_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMCommentViewDataConvertor {
-  static LMCommentViewData fromComment(Comment comment) {
+  static LMCommentViewData fromComment(
+      Comment comment, Map<String, LMUserViewData> users) {
     LMCommentViewDataBuilder commentViewDataBuilder =
         LMCommentViewDataBuilder();
     commentViewDataBuilder
@@ -21,8 +20,10 @@ class LMCommentViewDataConvertor {
       ..isLiked(comment.isLiked)
       ..isEdited(comment.isEdited)
       ..uuid(comment.uuid)
+      ..user(users[comment.userId]!)
       ..parentComment(comment.parentComment != null
-          ? LMCommentViewDataConvertor.fromComment(comment.parentComment!)
+          ? LMCommentViewDataConvertor.fromComment(
+              comment.parentComment!, users)
           : null);
 
     return commentViewDataBuilder.build();

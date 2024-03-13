@@ -99,14 +99,16 @@ class LMFeedPostHeader extends StatelessWidget {
                                   child: titleText ??
                                       LMFeedText(
                                         text: user.name,
-                                        style: LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize:
-                                                LikeMindsTheme.kFontMedium,
-                                            color: feedTheme.onContainer,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                        style: postHeaderStyle
+                                                ?.titleTextStyle ??
+                                            LMFeedTextStyle(
+                                              textStyle: TextStyle(
+                                                fontSize:
+                                                    LikeMindsTheme.kFontMedium,
+                                                color: feedTheme.onContainer,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
                                       ),
                                 ),
                               ),
@@ -135,25 +137,34 @@ class LMFeedPostHeader extends StatelessWidget {
                                                   padding:
                                                       const EdgeInsets.all(4.0),
                                                   child: customTitle ??
-                                                      Text(
-                                                        user.customTitle!
+                                                      LMFeedText(
+                                                        text: user.customTitle!
                                                                 .isNotEmpty
                                                             ? user.customTitle!
                                                             : "",
                                                         // maxLines: 1,
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              LikeMindsTheme
-                                                                  .kFontSmall,
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontStyle: user.name
-                                                                  .isNotEmpty
-                                                              ? FontStyle.normal
-                                                              : FontStyle
-                                                                  .italic,
-                                                        ),
+                                                        style: postHeaderStyle
+                                                                ?.customTitleTextStyle ??
+                                                            LMFeedTextStyle(
+                                                              textStyle:
+                                                                  TextStyle(
+                                                                fontSize:
+                                                                    LikeMindsTheme
+                                                                        .kFontSmall,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontStyle: user
+                                                                        .name
+                                                                        .isNotEmpty
+                                                                    ? FontStyle
+                                                                        .normal
+                                                                    : FontStyle
+                                                                        .italic,
+                                                              ),
+                                                            ),
                                                       ),
                                                 ),
                                               ),
@@ -186,13 +197,25 @@ class LMFeedPostHeader extends StatelessWidget {
                                   LMFeedText(
                                     text: LMFeedTimeAgo.instance
                                         .format(postViewData.createdAt),
-                                    style: LMFeedTextStyle(
+                                    style: postHeaderStyle?.subTextStyle ??
+                                        LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize: LikeMindsTheme.kFontSmall,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                  ),
+                              LikeMindsTheme.kHorizontalPaddingSmall,
+                              LMFeedText(
+                                text: postViewData.isEdited ? '·' : '',
+                                style: postHeaderStyle?.subTextStyle ??
+                                    LMFeedTextStyle(
                                       textStyle: TextStyle(
                                         fontSize: LikeMindsTheme.kFontSmall,
                                         color: Colors.grey[700],
                                       ),
                                     ),
-                                  ),
+                              ),
                               LikeMindsTheme.kHorizontalPaddingSmall,
                               if (postViewData.isEdited)
                                 subTextSeparator ??
@@ -212,12 +235,14 @@ class LMFeedPostHeader extends StatelessWidget {
                                         text: postViewData.isEdited
                                             ? 'Edited'
                                             : '',
-                                        style: LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize: LikeMindsTheme.kFontSmall,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
+                                        style: postHeaderStyle?.subTextStyle ??
+                                            LMFeedTextStyle(
+                                              textStyle: TextStyle(
+                                                fontSize:
+                                                    LikeMindsTheme.kFontSmall,
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
                                       )
                                   : const SizedBox(),
                             ],
@@ -242,7 +267,8 @@ class LMFeedPostHeader extends StatelessWidget {
               ),
             ),
           postViewData.menuItems.isNotEmpty
-              ? menuBuilder?.call(_defMenuBuilder()) ?? _defMenuBuilder()
+              ? menuBuilder?.call(_defMenuBuilder(feedTheme)) ??
+                  _defMenuBuilder(feedTheme)
               : const SizedBox()
         ],
       ),
@@ -283,11 +309,10 @@ class LMFeedPostHeader extends StatelessWidget {
     );
   }
 
-  LMFeedMenu _defMenuBuilder() {
+  LMFeedMenu _defMenuBuilder(LMFeedThemeData feedTheme) {
     return menu ??
         LMFeedMenu(
           menuItems: postViewData.menuItems,
-          isFeed: isFeed,
           removeItemIds: const {},
           action: LMFeedMenuAction(),
         );
@@ -302,6 +327,10 @@ class LMFeedPostHeaderStyle {
   final double? imageSize;
   final LMFeedTextStyle? fallbackTextStyle;
   final bool showCustomTitle;
+  final LMFeedTextStyle? titleTextStyle;
+  final LMFeedTextStyle? subTextStyle;
+  final LMFeedTextStyle? customTitleTextStyle;
+  final LMFeedMenuStyle? menuStyle;
 
   final bool showPinnedIcon;
 
@@ -314,6 +343,10 @@ class LMFeedPostHeaderStyle {
     this.fallbackTextStyle,
     this.showCustomTitle = true,
     this.showPinnedIcon = true,
+    this.titleTextStyle,
+    this.subTextStyle,
+    this.customTitleTextStyle,
+    this.menuStyle,
   });
 
   LMFeedPostHeaderStyle copyWith({
@@ -325,6 +358,10 @@ class LMFeedPostHeaderStyle {
     LMFeedTextStyle? fallbackTextStyle,
     bool? showCustomTitle,
     bool? showPinnedIcon,
+    LMFeedTextStyle? titleTextStyle,
+    LMFeedTextStyle? subTextStyle,
+    LMFeedTextStyle? customTitleTextStyle,
+    LMFeedMenuStyle? menuStyle,
   }) {
     return LMFeedPostHeaderStyle(
       padding: padding ?? this.padding,
@@ -335,6 +372,10 @@ class LMFeedPostHeaderStyle {
       fallbackTextStyle: fallbackTextStyle ?? this.fallbackTextStyle,
       showCustomTitle: showCustomTitle ?? this.showCustomTitle,
       showPinnedIcon: showPinnedIcon ?? this.showPinnedIcon,
+      titleTextStyle: titleTextStyle ?? this.titleTextStyle,
+      subTextStyle: subTextStyle ?? this.subTextStyle,
+      customTitleTextStyle: customTitleTextStyle ?? this.customTitleTextStyle,
+      menuStyle: menuStyle ?? this.menuStyle,
     );
   }
 

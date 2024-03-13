@@ -9,10 +9,7 @@
       "cwd": "example",
       "request": "launch",
       "type": "dart",
-      "args": [
-        "--dart-define",
-        "DEBUG=true"
-      ]
+      "args": ["--dart-define", "DEBUG=true"]
     },
     {
       "name": "likeminds_feed_sample (profile mode)",
@@ -20,10 +17,7 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "args": [
-        "--dart-define",
-        "DEBUG=true"
-      ]
+      "args": ["--dart-define", "DEBUG=true"]
     },
     {
       "name": "likeminds_feed_sample (release mode)",
@@ -31,6 +25,7 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
-    },
+      "args": ["--dart-define", "DEBUG=true"]
+    }
   ]
 }

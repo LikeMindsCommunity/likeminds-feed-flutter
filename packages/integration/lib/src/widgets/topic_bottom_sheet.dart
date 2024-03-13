@@ -161,7 +161,7 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
                 builder: (context, state) {
                   if (state is LMFeedTopicLoadingState) {
                     return LMFeedLoader(
-                      color: feedTheme?.primaryColor,
+                      style: feedTheme?.loaderStyle,
                     );
                   }
 

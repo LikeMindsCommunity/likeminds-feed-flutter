@@ -1,26 +1,31 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_ui/src/models/helper/attachment/attachment_view_data.dart';
-import 'package:likeminds_feed_flutter_ui/src/utils/theme/theme.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/media/image.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/media/video.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedCarousel extends StatefulWidget {
   final List<LMAttachmentViewData> attachments;
   final String postId;
 
+  /// {@macro feed_image}
   final LMFeedImage? imageItem;
   final LMFeedVideo? videoItem;
 
-  final Widget Function(LMFeedImage)? imageBuilder;
-  final Widget Function(LMFeedVideo)? videoBuilder;
+  /// {@macro feed_image_builder}
+  final LMFeedImageBuilder? imageBuilder;
+
+  /// {@macro feed_video_builder}
+  final LMFeedVideoBuilder? videoBuilder;
+
+  /// {@macro feed_carousel_indicator_builder}
+  final LMFeedCarouselIndicatorBuilder? carouselIndicatorBuilder;
 
   final LMFeedPostVideoStyle? videoStyle;
   final LMFeedPostImageStyle? imageStyle;
   final LMFeedPostCarouselStyle? style;
 
-  final Function(String, StackTrace)? onError;
+  /// {@macro feed_error_handler}
+  final LMFeedErrorHandler? onError;
   final VoidCallback? onMediaTap;
 
   const LMFeedCarousel({
@@ -36,33 +41,41 @@ class LMFeedCarousel extends StatefulWidget {
     this.imageStyle,
     this.style,
     this.onMediaTap,
+    this.carouselIndicatorBuilder,
   }) : super(key: key);
 
   @override
   State<LMFeedCarousel> createState() => _LMCarouselState();
 
-  static LMFeedCarousel defCarousel(
-    List<LMAttachmentViewData> attachments,
-    String postId, {
+  LMFeedCarousel copyWith(
+    List<LMAttachmentViewData>? attachments,
+    String? postId, {
     LMFeedImage? imageItem,
     LMFeedVideo? videoItem,
     Function(String, StackTrace)? onError,
-    Function(VideoController)? initialiseVideoController,
     LMFeedPostVideoStyle? videoStyle,
     LMFeedPostImageStyle? imageStyle,
     LMFeedPostCarouselStyle? style,
+    Function(VideoController)? initialiseVideoController,
     VoidCallback? onMediaTap,
+    Widget Function(LMFeedImage)? imageBuilder,
+    Widget Function(LMFeedVideo)? videoBuilder,
+    Widget Function(int)? carouselIndicatorBuilder,
   }) {
     return LMFeedCarousel(
-      postId: postId,
-      attachments: attachments,
-      imageItem: imageItem,
-      videoItem: videoItem,
-      onError: onError,
-      videoStyle: videoStyle,
-      imageStyle: imageStyle,
-      style: style,
-      onMediaTap: onMediaTap,
+      postId: postId ?? this.postId,
+      attachments: attachments ?? this.attachments,
+      imageItem: imageItem ?? this.imageItem,
+      videoItem: videoItem ?? this.videoItem,
+      onError: onError ?? this.onError,
+      videoStyle: videoStyle ?? this.videoStyle,
+      imageStyle: imageStyle ?? this.imageStyle,
+      style: style ?? this.style,
+      onMediaTap: onMediaTap ?? this.onMediaTap,
+      carouselIndicatorBuilder:
+          carouselIndicatorBuilder ?? this.carouselIndicatorBuilder,
+      imageBuilder: imageBuilder ?? this.imageBuilder,
+      videoBuilder: videoBuilder ?? this.videoBuilder,
     );
   }
 }
@@ -172,67 +185,62 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                     ),
               ),
             ),
-            (style!.showIndicator ?? true)
+            (style!.showIndicator ?? true) && checkIfMultipleAttachments()
                 ? ValueListenableBuilder(
                     valueListenable: rebuildCurr,
                     builder: (context, _, __) {
-                      return Column(
-                        children: [
-                          checkIfMultipleAttachments()
-                              ? LikeMindsTheme.kVerticalPaddingMedium
-                              : const SizedBox(),
-                          checkIfMultipleAttachments()
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: widget.attachments.map((url) {
-                                    int index = widget.attachments.indexOf(url);
-                                    return currPosition == index
-                                        ? Container(
-                                            width:
-                                                style!.indicatorWidth ?? 16.0,
-                                            height:
-                                                style!.indicatorHeight ?? 8.0,
-                                            padding: style!.indicatorPadding,
-                                            margin: style!.indicatorMargin ??
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 7.0,
-                                                    horizontal: 2.0),
-                                            decoration: BoxDecoration(
-                                              borderRadius: style!
-                                                      .indicatorBorderRadius ??
-                                                  const BorderRadius.all(
-                                                    Radius.circular(4),
-                                                  ),
-                                              color:
-                                                  style!.activeIndicatorColor ??
-                                                      feedTheme.primaryColor,
-                                            ),
-                                          )
-                                        : Container(
-                                            width: style!.indicatorWidth ?? 8.0,
-                                            height:
-                                                style!.indicatorHeight ?? 8.0,
-                                            padding: style!.indicatorPadding,
-                                            margin: style!.indicatorMargin ??
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 7.0,
-                                                    horizontal: 2.0),
-                                            decoration: BoxDecoration(
-                                              borderRadius: style!
-                                                      .indicatorBorderRadius ??
-                                                  const BorderRadius.all(
-                                                    Radius.circular(4),
-                                                  ),
-                                              color: style!
-                                                      .inActiveIndicatorColor ??
-                                                  feedTheme.inActiveColor,
-                                            ),
-                                          );
-                                  }).toList(),
-                                )
-                              : const SizedBox(),
-                        ],
-                      );
+                      return widget.carouselIndicatorBuilder
+                              ?.call(currPosition) ??
+                          Column(
+                            children: [
+                              LikeMindsTheme.kVerticalPaddingMedium,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: widget.attachments.map((url) {
+                                  int index = widget.attachments.indexOf(url);
+                                  return currPosition == index
+                                      ? Container(
+                                          width: style!.indicatorWidth ?? 16.0,
+                                          height: style!.indicatorHeight ?? 8.0,
+                                          padding: style!.indicatorPadding,
+                                          margin: style!.indicatorMargin ??
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 7.0,
+                                                  horizontal: 2.0),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                style!.indicatorBorderRadius ??
+                                                    const BorderRadius.all(
+                                                      Radius.circular(4),
+                                                    ),
+                                            color:
+                                                style!.activeIndicatorColor ??
+                                                    feedTheme.primaryColor,
+                                          ),
+                                        )
+                                      : Container(
+                                          width: style!.indicatorWidth ?? 8.0,
+                                          height: style!.indicatorHeight ?? 8.0,
+                                          padding: style!.indicatorPadding,
+                                          margin: style!.indicatorMargin ??
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 7.0,
+                                                  horizontal: 2.0),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                style!.indicatorBorderRadius ??
+                                                    const BorderRadius.all(
+                                                      Radius.circular(4),
+                                                    ),
+                                            color:
+                                                style!.inActiveIndicatorColor ??
+                                                    feedTheme.inActiveColor,
+                                          ),
+                                        );
+                                }).toList(),
+                              )
+                            ],
+                          );
                     },
                   )
                 : const SizedBox.shrink(),

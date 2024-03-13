@@ -142,7 +142,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
         builder: (context, state) {
           if (state is LMFeedTopicLoadingState) {
             return LMFeedLoader(
-              color: LMFeedTheme.of(context).primaryColor,
+              style: LMFeedTheme.of(context).loaderStyle,
             );
           }
 

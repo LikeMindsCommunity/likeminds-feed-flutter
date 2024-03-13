@@ -373,6 +373,8 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
     return LMFeedPostContent(
       onTagTap: (String? userId) {},
       style: feedThemeData?.contentStyle,
+      text: post.text,
+      heading: post.heading,
     );
   }
 
@@ -561,6 +563,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
       );
 
   LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
+        isActive: postViewData.isSaved,
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           rebuildPostWidget.value = !rebuildPostWidget.value;

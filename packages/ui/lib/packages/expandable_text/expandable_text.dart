@@ -13,8 +13,8 @@ import './text_parser.dart';
 
 typedef StringCallback = void Function(String value);
 
-class ExpandableText extends StatefulWidget {
-  const ExpandableText(
+class LMFeedExpandableText extends StatefulWidget {
+  const LMFeedExpandableText(
     this.text, {
     Key? key,
     required this.expandText,
@@ -40,7 +40,7 @@ class ExpandableText extends StatefulWidget {
     this.textDirection,
     this.textAlign,
     this.textScaleFactor,
-    this.maxLines = 2,
+    this.maxLines = 3,
     this.animation = false,
     this.animationDuration,
     this.animationCurve,
@@ -78,13 +78,13 @@ class ExpandableText extends StatefulWidget {
   final Duration? animationDuration;
   final Curve? animationCurve;
   final String? semanticsLabel;
-  final Function(String) onTagTap; // user id of the tag of user tapped
+  final Function(String) onTagTap;
 
   @override
-  ExpandableTextState createState() => ExpandableTextState();
+  LMFeedExpandableTextState createState() => LMFeedExpandableTextState();
 }
 
-class ExpandableTextState extends State<ExpandableText>
+class LMFeedExpandableTextState extends State<LMFeedExpandableText>
     with TickerProviderStateMixin {
   bool _expanded = false;
   RegExp regExp = RegExp(kRegexLinksAndTags);
@@ -105,7 +105,7 @@ class ExpandableTextState extends State<ExpandableText>
   }
 
   @override
-  void didUpdateWidget(ExpandableText oldWidget) {
+  void didUpdateWidget(LMFeedExpandableText oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.text != widget.text ||
@@ -217,7 +217,7 @@ class ExpandableTextState extends State<ExpandableText>
           textAlign: textAlign,
           textDirection: textDirection,
           textScaleFactor: textScaleFactor,
-          maxLines: 3,
+          maxLines: widget.maxLines,
           locale: locale,
         );
         textPainter.layout(minWidth: constraints.minWidth, maxWidth: maxWidth);

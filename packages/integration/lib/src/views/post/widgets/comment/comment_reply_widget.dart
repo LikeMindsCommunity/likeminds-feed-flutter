@@ -133,7 +133,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 height: 20,
                 width: 20,
                 child: LMFeedLoader(
-                  color: feedTheme!.primaryColor,
+                  style: feedTheme!.loaderStyle,
                 ),
               ),
             );
@@ -168,7 +168,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                       replies.insert(
                           0,
                           LMCommentViewDataConvertor.fromComment(
-                              response.reply!));
+                              response.reply!, users));
                     }
                   }
                   break;
@@ -189,7 +189,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                         (element) => element.id == response.reply!.id);
                     if (index != -1) {
                       replies[index] = LMCommentViewDataConvertor.fromComment(
-                          response.reply!);
+                          response.reply!, users);
                     }
                   }
                   break;
@@ -297,21 +297,21 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       }),
       listener: (context, state) {
         if (state is LMFeedCommentRepliesLoadedState) {
-          replies = state.commentDetails.postReplies!.replies
-                  ?.map((e) => LMCommentViewDataConvertor.fromComment(e))
-                  .toList() ??
-              [];
           users = state.commentDetails.users!.map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
           users.putIfAbsent(user.userUniqueId, () => user);
-        } else if (state is LMFeedPaginatedCommentRepliesLoadingState) {
-          replies = state.prevCommentDetails.postReplies!.replies
-                  ?.map((e) => LMCommentViewDataConvertor.fromComment(e))
+          replies = state.commentDetails.postReplies!.replies
+                  ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
               [];
+        } else if (state is LMFeedPaginatedCommentRepliesLoadingState) {
           users = state.prevCommentDetails.users!.map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
           users.putIfAbsent(user.userUniqueId, () => user);
+          replies = state.prevCommentDetails.postReplies!.replies
+                  ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
+                  .toList() ??
+              [];
         }
         replyCount = replies.length;
       },

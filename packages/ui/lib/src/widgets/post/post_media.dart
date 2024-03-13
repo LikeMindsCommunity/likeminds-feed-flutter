@@ -15,6 +15,7 @@ class LMFeedPostMedia extends StatefulWidget {
     this.onError,
     this.style,
     this.onMediaTap,
+    this.carouselIndicatorBuilder,
   });
 
   final List<LMAttachmentViewData> attachments;
@@ -28,6 +29,7 @@ class LMFeedPostMedia extends StatefulWidget {
   final VoidCallback? onMediaTap;
 
   final LMFeedPostMediaStyle? style;
+  final Widget Function(int)? carouselIndicatorBuilder;
 
   @override
   State<LMFeedPostMedia> createState() => _LMPostMediaState();
@@ -40,6 +42,8 @@ class LMFeedPostMedia extends StatefulWidget {
     Function(VideoController)? initialiseVideoController,
     Function(String, StackTrace)? onError,
     LMFeedPostMediaStyle? style,
+    Widget Function(int)? carouselIndicatorBuilder,
+    VoidCallback? onMediaTap,
   }) {
     return LMFeedPostMedia(
       attachments: attachments ?? this.attachments,
@@ -48,6 +52,9 @@ class LMFeedPostMedia extends StatefulWidget {
       subtitle: subtitle ?? this.subtitle,
       onError: onError ?? this.onError,
       style: style ?? this.style,
+      carouselIndicatorBuilder:
+          carouselIndicatorBuilder ?? this.carouselIndicatorBuilder,
+      onMediaTap: onMediaTap ?? this.onMediaTap,
     );
   }
 }
@@ -82,7 +89,6 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
     if (attachments == null || attachments!.isEmpty) {
       return const SizedBox();
     }
-    // attachments = InheritedPostProvider.of(context)?.post.attachments ?? [];
     if (attachments!.first.attachmentType == 3) {
       /// If the attachment is a document,
       /// we need to call the method 'getDocumentList'
@@ -107,6 +113,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         imageStyle: widget.style?.imageStyle,
         videoStyle: widget.style?.videoStyle,
         onMediaTap: widget.onMediaTap,
+        carouselIndicatorBuilder: widget.carouselIndicatorBuilder,
       );
     } else if (attachments!.first.attachmentType == 8) {
       final repostData = attachments!.first.attachmentMeta.repost!;

@@ -159,51 +159,46 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   Widget build(BuildContext context) {
     LMFeedThemeData lmFeedThemeData = LMFeedTheme.of(context);
     style = widget.style ?? LMFeedTheme.of(context).postStyle;
-    return InheritedPostProvider(
-      post: widget.post,
-      child: GestureDetector(
-        onTap: () {
-          widget.onPostTap?.call(context, widget.post);
-        },
-        behavior: HitTestBehavior.translucent,
-        child: Container(
-          decoration: BoxDecoration(
-            color: lmFeedThemeData.container,
-            borderRadius: style?.borderRadius,
-            boxShadow: style?.boxShadow,
-            border: style?.border,
-          ),
-          padding: style?.padding,
-          margin: style?.margin,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (widget.activityHeader != null) widget.activityHeader!,
-              widget.headerBuilder
-                      ?.call(context, _defPostHeader(), widget.post) ??
-                  _defPostHeader(),
-              widget.post.topics.isEmpty
-                  ? const SizedBox.shrink()
-                  : widget.topicBuilder
-                          ?.call(context, _defTopicWidget(), widget.post) ??
-                      _defTopicWidget(),
-              widget.post.text.isEmpty
-                  ? const SizedBox.shrink()
-                  : widget.contentBuilder
-                          ?.call(context, _defContentWidget(), widget.post) ??
-                      _defContentWidget(),
-              widget.post.attachments != null &&
-                      widget.post.attachments!.isNotEmpty
-                  ? widget.mediaBuilder
-                          ?.call(context, _defPostMedia(), widget.post) ??
-                      _defPostMedia()
-                  : const SizedBox.shrink(),
-              widget.footerBuilder
-                      ?.call(context, _defFooterWidget(), widget.post) ??
-                  _defFooterWidget(),
-            ],
-          ),
+    return GestureDetector(
+      onTap: () {
+        widget.onPostTap?.call(context, widget.post);
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        decoration: BoxDecoration(
+          color: style?.backgroundColor ?? lmFeedThemeData.container,
+          borderRadius: style?.borderRadius,
+          boxShadow: style?.boxShadow,
+          border: style?.border,
+        ),
+        padding: style?.padding,
+        margin: style?.margin,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.activityHeader != null) widget.activityHeader!,
+            widget.headerBuilder
+                    ?.call(context, _defPostHeader(), widget.post) ??
+                _defPostHeader(),
+            widget.post.topics.isEmpty
+                ? const SizedBox.shrink()
+                : widget.topicBuilder
+                        ?.call(context, _defTopicWidget(), widget.post) ??
+                    _defTopicWidget(),
+            widget.contentBuilder
+                    ?.call(context, _defContentWidget(), widget.post) ??
+                _defContentWidget(),
+            widget.post.attachments != null &&
+                    widget.post.attachments!.isNotEmpty
+                ? widget.mediaBuilder
+                        ?.call(context, _defPostMedia(), widget.post) ??
+                    _defPostMedia()
+                : const SizedBox.shrink(),
+            widget.footerBuilder
+                    ?.call(context, _defFooterWidget(), widget.post) ??
+                _defFooterWidget(),
+          ],
         ),
       ),
     );
@@ -221,6 +216,8 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
     return widget.content ??
         LMFeedPostContent(
           onTagTap: widget.onTagTap,
+          text: widget.post.text,
+          heading: widget.post.heading,
         );
   }
 
@@ -248,35 +245,15 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   }
 }
 
-class InheritedPostProvider extends InheritedWidget {
-  const InheritedPostProvider({
-    super.key,
-    required this.child,
-    required this.post,
-  }) : super(child: child);
-
-  @override
-  final Widget child;
-  final LMPostViewData post;
-
-  static InheritedPostProvider? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<InheritedPostProvider>();
-  }
-
-  @override
-  bool updateShouldNotify(InheritedPostProvider oldWidget) {
-    return true;
-  }
-}
-
 class LMFeedPostStyle {
   // Styling variables
   final List<BoxShadow>? boxShadow;
   final BorderRadiusGeometry? borderRadius;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
-
   final BoxBorder? border;
+  final Color? backgroundColor;
+  final LMFeedPostLikesListType likesListType;
 
   LMFeedPostStyle({
     this.boxShadow,
@@ -284,6 +261,8 @@ class LMFeedPostStyle {
     this.padding,
     this.margin,
     this.border,
+    this.backgroundColor,
+    this.likesListType = LMFeedPostLikesListType.screen,
   });
 
   LMFeedPostStyle copyWith({
@@ -297,6 +276,8 @@ class LMFeedPostStyle {
     LMFeedPostTopicStyle? topicStyle,
     LMFeedPostMediaStyle? mediaStyle,
     BoxBorder? border,
+    Color? backgroundColor,
+    LMFeedPostLikesListType? likesListType,
   }) {
     return LMFeedPostStyle(
       boxShadow: boxShadow ?? this.boxShadow,
@@ -304,6 +285,8 @@ class LMFeedPostStyle {
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
       border: border ?? this.border,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      likesListType: likesListType ?? this.likesListType,
     );
   }
 

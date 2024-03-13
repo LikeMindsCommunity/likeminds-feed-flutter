@@ -32,14 +32,16 @@ class LMFeedCommentWidget extends StatefulWidget {
   final LMFeedText? titleText;
   final LMFeedText? subtitleText;
 
-  final Function(String) onTagTap;
+  /// {@macro feed_on_tag_tap}
+  final LMFeedOnTagTap onTagTap;
 
   final Widget Function(LMFeedMenu)? menu;
   final LMFeedMenuAction lmFeedMenuAction;
 
-  final Widget Function(LMFeedButton)? likeButtonBuilder;
-  final Widget Function(LMFeedButton)? replyButtonBuilder;
-  final Widget Function(LMFeedButton)? showRepliesButtonBuilder;
+  /// {@macro feed_button_builder}
+  final LMFeedButtonBuilder? likeButtonBuilder;
+  final LMFeedButtonBuilder? replyButtonBuilder;
+  final LMFeedButtonBuilder? showRepliesButtonBuilder;
 
   final LMFeedButton? likeButton;
   final LMFeedButton? replyButton;
@@ -154,7 +156,8 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
           LikeMindsTheme.kVerticalPaddingMedium,
           Container(
             padding: style!.actionsPadding ?? EdgeInsets.zero,
-            child: ExpandableText(
+            color: style!.contentBackgroundColor ?? Colors.white,
+            child: LMFeedExpandableText(
               widget.comment.text,
               onTagTap: widget.onTagTap,
               expandText: "see more",
@@ -234,7 +237,6 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
 
   LMFeedMenu _defPostMenu() {
     return LMFeedMenu(
-      isFeed: false,
       menuItems: widget.comment.menuItems,
       action: widget.lmFeedMenuAction,
     );

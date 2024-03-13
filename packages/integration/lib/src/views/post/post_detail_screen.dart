@@ -74,8 +74,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       LMFeedFetchCommentReplyBloc.instance;
   LMFeedPostDetailScreenHandler? _postDetailScreenHandler;
   Future<LMPostViewData?>? getPostData;
-  LMUserViewData currentUser = LMUserViewDataConvertor.fromUser(
-      LMFeedUserLocalPreference.instance.fetchUserData());
+  LMUserViewData currentUser =
+      LMFeedUserLocalPreference.instance.fetchUserData();
   String? commentIdReplyId;
   bool replyShown = false;
   LMFeedThemeData? feedTheme;
@@ -133,7 +133,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         return value;
       });
     }
-    config = widget.config ??  LMFeedCore.config.postDetailConfig;
+    config = widget.config ?? LMFeedCore.config.postDetailConfig;
   }
 
   @override
@@ -145,6 +145,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   @override
   Widget build(BuildContext context) {
     feedTheme = LMFeedTheme.of(context);
+    Size screenSize = MediaQuery.of(context).size;
     return RefreshIndicator.adaptive(
       onRefresh: () {
         _pagingController.itemList?.clear();
@@ -173,11 +174,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     body: CustomScrollView(
                       slivers: [
                         SliverToBoxAdapter(
-                            child: widget.postBuilder?.call(
-                                    context,
-                                    defPostWidget(),
-                                    _postDetailScreenHandler!.postData!) ??
-                                defPostWidget()),
+                          child: widget.postBuilder?.call(
+                                  context,
+                                  defPostWidget(),
+                                  _postDetailScreenHandler!.postData!) ??
+                              LMFeedCore.widgets?.postWidgetBuilder.call(
+                                  context,
+                                  defPostWidget(),
+                                  _postDetailScreenHandler!.postData!) ??
+                              defPostWidget(),
+                        ),
                         SliverToBoxAdapter(
                           child: BlocListener<LMFeedCommentHandlerBloc,
                               LMFeedCommentHandlerState>(
@@ -245,18 +251,26 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       userViewData = _postDetailScreenHandler!
                                           .users[commentViewData.userId]!;
 
+                                      LMFeedCommentWidget commentWidget =
+                                          defCommentTile(
+                                              commentViewData, userViewData);
+
                                       return SizedBox(
                                         child: Column(
                                           children: [
                                             widget.commentBuilder?.call(
                                                     context,
-                                                    defCommentTile(
-                                                        commentViewData,
-                                                        userViewData),
+                                                    commentWidget,
                                                     _postDetailScreenHandler!
                                                         .postData!) ??
-                                                defCommentTile(commentViewData,
-                                                    userViewData),
+                                                LMFeedCore
+                                                    .widgets?.commentBuilder
+                                                    ?.call(
+                                                        context,
+                                                        commentWidget,
+                                                        _postDetailScreenHandler!
+                                                            .postData!) ??
+                                                commentWidget,
                                             (replyShown &&
                                                     commentIdReplyId ==
                                                         commentViewData.id)
@@ -264,8 +278,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     post:
                                                         _postDetailScreenHandler!
                                                             .postData!,
-                                                    commentBuilder:
-                                                        widget.commentBuilder,
+                                                    commentBuilder: widget
+                                                            .commentBuilder ??
+                                                        LMFeedCore.widgets
+                                                            ?.commentBuilder,
                                                     refresh: () {
                                                       _pagingController
                                                           .refresh();
@@ -497,7 +513,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       },
       style: feedTheme!.postStyle,
       header: _defPostHeader(),
-      content: _defContentWidget(),
+      content: _defContentWidget(_postDetailScreenHandler!.postData!),
       footer: _defFooterWidget(),
       topicWidget: _defTopicWidget(),
       media: _defPostMedia(),
@@ -512,7 +528,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     );
   }
 
-  LMFeedPostContent _defContentWidget() {
+  LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
       onTagTap: (String userId) {
         LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
@@ -523,6 +539,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         );
       },
       style: feedTheme?.contentStyle,
+      text: post.text,
+      heading: post.heading,
     );
   }
 
@@ -562,7 +580,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       },
       menu: LMFeedMenu(
         menuItems: _postDetailScreenHandler!.postData?.menuItems ?? [],
-        isFeed: false,
         removeItemIds: {postReportId, postEditId},
         action: LMFeedMenuAction(
           onPostPin: () => handlePostPinAction(),
@@ -646,13 +663,41 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
           videoController?.player.pause();
 
-          Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedLikesScreen(
-                postId: _postDetailScreenHandler!.postData!.id,
+          if ((feedTheme?.postStyle.likesListType ??
+                  LMFeedPostLikesListType.screen) ==
+              LMFeedPostLikesListType.screen) {
+            Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute(
+                builder: (context) => LMFeedLikesScreen(
+                  postId: _postDetailScreenHandler!.postData!.id,
+                ),
               ),
-            ),
-          );
+            );
+          } else {
+            showModalBottomSheet(
+              context: context,
+              useRootNavigator: true,
+              useSafeArea: true,
+              isScrollControlled: true,
+              elevation: 10,
+              enableDrag: true,
+              showDragHandle: true,
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+                minHeight: MediaQuery.of(context).size.height * 0.3,
+              ),
+              backgroundColor: feedTheme?.container,
+              clipBehavior: Clip.hardEdge,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0),
+                ),
+              ),
+              builder: (context) => LMFeedLikesBottomSheet(
+                  postId: _postDetailScreenHandler!.postData!.id),
+            );
+          }
         },
         onTap: () async {
           if (_postDetailScreenHandler!.postData!.isLiked) {
@@ -705,6 +750,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       );
 
   LMFeedButton defSaveButton() => LMFeedButton(
+        isActive: _postDetailScreenHandler!.postData!.isSaved,
         onTap: () async {
           _postDetailScreenHandler!.postData!.isSaved =
               !_postDetailScreenHandler!.postData!.isSaved;
@@ -1178,7 +1224,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                           ? null
                           : state is LMFeedCommentLoadingState
                               ? LMFeedLoader(
-                                  color: feedTheme?.primaryColor,
+                                  style: feedTheme?.loaderStyle,
                                 )
                               : LMFeedButton(
                                   style: const LMFeedButtonStyle(

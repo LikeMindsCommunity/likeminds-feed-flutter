@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/post/post.dart';
 
 class LMFeedPostContent extends StatelessWidget {
   const LMFeedPostContent({
@@ -10,49 +9,85 @@ class LMFeedPostContent extends StatelessWidget {
     this.onTagTap,
     this.expanded = false,
     this.style,
+    this.heading,
   });
 
   final String? text;
+  final String? heading;
 
-  final Function(String)? onTagTap;
+  final LMFeedOnTagTap? onTagTap;
   final bool expanded;
 
   final LMFeedPostContentStyle? style;
 
   @override
   Widget build(BuildContext context) {
-    final postDetails = InheritedPostProvider.of(context)?.post;
     final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
     final LMFeedPostContentStyle contentStyle = style ?? feedTheme.contentStyle;
-    return Container(
-      width: contentStyle.width,
-      height: contentStyle.height,
-      padding: contentStyle.padding,
-      margin: contentStyle.margin,
-      child: ExpandableText(
-        text ?? postDetails!.text,
-        onTagTap: (String userId) {
-          onTagTap?.call(userId);
-        },
-        expandText: contentStyle.expandText ?? "see more",
-        animation: contentStyle.animation ?? true,
-        maxLines: contentStyle.visibleLines ?? 4,
-        expanded: expanded,
-        hashtagStyle: contentStyle.linkStyle ??
-            Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: feedTheme.primaryColor),
-        prefixStyle: contentStyle.expandTextStyle,
-        linkStyle: contentStyle.linkStyle ??
-            Theme.of(context)
-                .textTheme
-                .bodyMedium!
-                .copyWith(color: feedTheme.primaryColor),
-        textAlign: contentStyle.textAlign ?? TextAlign.left,
-        style: contentStyle.textStyle ?? Theme.of(context).textTheme.bodyMedium,
-      ),
-    );
+    return (text == null || text!.isEmpty) &&
+            (heading == null || heading!.isEmpty)
+        ? const SizedBox()
+        : Container(
+            width: contentStyle.width,
+            height: contentStyle.height,
+            padding: contentStyle.padding,
+            margin: contentStyle.margin,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (heading != null && heading!.isNotEmpty)
+                  LMFeedExpandableText(
+                    heading!,
+                    expandText: "",
+                    expanded: true,
+                    collapseText: "",
+                    hashtagStyle: contentStyle.linkStyle ??
+                        Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: feedTheme.primaryColor),
+                    prefixStyle: contentStyle.expandTextStyle,
+                    linkStyle: contentStyle.linkStyle ??
+                        Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: feedTheme.primaryColor),
+                    onTagTap: (String uuid) {
+                      onTagTap?.call(uuid);
+                    },
+                    style: contentStyle.headingStyle,
+                  ),
+                if ((heading != null && heading!.isNotEmpty) &&
+                    (text != null && text!.isNotEmpty))
+                  contentStyle.headingSeparator,
+                if (text != null && text!.isNotEmpty)
+                  LMFeedExpandableText(
+                    text!,
+                    onTagTap: (String userId) {
+                      onTagTap?.call(userId);
+                    },
+                    expandText: contentStyle.expandText ?? "see more",
+                    animation: contentStyle.animation ?? true,
+                    maxLines: contentStyle.visibleLines ?? 4,
+                    expanded: expanded,
+                    hashtagStyle: contentStyle.linkStyle ??
+                        Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: feedTheme.primaryColor),
+                    prefixStyle: contentStyle.expandTextStyle,
+                    linkStyle: contentStyle.linkStyle ??
+                        Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: feedTheme.primaryColor),
+                    textAlign: contentStyle.textAlign ?? TextAlign.left,
+                    style: contentStyle.textStyle ??
+                        Theme.of(context).textTheme.bodyMedium,
+                  ),
+              ],
+            ),
+          );
   }
 
   LMFeedPostContent copyWith({
@@ -71,7 +106,9 @@ class LMFeedPostContent extends StatelessWidget {
 }
 
 class LMFeedPostContentStyle {
+  final Widget headingSeparator;
   final TextStyle? textStyle;
+  final TextStyle? headingStyle;
   final TextStyle? linkStyle;
   final TextStyle? expandTextStyle;
   final TextAlign? textAlign;
@@ -85,6 +122,7 @@ class LMFeedPostContentStyle {
 
   const LMFeedPostContentStyle({
     this.textStyle,
+    this.headingStyle,
     this.linkStyle,
     this.expandTextStyle,
     this.expandText,
@@ -95,10 +133,12 @@ class LMFeedPostContentStyle {
     this.height,
     this.padding,
     this.margin,
+    this.headingSeparator = const SizedBox.shrink(),
   });
 
   LMFeedPostContentStyle copyWith({
     TextStyle? textStyle,
+    TextStyle? headingStyle,
     TextStyle? linkStyle,
     TextStyle? expandTextStyle,
     TextAlign? textAlign,
@@ -109,9 +149,11 @@ class LMFeedPostContentStyle {
     double? height,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    Widget? headingSeparator,
   }) {
     return LMFeedPostContentStyle(
       textStyle: textStyle ?? this.textStyle,
+      headingStyle: headingStyle ?? this.headingStyle,
       linkStyle: linkStyle ?? this.linkStyle,
       expandTextStyle: expandTextStyle ?? this.expandTextStyle,
       expandText: expandText ?? this.expandText,
@@ -122,12 +164,20 @@ class LMFeedPostContentStyle {
       height: height ?? this.height,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
+      headingSeparator: headingSeparator ?? this.headingSeparator,
     );
   }
 
   factory LMFeedPostContentStyle.basic({Color? onContainer}) =>
       LMFeedPostContentStyle(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        headingSeparator: const SizedBox(height: 0.0),
+        headingStyle: TextStyle(
+          color: onContainer ?? LikeMindsTheme.greyColor,
+          fontSize: 18,
+          fontFamily: 'Roboto',
+          fontWeight: FontWeight.w700,
+        ),
         textStyle: TextStyle(
           color: onContainer ?? LikeMindsTheme.greyColor,
           fontSize: 16,

@@ -8,18 +8,16 @@ class LMFeedMenu extends StatelessWidget {
     super.key,
     this.children,
     required this.menuItems,
-    required this.isFeed,
-    this.menuIcon,
     this.removeItemIds = const {4, 7},
     this.action,
+    this.style,
   });
 
   final Map<int, Widget>? children;
-  final LMFeedIcon? menuIcon;
   final List<LMPopUpMenuItemViewData> menuItems;
-  final bool isFeed;
   final Set<int> removeItemIds;
   final LMFeedMenuAction? action;
+  final LMFeedMenuStyle? style;
 
   void removeReportIntegration() {
     menuItems.removeWhere((element) {
@@ -31,47 +29,133 @@ class LMFeedMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     removeReportIntegration();
     LMFeedThemeData theme = LMFeedTheme.of(context);
+    LMFeedMenuStyle? style = this.style ?? theme.headerStyle.menuStyle;
     return menuItems.isEmpty
         ? Container()
-        : SizedBox(
-            child: PopupMenuButton<int>(
-              onSelected: _handleMenuTap,
-              itemBuilder: (context) => menuItems
-                  .map(
-                    (element) => PopupMenuItem(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      value: element.id,
-                      child: children?[element.id] ??
-                          LMFeedText(
-                            text: element.title,
-                            style: LMFeedTextStyle(
-                              textStyle: TextStyle(
-                                color: theme.onContainer,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+        : (theme.headerStyle.menuStyle?.menuType ?? LMFeedPostMenuType.popUp) ==
+                LMFeedPostMenuType.popUp
+            ? SizedBox(
+                child: PopupMenuButton<int>(
+                  onSelected: _handleMenuTap,
+                  itemBuilder: (context) => menuItems
+                      .map(
+                        (element) => PopupMenuItem(
+                          padding: style?.padding ??
+                              const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
                               ),
+                          textStyle: style?.menuTitleStyle?.textStyle,
+                          value: element.id,
+                          child: children?[element.id] ??
+                              LMFeedText(
+                                text: element.title,
+                                style: style?.menuTitleStyle ??
+                                    LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        color: theme.onContainer,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                              ),
+                        ),
+                      )
+                      .toList(),
+                  color: theme.container,
+                  surfaceTintColor: Colors.transparent,
+                  child: style?.menuIcon ??
+                      const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: Icon(
+                          Icons.more_horiz,
+                          color: Colors.grey,
+                          size: 24,
+                        ),
+                      ),
+                ),
+              )
+            : GestureDetector(
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      backgroundColor:
+                          style?.backgroundColor ?? theme.container,
+                      enableDrag: true,
+                      useRootNavigator: true,
+                      useSafeArea: true,
+                      clipBehavior: Clip.hardEdge,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            style?.borderRadius ?? BorderRadius.circular(0.0),
+                      ),
+                      builder: (context) {
+                        return LMFeedBottomSheet(
+                            style: LMFeedBottomSheetStyle(
+                              dragBarColor: theme.disabledColor,
+                              backgroundColor:
+                                  style?.backgroundColor ?? theme.container,
+                              borderRadius: style?.borderRadius,
+                              boxShadow: style?.boxShadow,
+                              margin: style?.margin,
+                              padding: style?.padding ??
+                                  const EdgeInsets.symmetric(horizontal: 20.0),
                             ),
-                          ),
-                    ),
-                  )
-                  .toList(),
-              color: theme.container,
-              surfaceTintColor: Colors.transparent,
-              child: menuIcon ??
-                  const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: Icon(
-                      Icons.more_horiz,
-                      color: Colors.grey,
-                      size: 24,
-                    ),
-                  ),
-            ),
-          );
+                            title: (style?.showBottomSheetTitle ?? true)
+                                ? LMFeedText(
+                                    text: "Options",
+                                    style: style?.headingStyle ??
+                                        LMFeedTextStyle(
+                                          textAlign: TextAlign.left,
+                                          textStyle: TextStyle(
+                                            color: theme.onContainer,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                  )
+                                : null,
+                            children: menuItems
+                                .map(
+                                  (e) =>
+                                      children?[e.id] ??
+                                      ListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: LMFeedText(
+                                          text: e.title,
+                                          style: style?.menuTitleStyle ??
+                                              LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  color: theme.onContainer,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                            _handleMenuTap(e.id);
+                                          },
+                                        ),
+                                      ),
+                                )
+                                .toList());
+                      });
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  child: style?.menuIcon ??
+                      const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: Icon(
+                          Icons.more_horiz,
+                          color: Colors.grey,
+                          size: 24,
+                        ),
+                      ),
+                ),
+              );
   }
 
   void _handleMenuTap(int itemId) {
@@ -100,6 +184,8 @@ class LMFeedMenu extends StatelessWidget {
       case LMFeedMenuAction.commentEditId:
         action?.onCommentEdit?.call();
         break;
+      default:
+        break;
     }
   }
 
@@ -107,17 +193,16 @@ class LMFeedMenu extends StatelessWidget {
     Map<int, Widget>? children,
     LMFeedIcon? menuIcon,
     List<LMPopUpMenuItemViewData>? menuItems,
-    bool? isFeed,
     Set<int>? removeItemIds,
     LMFeedMenuAction? action,
+    LMFeedMenuStyle? style,
   }) {
     return LMFeedMenu(
       children: children ?? this.children,
-      menuIcon: menuIcon ?? this.menuIcon,
       menuItems: menuItems ?? this.menuItems,
-      isFeed: isFeed ?? this.isFeed,
       removeItemIds: removeItemIds ?? this.removeItemIds,
       action: action ?? this.action,
+      style: style ?? this.style,
     );
   }
 }
@@ -174,6 +259,88 @@ class LMFeedMenuAction {
       onCommentDelete: onCommentDelete ?? this.onCommentDelete,
       onCommentReport: onCommentReport ?? this.onCommentReport,
       onCommentEdit: onCommentEdit ?? this.onCommentEdit,
+    );
+  }
+}
+
+class LMFeedMenuStyle {
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final LMFeedIcon? menuIcon;
+  final LMFeedPostMenuType menuType;
+  final LMFeedTextStyle? headingStyle;
+  final LMFeedTextStyle? menuTitleStyle;
+  final Color? backgroundColor;
+  final List<BoxShadow>? boxShadow;
+  final BorderRadius? borderRadius;
+  final Border? border;
+  final bool? showBottomSheetTitle;
+  final Map<int, LMFeedMenuItemStyle>? menuItemStyle;
+
+  const LMFeedMenuStyle({
+    this.padding,
+    this.margin,
+    this.menuIcon,
+    this.menuType = LMFeedPostMenuType.popUp,
+    this.headingStyle,
+    this.menuTitleStyle,
+    this.backgroundColor,
+    this.boxShadow,
+    this.borderRadius,
+    this.border,
+    this.showBottomSheetTitle = true,
+    this.menuItemStyle,
+  });
+
+  LMFeedMenuStyle copyWith({
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    Color? iconColor,
+    double? iconSize,
+    LMFeedPostMenuType? menuType,
+    LMFeedIcon? menuIcon,
+    LMFeedTextStyle? headingStyle,
+    LMFeedTextStyle? menuTitleStyle,
+    Color? backgroundColor,
+    List<BoxShadow>? boxShadow,
+    BorderRadius? borderRadius,
+    Border? border,
+    bool? showBottomSheetTitle,
+    Map<int, LMFeedMenuItemStyle>? menuItemStyle,
+  }) {
+    return LMFeedMenuStyle(
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      menuIcon: menuIcon ?? this.menuIcon,
+      menuType: menuType ?? this.menuType,
+      headingStyle: headingStyle ?? this.headingStyle,
+      menuTitleStyle: menuTitleStyle ?? this.menuTitleStyle,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      boxShadow: boxShadow ?? this.boxShadow,
+      borderRadius: borderRadius ?? this.borderRadius,
+      border: border ?? this.border,
+      showBottomSheetTitle: showBottomSheetTitle ?? this.showBottomSheetTitle,
+      menuItemStyle: menuItemStyle ?? this.menuItemStyle,
+    );
+  }
+}
+
+class LMFeedMenuItemStyle {
+  LMFeedIcon icon;
+  LMFeedTextStyle titleStyle;
+
+  LMFeedMenuItemStyle({
+    required this.icon,
+    required this.titleStyle,
+  });
+
+  LMFeedMenuItemStyle copyWith({
+    LMFeedIcon? icon,
+    LMFeedTextStyle? titleStyle,
+  }) {
+    return LMFeedMenuItemStyle(
+      icon: icon ?? this.icon,
+      titleStyle: titleStyle ?? this.titleStyle,
     );
   }
 }

@@ -5,6 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
+/// {@template feed_image}
+/// A widget to display an image in a post.
+/// The image can be fetched from a URL or from a file.
+/// The [LMFeedImage] can be customized by passing in the required parameters
+/// and can be used in a post.
+/// The image can be tapped to perform an action.
+/// The image can be customized by passing in the required parameters
+/// and can be used in a post.
+/// {@endtemplate}
 class LMFeedImage extends StatefulWidget {
   const LMFeedImage({
     super.key,
@@ -18,7 +27,8 @@ class LMFeedImage extends StatefulWidget {
   final String? imageUrl;
   final File? imageFile;
 
-  final Function(String, StackTrace)? onError;
+  /// {@macro feed_error_handler}
+  final LMFeedErrorHandler? onError;
 
   final LMFeedPostImageStyle? style;
 
@@ -53,9 +63,13 @@ class _LMImageState extends State<LMFeedImage> {
     return GestureDetector(
       onTap: () => widget.onMediaTap?.call(),
       child: widget.imageUrl != null
-          ? ClipRRect(
+          ? Container(
+              padding: style?.padding,
+              margin: style?.margin,
+              decoration: BoxDecoration(
+                borderRadius: style!.borderRadius ?? BorderRadius.zero,
+              ),
               clipBehavior: Clip.hardEdge,
-              borderRadius: style!.borderRadius ?? BorderRadius.zero,
               child: CachedNetworkImage(
                 cacheKey: widget.imageUrl!,
                 height: style!.height,
@@ -122,6 +136,8 @@ class LMFeedPostImageStyle {
   final double? aspectRatio;
   final BorderRadius? borderRadius;
   final Color? borderColor;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
 
   final Widget? loaderWidget;
   final Widget? errorWidget;
@@ -139,6 +155,8 @@ class LMFeedPostImageStyle {
     this.errorWidget,
     this.shimmerWidget,
     this.boxFit,
+    this.padding,
+    this.margin,
   });
 
   LMFeedPostImageStyle copyWith({
@@ -151,6 +169,8 @@ class LMFeedPostImageStyle {
     Widget? errorWidget,
     Widget? shimmerWidget,
     BoxFit? boxFit,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
   }) {
     return LMFeedPostImageStyle(
       height: height ?? this.height,
@@ -162,6 +182,8 @@ class LMFeedPostImageStyle {
       errorWidget: errorWidget ?? this.errorWidget,
       shimmerWidget: shimmerWidget ?? this.shimmerWidget,
       boxFit: boxFit ?? this.boxFit,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
     );
   }
 

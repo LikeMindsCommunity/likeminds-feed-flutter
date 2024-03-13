@@ -12,6 +12,10 @@ class LMPostViewData {
   /// might contain tags and mentions
   String text;
 
+  /// post heading [nullable]
+  /// might contain tags and mentions
+  String? heading;
+
   /// topics of the post [nullable]
   List<LMTopicViewData> topics;
 
@@ -44,6 +48,8 @@ class LMPostViewData {
 
   List<LMCommentViewData> replies;
 
+  List<String>? commentIds;
+
   bool isRepost;
   bool isRepostedByUser;
   int repostCount;
@@ -51,6 +57,8 @@ class LMPostViewData {
 
   /// widget map to hold custom widget data
   Map<String, LMWidgetViewData>? widgets;
+
+  List<LMCommentViewData>? topComments;
 
   /// {@macro post_view_data}
   LMPostViewData._({
@@ -76,6 +84,9 @@ class LMPostViewData {
     required this.repostCount,
     this.isDeleted = false,
     this.widgets,
+    this.commentIds,
+    this.heading,
+    this.topComments,
   });
 }
 
@@ -102,6 +113,9 @@ class LMPostViewDataBuilder {
   int? _repostCount;
   bool? _isDeleted;
   Map<String, LMWidgetViewData>? _widgets;
+  String? _heading;
+  List<String>? _commentIds;
+  List<LMCommentViewData>? _topComments;
 
   void id(String id) {
     _id = id;
@@ -191,6 +205,18 @@ class LMPostViewDataBuilder {
     _widgets = widgets;
   }
 
+  void heading(String heading) {
+    _heading = heading;
+  }
+
+  void commentIds(List<String> commentIds) {
+    _commentIds = commentIds;
+  }
+
+  void topComments(List<LMCommentViewData> topComments) {
+    _topComments = topComments;
+  }
+
   LMPostViewData build() {
     return LMPostViewData._(
       id: _id!,
@@ -215,6 +241,9 @@ class LMPostViewDataBuilder {
       isRepostedByUser: _isRepostedByUser!,
       repostCount: _repostCount!,
       widgets: _widgets,
+      heading: _heading,
+      commentIds: _commentIds,
+      topComments: _topComments,
     );
   }
 }

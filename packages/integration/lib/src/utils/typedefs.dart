@@ -30,3 +30,16 @@ typedef LMFeedProfileBlocListener = Function(
 /// Takes [BuildContext] as parameter and returns [Widget]
 /// {@endtemplate}
 typedef LMFeedContextWidgetBuilder = Widget Function(BuildContext context);
+
+/// {@template context_button_builder}
+/// Button builder function for [BuildContext]
+/// Takes [BuildContext] and [LMFeedButton] as parameters and returns [Widget]
+/// {@endtemplate}
+typedef LMFeedContextButtonBuilder = Widget Function(
+    BuildContext, LMFeedButton);
+
+/// {@template lm_feed_tile_builder}
+/// Tile builder function for [LMFeedTile]
+/// Takes [BuildContext] and [LMFeedTile] as parameters and returns [Widget]
+/// {@endtemplate}
+typedef LMFeedTileBuilder = Widget Function(BuildContext, LMFeedTile);

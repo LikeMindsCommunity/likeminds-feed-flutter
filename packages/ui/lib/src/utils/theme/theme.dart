@@ -34,6 +34,8 @@ class LMFeedThemeData {
   final LMFeedDialogStyle dialogStyle;
   final LMFeedPopUpMenuStyle popUpMenuStyle;
   final LMFeedComposeScreenStyle composeScreenStyle;
+  final LMFeedLoaderStyle loaderStyle;
+  final LMFeedBottomSheetStyle bottomSheetStyle;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -77,6 +79,8 @@ class LMFeedThemeData {
     required this.dialogStyle,
     required this.popUpMenuStyle,
     required this.composeScreenStyle,
+    required this.loaderStyle,
+    required this.bottomSheetStyle,
   });
 
   factory LMFeedThemeData.fromThemeData(ThemeData theme) {
@@ -122,6 +126,8 @@ class LMFeedThemeData {
     Color? container,
     Color? onContainer,
     Color? onPrimary,
+    LMFeedLoaderStyle? loaderStyle,
+    LMFeedBottomSheetStyle? bottomSheetStyle,
   }) {
     return LMFeedThemeData(
       backgroundColor: backgroundColor ?? LikeMindsTheme.backgroundColor,
@@ -160,6 +166,10 @@ class LMFeedThemeData {
           LMFeedComposeScreenStyle.basic(
             primaryColor: primaryColor,
           ),
+      loaderStyle: LMFeedLoaderStyle(
+        color: primaryColor ?? LikeMindsTheme.primaryColor,
+      ),
+      bottomSheetStyle: const LMFeedBottomSheetStyle(),
     );
   }
 
@@ -191,6 +201,8 @@ class LMFeedThemeData {
     LMFeedPostMediaStyle? mediaStyle,
     LMFeedPostFooterStyle? footerStyle,
     LMFeedComposeScreenStyle? composeScreenStyle,
+    LMFeedLoaderStyle? loaderStyle,
+    LMFeedBottomSheetStyle? bottomSheetStyle,
   }) {
     return LMFeedThemeData(
       postStyle: postStyle ?? this.postStyle,
@@ -220,6 +232,8 @@ class LMFeedThemeData {
       mediaStyle: mediaStyle ?? this.mediaStyle,
       footerStyle: footerStyle ?? this.footerStyle,
       composeScreenStyle: composeScreenStyle ?? this.composeScreenStyle,
+      loaderStyle: loaderStyle ?? this.loaderStyle,
+      bottomSheetStyle: bottomSheetStyle ?? this.bottomSheetStyle,
     );
   }
 }

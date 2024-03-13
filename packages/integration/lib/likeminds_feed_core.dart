@@ -5,8 +5,8 @@ import 'package:likeminds_feed_flutter_core/src/bloc/analytics/analytics_bloc.da
 import 'package:likeminds_feed_flutter_core/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/builder/feed_builder.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
@@ -27,11 +27,12 @@ export 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handle
 export 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/builder/feed_builder.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
-  late final LMFeedMediaService? mediaService;
   bool initiateUserCalled = false;
+  LMFeedWidgets? _widgets;
 
   /// This is stream is used to listen to
   /// deep links while the app is in active state
@@ -53,6 +54,8 @@ class LMFeedCore {
 
   static String? get domain => instance.clientDomain;
 
+  static LMFeedWidgets? get widgets => instance._widgets;
+
   static set deepLinkStream(StreamSubscription deepLinkStream) =>
       instance.deepLinkStreamListener = deepLinkStream;
 
@@ -64,6 +67,7 @@ class LMFeedCore {
     ThemeData? theme,
     String? domain,
     LMFeedConfig? config,
+    LMFeedWidgets? widgets,
   }) async {
     assert(apiKey != null || lmFeedClient != null);
     this.lmFeedClient =
@@ -71,6 +75,7 @@ class LMFeedCore {
     clientDomain = domain;
     await LMFeedUserLocalPreference.instance.initialize();
     feedConfig = config ?? LMFeedConfig();
+    _widgets = widgets;
     MediaKit.ensureInitialized();
   }
 
