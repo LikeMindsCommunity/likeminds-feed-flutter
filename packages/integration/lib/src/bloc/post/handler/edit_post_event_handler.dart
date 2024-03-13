@@ -11,8 +11,9 @@ void editPostEventHandler(
   try {
     emit(LMFeedEditPostUploadingState());
     // Mapping [LMAttachmentViewData] to [Attachment]
-    List<Attachment>? attachments = event.attachments
-        ?.map((e) => LMAttachmentViewDataConvertor.toAttachment(e))
+    List<Attachment>? attachments = LMFeedComposeBloc.instance.postMedia
+        .map((e) => LMAttachmentViewDataConvertor.toAttachment(
+            e.toAttachmentViewData()))
         .toList();
     // Text associated with the post
     // can be null [either heading or attachments should be present though]

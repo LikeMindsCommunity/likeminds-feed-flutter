@@ -99,7 +99,7 @@ void newPostEventHandler(
 
     final requestBuilder = AddPostRequestBuilder()
       ..attachments(attachments)
-      ..topics(postTopics)
+      ..topics(postTopics.map((e) => e).toList())
       ..tempId('${-DateTime.now().millisecondsSinceEpoch}');
 
     if (headingText != null) {
@@ -117,7 +117,7 @@ void newPostEventHandler(
         await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
 
     if (response.success) {
-            emit(
+      emit(
         LMFeedNewPostUploadedState(
             postData: LMPostViewDataConvertor.fromPost(
               post: response.post!,

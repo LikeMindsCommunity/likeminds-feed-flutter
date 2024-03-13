@@ -36,19 +36,6 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
 
     // Check if the response is success or not
     if (response.success) {
-      // Show the toast message for comment deleted
-      LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: 'Comment Deleted',
-          ),
-        ),
-      );
-      // TODO: remove old toast
-      // toast(
-      //   'Comment Deleted',
-      //   duration: Toast.LENGTH_LONG,
-      // );
       // Notify the UI to change the view to Success
       // and remove the comment from the UI
       // and update the comment count
@@ -74,7 +61,7 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
       );
     } else {
       // Notify the UI to change the view to Error
-      // and show the error message
+      // show the error message
       if (response.errorMessage != null) {
         LMFeedCore.showSnackBar(
           LMFeedSnackBar(
@@ -82,21 +69,7 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
           ),
         );
       }
-      // TODO: remove old toast
-      if (response.errorMessage != null) {
-        LMFeedCore.showSnackBar(
-          LMFeedSnackBar(
-            content: LMFeedText(
-              text: response.errorMessage!,
-            ),
-          ),
-        );
-      }
-      // TODO: remove old toast
-      // toast(
-      //   response.errorMessage ?? '',
-      //   duration: Toast.LENGTH_LONG,
-      // );
+
       emit(LMFeedCommentErrorState(
         commentActionResponse: response,
         commentMetaData: event.commentMetaData,
@@ -104,9 +77,5 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
     }
   } on Exception catch (err, stacktrace) {
     LMFeedLogger.instance.handleException(err, stacktrace);
-    // toast(
-    //   'An error occcurred while deleting comment',
-    //   duration: Toast.LENGTH_LONG,
-    // );
   }
 }
