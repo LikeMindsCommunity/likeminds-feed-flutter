@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:video_player/video_player.dart';
 
 class LMFeedActivityWidget extends StatefulWidget {
@@ -42,7 +41,7 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return Container(
       color: feedTheme.container,
       child: FutureBuilder<GetUserActivityResponse>(

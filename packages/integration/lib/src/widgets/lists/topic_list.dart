@@ -3,10 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/topic/topic_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedTopicList extends StatefulWidget {
   final List<LMTopicViewData> selectedTopics;
@@ -107,7 +104,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
       width: min(screenSize.width, 180),
       constraints: const BoxConstraints(maxHeight: 250),
       decoration: BoxDecoration(
-        color: widget.backgroundColor ?? LMFeedTheme.of(context).container,
+        color: widget.backgroundColor ?? LMFeedCore.theme.container,
         borderRadius: BorderRadius.circular(4.0),
       ),
       margin: const EdgeInsets.only(top: 32),
@@ -142,7 +139,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
         builder: (context, state) {
           if (state is LMFeedTopicLoadingState) {
             return LMFeedLoader(
-              style: LMFeedTheme.of(context).loaderStyle,
+              style: LMFeedCore.theme.loaderStyle,
             );
           }
 
@@ -183,9 +180,8 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
                                           horizontal: 8.0, vertical: 10.0),
                                       decoration: BoxDecoration(
                                         color: isTopicSelected
-                                            ? LMFeedTheme.of(context)
-                                                .primaryColor
-                                            : LMFeedTheme.of(context).container,
+                                            ? LMFeedCore.theme.primaryColor
+                                            : LMFeedCore.theme.container,
                                       ),
                                       alignment: Alignment.topLeft,
                                       clipBehavior: Clip.hardEdge,
@@ -200,10 +196,10 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
                                                 maxLines: 2,
                                                 textStyle: TextStyle(
                                                   color: isTopicSelected
-                                                      ? LMFeedTheme.of(context)
-                                                          .onPrimary
-                                                      : LMFeedTheme.of(context)
-                                                          .onContainer,
+                                                      ? LMFeedCore
+                                                          .theme.onPrimary
+                                                      : LMFeedCore
+                                                          .theme.onContainer,
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w500,
                                                   height: 1.30,
@@ -262,7 +258,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
                   ),
                   decoration: BoxDecoration(
                     color: isTopicSelected
-                        ? LMFeedTheme.of(context).secondaryColor
+                        ? LMFeedCore.theme.secondaryColor
                         : Colors.white,
                   ),
                   alignment: Alignment.topLeft,
@@ -278,7 +274,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
                             textStyle: TextStyle(
                               color: isTopicSelected
                                   ? Colors.grey
-                                  : LMFeedTheme.of(context).secondaryColor,
+                                  : LMFeedCore.theme.secondaryColor,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               height: 1.20,

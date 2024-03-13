@@ -75,9 +75,6 @@ class LMFeedTaggingHelper {
 
   static void routeToProfile(String userId) {
     debugPrint(userId);
-    // if (!locator<LikeMindsService>().isProd) {
-    //   toast('Profile call back fired');
-    // }
   }
 
   static String convertRouteToTag(String text, {bool withTilde = true}) {

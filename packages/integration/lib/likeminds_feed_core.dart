@@ -6,13 +6,14 @@ import 'package:likeminds_feed_flutter_core/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/builder/feed_builder.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit/media_kit.dart';
 import 'dart:async';
 
@@ -27,12 +28,13 @@ export 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handle
 export 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
-export 'package:likeminds_feed_flutter_core/src/utils/builder/feed_builder.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
   bool initiateUserCalled = false;
-  LMFeedWidgets? _widgets;
+  LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
+  GlobalKey<ScaffoldMessengerState>? _scaffoldMessengerKey;
 
   /// This is stream is used to listen to
   /// deep links while the app is in active state
@@ -54,7 +56,17 @@ class LMFeedCore {
 
   static String? get domain => instance.clientDomain;
 
-  static LMFeedWidgets? get widgets => instance._widgets;
+  static LMFeedThemeData get theme => LMFeedTheme.instance.theme;
+
+  static LMFeedWidgetUtility get widgetUtility => instance._widgetUtility;
+
+  static void showSnackBar(LMFeedSnackBar snackBar) {
+    snackBar = snackBar.copyWith(style: theme.snackBarTheme);
+    instance._scaffoldMessengerKey?.currentState?.showSnackBar(snackBar);
+  }
+
+  static GlobalKey<ScaffoldMessengerState>? get scaffoldMessengerKey =>
+      instance._scaffoldMessengerKey;
 
   static set deepLinkStream(StreamSubscription deepLinkStream) =>
       instance.deepLinkStreamListener = deepLinkStream;
@@ -64,10 +76,11 @@ class LMFeedCore {
   Future<void> initialize({
     String? apiKey,
     LMFeedClient? lmFeedClient,
-    ThemeData? theme,
     String? domain,
     LMFeedConfig? config,
-    LMFeedWidgets? widgets,
+    LMFeedWidgetUtility? widgets,
+    GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
+    LMFeedThemeData? theme,
   }) async {
     assert(apiKey != null || lmFeedClient != null);
     this.lmFeedClient =
@@ -75,7 +88,9 @@ class LMFeedCore {
     clientDomain = domain;
     await LMFeedUserLocalPreference.instance.initialize();
     feedConfig = config ?? LMFeedConfig();
-    _widgets = widgets;
+    if (widgets != null) _widgetUtility = widgets;
+    _scaffoldMessengerKey = scaffoldMessengerKey;
+    LMFeedTheme.instance.initialise(theme: theme ?? LMFeedThemeData.light());
     MediaKit.ensureInitialized();
   }
 

@@ -94,11 +94,21 @@ void newPostEventHandler(
     List<Topic> postTopics = event.selectedTopics
         .map((e) => LMTopicViewDataConvertor.toTopic(e))
         .toList();
+    String? postText = event.postText;
+    String? headingText = event.heading;
+
     final requestBuilder = AddPostRequestBuilder()
-      ..text(event.postText)
       ..attachments(attachments)
       ..topics(postTopics)
       ..tempId('${-DateTime.now().millisecondsSinceEpoch}');
+
+    if (headingText != null) {
+      requestBuilder.heading(headingText);
+    }
+
+    if (postText != null) {
+      requestBuilder.text(postText);
+    }
 
     if (isRepost != null) {
       requestBuilder.isRepost(isRepost);
@@ -132,14 +142,14 @@ void newPostEventHandler(
             )),
       );
     } else {
-      emit(LMFeedNewPostErrorState(message: response.errorMessage!));
+      emit(LMFeedNewPostErrorState(errorMessage: response.errorMessage!));
     }
 
     LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
   } on Exception catch (err, stacktrace) {
     LMFeedLogger.instance.handleException(err, stacktrace);
 
-    emit(const LMFeedNewPostErrorState(message: 'An error occurred'));
+    emit(const LMFeedNewPostErrorState(errorMessage: 'An error occurred'));
     debugPrint(err.toString());
   }
 }

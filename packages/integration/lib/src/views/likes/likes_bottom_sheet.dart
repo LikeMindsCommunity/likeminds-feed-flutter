@@ -72,8 +72,7 @@ class _LMFeedLikesBottomSheetState extends State<LMFeedLikesBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    Size screenSize = MediaQuery.of(context).size;
-    LMFeedThemeData theme = LMFeedTheme.of(context);
+    LMFeedThemeData theme = LMFeedCore.theme;
     LMFeedBottomSheetStyle bottomSheetStyle =
         widget.style ?? theme.bottomSheetStyle;
 
