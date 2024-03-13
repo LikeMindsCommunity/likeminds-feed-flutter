@@ -11,8 +11,11 @@ class LMPostViewDataConvertor {
     Map<String, Topic>? topics,
     Map<String, Comment>? filteredComments,
   }) {
+    Map<String, LMWidgetViewData>? widgetMap = widgets?.map((key, value) =>
+        MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
     LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
-    Map<String, LMWidgetViewData> widgetMap = {};
+    Map<String, LMWidgetViewData> postWidget = {};
 
     postViewDataBuilder.id(post.id);
 
@@ -22,8 +25,8 @@ class LMPostViewDataConvertor {
     if (topics != null) {
       post.topics?.forEach((element) {
         if (topics[element] != null) {
-          topicViewData
-              .add(LMTopicViewDataConvertor.fromTopic(topics[element]!));
+          topicViewData.add(LMTopicViewDataConvertor.fromTopic(topics[element]!,
+              widgets: widgetMap));
         }
       });
     }
@@ -36,7 +39,7 @@ class LMPostViewDataConvertor {
         if (e.attachmentType == 5 && widgets != null) {
           String? key = e.attachmentMeta.meta?['entity_id'];
           if (key != null && widgets[key] != null) {
-            widgetMap[key] =
+            postWidget[key] =
                 LMWidgetViewDataConvertor.fromWidgetModel(widgets[key]!);
           }
         } else if (e.attachmentType == 8 &&
@@ -100,7 +103,7 @@ class LMPostViewDataConvertor {
 
     postViewDataBuilder.isDeleted(post.isDeleted ?? false);
 
-    postViewDataBuilder.widgets(widgetMap);
+    postViewDataBuilder.widgets(postWidget);
 
     if (post.heading != null) postViewDataBuilder.heading(post.heading!);
 

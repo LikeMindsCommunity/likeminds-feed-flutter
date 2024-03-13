@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -299,15 +299,17 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
           ),
         );
       } else if (media.mediaType == LMMediaType.document) {
-        return const LMFeedIcon(
-          type: LMFeedIconType.svg,
-          assetPath: kAssetDocPDFIcon,
-          style: LMFeedIconStyle(
-            color: Colors.red,
-            size: 35,
-            boxPadding: 0,
-          ),
-        );
+        return LMFeedTheme
+                .instance.theme.mediaStyle.documentStyle.documentIcon ??
+            LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.picture_as_pdf,
+              style: LMFeedIconStyle(
+                color: Colors.red,
+                size: 35,
+                boxPadding: 0,
+              ),
+            );
       } else {
         return const SizedBox.shrink();
       }

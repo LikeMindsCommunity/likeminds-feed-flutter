@@ -5,9 +5,11 @@ abstract class LMFeedEvent extends Equatable {
 }
 
 class LMFeedGetUniversalFeedEvent extends LMFeedEvent {
-  final int offset;
-  final List<LMTopicViewData>? topics;
-  const LMFeedGetUniversalFeedEvent({required this.offset, this.topics});
+  final int pageKey;
+  final List<String> topicsIds;
+
+  const LMFeedGetUniversalFeedEvent(
+      {required this.pageKey, required this.topicsIds});
   @override
-  List<Object?> get props => [offset, topics];
+  List<Object?> get props => [pageKey, topicsIds];
 }

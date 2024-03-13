@@ -15,16 +15,18 @@ class LMFeedUniversalFeedLoadedState extends LMFeedState {
   final Map<String, LMUserViewData> users;
   final Map<String, LMWidgetViewData> widgets;
   final Map<String, LMTopicViewData> topics;
+  final int pageKey;
 
   const LMFeedUniversalFeedLoadedState({
     required this.topics,
     required this.posts,
     required this.users,
     required this.widgets,
+    required this.pageKey,
   });
 
   @override
-  List<Object?> get props => [posts, users, widgets, topics];
+  List<Object?> get props => [posts, users, widgets, topics, pageKey];
 }
 
 class LMFeedUniversalFeedLoadingState extends LMFeedState {

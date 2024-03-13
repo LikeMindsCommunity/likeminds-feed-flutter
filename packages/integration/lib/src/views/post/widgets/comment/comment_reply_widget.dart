@@ -434,7 +434,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   size: 20,
                   color: feedTheme!.primaryColor,
                 ),
-                assetPath: kAssetLikeFilledIcon,
               ),
             ),
         text: LMFeedText(

@@ -41,12 +41,12 @@ class LMFeedActivityWidgetScreen extends StatelessWidget {
                 ),
               ),
               Divider(color: feedTheme.onContainer.withOpacity(0.15)),
-              LMFeedActivityWidget(
-                uuid: uuid,
-                appBarBuilder: appBarBuilder,
-                postWidgetBuilder: postWidgetBuilder,
-                commentWidgetBuilder: commentWidgetBuilder,
-              ),
+              // LMFeedActivityWidget(
+              //   uuid: uuid,
+              //   appBarBuilder: appBarBuilder,
+              //   postWidgetBuilder: postWidgetBuilder,
+              //   commentWidgetBuilder: commentWidgetBuilder,
+              // ),
               Divider(color: feedTheme.onContainer.withOpacity(0.15)),
             ],
           ),

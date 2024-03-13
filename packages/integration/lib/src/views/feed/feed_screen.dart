@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
@@ -9,7 +8,7 @@ import 'package:likeminds_feed_flutter_core/src/views/edit/edit_post_screen.dart
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_core/src/views/topic/topic_selector_bottom_sheet.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 part 'feed_screen_configuration.dart';
@@ -163,8 +162,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     clearPagingController();
     _feedBloc.add(
       LMFeedGetUniversalFeedEvent(
-        offset: 1,
-        topics: _feedBloc.selectedTopics,
+        pageKey: 1,
+        topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
       ),
     );
   }
@@ -184,15 +183,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
-  int _pageFeed = 1; // current index of FeedRoom
-
   void _addPaginationListener() {
     _pagingController.addPageRequestListener(
       (pageKey) {
         _feedBloc.add(
           LMFeedGetUniversalFeedEvent(
-            offset: pageKey,
-            topics: _feedBloc.selectedTopics,
+            pageKey: pageKey,
+            topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
           ),
         );
       },
@@ -204,7 +201,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   // This function updates the paging controller based on the state changes
   void updatePagingControllers(LMFeedState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
-      _pageFeed++;
       List<LMPostViewData> listOfPosts = state.posts;
 
       _feedBloc.users.addAll(state.users);
@@ -214,7 +210,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       if (state.posts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
-        _pagingController.appendPage(listOfPosts, _pageFeed);
+        _pagingController.appendPage(listOfPosts, state.pageKey + 1);
       }
     }
   }
@@ -225,7 +221,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
     if (_pagingController.itemList != null) _pagingController.itemList?.clear();
-    _pageFeed = 1;
   }
 
   void showTopicSelectSheet(BuildContext context) {
@@ -668,15 +663,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           ),
         );
       } else if (media.mediaType == LMMediaType.document) {
-        return const LMFeedIcon(
-          type: LMFeedIconType.svg,
-          assetPath: kAssetDocPDFIcon,
-          style: LMFeedIconStyle(
-            color: Colors.red,
-            size: 35,
-            boxPadding: 0,
-          ),
-        );
+        return LMFeedTheme
+                .instance.theme.mediaStyle.documentStyle.documentIcon ??
+            LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.picture_as_pdf,
+              style: LMFeedIconStyle(
+                color: Colors.red,
+                size: 35,
+                boxPadding: 0,
+              ),
+            );
       } else {
         return const SizedBox.shrink();
       }
@@ -1252,61 +1249,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(
-                        composeTopicSelectorBuilder:
-                            (List<LMTopicViewData> topicList) {
-                          List<LMTopicViewData> selectedTopics =
-                              LMFeedComposeBloc.instance.selectedTopics;
-                          return Container(
-                            height: 110,
-                            padding: EdgeInsets.symmetric(horizontal: 20.0),
-                            child: Column(
-                              children: <Widget>[
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    LMFeedText(text: "Tags"),
-                                    LMFeedButton(
-                                      onTap: () {},
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                selectedTopics.isEmpty
-                                    ? LMFeedButton(
-                                        style: LMFeedButtonStyle(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start),
-                                        onTap: () {
-                                          showModalBottomSheet(
-                                              context: context,
-                                              builder: (context) {
-                                                return LMFeedTopicSelectBottomSheet(
-                                                  style: feedThemeData
-                                                      ?.bottomSheetStyle,
-                                                );
-                                              });
-                                        },
-                                        text: LMFeedText(text: "Select Tags"),
-                                      )
-                                    : Wrap(
-                                        children: selectedTopics
-                                            .map(
-                                              (e) => LMFeedTopicChip(
-                                                topic: e,
-                                                isSelected: true,
-                                                style: feedThemeData?.topicStyle
-                                                    .activeChipStyle,
-                                              ),
-                                            )
-                                            .toList(),
-                                      ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                      builder: (context) => LMFeedComposeScreen(),
                     ),
                   );
                 } else {
