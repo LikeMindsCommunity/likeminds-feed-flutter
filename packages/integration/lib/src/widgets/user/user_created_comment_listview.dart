@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
@@ -126,9 +125,7 @@ class _LMFeedUserCreatedCommentListViewState
     feedThemeData = LMFeedTheme.of(context);
     return BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
       bloc: LMFeedPostBloc.instance,
-      listener: (context,state){
-        
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         return BlocConsumer<LMFeedUserCreatedCommentBloc,
             LMFeedUserCreatedCommentState>(
@@ -153,6 +150,7 @@ class _LMFeedUserCreatedCommentListViewState
             }
             if (state is UserCreatedCommentLoadedState) {
               return PagedListView(
+                // shrinkWrap: true,
                 pagingController: _pagingController,
                 builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
                   noItemsFoundIndicatorBuilder: (context) {
@@ -160,8 +158,11 @@ class _LMFeedUserCreatedCommentListViewState
                         noPostInFeedWidget();
                   },
                   itemBuilder: (context, item, index) {
-                    LMFeedPostWidget postWidget =
-                        defPostWidget(feedThemeData, _posts[item.postId]!);
+                    LMFeedPostWidget postWidget = defPostWidget(
+                      feedThemeData,
+                      _posts[item.postId]!,
+                      item,
+                    );
                     return Column(
                       children: [
                         const SizedBox(height: 2),
@@ -226,8 +227,8 @@ class _LMFeedUserCreatedCommentListViewState
     }
   }
 
-  LMFeedPostWidget defPostWidget(
-      LMFeedThemeData? feedThemeData, LMPostViewData post) {
+  LMFeedPostWidget defPostWidget(LMFeedThemeData? feedThemeData,
+      LMPostViewData post, LMCommentViewData comment) {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
@@ -283,8 +284,11 @@ class _LMFeedUserCreatedCommentListViewState
       },
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
-      content: _defContentWidget(post),
-      media: _defPostMedia(post),
+      content: LMFeedPostCustomContent(
+        comment: comment,
+        post: post,
+        feedThemeData: feedThemeData,
+      ),
       topicWidget: _defTopicWidget(post),
     );
   }
@@ -294,15 +298,6 @@ class _LMFeedUserCreatedCommentListViewState
       topics: post.topics,
       post: post,
       style: feedThemeData?.topicStyle,
-    );
-  }
-
-  LMFeedPostContent _defContentWidget(LMPostViewData post) {
-    return LMFeedPostContent(
-      onTagTap: (String? userId) {},
-      style: feedThemeData?.contentStyle,
-      text: post.text,
-      heading: post.heading,
     );
   }
 
@@ -365,35 +360,6 @@ class _LMFeedUserCreatedCommentListViewState
             },
           ),
         );
-      },
-    );
-  }
-
-  LMFeedPostMedia _defPostMedia(
-    LMPostViewData post,
-  ) {
-    return LMFeedPostMedia(
-      attachments: post.attachments!,
-      postId: post.id,
-      style: feedThemeData?.mediaStyle,
-      onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
-        // ignore: use_build_context_synchronously
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LMFeedMediaPreviewScreen(
-              postAttachments: post.attachments ?? [],
-              post: post,
-              user: post.user!,
-            ),
-          ),
-        );
-        await postVideoController?.player.play();
       },
     );
   }
@@ -719,5 +685,88 @@ class _LMFeedUserCreatedCommentListViewState
         ),
       );
     }
+  }
+}
+
+class LMFeedPostCustomContent extends LMFeedPostContent {
+  const LMFeedPostCustomContent({
+    required this.comment,
+    required this.post,
+    this.feedThemeData,
+  });
+  final LMCommentViewData comment;
+  final LMPostViewData post;
+  final LMFeedThemeData? feedThemeData;
+
+  @override
+  Widget build(BuildContext context) {
+    return _defCommentBuilder(context);
+  }
+
+  Widget _defCommentBuilder(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(
+          width: 50,
+        ),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              color: feedThemeData?.backgroundColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.zero,
+                topRight: Radius.circular(10.0),
+                bottomLeft: Radius.circular(10.0),
+                bottomRight: Radius.circular(10.0),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                LMFeedText(
+                  text: comment.user.name,
+                  style: const LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      // color: textSecondary,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10.0,
+                ),
+                LMFeedExpandableText(
+                  LMFeedTaggingHelper.convertRouteToTag(comment.text),
+                  expandText: "Read More",
+                  prefixStyle: const TextStyle(
+                    // color: textSecondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    height: 1.66,
+                  ),
+                  expandOnTextTap: true,
+                  onTagTap: (String uuid) {
+                    LMFeedProfileBloc.instance.add(
+                      LMFeedRouteToUserProfileEvent(
+                        userUniqueId: uuid,
+                        context: context,
+                      ),
+                    );
+                  },
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w400,
+                    // color: textSecondary,
+                    height: 1.66,
+                  ),
+                  maxLines: 4,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
