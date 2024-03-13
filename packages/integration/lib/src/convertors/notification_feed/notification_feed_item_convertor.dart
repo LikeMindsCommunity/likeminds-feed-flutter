@@ -1,5 +1,6 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/notification_feed/activity_entity_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMNotificationFeedItemViewDataConvertor {
@@ -12,7 +13,14 @@ class LMNotificationFeedItemViewDataConvertor {
 
     notificationFeedItemViewDataBuilder.action(notificationFeedItem.action);
 
-    notificationFeedItemViewDataBuilder.actionBy(notificationFeedItem.actionBy);
+    List<LMUserViewData> actionBy= [];
+    for(String userId in notificationFeedItem.actionBy) {
+      if(users[userId] != null) {
+        final user = LMUserViewDataConvertor.fromUser(users[userId]!);
+        actionBy.add(user);
+      }
+    }
+    notificationFeedItemViewDataBuilder.actionBy(actionBy);
 
     notificationFeedItemViewDataBuilder.actionOn(notificationFeedItem.actionOn);
 
@@ -28,7 +36,7 @@ class LMNotificationFeedItemViewDataConvertor {
     }
 
     notificationFeedItemViewDataBuilder
-        .createdAt(notificationFeedItem.createdAt);
+        .createdAt(DateTime.fromMillisecondsSinceEpoch(notificationFeedItem.createdAt));
 
     notificationFeedItemViewDataBuilder.entityId(notificationFeedItem.entityId);
 
@@ -43,7 +51,7 @@ class LMNotificationFeedItemViewDataConvertor {
     notificationFeedItemViewDataBuilder.isRead(notificationFeedItem.isRead);
 
     notificationFeedItemViewDataBuilder
-        .updatedAt(notificationFeedItem.updatedAt);
+        .updatedAt(DateTime.fromMillisecondsSinceEpoch(notificationFeedItem.updatedAt));
 
     return notificationFeedItemViewDataBuilder.build();
   }
@@ -53,18 +61,18 @@ class LMNotificationFeedItemViewDataConvertor {
     return NotificationFeedItem(
       id: notificationFeedItemViewData.id,
       action: notificationFeedItemViewData.action,
-      actionBy: notificationFeedItemViewData.actionBy,
+      actionBy: notificationFeedItemViewData.actionBy.map((e) => e.sdkClientInfo!.userUniqueId).toList(),
       actionOn: notificationFeedItemViewData.actionOn,
       activityEntityData: LMActivityEntityViewDataConvertor.toActivityEntity(
           notificationFeedItemViewData.activityEntityData),
       activityText: notificationFeedItemViewData.activityText,
-      createdAt: notificationFeedItemViewData.createdAt,
+      createdAt: notificationFeedItemViewData.createdAt.millisecondsSinceEpoch,
       cta: notificationFeedItemViewData.cta,
       entityId: notificationFeedItemViewData.entityId,
       entityOwnerId: notificationFeedItemViewData.entityOwnerId,
       entityType: notificationFeedItemViewData.entityType,
       isRead: notificationFeedItemViewData.isRead,
-      updatedAt: notificationFeedItemViewData.updatedAt,
+      updatedAt: notificationFeedItemViewData.updatedAt.millisecondsSinceEpoch,
     );
   }
 }

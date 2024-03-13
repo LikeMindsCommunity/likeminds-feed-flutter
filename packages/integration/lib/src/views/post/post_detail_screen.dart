@@ -11,6 +11,7 @@ import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comme
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
+import 'package:likeminds_feed_flutter_core/src/views/report/report_bottom_sheet.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 part 'post_detail_screen_configuration.dart';
@@ -67,6 +68,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
 }
 
 class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
+  final ValueNotifier _rebuildComment = ValueNotifier(false);
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
   final LMFeedFetchCommentReplyBloc _commentRepliesBloc =
@@ -222,7 +224,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       ),
                                 PagedListView.separated(
                                   pagingController: _postDetailScreenHandler!
-                                      .commetListPagingController,
+                                      .commentListPagingController,
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
                                   builderDelegate: PagedChildBuilderDelegate<
@@ -342,6 +344,33 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedMenuAction defLMFeedMenuAction(LMCommentViewData commentViewData) =>
       LMFeedMenuAction(
+        onCommentReport: () {
+          showModalBottomSheet(
+            context: context,
+            useRootNavigator: true,
+            useSafeArea: true,
+            isScrollControlled: true,
+            elevation: 10,
+            enableDrag: true,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              minHeight: MediaQuery.of(context).size.height * 0.3,
+            ),
+            backgroundColor: feedTheme?.container,
+            clipBehavior: Clip.hardEdge,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
+              ),
+            ),
+            builder: (context) => LMFeedReportBottomSheet(
+              entityId: commentViewData.id,
+              entityType: 6,
+              entityCreatorId: commentViewData.userId,
+            ),
+          );
+        },
         onCommentEdit: () {
           debugPrint('Editing functionality');
 
@@ -399,7 +428,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       ..level(0)
                       ..commentId(commentViewData.id))
                     .build();
-
+                _postDetailScreenHandler!
+                    .deleteCommentFromController(commentViewData.id);
+                _postDetailScreenHandler!.postData!.commentCount -= 1;
+                _postDetailScreenHandler!.rebuildPostWidget.value =
+                    !_postDetailScreenHandler!.rebuildPostWidget.value;
                 _postDetailScreenHandler!.commentHandlerBloc.add(
                     LMFeedCommentActionEvent(
                         commentActionRequest: deleteCommentRequest,
@@ -579,6 +612,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         menuItems: _postDetailScreenHandler!.postData?.menuItems ?? [],
         removeItemIds: {postReportId, postEditId},
         action: LMFeedMenuAction(
+          onPostReport: () => handlePostReportAction(),
           onPostPin: () => handlePostPinAction(),
           onPostUnpin: () => handlePostPinAction(),
           onPostDelete: () {
@@ -876,8 +910,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       menu: (menu) {
         return menu.copyWith(
           removeItemIds: {
-            commentEditId,
-            commentReportId,
+            // commentEditId,
+            // commentReportId,
           },
         );
       },
@@ -1270,8 +1304,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                           ),
                                         ),
                                       );
-                                      // TODO: remove old toast
-                                      // toast("Please write something to post");
 
                                       return;
                                     }
@@ -1296,7 +1328,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                         .commentId!)
                                                     ..text(commentText))
                                                   .build();
-
+                                          _postDetailScreenHandler!
+                                              .addTempEditingComment(
+                                                  state.commentMetaData
+                                                          .commentId ??
+                                                      '',
+                                                  commentText);
                                           _postDetailScreenHandler!
                                               .commentHandlerBloc
                                               .add(LMFeedCommentActionEvent(
@@ -1333,7 +1370,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                             (LMCommentMetaDataBuilder()
                                                   ..commentActionEntity(
                                                       LMFeedCommentType.reply)
-                                                  ..level(0)
+                                                  ..level(1)
                                                   ..postId(widget.postId)
                                                   ..commentId(state
                                                       .commentMetaData
@@ -1346,11 +1383,26 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                             (AddCommentReplyRequestBuilder()
                                                   ..postId(widget.postId)
                                                   ..text(commentText)
+                                                  ..tempId(
+                                                      '${-DateTime.now().millisecondsSinceEpoch}')
                                                   ..commentId(state
                                                       .commentMetaData
                                                       .commentId!))
                                                 .build();
 
+                                        _postDetailScreenHandler!
+                                            .addTempReplyCommentToController(
+                                          addReplyRequest.tempId ?? '',
+                                          commentText,
+                                          1,
+                                          state.commentMetaData.commentId!,
+                                          replyShown,
+                                        );
+                                        commentIdReplyId =
+                                            state.commentMetaData.commentId;
+                                        replyShown = true;
+                                        _rebuildComment.value =
+                                            !_rebuildComment.value;
                                         _postDetailScreenHandler!
                                             .commentHandlerBloc
                                             .add(LMFeedCommentActionEvent(
@@ -1373,9 +1425,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       AddCommentRequest addCommentRequest =
                                           (AddCommentRequestBuilder()
                                                 ..postId(widget.postId)
-                                                ..text(commentText))
+                                                ..text(commentText)
+                                                ..tempId(
+                                                    '${-DateTime.now().millisecondsSinceEpoch}'))
                                               .build();
-
+                                      _postDetailScreenHandler!
+                                          .addTempCommentToController(
+                                        addCommentRequest.tempId ?? '',
+                                        commentText,
+                                        0,
+                                      );
                                       _postDetailScreenHandler!
                                           .commentHandlerBloc
                                           .add(LMFeedCommentActionEvent(
@@ -1399,6 +1458,34 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<dynamic> handlePostReportAction() {
+    return showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      useSafeArea: true,
+      isScrollControlled: true,
+      elevation: 10,
+      enableDrag: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+        minHeight: MediaQuery.of(context).size.height * 0.3,
+      ),
+      backgroundColor: feedTheme?.container,
+      clipBehavior: Clip.hardEdge,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) => LMFeedReportBottomSheet(
+        entityId: _postDetailScreenHandler!.postId,
+        entityType: 5,
+        entityCreatorId: _postDetailScreenHandler!.postData!.userId,
       ),
     );
   }

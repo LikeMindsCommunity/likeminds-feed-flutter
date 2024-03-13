@@ -57,7 +57,7 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
         await LMFeedCore.instance.lmFeedClient.getUniversalFeed(
       (GetFeedRequestBuilder()
             ..page(event.pageKey)
-            ..topics(event.topicsIds)
+            ..topicIds(event.topicsIds)
             ..pageSize(10))
           .build(),
     );
