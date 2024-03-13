@@ -41,6 +41,8 @@ class LMFeedTile extends StatelessWidget {
         child: Row(
           mainAxisAlignment:
               inStyle.mainAxisAlignment ?? MainAxisAlignment.start,
+          crossAxisAlignment:
+              inStyle.crossAxisAlignment ?? CrossAxisAlignment.center,
           children: [
             leading ??
                 Container(
@@ -107,6 +109,9 @@ class LMFeedTileStyle {
   /// main axis alignment for the row inside the tile
   final MainAxisAlignment? mainAxisAlignment;
 
+  /// cross axis alignment for the row inside the tile
+  final CrossAxisAlignment? crossAxisAlignment;
+
   /// padding from exterior bounds (borders)
   final EdgeInsets? padding;
 
@@ -119,6 +124,7 @@ class LMFeedTileStyle {
     this.border,
     this.borderRadius,
     this.mainAxisAlignment,
+    this.crossAxisAlignment,
     this.padding,
     this.height,
     this.width,
@@ -130,6 +136,7 @@ class LMFeedTileStyle {
     Border? border,
     double? borderRadius,
     MainAxisAlignment? mainAxisAlignment,
+    CrossAxisAlignment? crossAxisAlignment,
     EdgeInsets? padding,
     double? height,
     double? width,
@@ -140,6 +147,7 @@ class LMFeedTileStyle {
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
       mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
+      crossAxisAlignment: crossAxisAlignment ?? this.crossAxisAlignment,
       padding: padding ?? this.padding,
       height: height ?? this.height,
       width: width ?? this.width,
@@ -152,6 +160,7 @@ class LMFeedTileStyle {
       backgroundColor: Colors.transparent,
       borderRadius: 0,
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       padding: EdgeInsets.all(12),
       width: double.infinity,
       margin: 12,
