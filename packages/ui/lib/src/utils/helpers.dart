@@ -153,7 +153,11 @@ class LMFeedTaggingHelper {
     return userTags;
   }
 
-  static List<TextSpan> extractNotificationTags(String text) {
+  static List<TextSpan> extractNotificationTags(
+    String text, {
+    TextStyle? normalTextStyle,
+    TextStyle? tagTextStyle,
+  }) {
     List<TextSpan> textSpans = [];
     final Iterable<RegExpMatch> matches =
         RegExp(notificationTagRoute).allMatches(text);
@@ -168,10 +172,11 @@ class LMFeedTaggingHelper {
         textSpans.add(
           TextSpan(
             text: text.substring(lastIndex, startIndex),
-            style: const TextStyle(
-              wordSpacing: 1.5,
-              color: Colors.grey,
-            ),
+            style: normalTextStyle ??
+                const TextStyle(
+                  wordSpacing: 1.5,
+                  color: Colors.grey,
+                ),
           ),
         );
       }
@@ -179,11 +184,12 @@ class LMFeedTaggingHelper {
       textSpans.add(
         TextSpan(
           text: LMFeedTaggingHelper.decodeNotificationString(link!).keys.first,
-          style: const TextStyle(
-            wordSpacing: 1.5,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey,
-          ),
+          style: tagTextStyle ??
+              const TextStyle(
+                wordSpacing: 1.5,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
         ),
       );
 
@@ -194,7 +200,8 @@ class LMFeedTaggingHelper {
       // Add a TextSpan for the remaining text
       textSpans.add(TextSpan(
         text: text.substring(lastIndex),
-        style: const TextStyle(wordSpacing: 1.5, color: Colors.grey),
+        style:
+            normalTextStyle ?? TextStyle(wordSpacing: 1.5, color: Colors.grey),
       ));
     }
 

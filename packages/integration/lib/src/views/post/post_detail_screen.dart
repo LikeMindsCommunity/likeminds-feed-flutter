@@ -11,6 +11,7 @@ import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/comme
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
+import 'package:likeminds_feed_flutter_core/src/views/report/report_bottom_sheet.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -347,6 +348,33 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedMenuAction defLMFeedMenuAction(LMCommentViewData commentViewData) =>
       LMFeedMenuAction(
+        onCommentReport: () {
+          showModalBottomSheet(
+            context: context,
+            useRootNavigator: true,
+            useSafeArea: true,
+            isScrollControlled: true,
+            elevation: 10,
+            enableDrag: true,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              minHeight: MediaQuery.of(context).size.height * 0.3,
+            ),
+            backgroundColor: feedTheme?.container,
+            clipBehavior: Clip.hardEdge,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
+              ),
+            ),
+            builder: (context) => LMFeedReportBottomSheet(
+              entityId: commentViewData.id,
+              entityType: 6,
+              entityCreatorId: commentViewData.userId,
+            ),
+          );
+        },
         onCommentEdit: () {
           debugPrint('Editing functionality');
 
@@ -582,6 +610,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         menuItems: _postDetailScreenHandler!.postData?.menuItems ?? [],
         removeItemIds: {postReportId, postEditId},
         action: LMFeedMenuAction(
+          onPostReport: () => handlePostReportAction(),
           onPostPin: () => handlePostPinAction(),
           onPostUnpin: () => handlePostPinAction(),
           onPostDelete: () {
@@ -866,7 +895,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         return menu.copyWith(
           removeItemIds: {
             commentEditId,
-            commentReportId,
+            // commentReportId,
           },
         );
       },
@@ -1386,6 +1415,34 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Future<dynamic> handlePostReportAction() {
+    return showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      useSafeArea: true,
+      isScrollControlled: true,
+      elevation: 10,
+      enableDrag: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+        minHeight: MediaQuery.of(context).size.height * 0.3,
+      ),
+      backgroundColor: feedTheme?.container,
+      clipBehavior: Clip.hardEdge,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) => LMFeedReportBottomSheet(
+        entityId: _postDetailScreenHandler!.postId,
+        entityType: 5,
+        entityCreatorId: _postDetailScreenHandler!.postData!.userId,
       ),
     );
   }
