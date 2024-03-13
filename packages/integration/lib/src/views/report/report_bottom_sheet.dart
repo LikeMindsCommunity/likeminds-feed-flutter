@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/report/report_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -69,13 +68,13 @@ class LMFeedReportBottomSheet extends StatefulWidget {
 }
 
 class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
-  LMFeedReportBloc reportBloc = LMFeedReportBloc();
+  LMFeedModerationBloc reportBloc = LMFeedModerationBloc();
   LMFeedThemeData? feedTheme;
 
   @override
   void initState() {
     super.initState();
-    reportBloc.add(LMReportFetchEvent());
+    reportBloc.add(LMFeedReportReasonFetchEvent());
   }
 
   @override
@@ -86,7 +85,7 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     LMFeedBottomSheetStyle? bottomSheetStyle =
         widget.style ?? feedTheme?.bottomSheetStyle;
     return Padding(
@@ -96,7 +95,7 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
               right: 24.0,
               top: 24.0,
               bottom: MediaQuery.of(context).viewInsets.bottom + 24),
-      child: BlocConsumer<LMFeedReportBloc, LMFeedReportState>(
+      child: BlocConsumer<LMFeedModerationBloc, LMFeedModerationState>(
           bloc: reportBloc,
           listener: (context, state) {
             if (state is LMFeedReportSubmitFailedState) {
@@ -181,7 +180,7 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
   GestureDetector _defReasonTile(LMDeleteReasonViewData e) {
     return GestureDetector(
       onTap: () {
-        reportBloc.add(LMReportReasonSelectEvent(reason: e));
+        reportBloc.add(LMFeedReportReasonSelectEvent(reason: e));
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,7 +270,7 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
         ),
       ),
       onTap: () async {
-        reportBloc.add(LMReportSubmitEvent(
+        reportBloc.add(LMFeedReportSubmitEvent(
           entityCreatorId: widget.entityCreatorId,
           entityId: widget.entityId,
           entityType: widget.entityType,

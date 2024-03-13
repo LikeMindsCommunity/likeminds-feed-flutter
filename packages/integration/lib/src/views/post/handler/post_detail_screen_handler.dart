@@ -206,10 +206,10 @@ class LMFeedPostDetailScreenHandler {
               state as LMFeedCommentErrorState<AddCommentResponse>;
           removeTempCommentFromController(
               commentErrorState.commentMetaData.commentId!);
-          toast(
-            commentErrorState.commentActionResponse.errorMessage ??
-                'An error occurred',
-          );
+          LMFeedCore.showSnackBar(LMFeedSnackBar(
+              content: Text(
+                  commentErrorState.commentActionResponse.errorMessage ??
+                      'An error occurred')));
           break;
         }
     }
@@ -252,7 +252,7 @@ class LMFeedPostDetailScreenHandler {
       commentViewData.parentComment = parentComment;
     }
 
-    // if (!replyShown) 
+    // if (!replyShown)
     {
       LMFeedFetchCommentReplyBloc.instance
           .add(LMFeedAddLocalReplyEvent(comment: commentViewData));
