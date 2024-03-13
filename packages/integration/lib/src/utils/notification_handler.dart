@@ -11,7 +11,7 @@ import 'package:overlay_support/overlay_support.dart';
 class LMNotificationHandler {
   String? deviceId;
   String? fcmToken;
-  int? memberId;
+  String? uuid;
 
   static LMNotificationHandler? _instance;
 
@@ -34,18 +34,18 @@ class LMNotificationHandler {
   /// Register the device for notifications
   /// This is called from the client side
   /// It calls the [registerDevice] method of the [LikeMindsService]
-  /// It initializes the [memberId] which is used to route the notification
+  /// It initializes the [uuid] which is used to route the notification
   /// If the registration is successful, it prints success message
-  void registerDevice(int memberId) async {
+  void registerDevice(String uuid) async {
     if (fcmToken == null || deviceId == null) {
       return;
     }
     RegisterDeviceRequest request = (RegisterDeviceRequestBuilder()
           ..token(fcmToken!)
-          ..memberId(memberId)
+          ..uuid(uuid)
           ..deviceId(deviceId!))
         .build();
-    this.memberId = memberId;
+    this.uuid = uuid;
     final response = await LMFeedCore.client.registerDevice(request);
     if (response.success) {
       debugPrint("Device registered for notifications successfully");

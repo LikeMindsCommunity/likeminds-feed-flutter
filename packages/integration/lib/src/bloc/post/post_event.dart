@@ -94,12 +94,16 @@ class LMFeedDeletePostEvent extends LMFeedPostEvents {
 }
 
 class LMFeedUpdatePostEvent extends LMFeedPostEvents {
-  final LMPostViewData post;
+  final LMPostViewData? post;
+  final LMFeedPostActionType actionType;
+  final String postId;
 
   LMFeedUpdatePostEvent({
-    required this.post,
+    this.post,
+    required this.actionType,
+    required this.postId,
   });
 
   @override
-  List<Object> get props => [post, DateTime.now().millisecondsSinceEpoch];
+  List<Object> get props => [identityHashCode(this)];
 }

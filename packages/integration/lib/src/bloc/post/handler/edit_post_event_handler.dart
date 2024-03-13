@@ -6,6 +6,7 @@ part of '../post_bloc.dart';
 /// from the server
 /// If the response is successful, [LMFeedEditPostUploadedState] is emitted
 /// If the response is not successful, [LMFeedNewPostErrorState] is emitted
+/// {@endtemplate}
 void editPostEventHandler(
     LMFeedEditPostEvent event, Emitter<LMFeedPostState> emit) async {
   try {
@@ -25,13 +26,11 @@ void editPostEventHandler(
     // Building edit post request
     EditPostRequestBuilder editPostRequestBuilder = EditPostRequestBuilder()
       // attachments associated to the post
-      ..attachments(attachments ?? [])
+      ..attachments(attachments)
       // postId of the post to be edited
       ..postId(event.postId)
       // topics associated to the post
-      ..topics(event.selectedTopics
-          .map((e) => LMTopicViewDataConvertor.toTopic(e))
-          .toList());
+      ..topics(event.selectedTopics.map((e) => e.id).toList());
 
     // If postText is not null, add postText in request
     if (postText != null) {

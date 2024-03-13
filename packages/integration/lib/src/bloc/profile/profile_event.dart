@@ -10,12 +10,12 @@ abstract class LMFeedProfileEvent extends Equatable {
 class LMFeedProfileEventInitEvent extends LMFeedProfileEvent {}
 
 class LMFeedRouteToUserProfileEvent extends LMFeedProfileEvent {
-  final String userUniqueId;
+  final String uuid;
 
-  const LMFeedRouteToUserProfileEvent({required this.userUniqueId});
+  const LMFeedRouteToUserProfileEvent({required this.uuid});
 
   @override
-  List<Object> get props => [userUniqueId, identityHashCode(this)];
+  List<Object> get props => [uuid, identityHashCode(this)];
 }
 
 class LMFeedRouteToCompanyProfileEvent extends LMFeedProfileEvent {

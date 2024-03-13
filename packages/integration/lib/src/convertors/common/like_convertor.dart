@@ -6,7 +6,7 @@ class LMLikeViewDataConvertor {
     LMLikeViewDataBuilder likeViewDataBuilder = LMLikeViewDataBuilder();
     likeViewDataBuilder
       ..id(likeModel.id)
-      ..userId(likeModel.userId)
+      ..uuid(likeModel.uuid)
       ..createdAt(likeModel.createdAt)
       ..updatedAt(likeModel.updatedAt);
     return likeViewDataBuilder.build();
@@ -17,7 +17,7 @@ class LMLikeViewDataConvertor {
       id: likeViewData.id,
       createdAt: likeViewData.createdAt,
       updatedAt: likeViewData.updatedAt,
-      userId: likeViewData.userId,
+      uuid: likeViewData.uuid,
     );
   }
 }

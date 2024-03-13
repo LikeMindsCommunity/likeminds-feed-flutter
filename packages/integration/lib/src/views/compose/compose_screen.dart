@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -72,6 +73,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   Timer? _debounce;
   String? result;
   Size? screenSize;
+  // bool to check if the user has tapped on the cancel icon
+  // of link preview, in that case toggle the bool to true
+  // and don't generate link preview any further
+  bool linkCancelled = false;
 
   /// Value notifiers to rebuild small widgets throughout the screen
   /// Rather than handling state management from complex classes
@@ -144,8 +149,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           ),
         ),
       );
-      // TODO: remove old toast
-      // toast("Error while selecting media, please try again");
     }
   }
 
@@ -301,7 +304,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: LMFeedPostWidget(
                         post: repost!,
-                        user: repost!.user!,
+                        user: repost!.user,
                         isFeed: false,
                         topics: repost?.topics ?? [],
                         footerBuilder: (context, footer, footerData) =>
@@ -395,7 +398,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       width: style?.mediaStyle?.videoStyle?.width ??
                           screenSize?.width,
                       decoration: BoxDecoration(
-                        color: feedTheme.onContainer ?? Colors.black,
+                        color: feedTheme.onContainer,
                         borderRadius:
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),
@@ -498,6 +501,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           right: 7.5,
                           child: GestureDetector(
                             onTap: () {
+                              if (composeBloc.postMedia[index].mediaType ==
+                                  LMMediaType.link) {
+                                linkCancelled = true;
+                              }
                               composeBloc.add(
                                 LMFeedComposeRemoveAttachmentEvent(
                                   index: index,
@@ -535,7 +542,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     final theme = LMFeedCore.theme;
     return LMFeedAppBar(
         style: LMFeedAppBarStyle(
-          backgroundColor: feedTheme.container ?? Colors.white,
+          backgroundColor: feedTheme.container,
           height: 72,
           centerTitle: true,
           padding: const EdgeInsets.symmetric(
@@ -617,11 +624,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       ),
                     ),
                   );
-                  // TODO: remove old toast
-                  // toast(
-                  //   "Can't create a post without topic",
-                  //   duration: Toast.LENGTH_LONG,
-                  // );
                   return;
                 }
                 userTags =
@@ -661,11 +663,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     ),
                   ),
                 );
-                // TODO: remove old toast
-                // toast(
-                //   "Can't create a post without text or attachments",
-                //   duration: Toast.LENGTH_LONG,
-                // );
               }
             },
           ),
@@ -745,8 +742,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                                 LMFeedAnalyticsKeysDep.userTaggedInPost,
                             eventProperties: {
                               'tagged_user_id':
-                                  tag.sdkClientInfo?.userUniqueId ??
-                                      tag.userUniqueId,
+                                  tag.sdkClientInfo?.uuid ?? tag.uuid,
                               'tagged_user_count':
                                   composeBloc.userTags.length.toString(),
                             },
@@ -776,7 +772,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       _debounce?.cancel();
     }
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      handleTextLinks(p0);
+      if (!linkCancelled) handleTextLinks(p0);
     });
   }
 
@@ -1048,9 +1044,8 @@ void sendPostCreationCompletedEvent(
     List<String> taggedUserId = [];
 
     taggedUserCount = usersTagged.length;
-    taggedUserId = usersTagged
-        .map((e) => e.sdkClientInfo?.userUniqueId ?? e.userUniqueId!)
-        .toList();
+    taggedUserId =
+        usersTagged.map((e) => e.sdkClientInfo?.uuid ?? e.uuid!).toList();
 
     propertiesMap['user_tagged'] = taggedUserCount == 0 ? 'no' : 'yes';
     if (taggedUserCount > 0) {

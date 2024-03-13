@@ -51,6 +51,9 @@ class LMFeedProfilePicture extends StatelessWidget {
                   text: getInitials(fallbackText).toUpperCase(),
                   style: inStyle.fallbackTextStyle ??
                       LMFeedTextStyle(
+                        overflow: TextOverflow.clip,
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
                         textStyle: TextStyle(
                           color: Colors.white,
                           fontSize:

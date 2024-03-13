@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMSampleApp extends StatefulWidget {
-  final String? userId;
+  final String? uuid;
   final String userName;
-  const LMSampleApp({super.key, this.userId, required this.userName});
+  const LMSampleApp({super.key, this.uuid, required this.userName});
 
   @override
   State<LMSampleApp> createState() => _LMSampleAppState();
@@ -24,8 +24,8 @@ class _LMSampleAppState extends State<LMSampleApp> {
   void callInitiateUser() {
     InitiateUserRequestBuilder request = InitiateUserRequestBuilder();
 
-    if (widget.userId != null && widget.userId!.isNotEmpty) {
-      request.userId(widget.userId!);
+    if (widget.uuid != null && widget.uuid!.isNotEmpty) {
+      request.uuid(widget.uuid!);
     }
 
     if (widget.userName.isNotEmpty) {

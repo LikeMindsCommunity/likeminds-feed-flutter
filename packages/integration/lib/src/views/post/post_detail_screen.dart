@@ -87,8 +87,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   List<LMUserTagViewData> userTags = [];
   LMPostDetailScreenConfig? config;
 
-  void onLikeTap() {}
-
   @override
   void initState() {
     super.initState();
@@ -139,7 +137,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   @override
   void dispose() {
-    LMFeedCommentHandlerBloc.instance.add(LMFeedCommentCancelEvent());
+    LMFeedCommentBloc.instance.add(LMFeedCommentCancelEvent());
     super.dispose();
   }
 
@@ -182,11 +180,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               LMFeedCore.widgetUtility.postWidgetBuilder.call(
                                   context,
                                   defPostWidget(),
-                                  _postDetailScreenHandler!.postData!) ??
-                              defPostWidget(),
+                                  _postDetailScreenHandler!.postData!),
                         ),
                         SliverToBoxAdapter(
-                          child: BlocListener<LMFeedCommentHandlerBloc,
+                          child: BlocListener<LMFeedCommentBloc,
                               LMFeedCommentHandlerState>(
                             bloc: _postDetailScreenHandler!.commentHandlerBloc,
                             listener: (context, state) {
@@ -245,12 +242,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                         (context, commentViewData, index) {
                                       LMUserViewData userViewData;
                                       if (!_postDetailScreenHandler!.users
-                                          .containsKey(
-                                              commentViewData.userId)) {
+                                          .containsKey(commentViewData.uuid)) {
                                         return const SizedBox.shrink();
                                       }
                                       userViewData = _postDetailScreenHandler!
-                                          .users[commentViewData.userId]!;
+                                          .users[commentViewData.uuid]!;
 
                                       LMFeedCommentWidget commentWidget =
                                           defCommentTile(
@@ -270,8 +266,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                         context,
                                                         commentWidget,
                                                         _postDetailScreenHandler!
-                                                            .postData!) ??
-                                                commentWidget,
+                                                            .postData!),
                                             (replyShown &&
                                                     commentIdReplyId ==
                                                         commentViewData.id)
@@ -294,7 +289,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                         _postDetailScreenHandler!
                                                                 .users[
                                                             commentViewData
-                                                                .userId]!,
+                                                                .uuid]!,
                                                   )
                                                 : const SizedBox.shrink()
                                           ],
@@ -406,11 +401,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           );
         },
         onCommentDelete: () {
+          String commentCreatorUUID = commentViewData.user.sdkClientInfo.uuid;
+
           showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
               title: 'Delete Comment',
-              userId: commentViewData.userId,
+              uuid: commentCreatorUUID,
               content:
                   'Are you sure you want to delete this post. This action can not be reversed.',
               action: (String reason) async {
@@ -515,7 +512,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedPostWidget(
       post: _postDetailScreenHandler!.postData!,
       user: _postDetailScreenHandler!
-          .users[_postDetailScreenHandler!.postData!.userId]!,
+          .users[_postDetailScreenHandler!.postData!.uuid]!,
       topics: _postDetailScreenHandler!.postData!.topics,
       onMediaTap: () {
         Navigator.push(
@@ -526,7 +523,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   _postDetailScreenHandler!.postData!.attachments ?? [],
               post: _postDetailScreenHandler!.postData!,
               user: _postDetailScreenHandler!
-                  .users[_postDetailScreenHandler!.postData!.userId]!,
+                  .users[_postDetailScreenHandler!.postData!.uuid]!,
             ),
           ),
         );
@@ -536,11 +533,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         widget.onPostTap?.call();
       },
       isFeed: false,
-      onTagTap: (String userId) {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
+      onTagTap: (String uuid) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(uuid);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
           ),
         );
       },
@@ -563,11 +560,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
-      onTagTap: (String userId) {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
+      onTagTap: (String uuid) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(uuid);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
           ),
         );
       },
@@ -592,22 +589,22 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   LMFeedPostHeader _defPostHeader() {
     return LMFeedPostHeader(
       user: _postDetailScreenHandler!
-          .users[_postDetailScreenHandler!.postData!.userId]!,
+          .users[_postDetailScreenHandler!.postData!.uuid]!,
       isFeed: true,
       postViewData: _postDetailScreenHandler!.postData!,
       postHeaderStyle: feedTheme?.headerStyle,
       onProfileTap: () {
         LMFeedCore.instance.lmFeedClient.routeToProfile(
             _postDetailScreenHandler!
-                .users[_postDetailScreenHandler!.postData!.userId]!
-                .sdkClientInfo!
-                .userUniqueId);
+                .users[_postDetailScreenHandler!.postData!.uuid]!
+                .sdkClientInfo
+                .uuid);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: _postDetailScreenHandler!
-                .users[_postDetailScreenHandler!.postData!.userId]!
-                .sdkClientInfo!
-                .userUniqueId,
+            uuid: _postDetailScreenHandler!
+                .users[_postDetailScreenHandler!.postData!.uuid]!
+                .sdkClientInfo
+                .uuid,
           ),
         );
       },
@@ -619,11 +616,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           onPostPin: () => handlePostPinAction(),
           onPostUnpin: () => handlePostPinAction(),
           onPostDelete: () {
+            String postCreatorUUID =
+                _postDetailScreenHandler!.postData!.user.sdkClientInfo.uuid;
+
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete Comment',
-                userId: _postDetailScreenHandler!.postData!.userId,
+                uuid: postCreatorUUID,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',
                 action: (String reason) async {
@@ -639,7 +639,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       eventProperties: {
                         "post_id": _postDetailScreenHandler!.postData!.id,
                         "post_type": postType,
-                        "user_id": _postDetailScreenHandler!.postData!.userId,
+                        "user_id": _postDetailScreenHandler!.postData!.uuid,
                         "user_state": isCm ? "CM" : "member",
                       },
                     ),
@@ -681,7 +681,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   _postDetailScreenHandler!.postData!.attachments ?? [],
               post: _postDetailScreenHandler!.postData!,
               user: _postDetailScreenHandler!
-                  .users[_postDetailScreenHandler!.postData!.userId]!,
+                  .users[_postDetailScreenHandler!.postData!.uuid]!,
             ),
           ),
         );
@@ -701,41 +701,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
           videoController?.player.pause();
 
-          if ((feedTheme?.postStyle.likesListType ??
-                  LMFeedPostLikesListViewType.screen) ==
-              LMFeedPostLikesListViewType.screen) {
-            Navigator.of(context, rootNavigator: true).push(
-              MaterialPageRoute(
-                builder: (context) => LMFeedLikesScreen(
-                  postId: _postDetailScreenHandler!.postData!.id,
-                ),
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(
+              builder: (context) => LMFeedLikesScreen(
+                postId: _postDetailScreenHandler!.postData!.id,
               ),
-            );
-          } else {
-            showModalBottomSheet(
-              context: context,
-              useRootNavigator: true,
-              useSafeArea: true,
-              isScrollControlled: true,
-              elevation: 10,
-              enableDrag: true,
-              showDragHandle: true,
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.7,
-                minHeight: MediaQuery.of(context).size.height * 0.3,
-              ),
-              backgroundColor: feedTheme?.container,
-              clipBehavior: Clip.hardEdge,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
-                ),
-              ),
-              builder: (context) => LMFeedLikesBottomSheet(
-                  postId: _postDetailScreenHandler!.postData!.id),
-            );
-          }
+            ),
+          );
         },
         onTap: () async {
           if (_postDetailScreenHandler!.postData!.isLiked) {
@@ -748,8 +720,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           _postDetailScreenHandler!.rebuildPostWidget.value =
               !_postDetailScreenHandler!.rebuildPostWidget.value;
 
-          LMFeedPostBloc.instance.add(
-              LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: _postDetailScreenHandler!.postData!.id,
+              actionType: _postDetailScreenHandler!.postData!.isLiked
+                  ? LMFeedPostActionType.like
+                  : LMFeedPostActionType.unlike));
 
           final likePostRequest = (LikePostRequestBuilder()
                 ..postId(_postDetailScreenHandler!.postData!.id))
@@ -767,8 +742,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     : _postDetailScreenHandler!.postData!.likeCount - 1;
             _postDetailScreenHandler!.rebuildPostWidget.value =
                 !_postDetailScreenHandler!.rebuildPostWidget.value;
+
             LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-                post: _postDetailScreenHandler!.postData!));
+                postId: _postDetailScreenHandler!.postData!.id,
+                actionType: _postDetailScreenHandler!.postData!.isLiked
+                    ? LMFeedPostActionType.like
+                    : LMFeedPostActionType.unlike));
           }
         },
       );
@@ -794,8 +773,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               !_postDetailScreenHandler!.postData!.isSaved;
           _postDetailScreenHandler!.rebuildPostWidget.value =
               !_postDetailScreenHandler!.rebuildPostWidget.value;
-          LMFeedPostBloc.instance.add(
-              LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+            postId: _postDetailScreenHandler!.postData!.id,
+            actionType: _postDetailScreenHandler!.postData!.isSaved
+                ? LMFeedPostActionType.saved
+                : LMFeedPostActionType.unsaved,
+          ));
 
           final savePostRequest = (SavePostRequestBuilder()
                 ..postId(_postDetailScreenHandler!.postData!.id))
@@ -809,8 +793,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 !_postDetailScreenHandler!.postData!.isSaved;
             _postDetailScreenHandler!.rebuildPostWidget.value =
                 !_postDetailScreenHandler!.rebuildPostWidget.value;
+
             LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-                post: _postDetailScreenHandler!.postData!));
+              postId: _postDetailScreenHandler!.postData!.id,
+              actionType: _postDetailScreenHandler!.postData!.isSaved
+                  ? LMFeedPostActionType.saved
+                  : LMFeedPostActionType.unsaved,
+            ));
           }
         },
         style: feedTheme?.footerStyle.saveButtonStyle,
@@ -938,34 +927,30 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           backgroundColor: feedTheme?.primaryColor,
         ),
         fallbackText:
-            _postDetailScreenHandler!.users[commentViewData.userId]!.name,
+            _postDetailScreenHandler!.users[commentViewData.uuid]!.name,
         onTap: () {
-          if (_postDetailScreenHandler!
-                  .users[commentViewData.userId]!.sdkClientInfo !=
-              null) {
-            LMFeedCore.instance.lmFeedClient.routeToProfile(
-                _postDetailScreenHandler!.users[commentViewData.userId]!
-                    .sdkClientInfo!.userUniqueId);
+          LMFeedCore.instance.lmFeedClient.routeToProfile(
+              _postDetailScreenHandler!
+                  .users[commentViewData.uuid]!.sdkClientInfo.uuid);
 
-            LMFeedProfileBloc.instance.add(
-              LMFeedRouteToUserProfileEvent(
-                userUniqueId: _postDetailScreenHandler!
-                    .users[commentViewData.userId]!.sdkClientInfo!.userUniqueId,
-              ),
-            );
-          }
+          LMFeedProfileBloc.instance.add(
+            LMFeedRouteToUserProfileEvent(
+              uuid: _postDetailScreenHandler!
+                  .users[commentViewData.uuid]!.sdkClientInfo.uuid,
+            ),
+          );
         },
         imageUrl:
-            _postDetailScreenHandler!.users[commentViewData.userId]!.imageUrl,
+            _postDetailScreenHandler!.users[commentViewData.uuid]!.imageUrl,
       ),
       likeButton: defCommentLikeButton(commentViewData),
       replyButton: defCommentReplyButton(commentViewData),
       showRepliesButton: defCommentShowRepliesButton(commentViewData),
-      onTagTap: (String userId) {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
+      onTagTap: (String uuid) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(uuid);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
           ),
         );
       },
@@ -1082,7 +1067,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ..postId(widget.postId)
               ..commentActionType(LMFeedCommentActionType.replying)
               ..level(0)
-              ..user(_postDetailScreenHandler!.users[commentViewData.userId]!)
+              ..user(_postDetailScreenHandler!.users[commentViewData.uuid]!)
               ..commentId(commentViewData.id))
             .build();
 
@@ -1148,7 +1133,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   Widget defBottomTextField() {
     return SafeArea(
-      child: BlocBuilder<LMFeedCommentHandlerBloc, LMFeedCommentHandlerState>(
+      child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
         bloc: _postDetailScreenHandler!.commentHandlerBloc,
         builder: (context, state) => Container(
           decoration: BoxDecoration(
@@ -1245,10 +1230,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                             ),
                       ),
                       onTap: () {
-                        if (currentUser.sdkClientInfo != null) {
-                          LMFeedCore.instance.lmFeedClient.routeToProfile(
-                              currentUser.sdkClientInfo!.userUniqueId);
-                        }
+                        LMFeedCore.instance.lmFeedClient
+                            .routeToProfile(currentUser.sdkClientInfo.uuid);
                       },
                     ),
                     Expanded(
@@ -1326,8 +1309,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     }
 
                                     _postDetailScreenHandler!.users.putIfAbsent(
-                                        currentUser.userUniqueId,
-                                        () => currentUser);
+                                        currentUser.uuid, () => currentUser);
 
                                     if (state
                                         is LMFeedCommentActionOngoingState) {
@@ -1518,8 +1500,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           ..postId(_postDetailScreenHandler!.postData!.id))
         .build();
 
-    LMFeedPostBloc.instance
-        .add(LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+      postId: _postDetailScreenHandler!.postData!.id,
+      actionType: _postDetailScreenHandler!.postData!.isPinned
+          ? LMFeedPostActionType.pinned
+          : LMFeedPostActionType.unpinned,
+    ));
 
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
@@ -1530,8 +1516,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       _postDetailScreenHandler!.rebuildPostWidget.value =
           !_postDetailScreenHandler!.rebuildPostWidget.value;
 
-      LMFeedPostBloc.instance.add(
-          LMFeedUpdatePostEvent(post: _postDetailScreenHandler!.postData!));
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: _postDetailScreenHandler!.postData!.id,
+        actionType: _postDetailScreenHandler!.postData!.isPinned
+            ? LMFeedPostActionType.pinned
+            : LMFeedPostActionType.unpinned,
+      ));
     } else {
       String postType = LMFeedPostUtils.getPostType(
           _postDetailScreenHandler!.postData!.attachments);
@@ -1545,7 +1535,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
-            'created_by_id': _postDetailScreenHandler!.postData!.userId,
+            'created_by_id': _postDetailScreenHandler!.postData!.uuid,
             'post_id': _postDetailScreenHandler!.postData!.id,
             'post_type': postType,
           },

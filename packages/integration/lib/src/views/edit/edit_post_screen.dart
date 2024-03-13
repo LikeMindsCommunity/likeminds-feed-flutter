@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -76,6 +77,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   Timer? _debounce;
   String? result;
   Size? screenSize;
+  // bool to check if the user has tapped on the cancel icon
+  // of link preview, in that case toggle the bool to true
+  // and don't generate link preview any further
+  bool linkCancelled = false;
 
   /// Value notifiers to rebuild small widgets throughout the screen
   /// Rather than handling state management from complex classes
@@ -443,7 +448,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: LMFeedPostWidget(
                         post: repost!,
-                        user: repost!.user!,
+                        user: repost!.user,
                         isFeed: false,
                         topics: repost?.topics ?? [],
                         footerBuilder: (context, footer, footerData) =>
@@ -482,7 +487,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   ? const NeverScrollableScrollPhysics()
                   : null,
               shrinkWrap: true,
-              itemCount: postViewData!.attachments!.length,
+              itemCount: composeBloc.postMedia.length,
               itemBuilder: (context, index) {
                 Widget mediaWidget;
                 LMMediaModel mediaModel = composeBloc.postMedia[index];
@@ -598,6 +603,37 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   child: Stack(
                     children: <Widget>[
                       mediaWidget,
+                      if (composeBloc.postMedia[index].mediaType ==
+                          LMMediaType.link)
+                        Positioned(
+                          top: 7.5,
+                          right: 7.5,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (composeBloc.postMedia[index].mediaType ==
+                                  LMMediaType.link) {
+                                linkCancelled = true;
+                              }
+                              composeBloc.add(
+                                LMFeedComposeRemoveAttachmentEvent(
+                                  index: index,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                borderRadius: BorderRadius.circular(500),
+                              ),
+                              width: 24,
+                              height: 24,
+                              child: Icon(
+                                Icons.cancel,
+                                color: feedTheme.disabledColor,
+                              ),
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 );
@@ -822,8 +858,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                                 LMFeedAnalyticsKeysDep.userTaggedInPost,
                             eventProperties: {
                               'tagged_user_id':
-                                  tag.sdkClientInfo?.userUniqueId ??
-                                      tag.userUniqueId,
+                                  tag.sdkClientInfo?.uuid ?? tag.uuid,
                               'tagged_user_count':
                                   composeBloc.userTags.length.toString(),
                             },
@@ -853,7 +888,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
       _debounce?.cancel();
     }
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      handleTextLinks(p0);
+      if (!linkCancelled) handleTextLinks(p0);
     });
   }
 
@@ -1125,9 +1160,8 @@ void sendPostCreationCompletedEvent(
     List<String> taggedUserId = [];
 
     taggedUserCount = usersTagged.length;
-    taggedUserId = usersTagged
-        .map((e) => e.sdkClientInfo?.userUniqueId ?? e.userUniqueId!)
-        .toList();
+    taggedUserId =
+        usersTagged.map((e) => e.sdkClientInfo?.uuid ?? e.uuid!).toList();
 
     propertiesMap['user_tagged'] = taggedUserCount == 0 ? 'no' : 'yes';
     if (taggedUserCount > 0) {

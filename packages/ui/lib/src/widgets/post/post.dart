@@ -240,8 +240,6 @@ class LMFeedPostStyle {
   final EdgeInsetsGeometry? margin;
   final BoxBorder? border;
   final Color? backgroundColor;
-  final LMFeedPostLikesListViewType likesListType;
-  final LMFeedPostDeleteViewType? deleteSheetType;
 
   LMFeedPostStyle({
     this.boxShadow,
@@ -250,8 +248,6 @@ class LMFeedPostStyle {
     this.margin,
     this.border,
     this.backgroundColor,
-    this.likesListType = LMFeedPostLikesListViewType.screen,
-    this.deleteSheetType = LMFeedPostDeleteViewType.dialog,
   });
 
   LMFeedPostStyle copyWith({
@@ -276,8 +272,6 @@ class LMFeedPostStyle {
       margin: margin ?? this.margin,
       border: border ?? this.border,
       backgroundColor: backgroundColor ?? this.backgroundColor,
-      likesListType: likesListType ?? this.likesListType,
-      deleteSheetType: deleteSheetType ?? this.deleteSheetType,
     );
   }
 

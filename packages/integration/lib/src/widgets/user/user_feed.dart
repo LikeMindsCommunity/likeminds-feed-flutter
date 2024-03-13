@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
@@ -13,7 +14,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 class LMFeedUserFeedWidget extends StatefulWidget {
   const LMFeedUserFeedWidget({
     Key? key,
-    required this.userId,
+    required this.uuid,
     this.postBuilder,
     this.noItemsFoundIndicatorBuilder,
     this.firstPageProgressIndicatorBuilder,
@@ -24,7 +25,7 @@ class LMFeedUserFeedWidget extends StatefulWidget {
   }) : super(key: key);
 
   // The user id for which the user feed is to be shown
-  final String userId;
+  final String uuid;
   // Builder for post item
   // {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
@@ -84,7 +85,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
       final userFeedRequest = (GetUserFeedRequestBuilder()
             ..page(pageKey)
             ..pageSize(pageSize)
-            ..userId(widget.userId))
+            ..uuid(widget.uuid))
           .build();
       GetUserFeedResponse response =
           await LMFeedCore.instance.lmFeedClient.getUserFeed(userFeedRequest);
@@ -201,10 +202,12 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post.id) ??
+                  ?.indexWhere((element) => element.id == state.postId) ??
               -1;
           if (index != -1) {
-            feedRoomItemList![index] = state.post;
+            LMPostViewData updatePostViewData = feedRoomItemList![index];
+            updatePostViewData = LMFeedPostUtils.updatePostData(
+                updatePostViewData, state.actionType);
           }
           _pagingController.itemList = feedRoomItemList;
           rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -228,10 +231,13 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post.id) ??
+                  ?.indexWhere((element) => element.id == state.postId) ??
               -1;
           if (index != -1) {
-            feedRoomItemList?[index] = state.post;
+            LMPostViewData? postViewData = feedRoomItemList?[index];
+            if (postViewData != null) {
+              LMFeedPostUtils.updatePostData(postViewData, state.actionType);
+            }
           }
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
@@ -243,7 +249,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
               pagingController: _pagingController,
               builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
                 itemBuilder: (context, item, index) {
-                  if (!users.containsKey(item.userId)) {
+                  if (!users.containsKey(item.uuid)) {
                     return const SizedBox();
                   }
                   LMFeedPostWidget postWidget =
@@ -316,12 +322,12 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: users[post.userId]!,
+      user: users[post.uuid]!,
       isFeed: false,
-      onTagTap: (String userId) {
+      onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
           ),
         );
       },
@@ -342,7 +348,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: users[post.userId]!,
+              user: users[post.uuid]!,
             ),
           ),
         );
@@ -383,7 +389,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
-      onTagTap: (String? userId) {},
+      onTagTap: (String? uuid) {},
       style: feedThemeData?.contentStyle,
       text: post.text,
       heading: post.heading,
@@ -404,7 +410,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
 
   LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: users[postViewData.userId]!,
+      user: users[postViewData.uuid]!,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData?.headerStyle,
@@ -419,7 +425,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
                   title: 'Delete Comment',
-                  userId: postViewData.userId,
+                  uuid: postViewData.uuid,
                   content:
                       'Are you sure you want to delete this post. This action can not be reversed.',
                   action: (String reason) async {
@@ -473,7 +479,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: users[post.userId]!,
+              user: users[post.uuid]!,
             ),
           ),
         );
@@ -579,8 +585,12 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+            postId: postViewData.id,
+            actionType: postViewData.isSaved
+                ? LMFeedPostActionType.saved
+                : LMFeedPostActionType.unsaved,
+          ));
 
           final savePostRequest =
               (SavePostRequestBuilder()..postId(postViewData.id)).build();
@@ -591,8 +601,14 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
           if (!response.success) {
             postViewData.isSaved = !postViewData.isSaved;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
+            LMFeedPostBloc.instance.add(
+              LMFeedUpdatePostEvent(
+                postId: postViewData.id,
+                actionType: postViewData.isSaved
+                    ? LMFeedPostActionType.saved
+                    : LMFeedPostActionType.unsaved,
+              ),
+            );
           }
         },
         style: feedThemeData?.footerStyle.saveButtonStyle,
@@ -767,12 +783,20 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postViewData.id,
+        actionType: postViewData.isPinned
+            ? LMFeedPostActionType.pinned
+            : LMFeedPostActionType.unpinned));
 
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;
       rebuildPostWidget.value = !rebuildPostWidget.value;
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          postId: postViewData.id,
+          actionType: postViewData.isPinned
+              ? LMFeedPostActionType.pinned
+              : LMFeedPostActionType.unpinned));
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 
@@ -785,7 +809,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
-            'created_by_id': postViewData.userId,
+            'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,
             'post_type': postType,
           },

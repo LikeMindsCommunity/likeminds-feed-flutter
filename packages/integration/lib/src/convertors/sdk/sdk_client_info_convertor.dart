@@ -11,7 +11,7 @@ class LMSDKClientInfoViewDataConvertor {
 
     sdkClientInfoViewDataBuilder.user(sdkClientInfo.user);
 
-    sdkClientInfoViewDataBuilder.userUniqueId(sdkClientInfo.userUniqueId);
+    sdkClientInfoViewDataBuilder.uuid(sdkClientInfo.uuid);
 
     return sdkClientInfoViewDataBuilder.build();
   }
@@ -21,7 +21,7 @@ class LMSDKClientInfoViewDataConvertor {
     return SDKClientInfo(
       community: sdkClientInfoViewData.community,
       user: sdkClientInfoViewData.user,
-      userUniqueId: sdkClientInfoViewData.userUniqueId,
+      uuid: sdkClientInfoViewData.uuid,
     );
   }
 }

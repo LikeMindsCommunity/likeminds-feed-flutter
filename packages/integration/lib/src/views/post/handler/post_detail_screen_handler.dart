@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/comment/comment_replies/comment_replies_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 
@@ -8,7 +9,7 @@ class LMFeedPostDetailScreenHandler {
   final Map<String, LMUserViewData> users = {};
   final PagingController<int, LMCommentViewData> commentListPagingController;
   final String postId;
-  late final LMFeedCommentHandlerBloc commentHandlerBloc;
+  late final LMFeedCommentBloc commentHandlerBloc;
   late final FocusNode focusNode;
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -17,8 +18,8 @@ class LMFeedPostDetailScreenHandler {
   Map<String, LMWidgetViewData> widgets = {};
   LMPostViewData? postData;
 
-  LMFeedPostDetailScreenHandler(this.commentListPagingController, this.postId) {
-    commentHandlerBloc = LMFeedCommentHandlerBloc.instance;
+  LMFeedPostDetailScreenHandler(this.commetListPagingController, this.postId) {
+    commentHandlerBloc = LMFeedCommentBloc.instance;
     addCommentListPaginationListener();
     commentController = TextEditingController();
     focusNode = FocusNode();
@@ -33,18 +34,37 @@ class LMFeedPostDetailScreenHandler {
     final response = await LMFeedCore.client.getPostDetails(postDetailRequest);
 
     if (response.success) {
+      // Convert [User] to [LMUserViewData]
+      // Add users to the map
       users.addAll(response.users!.map((key, value) =>
           MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
 
+      // Convert [Topic] to [LMTopicViewData]
+      // Add topics to the map
       topics.addAll(response.topics!.map((key, value) =>
           MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
-      repostedPosts.addAll(response.repostedPosts?.map((key, value) =>
-              MapEntry(key, LMPostViewDataConvertor.fromPost(post: value))) ??
+
+      // Convert [Post] to [LMPostViewData]
+      // Add reposted posts to the map
+      repostedPosts.addAll(response.repostedPosts?.map((key, value) => MapEntry(
+              key,
+              LMPostViewDataConvertor.fromPost(
+                post: value,
+                widgets: response.widgets,
+                repostedPosts: response.repostedPosts,
+                users: response.users ?? {},
+                topics: response.topics ?? {},
+              ))) ??
           {});
 
+      // Convert [WidgetModel] to [LMWidgetViewData]
+      // Add widgets to the map
       widgets.addAll(response.widgets?.map((key, value) => MapEntry(
               key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
           {});
+
+      // Convert [Post] to [LMPostViewData]
+      // Add post data, and all supporting data to the map
       final LMPostViewData postViewData = LMPostViewDataConvertor.fromPost(
         post: response.post!,
         widgets: response.widgets,
@@ -126,7 +146,9 @@ class LMFeedPostDetailScreenHandler {
               LMCommentViewDataConvertor.fromComment(response.reply!, users);
           replaceTempCommentWithActualComment(commentViewData);
 
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postData!.id,
+              actionType: LMFeedPostActionType.commentAdded));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
@@ -177,7 +199,13 @@ class LMFeedPostDetailScreenHandler {
             }
           }
 
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postData!.id,
+              actionType:
+                  commentSuccessState.commentMetaData.commentActionEntity ==
+                          LMFeedCommentType.parent
+                      ? LMFeedPostActionType.commentDeleted
+                      : LMFeedPostActionType.replyDeleted));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;

@@ -14,9 +14,9 @@ class LMUserViewData {
   String? imageUrl;
   bool? isGuest;
   bool? isDeleted;
-  String userUniqueId;
+  String uuid;
   String? organisationName;
-  LMSDKClientInfoViewData? sdkClientInfo;
+  LMSDKClientInfoViewData sdkClientInfo;
   int? updatedAt;
   bool? isOwner;
 
@@ -38,10 +38,10 @@ class LMUserViewData {
     required this.id,
     required this.name,
     this.imageUrl,
-    required this.isGuest,
-    required this.userUniqueId,
+    this.isGuest,
+    required this.uuid,
     this.organisationName,
-    this.sdkClientInfo,
+    required this.sdkClientInfo,
     this.updatedAt,
     this.isOwner,
     this.customTitle,
@@ -63,7 +63,7 @@ class LMUserViewDataBuilder {
   String? _imageUrl;
   bool? _isGuest;
   bool? _isDeleted;
-  String? _userUniqueId;
+  String? _uuid;
   String? _organisationName;
   LMSDKClientInfoViewData? _sdkClientInfo;
   int? _updatedAt;
@@ -95,8 +95,8 @@ class LMUserViewDataBuilder {
     _isDeleted = isDeleted;
   }
 
-  void userUniqueId(String userUniqueId) {
-    _userUniqueId = userUniqueId;
+  void uuid(String uuid) {
+    _uuid = uuid;
   }
 
   void organisationName(String organisationName) {
@@ -146,9 +146,9 @@ class LMUserViewDataBuilder {
       name: _name!,
       imageUrl: _imageUrl,
       isGuest: _isGuest,
-      userUniqueId: _userUniqueId!,
+      uuid: _uuid!,
       organisationName: _organisationName,
-      sdkClientInfo: _sdkClientInfo,
+      sdkClientInfo: _sdkClientInfo!,
       updatedAt: _updatedAt,
       isOwner: _isOwner,
       customTitle: _customTitle,

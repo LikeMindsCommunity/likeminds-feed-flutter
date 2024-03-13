@@ -136,7 +136,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
                   body: noItemLikesView(),
                 ),
                 itemBuilder: (context, item, index) =>
-                    LikesTile(user: handler!.userData[item.userId]),
+                    LikesTile(user: handler!.userData[item.uuid]),
                 firstPageProgressIndicatorBuilder: (context) => SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 50.0),
@@ -183,9 +183,7 @@ class LikesTile extends StatelessWidget {
                 onTap: () {
                   LMFeedProfileBloc.instance.add(
                     LMFeedRouteToUserProfileEvent(
-                      userUniqueId: user?.sdkClientInfo?.userUniqueId ??
-                          user?.userUniqueId ??
-                          '',
+                      uuid: user?.sdkClientInfo.uuid ?? user?.uuid ?? '',
                     ),
                   );
                 },

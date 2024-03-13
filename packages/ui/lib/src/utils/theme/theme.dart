@@ -169,7 +169,11 @@ class LMFeedThemeData {
         color: primaryColor ?? LikeMindsTheme.primaryColor,
       ),
       bottomSheetStyle: bottomSheetStyle ?? const LMFeedBottomSheetStyle(),
-      snackBarTheme: snackBarTheme ?? const LMFeedSnackBarStyle(),
+      snackBarTheme: snackBarTheme ??
+          LMFeedSnackBarStyle(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: primaryColor ?? LikeMindsTheme.primaryColor,
+          ),
     );
   }
 

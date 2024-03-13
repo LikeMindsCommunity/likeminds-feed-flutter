@@ -6,7 +6,7 @@ class LMUserTagViewData {
   String? customTitle;
   int? id;
   bool? isGuest;
-  String? userUniqueId;
+  String? uuid;
   LMSDKClientInfoViewData? sdkClientInfo;
 
   LMUserTagViewData._({
@@ -15,7 +15,7 @@ class LMUserTagViewData {
     this.customTitle,
     this.id,
     this.isGuest,
-    this.userUniqueId,
+    this.uuid,
     this.sdkClientInfo,
   });
 }
@@ -26,7 +26,7 @@ class LMUserTagViewDataBuilder {
   String? _customTitle;
   int? _id;
   bool? _isGuest;
-  String? _userUniqueId;
+  String? _uuid;
   LMSDKClientInfoViewData? _sdkClientInfo;
 
   void name(String name) {
@@ -49,8 +49,8 @@ class LMUserTagViewDataBuilder {
     _isGuest = isGuest;
   }
 
-  void userUniqueId(String userUniqueId) {
-    _userUniqueId = userUniqueId;
+  void uuid(String uuid) {
+    _uuid = uuid;
   }
 
   void sdkClientInfo(LMSDKClientInfoViewData sdkClientInfo) {
@@ -64,7 +64,7 @@ class LMUserTagViewDataBuilder {
       customTitle: _customTitle,
       id: _id,
       isGuest: _isGuest,
-      userUniqueId: _userUniqueId,
+      uuid: _uuid,
       sdkClientInfo: _sdkClientInfo,
     );
   }

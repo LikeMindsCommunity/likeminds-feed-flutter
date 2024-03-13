@@ -19,16 +19,13 @@ import 'dart:async';
 
 export 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/views.dart';
-export 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
 export 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
-export 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+export 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart'
+    hide kRegexLinksAndTags, getImageFileDimensions, getNetworkImageDimensions;
 export 'package:likeminds_feed/likeminds_feed.dart';
-export 'package:likeminds_feed_flutter_core/src/utils/deep_link/deep_link_handler.dart';
-export 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
-export 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
-export 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
@@ -108,7 +105,9 @@ class LMFeedCore {
           initiateUserCalled = true;
           await LMFeedUserLocalPreference.instance
               .setUserDataFromInitiateUserResponse(value);
-          LMNotificationHandler.instance.registerDevice(value.user!.id);
+          LMNotificationHandler.instance.registerDevice(
+            value.user!.sdkClientInfo.uuid,
+          );
         }
         return value;
       });

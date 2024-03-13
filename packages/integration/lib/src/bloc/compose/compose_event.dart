@@ -1,5 +1,9 @@
 part of 'compose_bloc.dart';
 
+/// {@template lm_feed_compose_event}
+/// [LMFeedComposeEvent] defines the events which are
+/// handled by [LMFeedComposeBloc]
+/// {@endtemplate}
 @immutable
 class LMFeedComposeEvent extends Equatable {
   const LMFeedComposeEvent();
@@ -8,10 +12,21 @@ class LMFeedComposeEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+/// {@template lm_feed_compose_fetch_topic_event}
+/// [LMFeedComposeFetchTopicsEvent] fetches the topics for the post
+/// {@endtemplate}
 class LMFeedComposeFetchTopicsEvent extends LMFeedComposeEvent {}
 
+/// {@template lm_feed_compose_add_image_event}
+/// [LMFeedComposeAddImageEvent] opens the image picker and handles the flow
+/// to add the selected images to the post
+/// {@endtemplate}
 class LMFeedComposeAddImageEvent extends LMFeedComposeEvent {}
 
+/// {@template lm_feed_compose_add_video_event}
+/// [LMFeedComposeAddVideoEvent] opens the video picker and handles the flow
+/// to add the selected video to the post
+/// {@endtemplate}
 class LMFeedComposeAddVideoEvent extends LMFeedComposeEvent {}
 
 class LMFeedComposeAddDocumentEvent extends LMFeedComposeEvent {}
