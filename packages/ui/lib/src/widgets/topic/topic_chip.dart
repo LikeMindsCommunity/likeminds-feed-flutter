@@ -32,7 +32,7 @@ class LMFeedTopicChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
 
     LMFeedTopicChipStyle? style = this.style ??
         (isSelected

@@ -62,7 +62,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
   Widget build(BuildContext context) {
     final DateFormat formatter = DateFormat('MMMM d, hh:mm');
     final String formatted = formatter.format(post.createdAt);
-    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    final LMFeedThemeData feedTheme = LMFeedCore.theme;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(

@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedPostDetailScreenHandler {
   final Map<String, LMUserViewData> users = {};
@@ -59,10 +58,18 @@ class LMFeedPostDetailScreenHandler {
 
       return postViewData;
     } else {
-      toast(
-        response.errorMessage ?? 'An error occurred',
-        duration: Toast.LENGTH_LONG,
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(
+            text: response.errorMessage ?? "An error occurred",
+          ),
+        ),
       );
+      // TODO: remove old toast
+      // toast(
+      //   response.errorMessage ?? 'An error occurred',
+      //   duration: Toast.LENGTH_LONG,
+      // );
 
       return null;
     }

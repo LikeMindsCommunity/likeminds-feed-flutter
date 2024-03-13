@@ -31,7 +31,7 @@ class LMFeedUserTile extends LMFeedTile {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     return LMFeedTile(
       onTap: onTap,
       style: style ??

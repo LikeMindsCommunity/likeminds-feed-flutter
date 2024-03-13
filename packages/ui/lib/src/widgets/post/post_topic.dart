@@ -20,15 +20,14 @@ class LMFeedPostTopic extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     LMFeedPostTopicStyle topicStyle =
-        style ?? LMFeedTheme.of(context).topicStyle;
+        style ?? LMFeedTheme.instance.theme.topicStyle;
     return Container(
       margin: topicStyle.margin,
       padding: topicStyle.padding,
       child: Wrap(
         children: post.topics
             .map((e) =>
-                topicChipBuilder?.call(
-                    context, defTopicChip(e, topicStyle)) ??
+                topicChipBuilder?.call(context, defTopicChip(e, topicStyle)) ??
                 defTopicChip(e, topicStyle))
             .toList(),
       ),

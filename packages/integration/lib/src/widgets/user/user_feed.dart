@@ -9,18 +9,18 @@ import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedUserFeedWidget extends StatefulWidget {
   const LMFeedUserFeedWidget({
     Key? key,
     required this.userId,
     this.postBuilder,
-    this.emptyFeedViewBuilder,
-    this.firstPageLoaderBuilder,
-    this.paginationLoaderBuilder,
-    this.feedErrorViewBuilder,
-    this.noNewPageWidgetBuilder,
+    this.noItemsFoundIndicatorBuilder,
+    this.firstPageProgressIndicatorBuilder,
+    this.newPageProgressIndicatorBuilder,
+    this.noMoreItemsIndicatorBuilder,
+    this.firstPageErrorIndicatorBuilder,
+    this.newPageErrorIndicatorBuilder,
   }) : super(key: key);
 
   // The user id for which the user feed is to be shown
@@ -30,21 +30,24 @@ class LMFeedUserFeedWidget extends StatefulWidget {
   final LMFeedPostWidgetBuilder? postBuilder;
   // {@macro context_widget_builder}
   // Builder for empty feed view
-  final LMFeedContextWidgetBuilder? emptyFeedViewBuilder;
+  final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
   // Builder for first page loader when no post are there
-  final LMFeedContextWidgetBuilder? firstPageLoaderBuilder;
+  final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;
   // Builder for pagination loader when more post are there
-  final LMFeedContextWidgetBuilder? paginationLoaderBuilder;
-  // Builder for error view when error occurs
-  final LMFeedContextWidgetBuilder? feedErrorViewBuilder;
+  final LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder;
   // Builder for widget when no more post are there
-  final LMFeedContextWidgetBuilder? noNewPageWidgetBuilder;
+  final LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder;
+  // Builder for error view while loading a new page
+  final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
+  // Builder for error view while loading the first page
+  final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
   @override
   State<LMFeedUserFeedWidget> createState() => _LMFeedUserFeedWidgetState();
 }
 
 class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
+  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   static const int pageSize = 10;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   Map<String, LMUserViewData> users = {};
@@ -140,17 +143,25 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
 
   @override
   Widget build(BuildContext context) {
-    feedThemeData = LMFeedTheme.of(context);
+    feedThemeData = LMFeedCore.theme;
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
     return BlocListener(
       bloc: newPostBloc,
       listener: (context, state) {
         if (state is LMFeedNewPostErrorState) {
           postUploading.value = false;
-          toast(
-            state.message,
-            duration: Toast.LENGTH_LONG,
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                text: state.errorMessage,
+              ),
+            ),
           );
+          // TODO: remove old toast
+          // toast(
+          //   state.message,
+          //   duration: Toast.LENGTH_LONG,
+          // );
         }
         if (state is LMFeedNewPostUploadedState) {
           LMPostViewData? item = state.postData;
@@ -231,25 +242,26 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             return PagedSliverList(
               pagingController: _pagingController,
               builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
-                noItemsFoundIndicatorBuilder: (context) {
-                  return widget.emptyFeedViewBuilder?.call(context) ??
-                      noPostInFeedWidget();
-                },
                 itemBuilder: (context, item, index) {
                   if (!users.containsKey(item.userId)) {
                     return const SizedBox();
                   }
+                  LMFeedPostWidget postWidget =
+                      defPostWidget(feedThemeData, item);
+
                   return Column(
                     children: [
                       const SizedBox(height: 2),
-                      widget.postBuilder?.call(
-                            context,
-                            defPostWidget(feedThemeData, item),
-                            item,
-                          ) ??
-                          defPostWidget(feedThemeData, item),
+                      widget.postBuilder?.call(context, postWidget, item) ??
+                          _widgetsBuilder.postWidgetBuilder(
+                              context, postWidget, item),
                     ],
                   );
+                },
+                noItemsFoundIndicatorBuilder: (context) {
+                  return widget.noItemsFoundIndicatorBuilder?.call(context) ??
+                      _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(context,
+                          createPostButton: createPostButton());
                 },
                 firstPageProgressIndicatorBuilder: (context) =>
                     const LMFeedShimmer(),
@@ -634,10 +646,18 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
               ),
             );
           } else {
-            toast(
-              'A post is already uploading.',
-              duration: Toast.LENGTH_LONG,
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                  text: 'A post is already uploading.',
+                ),
+              ),
             );
+            // TODO: remove old toast
+            // toast(
+            //   'A post is already uploading.',
+            //   duration: Toast.LENGTH_LONG,
+            // );
           }
         },
         style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
@@ -658,103 +678,84 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
             )),
       );
 
-  Widget noPostInFeedWidget() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.post_add,
-              style: LMFeedIconStyle(
-                size: 48,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const LMFeedText(
-              text: 'No posts to show',
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const LMFeedText(
-              text: "Be the first one to post here",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: LikeMindsTheme.greyColor,
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            LMFeedButton(
-              style: LMFeedButtonStyle(
-                icon: const LMFeedIcon(
-                  type: LMFeedIconType.icon,
-                  icon: Icons.add,
-                  style: LMFeedIconStyle(
-                    size: 18,
-                  ),
-                ),
-                borderRadius: 28,
-                backgroundColor: feedThemeData?.primaryColor,
-                height: 44,
-                width: 153,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                placement: LMFeedIconButtonPlacement.end,
-              ),
-              text: const LMFeedText(
-                text: "Create Post",
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              onTap: userPostingRights
-                  ? () async {
-                      if (!postUploading.value) {
-                        LMFeedAnalyticsBloc.instance.add(
-                            const LMFeedFireAnalyticsEvent(
-                                eventName:
-                                    LMFeedAnalyticsKeys.postCreationStarted,
-                                deprecatedEventName:
-                                    LMFeedAnalyticsKeysDep.postCreationStarted,
-                                eventProperties: {}));
-
-                        String? currentVisiblePost =
-                            LMFeedVideoProvider.instance.currentVisiblePostId;
-
-                        VideoController? postVideoController =
-                            LMFeedVideoProvider.instance
-                                .getVideoController(currentVisiblePost ?? '');
-
-                        await postVideoController?.player.pause();
-                        // ignore: use_build_context_synchronously
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LMFeedComposeScreen(),
-                          ),
-                        );
-                        await postVideoController?.player.pause();
-                      } else {
-                        toast(
-                          'A post is already uploading.',
-                          duration: Toast.LENGTH_LONG,
-                        );
-                      }
-                    }
-                  : () => toast("You do not have permission to create a post"),
-            ),
-          ],
+  LMFeedButton createPostButton() {
+    return LMFeedButton(
+      style: LMFeedButtonStyle(
+        icon: const LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.add,
+          style: LMFeedIconStyle(
+            size: 18,
+          ),
         ),
-      );
+        borderRadius: 28,
+        backgroundColor: feedThemeData?.primaryColor,
+        height: 44,
+        width: 153,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        placement: LMFeedIconButtonPlacement.end,
+      ),
+      text: const LMFeedText(
+        text: "Create Post",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      onTap: userPostingRights
+          ? () async {
+              if (!postUploading.value) {
+                LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
+                    eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                    deprecatedEventName:
+                        LMFeedAnalyticsKeysDep.postCreationStarted,
+                    eventProperties: {}));
+
+                String? currentVisiblePost =
+                    LMFeedVideoProvider.instance.currentVisiblePostId;
+
+                VideoController? postVideoController = LMFeedVideoProvider
+                    .instance
+                    .getVideoController(currentVisiblePost ?? '');
+
+                await postVideoController?.player.pause();
+                // ignore: use_build_context_synchronously
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LMFeedComposeScreen(),
+                  ),
+                );
+                await postVideoController?.player.pause();
+              } else {
+                LMFeedCore.showSnackBar(
+                  LMFeedSnackBar(
+                    content: LMFeedText(
+                      text: 'A post is already uploading.',
+                    ),
+                  ),
+                );
+                // TODO: remove old toast
+                // toast(
+                //   'A post is already uploading.',
+                //   duration: Toast.LENGTH_LONG,
+                // );
+              }
+            }
+          : () {
+              LMFeedCore.showSnackBar(
+                LMFeedSnackBar(
+                  content: LMFeedText(
+                    text: 'You do not have permission to create a post',
+                  ),
+                ),
+              );
+              // TODO: remove old toast
+              // toast("You do not have permission to create a post");
+            },
+    );
+  }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;

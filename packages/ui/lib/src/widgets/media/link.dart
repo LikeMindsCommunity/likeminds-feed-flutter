@@ -59,7 +59,7 @@ class LMFeedLinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    final LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     final LMFeedPostLinkPreviewStyle style =
         this.style ?? feedTheme.mediaStyle.linkStyle;
     return GestureDetector(

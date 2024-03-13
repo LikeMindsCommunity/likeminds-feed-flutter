@@ -99,7 +99,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     replyStyle = widget.style ?? feedTheme?.replyStyle;
     return BlocConsumer(
       bloc: _commentRepliesBloc,

@@ -18,7 +18,7 @@ class LMFeedActivityWidgetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return Scaffold(
       backgroundColor: feedTheme.backgroundColor,
       body: Container(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedDeleteConfirmationDialog extends StatelessWidget {
   final String title;
@@ -28,7 +27,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     DeleteReason? reasonForDeletion;
     bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
     LMUserViewData? user = LMFeedUserLocalPreference.instance.fetchUserData();
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
 
     return Dialog(
       backgroundColor: feedTheme.container,
@@ -202,8 +201,17 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                   !rebuildReasonBox.value;
                                             });
                                           } else {
-                                            toast(value.errorMessage ??
-                                                'An error occurred');
+                                            LMFeedCore.showSnackBar(
+                                              LMFeedSnackBar(
+                                                content: LMFeedText(
+                                                  text: value.errorMessage ??
+                                                      "An error occurred",
+                                                ),
+                                              ),
+                                            );
+                                            // TODO: remove old toast
+                                            // toast(value.errorMessage ??
+                                            //     'An error occurred');
                                           }
                                           boolVarLoading = false;
                                           rebuildReasonBox.value =
@@ -269,7 +277,15 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                     if (user.userUniqueId != userId &&
                         isCm &&
                         reasonForDeletion == null) {
-                      toast('Please select a reason for deletion');
+                      LMFeedCore.showSnackBar(
+                        LMFeedSnackBar(
+                          content: LMFeedText(
+                            text: 'Please select a reason for deletion',
+                          ),
+                        ),
+                      );
+                      // TODO: remove old toast
+                      // toast('Please select a reason for deletion');
                       return;
                     }
                     action(reasonForDeletion == null

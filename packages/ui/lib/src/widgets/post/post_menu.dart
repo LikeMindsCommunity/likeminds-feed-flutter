@@ -28,7 +28,7 @@ class LMFeedMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     removeReportIntegration();
-    LMFeedThemeData theme = LMFeedTheme.of(context);
+    LMFeedThemeData theme = LMFeedTheme.instance.theme;
     LMFeedMenuStyle? style = this.style ?? theme.headerStyle.menuStyle;
     return menuItems.isEmpty
         ? Container()

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/topic/topic_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/post/topic_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedTopicBottomSheet extends StatefulWidget {
   final List<LMTopicViewData> selectedTopics;
@@ -104,7 +101,7 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     return Container(
       width: screenSize.width,
       decoration: BoxDecoration(
