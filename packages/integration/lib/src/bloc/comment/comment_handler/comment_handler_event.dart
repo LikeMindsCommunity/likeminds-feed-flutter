@@ -22,9 +22,9 @@ abstract class LMFeedCommentHandlerEvent extends Equatable {
 /// comment/reply on which the action is to be performed.
 ///
 /// {@endtemplate}
-class LMFeedCommentActionEvent<Response extends Object>
+class LMFeedCommentActionEvent<CommentRequest extends Object>
     extends LMFeedCommentHandlerEvent {
-  final Response commentActionRequest;
+  final CommentRequest commentActionRequest;
   final LMCommentMetaData commentMetaData;
 
   const LMFeedCommentActionEvent({

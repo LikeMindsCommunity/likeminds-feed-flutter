@@ -9,12 +9,15 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class LMFeedComposeScreen extends StatefulWidget {
-  // Builder for appbar
-  // Builder for content
-  // Builder for media preview
-  // Builder for bottom bar for buttons
-  const LMFeedComposeScreen({
+/// {@template lm_feed_edit_post_screen}
+/// This screen is used to edit a post
+/// It provides the user with the ability to edit the post
+/// Attachments are not editable except links
+/// [postViewData] is a required parameter
+/// and is of type [LMPostViewData]
+/// {@endtemplate}
+class LMFeedEditPostScreen extends StatefulWidget {
+  const LMFeedEditPostScreen({
     super.key,
     // Widget builder functions for customizations
     this.composeDiscardDialogBuilder,
@@ -25,8 +28,10 @@ class LMFeedComposeScreen extends StatefulWidget {
     this.composeUserHeaderBuilder,
     // Config for the screen
     this.config,
+    // Style for the screen
     this.style,
-    this.attachments,
+    // Post data to be edited
+    required this.postViewData,
     this.displayName,
     this.displayUrl,
   });
@@ -43,17 +48,16 @@ class LMFeedComposeScreen extends StatefulWidget {
   final Widget Function()? composeMediaPreviewBuilder;
   final Widget Function(BuildContext context, LMUserViewData user)?
       composeUserHeaderBuilder;
-  final List<LMAttachmentViewData>? attachments;
+  final LMPostViewData postViewData;
   final String? displayName;
   final String? displayUrl;
 
   @override
-  State<LMFeedComposeScreen> createState() => _LMFeedComposeScreenState();
+  State<LMFeedEditPostScreen> createState() => _LMFeedEditPostScreenState();
 }
 
-class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
-  /// Required blocs and data for basic functionality, or state management
-
+class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
+  LMPostViewData? postViewData;
   final LMUserViewData user =
       LMFeedUserLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
@@ -66,7 +70,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
-  TextEditingController? _headingController;
+  TextEditingController? _headingController = TextEditingController();
   final CustomPopupMenuController _controllerPopUp =
       CustomPopupMenuController();
   Timer? _debounce;
@@ -78,46 +82,107 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   ValueNotifier<bool> rebuildLinkPreview = ValueNotifier(false);
   ValueNotifier<bool> rebuildTopicFloatingButton = ValueNotifier(false);
 
-  @override
-  void initState() {
-    super.initState();
-    style = widget.style ?? feedTheme.composeScreenStyle;
+  // This function handles all the actions
+  // for populating edit post screen with post data
+  void onBoardPostDetails() {
+    // Set the postViewData from the widget
+    postViewData = widget.postViewData;
+    // Check if the post is a repost
+    // If it is, then populate the repost object to generate
+    // the repost preview
     _checkForRepost();
+    // Set the config from the widget
+    // If the widget does not have a config, then set the config
+    // from the core
     config = widget.config ?? LMFeedCore.config.composeConfig;
+    // Set the heading controller if the config allows it
     _headingController =
         (config?.enableHeading ?? false) ? TextEditingController() : null;
+    // Populate the screen with the post details
+    // heading controller with heading
+    // text controller with post text
+    fillScreenWithPostDetails();
+    // Add an event in the compose bloc to
+    // fetch the topics from the server
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
+    // Map the list of [AttachmentViewData] to [LMMediaModel]
+    // and set the list in the compose bloc
+    composeBloc.postMedia = postViewData!.attachments
+            ?.map((e) => LMMediaModel.fromAttachmentViewData(e))
+            .toList() ??
+        [];
+
+    for (LMMediaModel media in composeBloc.postMedia) {
+      if (media.mediaType == LMMediaType.video) {
+        composeBloc.videoCount++;
+      } else if (media.mediaType == LMMediaType.document) {
+        composeBloc.documentCount++;
+      } else if (media.mediaType == LMMediaType.image) {
+        composeBloc.imageCount++;
+      }
+    }
+
+    composeBloc.selectedTopics = postViewData!.topics;
+    // Open the on screen keyboard
     if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
     }
   }
 
   @override
-  void didUpdateWidget(LMFeedComposeScreen oldWidget) {
+  void initState() {
+    super.initState();
+    // populate the post details
+    // when the screen is initialized
+    onBoardPostDetails();
+  }
+
+  @override
+  void didUpdateWidget(LMFeedEditPostScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _checkForRepost();
-    style = widget.style ?? feedTheme.composeScreenStyle;
-    _checkForRepost();
-    config = widget.config ?? LMFeedCore.config.composeConfig;
-    _headingController =
-        (config?.enableHeading ?? false) ? TextEditingController() : null;
-    composeBloc.add(LMFeedComposeFetchTopicsEvent());
+    // populate the post details
+    // when the widget is updated
+    onBoardPostDetails();
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
+    // Clear the video controller from the media provider
+    // to free up memory and avoid memory leaks
     if (composeBloc.videoCount > 0) {
       LMFeedVideoProvider.instance.clearPostController(
           composeBloc.postMedia.first.mediaFile?.uri.toString() ?? '');
     }
+    // Add an event in the compose bloc to clear the current state
     composeBloc.add(LMFeedComposeCloseEvent());
     super.dispose();
   }
 
+  // This function is used to populate
+  // heading controller and text controller
+  // with post heading and text content
+  // It also populates the media list with
+  // the media attached to the post
+  void fillScreenWithPostDetails() {
+    _headingController?.text = postViewData?.heading ?? '';
+
+    composeBloc.userTags =
+        LMFeedTaggingHelper.addUserTagsIfMatched(_controller.text);
+
+    String postText = LMFeedTaggingHelper.convertRouteToTag(postViewData!.text);
+
+    _controller.text = postText;
+  }
+
+  // This function is used to populate
+  // the repost object with the post
+  // that is being reposted
+  // The post that will be reposted will be added
+  // to the media list
   void _checkForRepost() {
-    if (widget.attachments != null) {
-      for (LMAttachmentViewData attachment in widget.attachments!) {
+    if (postViewData?.attachments != null) {
+      for (LMAttachmentViewData attachment in postViewData!.attachments!) {
         if (attachment.attachmentType == 8) {
           repost = attachment.attachmentMeta.repost;
           composeBloc.postMedia.add(
@@ -149,9 +214,87 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     }
   }
 
+  // This functions checks for any disabled topics
+  // in the selected topics list
+  // return true if any topic is disabled
+  // else return false
+  bool checkForDisabledTopics() {
+    List<String> disabledTopics = [];
+
+    for (LMTopicViewData topic in composeBloc.selectedTopics) {
+      if (!topic.isEnabled) {
+        disabledTopics.add(topic.name);
+      }
+    }
+
+    if (disabledTopics.isNotEmpty) {
+      // Show a dialog to inform the user
+      // that the selected topics are disabled
+      // and the post cannot be saved
+      showDialog(
+          context: context,
+          builder: (dialogContext) => AlertDialog(
+                backgroundColor: feedTheme.container,
+                title: Text(
+                  "Topic Disabled",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      color: feedTheme.onContainer),
+                ),
+                content: Text(
+                  "The following topics have been disabled. Please remove them to save the post.\n${disabledTopics.join(', ')}.",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: feedTheme.onContainer,
+                  ),
+                ),
+                actions: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(dialogContext),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 10.0, bottom: 10.0),
+                      child: Text(
+                        'Okay',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: feedTheme.primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ));
+      return true;
+    }
+    return false;
+  }
+
+  // This function checks if topics are required
+  // and selected
+  // If topics are required and not selected
+  // then show a snackbar and return false
+  bool checkIfTopicAreRequiredAndSelected() {
+    if (config!.topicRequiredToCreatePost &&
+        composeBloc.selectedTopics.isEmpty &&
+        config!.enableTopics) {
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(
+            text: "Can't create a post without topic",
+          ),
+        ),
+      );
+      return false;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedCore.theme;
+    config = widget.config ?? LMFeedCore.config.composeConfig;
+    style = widget.style ?? feedTheme.composeScreenStyle;
     screenSize = MediaQuery.of(context).size;
     LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
     return WillPopScope(
@@ -169,7 +312,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             listener: _composeBlocListener,
             child: Scaffold(
               backgroundColor: feedTheme.container,
-              bottomSheet: _defMediaPicker(),
               appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
                   _defAppBar(),
               floatingActionButton: Padding(
@@ -324,31 +466,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 20,
-                    right: 20,
-                    child: GestureDetector(
-                      onTap: () {
-                        composeBloc.add(
-                          const LMFeedComposeRemoveAttachmentEvent(
-                            index: 0,
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(500),
-                        ),
-                        width: 24,
-                        height: 24,
-                        child: Icon(
-                          Icons.cancel,
-                          color: feedTheme.disabledColor,
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             );
@@ -365,10 +482,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   ? const NeverScrollableScrollPhysics()
                   : null,
               shrinkWrap: true,
-              itemCount: composeBloc.postMedia.length,
+              itemCount: postViewData!.attachments!.length,
               itemBuilder: (context, index) {
                 Widget mediaWidget;
-                switch (composeBloc.postMedia[index].mediaType) {
+                LMMediaModel mediaModel = composeBloc.postMedia[index];
+                switch (mediaModel.mediaType) {
                   case LMMediaType.image:
                     mediaWidget = Container(
                       clipBehavior: Clip.hardEdge,
@@ -382,7 +500,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       width: style?.mediaStyle?.imageStyle?.width ??
                           screenSize?.width,
                       child: LMFeedImage(
-                        imageFile: composeBloc.postMedia[index].mediaFile,
+                        imageUrl: mediaModel.link,
                         style: style?.mediaStyle?.imageStyle,
                       ),
                     );
@@ -395,21 +513,20 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       width: style?.mediaStyle?.videoStyle?.width ??
                           screenSize?.width,
                       decoration: BoxDecoration(
-                        color: feedTheme.onContainer ?? Colors.black,
+                        color: feedTheme.onContainer,
                         borderRadius:
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),
                       child: LMFeedVideo(
-                        videoFile: composeBloc.postMedia[index].mediaFile,
+                        videoUrl: mediaModel.link,
                         style: style?.mediaStyle?.videoStyle,
-                        postId: composeBloc.postMedia[index].mediaFile!.uri
-                            .toString(),
+                        postId: postViewData!.id,
                       ),
                     );
                     break;
                   case LMMediaType.link:
                     mediaWidget = LMFeedLinkPreview(
-                      linkModel: composeBloc.postMedia[index],
+                      linkModel: mediaModel,
                       style: style?.mediaStyle?.linkStyle?.copyWith(
                             width: style?.mediaStyle?.linkStyle?.width ??
                                 MediaQuery.of(context).size.width - 84,
@@ -425,14 +542,12 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           ),
                       onTap: () {
                         launchUrl(
-                          Uri.parse(
-                              composeBloc.postMedia[index].ogTags?.url ?? ''),
+                          Uri.parse(mediaModel.ogTags?.url ?? ''),
                           mode: LaunchMode.externalApplication,
                         );
                       },
                       title: LMFeedText(
-                        text:
-                            composeBloc.postMedia[index].ogTags?.title ?? "--",
+                        text: mediaModel.ogTags?.title ?? "--",
                         style: const LMFeedTextStyle(
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -444,9 +559,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         ),
                       ),
                       subtitle: LMFeedText(
-                        text:
-                            composeBloc.postMedia[index].ogTags?.description ??
-                                "--",
+                        text: mediaModel.ogTags?.description ?? "--",
                         style: const LMFeedTextStyle(
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -462,14 +575,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   case LMMediaType.document:
                     {
                       mediaWidget = LMFeedDocument(
-                        onRemove: () {
-                          composeBloc.add(
-                            LMFeedComposeRemoveAttachmentEvent(
-                              index: index,
-                            ),
-                          );
-                        },
-                        documentFile: composeBloc.postMedia[index].mediaFile,
+                        documentUrl: mediaModel.link,
                         style: style?.mediaStyle?.documentStyle?.copyWith(
                               width: style?.mediaStyle?.documentStyle?.width ??
                                   MediaQuery.of(context).size.width - 84,
@@ -477,9 +583,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                             LMFeedPostDocumentStyle(
                               width: screenSize!.width - 84,
                               height: 90,
+                              removeIcon: null,
                             ),
                         size: PostHelper.getFileSizeString(
-                            bytes: composeBloc.postMedia[index].size ?? 0),
+                            bytes: mediaModel.size ?? 0),
                       );
                       break;
                     }
@@ -491,33 +598,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   child: Stack(
                     children: <Widget>[
                       mediaWidget,
-                      if (composeBloc.postMedia[index].mediaType !=
-                          LMMediaType.document)
-                        Positioned(
-                          top: 7.5,
-                          right: 7.5,
-                          child: GestureDetector(
-                            onTap: () {
-                              composeBloc.add(
-                                LMFeedComposeRemoveAttachmentEvent(
-                                  index: index,
-                                ),
-                              );
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(500),
-                              ),
-                              width: 24,
-                              height: 24,
-                              child: Icon(
-                                Icons.cancel,
-                                color: feedTheme.disabledColor,
-                              ),
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 );
@@ -535,7 +615,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     final theme = LMFeedCore.theme;
     return LMFeedAppBar(
         style: LMFeedAppBarStyle(
-          backgroundColor: feedTheme.container ?? Colors.white,
+          backgroundColor: feedTheme.container,
           height: 72,
           centerTitle: true,
           padding: const EdgeInsets.symmetric(
@@ -564,7 +644,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           style: const LMFeedButtonStyle(),
         ),
         title: LMFeedText(
-          text: "Create Post",
+          text: "Edit Post",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               fontSize: 18,
@@ -576,7 +656,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         trailing: [
           LMFeedButton(
             text: LMFeedText(
-              text: "Post",
+              text: "Save",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   color: theme.onPrimary,
@@ -591,7 +671,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               borderRadius: 6,
               height: 34,
             ),
-            onTap: () {
+            onTap: () async {
+              // Close the on screen keyboard if it is open
               _focusNode.unfocus();
 
               String? heading = _headingController?.text;
@@ -599,6 +680,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
               String postText = _controller.text;
               postText = postText.trim();
+
               if ((heading?.isNotEmpty ?? false) ||
                   postText.isNotEmpty ||
                   composeBloc.postMedia.isNotEmpty) {
@@ -607,23 +689,20 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   ...composeBloc.selectedTopics
                 ];
 
-                if (config!.topicRequiredToCreatePost &&
-                    selectedTopics.isEmpty &&
-                    config!.enableTopics) {
-                  LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: "Can't create a post without topic",
-                      ),
-                    ),
-                  );
-                  // TODO: remove old toast
-                  // toast(
-                  //   "Can't create a post without topic",
-                  //   duration: Toast.LENGTH_LONG,
-                  // );
+                // Check if topics are required to create/edit a post
+                // if yes, check if the selected topics list is empty
+                // if it is, then show a snackbar and return
+                if (!checkIfTopicAreRequiredAndSelected()) {
                   return;
                 }
+
+                // check if the selected topic list has any
+                // disabled topics in it or not
+                // if it has, then show a snackbar and return
+                if (checkForDisabledTopics()) {
+                  return;
+                }
+
                 userTags =
                     LMFeedTaggingHelper.matchTags(_controller.text, userTags);
 
@@ -633,24 +712,27 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
                 sendPostCreationCompletedEvent(
                     [...composeBloc.postMedia], userTags, selectedTopics);
-                if (widget.attachments != null &&
-                    widget.attachments!.isNotEmpty &&
-                    widget.attachments!.first.attachmentType == 5) {
+
+                if (postViewData?.attachments != null &&
+                    postViewData!.attachments!.isNotEmpty &&
+                    postViewData!.attachments!.first.attachmentType == 5) {
                   composeBloc.postMedia.add(
                     LMMediaModel(
                       mediaType: LMMediaType.widget,
                       widgetsMeta:
-                          widget.attachments?.first.attachmentMeta.meta,
+                          postViewData!.attachments?.first.attachmentMeta.meta,
                     ),
                   );
                 }
-                LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-                  user: user,
-                  postText: result!,
-                  selectedTopics: selectedTopics,
-                  postMedia: [...composeBloc.postMedia],
-                  heading: _headingController?.text,
-                ));
+
+                LMFeedPostBloc.instance.add(
+                  LMFeedEditPostEvent(
+                    postId: postViewData!.id,
+                    postText: result!,
+                    selectedTopics: selectedTopics,
+                    heading: _headingController?.text,
+                  ),
+                );
 
                 Navigator.pop(context);
               } else {
@@ -661,11 +743,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     ),
                   ),
                 );
-                // TODO: remove old toast
-                // toast(
-                //   "Can't create a post without text or attachments",
-                //   duration: Toast.LENGTH_LONG,
-                // );
               }
             },
           ),

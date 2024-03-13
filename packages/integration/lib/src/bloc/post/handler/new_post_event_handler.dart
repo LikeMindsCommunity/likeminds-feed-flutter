@@ -99,7 +99,7 @@ void newPostEventHandler(
 
     final requestBuilder = AddPostRequestBuilder()
       ..attachments(attachments)
-      ..topics(postTopics);
+      ..topics(postTopics.map((e) => e.id).toList());
 
     if (headingText != null) {
       requestBuilder.heading(headingText);

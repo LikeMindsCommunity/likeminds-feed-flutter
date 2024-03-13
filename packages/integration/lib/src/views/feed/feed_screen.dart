@@ -5,6 +5,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_feed_flutter_core/src/views/edit/edit_post_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
@@ -204,7 +205,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   void refresh() => _pagingController.refresh();
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(Object? state) {
+  void updatePagingControllers(LMFeedState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
       _pageFeed++;
       List<LMPostViewData> listOfPosts = state.posts;
@@ -523,9 +524,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 },
               ),
             ),
-            BlocListener(
+            BlocListener<LMFeedBloc, LMFeedState>(
               bloc: _feedBloc,
-              listener: (context, state) => updatePagingControllers(state),
+              listener: (context, LMFeedState state) =>
+                  updatePagingControllers(state),
               child: ValueListenableBuilder(
                 valueListenable: rebuildPostWidget,
                 builder: (context, _, __) {
@@ -794,6 +796,20 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         menuItems: postViewData.menuItems,
         removeItemIds: {postReportId, postEditId},
         action: LMFeedMenuAction(
+          onPostEdit: () {
+            // Mute all video controllers
+            // to prevent video from playing in background
+            // while editing the post
+            LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => LMFeedEditPostScreen(
+                  postViewData: postViewData,
+                ),
+              ),
+            );
+          },
           onPostReport: () => handlePostReportAction(postViewData),
           onPostUnpin: () => handlePostPinAction(postViewData),
           onPostPin: () => handlePostPinAction(postViewData),
