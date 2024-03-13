@@ -34,17 +34,14 @@ class LMFeedComposeScreenConfig {
     this.enableVideos = true,
     this.enableHeading = false,
     this.topicRequiredToCreatePost = false,
-    this.topicSelectorType = LMFeedComposeTopicSelectorType.popup,
     this.userDisplayType = LMFeedComposeUserDisplayType.profilePicture,
+    this.multipleTopicsSelectable = false,
   });
 
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]
   /// to support changing light and dark style of overall system
   /// elements in accordance to the screen's background
   final SystemUiOverlayStyle composeSystemOverlayStyle;
-
-  /// The topic selector type to be shown
-  final LMFeedComposeTopicSelectorType topicSelectorType;
 
   /// The user display type to be shown
   final LMFeedComposeUserDisplayType userDisplayType;
@@ -82,6 +79,9 @@ class LMFeedComposeScreenConfig {
   /// [bool] to make topic required for post creation
   final bool topicRequiredToCreatePost;
 
+  /// [bool] to make multiple topics selectable
+  final bool multipleTopicsSelectable;
+
   LMFeedComposeScreenConfig copyWith({
     SystemUiOverlayStyle? composeSystemOverlayStyle,
     String? composeHint,
@@ -92,6 +92,10 @@ class LMFeedComposeScreenConfig {
     bool? enableTopics,
     bool? enableVideos,
     bool? topicRequiredToCreatePost,
+    LMFeedComposeUserDisplayType? userDisplayType,
+    bool? enableHeading,
+    String? headingHint,
+    bool? multipleTopicsSelectable,
   }) {
     return LMFeedComposeScreenConfig(
       composeSystemOverlayStyle:
@@ -105,6 +109,11 @@ class LMFeedComposeScreenConfig {
       enableVideos: enableVideos ?? this.enableVideos,
       topicRequiredToCreatePost:
           topicRequiredToCreatePost ?? this.topicRequiredToCreatePost,
+      enableHeading: enableHeading ?? this.enableHeading,
+      headingHint: headingHint ?? this.headingHint,
+      multipleTopicsSelectable:
+          multipleTopicsSelectable ?? this.multipleTopicsSelectable,
+      userDisplayType: userDisplayType ?? this.userDisplayType,
     );
   }
 }

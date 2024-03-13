@@ -39,7 +39,7 @@ class LMFeedUserMetaBloc
       Emitter<LMFeedUserMetaState> emit) async {
     EditProfileRequest editProfileRequest = (EditProfileRequestBuilder()
           ..name(event.user.name)
-          ..userUniqueId(event.user.sdkClientInfo!.userUniqueId)
+          ..uuid(event.user.sdkClientInfo.uuid)
           ..metadata(event.metadata))
         .build();
     try {
@@ -47,7 +47,7 @@ class LMFeedUserMetaBloc
           .editProfile(editProfileRequest);
       if (response.success) {
         emit(LMFeedUserMetaUpdatedState());
-        add(LMFeedUserMetaGetEvent(uuid: event.user.userUniqueId));
+        add(LMFeedUserMetaGetEvent(uuid: event.user.uuid));
       }
     } on Error catch (e, stackTrace) {}
   }

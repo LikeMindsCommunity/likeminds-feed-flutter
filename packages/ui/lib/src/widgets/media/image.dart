@@ -59,7 +59,7 @@ class _LMImageState extends State<LMFeedImage> {
 
   @override
   Widget build(BuildContext context) {
-    style = widget.style ?? LMFeedTheme.of(context).mediaStyle.imageStyle;
+    style = widget.style ?? LMFeedTheme.instance.theme.mediaStyle.imageStyle;
     return GestureDetector(
       onTap: () => widget.onMediaTap?.call(),
       child: widget.imageUrl != null

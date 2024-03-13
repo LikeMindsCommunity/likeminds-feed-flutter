@@ -63,7 +63,7 @@ class LMFeedDeepLinkHandler {
     } else {
       InitiateUserResponse response =
           await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-                ..userId(request.userId)
+                ..uuid(request.uuid)
                 ..userName(request.userName))
               .build());
       if (response.success) {
@@ -91,7 +91,7 @@ class LMFeedDeepLinkHandler {
   ) async {
     InitiateUserResponse response =
         await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-              ..userId(request.userId)
+              ..uuid(request.uuid)
               ..userName(request.userName))
             .build());
     if (response.success) {
@@ -127,7 +127,7 @@ class LMFeedDeepLinkHandler {
     } else {
       InitiateUserResponse response =
           await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-                ..userId(request.userId)
+                ..uuid(request.uuid)
                 ..userName(request.userName))
               .build());
       if (response.success) {

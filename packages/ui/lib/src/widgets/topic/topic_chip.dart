@@ -13,8 +13,10 @@ import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 * and can be used in a list of chips
 */
 class LMFeedTopicChip extends StatelessWidget {
-  // Action to perform after tapping on the topic chip
+  // Action to perform after tapping on the topic chip icon
   final Function(LMTopicViewData)? onIconTap;
+  // Action to perform after tapping on the topic chip
+  final Function(BuildContext, LMTopicViewData)? onTap;
   // Required parameters
   final LMTopicViewData topic;
 
@@ -26,13 +28,14 @@ class LMFeedTopicChip extends StatelessWidget {
     Key? key,
     required this.topic,
     this.style,
+    this.onTap,
     this.onIconTap,
     required this.isSelected,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
 
     LMFeedTopicChipStyle? style = this.style ??
         (isSelected
@@ -49,65 +52,74 @@ class LMFeedTopicChip extends StatelessWidget {
       ),
     );
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          margin: style?.margin ?? const EdgeInsets.only(right: 8.0),
-          alignment: Alignment.center,
-          height: style?.height,
-          padding: style?.padding ??
-              const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-          decoration: BoxDecoration(
-            borderRadius: style?.borderRadius ?? BorderRadius.circular(5.0),
-            border: (style?.showBorder ?? false)
-                ? Border.all(
-                    color: style?.borderColor ?? Colors.transparent,
-                    width: style?.borderWidth ?? 1,
-                  )
-                : null,
-            color: style?.backgroundColor ?? Colors.transparent,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              style?.icon != null &&
-                      style?.iconPlacement == LMFeedIconButtonPlacement.start
-                  ? GestureDetector(
-                      onTap: onIconTap != null ? () => onIconTap!(topic) : null,
-                      child: Container(
-                        color: Colors.transparent,
-                        child: style?.icon,
-                      ),
+    return GestureDetector(
+      onTap: () {
+        onTap?.call(context, topic);
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin:
+                style?.margin ?? const EdgeInsets.only(right: 8.0, bottom: 4.0),
+            alignment: Alignment.center,
+            height: style?.height,
+            padding: style?.padding ??
+                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+            decoration: BoxDecoration(
+              borderRadius: style?.borderRadius ?? BorderRadius.circular(5.0),
+              border: (style?.showBorder ?? false)
+                  ? Border.all(
+                      color: style?.borderColor ?? Colors.transparent,
+                      width: style?.borderWidth ?? 1,
                     )
-                  : const SizedBox(),
-              style?.icon != null &&
-                      style?.iconPlacement == LMFeedIconButtonPlacement.start
-                  ? LikeMindsTheme.kHorizontalPaddingSmall
-                  : const SizedBox(),
-              topic.name.isEmpty
-                  ? const SizedBox()
-                  : (style?.gripChip ?? false)
-                      ? Expanded(child: topicText)
-                      : topicText,
-              style?.icon != null &&
-                      style?.iconPlacement == LMFeedIconButtonPlacement.end
-                  ? LikeMindsTheme.kHorizontalPaddingSmall
-                  : const SizedBox(),
-              style?.icon != null &&
-                      style?.iconPlacement == LMFeedIconButtonPlacement.end
-                  ? GestureDetector(
-                      onTap: onIconTap != null ? () => onIconTap!(topic) : null,
-                      child: Container(
-                        color: Colors.transparent,
-                        child: style?.icon,
-                      ),
-                    )
-                  : const SizedBox()
-            ],
+                  : null,
+              color: style?.backgroundColor ?? Colors.transparent,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                style?.icon != null &&
+                        style?.iconPlacement == LMFeedIconButtonPlacement.start
+                    ? GestureDetector(
+                        onTap:
+                            onIconTap != null ? () => onIconTap!(topic) : null,
+                        child: Container(
+                          color: Colors.transparent,
+                          child: style?.icon,
+                        ),
+                      )
+                    : const SizedBox(),
+                style?.icon != null &&
+                        style?.iconPlacement == LMFeedIconButtonPlacement.start
+                    ? LikeMindsTheme.kHorizontalPaddingSmall
+                    : const SizedBox(),
+                topic.name.isEmpty
+                    ? const SizedBox()
+                    : (style?.gripChip ?? false)
+                        ? Expanded(child: topicText)
+                        : topicText,
+                style?.icon != null &&
+                        style?.iconPlacement == LMFeedIconButtonPlacement.end
+                    ? LikeMindsTheme.kHorizontalPaddingSmall
+                    : const SizedBox(),
+                style?.icon != null &&
+                        style?.iconPlacement == LMFeedIconButtonPlacement.end
+                    ? GestureDetector(
+                        onTap:
+                            onIconTap != null ? () => onIconTap!(topic) : null,
+                        child: Container(
+                          color: Colors.transparent,
+                          child: style?.icon,
+                        ),
+                      )
+                    : const SizedBox()
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

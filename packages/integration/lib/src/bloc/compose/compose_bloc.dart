@@ -14,17 +14,29 @@ import 'handler/add_image_event_handler.dart';
 part 'compose_event.dart';
 part 'compose_state.dart';
 
+/// {@template lm_feed_compose_bloc}
+/// [LMFeedComposeBloc] handles all the post creation and
+/// edition related actions
+/// like attaching media to a post, adding topics,
+/// add link preview to a link present in post etc.
+/// [LMFeedComposeEvent] defines the events which are handled by this bloc.
+/// [LMFeedComposeState] defines the states which are emitted by this bloc
+/// {@endtemplate}
 class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
   static LMFeedComposeBloc? _bloc;
 
+  /// {@macro lm_feed_compose_bloc}
   static LMFeedComposeBloc get instance => _bloc ??= LMFeedComposeBloc._();
 
   /// Lists to maintain throughout the screen for sending/receiving data
   int imageCount = 0;
   int videoCount = 0;
   int documentCount = 0;
+  // List of media attached to the post
   List<LMMediaModel> postMedia = [];
+  // List of user tags added to the post
   List<LMUserTagViewData> userTags = [];
+  // List of topics added to the post
   List<LMTopicViewData> selectedTopics = [];
 
   LMFeedComposeBloc._() : super(LMFeedComposeInitialState()) {

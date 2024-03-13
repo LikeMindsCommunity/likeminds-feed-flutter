@@ -6,6 +6,42 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedPostUtils {
+  static LMPostViewData updatePostData(
+      LMPostViewData postViewData, LMFeedPostActionType actionType) {
+    switch (actionType) {
+      case LMFeedPostActionType.like:
+        postViewData.isLiked = true;
+        postViewData.likeCount += 1;
+        break;
+      case LMFeedPostActionType.unlike:
+        postViewData.isLiked = false;
+        postViewData.likeCount -= 1;
+        break;
+      case LMFeedPostActionType.commentAdded:
+        postViewData.commentCount += 1;
+        break;
+      case LMFeedPostActionType.commentDeleted:
+        postViewData.commentCount -= 1;
+        break;
+      case LMFeedPostActionType.pinned:
+        postViewData.isPinned = true;
+        break;
+      case LMFeedPostActionType.unpinned:
+        postViewData.isPinned = false;
+        break;
+      case LMFeedPostActionType.saved:
+        postViewData.isSaved = true;
+        break;
+      case LMFeedPostActionType.unsaved:
+        postViewData.isSaved = false;
+        break;
+      default:
+        break;
+    }
+
+    return postViewData;
+  }
+
   static const String notificationTagRoute =
       r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9_]+)>>';
 
@@ -170,17 +206,17 @@ class LMFeedPostUtils {
   static LMPostViewData postViewDataFromActivity(
     UserActivityItem activity,
     Map<String, WidgetModel>? widgets,
-    Map<String, User>? users,
+    Map<String, User> users,
     Map<String, Topic>? topics, {
     Map<String, Comment>? filteredComments,
     Map<String, Post>? repostedPosts,
   }) {
     List<LMTopicViewData> topicViewData = [];
 
-    if (activity.activityEntityData.topics != null &&
+    if (activity.activityEntityData.topicIds != null &&
         topics != null &&
-        activity.activityEntityData.topics!.isNotEmpty) {
-      for (var topicId in activity.activityEntityData.topics!) {
+        activity.activityEntityData.topicIds!.isNotEmpty) {
+      for (var topicId in activity.activityEntityData.topicIds!) {
         if (topics[topicId] != null) {
           topicViewData
               .add(LMTopicViewDataConvertor.fromTopic(topics[topicId]!));
@@ -192,7 +228,7 @@ class LMFeedPostUtils {
         ? LMPostViewDataConvertor.fromPost(
             post: activity.activityEntityData.postData!,
             widgets: widgets,
-            users: users ?? {},
+            users: users,
             topics: topics ?? {},
             filteredComments: filteredComments ?? {},
             repostedPosts: repostedPosts ?? {},
@@ -210,15 +246,16 @@ class LMFeedPostUtils {
               ..replies(activity.activityEntityData.replies
                       ?.map((e) => LMCommentViewDataConvertor.fromComment(
                           e,
-                          users?.map((key, value) => MapEntry(key,
-                                  LMUserViewDataConvertor.fromUser(value))) ??
-                              {}))
+                          users.map((key, value) => MapEntry(
+                              key, LMUserViewDataConvertor.fromUser(value)))))
                       .toList() ??
                   [])
               ..communityId(activity.activityEntityData.communityId)
               ..isPinned(activity.activityEntityData.isPinned!)
               ..topics(topicViewData)
-              ..userId(activity.activityEntityData.userId!)
+              ..uuid(activity.activityEntityData.uuid!)
+              ..user(LMUserViewDataConvertor.fromUser(
+                  users[activity.activityEntityData.uuid!]!))
               ..likeCount(activity.activityEntityData.likesCount!)
               ..commentCount(activity.activityEntityData.commentsCount!)
               ..isSaved(activity.activityEntityData.isSaved!)
@@ -245,7 +282,7 @@ class LMFeedPostUtils {
   static LMCommentViewData commentViewDataFromActivity(
       UserActivityEntityData commentData, Map<String, User> users) {
     LMCommentViewDataBuilder commentViewDataBuilder = LMCommentViewDataBuilder()
-      ..userId(commentData.userId!)
+      ..uuid(commentData.uuid!)
       ..text(commentData.text)
       ..level(commentData.level!)
       ..likesCount(commentData.likesCount!)
@@ -267,8 +304,13 @@ class LMFeedPostUtils {
           [])
       ..isEdited(commentData.isEdited);
 
-    if (commentData.userId != null) {
-      commentViewDataBuilder.uuid(commentData.userId!);
+    if (commentData.uuid != null) {
+      commentViewDataBuilder.uuid(commentData.uuid!);
+
+      LMUserViewData user =
+          LMUserViewDataConvertor.fromUser(users[commentData.uuid]!);
+
+      commentViewDataBuilder.user(user);
     }
 
     if (commentData.updatedAt != null) {

@@ -2,6 +2,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
 import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/widgets.dart';
 
 part 'handler/likes_screen_handler.dart';
@@ -61,7 +62,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     return WillPopScope(
       onWillPop: () {
         Navigator.of(context).pop();
@@ -136,7 +137,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
                   body: noItemLikesView(),
                 ),
                 itemBuilder: (context, item, index) =>
-                    LikesTile(user: handler!.userData[item.userId]),
+                    LikesTile(user: handler!.userData[item.uuid]),
                 firstPageProgressIndicatorBuilder: (context) => SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 50.0),
@@ -183,10 +184,8 @@ class LikesTile extends StatelessWidget {
                 onTap: () {
                   LMFeedProfileBloc.instance.add(
                     LMFeedRouteToUserProfileEvent(
-                      userUniqueId: user?.sdkClientInfo?.userUniqueId ??
-                          user?.userUniqueId ??
-                          '',
-                          context: context,
+                      uuid: user?.sdkClientInfo.uuid ?? user?.uuid ?? '',
+                      context: context,
                     ),
                   );
                 },

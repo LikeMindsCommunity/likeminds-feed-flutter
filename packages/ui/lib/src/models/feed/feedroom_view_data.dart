@@ -37,7 +37,7 @@ class LMFeedRoomViewData {
   int? onlineLinkEnableBefore;
   String? onlineLinkType;
   int participantsCount;
-  int? memberId;
+  String? uuid;
   String? access;
   LMUserViewData member;
   List<dynamic>? cohorts;
@@ -80,7 +80,7 @@ class LMFeedRoomViewData {
     this.onlineLinkEnableBefore,
     this.onlineLinkType,
     required this.participantsCount,
-    this.memberId,
+    this.uuid,
     this.access,
     required this.member,
     this.cohorts,
@@ -125,7 +125,7 @@ class LMFeedRoomViewDataBuilder {
   int? _onlineLinkEnableBefore;
   String? _onlineLinkType;
   int? _participantsCount;
-  int? _memberId;
+  String? _uuid;
   String? _access;
   LMUserViewData? _member;
   List<dynamic>? _cohorts;
@@ -275,8 +275,8 @@ class LMFeedRoomViewDataBuilder {
     _participantsCount = participantsCount;
   }
 
-  void memberId(int memberId) {
-    _memberId = memberId;
+  void uuid(String uuid) {
+    _uuid = uuid;
   }
 
   void access(String access) {
@@ -331,7 +331,7 @@ class LMFeedRoomViewDataBuilder {
       onlineLinkEnableBefore: _onlineLinkEnableBefore,
       onlineLinkType: _onlineLinkType,
       participantsCount: _participantsCount!,
-      memberId: _memberId,
+      uuid: _uuid,
       access: _access,
       member: _member!,
       cohorts: _cohorts,

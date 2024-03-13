@@ -7,12 +7,15 @@ class LMPostViewDataConvertor {
     required Post post,
     Map<String, WidgetModel>? widgets,
     Map<String, Post>? repostedPosts,
-    Map<String, User>? users,
+    required Map<String, User> users,
     Map<String, Topic>? topics,
     Map<String, Comment>? filteredComments,
   }) {
+    Map<String, LMWidgetViewData>? widgetMap = widgets?.map((key, value) =>
+        MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
     LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
-    Map<String, LMWidgetViewData> widgetMap = {};
+    Map<String, LMWidgetViewData> postWidget = {};
 
     postViewDataBuilder.id(post.id);
 
@@ -20,10 +23,10 @@ class LMPostViewDataConvertor {
 
     List<LMTopicViewData> topicViewData = [];
     if (topics != null) {
-      post.topics?.forEach((element) {
+      post.topicIds?.forEach((element) {
         if (topics[element] != null) {
-          topicViewData
-              .add(LMTopicViewDataConvertor.fromTopic(topics[element]!));
+          topicViewData.add(LMTopicViewDataConvertor.fromTopic(topics[element]!,
+              widgets: widgetMap));
         }
       });
     }
@@ -36,7 +39,7 @@ class LMPostViewDataConvertor {
         if (e.attachmentType == 5 && widgets != null) {
           String? key = e.attachmentMeta.meta?['entity_id'];
           if (key != null && widgets[key] != null) {
-            widgetMap[key] =
+            postWidget[key] =
                 LMWidgetViewDataConvertor.fromWidgetModel(widgets[key]!);
           }
         } else if (e.attachmentType == 8 &&
@@ -59,10 +62,11 @@ class LMPostViewDataConvertor {
 
     postViewDataBuilder.isPinned(post.isPinned);
 
-    postViewDataBuilder.userId(post.userId);
-    if (users != null && users[post.userId] != null) {
+    postViewDataBuilder.uuid(post.uuid);
+
+    if (users[post.uuid] != null) {
       postViewDataBuilder
-          .user(LMUserViewDataConvertor.fromUser(users[post.userId]!));
+          .user(LMUserViewDataConvertor.fromUser(users[post.uuid]!));
     }
 
     postViewDataBuilder.likeCount(post.likeCount);
@@ -84,7 +88,7 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.replies(post.replies
             ?.map((e) => LMCommentViewDataConvertor.fromComment(
                 e,
-                users!.map((key, value) =>
+                users.map((key, value) =>
                     MapEntry(key, LMUserViewDataConvertor.fromUser(value)))))
             .toList() ??
         []);
@@ -99,7 +103,7 @@ class LMPostViewDataConvertor {
 
     postViewDataBuilder.isDeleted(post.isDeleted ?? false);
 
-    postViewDataBuilder.widgets(widgetMap);
+    postViewDataBuilder.widgets(postWidget);
 
     if (post.heading != null) postViewDataBuilder.heading(post.heading!);
 
@@ -112,7 +116,7 @@ class LMPostViewDataConvertor {
           if (filteredComments[element] != null)
             topComments.add(LMCommentViewDataConvertor.fromComment(
                 filteredComments[element]!,
-                users!.map((key, value) =>
+                users.map((key, value) =>
                     MapEntry(key, LMUserViewDataConvertor.fromUser(value)))));
         });
       }
@@ -136,8 +140,8 @@ class LMPostViewDataConvertor {
           .toList(),
       communityId: postViewData.communityId,
       isPinned: postViewData.isPinned,
-      topics: postViewData.topics.map((e) => e.id).toList(),
-      userId: postViewData.userId,
+      topicIds: postViewData.topics.map((e) => e.id).toList(),
+      uuid: postViewData.uuid,
       likeCount: postViewData.likeCount,
       commentCount: postViewData.commentCount,
       isSaved: postViewData.isSaved,

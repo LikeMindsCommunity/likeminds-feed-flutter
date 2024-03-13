@@ -20,7 +20,7 @@ class LMFeedPostSomething extends StatelessWidget {
   Widget build(BuildContext context) {
     LMUserViewData user = LMFeedUserLocalPreference.instance.fetchUserData();
     Size screenSize = MediaQuery.of(context).size;
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
@@ -48,10 +48,7 @@ class LMFeedPostSomething extends StatelessWidget {
                 ),
                 imageUrl: user.imageUrl,
                 onTap: () {
-                  if (user.sdkClientInfo != null) {
-                    LMFeedCore.client
-                        .routeToProfile(user.sdkClientInfo!.userUniqueId);
-                  }
+                  LMFeedCore.client.routeToProfile(user.sdkClientInfo.uuid);
                 },
               ),
               LikeMindsTheme.kHorizontalPaddingMedium,

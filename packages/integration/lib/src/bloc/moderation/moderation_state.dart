@@ -7,25 +7,42 @@ abstract class LMFeedModerationState extends Equatable {
   List<Object> get props => [];
 }
 
-class LMFeedModerationInitialState extends LMFeedModerationState {}
+final class LMFeedReportInitialState extends LMFeedModerationState {}
 
-class LMFeedNotificationsLoadingState extends LMFeedModerationState {}
+final class LMFeedReportLoadingState extends LMFeedModerationState {}
 
-class LMFeedNotificationsPaginationLoadingState extends LMFeedModerationState {}
-
-class LMFeedNotificationsLoadedState extends LMFeedModerationState {
-  final List<LMNotificationFeedItemViewData> response;
-
-  const LMFeedNotificationsLoadedState({required this.response});
-
+final class LMFeedReportSuccessState extends LMFeedModerationState {
+  final List<LMDeleteReasonViewData> reasons;
+  LMFeedReportSuccessState({required this.reasons});
   @override
-  List<Object> get props => [response];
+  List<Object> get props => [reasons];
 }
 
-class LMFeedNotificationsErrorState extends LMFeedModerationState {
-  final String message;
-  const LMFeedNotificationsErrorState({required this.message});
+final class LMFeedReportFailureState extends LMFeedModerationState {
+  final String error;
+
+  const LMFeedReportFailureState({required this.error});
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [error];
+}
+
+final class LMFeedReportReasonSelectedState extends LMFeedModerationState {
+  final LMDeleteReasonViewData reason;
+
+  const LMFeedReportReasonSelectedState({required this.reason});
+
+  @override
+  List<Object> get props => [reason];
+}
+
+final class LMFeedReportSubmittedState extends LMFeedModerationState {}
+
+final class LMFeedReportSubmitFailedState extends LMFeedModerationState {
+  final String error;
+
+  const LMFeedReportSubmitFailedState({required this.error});
+
+  @override
+  List<Object> get props => [error];
 }

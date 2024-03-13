@@ -61,5 +61,5 @@ final storyUser = (LMUserViewDataBuilder()
       ..name("Divu")
       ..id(123456)
       ..imageUrl("https://picsum.photos/200")
-      ..userUniqueId("sdbi13i42iciw2"))
+      ..uuid("sdbi13i42iciw2"))
     .build();

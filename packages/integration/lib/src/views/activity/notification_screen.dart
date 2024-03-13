@@ -38,7 +38,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
       PagingController<int, LMNotificationFeedItemViewData>(
     firstPageKey: 1,
   );
-  LMFeedModerationBloc? _notificationsBloc;
+  LMFeedNotificationsBloc? _notificationsBloc;
 
   int _page = 1;
   LMFeedThemeData? _theme;
@@ -46,7 +46,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   @override
   void initState() {
     super.initState();
-    _notificationsBloc = LMFeedModerationBloc();
+    _notificationsBloc = LMFeedNotificationsBloc();
     addPageRequestListener();
 
     _notificationsBloc!.add(
@@ -79,15 +79,10 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     }
   }
 
-  bool todayFlag = true;
-  bool earlierFlag = true;
-  String? _todayNotificationId;
-  String? _earlierNotificationId;
-
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
-    _theme = LMFeedTheme.of(context);
+    _theme = LMFeedCore.theme;
     return Scaffold(
       backgroundColor: _theme?.backgroundColor,
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
@@ -144,8 +139,6 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   Widget getNotificationsLoadedView({
     LMFeedNotificationsLoadedState? state,
   }) {
-    todayFlag = true;
-    earlierFlag = true;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -166,25 +159,9 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
                     _defEmptyNotificationFeedView(),
               ),
               itemBuilder: (context, item, index) {
-                if (_todayNotificationId == null &&
-                    DateTime.now().day == item.createdAt.day) {
-                  _todayNotificationId = item.id;
-                }
-                if (_earlierNotificationId == null &&
-                    DateTime.now().day != item.createdAt.day) {
-                  _earlierNotificationId = item.id;
-                }
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // widget.timeStampBuilder?.call(context) ??
-                    //     _defTimeStampWidget(item.createdAt),
-                    // _defTime(item.createdAt, item.id),
-                    widget.notificationTileBuilder
-                            ?.call(context, item, _defNotificationTile(item)) ??
-                        _defNotificationTile(item),
-                  ],
-                );
+                return widget.notificationTileBuilder
+                        ?.call(context, item, _defNotificationTile(item)) ??
+                    _defNotificationTile(item);
               },
             ),
           ),
@@ -244,72 +221,6 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
             fontWeight: FontWeight.w600,
           ))),
     );
-  }
-
-  Widget _defTime(DateTime createdAt, String postId) {
-    if (postId == _todayNotificationId) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-        child: LMFeedText(
-          text: "Today",
-          style: LMFeedTextStyle(
-              textStyle: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          )),
-        ),
-      );
-    } else if (postId == _earlierNotificationId) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-        child: LMFeedText(
-          text: "Earlier",
-          style: LMFeedTextStyle(
-              textStyle: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          )),
-        ),
-      );
-    }
-    return const SizedBox.shrink();
-  }
-
-  Widget _defTimeStampWidget(DateTime createdAt) {
-    if (DateTime.now().day == createdAt.day) {
-      if (todayFlag) {
-        todayFlag = false;
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-          child: LMFeedText(
-            text: "Today",
-            style: LMFeedTextStyle(
-                textStyle: TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            )),
-          ),
-        );
-      }
-    } else if (earlierFlag) {
-      earlierFlag = false;
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
-        child: LMFeedText(
-          text: "Earlier",
-          style: LMFeedTextStyle(
-              textStyle: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          )),
-        ),
-      );
-    }
-    return const SizedBox.shrink();
   }
 
   Widget _defNotificationsErrorView(String message) {

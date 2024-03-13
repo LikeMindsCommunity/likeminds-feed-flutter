@@ -2,13 +2,13 @@ class LMLikeViewData {
   String id;
   int createdAt;
   int updatedAt;
-  String userId;
+  String uuid;
 
   LMLikeViewData._({
     required this.id,
     required this.createdAt,
     required this.updatedAt,
-    required this.userId,
+    required this.uuid,
   });
 }
 
@@ -16,7 +16,7 @@ class LMLikeViewDataBuilder {
   String? _id;
   int? _createdAt;
   int? _updatedAt;
-  String? _userId;
+  String? _uuid;
 
   void id(String id) {
     _id = id;
@@ -30,8 +30,8 @@ class LMLikeViewDataBuilder {
     _updatedAt = updatedAt;
   }
 
-  void userId(String userId) {
-    _userId = userId;
+  void uuid(String uuid) {
+    _uuid = uuid;
   }
 
   LMLikeViewData build() {
@@ -39,7 +39,7 @@ class LMLikeViewDataBuilder {
       id: _id!,
       createdAt: _createdAt!,
       updatedAt: _updatedAt!,
-      userId: _userId!,
+      uuid: _uuid!,
     );
   }
 }

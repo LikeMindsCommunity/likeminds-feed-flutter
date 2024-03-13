@@ -13,3 +13,6 @@ scripts:
 
   dry-run:
     exec: flutter pub publish --dry-run
+
+  test-dependencies:
+    run: fvm spawn 3.10.2 pub get; fvm spawn stable pub get

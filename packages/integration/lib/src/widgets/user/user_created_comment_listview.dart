@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/user_created_comment/user_created_comment_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
@@ -14,7 +15,7 @@ import 'package:overlay_support/overlay_support.dart';
 class LMFeedUserCreatedCommentListView extends StatefulWidget {
   const LMFeedUserCreatedCommentListView({
     Key? key,
-    required this.userId,
+    required this.uuid,
     this.postBuilder,
     this.emptyFeedViewBuilder,
     this.firstPageLoaderBuilder,
@@ -24,7 +25,7 @@ class LMFeedUserCreatedCommentListView extends StatefulWidget {
   }) : super(key: key);
 
   // The user id for which the user feed is to be shown
-  final String userId;
+  final String uuid;
   // Builder for post item
   // {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
@@ -66,7 +67,7 @@ class _LMFeedUserCreatedCommentListViewState
     addPageRequestListener();
     _userCreatedCommentBloc.add(
       LMFeedUserCreatedCommentGetEvent(
-        uuid: widget.userId,
+        uuid: widget.uuid,
         page: _page,
         pageSize: pageSize,
       ),
@@ -88,7 +89,7 @@ class _LMFeedUserCreatedCommentListViewState
       (pageKey) {
         _userCreatedCommentBloc.add(
           LMFeedUserCreatedCommentGetEvent(
-            uuid: widget.userId,
+            uuid: widget.uuid,
             page: _page,
             pageSize: pageSize,
           ),
@@ -122,7 +123,7 @@ class _LMFeedUserCreatedCommentListViewState
 
   @override
   Widget build(BuildContext context) {
-    feedThemeData = LMFeedTheme.of(context);
+    feedThemeData = LMFeedCore.theme;
     return BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
       bloc: LMFeedPostBloc.instance,
       listener: (context, state) {},
@@ -168,7 +169,7 @@ class _LMFeedUserCreatedCommentListViewState
                         const SizedBox(height: 2),
                         widget.postBuilder?.call(
                                 context, postWidget, _posts[item.postId]!) ??
-                            LMFeedCore.widgets?.postWidgetBuilder.call(
+                            LMFeedCore.widgetUtility?.postWidgetBuilder.call(
                                 context, postWidget, _posts[item.postId]!) ??
                             postWidget,
                         const Divider(),
@@ -210,9 +211,9 @@ class _LMFeedUserCreatedCommentListViewState
           ),
         );
       } else if (media.mediaType == LMMediaType.document) {
-        return const LMFeedIcon(
+        return LMFeedIcon(
           type: LMFeedIconType.svg,
-          assetPath: kAssetDocPDFIcon,
+          assetPath: kAssetNoPostsIcon,
           style: LMFeedIconStyle(
             color: Colors.red,
             size: 35,
@@ -234,10 +235,10 @@ class _LMFeedUserCreatedCommentListViewState
       topics: post.topics,
       user: post.user!,
       isFeed: false,
-      onTagTap: (String userId) {
+      onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
             context: context,
           ),
         );
@@ -259,7 +260,7 @@ class _LMFeedUserCreatedCommentListViewState
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: post.user!,
+              user: post.user,
             ),
           ),
         );
@@ -330,7 +331,7 @@ class _LMFeedUserCreatedCommentListViewState
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
                   title: 'Delete Comment',
-                  userId: postViewData.userId,
+                  uuid: postViewData.uuid,
                   content:
                       'Are you sure you want to delete this post. This action can not be reversed.',
                   action: (String reason) async {
@@ -461,8 +462,11 @@ class _LMFeedUserCreatedCommentListViewState
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+            post: postViewData,
+            actionType: LMFeedPostActionType.saved,
+            postId: postViewData.id,
+          ));
 
           final savePostRequest =
               (SavePostRequestBuilder()..postId(postViewData.id)).build();
@@ -473,8 +477,11 @@ class _LMFeedUserCreatedCommentListViewState
           if (!response.success) {
             postViewData.isSaved = !postViewData.isSaved;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              post: postViewData,
+              actionType: LMFeedPostActionType.saved,
+              postId: postViewData.id,
+            ));
           }
         },
         style: feedThemeData?.footerStyle.saveButtonStyle,
@@ -660,12 +667,20 @@ class _LMFeedUserCreatedCommentListViewState
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+      post: postViewData,
+      actionType: LMFeedPostActionType.pinned,
+      postId: postViewData.id,
+    ));
 
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;
       rebuildPostWidget.value = !rebuildPostWidget.value;
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        post: postViewData,
+        actionType: LMFeedPostActionType.pinned,
+        postId: postViewData.id,
+      ));
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 
@@ -678,7 +693,7 @@ class _LMFeedUserCreatedCommentListViewState
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
-            'created_by_id': postViewData.userId,
+            'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,
             'post_type': postType,
           },
@@ -750,7 +765,7 @@ class LMFeedPostCustomContent extends LMFeedPostContent {
                   onTagTap: (String uuid) {
                     LMFeedProfileBloc.instance.add(
                       LMFeedRouteToUserProfileEvent(
-                        userUniqueId: uuid,
+                        uuid: uuid,
                         context: context,
                       ),
                     );

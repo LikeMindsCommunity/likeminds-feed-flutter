@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedDeleteConfirmationDialog extends StatelessWidget {
   final String title;
   final String content;
-  final String userId;
+  // Creater SDK Client Info UUID
+  final String uuid;
   final Function(String) action;
   final String actionText;
 
@@ -15,7 +15,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     super.key,
     required this.title,
     required this.content,
-    required this.userId,
+    required this.uuid,
     required this.action,
     required this.actionText,
   });
@@ -27,8 +27,10 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     ValueNotifier<bool> rebuildReasonBox = ValueNotifier(false);
     DeleteReason? reasonForDeletion;
     bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
-    LMUserViewData? user = LMFeedUserLocalPreference.instance.fetchUserData();
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    // User Data of the logged in user
+    LMUserViewData? currentUser =
+        LMFeedUserLocalPreference.instance.fetchUserData();
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
 
     return Dialog(
       backgroundColor: feedTheme.container,
@@ -49,12 +51,12 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
             Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
             LikeMindsTheme.kVerticalPaddingLarge,
             Text(content),
-            user.userUniqueId == userId
+            currentUser.sdkClientInfo.uuid == uuid
                 ? const SizedBox.shrink()
                 : isCm
                     ? LikeMindsTheme.kVerticalPaddingLarge
                     : const SizedBox.shrink(),
-            user.userUniqueId == userId
+            currentUser.sdkClientInfo.uuid == uuid
                 ? const SizedBox.shrink()
                 : isCm
                     ? Builder(builder: (context) {
@@ -100,7 +102,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                 builder: (context) {
                                                   return Container(
                                                     padding: const EdgeInsets
-                                                            .symmetric(
+                                                        .symmetric(
                                                         horizontal: 20.0,
                                                         vertical: 30.0),
                                                     width: screenSize.width,
@@ -139,7 +141,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                                       Container(
                                                                 margin:
                                                                     const EdgeInsets
-                                                                            .only(
+                                                                        .only(
                                                                         left:
                                                                             50),
                                                                 child:
@@ -202,8 +204,17 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                   !rebuildReasonBox.value;
                                             });
                                           } else {
-                                            toast(value.errorMessage ??
-                                                'An error occurred');
+                                            LMFeedCore.showSnackBar(
+                                              LMFeedSnackBar(
+                                                content: LMFeedText(
+                                                  text: value.errorMessage ??
+                                                      "An error occurred",
+                                                ),
+                                              ),
+                                            );
+                                            // TODO: remove old toast
+                                            // toast(value.errorMessage ??
+                                            //     'An error occurred');
                                           }
                                           boolVarLoading = false;
                                           rebuildReasonBox.value =
@@ -266,10 +277,16 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    if (user.userUniqueId != userId &&
+                    if (currentUser.sdkClientInfo.uuid != uuid &&
                         isCm &&
                         reasonForDeletion == null) {
-                      toast('Please select a reason for deletion');
+                      LMFeedCore.showSnackBar(
+                        LMFeedSnackBar(
+                          content: LMFeedText(
+                            text: 'Please select a reason for deletion',
+                          ),
+                        ),
+                      );
                       return;
                     }
                     action(reasonForDeletion == null

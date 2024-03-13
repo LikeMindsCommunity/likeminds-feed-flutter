@@ -129,7 +129,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
+    LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return Scaffold(
       backgroundColor: feedThemeData.backgroundColor,
       floatingActionButton: FloatingActionButton(

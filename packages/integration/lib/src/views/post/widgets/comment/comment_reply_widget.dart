@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 
 class LMFeedCommentReplyWidget extends StatefulWidget {
@@ -53,7 +51,7 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
 
 class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedFetchCommentReplyBloc? _commentRepliesBloc;
-  LMFeedCommentHandlerBloc? _commentHandlerBloc;
+  LMFeedCommentBloc? _commentHandlerBloc;
   ValueNotifier<bool> rebuildLikeButton = ValueNotifier(false);
   ValueNotifier<bool> rebuildReplyList = ValueNotifier(false);
   List<LMCommentViewData> replies = [];
@@ -75,7 +73,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     likeCount = reply!.likesCount;
     replyCount = reply!.repliesCount;
     refresh = widget.refresh;
-    _commentHandlerBloc = LMFeedCommentHandlerBloc.instance;
+    _commentHandlerBloc = LMFeedCommentBloc.instance;
     _commentRepliesBloc = LMFeedFetchCommentReplyBloc.instance;
   }
 
@@ -99,7 +97,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
+    feedTheme = LMFeedCore.theme;
     replyStyle = widget.style ?? feedTheme?.replyStyle;
     return BlocConsumer(
       bloc: _commentRepliesBloc,
@@ -219,8 +217,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
             return const SizedBox();
           }
         }
-        return BlocConsumer<LMFeedCommentHandlerBloc,
-            LMFeedCommentHandlerState>(
+        return BlocConsumer<LMFeedCommentBloc, LMFeedCommentHandlerState>(
           bloc: _commentHandlerBloc,
           listener: (context, state) {
             switch (state.runtimeType) {
@@ -370,7 +367,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         if (state is LMFeedCommentRepliesLoadedState) {
           users = state.commentDetails.users!.map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
-          users.putIfAbsent(user.userUniqueId, () => user);
+          users.putIfAbsent(user.uuid, () => user);
           replies = state.commentDetails.postReplies!.replies
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
@@ -378,7 +375,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         } else if (state is LMFeedPaginatedCommentRepliesLoadingState) {
           users = state.prevCommentDetails.users!.map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
-          users.putIfAbsent(user.userUniqueId, () => user);
+          users.putIfAbsent(user.uuid, () => user);
           replies = state.prevCommentDetails.postReplies!.replies
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
@@ -398,8 +395,8 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     return LMFeedCommentWidget(
       style: replyStyle,
       comment: commentViewData,
-      onTagTap: (String userId) {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(userId);
+      onTagTap: (String uuid) {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(uuid);
       },
       user: commentViewData.user,
       profilePicture: LMFeedProfilePicture(
@@ -410,10 +407,8 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         ),
         fallbackText: commentViewData.user.name,
         onTap: () {
-          if (commentViewData.user.sdkClientInfo != null) {
-            LMFeedCore.instance.lmFeedClient.routeToProfile(
-                commentViewData.user.sdkClientInfo!.userUniqueId);
-          }
+          LMFeedCore.instance.lmFeedClient
+              .routeToProfile(user.sdkClientInfo.uuid);
         },
       ),
       lmFeedMenuAction: defLMFeedMenuAction(
@@ -450,12 +445,13 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       },
       onCommentDelete: () {
         _commentHandlerBloc!.add(LMFeedCommentCancelEvent());
+        String commentCreatorUUID = commentViewData.user.sdkClientInfo.uuid;
 
         showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete Comment',
-                userId: commentViewData.userId,
+                uuid: commentCreatorUUID,
                 content:
                     'Are you sure you want to delete this comment. This action can not be reversed.',
                 action: (String reason) async {
@@ -510,7 +506,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   size: 20,
                   color: feedTheme!.primaryColor,
                 ),
-                assetPath: kAssetLikeFilledIcon,
               ),
             ),
         text: LMFeedText(

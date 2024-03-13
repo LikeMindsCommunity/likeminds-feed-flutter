@@ -37,7 +37,7 @@ class LMFeedUserCreatedCommentBloc
           final posts = response.posts?.map((key, value) => MapEntry(
                   key,
                   LMPostViewDataConvertor.fromPost(
-                      post: value, users: response.users))) ??
+                      post: value, users: response.users??{}))) ??
               {};
           emit(UserCreatedCommentLoadedState(comments: comments, posts: posts));
         } else {
