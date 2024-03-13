@@ -34,7 +34,7 @@ class LMFeedSearchBloc extends Bloc<LMFeedSearchEvent, LMFeedSearchState> {
           posts.add(LMPostViewDataConvertor.fromPost(
             post: post,
             widgets: searchResponse.widgets,
-            users: searchResponse.users,
+            users: searchResponse.users??{},
             topics: searchResponse.topics,
             repostedPosts: searchResponse.repostedPosts,
           ));

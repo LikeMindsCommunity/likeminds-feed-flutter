@@ -155,7 +155,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    theme = LMFeedTheme.of(context);
+    theme = LMFeedCore.theme;
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: theme?.backgroundColor,
@@ -199,7 +199,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             if (state is LMFeedNewPostErrorState) {
               postUploading.value = false;
               toast(
-                state.message,
+                state.errorMessage,
                 duration: Toast.LENGTH_LONG,
               );
             }
@@ -238,10 +238,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               List<LMPostViewData>? feedRoomItemList =
                   _pagingController.itemList;
               int index = feedRoomItemList
-                      ?.indexWhere((element) => element.id == state.post.id) ??
+                      ?.indexWhere((element) => element.id == state.post?.id) ??
                   -1;
               if (index != -1) {
-                feedRoomItemList![index] = state.post;
+                feedRoomItemList![index] = state.post!;
               }
               _pagingController.itemList = feedRoomItemList;
               rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -264,10 +264,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               List<LMPostViewData>? feedRoomItemList =
                   _pagingController.itemList;
               int index = feedRoomItemList
-                      ?.indexWhere((element) => element.id == state.post.id) ??
+                      ?.indexWhere((element) => element.id == state.post?.id) ??
                   -1;
               if (index != -1) {
-                feedRoomItemList?[index] = state.post;
+                feedRoomItemList?[index] = state.post!;
               }
               rebuildPostWidget.value = !rebuildPostWidget.value;
             }
@@ -310,7 +310,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                                 noPostInFeedWidget();
                           },
                           itemBuilder: (context, item, index) {
-                            // if (!users.containsKey(item.userId)) {
+                            // if (!users.containsKey(item.uuid)) {
                             //   return const SizedBox();
                             // }
                             return Column(
@@ -363,7 +363,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       } else if (media.mediaType == LMMediaType.document) {
         return const LMFeedIcon(
           type: LMFeedIconType.svg,
-          assetPath: kAssetDocPDFIcon,
+          assetPath: kAssetNoPostsIcon,
           style: LMFeedIconStyle(
             color: Colors.red,
             size: 35,
@@ -384,10 +384,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       topics: post.topics,
       user: post.user!,
       isFeed: false,
-      onTagTap: (String userId) {
+      onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
             context: context,
           ),
         );
@@ -450,7 +450,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
-      onTagTap: (String? userId) {},
+      onTagTap: (String? uuid) {},
       style: theme?.contentStyle,
       text: post.text,
       heading: post.heading,
@@ -486,7 +486,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
                   title: 'Delete Comment',
-                  userId: postViewData.userId,
+                  uuid: postViewData.uuid,
                   content:
                       'Are you sure you want to delete this post. This action can not be reversed.',
                   action: (String reason) async {
@@ -646,8 +646,11 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+            post: postViewData,
+            actionType: LMFeedPostActionType.saved,
+            postId: postViewData.id,
+          ));
 
           final savePostRequest =
               (SavePostRequestBuilder()..postId(postViewData.id)).build();
@@ -658,8 +661,11 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           if (!response.success) {
             postViewData.isSaved = !postViewData.isSaved;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              post: postViewData,
+              actionType: LMFeedPostActionType.saved,
+              postId: postViewData.id,
+            ));
           }
         },
         style: theme?.footerStyle.saveButtonStyle,
@@ -842,12 +848,20 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+      post: postViewData,
+      actionType: LMFeedPostActionType.pinned,
+      postId: postViewData.id,
+    ));
 
     if (!response.success) {
       postViewData.isPinned = !postViewData.isPinned;
       rebuildPostWidget.value = !rebuildPostWidget.value;
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        post: postViewData,
+        actionType: LMFeedPostActionType.pinned,
+        postId: postViewData.id,
+      ));
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 
@@ -860,7 +874,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
-            'created_by_id': postViewData.userId,
+            'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,
             'post_type': postType,
           },

@@ -627,11 +627,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               MaterialPageRoute(
                 builder: (context) => LMFeedSearchScreen(
                   postBuilder: widget.postBuilder,
-                  emptyFeedViewBuilder: widget.emptyFeedViewBuilder,
-                  paginationLoaderBuilder: widget.paginationLoaderBuilder,
-                  feedErrorViewBuilder: widget.feedErrorViewBuilder,
-                  noNewPageWidgetBuilder: widget.noNewPageWidgetBuilder,
-                  firstPageLoaderBuilder: widget.firstPageLoaderBuilder,
+                  emptyFeedViewBuilder: widget.noItemsFoundIndicatorBuilder,
+                  paginationLoaderBuilder: widget.newPageProgressIndicatorBuilder,
+                  feedErrorViewBuilder: widget.newPageErrorIndicatorBuilder,
+                  noNewPageWidgetBuilder: widget.noMoreItemsIndicatorBuilder,
+                  firstPageLoaderBuilder: widget.firstPageProgressIndicatorBuilder,
                 ),
               ),
             );
