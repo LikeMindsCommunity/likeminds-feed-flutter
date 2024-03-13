@@ -11,11 +11,9 @@ class LMSDKClientInfoViewDataConvertor {
 
     sdkClientInfoViewDataBuilder.user(sdkClientInfo.user);
 
-    sdkClientInfoViewDataBuilder.userUniqueId(sdkClientInfo.userUniqueId);
+    sdkClientInfoViewDataBuilder.uuid(sdkClientInfo.uuid);
 
-    if (sdkClientInfo.widgetId != null) {
-      sdkClientInfoViewDataBuilder.widgetId(sdkClientInfo.widgetId!);
-    }
+    sdkClientInfoViewDataBuilder.widgetId(sdkClientInfo.widgetId ?? '');
 
     return sdkClientInfoViewDataBuilder.build();
   }
@@ -25,7 +23,7 @@ class LMSDKClientInfoViewDataConvertor {
     return SDKClientInfo(
       community: sdkClientInfoViewData.community,
       user: sdkClientInfoViewData.user,
-      userUniqueId: sdkClientInfoViewData.userUniqueId,
+      uuid: sdkClientInfoViewData.uuid,
       widgetId: sdkClientInfoViewData.widgetId,
     );
   }

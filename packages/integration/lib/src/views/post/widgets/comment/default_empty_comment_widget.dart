@@ -6,7 +6,7 @@ class LMFeedEmptyCommentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return Column(
       children: <Widget>[
         SizedBox(

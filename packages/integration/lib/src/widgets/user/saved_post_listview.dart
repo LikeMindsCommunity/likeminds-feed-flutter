@@ -100,14 +100,14 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
     screenSize = MediaQuery.of(context).size;
 
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
-    _theme = LMFeedTheme.of(context);
-    return BlocConsumer<LMFeedPostBloc,LMFeedPostState>(
+    _theme = LMFeedCore.theme;
+    return BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
       bloc: LMFeedPostBloc.instance,
       listener: (context, state) {
         if (state is LMFeedNewPostErrorState) {
           postUploading.value = false;
           toast(
-            state.message,
+            state.errorMessage,
             duration: Toast.LENGTH_LONG,
           );
         }
@@ -145,10 +145,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post.id) ??
+                  ?.indexWhere((element) => element.id == state.post?.id) ??
               -1;
           if (index != -1) {
-            feedRoomItemList![index] = state.post;
+            feedRoomItemList![index] = state.post!;
           }
           _pagingController.itemList = feedRoomItemList;
           rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -168,10 +168,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post.id) ??
+                  ?.indexWhere((element) => element.id == state.post?.id) ??
               -1;
           if (index != -1) {
-            feedRoomItemList?[index] = state.post;
+            feedRoomItemList?[index] = state.post!;
           }
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
@@ -208,7 +208,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                     LMFeedPostWidget postWidget = defPostWidget(_theme, item);
                     return widget.postBuilder
                             ?.call(context, postWidget, item) ??
-                        LMFeedCore.widgets?.postWidgetBuilder
+                        LMFeedCore.widgetUtility?.postWidgetBuilder
                             .call(context, postWidget, item) ??
                         SizedBox();
                   },
@@ -229,10 +229,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       topics: post.topics,
       user: post.user!,
       isFeed: false,
-      onTagTap: (String userId) {
+      onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
             context: context,
           ),
         );
@@ -271,8 +271,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           MaterialPageRoute(
             builder: (context) => LMFeedPostDetailScreen(
               postId: post.id,
-              postBuilder:
-                  widget.postBuilder ?? LMFeedCore.widgets?.postWidgetBuilder,
+              postBuilder: widget.postBuilder ??
+                  LMFeedCore.widgetUtility?.postWidgetBuilder,
             ),
           ),
         );
@@ -296,10 +296,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
-      onTagTap: (String? userId) {
+      onTagTap: (String? uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId ?? post.userId,
+            uuid: uuid ?? post.uuid,
             context: context,
           ),
         );
@@ -330,10 +330,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       postHeaderStyle: _theme?.headerStyle,
       onProfileTap: () {
         LMFeedCore.instance.lmFeedClient
-            .routeToProfile(postViewData.user!.sdkClientInfo!.userUniqueId);
+            .routeToProfile(postViewData.user!.sdkClientInfo!.uuid);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: postViewData.user!.sdkClientInfo!.userUniqueId,
+            uuid: postViewData.user!.sdkClientInfo!.uuid,
             context: context,
           ),
         );
@@ -350,7 +350,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete Comment',
-                userId: postViewData.userId,
+                uuid: postViewData.uuid,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',
                 action: (String reason) async {
@@ -366,7 +366,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
-                        "user_id": postViewData.userId,
+                        "user_id": postViewData.uuid,
                         "user_state": isCm ? "CM" : "member",
                       },
                     ),
@@ -425,46 +425,13 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                 postViewData.likeCount)),
         style: _theme?.footerStyle.likeButtonStyle,
         onTextTap: () {
-          VideoController? videoController =
-              LMFeedVideoProvider.instance.getVideoController(postViewData.id);
-
-          videoController?.player.pause();
-
-          if ((_theme?.postStyle.likesListType ??
-                  LMFeedPostLikesListType.screen) ==
-              LMFeedPostLikesListType.screen) {
-            Navigator.of(context, rootNavigator: true).push(
-              MaterialPageRoute(
-                builder: (context) => LMFeedLikesScreen(
-                  postId: postViewData.id,
-                ),
+          Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(
+              builder: (context) => LMFeedLikesScreen(
+                postId: postViewData.id,
               ),
-            );
-          } else {
-            showModalBottomSheet(
-              context: context,
-              useRootNavigator: true,
-              useSafeArea: true,
-              isScrollControlled: true,
-              elevation: 10,
-              enableDrag: true,
-              showDragHandle: true,
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.7,
-                minHeight: MediaQuery.of(context).size.height * 0.3,
-              ),
-              backgroundColor: _theme?.container,
-              clipBehavior: Clip.hardEdge,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
-                ),
-              ),
-              builder: (context) =>
-                  LMFeedLikesBottomSheet(postId: postViewData.id),
-            );
-          }
+            ),
+          );
         },
         onTap: () async {
           if (postViewData.isLiked) {
@@ -517,8 +484,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               builder: (context) => LMFeedPostDetailScreen(
                 postId: post.id,
                 openKeyboard: true,
-                postBuilder:
-                    widget.postBuilder ?? LMFeedCore.widgets?.postWidgetBuilder,
+                postBuilder: widget.postBuilder ??
+                    LMFeedCore.widgetUtility?.postWidgetBuilder,
               ),
             ),
           );
@@ -536,8 +503,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               builder: (context) => LMFeedPostDetailScreen(
                 postId: post.id,
                 openKeyboard: true,
-                postBuilder:
-                    widget.postBuilder ?? LMFeedCore.widgets?.postWidgetBuilder,
+                postBuilder: widget.postBuilder ??
+                    LMFeedCore.widgetUtility?.postWidgetBuilder,
               ),
             ),
           );
@@ -550,8 +517,11 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+            post: postViewData,
+            actionType: LMFeedPostActionType.saved,
+            postId: postViewData.id, // This is to update the post in the feed
+          ));
 
           final savePostRequest =
               (SavePostRequestBuilder()..postId(postViewData.id)).build();
@@ -562,8 +532,11 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           if (!response.success) {
             postViewData.isSaved = !postViewData.isSaved;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              post: postViewData,
+              actionType: LMFeedPostActionType.saved,
+              postId: postViewData.id, // This is to update the post in the feed
+            ));
           }
         },
         style: _theme?.footerStyle.saveButtonStyle,
@@ -760,7 +733,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       builder: (context) => LMFeedReportBottomSheet(
         entityId: postViewData.id,
         entityType: 5,
-        entityCreatorId: postViewData.userId,
+        entityCreatorId: postViewData.uuid,
       ),
     );
   }
@@ -791,7 +764,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        post: postViewData,
+        actionType: LMFeedPostActionType.pinned,
+        postId: postViewData.id));
 
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
@@ -820,7 +796,11 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
 
       rebuildPostWidget.value = !rebuildPostWidget.value;
 
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        post: postViewData,
+        actionType: LMFeedPostActionType.pinned,
+        postId: postViewData.id,
+      ));
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 
@@ -833,7 +813,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
-            'created_by_id': postViewData.userId,
+            'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,
             'post_type': postType,
           },

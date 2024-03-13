@@ -7,26 +7,35 @@ abstract class LMFeedModerationEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LMFeedGetNotificationsEvent extends LMFeedModerationEvent {
-  final int offset;
-  final int pageSize;
-
-  const LMFeedGetNotificationsEvent({
-    required this.offset,
-    required this.pageSize,
-  });
-
-  @override
-  List<Object> get props => [offset, pageSize];
+class LMFeedReportReasonFetchEvent extends LMFeedModerationEvent {
+  LMFeedReportReasonFetchEvent();
 }
 
-class LMFeedMarkNotificationAsReadEvent extends LMFeedModerationEvent {
-  final String activityId;
+class LMFeedReportReasonSelectEvent extends LMFeedModerationEvent {
+  final LMDeleteReasonViewData reason;
 
-  const LMFeedMarkNotificationAsReadEvent({
-    required this.activityId,
+  LMFeedReportReasonSelectEvent({required this.reason});
+
+  @override
+  List<Object> get props => [reason];
+}
+
+class LMFeedReportSubmitEvent extends LMFeedModerationEvent {
+  final String entityCreatorId;
+  final String entityId;
+  final int entityType;
+  final String reason;
+  final int tagId;
+
+  LMFeedReportSubmitEvent({
+    required this.entityCreatorId,
+    required this.entityId,
+    required this.entityType,
+    required this.reason,
+    required this.tagId,
   });
 
   @override
-  List<Object> get props => [activityId];
+  List<Object> get props =>
+      [entityCreatorId, entityId, entityType, reason, tagId];
 }

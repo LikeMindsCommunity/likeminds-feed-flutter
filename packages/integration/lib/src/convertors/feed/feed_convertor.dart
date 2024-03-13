@@ -139,8 +139,8 @@ class LMFeedViewDataConvertor {
       feedRoomViewDataBuilder.onlineLinkType(feedRoomModel.onlineLinkType!);
     }
 
-    if (feedRoomModel.memberId != null) {
-      feedRoomViewDataBuilder.memberId(feedRoomModel.memberId!);
+    if (feedRoomModel.uuid != null) {
+      feedRoomViewDataBuilder.uuid(feedRoomModel.uuid!);
     }
 
     if (feedRoomModel.access != null) {
@@ -196,7 +196,7 @@ class LMFeedViewDataConvertor {
       onlineLinkEnableBefore: feedRoomViewData.onlineLinkEnableBefore,
       onlineLinkType: feedRoomViewData.onlineLinkType,
       participantsCount: feedRoomViewData.participantsCount,
-      memberId: feedRoomViewData.memberId,
+      uuid: feedRoomViewData.uuid,
       access: feedRoomViewData.access,
       member: LMUserViewDataConvertor.toUser(feedRoomViewData.member),
       cohorts: feedRoomViewData.cohorts,

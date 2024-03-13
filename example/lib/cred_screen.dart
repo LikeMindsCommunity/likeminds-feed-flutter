@@ -22,61 +22,52 @@ class MyApp extends StatelessWidget {
         textColor: Colors.white,
         alignment: Alignment.bottomCenter,
       ),
-      child: LMFeedTheme(
-        theme: LMFeedThemeData.light(
-          primaryColor: Colors.red[300],
-          tagColor: Colors.red[300],
-          linkColor: Colors.red[300],
-        ),
-        child: MaterialApp(
-          title: 'Integration App for UI + SDK package',
-          debugShowCheckedModeBanner: _isProd,
-          navigatorKey: rootNavigatorKey,
-          scaffoldMessengerKey: rootScaffoldMessengerKey,
-          theme: ThemeData(
-            useMaterial3: false,
-            primaryColor: Colors.deepPurple,
-            inputDecorationTheme: InputDecorationTheme(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              outlineBorder: const BorderSide(
+      child: MaterialApp(
+        title: 'Integration App for UI + SDK package',
+        debugShowCheckedModeBanner: _isProd,
+        navigatorKey: rootNavigatorKey,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
+        theme: ThemeData(
+          useMaterial3: false,
+          primaryColor: Colors.deepPurple,
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            outlineBorder: const BorderSide(
+              color: Colors.deepPurple,
+              width: 2,
+            ),
+            activeIndicatorBorder: const BorderSide(
+              color: Colors.deepPurple,
+              width: 2,
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
                 color: Colors.deepPurple,
                 width: 2,
               ),
-              activeIndicatorBorder: const BorderSide(
+            ),
+            enabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
                 color: Colors.deepPurple,
                 width: 2,
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.deepPurple,
-                  width: 2,
-                ),
-              ),
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: Colors.deepPurple,
-                  width: 2,
-                ),
               ),
             ),
           ),
-          home: LMFeedBlocListener(
-            analyticsListener:
-                (BuildContext context, LMFeedAnalyticsState state) {
-              if (state is LMFeedAnalyticsEventFired) {
-                debugPrint("Bloc Listened for event, - ${state.eventName}");
-                debugPrint("////////////////");
-                debugPrint("With properties - ${state.eventProperties}");
-              }
-            },
-            profileListener:
-                (BuildContext context, LMFeedProfileState state) {},
-            routingListener:
-                (BuildContext context, LMFeedRoutingState state) {},
-            child: const CredScreen(),
-          ),
+        ),
+        home: LMFeedBlocListener(
+          analyticsListener:
+              (BuildContext context, LMFeedAnalyticsState state) {
+            if (state is LMFeedAnalyticsEventFired) {
+              debugPrint("Bloc Listened for event, - ${state.eventName}");
+              debugPrint("////////////////");
+              debugPrint("With properties - ${state.eventProperties}");
+            }
+          },
+          profileListener: (BuildContext context, LMFeedProfileState state) {},
+          routingListener: (BuildContext context, LMFeedRoutingState state) {},
+          child: const CredScreen(),
         ),
       ),
     );
@@ -92,15 +83,14 @@ class CredScreen extends StatefulWidget {
 
 class _CredScreenState extends State<CredScreen> {
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _userIdController = TextEditingController();
+  final TextEditingController _uuidController = TextEditingController();
   StreamSubscription? _streamSubscription;
   LMSampleApp? lmFeed;
-  String? userId;
+  String? uuid;
 
   @override
   void initState() {
     super.initState();
-    // userId = UserLocalPreference.instance.fetchUserId();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       initUniLinks(context);
     });
@@ -109,7 +99,7 @@ class _CredScreenState extends State<CredScreen> {
   @override
   void dispose() {
     _usernameController.dispose();
-    _userIdController.dispose();
+    _uuidController.dispose();
     _streamSubscription?.cancel();
     super.dispose();
   }
@@ -130,7 +120,7 @@ class _CredScreenState extends State<CredScreen> {
       final uriLink = Uri.parse(initialLink);
       if (uriLink.isAbsolute) {
         final deepLinkRequestBuilder = LMFeedDeepLinkRequestBuilder()
-          ..userId(userId ?? "Test-User-Id")
+          ..uuid(uuid ?? "Test-User-Id")
           ..userName("Test User");
         if (uriLink.path == '/post') {
           List secondPathSegment = initialLink.split('post_id=');
@@ -168,7 +158,7 @@ class _CredScreenState extends State<CredScreen> {
         final uriLink = Uri.parse(link);
         if (uriLink.isAbsolute) {
           final deepLinkRequestBuilder = LMFeedDeepLinkRequestBuilder()
-            ..userId(userId ?? "Test-User-Id")
+            ..uuid(uuid ?? "Test-User-Id")
             ..userName("Test User");
 
           if (uriLink.path == '/post') {
@@ -195,21 +185,22 @@ class _CredScreenState extends State<CredScreen> {
       }
     }, onError: (err) {
       // Handle exception by warning the user their action did not succeed
-      toast('An error occurred');
+      LMFeedCore.showSnackBar(
+          LMFeedSnackBar(content: const Text('An error occurred')));
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     // return lmFeed;
-    userId = null; // UserLocalPreference.instance.fetchUserId();
+    uuid = null; // UserLocalPreference.instance.fetchuuid();
     // If the local prefs have user id stored
     // Login using that user Id
     // otherwise show the cred screen for login
-    if (userId != null && userId!.isNotEmpty) {
+    if (uuid != null && uuid!.isNotEmpty) {
       return lmFeed = LMSampleApp(
-        userId: userId,
+        uuid: uuid,
         userName: 'Test User',
       );
     } else {
@@ -258,7 +249,7 @@ class _CredScreenState extends State<CredScreen> {
                 const SizedBox(height: 12),
                 TextField(
                   cursorColor: Colors.white,
-                  controller: _userIdController,
+                  controller: _uuidController,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                       fillColor: Colors.white,
@@ -274,16 +265,27 @@ class _CredScreenState extends State<CredScreen> {
                 const SizedBox(height: 36),
                 GestureDetector(
                   onTap: () {
-                    String userId = _userIdController.text;
+                    String uuid = _uuidController.text;
                     String userName = _usernameController.text;
 
-                    if (userName.isEmpty && userId.isEmpty) {
-                      toast("Username cannot be empty");
+                    if (userName.isEmpty && uuid.isEmpty) {
+                      LMFeedCore.showSnackBar(
+                        LMFeedSnackBar(
+                          content: Container(
+                            child: const LMFeedText(
+                              text: "Username cannot be empty",
+                              style: LMFeedTextStyle(
+                                  textStyle: TextStyle(color: Colors.black)),
+                            ),
+                          ),
+                        ),
+                      );
+                      //toast("Username cannot be empty");
                       return;
                     }
 
                     lmFeed = LMSampleApp(
-                      userId: _userIdController.text,
+                      uuid: _uuidController.text,
                       userName: _usernameController.text,
                     );
 
@@ -291,7 +293,7 @@ class _CredScreenState extends State<CredScreen> {
                       // INIT - Get the LMFeed instance and pass the credentials (if any)
                       builder: (context) => ExampleTabScreen(
                         feedWidget: lmFeed!,
-                        userId: userId,
+                        uuid: uuid,
                       ),
                     );
                     Navigator.of(context).push(route);

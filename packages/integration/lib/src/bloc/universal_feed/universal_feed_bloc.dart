@@ -12,7 +12,7 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
   List<LMTopicViewData> selectedTopics = [];
   // list of all the topics
   Map<String, LMTopicViewData> topics = {};
-  // list of all the users
+// list of all the users
   Map<String, LMUserViewData> users = {};
   // list of all the widgets
   Map<String, LMWidgetViewData> widgets = {};
@@ -52,18 +52,12 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
     } else {
       emit(LMFeedUniversalFeedLoadingState());
     }
-    List<Topic> selectedTopics = [];
 
-    if (event.topics != null && event.topics!.isNotEmpty) {
-      selectedTopics = event.topics!
-          .map((e) => LMTopicViewDataConvertor.toTopic(e))
-          .toList();
-    }
     GetFeedResponse response =
         await LMFeedCore.instance.lmFeedClient.getUniversalFeed(
       (GetFeedRequestBuilder()
-            ..page(event.offset)
-            ..topics(selectedTopics)
+            ..page(event.pageKey)
+            ..topicIds(event.topicsIds)
             ..pageSize(10))
           .build(),
     );
@@ -87,13 +81,14 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
 
       emit(
         LMFeedUniversalFeedLoadedState(
+          pageKey: event.pageKey,
           topics: topics,
           posts: response.posts
                   ?.map((e) => LMPostViewDataConvertor.fromPost(
                         post: e,
                         widgets: response.widgets,
                         repostedPosts: response.repostedPosts,
-                        users: response.users,
+                        users: response.users ?? {},
                         topics: response.topics,
                         filteredComments: response.filteredComments,
                       ))

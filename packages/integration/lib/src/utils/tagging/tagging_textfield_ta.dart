@@ -123,7 +123,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return TypeAheadField<LMUserTagViewData>(
       onTagTap: (p) {},
       scrollController: _scrollController,

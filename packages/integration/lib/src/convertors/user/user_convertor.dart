@@ -14,6 +14,9 @@ class LMUserViewDataConvertor {
 
     userViewDataBuilder.imageUrl(user.imageUrl);
 
+    userViewDataBuilder.sdkClientInfo(
+        LMSDKClientInfoViewDataConvertor.fromSDKClientInfo(user.sdkClientInfo));
+
     if (user.isGuest != null) {
       userViewDataBuilder.isGuest(user.isGuest!);
     }
@@ -22,16 +25,11 @@ class LMUserViewDataConvertor {
       userViewDataBuilder.isDeleted(user.isDeleted!);
     }
 
-    userViewDataBuilder.userUniqueId(user.userUniqueId);
+    userViewDataBuilder.uuid(user.uuid);
     if (user.organisationName != null) {
       userViewDataBuilder.organisationName(user.organisationName!);
     }
 
-    if (user.sdkClientInfo != null) {
-      userViewDataBuilder.sdkClientInfo(
-          LMSDKClientInfoViewDataConvertor.fromSDKClientInfo(
-              user.sdkClientInfo!));
-    }
     if (user.updatedAt != null) {
       userViewDataBuilder.updatedAt(user.updatedAt!);
     }
@@ -69,12 +67,10 @@ class LMUserViewDataConvertor {
       name: userViewData.name,
       imageUrl: userViewData.imageUrl,
       isGuest: userViewData.isGuest,
-      userUniqueId: userViewData.userUniqueId,
+      uuid: userViewData.uuid,
       organisationName: userViewData.organisationName,
-      sdkClientInfo: userViewData.sdkClientInfo != null
-          ? LMSDKClientInfoViewDataConvertor.toSDKClientInfo(
-              userViewData.sdkClientInfo!)
-          : null,
+      sdkClientInfo: LMSDKClientInfoViewDataConvertor.toSDKClientInfo(
+          userViewData.sdkClientInfo),
       updatedAt: userViewData.updatedAt,
       isOwner: userViewData.isOwner,
       customTitle: userViewData.customTitle,

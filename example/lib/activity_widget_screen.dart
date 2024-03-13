@@ -18,7 +18,7 @@ class LMFeedActivityWidgetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return Scaffold(
       backgroundColor: feedTheme.backgroundColor,
       body: Container(
@@ -41,12 +41,12 @@ class LMFeedActivityWidgetScreen extends StatelessWidget {
                 ),
               ),
               Divider(color: feedTheme.onContainer.withOpacity(0.15)),
-              LMFeedActivityWidget(
-                uuid: uuid,
-                appBarBuilder: appBarBuilder,
-                postWidgetBuilder: postWidgetBuilder,
-                commentWidgetBuilder: commentWidgetBuilder,
-              ),
+              // LMFeedActivityWidget(
+              //   uuid: uuid,
+              //   appBarBuilder: appBarBuilder,
+              //   postWidgetBuilder: postWidgetBuilder,
+              //   commentWidgetBuilder: commentWidgetBuilder,
+              // ),
               Divider(color: feedTheme.onContainer.withOpacity(0.15)),
             ],
           ),

@@ -1,15 +1,12 @@
-import 'package:flutter/cupertino.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/comment/comment_replies/comment_replies_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedPostDetailScreenHandler {
   final Map<String, LMUserViewData> users = {};
-  final PagingController<int, LMCommentViewData> commentListPagingController;
-  final String postId;
-  late final LMFeedCommentHandlerBloc commentHandlerBloc;
+  late final PagingController<int, LMCommentViewData>
+      commentListPagingController;
+  late final String postId;
+  late final LMFeedCommentBloc commentHandlerBloc;
   late final FocusNode focusNode;
   late final TextEditingController commentController;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -18,11 +15,15 @@ class LMFeedPostDetailScreenHandler {
   Map<String, LMWidgetViewData> widgets = {};
   LMPostViewData? postData;
 
-  LMFeedPostDetailScreenHandler(this.commentListPagingController, this.postId) {
-    commentHandlerBloc = LMFeedCommentHandlerBloc.instance;
+  LMFeedPostDetailScreenHandler(
+      PagingController<int, LMCommentViewData> commetListPagingController,
+      String postId) {
+    commentHandlerBloc = LMFeedCommentBloc.instance;
     addCommentListPaginationListener();
     commentController = TextEditingController();
     focusNode = FocusNode();
+    this.commentListPagingController = commetListPagingController;
+    this.postId = postId;
   }
 
   Future<LMPostViewData?> fetchCommentListWithPage(int page) async {
@@ -34,18 +35,37 @@ class LMFeedPostDetailScreenHandler {
     final response = await LMFeedCore.client.getPostDetails(postDetailRequest);
 
     if (response.success) {
+      // Convert [User] to [LMUserViewData]
+      // Add users to the map
       users.addAll(response.users!.map((key, value) =>
           MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
 
+      // Convert [Topic] to [LMTopicViewData]
+      // Add topics to the map
       topics.addAll(response.topics!.map((key, value) =>
           MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
-      repostedPosts.addAll(response.repostedPosts?.map((key, value) =>
-              MapEntry(key, LMPostViewDataConvertor.fromPost(post: value))) ??
+
+      // Convert [Post] to [LMPostViewData]
+      // Add reposted posts to the map
+      repostedPosts.addAll(response.repostedPosts?.map((key, value) => MapEntry(
+              key,
+              LMPostViewDataConvertor.fromPost(
+                post: value,
+                widgets: response.widgets,
+                repostedPosts: response.repostedPosts,
+                users: response.users ?? {},
+                topics: response.topics ?? {},
+              ))) ??
           {});
 
+      // Convert [WidgetModel] to [LMWidgetViewData]
+      // Add widgets to the map
       widgets.addAll(response.widgets?.map((key, value) => MapEntry(
               key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
           {});
+
+      // Convert [Post] to [LMPostViewData]
+      // Add post data, and all supporting data to the map
       final LMPostViewData postViewData = LMPostViewDataConvertor.fromPost(
         post: response.post!,
         widgets: response.widgets,
@@ -60,10 +80,18 @@ class LMFeedPostDetailScreenHandler {
 
       return postViewData;
     } else {
-      toast(
-        response.errorMessage ?? 'An error occurred',
-        duration: Toast.LENGTH_LONG,
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(
+            text: response.errorMessage ?? "An error occurred",
+          ),
+        ),
       );
+      // TODO: remove old toast
+      // toast(
+      //   response.errorMessage ?? 'An error occurred',
+      //   duration: Toast.LENGTH_LONG,
+      // );
 
       return null;
     }
@@ -119,7 +147,9 @@ class LMFeedPostDetailScreenHandler {
               LMCommentViewDataConvertor.fromComment(response.reply!, users);
           replaceTempCommentWithActualComment(commentViewData);
 
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postData!.id,
+              actionType: LMFeedPostActionType.commentAdded));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
@@ -143,6 +173,15 @@ class LMFeedPostDetailScreenHandler {
         }
       case const (LMFeedCommentSuccessState<DeleteCommentResponse>):
         {
+          // Show the toast message for comment deleted
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                text: 'Comment Deleted',
+              ),
+            ),
+          );
+
           final LMFeedCommentSuccessState commentSuccessState =
               state as LMFeedCommentSuccessState;
 
@@ -161,7 +200,13 @@ class LMFeedPostDetailScreenHandler {
             }
           }
 
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postData!));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postData!.id,
+              actionType:
+                  commentSuccessState.commentMetaData.commentActionEntity ==
+                          LMFeedCommentType.parent
+                      ? LMFeedPostActionType.commentDeleted
+                      : LMFeedPostActionType.replyDeleted));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
@@ -193,16 +238,26 @@ class LMFeedPostDetailScreenHandler {
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
-      case const (LMFeedCommentErrorState<AddCommentRequest>):
+      case const (LMFeedCommentErrorState<DeleteCommentResponse>):
+        {
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                  text: (state as DeleteCommentResponse).errorMessage ??
+                      "An error occurred"),
+            ),
+          );
+        }
+      case const (LMFeedCommentErrorState<AddCommentRequest>,):
         {
           final LMFeedCommentErrorState<AddCommentResponse> commentErrorState =
               state as LMFeedCommentErrorState<AddCommentResponse>;
           removeTempCommentFromController(
               commentErrorState.commentMetaData.commentId!);
-          toast(
-            commentErrorState.commentActionResponse.errorMessage ??
-                'An error occurred',
-          );
+          LMFeedCore.showSnackBar(LMFeedSnackBar(
+              content: Text(
+                  commentErrorState.commentActionResponse.errorMessage ??
+                      'An error occurred')));
           break;
         }
     }
@@ -220,7 +275,7 @@ class LMFeedPostDetailScreenHandler {
         LMFeedUserLocalPreference.instance.fetchUserData();
     LMCommentViewData commentViewData = (LMCommentViewDataBuilder()
           ..id(tempId)
-          ..userId(currentUser.userUniqueId)
+          ..uuid(currentUser.uuid)
           ..text(text)
           ..level(level)
           ..likesCount(0)
@@ -230,7 +285,6 @@ class LMFeedPostDetailScreenHandler {
           ..createdAt(DateTime.now())
           ..updatedAt(DateTime.now())
           ..isLiked(false)
-          ..uuid('')
           ..user(currentUser)
           ..tempId(tempId))
         .build();
@@ -245,7 +299,7 @@ class LMFeedPostDetailScreenHandler {
       commentViewData.parentComment = parentComment;
     }
 
-    // if (!replyShown) 
+    // if (!replyShown)
     {
       LMFeedFetchCommentReplyBloc.instance
           .add(LMFeedAddLocalReplyEvent(comment: commentViewData));
@@ -257,7 +311,7 @@ class LMFeedPostDetailScreenHandler {
         LMFeedUserLocalPreference.instance.fetchUserData();
     LMCommentViewData commentViewData = (LMCommentViewDataBuilder()
           ..id(tempId)
-          ..userId(currentUser.userUniqueId)
+          ..uuid(currentUser.uuid)
           ..text(text)
           ..level(level)
           ..likesCount(0)
@@ -267,7 +321,6 @@ class LMFeedPostDetailScreenHandler {
           ..createdAt(DateTime.now())
           ..updatedAt(DateTime.now())
           ..isLiked(false)
-          ..uuid('')
           ..user(currentUser)
           ..tempId(tempId))
         .build();

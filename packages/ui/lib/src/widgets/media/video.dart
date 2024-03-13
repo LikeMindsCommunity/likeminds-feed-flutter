@@ -155,7 +155,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     style = widget.style ?? feedTheme.mediaStyle.videoStyle;
     return GestureDetector(
       onTap: () {

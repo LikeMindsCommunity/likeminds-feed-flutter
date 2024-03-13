@@ -60,7 +60,7 @@ class LMFeedCarousel extends StatefulWidget {
     VoidCallback? onMediaTap,
     Widget Function(LMFeedImage)? imageBuilder,
     Widget Function(LMFeedVideo)? videoBuilder,
-    Widget Function(int)? carouselIndicatorBuilder,
+    Widget Function(int, Widget)? carouselIndicatorBuilder,
   }) {
     return LMFeedCarousel(
       postId: postId ?? this.postId,
@@ -139,7 +139,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     style = widget.style ?? feedTheme.mediaStyle.carouselStyle;
     mapAttachmentsToWidget();
     return GestureDetector(
@@ -189,64 +189,64 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 ? ValueListenableBuilder(
                     valueListenable: rebuildCurr,
                     builder: (context, _, __) {
+                      Widget carouselIndicator =
+                          defCarouselIndicator(feedTheme);
                       return widget.carouselIndicatorBuilder
-                              ?.call(currPosition) ??
-                          Column(
-                            children: [
-                              LikeMindsTheme.kVerticalPaddingMedium,
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: widget.attachments.map((url) {
-                                  int index = widget.attachments.indexOf(url);
-                                  return currPosition == index
-                                      ? Container(
-                                          width: style!.indicatorWidth ?? 16.0,
-                                          height: style!.indicatorHeight ?? 8.0,
-                                          padding: style!.indicatorPadding,
-                                          margin: style!.indicatorMargin ??
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 7.0,
-                                                  horizontal: 2.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                style!.indicatorBorderRadius ??
-                                                    const BorderRadius.all(
-                                                      Radius.circular(4),
-                                                    ),
-                                            color:
-                                                style!.activeIndicatorColor ??
-                                                    feedTheme.primaryColor,
-                                          ),
-                                        )
-                                      : Container(
-                                          width: style!.indicatorWidth ?? 8.0,
-                                          height: style!.indicatorHeight ?? 8.0,
-                                          padding: style!.indicatorPadding,
-                                          margin: style!.indicatorMargin ??
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 7.0,
-                                                  horizontal: 2.0),
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                style!.indicatorBorderRadius ??
-                                                    const BorderRadius.all(
-                                                      Radius.circular(4),
-                                                    ),
-                                            color:
-                                                style!.inActiveIndicatorColor ??
-                                                    feedTheme.inActiveColor,
-                                          ),
-                                        );
-                                }).toList(),
-                              )
-                            ],
-                          );
+                              ?.call(currPosition, carouselIndicator) ??
+                          carouselIndicator;
                     },
                   )
                 : const SizedBox.shrink(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget defCarouselIndicator(LMFeedThemeData feedTheme) {
+    return Column(
+      children: [
+        LikeMindsTheme.kVerticalPaddingMedium,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: widget.attachments.map((url) {
+            int index = widget.attachments.indexOf(url);
+            return currPosition == index
+                ? Container(
+                    width: style!.indicatorWidth ?? 16.0,
+                    height: style!.indicatorHeight ?? 8.0,
+                    padding: style!.indicatorPadding,
+                    margin: style!.indicatorMargin ??
+                        const EdgeInsets.symmetric(
+                            vertical: 7.0, horizontal: 2.0),
+                    decoration: BoxDecoration(
+                      borderRadius: style!.indicatorBorderRadius ??
+                          const BorderRadius.all(
+                            Radius.circular(4),
+                          ),
+                      color:
+                          style!.activeIndicatorColor ?? feedTheme.primaryColor,
+                    ),
+                  )
+                : Container(
+                    width: style!.indicatorWidth ?? 8.0,
+                    height: style!.indicatorHeight ?? 8.0,
+                    padding: style!.indicatorPadding,
+                    margin: style!.indicatorMargin ??
+                        const EdgeInsets.symmetric(
+                            vertical: 7.0, horizontal: 2.0),
+                    decoration: BoxDecoration(
+                      borderRadius: style!.indicatorBorderRadius ??
+                          const BorderRadius.all(
+                            Radius.circular(4),
+                          ),
+                      color: style!.inActiveIndicatorColor ??
+                          feedTheme.inActiveColor,
+                    ),
+                  );
+          }).toList(),
+        )
+      ],
     );
   }
 }

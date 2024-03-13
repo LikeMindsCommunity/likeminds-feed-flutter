@@ -15,16 +15,18 @@ class LMFeedNotificationTile extends StatelessWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final _theme = LMFeedTheme.of(context);
+    final _theme = LMFeedCore.theme;
     debugPrint(_theme.contentStyle.headingStyle?.color?.value.toString());
     return ValueListenableBuilder(
         valueListenable: _rebuild,
         builder: (context, _, __) {
           return LMFeedTile(
               style: style?.copyWith(
-                backgroundColor: notificationItemViewData.isRead?style?.backgroundColor: style?.activeBackgroundColor,
+                backgroundColor: notificationItemViewData.isRead
+                    ? style?.backgroundColor
+                    : style?.activeBackgroundColor,
               ),
-              onTap: (){
+              onTap: () {
                 onTap?.call();
                 notificationItemViewData.isRead = true;
                 _rebuild.value = !_rebuild.value;
@@ -61,7 +63,8 @@ class LMFeedNotificationTile extends StatelessWidget {
               subtitle: Padding(
                 padding: EdgeInsets.only(top: 5),
                 child: LMFeedText(
-                  text: LMFeedTimeAgo.instance.format(notificationItemViewData.updatedAt),
+                  text: LMFeedTimeAgo.instance
+                      .format(notificationItemViewData.updatedAt),
                   style: LMFeedTextStyle(
                     maxLines: 1,
                     textStyle: TextStyle(

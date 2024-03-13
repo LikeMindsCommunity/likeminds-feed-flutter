@@ -4,11 +4,11 @@ import 'package:likeminds_feed_sample/activity_widget_screen.dart';
 
 class ExampleTabScreen extends StatefulWidget {
   final Widget feedWidget;
-  final String userId;
+  final String uuid;
   const ExampleTabScreen({
     super.key,
     required this.feedWidget,
-    required this.userId,
+    required this.uuid,
   });
 
   @override
@@ -30,7 +30,7 @@ class _ExampleTabScreenState extends State<ExampleTabScreen>
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData lmFeedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData lmFeedTheme = LMFeedCore.theme;
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         selectedIndex: tabController.index,
@@ -70,7 +70,7 @@ class _ExampleTabScreenState extends State<ExampleTabScreen>
             feedWidget: widget.feedWidget,
           ),
           LMFeedActivityWidgetScreen(
-            uuid: widget.userId,
+            uuid: widget.uuid,
           ),
         ],
       ),

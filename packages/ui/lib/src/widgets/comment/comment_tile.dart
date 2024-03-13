@@ -98,7 +98,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     style = widget.style ?? feedTheme.commentStyle;
     return Container(
       decoration: BoxDecoration(

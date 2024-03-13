@@ -19,9 +19,6 @@ class LMFeedPostWidget extends StatefulWidget {
     this.onPostTap,
     required this.isFeed,
     this.onTagTap,
-    this.onLikeTap,
-    this.onPinTap,
-    this.onSaveTap,
     required this.topics,
     this.childrenSpacing,
     this.header,
@@ -67,10 +64,6 @@ class LMFeedPostWidget extends StatefulWidget {
   final LMFeedOnPostTap? onPostTap;
   final Function(String)? onTagTap;
   final double? childrenSpacing;
-
-  final Function(bool isLiked)? onLikeTap;
-  final Function(bool isPinned)? onPinTap;
-  final Function(bool isSaved)? onSaveTap;
   final VoidCallback? onMediaTap;
 
   final VoidCallback? disposeVideoPlayerOnInActive;
@@ -93,9 +86,6 @@ class LMFeedPostWidget extends StatefulWidget {
     bool? isFeed,
     LMFeedOnPostTap? onPostTap,
     Function(String)? onTagTap,
-    Function(bool isLiked)? onLikeTap,
-    Function(bool isPinned)? onPinTap,
-    Function(bool isSaved)? onSaveTap,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
     double? childrenSpacing,
@@ -116,9 +106,6 @@ class LMFeedPostWidget extends StatefulWidget {
       isFeed: isFeed ?? this.isFeed,
       onPostTap: onPostTap ?? this.onPostTap,
       onTagTap: onTagTap ?? this.onTagTap,
-      onLikeTap: onLikeTap ?? this.onLikeTap,
-      onPinTap: onPinTap ?? this.onPinTap,
-      onSaveTap: onSaveTap ?? this.onSaveTap,
       childrenSpacing: childrenSpacing ?? this.childrenSpacing,
       content: content ?? this.content,
       footer: footer ?? this.footer,
@@ -157,8 +144,8 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData lmFeedThemeData = LMFeedTheme.of(context);
-    style = widget.style ?? LMFeedTheme.of(context).postStyle;
+    LMFeedThemeData lmFeedThemeData = LMFeedTheme.instance.theme;
+    style = widget.style ?? LMFeedTheme.instance.theme.postStyle;
     return GestureDetector(
       onTap: () {
         widget.onPostTap?.call(context, widget.post);
@@ -253,7 +240,6 @@ class LMFeedPostStyle {
   final EdgeInsetsGeometry? margin;
   final BoxBorder? border;
   final Color? backgroundColor;
-  final LMFeedPostLikesListType likesListType;
 
   LMFeedPostStyle({
     this.boxShadow,
@@ -262,7 +248,6 @@ class LMFeedPostStyle {
     this.margin,
     this.border,
     this.backgroundColor,
-    this.likesListType = LMFeedPostLikesListType.screen,
   });
 
   LMFeedPostStyle copyWith({
@@ -277,7 +262,8 @@ class LMFeedPostStyle {
     LMFeedPostMediaStyle? mediaStyle,
     BoxBorder? border,
     Color? backgroundColor,
-    LMFeedPostLikesListType? likesListType,
+    LMFeedPostLikesListViewType? likesListType,
+    LMFeedPostDeleteViewType? deleteSheetType,
   }) {
     return LMFeedPostStyle(
       boxShadow: boxShadow ?? this.boxShadow,
@@ -286,7 +272,6 @@ class LMFeedPostStyle {
       margin: margin ?? this.margin,
       border: border ?? this.border,
       backgroundColor: backgroundColor ?? this.backgroundColor,
-      likesListType: likesListType ?? this.likesListType,
     );
   }
 

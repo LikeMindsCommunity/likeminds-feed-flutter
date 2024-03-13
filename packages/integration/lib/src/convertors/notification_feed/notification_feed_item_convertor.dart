@@ -13,9 +13,9 @@ class LMNotificationFeedItemViewDataConvertor {
 
     notificationFeedItemViewDataBuilder.action(notificationFeedItem.action);
 
-    List<LMUserViewData> actionBy= [];
-    for(String userId in notificationFeedItem.actionBy) {
-      if(users[userId] != null) {
+    List<LMUserViewData> actionBy = [];
+    for (String userId in notificationFeedItem.actionBy) {
+      if (users[userId] != null) {
         final user = LMUserViewDataConvertor.fromUser(users[userId]!);
         actionBy.add(user);
       }
@@ -35,8 +35,8 @@ class LMNotificationFeedItemViewDataConvertor {
       notificationFeedItemViewDataBuilder.cta(notificationFeedItem.cta!);
     }
 
-    notificationFeedItemViewDataBuilder
-        .createdAt(DateTime.fromMillisecondsSinceEpoch(notificationFeedItem.createdAt));
+    notificationFeedItemViewDataBuilder.createdAt(
+        DateTime.fromMillisecondsSinceEpoch(notificationFeedItem.createdAt));
 
     notificationFeedItemViewDataBuilder.entityId(notificationFeedItem.entityId);
 
@@ -50,8 +50,8 @@ class LMNotificationFeedItemViewDataConvertor {
 
     notificationFeedItemViewDataBuilder.isRead(notificationFeedItem.isRead);
 
-    notificationFeedItemViewDataBuilder
-        .updatedAt(DateTime.fromMillisecondsSinceEpoch(notificationFeedItem.updatedAt));
+    notificationFeedItemViewDataBuilder.updatedAt(
+        DateTime.fromMillisecondsSinceEpoch(notificationFeedItem.updatedAt));
 
     return notificationFeedItemViewDataBuilder.build();
   }
@@ -61,7 +61,9 @@ class LMNotificationFeedItemViewDataConvertor {
     return NotificationFeedItem(
       id: notificationFeedItemViewData.id,
       action: notificationFeedItemViewData.action,
-      actionBy: notificationFeedItemViewData.actionBy.map((e) => e.sdkClientInfo!.userUniqueId).toList(),
+      actionBy: notificationFeedItemViewData.actionBy
+          .map((e) => e.sdkClientInfo.uuid)
+          .toList(),
       actionOn: notificationFeedItemViewData.actionOn,
       activityEntityData: LMActivityEntityViewDataConvertor.toActivityEntity(
           notificationFeedItemViewData.activityEntityData),

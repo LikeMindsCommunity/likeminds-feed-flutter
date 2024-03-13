@@ -3,11 +3,9 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/media/media_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LMFeedMediaHandler {
@@ -25,9 +23,12 @@ class LMFeedMediaHandler {
           } else if (permissionStatus == PermissionStatus.denied) {
             permissionStatus = await Permission.photos.request();
             if (permissionStatus == PermissionStatus.permanentlyDenied) {
-              toast(
-                'Permissions denied, change app settings',
-                duration: Toast.LENGTH_LONG,
+              LMFeedCore.showSnackBar(
+                LMFeedSnackBar(
+                  content: LMFeedText(
+                    text: 'Permissions denied, change app settings',
+                  ),
+                ),
               );
               return false;
             } else if (permissionStatus == PermissionStatus.granted) {
@@ -43,9 +44,12 @@ class LMFeedMediaHandler {
           } else if (permissionStatus == PermissionStatus.denied) {
             permissionStatus = await Permission.videos.request();
             if (permissionStatus == PermissionStatus.permanentlyDenied) {
-              toast(
-                'Permissions denied, change app settings',
-                duration: Toast.LENGTH_LONG,
+              LMFeedCore.showSnackBar(
+                LMFeedSnackBar(
+                  content: LMFeedText(
+                    text: 'Permissions denied, change app settings',
+                  ),
+                ),
               );
               return false;
             } else if (permissionStatus == PermissionStatus.granted) {
@@ -134,11 +138,13 @@ class LMFeedMediaHandler {
 
       if (pickedFiles.files.isNotEmpty) {
         if (currentMediaLength + 1 > 10) {
-          toast(
-            'A total of 10 attachments can be added to a post',
-            duration: Toast.LENGTH_LONG,
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                text: 'A total of 10 attachments can be added to a post',
+              ),
+            ),
           );
-          // onUploadedMedia(false);
           return null;
         } else {
           for (PlatformFile pFile in pickedFiles.files) {
@@ -146,9 +152,13 @@ class LMFeedMediaHandler {
             int fileBytes = await file.length();
             double fileSize = getFileSizeInDouble(fileBytes);
             if (fileSize > sizeLimit) {
-              toast(
-                'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-                duration: Toast.LENGTH_LONG,
+              LMFeedCore.showSnackBar(
+                LMFeedSnackBar(
+                  content: LMFeedText(
+                    text:
+                        'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
+                  ),
+                ),
               );
             } else {
               File video = File(file.path);
@@ -161,20 +171,20 @@ class LMFeedMediaHandler {
               videoFiles.add(videoFile);
             }
           }
-          // onUploadedMedia(true);
           return videoFiles;
         }
       } else {
-        // onUploadedMedia(false);
         return null;
       }
     } on Exception catch (err, stacktrace) {
       LMFeedLogger.instance.handleException(err, stacktrace);
-      toast(
-        'An error occurred',
-        duration: Toast.LENGTH_LONG,
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(
+            text: 'An error occurred',
+          ),
+        ),
       );
-      // onUploadedMedia(false);
       debugPrint(err.toString());
       return null;
     }
@@ -193,18 +203,24 @@ class LMFeedMediaHandler {
       );
       if (pickedFiles != null) {
         if (currentMediaLength + pickedFiles.files.length > 3) {
-          toast(
-            'A total of 3 documents can be added to a post',
-            duration: Toast.LENGTH_LONG,
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                text: 'A total of 3 documents can be added to a post',
+              ),
+            ),
           );
           return null;
         }
         List<LMMediaModel> attachedFiles = [];
         for (var pickedFile in pickedFiles.files) {
           if (getFileSizeInDouble(pickedFile.size) > 100) {
-            toast(
-              'File size should be smaller than 100MB',
-              duration: Toast.LENGTH_LONG,
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                  text: 'File size should be smaller than 100MB',
+                ),
+              ),
             );
           } else {
             LMMediaModel documentFile = LMMediaModel(
@@ -223,9 +239,12 @@ class LMFeedMediaHandler {
       }
     } on Exception catch (err, stacktrace) {
       LMFeedLogger.instance.handleException(err, stacktrace);
-      toast(
-        'An error occurred',
-        duration: Toast.LENGTH_LONG,
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(
+            text: 'An error occurred',
+          ),
+        ),
       );
       return null;
     }
@@ -257,9 +276,12 @@ class LMFeedMediaHandler {
 
     if (list != null && list.files.isNotEmpty) {
       if (mediaCount + list.files.length > 10) {
-        toast(
-          'A total of 10 attachments can be added to a post',
-          duration: Toast.LENGTH_LONG,
+        LMFeedCore.showSnackBar(
+          LMFeedSnackBar(
+            content: LMFeedText(
+              text: 'A total of 10 attachments can be added to a post',
+            ),
+          ),
         );
         return [];
       }
@@ -267,9 +289,13 @@ class LMFeedMediaHandler {
         int fileBytes = image.size;
         double fileSize = getFileSizeInDouble(fileBytes);
         if (fileSize > sizeLimit) {
-          toast(
-            'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-            duration: Toast.LENGTH_LONG,
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                text:
+                    'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
+              ),
+            ),
           );
           return [];
         }
@@ -283,7 +309,6 @@ class LMFeedMediaHandler {
             ),
           )
           .toList();
-      // onUploaded(true);
 
       return mediaFiles;
     } else {

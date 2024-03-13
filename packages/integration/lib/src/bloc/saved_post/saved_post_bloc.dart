@@ -7,7 +7,8 @@ import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_pre
 part 'saved_post_event.dart';
 part 'saved_post_state.dart';
 
-class LMFeedSavedPostBloc extends Bloc<LMFeedSavedPostEvent, LMFeedSavedPostState> {
+class LMFeedSavedPostBloc
+    extends Bloc<LMFeedSavedPostEvent, LMFeedSavedPostState> {
   LMFeedSavedPostBloc() : super(LMFeedSavedPostInitialState()) {
     on<LMFeedGetSavedPostEvent>(_mapGetSavedPostToState);
   }
@@ -24,12 +25,12 @@ class LMFeedSavedPostBloc extends Bloc<LMFeedSavedPostEvent, LMFeedSavedPostStat
       final user = LMFeedUserLocalPreference.instance.fetchUserData();
       final savePostResponse = await LMFeedCore.client.getSavedPost(
         (GetSavedPostRequestBuilder()
-              ..uuid(user.userUniqueId)
+              ..uuid(user.uuid)
               ..page(event.page)
               ..pageSize(event.pageSize))
             .build(),
       );
-      debugPrint(user.userUniqueId);
+      debugPrint(user.uuid);
       if (savePostResponse.success) {
         List<LMPostViewData> savedPost = [];
         savePostResponse.posts?.forEach((post) {
@@ -37,7 +38,7 @@ class LMFeedSavedPostBloc extends Bloc<LMFeedSavedPostEvent, LMFeedSavedPostStat
             post: post,
             widgets: savePostResponse.widgets,
             repostedPosts: savePostResponse.repostedPosts,
-            users: savePostResponse.users,
+            users: savePostResponse.users ?? {},
             topics: savePostResponse.topics,
           ));
         });

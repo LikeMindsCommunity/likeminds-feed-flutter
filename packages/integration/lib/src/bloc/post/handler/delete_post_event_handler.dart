@@ -6,22 +6,13 @@ void deletePostEventHandler(
     (DeletePostRequestBuilder()
           ..postId(event.postId)
           ..deleteReason(event.reason)
-          ..isRepost(event.isRepost)
-          )
+          ..isRepost(event.isRepost))
         .build(),
   );
 
   if (response.success) {
-    toast(
-      'Post Deleted',
-      duration: Toast.LENGTH_LONG,
-    );
     emit(LMFeedPostDeletedState(postId: event.postId));
   } else {
-    toast(
-      response.errorMessage ?? 'An error occurred',
-      duration: Toast.LENGTH_LONG,
-    );
     emit(LMFeedPostDeletionErrorState(
         message: response.errorMessage ?? 'An error occurred'));
   }

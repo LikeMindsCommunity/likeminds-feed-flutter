@@ -2,7 +2,7 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMCommentViewData {
   String id;
-  String userId;
+  String uuid;
   String text;
   int level;
   int likesCount;
@@ -14,14 +14,13 @@ class LMCommentViewData {
   DateTime updatedAt;
   bool isLiked;
   List<LMCommentViewData>? replies;
-  String uuid;
   String? tempId;
   LMUserViewData user;
   String? postId;
 
   LMCommentViewData._({
     required this.id,
-    required this.userId,
+    required this.uuid,
     required this.text,
     required this.level,
     required this.likesCount,
@@ -32,7 +31,6 @@ class LMCommentViewData {
     required this.isLiked,
     required this.isEdited,
     this.parentComment,
-    required this.uuid,
     this.tempId,
     this.replies,
     required this.user,
@@ -42,7 +40,7 @@ class LMCommentViewData {
 
 class LMCommentViewDataBuilder {
   String? _id;
-  String? _userId;
+  String? _uuid;
   String? _text;
   int? _level;
   int? _likesCount;
@@ -53,7 +51,6 @@ class LMCommentViewDataBuilder {
   DateTime? _createdAt;
   DateTime? _updatedAt;
   bool? _isLiked;
-  String? _uuid;
   String? _tempId;
   List<LMCommentViewData>? _replies;
   LMUserViewData? _user;
@@ -63,8 +60,8 @@ class LMCommentViewDataBuilder {
     _id = id;
   }
 
-  void userId(String userId) {
-    _userId = userId;
+  void uuid(String uuid) {
+    _uuid = uuid;
   }
 
   void text(String text) {
@@ -107,10 +104,6 @@ class LMCommentViewDataBuilder {
     _isLiked = isLiked;
   }
 
-  void uuid(String uuid) {
-    _uuid = uuid;
-  }
-
   void tempId(String tempId) {
     _tempId = tempId;
   }
@@ -130,7 +123,7 @@ class LMCommentViewDataBuilder {
   LMCommentViewData build() {
     return LMCommentViewData._(
       id: _id!,
-      userId: _userId!,
+      uuid: _uuid!,
       text: _text!,
       level: _level!,
       likesCount: _likesCount!,
@@ -141,7 +134,6 @@ class LMCommentViewDataBuilder {
       createdAt: _createdAt!,
       updatedAt: _updatedAt!,
       isLiked: _isLiked!,
-      uuid: _uuid!,
       tempId: _tempId,
       replies: _replies,
       user: _user!,
