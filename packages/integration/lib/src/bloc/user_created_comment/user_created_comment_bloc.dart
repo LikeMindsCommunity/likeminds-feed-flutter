@@ -9,11 +9,7 @@ class LMFeedUserCreatedCommentBloc
     extends Bloc<LMFeedUserCreatedCommentEvent, LMFeedUserCreatedCommentState> {
   LMFeedUserCreatedCommentBloc() : super(UserCreatedCommentInitialState()) {
     on<LMFeedUserCreatedCommentGetEvent>((event, emit) async {
-      if (event.page > 1) {
-        emit(UserCreatedCommentPaginationLoadingState());
-      } else {
-        emit(UserCreatedCommentLoadingState());
-      }
+      emit(UserCreatedCommentLoadingState());
       try {
         final request = (GetUserCommentsRequestBuilder()
               ..page(event.page)
@@ -28,18 +24,19 @@ class LMFeedUserCreatedCommentBloc
                   (key, value) =>
                       MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
               {};
-          response.comments?.forEach((comment) {
-            comments.add(LMCommentViewDataConvertor.fromComment(
+          comments =  response.comments?.map((comment) {
+             return LMCommentViewDataConvertor.fromComment(
               comment,
               users,
-            ));
-          });
+            );
+          }).toList() ?? [];
+
           final posts = response.posts?.map((key, value) => MapEntry(
                   key,
                   LMPostViewDataConvertor.fromPost(
-                      post: value, users: response.users??{}))) ??
+                      post: value, users: response.users ?? {}))) ??
               {};
-          emit(UserCreatedCommentLoadedState(comments: comments, posts: posts));
+          emit(UserCreatedCommentLoadedState(comments: comments, posts: posts, page: event.page));
         } else {
           emit(UserCreatedCommentErrorState(
               errorMessage: response.errorMessage ??

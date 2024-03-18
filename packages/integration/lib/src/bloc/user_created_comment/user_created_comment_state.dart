@@ -11,15 +11,17 @@ final class UserCreatedCommentInitialState
 final class UserCreatedCommentLoadingState
     extends LMFeedUserCreatedCommentState {}
 
-final class UserCreatedCommentPaginationLoadingState
-    extends LMFeedUserCreatedCommentState {}
-
 final class UserCreatedCommentLoadedState
     extends LMFeedUserCreatedCommentState {
   final List<LMCommentViewData> comments;
   final Map<String, LMPostViewData> posts;
+  final int page;
 
-  UserCreatedCommentLoadedState({required this.comments, required this.posts});
+  UserCreatedCommentLoadedState({
+    required this.comments,
+    required this.posts,
+    required this.page,
+  });
   @override
   List<Object> get props => [comments, posts];
 }
