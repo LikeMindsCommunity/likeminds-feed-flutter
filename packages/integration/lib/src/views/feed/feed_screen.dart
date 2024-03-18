@@ -1311,7 +1311,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     } else {
       int index = postViewData.menuItems
           .indexWhere((element) => element.id == postPinId);
-
       if (index != -1) {
         postViewData.menuItems[index]
           ..title = "Pin This Post"

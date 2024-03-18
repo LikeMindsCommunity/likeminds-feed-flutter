@@ -23,13 +23,13 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.text(post.text);
 
     List<LMTopicViewData> topicViewData = [];
-    if (topics != null) {
-      post.topicIds?.forEach((element) {
-        if (topics[element] != null) {
-          topicViewData.add(LMTopicViewDataConvertor.fromTopic(topics[element]!,
+    if (topics != null && post.topicIds != null) {
+      for (String topicId in post.topicIds!) {
+        if (topics[topicId] != null) {
+          topicViewData.add(LMTopicViewDataConvertor.fromTopic(topics[topicId]!,
               widgets: widgetMap));
         }
-      });
+      }
     }
     postViewDataBuilder.topics(topicViewData);
 
