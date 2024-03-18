@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 import 'package:video_player/video_player.dart';
 
 class LMFeedActivityWidget extends StatefulWidget {
