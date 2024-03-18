@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:async';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -6,9 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
@@ -58,8 +57,7 @@ class LMFeedComposeScreen extends StatefulWidget {
 class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Required blocs and data for basic functionality, or state management
 
-  final LMUserViewData user =
-      LMFeedUserLocalPreference.instance.fetchUserData();
+  final LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
@@ -209,9 +207,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 18),
-                      widget.composeUserHeaderBuilder?.call(context, user) ??
+                      widget.composeUserHeaderBuilder?.call(context, user!) ??
                           widgetUtility.composeScreenUserHeaderBuilder(
-                              context, user),
+                              context, user!),
                       const SizedBox(height: 18),
                       widget.composeContentBuilder?.call() ??
                           _defContentInput(),
@@ -656,7 +654,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   );
                 }
                 LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-                  user: user,
+                  user: user!,
                   postText: result!,
                   selectedTopics: selectedTopics,
                   postMedia: [...composeBloc.postMedia],
@@ -717,8 +715,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       padding: const EdgeInsets.only(top: 4.0),
                       margin: const EdgeInsets.only(right: 12),
                       child: LMFeedProfilePicture(
-                        fallbackText: widget.displayName ?? user.name,
-                        imageUrl: widget.displayUrl ?? user.imageUrl,
+                        fallbackText: widget.displayName ?? user!.name,
+                        imageUrl: widget.displayUrl ?? user!.imageUrl,
                         style: LMFeedProfilePictureStyle(
                           backgroundColor: theme.primaryColor,
                           size: 36,

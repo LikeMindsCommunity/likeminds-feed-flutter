@@ -144,7 +144,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
               )
             : LMFeedPostWidget(
                 post: repostData,
-                user: repostData.user!,
+                user: repostData.user,
                 isFeed: true,
                 topics: repostData.topics,
                 footerBuilder: (context, footer, footerData) =>

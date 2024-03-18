@@ -1,9 +1,11 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_flutter_core/src/views/edit/edit_post_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/edit_post_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
@@ -100,11 +102,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   // bloc to handle universal feed
   late final LMFeedBloc _feedBloc; // bloc to fetch the feedroom data
-  bool isCm = LMFeedUserLocalPreference.instance
-      .fetchMemberState(); // whether the logged in user is a community manager or not
+  bool isCm = LMFeedUserUtils
+      .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
-  LMUserViewData currentUser =
-      LMFeedUserLocalPreference.instance.fetchUserData();
+  LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
   // future to get the unread notification count
   late Future<GetUnreadNotificationCountResponse> getUnreadNotificationCount;
@@ -132,7 +133,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedBloc.instance;
-    userPostingRights = checkPostCreationRights();
+    userPostingRights = LMFeedUserUtils.checkPostCreationRights();
 
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
@@ -143,16 +144,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         },
       ),
     );
-  }
-
-  bool checkPostCreationRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
-    return memberRights;
   }
 
   void updateSelectedTopics(List<LMTopicViewData> topics) {
@@ -838,7 +829,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
-                        "user_id": currentUser.sdkClientInfo.uuid,
+                        "user_id": currentUser?.sdkClientInfo.uuid,
                         "user_state": isCm ? "CM" : "member",
                       },
                     ),

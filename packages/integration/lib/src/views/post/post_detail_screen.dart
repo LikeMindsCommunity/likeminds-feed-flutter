@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -73,13 +75,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       LMFeedFetchCommentReplyBloc.instance;
   LMFeedPostDetailScreenHandler? _postDetailScreenHandler;
   Future<LMPostViewData?>? getPostData;
-  LMUserViewData currentUser =
-      LMFeedUserLocalPreference.instance.fetchUserData();
+  LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
   String? commentIdReplyId;
   bool replyShown = false;
-  LMFeedThemeData? feedTheme;
+  LMFeedThemeData feedTheme = LMFeedCore.theme;
 
-  bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
+  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
 
   bool right = true;
   List<LMUserTagViewData> userTags = [];
@@ -97,7 +98,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           !_postDetailScreenHandler!.rebuildPostWidget.value;
       return value;
     });
-    right = _postDetailScreenHandler!.checkCommentRights();
+    right = LMFeedUserUtils.checkCommentRights();
     if (widget.openKeyboard) {
       _postDetailScreenHandler!.openOnScreenKeyboard();
     }
@@ -141,8 +142,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedCore.theme;
-    Size screenSize = MediaQuery.of(context).size;
     return RefreshIndicator.adaptive(
       onRefresh: () {
         _pagingController.itemList?.clear();
@@ -150,8 +149,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         _commentRepliesBloc.add(LMFeedClearCommentRepliesEvent());
         return Future.value();
       },
-      color: feedTheme?.primaryColor,
-      backgroundColor: feedTheme?.container,
+      color: feedTheme.primaryColor,
+      backgroundColor: feedTheme.container,
       child: FutureBuilder<LMPostViewData?>(
         future: getPostData,
         builder: (context, snapshot) {
@@ -162,7 +161,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 builder: (context, _, __) {
                   return Scaffold(
                     resizeToAvoidBottomInset: true,
-                    backgroundColor: feedTheme?.backgroundColor,
+                    backgroundColor: feedTheme.backgroundColor,
                     bottomSheet: widget.bottomTextFieldBuilder?.call(
                             context, _postDetailScreenHandler!.postData!) ??
                         defBottomTextField(),
@@ -197,11 +196,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     ? const SizedBox.shrink()
                                     : Container(
                                         decoration: BoxDecoration(
-                                            color: feedTheme?.container),
+                                            color: feedTheme.container),
                                         margin:
                                             const EdgeInsets.only(top: 10.0),
                                         padding:
-                                            feedTheme?.commentStyle.padding ??
+                                            feedTheme.commentStyle.padding ??
                                                 const EdgeInsets.symmetric(
                                                   horizontal: 16.0,
                                                 ),
@@ -215,7 +214,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                             textStyle: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              color: feedTheme!.onContainer,
+                                              color: feedTheme.onContainer,
                                             ),
                                           ),
                                         ),
@@ -319,12 +318,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 });
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return Scaffold(
-              backgroundColor: feedTheme?.backgroundColor,
+              backgroundColor: feedTheme.backgroundColor,
               body: const LMFeedLoader(),
             );
           } else if (snapshot.hasError) {
             return Scaffold(
-              backgroundColor: feedTheme?.backgroundColor,
+              backgroundColor: feedTheme.backgroundColor,
               body: Center(
                 child: Text(
                   '${snapshot.error}',
@@ -354,7 +353,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               maxHeight: MediaQuery.of(context).size.height * 0.7,
               minHeight: MediaQuery.of(context).size.height * 0.3,
             ),
-            backgroundColor: feedTheme?.container,
+            backgroundColor: feedTheme.container,
             clipBehavior: Clip.hardEdge,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
@@ -454,7 +453,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 : CupertinoIcons.chevron_back,
             style: LMFeedIconStyle(
               size: 28,
-              color: feedTheme?.onContainer,
+              color: feedTheme.onContainer,
             ),
           ),
         ),
@@ -472,7 +471,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               textStyle: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
-                color: feedTheme?.onContainer,
+                color: feedTheme.onContainer,
               ),
             ),
           ),
@@ -486,7 +485,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     textStyle: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: feedTheme?.primaryColor,
+                      color: feedTheme.primaryColor,
                     ),
                   ),
                 ),
@@ -494,7 +493,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       ),
       trailing: const [SizedBox(width: 36)],
       style: LMFeedAppBarStyle(
-        backgroundColor: feedTheme?.container,
+        backgroundColor: feedTheme.container,
         height: 61,
       ),
     );
@@ -539,7 +538,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           ),
         );
       },
-      style: feedTheme!.postStyle,
+      style: feedTheme.postStyle,
       header: _defPostHeader(),
       content: _defContentWidget(_postDetailScreenHandler!.postData!),
       footer: _defFooterWidget(),
@@ -552,7 +551,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedPostTopic(
       topics: _postDetailScreenHandler!.postData!.topics,
       post: _postDetailScreenHandler!.postData!,
-      style: feedTheme?.topicStyle,
+      style: feedTheme.topicStyle,
     );
   }
 
@@ -566,7 +565,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           ),
         );
       },
-      style: feedTheme?.contentStyle,
+      style: feedTheme.contentStyle,
       text: post.text,
       heading: post.heading,
     );
@@ -579,7 +578,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       shareButton: defShareButton(),
       saveButton: defSaveButton(),
       repostButton: defRepostButton(),
-      postFooterStyle: feedTheme?.footerStyle,
+      postFooterStyle: feedTheme.footerStyle,
       showRepostButton: !_postDetailScreenHandler!.postData!.isRepost,
     );
   }
@@ -590,7 +589,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           .users[_postDetailScreenHandler!.postData!.uuid]!,
       isFeed: true,
       postViewData: _postDetailScreenHandler!.postData!,
-      postHeaderStyle: feedTheme?.headerStyle,
+      postHeaderStyle: feedTheme.headerStyle,
       onProfileTap: () {
         LMFeedCore.instance.lmFeedClient.routeToProfile(
             _postDetailScreenHandler!
@@ -665,7 +664,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedPostMedia(
       postId: _postDetailScreenHandler!.postData!.id,
       attachments: _postDetailScreenHandler!.postData!.attachments!,
-      style: feedTheme?.mediaStyle,
+      style: feedTheme.mediaStyle,
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
@@ -692,7 +691,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         text: LMFeedText(
             text: LMFeedPostUtils.getLikeCountTextWithCount(
                 _postDetailScreenHandler!.postData!.likeCount)),
-        style: feedTheme?.footerStyle.likeButtonStyle,
+        style: feedTheme.footerStyle.likeButtonStyle,
         onTextTap: () {
           VideoController? videoController = LMFeedVideoProvider.instance
               .getVideoController(_postDetailScreenHandler!.postData!.id);
@@ -755,7 +754,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           text: LMFeedPostUtils.getCommentCountTextWithCount(
               _postDetailScreenHandler!.postData!.commentCount),
         ),
-        style: feedTheme?.footerStyle.commentButtonStyle,
+        style: feedTheme.footerStyle.commentButtonStyle,
         onTap: () {
           _postDetailScreenHandler!.openOnScreenKeyboard();
         },
@@ -800,7 +799,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             ));
           }
         },
-        style: feedTheme?.footerStyle.saveButtonStyle,
+        style: feedTheme.footerStyle.saveButtonStyle,
       );
 
   LMFeedButton defShareButton() => LMFeedButton(
@@ -809,14 +808,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           LMFeedDeepLinkHandler()
               .sharePost(_postDetailScreenHandler!.postData!.id);
         },
-        style: feedTheme?.footerStyle.shareButtonStyle,
+        style: feedTheme.footerStyle.shareButtonStyle,
       );
   LMFeedButton defRepostButton() => LMFeedButton(
         text: LMFeedText(
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: _postDetailScreenHandler!.postData!.isRepostedByUser
-                  ? feedTheme?.primaryColor
+                  ? feedTheme.primaryColor
                   : null,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -862,11 +861,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       ),
                     ),
                   );
-                  // TODO: remove old toast
-                  // toast(
-                  //   'A post is already uploading.',
-                  //   duration: Toast.LENGTH_LONG,
-                  // );
                 }
               }
             : () {
@@ -877,25 +871,22 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     ),
                   ),
                 );
-                // TODO: remove old toast
-                // toast("You do not have permission to create a post");
               },
-        style: feedTheme?.footerStyle.repostButtonStyle?.copyWith(
-            icon: feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
+        style: feedTheme.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedTheme.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedTheme.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color:
                           _postDetailScreenHandler!.postData!.isRepostedByUser
-                              ? feedTheme?.primaryColor
+                              ? feedTheme.primaryColor
                               : null),
             ),
-            activeIcon:
-                feedTheme?.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedTheme?.footerStyle.repostButtonStyle?.icon?.style
+            activeIcon: feedTheme.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedTheme.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color:
                           _postDetailScreenHandler!.postData!.isRepostedByUser
-                              ? feedTheme?.primaryColor
+                              ? feedTheme.primaryColor
                               : null),
             )),
       );
@@ -913,16 +904,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           },
         );
       },
-      style: feedTheme?.commentStyle ??
-          const LMFeedCommentStyle(
-            padding: EdgeInsets.all(16.0),
-            actionsPadding: EdgeInsets.only(left: 48),
-          ),
+      style: feedTheme.commentStyle,
       lmFeedMenuAction: defLMFeedMenuAction(commentViewData),
       profilePicture: LMFeedProfilePicture(
         style: LMFeedProfilePictureStyle(
           size: 36,
-          backgroundColor: feedTheme?.primaryColor,
+          backgroundColor: feedTheme.primaryColor,
         ),
         fallbackText:
             _postDetailScreenHandler!.users[commentViewData.uuid]!.name,
@@ -957,7 +944,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedButton defCommentLikeButton(LMCommentViewData commentViewData) {
     return LMFeedButton(
-      style: feedTheme?.commentStyle.likeButtonStyle?.copyWith(
+      style: feedTheme.commentStyle.likeButtonStyle?.copyWith(
               showText: commentViewData.likesCount == 0 ? false : true) ??
           LMFeedButtonStyle(
             margin: 10.0,
@@ -972,7 +959,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             activeIcon: LMFeedIcon(
               type: LMFeedIconType.icon,
               style: LMFeedIconStyle(
-                color: feedTheme?.primaryColor,
+                color: feedTheme.primaryColor,
                 size: 20,
               ),
               icon: Icons.thumb_up_alt_rounded,
@@ -989,7 +976,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         text: LMFeedPostUtils.getLikeCountTextWithCount(
             commentViewData.likesCount),
         style: LMFeedTextStyle(
-          textStyle: TextStyle(color: feedTheme?.primaryColor, fontSize: 12),
+          textStyle: TextStyle(color: feedTheme.primaryColor, fontSize: 12),
         ),
       ),
       onTextTap: () {
@@ -1041,7 +1028,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   LMFeedButton defCommentReplyButton(LMCommentViewData commentViewData) {
     return LMFeedButton(
-      style: feedTheme?.commentStyle.replyButtonStyle ??
+      style: feedTheme.commentStyle.replyButtonStyle ??
           const LMFeedButtonStyle(
             margin: 10,
             icon: LMFeedIcon(
@@ -1120,12 +1107,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
-            color: feedTheme?.primaryColor,
+            color: feedTheme.primaryColor,
             fontSize: 14,
           ),
         ),
       ),
-      style: feedTheme?.commentStyle.showRepliesButtonStyle,
+      style: feedTheme.commentStyle.showRepliesButtonStyle,
     );
   }
 
@@ -1135,7 +1122,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         bloc: _postDetailScreenHandler!.commentHandlerBloc,
         builder: (context, state) => Container(
           decoration: BoxDecoration(
-            color: feedTheme?.container ?? LikeMindsTheme.whiteColor,
+            color: feedTheme.container,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -1163,8 +1150,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               textStyle: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: feedTheme?.onContainer ??
-                                    LikeMindsTheme.greyColor,
+                                color: feedTheme.onContainer,
                               ),
                             ),
                           ),
@@ -1203,7 +1189,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   : const SizedBox.shrink(),
               Container(
                 decoration: BoxDecoration(
-                    color: feedTheme?.primaryColor.withOpacity(0.04),
+                    color: feedTheme.primaryColor.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(24)),
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
                 padding:
@@ -1214,7 +1200,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       fallbackText: currentUser.name,
                       imageUrl: currentUser.imageUrl,
                       style: LMFeedProfilePictureStyle.basic().copyWith(
-                        backgroundColor: feedTheme?.primaryColor,
+                        backgroundColor: feedTheme.primaryColor,
                         size: 36,
                         fallbackTextStyle: LMFeedProfilePictureStyle.basic()
                             .fallbackTextStyle
@@ -1242,11 +1228,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         },
                         controller: _postDetailScreenHandler!.commentController,
                         decoration:
-                            feedTheme?.textFieldStyle.decoration?.copyWith(
+                            feedTheme.textFieldStyle.decoration?.copyWith(
                           enabled: right,
                           hintText: right
-                              ? feedTheme
-                                      ?.textFieldStyle.decoration?.hintText ??
+                              ? feedTheme.textFieldStyle.decoration?.hintText ??
                                   'Write a comment'
                               : "You do not have permission to comment.",
                         ),
@@ -1261,7 +1246,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                           ? null
                           : state is LMFeedCommentLoadingState
                               ? LMFeedLoader(
-                                  style: feedTheme?.loaderStyle,
+                                  style: feedTheme.loaderStyle,
                                 )
                               : LMFeedButton(
                                   style: const LMFeedButtonStyle(
@@ -1274,12 +1259,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       textStyle: TextStyle(
                                         fontWeight: FontWeight.w500,
                                         fontSize: feedTheme
-                                                ?.textFieldStyle
+                                                .textFieldStyle
                                                 .decoration
                                                 ?.hintStyle
                                                 ?.fontSize ??
                                             13,
-                                        color: feedTheme?.primaryColor,
+                                        color: feedTheme.primaryColor,
                                       ),
                                     ),
                                   ),
@@ -1472,7 +1457,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         maxHeight: MediaQuery.of(context).size.height * 0.7,
         minHeight: MediaQuery.of(context).size.height * 0.3,
       ),
-      backgroundColor: feedTheme?.container,
+      backgroundColor: feedTheme.container,
       clipBehavior: Clip.hardEdge,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(

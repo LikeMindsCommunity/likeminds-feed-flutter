@@ -5,7 +5,7 @@ class LMFeedNotificationTile extends StatelessWidget {
   final LMNotificationFeedItemViewData notificationItemViewData;
   final LMFeedNotificationTileStyle? style;
   final VoidCallback? onTap;
-  ValueNotifier<bool> _rebuild = ValueNotifier(false);
+  final ValueNotifier<bool> _rebuild = ValueNotifier(false);
 
   LMFeedNotificationTile({
     Key? key,
