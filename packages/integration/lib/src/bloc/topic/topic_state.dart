@@ -6,6 +6,8 @@ class LMFeedTopicInitialState extends LMFeedTopicState {}
 
 class LMFeedTopicLoadingState extends LMFeedTopicState {}
 
+class LMFeedTopicPaginationLoadingState extends LMFeedTopicState {}
+
 class LMFeedTopicErrorState extends LMFeedTopicState {
   final String errorMessage;
 

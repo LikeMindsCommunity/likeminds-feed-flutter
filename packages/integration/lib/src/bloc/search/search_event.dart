@@ -24,3 +24,5 @@ class LMFeedGetSearchEvent extends LMFeedSearchEvent {
   @override
   List<Object> get props => [query, type, page, pageSize];
 }
+
+class LMFeedClearSearchEvent extends LMFeedSearchEvent {}
