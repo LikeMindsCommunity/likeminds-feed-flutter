@@ -34,7 +34,6 @@ class LMFeedComposeScreenConfig {
     this.enableVideos = true,
     this.enableHeading = false,
     this.topicRequiredToCreatePost = false,
-    this.topicSelectorType = LMFeedComposeTopicSelectorType.popup,
     this.userDisplayType = LMFeedComposeUserDisplayType.profilePicture,
     this.multipleTopicsSelectable = false,
   });
@@ -43,9 +42,6 @@ class LMFeedComposeScreenConfig {
   /// to support changing light and dark style of overall system
   /// elements in accordance to the screen's background
   final SystemUiOverlayStyle composeSystemOverlayStyle;
-
-  /// The topic selector type to be shown
-  final LMFeedComposeTopicSelectorType topicSelectorType;
 
   /// The user display type to be shown
   final LMFeedComposeUserDisplayType userDisplayType;
@@ -96,7 +92,6 @@ class LMFeedComposeScreenConfig {
     bool? enableTopics,
     bool? enableVideos,
     bool? topicRequiredToCreatePost,
-    LMFeedComposeTopicSelectorType? topicSelectorType,
     LMFeedComposeUserDisplayType? userDisplayType,
     bool? enableHeading,
     String? headingHint,
@@ -118,7 +113,6 @@ class LMFeedComposeScreenConfig {
       headingHint: headingHint ?? this.headingHint,
       multipleTopicsSelectable:
           multipleTopicsSelectable ?? this.multipleTopicsSelectable,
-      topicSelectorType: topicSelectorType ?? this.topicSelectorType,
       userDisplayType: userDisplayType ?? this.userDisplayType,
     );
   }

@@ -108,11 +108,6 @@ Future<String?> setupMessaging() async {
     debugPrint("Token - $token");
     return token.toString();
   } else {
-    // TODO: remove after testing
-    // toast(
-    //   'User declined or has not accepted notification permissions',
-    //   duration: Toast.LENGTH_LONG,
-    // );
     LMFeedCore.showSnackBar(
       LMFeedSnackBar(
         content: const Text(

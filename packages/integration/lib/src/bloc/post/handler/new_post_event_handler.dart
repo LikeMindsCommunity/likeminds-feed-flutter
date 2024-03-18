@@ -99,7 +99,7 @@ void newPostEventHandler(
 
     final requestBuilder = AddPostRequestBuilder()
       ..attachments(attachments)
-      ..topics(postTopics.map((e) => e).toList())
+      ..topicIds(postTopics.map((e) => e.id).toList())
       ..tempId('${-DateTime.now().millisecondsSinceEpoch}');
 
     if (headingText != null) {

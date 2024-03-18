@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of '../comment_handler_bloc.dart';
 
 /// {@template delete_comment_event_handler}

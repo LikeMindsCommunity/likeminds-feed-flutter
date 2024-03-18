@@ -102,7 +102,6 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     isMuted = widget.isMute;
     initialiseVideo = initialiseControllers();

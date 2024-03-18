@@ -14,6 +14,7 @@ class LMFeedTopicErrorState extends LMFeedTopicState {
 
 class LMFeedTopicLoadedState extends LMFeedTopicState {
   final GetTopicsResponse getTopicFeedResponse;
+  final int page;
 
-  LMFeedTopicLoadedState(this.getTopicFeedResponse);
+  LMFeedTopicLoadedState(this.getTopicFeedResponse, this.page);
 }

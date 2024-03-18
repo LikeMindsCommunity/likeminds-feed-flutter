@@ -187,4 +187,9 @@ class LMFeedWidgetUtility {
       BuildContext context, LMUserViewData user) {
     return const SizedBox.shrink();
   }
+
+  Widget composeScreenTopicSelectorBuilder(BuildContext context,
+      Widget topicSelector, List<LMTopicViewData> selectedTopics) {
+    return topicSelector;
+  }
 }

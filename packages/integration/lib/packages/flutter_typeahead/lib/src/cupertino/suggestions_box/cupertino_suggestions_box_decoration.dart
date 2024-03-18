@@ -18,9 +18,9 @@ class CupertinoSuggestionsBoxDecoration {
   /// Creates a [CupertinoSuggestionsBoxDecoration]
   const CupertinoSuggestionsBoxDecoration(
       {this.hasScrollbar = true,
-        this.constraints,
-        this.color,
-        this.border,
-        this.borderRadius,
-        this.offsetX = 0.0});
+      this.constraints,
+      this.color,
+      this.border,
+      this.borderRadius,
+      this.offsetX = 0.0});
 }

@@ -4,8 +4,6 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/media/media_utils.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LMFeedMediaHandler {
@@ -114,23 +112,23 @@ class LMFeedMediaHandler {
       );
 
       if (pickedFiles == null || pickedFiles.files.isEmpty) {
-        // onUploadedMedia(false);
         return null;
       }
 
-      CommunityConfigurations config =
-          await LMFeedUserLocalPreference.instance.getCommunityConfigurations();
-      if (config.value == null || config.value!["max_video_size"] == null) {
+      CommunityConfigurations? config = LMFeedLocalPreference.instance
+          .fetchCommunityConfiguration("media_limits");
+      if (config == null || config.value?["max_video_size"] == null) {
         final configResponse =
             await LMFeedCore.instance.lmFeedClient.getCommunityConfigurations();
         if (configResponse.success &&
             configResponse.communityConfigurations != null &&
             configResponse.communityConfigurations!.isNotEmpty) {
           config = configResponse.communityConfigurations!.first;
+          LMFeedLocalPreference.instance.storeCommunityConfiguration(config);
         }
       }
       final double sizeLimit;
-      if (config.value != null && config.value!["max_video_size"] != null) {
+      if (config != null && config.value?["max_video_size"] != null) {
         sizeLimit = config.value!["max_video_size"]! / 1024;
       } else {
         sizeLimit = 100;
@@ -256,19 +254,20 @@ class LMFeedMediaHandler {
       allowMultiple: true,
       type: FileType.image,
     );
-    CommunityConfigurations config =
-        await LMFeedUserLocalPreference.instance.getCommunityConfigurations();
-    if (config.value == null || config.value!["max_image_size"] == null) {
+    CommunityConfigurations? config = LMFeedLocalPreference.instance
+        .fetchCommunityConfiguration("media_limits");
+    if (config == null || config.value?["max_image_size"] == null) {
       final configResponse =
           await LMFeedCore.client.getCommunityConfigurations();
       if (configResponse.success &&
           configResponse.communityConfigurations != null &&
           configResponse.communityConfigurations!.isNotEmpty) {
         config = configResponse.communityConfigurations!.first;
+        LMFeedLocalPreference.instance.storeCommunityConfiguration(config);
       }
     }
     final double sizeLimit;
-    if (config.value != null && config.value!["max_image_size"] != null) {
+    if (config != null && config.value?["max_image_size"] != null) {
       sizeLimit = config.value!["max_image_size"]! / 1024;
     } else {
       sizeLimit = 5;

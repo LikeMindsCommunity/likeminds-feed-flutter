@@ -213,10 +213,10 @@ class LMFeedPostUtils {
   }) {
     List<LMTopicViewData> topicViewData = [];
 
-    if (activity.activityEntityData.topics != null &&
+    if (activity.activityEntityData.topicIds != null &&
         topics != null &&
-        activity.activityEntityData.topics!.isNotEmpty) {
-      for (var topicId in activity.activityEntityData.topics!) {
+        activity.activityEntityData.topicIds!.isNotEmpty) {
+      for (var topicId in activity.activityEntityData.topicIds!) {
         if (topics[topicId] != null) {
           topicViewData
               .add(LMTopicViewDataConvertor.fromTopic(topics[topicId]!));

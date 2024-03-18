@@ -180,31 +180,20 @@ class LMFeedPostHeader extends StatelessWidget {
                               subText != null
                                   ? LikeMindsTheme.kHorizontalPaddingXSmall
                                   : const SizedBox(),
-                              subTextSeparator ??
-                                  LMFeedText(
-                                    text: subText != null ? '·' : '',
-                                    style: LMFeedTextStyle(
-                                      textStyle: TextStyle(
-                                        fontSize: LikeMindsTheme.kFontSmall,
-                                        color: Colors.grey[700],
+                              if (createdAt != null)
+                                subTextSeparator ??
+                                    LMFeedText(
+                                      text: subText != null ? '·' : '',
+                                      style: LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: LikeMindsTheme.kFontSmall,
+                                          color: Colors.grey[700],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                              subText != null
-                                  ? LikeMindsTheme.kHorizontalPaddingXSmall
-                                  : const SizedBox(),
-                              createdAt ??
-                                  LMFeedText(
-                                    text: LMFeedTimeAgo.instance
-                                        .format(postViewData.createdAt),
-                                    style: postHeaderStyle?.subTextStyle ??
-                                        LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize: LikeMindsTheme.kFontSmall,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                  ),
+                              if (createdAt != null && subText != null)
+                                LikeMindsTheme.kHorizontalPaddingXSmall,
+                              createdAt ?? const SizedBox.shrink(),
                               LikeMindsTheme.kHorizontalPaddingSmall,
                               LMFeedText(
                                 text: postViewData.isEdited ? '·' : '',

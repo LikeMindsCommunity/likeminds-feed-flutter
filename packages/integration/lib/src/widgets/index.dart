@@ -6,3 +6,5 @@ export 'activity/activity_tile.dart';
 export 'activity/activity_widget.dart';
 
 export 'user/user_feed.dart';
+
+export 'lists/feed/feed_list.dart';

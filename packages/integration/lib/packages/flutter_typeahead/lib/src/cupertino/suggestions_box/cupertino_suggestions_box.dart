@@ -73,7 +73,6 @@ class CupertinoSuggestionsBox {
       int timer = 0;
       // viewInsets or MediaQuery have changed once keyboard has toggled or orientation has changed
       while (widgetMounted && timer < waitMetricsTimeoutMillis) {
-        // TODO: reduce delay if showDialog ever exposes detection of animation end
         await Future<void>.delayed(const Duration(milliseconds: 170));
         timer += 170;
 

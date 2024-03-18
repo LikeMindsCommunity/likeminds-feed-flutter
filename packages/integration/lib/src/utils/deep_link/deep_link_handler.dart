@@ -23,7 +23,6 @@ class LMFeedDeepLinkHandler {
 
   // Below functions takes the user outside of the application
   // using the domain provided at the time of initialization
-  // TODO: Add prefix text, image as per your requirements
   void sharePost(String postId) {
     String postUrl = createLink(postId);
     Share.share(postUrl);

@@ -30,7 +30,7 @@ void editPostEventHandler(
       // postId of the post to be edited
       ..postId(event.postId)
       // topics associated to the post
-      ..topics(event.selectedTopics.map((e) => e.id).toList());
+      ..topicIds(event.selectedTopics.map((e) => e.id).toList());
 
     // If postText is not null, add postText in request
     if (postText != null) {

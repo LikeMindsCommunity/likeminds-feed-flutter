@@ -16,7 +16,10 @@ class LMFeedTopicBloc extends Bloc<LMFeedTopicEvent, LMFeedTopicState> {
         GetTopicsResponse response =
             await LMFeedCore.client.getTopics(event.getTopicFeedRequest);
         if (response.success) {
-          emit(LMFeedTopicLoadedState(response));
+          emit(LMFeedTopicLoadedState(
+            response,
+            event.getTopicFeedRequest.page,
+          ));
         } else {
           emit(LMFeedTopicErrorState(response.errorMessage!));
         }

@@ -24,8 +24,9 @@ export 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart'
 export 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart'
     hide kRegexLinksAndTags, getImageFileDimensions, getNetworkImageDimensions;
 export 'package:likeminds_feed/likeminds_feed.dart';
-export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
+export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
@@ -83,7 +84,6 @@ class LMFeedCore {
     this.lmFeedClient =
         lmFeedClient ?? (LMFeedClientBuilder()..apiKey(apiKey!)).build();
     clientDomain = domain;
-    await LMFeedUserLocalPreference.instance.initialize();
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
     _scaffoldMessengerKey = scaffoldMessengerKey;
@@ -103,8 +103,7 @@ class LMFeedCore {
       ..then((value) async {
         if (value.success) {
           initiateUserCalled = true;
-          await LMFeedUserLocalPreference.instance
-              .setUserDataFromInitiateUserResponse(value);
+          await LMFeedLocalPreference.instance.storeUserData(value.user!);
           LMNotificationHandler.instance.registerDevice(
             value.user!.sdkClientInfo.uuid,
           );
@@ -118,8 +117,7 @@ class LMFeedCore {
       ..then(
         (value) async {
           if (value.success) {
-            await LMFeedUserLocalPreference.instance
-                .storeMemberRightsFromMemberStateResponse(value);
+            await LMFeedLocalPreference.instance.storeMemberState(value);
           }
           return value;
         },

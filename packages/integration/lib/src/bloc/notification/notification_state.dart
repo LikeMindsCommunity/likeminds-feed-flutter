@@ -11,7 +11,8 @@ class LMFeedNotificationsInitialState extends LMFeedNotificationsState {}
 
 class LMFeedNotificationsLoadingState extends LMFeedNotificationsState {}
 
-class LMFeedNotificationsPaginationLoadingState extends LMFeedNotificationsState {}
+class LMFeedNotificationsPaginationLoadingState
+    extends LMFeedNotificationsState {}
 
 class LMFeedNotificationsLoadedState extends LMFeedNotificationsState {
   final List<LMNotificationFeedItemViewData> response;

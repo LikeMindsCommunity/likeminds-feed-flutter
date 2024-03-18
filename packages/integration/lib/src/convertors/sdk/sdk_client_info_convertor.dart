@@ -1,5 +1,4 @@
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMSDKClientInfoViewDataConvertor {
   static LMSDKClientInfoViewData fromSDKClientInfo(
@@ -13,6 +12,9 @@ class LMSDKClientInfoViewDataConvertor {
 
     sdkClientInfoViewDataBuilder.uuid(sdkClientInfo.uuid);
 
+    if (sdkClientInfo.widgetId != null)
+      sdkClientInfoViewDataBuilder.widgetId(sdkClientInfo.widgetId!);
+
     return sdkClientInfoViewDataBuilder.build();
   }
 
@@ -22,6 +24,7 @@ class LMSDKClientInfoViewDataConvertor {
       community: sdkClientInfoViewData.community,
       user: sdkClientInfoViewData.user,
       uuid: sdkClientInfoViewData.uuid,
+      widgetId: sdkClientInfoViewData.widgetId,
     );
   }
 }
