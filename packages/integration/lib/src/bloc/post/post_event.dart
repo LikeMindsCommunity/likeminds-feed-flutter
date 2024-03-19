@@ -15,9 +15,12 @@ abstract class LMFeedPostEvents extends Equatable {
 /// {@endtemplate}
 class LMFeedGetPostEvent extends LMFeedPostEvents {
   final String postId;
+  final int page;
+  final int pageSize;
 
   ///{@macro lm_feed_get_post_event}
-  LMFeedGetPostEvent({required this.postId});
+  LMFeedGetPostEvent(
+      {required this.postId, required this.page, required this.pageSize});
 }
 
 /// {@template lm_feed_create_new_post_event}

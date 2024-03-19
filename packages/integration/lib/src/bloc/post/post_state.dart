@@ -24,11 +24,21 @@ class LMFeedPostSuccessState extends LMFeedPostState {
 /// [post] contains the post details and is of type [LMPostViewData]
 class LMFeedGetPostSuccessState extends LMFeedPostSuccessState {
   final LMPostViewData post;
+  final Map<String, LMUserViewData> userData;
+  final Map<String, LMTopicViewData> topics;
+  final Map<String, LMWidgetViewData> widgets;
+  final Map<String, LMPostViewData>? repostedPosts;
 
-  const LMFeedGetPostSuccessState({required this.post});
+  const LMFeedGetPostSuccessState({
+    required this.post,
+    required this.userData,
+    required this.topics,
+    required this.widgets,
+    this.repostedPosts,
+  });
 
   @override
-  List<Object> get props => [post];
+  List<Object> get props => [post, userData, topics, widgets];
 }
 
 /// When a new post is successfully uploaded
