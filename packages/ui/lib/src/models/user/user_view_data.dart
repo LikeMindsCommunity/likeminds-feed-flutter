@@ -36,6 +36,9 @@ class LMUserViewData {
 
   List<LMTopicViewData>? topics;
 
+  /// widget for storing custom data
+  LMWidgetViewData? widget;
+
   /// {@macro user_view_data}
   LMUserViewData._({
     required this.id,
@@ -55,6 +58,7 @@ class LMUserViewData {
     this.createdAt,
     this.isDeleted,
     this.topics,
+    this.widget,
   });
 }
 
@@ -79,6 +83,7 @@ class LMUserViewDataBuilder {
   int? _communityId;
   int? _createdAt;
   List<LMTopicViewData>? _topics;
+  LMWidgetViewData? _widget;
 
   void id(int id) {
     _id = id;
@@ -148,6 +153,10 @@ class LMUserViewDataBuilder {
     _topics = topics;
   }
 
+  void widget(LMWidgetViewData widget) {
+    _widget = widget;
+  }
+
   /// {@macro user_view_data_builder}
   LMUserViewData build() {
     return LMUserViewData._(
@@ -168,6 +177,7 @@ class LMUserViewDataBuilder {
       createdAt: _createdAt,
       isDeleted: _isDeleted,
       topics: _topics,
+      widget: _widget,
     );
   }
 }

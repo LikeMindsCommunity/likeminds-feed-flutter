@@ -207,7 +207,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     );
   }
 
-  Padding _defCustomWidget() {
+  Widget _defCustomWidget() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
       child: LMFeedText(

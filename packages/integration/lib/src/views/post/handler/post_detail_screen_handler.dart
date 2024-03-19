@@ -21,7 +21,6 @@ class LMFeedPostDetailScreenHandler {
     this.commentListPagingController = commetListPagingController;
     this.postId = postId;
     commentHandlerBloc = LMFeedCommentBloc.instance;
-    addCommentListPaginationListener();
     commentController = TextEditingController();
     focusNode = FocusNode();
   }

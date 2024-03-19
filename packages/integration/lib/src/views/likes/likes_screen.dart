@@ -184,6 +184,7 @@ class LikesTile extends StatelessWidget {
                   LMFeedProfileBloc.instance.add(
                     LMFeedRouteToUserProfileEvent(
                       uuid: user?.sdkClientInfo.uuid ?? user?.uuid ?? '',
+                      context: context,
                     ),
                   );
                 },

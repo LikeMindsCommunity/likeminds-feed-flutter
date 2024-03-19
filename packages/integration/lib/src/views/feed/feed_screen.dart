@@ -683,6 +683,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: uuid,
+            context: context,
           ),
         );
       },
@@ -748,6 +749,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: uuid ?? post.uuid,
+            context: context,
           ),
         );
       },
@@ -782,6 +784,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: _feedBloc.users[postViewData.uuid]!.sdkClientInfo.uuid,
+            context: context,
           ),
         );
       },

@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
-class LMFeedUserFeedWidget extends StatefulWidget {
-  const LMFeedUserFeedWidget({
+class LMFeedUserCreatedPostListView extends StatefulWidget {
+  const LMFeedUserCreatedPostListView({
     Key? key,
     required this.uuid,
     this.postBuilder,
@@ -38,10 +38,12 @@ class LMFeedUserFeedWidget extends StatefulWidget {
   final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
   @override
-  State<LMFeedUserFeedWidget> createState() => _LMFeedUserFeedWidgetState();
+  State<LMFeedUserCreatedPostListView> createState() =>
+      _LMFeedUserCreatedPostListViewState();
 }
 
-class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
+class _LMFeedUserCreatedPostListViewState
+    extends State<LMFeedUserCreatedPostListView> {
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   static const int pageSize = 10;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -308,6 +310,7 @@ class _LMFeedUserFeedWidgetState extends State<LMFeedUserFeedWidget> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: uuid,
+            context: context,
           ),
         );
       },

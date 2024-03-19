@@ -106,8 +106,9 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.repostCount(post.repostCount);
 
     postViewDataBuilder.isDeleted(post.isDeleted ?? false);
-
-    postViewDataBuilder.widgets(widgetMap!);
+    if(widgetMap != null) {
+      postViewDataBuilder.widgets(widgetMap);
+    }
 
     if (post.heading != null) postViewDataBuilder.heading(post.heading!);
 

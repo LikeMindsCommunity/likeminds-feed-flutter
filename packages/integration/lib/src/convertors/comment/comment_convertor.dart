@@ -21,6 +21,7 @@ class LMCommentViewDataConvertor {
       ..isEdited(comment.isEdited)
       ..user(users[comment.uuid]!)
       ..tempId(comment.tempId ?? '')
+      ..postId(comment.postId ?? '')
       ..parentComment(comment.parentComment != null
           ? LMCommentViewDataConvertor.fromComment(
               comment.parentComment!, users)
@@ -51,6 +52,7 @@ class LMCommentViewDataConvertor {
           ?.map((e) => LMCommentViewDataConvertor.toComment(e))
           .toList(),
       tempId: commentViewData.tempId,
+      postId: commentViewData.postId,
     );
   }
 }

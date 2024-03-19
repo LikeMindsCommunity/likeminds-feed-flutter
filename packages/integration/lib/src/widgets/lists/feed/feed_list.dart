@@ -161,6 +161,7 @@ class _LMFeedListState extends State<LMFeedList> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: uuid,
+            context: context,
           ),
         );
       },
@@ -226,6 +227,7 @@ class _LMFeedListState extends State<LMFeedList> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: uuid ?? post.uuid,
+            context: context,
           ),
         );
       },
@@ -260,6 +262,7 @@ class _LMFeedListState extends State<LMFeedList> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: _feedBloc.users[postViewData.uuid]!.sdkClientInfo.uuid,
+            context: context,
           ),
         );
       },

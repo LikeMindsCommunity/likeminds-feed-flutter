@@ -267,6 +267,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: uuid,
+            context: context,
           ),
         );
       },
@@ -349,6 +350,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: users[postViewData.uuid]!.sdkClientInfo.uuid,
+            context: context,
           ),
         );
       },

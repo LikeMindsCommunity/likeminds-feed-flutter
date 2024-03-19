@@ -5,7 +5,7 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMUserViewDataConvertor {
   static LMUserViewData fromUser(User user,
-      {Map<String, Topic>? topics, Map<String, List<String>>? userTopics}) {
+      {Map<String, Topic>? topics, Map<String, List<String>>? userTopics, Map<String, WidgetModel>? widgets}) {
     LMUserViewDataBuilder userViewDataBuilder = LMUserViewDataBuilder();
 
     userViewDataBuilder.id(user.id);
@@ -67,7 +67,10 @@ class LMUserViewDataConvertor {
       });
       userViewDataBuilder.topics(userTopicsList);
     }
-
+    if (widgets != null && widgets[user.sdkClientInfo.widgetId] != null) {
+      userViewDataBuilder.widget(LMWidgetViewDataConvertor.fromWidgetModel(
+          widgets[user.sdkClientInfo.widgetId]!));
+    }
     return userViewDataBuilder.build();
   }
 

@@ -16,6 +16,7 @@ class LMCommentViewData {
   List<LMCommentViewData>? replies;
   String? tempId;
   LMUserViewData user;
+  String? postId;
 
   LMCommentViewData._({
     required this.id,
@@ -33,6 +34,7 @@ class LMCommentViewData {
     this.tempId,
     this.replies,
     required this.user,
+    this.postId,
   });
 }
 
@@ -52,6 +54,7 @@ class LMCommentViewDataBuilder {
   String? _tempId;
   List<LMCommentViewData>? _replies;
   LMUserViewData? _user;
+  String? _postId;
 
   void id(String id) {
     _id = id;
@@ -113,6 +116,10 @@ class LMCommentViewDataBuilder {
     _user = user;
   }
 
+  void postId(String postId) {
+    _postId = postId;
+  }
+
   LMCommentViewData build() {
     return LMCommentViewData._(
       id: _id!,
@@ -130,6 +137,7 @@ class LMCommentViewDataBuilder {
       tempId: _tempId,
       replies: _replies,
       user: _user!,
+      postId: _postId,
     );
   }
 }
