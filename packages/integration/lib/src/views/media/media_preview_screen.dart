@@ -166,40 +166,45 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                     }
                   }),
             ),
-            ValueListenableBuilder(
-              valueListenable: rebuildCurr,
-              builder: (context, _, __) {
-                return Column(
-                  children: [
-                    checkIfMultipleAttachments()
-                        ? LikeMindsTheme.kVerticalPaddingMedium
-                        : const SizedBox(),
-                    checkIfMultipleAttachments()
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: postAttachments.map((url) {
-                              int index = postAttachments.indexOf(url);
-                              return Container(
-                                width: 8.0,
-                                height: 8.0,
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 7.0, horizontal: 2.0),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: currPosition == index
-                                      ? feedTheme.primaryColor
-                                      : feedTheme.container,
-                                ),
-                              );
-                            }).toList())
-                        : const SizedBox(),
-                  ],
-                );
-              },
-            ),
+            if (checkIfMultipleAttachments())
+              ValueListenableBuilder(
+                valueListenable: rebuildCurr,
+                builder: (context, _, __) {
+                  return widgetUtility.postMediaCarouselIndicatorBuilder(
+                      context,
+                      currPosition,
+                      postAttachments.length,
+                      carouselIndexIndicatorWidget());
+                },
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget carouselIndexIndicatorWidget() {
+    return Column(
+      children: [
+        LikeMindsTheme.kVerticalPaddingMedium,
+        Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: postAttachments.map((url) {
+              int index = postAttachments.indexOf(url);
+              return Container(
+                width: 8.0,
+                height: 8.0,
+                margin:
+                    const EdgeInsets.symmetric(vertical: 7.0, horizontal: 2.0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: currPosition == index
+                      ? feedTheme.primaryColor
+                      : feedTheme.container,
+                ),
+              );
+            }).toList())
+      ],
     );
   }
 }

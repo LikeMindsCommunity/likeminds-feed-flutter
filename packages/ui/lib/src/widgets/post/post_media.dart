@@ -47,7 +47,7 @@ class LMFeedPostMedia extends StatefulWidget {
     Function(VideoController)? initialiseVideoController,
     Function(String, StackTrace)? onError,
     LMFeedPostMediaStyle? style,
-    Widget Function(int, Widget)? carouselIndicatorBuilder,
+    Widget Function(BuildContext, int, int, Widget)? carouselIndicatorBuilder,
     VoidCallback? onMediaTap,
   }) {
     return LMFeedPostMedia(

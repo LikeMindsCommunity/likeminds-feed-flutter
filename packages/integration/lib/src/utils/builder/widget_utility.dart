@@ -125,8 +125,8 @@ class LMFeedWidgetUtility {
     return video;
   }
 
-  Widget postMediaCarouselIndicatorBuilder(
-      int index, Widget carouselIndicator) {
+  Widget postMediaCarouselIndicatorBuilder(BuildContext context, int currIndex,
+      int mediaLength, Widget carouselIndicator) {
     return carouselIndicator;
   }
 

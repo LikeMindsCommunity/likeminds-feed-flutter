@@ -60,7 +60,7 @@ class LMFeedCarousel extends StatefulWidget {
     VoidCallback? onMediaTap,
     Widget Function(LMFeedImage)? imageBuilder,
     Widget Function(LMFeedVideo)? videoBuilder,
-    Widget Function(int, Widget)? carouselIndicatorBuilder,
+    LMFeedCarouselIndicatorBuilder? carouselIndicatorBuilder,
   }) {
     return LMFeedCarousel(
       postId: postId ?? this.postId,
@@ -191,8 +191,11 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                     builder: (context, _, __) {
                       Widget carouselIndicator =
                           defCarouselIndicator(feedTheme);
-                      return widget.carouselIndicatorBuilder
-                              ?.call(currPosition, carouselIndicator) ??
+                      return widget.carouselIndicatorBuilder?.call(
+                              context,
+                              currPosition,
+                              mediaWidgets.length,
+                              carouselIndicator) ??
                           carouselIndicator;
                     },
                   )

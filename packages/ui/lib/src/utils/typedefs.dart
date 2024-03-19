@@ -72,7 +72,8 @@ typedef LMFeedVideoBuilder = Widget Function(LMFeedVideo);
 /// must return a widget, takes in [int] as params
 /// [int] is the current index of the carousel
 /// {@endtemplate}
-typedef LMFeedCarouselIndicatorBuilder = Widget Function(int, Widget);
+typedef LMFeedCarouselIndicatorBuilder = Widget Function(
+    BuildContext, int, int, Widget);
 
 ///{@template post_callback}
 /// A callback to handle interactions with the post.
