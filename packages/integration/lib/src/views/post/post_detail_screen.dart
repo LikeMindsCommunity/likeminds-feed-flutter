@@ -454,6 +454,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 _postDetailScreenHandler!.postData!.commentCount -= 1;
                 _postDetailScreenHandler!.rebuildPostWidget.value =
                     !_postDetailScreenHandler!.rebuildPostWidget.value;
+
                 _postDetailScreenHandler!.commentHandlerBloc.add(
                     LMFeedCommentActionEvent(
                         commentActionRequest: deleteCommentRequest,

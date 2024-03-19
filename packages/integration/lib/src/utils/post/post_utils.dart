@@ -7,7 +7,8 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedPostUtils {
   static LMPostViewData updatePostData(
-      LMPostViewData postViewData, LMFeedPostActionType actionType) {
+      LMPostViewData postViewData, LMFeedPostActionType actionType,
+      {String? commentId}) {
     switch (actionType) {
       case LMFeedPostActionType.like:
         postViewData.isLiked = true;
@@ -21,8 +22,16 @@ class LMFeedPostUtils {
         postViewData.commentCount += 1;
         break;
       case LMFeedPostActionType.commentDeleted:
-        postViewData.commentCount -= 1;
-        break;
+        {
+          if (commentId != null) {
+            postViewData.replies
+                .removeWhere((element) => element.id == commentId);
+            postViewData.topComments
+                ?.removeWhere((element) => element.id == commentId);
+          }
+          postViewData.commentCount -= 1;
+          break;
+        }
       case LMFeedPostActionType.pinned:
         postViewData.isPinned = true;
         break;

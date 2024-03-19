@@ -110,9 +110,14 @@ class LMFeedPostUpdateState extends LMFeedPostState {
   final LMPostViewData? post;
   final LMFeedPostActionType actionType;
   final String postId;
+  final String? commentId;
 
-  const LMFeedPostUpdateState(
-      {this.post, required this.postId, required this.actionType});
+  const LMFeedPostUpdateState({
+    this.post,
+    required this.postId,
+    required this.actionType,
+    this.commentId,
+  });
 
   @override
   List<Object> get props => [identityHashCode(this)];

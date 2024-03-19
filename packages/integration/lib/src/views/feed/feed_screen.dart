@@ -427,7 +427,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         -1;
                     if (index != -1) {
                       feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
-                          feedRoomItemList[index], curr.actionType);
+                          feedRoomItemList[index], curr.actionType,
+                          commentId: curr.commentId);
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }

@@ -13,6 +13,7 @@ class LMFeedPostDetailScreenHandler {
   Map<String, LMTopicViewData> topics = {};
   Map<String, LMPostViewData> repostedPosts = {};
   Map<String, LMWidgetViewData> widgets = {};
+  Map<String, List<String>> userTopics = {};
   LMPostViewData? postData;
 
   LMFeedPostDetailScreenHandler(
@@ -31,7 +32,8 @@ class LMFeedPostDetailScreenHandler {
           ..page(page))
         .build();
 
-    final response = await LMFeedCore.client.getPostDetails(postDetailRequest);
+    final PostDetailResponse response =
+        await LMFeedCore.client.getPostDetails(postDetailRequest);
 
     if (response.success) {
       // Convert [User] to [LMUserViewData]
@@ -185,6 +187,7 @@ class LMFeedPostDetailScreenHandler {
 
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
               postId: postData!.id,
+              commentId: commentSuccessState.commentMetaData.commentId,
               actionType:
                   commentSuccessState.commentMetaData.commentActionEntity ==
                           LMFeedCommentType.parent

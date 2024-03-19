@@ -3,4 +3,7 @@ part of '../post_bloc.dart';
 void updatePostEventHandler(
         LMFeedUpdatePostEvent event, Emitter<LMFeedPostState> emit) =>
     emit(LMFeedPostUpdateState(
-        post: event.post, actionType: event.actionType, postId: event.postId));
+        post: event.post,
+        commentId: event.commentId,
+        actionType: event.actionType,
+        postId: event.postId));

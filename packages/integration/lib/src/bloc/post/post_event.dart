@@ -100,11 +100,15 @@ class LMFeedUpdatePostEvent extends LMFeedPostEvents {
   final LMPostViewData? post;
   final LMFeedPostActionType actionType;
   final String postId;
+  // This variable stores the id of comment
+  // that is deleted
+  final String? commentId;
 
   LMFeedUpdatePostEvent({
     this.post,
     required this.actionType,
     required this.postId,
+    this.commentId,
   });
 
   @override
