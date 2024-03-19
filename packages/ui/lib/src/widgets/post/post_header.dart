@@ -195,17 +195,6 @@ class LMFeedPostHeader extends StatelessWidget {
                                 LikeMindsTheme.kHorizontalPaddingXSmall,
                               createdAt ?? const SizedBox.shrink(),
                               LikeMindsTheme.kHorizontalPaddingSmall,
-                              LMFeedText(
-                                text: postViewData.isEdited ? '·' : '',
-                                style: postHeaderStyle?.subTextStyle ??
-                                    LMFeedTextStyle(
-                                      textStyle: TextStyle(
-                                        fontSize: LikeMindsTheme.kFontSmall,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                              ),
-                              LikeMindsTheme.kHorizontalPaddingSmall,
                               if (postViewData.isEdited)
                                 subTextSeparator ??
                                     LMFeedText(

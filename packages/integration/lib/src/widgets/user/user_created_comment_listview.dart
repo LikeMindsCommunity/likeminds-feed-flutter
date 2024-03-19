@@ -691,7 +691,6 @@ class LMFeedPostCustomContent extends LMFeedPostContent {
 
   @override
   Widget build(BuildContext context) {
-    final heading = post.heading;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

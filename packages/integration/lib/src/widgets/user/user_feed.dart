@@ -276,11 +276,14 @@ class _LMFeedUserCreatedPostListViewState
                           createPostButton: createPostButton());
                 },
                 firstPageProgressIndicatorBuilder: (context) =>
+                    widget.firstPageProgressIndicatorBuilder?.call(context) ??
                     const LMFeedShimmer(),
-                newPageProgressIndicatorBuilder: (context) => const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
+                newPageProgressIndicatorBuilder: (context) =>
+                    widget.newPageProgressIndicatorBuilder?.call(context) ??
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
               ),
             );
           }),
