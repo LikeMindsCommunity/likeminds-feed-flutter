@@ -20,3 +20,4 @@ export 'moderation/moderation_bloc.dart';
 export 'notification/notification_bloc.dart';
 export 'simple_bloc_observer.dart';
 export 'user_meta/user_meta_bloc.dart';
+export 'search/search_bloc.dart';
