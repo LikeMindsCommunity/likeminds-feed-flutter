@@ -24,7 +24,7 @@ class LMFeedTopicSelectScreen extends StatefulWidget {
 
 class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  LMFeedWidgetUtility widgetUtility = LMFeedWidgetUtility.instance;
+  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   List<LMTopicViewData> selectedTopics = [];
   FocusNode keyboardNode = FocusNode();
   Set<String> selectedTopicId = {};

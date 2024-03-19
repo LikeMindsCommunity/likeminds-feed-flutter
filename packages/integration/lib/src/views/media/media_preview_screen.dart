@@ -27,7 +27,7 @@ class LMFeedMediaPreviewScreen extends StatefulWidget {
 class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
   final DateFormat formatter = DateFormat('MMMM d, hh:mm');
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
-  final LMFeedWidgetUtility widgetUtility = LMFeedWidgetUtility.instance;
+  final LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   late List<LMAttachmentViewData> postAttachments;
   late LMPostViewData post;
   late LMUserViewData user;

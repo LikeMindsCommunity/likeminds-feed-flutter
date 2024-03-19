@@ -37,7 +37,7 @@ class LMFeedSearchScreen extends StatefulWidget {
 
 class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedWidgetUtility widgetUtility = LMFeedWidgetUtility.instance;
+  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   ValueNotifier<bool> showCancelIcon = ValueNotifier<bool>(false);
   TextEditingController searchController = TextEditingController();
   CancelableOperation? _debounceOperation;

@@ -40,7 +40,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
 
   int _page = 1;
   LMFeedThemeData _theme = LMFeedCore.theme;
-  LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
+  LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
 
   @override
   void initState() {
