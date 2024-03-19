@@ -125,8 +125,16 @@ class LMFeedPostDetailScreenHandler {
 
   void handleBlocChanges(LMFeedCommentHandlerState state) {
     switch (state.runtimeType) {
+      case LMFeedCommentCanceledState:
+        {
+          commentController.clear();
+          closeOnScreenKeyboard();
+          break;
+        }
       case LMFeedCommentActionOngoingState:
         {
+          openOnScreenKeyboard();
+
           LMCommentMetaData commentMetaData =
               (state as LMFeedCommentActionOngoingState).commentMetaData;
 
