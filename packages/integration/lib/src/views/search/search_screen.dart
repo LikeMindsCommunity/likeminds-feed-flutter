@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:async/async.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -57,7 +53,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   @override
   void initState() {
     super.initState();
-    userPostingRights = checkPostCreationRights();
+    userPostingRights = LMFeedUserUtils.checkPostCreationRights();
     addPageRequestListener();
     searchController.addListener(() {
       _onTextChanged(searchController.text);
@@ -67,16 +63,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   @override
   void didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
-  }
-
-  bool checkPostCreationRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
-    return memberRights;
   }
 
   void addPageRequestListener() {
@@ -382,7 +368,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: post.user!,
+      user: post.user,
       isFeed: false,
       onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
@@ -409,7 +395,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: post.user!,
+              user: post.user,
             ),
           ),
         );
@@ -471,7 +457,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
 
   LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: postViewData.user!,
+      user: postViewData.user,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: theme?.headerStyle,
@@ -540,7 +526,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: post.user!,
+              user: post.user,
             ),
           ),
         );
