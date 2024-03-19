@@ -103,6 +103,7 @@ class LMFeedCore {
       ..then((value) async {
         if (value.success) {
           initiateUserCalled = true;
+          await LMFeedLocalPreference.instance.clearUserData();
           await LMFeedLocalPreference.instance.storeUserData(value.user!);
           LMNotificationHandler.instance.registerDevice(
             value.user!.sdkClientInfo.uuid,
