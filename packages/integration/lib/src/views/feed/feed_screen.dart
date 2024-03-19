@@ -255,7 +255,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   @override
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
-    return Scaffold(
+    return _widgetsBuilder.scaffold(
+      source: LMFeedWidgetSource.universalFeed,
       backgroundColor: feedThemeData.backgroundColor,
       appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
       floatingActionButton: ValueListenableBuilder(

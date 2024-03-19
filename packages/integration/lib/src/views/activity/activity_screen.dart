@@ -26,6 +26,7 @@ class LMFeedActivityScreen extends StatefulWidget {
 }
 
 class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
+  LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
   final PagingController<int, UserActivityItem> _pagingController =
       PagingController(firstPageKey: 1);
   Map<String, LMUserViewData> users = {};
@@ -101,7 +102,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _widgetUtility.scaffold(
+      source: LMFeedWidgetSource.activityScreen,
       backgroundColor: feedTheme.backgroundColor,
       appBar: LMFeedAppBar(
         style: LMFeedAppBarStyle(

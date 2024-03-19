@@ -68,6 +68,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
+  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
 
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
@@ -300,7 +301,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     config = widget.config ?? LMFeedCore.config.composeConfig;
     style = widget.style ?? feedTheme.composeScreenStyle;
     screenSize = MediaQuery.of(context).size;
-    LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+
     return WillPopScope(
       onWillPop: () {
         widget.composeDiscardDialogBuilder?.call(context) ??
@@ -314,7 +315,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
             bloc: composeBloc,
             listener: _composeBlocListener,
-            child: Scaffold(
+            child: widgetUtility.scaffold(
+              source: LMFeedWidgetSource.editPostScreen,
               backgroundColor: feedTheme.container,
               appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
                   _defAppBar(),

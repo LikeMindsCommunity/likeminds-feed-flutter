@@ -23,6 +23,8 @@ class LMFeedTopicSelectScreen extends StatefulWidget {
 }
 
 class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
+  LMFeedThemeData feedThemeData = LMFeedCore.theme;
+  LMFeedWidgetUtility widgetUtility = LMFeedWidgetUtility.instance;
   List<LMTopicViewData> selectedTopics = [];
   FocusNode keyboardNode = FocusNode();
   Set<String> selectedTopicId = {};
@@ -128,8 +130,8 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedCore.theme;
-    return Scaffold(
+    return widgetUtility.scaffold(
+      source: LMFeedWidgetSource.topicSelectScreen,
       backgroundColor: feedThemeData.backgroundColor,
       floatingActionButton: FloatingActionButton(
         onPressed: () {

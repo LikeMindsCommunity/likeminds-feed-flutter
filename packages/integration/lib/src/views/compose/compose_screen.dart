@@ -61,6 +61,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
+  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
@@ -155,9 +156,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedCore.theme;
     screenSize = MediaQuery.of(context).size;
-    LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+
     return WillPopScope(
       onWillPop: () {
         widget.composeDiscardDialogBuilder?.call(context) ??
@@ -171,7 +171,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
             bloc: composeBloc,
             listener: _composeBlocListener,
-            child: Scaffold(
+            child: widgetUtility.scaffold(
+              source: LMFeedWidgetSource.,
               backgroundColor: feedTheme.container,
               bottomSheet: _defMediaPicker(),
               appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??

@@ -65,6 +65,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
 }
 
 class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
+  LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
   final ValueNotifier _rebuildComment = ValueNotifier(false);
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
@@ -157,7 +158,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               return ValueListenableBuilder(
                   valueListenable: _postDetailScreenHandler!.rebuildPostWidget,
                   builder: (context, _, __) {
-                    return Scaffold(
+                    return _widgetBuilder.scaffold(
+                      source: LMFeedWidgetSource.postDetailScreen,
                       resizeToAvoidBottomInset: true,
                       backgroundColor: feedTheme.backgroundColor,
                       bottomSheet: widget.bottomTextFieldBuilder?.call(
@@ -174,12 +176,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       context,
                                       defPostWidget(context),
                                       _postDetailScreenHandler!.postData!) ??
-                                  LMFeedCore.widgetUtility.postWidgetBuilder
-                                      .call(
-                                          context,
-                                          defPostWidget(context),
-                                          _postDetailScreenHandler!
-                                              .postData!),
+                                  _widgetBuilder.postWidgetBuilder.call(
+                                      context,
+                                      defPostWidget(context),
+                                      _postDetailScreenHandler!.postData!),
                             ),
                             SliverToBoxAdapter(
                               child: BlocListener<LMFeedCommentBloc,
@@ -693,9 +693,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       attachments: _postDetailScreenHandler!.postData!.attachments!,
       style: feedTheme.mediaStyle,
       carouselIndicatorBuilder:
-          LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
-      imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
-      videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
+          _widgetBuilder.postMediaCarouselIndicatorBuilder,
+      imageBuilder: _widgetBuilder.imageBuilder,
+      videoBuilder: _widgetBuilder.videoBuilder,
       onMediaTap: () {
         Navigator.push(
           context,

@@ -25,6 +25,9 @@ class LMFeedMediaPreviewScreen extends StatefulWidget {
 }
 
 class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
+  final DateFormat formatter = DateFormat('MMMM d, hh:mm');
+  final LMFeedThemeData feedTheme = LMFeedCore.theme;
+  final LMFeedWidgetUtility widgetUtility = LMFeedWidgetUtility.instance;
   late List<LMAttachmentViewData> postAttachments;
   late LMPostViewData post;
   late LMUserViewData user;
@@ -60,10 +63,9 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final DateFormat formatter = DateFormat('MMMM d, hh:mm');
     final String formatted = formatter.format(post.createdAt);
-    final LMFeedThemeData feedTheme = LMFeedCore.theme;
-    return Scaffold(
+    return widgetUtility.scaffold(
+      source: LMFeedWidgetSource.mediaPreviewScreen,
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,

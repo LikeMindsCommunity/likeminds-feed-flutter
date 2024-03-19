@@ -2,6 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
+// This widget is used to display a topic feed bar
+// A [LMFeedTopicBar] displays a list of selected topics
+// The [LMFeedTopicBar] can be customized by
+// passing in the required parameters
 class LMFeedTopicBar extends StatelessWidget {
   final List<LMTopicViewData> selectedTopics;
   final Function(BuildContext) openTopicSelector;
