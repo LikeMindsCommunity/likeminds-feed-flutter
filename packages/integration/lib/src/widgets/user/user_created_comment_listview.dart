@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/user_created_comment/user_created_comment_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
@@ -130,8 +128,8 @@ class _LMFeedUserCreatedCommentListViewState
               return Column(
                 children: [
                   const SizedBox(height: 2),
-                  widget.postBuilder
-                          ?.call(context, postWidget, _posts[item.postId]!) ??
+                  // widget.postBuilder
+                  //         ?.call(context, postWidget, _posts[item.postId]!) ??
                       LMFeedCore.widgetUtility.postWidgetBuilder
                           .call(context, postWidget, _posts[item.postId]!),
                   const Divider(),
@@ -248,9 +246,11 @@ class _LMFeedUserCreatedCommentListViewState
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
       content: LMFeedPostCustomContent(
+        
         comment: comment,
         post: post,
         feedThemeData: feedThemeData,
+        
       ),
       topicWidget: _defTopicWidget(post),
     );
@@ -680,7 +680,7 @@ class _LMFeedUserCreatedCommentListViewState
 }
 
 class LMFeedPostCustomContent extends LMFeedPostContent {
-  const LMFeedPostCustomContent({
+   LMFeedPostCustomContent({
     required this.comment,
     required this.post,
     this.feedThemeData,
@@ -691,7 +691,19 @@ class LMFeedPostCustomContent extends LMFeedPostContent {
 
   @override
   Widget build(BuildContext context) {
-    return _defCommentBuilder(context);
+    final heading = post.heading;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+       LMFeedPostContent(
+      onTagTap: (String? uuid) {},
+      style: feedThemeData?.contentStyle,
+      text: post.text,
+      heading: post.heading,
+    ),
+        _defCommentBuilder(context),
+      ],
+    );
   }
 
   Widget _defCommentBuilder(BuildContext context) {
