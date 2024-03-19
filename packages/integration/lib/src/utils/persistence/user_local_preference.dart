@@ -47,6 +47,10 @@ class LMFeedLocalPreference {
         .insertOrUpdateLoggedInMemberState(memberStateResponse);
   }
 
+  Future<LMResponse> clearMemberState() {
+    return LMFeedCore.client.deleteLoggedInMemberState();
+  }
+
   MemberStateResponse? fetchMemberState() {
     LMResponse response = LMFeedCore.client.getLoggedInMemberState();
 

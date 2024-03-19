@@ -101,9 +101,9 @@ class LMFeedCore {
   Future<InitiateUserResponse> initiateUser(InitiateUserRequest request) async {
     return lmFeedClient.initiateUser(request)
       ..then((value) async {
+        await LMFeedLocalPreference.instance.clearUserData();
         if (value.success) {
           initiateUserCalled = true;
-          await LMFeedLocalPreference.instance.clearUserData();
           await LMFeedLocalPreference.instance.storeUserData(value.user!);
           LMNotificationHandler.instance.registerDevice(
             value.user!.sdkClientInfo.uuid,
@@ -117,6 +117,7 @@ class LMFeedCore {
     return lmFeedClient.getMemberState()
       ..then(
         (value) async {
+          await LMFeedLocalPreference.instance.clearMemberState();
           if (value.success) {
             await LMFeedLocalPreference.instance.storeMemberState(value);
           }
