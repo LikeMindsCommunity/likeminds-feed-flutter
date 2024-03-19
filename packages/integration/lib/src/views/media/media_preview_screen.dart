@@ -141,7 +141,6 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                       return LMFeedVideo(
                         videoUrl: postAttachments[index].attachmentMeta.url,
                         postId: widget.post.id,
-                        isMute: false,
                         autoPlay: true,
                         style: LMFeedPostVideoStyle.basic().copyWith(
                           showControls: true,

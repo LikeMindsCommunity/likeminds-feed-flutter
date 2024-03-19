@@ -19,7 +19,6 @@ class LMFeedVideo extends StatefulWidget {
     this.playButton,
     this.pauseButton,
     this.muteButton,
-    this.isMute = true,
     this.style,
     this.onMediaTap,
     this.autoPlay = false,
@@ -36,8 +35,6 @@ class LMFeedVideo extends StatefulWidget {
   final LMFeedButton? muteButton;
 
   final LMFeedPostVideoStyle? style;
-  // Video functionality control variables
-  final bool isMute;
 
   final bool autoPlay;
 
@@ -53,7 +50,6 @@ class LMFeedVideo extends StatefulWidget {
     LMFeedButton? playButton,
     LMFeedButton? pauseButton,
     LMFeedButton? muteButton,
-    bool? isMute,
     LMFeedPostVideoStyle? style,
     VoidCallback? onMediaTap,
   }) {
@@ -64,7 +60,6 @@ class LMFeedVideo extends StatefulWidget {
       playButton: playButton ?? this.playButton,
       pauseButton: pauseButton ?? this.pauseButton,
       muteButton: muteButton ?? this.muteButton,
-      isMute: isMute ?? this.isMute,
       style: style ?? this.style,
       onMediaTap: onMediaTap ?? this.onMediaTap,
     );
@@ -75,7 +70,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   ValueNotifier<bool> rebuildOverlay = ValueNotifier(false);
   bool _onTouch = true;
   bool initialiseOverlay = false;
-  bool? isMuted;
+  ValueNotifier<bool>? isMuted;
   ValueNotifier<bool> rebuildVideo = ValueNotifier(false);
   VideoController? controller;
 
@@ -103,7 +98,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   @override
   void initState() {
     super.initState();
-    isMuted = widget.isMute;
+    isMuted = LMFeedVideoProvider.instance.isMuted;
     initialiseVideo = initialiseControllers();
   }
 
@@ -112,7 +107,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.videoUrl != widget.videoUrl) {
       controller?.player.pause();
-      isMuted = widget.isMute;
+      isMuted = LMFeedVideoProvider.instance.isMuted;
       initialiseVideo = initialiseControllers();
     }
   }
@@ -136,13 +131,11 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     if (widget.videoUrl != null) {
       requestBuilder
         ..autoPlay(widget.autoPlay)
-        ..isMuted(isMuted!)
         ..videoSource(widget.videoUrl!)
         ..videoType(LMFeedVideoSourceType.network);
     } else {
       requestBuilder
         ..autoPlay(widget.autoPlay)
-        ..isMuted(isMuted!)
         ..videoSource(widget.videoFile!.uri.toString())
         ..videoType(LMFeedVideoSourceType.file);
     }
@@ -201,10 +194,10 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                       if (mounted) {
                         var visiblePercentage =
                             visibilityInfo.visibleFraction * 100;
-                        if (visiblePercentage < 90 && visiblePercentage > 0) {
+                        if (visiblePercentage < 100) {
                           controller?.player.pause();
                         }
-                        if (visiblePercentage >= 90 && widget.autoPlay) {
+                        if (visiblePercentage == 100 && widget.autoPlay) {
                           LMFeedVideoProvider.instance.currentVisiblePostId =
                               widget.postId;
                           controller?.player.play();
@@ -314,25 +307,20 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                         Positioned(
                           bottom: 0,
                           right: 0,
-                          child: StatefulBuilder(
-                            builder: (context, setChildState) {
+                          child: ValueListenableBuilder(
+                            valueListenable: isMuted!,
+                            builder: (context, state, _) {
                               return IconButton(
                                 onPressed: () {
-                                  if (!isMuted!) {
-                                    controller!.player.setVolume(0);
-                                  } else {
-                                    controller!.player.setVolume(100);
-                                  }
-                                  setChildState(() {
-                                    isMuted = !isMuted!;
-                                  });
+                                  LMFeedVideoProvider.instance
+                                      .toggleVolumeState();
                                 },
                                 icon: LMFeedIcon(
                                   type: LMFeedIconType.icon,
                                   style: const LMFeedIconStyle(
                                     color: Colors.white,
                                   ),
-                                  icon: isMuted!
+                                  icon: state
                                       ? Icons.volume_off
                                       : Icons.volume_up,
                                 ),
