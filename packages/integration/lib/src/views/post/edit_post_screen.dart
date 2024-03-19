@@ -805,11 +805,16 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               ? TextField(
                   controller: _headingController,
                   decoration: InputDecoration(
-                    hintText: config?.headingHint ?? "Add a Title",
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
+                    hintText: config?.headingHint,
                     hintStyle: TextStyle(
                       color: theme.onContainer.withOpacity(0.5),
                     ),
-                    border: InputBorder.none,
                   ),
                   style: TextStyle(
                     color: theme.onContainer,
