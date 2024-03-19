@@ -234,6 +234,9 @@ class LMFeedPostDetailScreenHandler {
           if (response.reply!.parentComment != null) {
             updateCommentInController(commentViewData.parentComment!);
           }
+          LMFeedFetchCommentReplyBloc.instance.add(LMFeedAddLocalReplyEvent(
+            comment: commentViewData,
+          ));
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
