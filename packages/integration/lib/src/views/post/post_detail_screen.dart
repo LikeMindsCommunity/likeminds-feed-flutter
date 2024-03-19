@@ -89,13 +89,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     super.initState();
     _postDetailScreenHandler =
         LMFeedPostDetailScreenHandler(_pagingController, widget.postId);
-    getPostData =
-        _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
-      _postDetailScreenHandler!.postData = value;
-      _postDetailScreenHandler!.rebuildPostWidget.value =
-          !_postDetailScreenHandler!.rebuildPostWidget.value;
-      return value;
-    });
+    updatePostAndCommentData();
     right = LMFeedUserUtils.checkCommentRights();
     if (widget.openKeyboard) {
       _postDetailScreenHandler!.openOnScreenKeyboard();
@@ -121,13 +115,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       _pagingController.refresh();
       _postDetailScreenHandler =
           LMFeedPostDetailScreenHandler(_pagingController, widget.postId);
-      getPostData =
-          _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
-        _postDetailScreenHandler!.postData = value;
-        _postDetailScreenHandler!.rebuildPostWidget.value =
-            !_postDetailScreenHandler!.rebuildPostWidget.value;
-        return value;
-      });
+      updatePostAndCommentData();
     }
     config = widget.config ?? LMFeedCore.config.postDetailConfig;
   }
@@ -146,6 +134,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           _pagingController.itemList?.clear();
           _pagingController.refresh();
           _commentRepliesBloc.add(LMFeedClearCommentRepliesEvent());
+          updatePostAndCommentData();
           return Future.value();
         },
         color: feedTheme.primaryColor,
@@ -1569,5 +1558,15 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
       );
     }
+  }
+
+  void updatePostAndCommentData() {
+    getPostData =
+        _postDetailScreenHandler!.fetchCommentListWithPage(1).then((value) {
+      _postDetailScreenHandler!.postData = value;
+      _postDetailScreenHandler!.rebuildPostWidget.value =
+          !_postDetailScreenHandler!.rebuildPostWidget.value;
+      return value;
+    });
   }
 }

@@ -36,15 +36,34 @@ class LMFeedPostDetailScreenHandler {
         await LMFeedCore.client.getPostDetails(postDetailRequest);
 
     if (response.success) {
-      // Convert [User] to [LMUserViewData]
-      // Add users to the map
-      users.addAll(response.users!.map((key, value) =>
-          MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
+      // Convert [WidgetModel] to [LMWidgetViewData]
+      // Add widgets to the map
+      widgets.addAll(response.widgets?.map((key, value) => MapEntry(
+              key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+          {});
 
       // Convert [Topic] to [LMTopicViewData]
       // Add topics to the map
-      topics.addAll(response.topics!.map((key, value) =>
-          MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
+      topics.addAll(response.topics!.map((key, value) => MapEntry(
+          key, LMTopicViewDataConvertor.fromTopic(value, widgets: widgets))));
+
+      userTopics.addAll(response.userTopics!);
+
+      // Convert [User] to [LMUserViewData]
+      // Add users to the map
+      users.addAll(
+        response.users!.map(
+          (key, value) => MapEntry(
+            key,
+            LMUserViewDataConvertor.fromUser(
+              value,
+              topics: response.topics,
+              widgets: response.widgets,
+              userTopics: userTopics,
+            ),
+          ),
+        ),
+      );
 
       // Convert [Post] to [LMPostViewData]
       // Add reposted posts to the map
@@ -56,13 +75,8 @@ class LMFeedPostDetailScreenHandler {
                 repostedPosts: response.repostedPosts,
                 users: response.users ?? {},
                 topics: response.topics ?? {},
+                userTopics: userTopics,
               ))) ??
-          {});
-
-      // Convert [WidgetModel] to [LMWidgetViewData]
-      // Add widgets to the map
-      widgets.addAll(response.widgets?.map((key, value) => MapEntry(
-              key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
           {});
 
       // Convert [Post] to [LMPostViewData]
@@ -73,6 +87,7 @@ class LMFeedPostDetailScreenHandler {
         repostedPosts: response.repostedPosts,
         users: response.users ?? {},
         topics: response.topics ?? {},
+        userTopics: userTopics,
       );
 
       final List<LMCommentViewData> commentList = postViewData.replies;

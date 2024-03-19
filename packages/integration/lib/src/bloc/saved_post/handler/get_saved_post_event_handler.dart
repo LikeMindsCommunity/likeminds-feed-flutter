@@ -6,7 +6,7 @@ getSavedPostEventHandler(LMFeedGetSavedPostEvent event, emit) async {
     final user = LMFeedLocalPreference.instance.fetchUserData();
     final savePostResponse = await LMFeedCore.client.getSavedPost(
       (GetSavedPostRequestBuilder()
-            ..uuid(user?.uuid??"")
+            ..uuid(user?.uuid ?? "")
             ..page(event.page)
             ..pageSize(event.pageSize))
           .build(),
@@ -21,6 +21,8 @@ getSavedPostEventHandler(LMFeedGetSavedPostEvent event, emit) async {
           repostedPosts: savePostResponse.repostedPosts,
           users: savePostResponse.users ?? {},
           topics: savePostResponse.topics,
+          filteredComments: savePostResponse.filteredComments,
+          userTopics: savePostResponse.userTopics,
         ));
       });
       emit(

@@ -27,6 +27,7 @@ Future<void> getSearchEventHandler(
           users: searchResponse.users ?? {},
           topics: searchResponse.topics,
           repostedPosts: searchResponse.repostedPosts,
+          userTopics: searchResponse.userTopics,
         ));
       }
       emit(LMFeedSearchLoadedState(posts: posts));

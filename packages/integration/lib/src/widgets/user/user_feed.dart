@@ -49,8 +49,8 @@ class _LMFeedUserCreatedPostListViewState
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
-  Map<String, WidgetModel> widgets = {};
-  Map<String, Post> repostedPosts = {};
+  Map<String, LMWidgetViewData> widgets = {};
+  Map<String, LMPostViewData> repostedPosts = {};
 
   int _pageFeed = 1;
   final PagingController<int, LMPostViewData> _pagingController =
@@ -85,30 +85,56 @@ class _LMFeedUserCreatedPostListViewState
   void updatePagingControllers(GetUserPostResponse response) {
     if (response.success) {
       _pageFeed++;
+      if (response.widgets != null) {
+        widgets.addAll(response.widgets?.map((key, value) => MapEntry(
+                key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+            {});
+      }
       if (response.topics != null) {
-        topics.addAll(response.topics!.map((key, value) =>
-            MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
+        topics.addAll(response.topics!.map((key, value) => MapEntry(
+              key,
+              LMTopicViewDataConvertor.fromTopic(value, widgets: widgets),
+            )));
       }
       if (response.users != null) {
-        users.addAll(response.users!.map((key, value) =>
-            MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
+        users.addAll(response.users!.map((key, value) => MapEntry(
+            key,
+            LMUserViewDataConvertor.fromUser(
+              value,
+              topics: response.topics,
+              widgets: response.widgets,
+            ))));
       }
-      if (response.widgets != null) {
-        widgets.addAll(response.widgets!);
-      }
+
       if (response.repostedPosts != null) {
-        repostedPosts.addAll(response.repostedPosts!);
+        repostedPosts.addAll(
+          response.repostedPosts!.map(
+            (key, value) => MapEntry(
+              key,
+              LMPostViewDataConvertor.fromPost(
+                post: value,
+                users: response.users!,
+                filteredComments: response.filteredComments,
+                repostedPosts: response.repostedPosts,
+                topics: response.topics,
+                userTopics: response.userTopics,
+                widgets: response.widgets,
+              ),
+            ),
+          ),
+        );
       }
       List<LMPostViewData> listOfPosts = response.posts!
           .map((e) => LMPostViewDataConvertor.fromPost(
               post: e,
-              widgets: widgets,
-              repostedPosts: repostedPosts,
-              topics: topics.map((key, value) =>
-                  MapEntry(key, LMTopicViewDataConvertor.toTopic(value))),
-              users: users.map((key, value) =>
-                  MapEntry(key, LMUserViewDataConvertor.toUser(value)))))
+              widgets: response.widgets,
+              repostedPosts: response.repostedPosts,
+              topics: response.topics,
+              users: response.users!,
+              filteredComments: response.filteredComments,
+              userTopics: response.userTopics))
           .toList();
+
       if (listOfPosts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
@@ -203,8 +229,8 @@ class _LMFeedUserCreatedPostListViewState
           }
           users.addAll(state.userData);
           topics.addAll(state.topics);
-          widgets.addAll(state.widgets.map((key, value) =>
-              MapEntry(key, LMWidgetViewDataConvertor.toWidgetModel(value))));
+          widgets.addAll(state.widgets);
+
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
 
