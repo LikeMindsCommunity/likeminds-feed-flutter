@@ -172,7 +172,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             bloc: composeBloc,
             listener: _composeBlocListener,
             child: widgetUtility.scaffold(
-              source: LMFeedWidgetSource.,
+              source: LMFeedWidgetSource.createPostScreen,
               backgroundColor: feedTheme.container,
               bottomSheet: _defMediaPicker(),
               appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??

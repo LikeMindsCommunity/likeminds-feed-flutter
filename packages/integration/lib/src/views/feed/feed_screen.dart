@@ -4,13 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/edit_post_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_core/src/views/report/report_bottom_sheet.dart';
-import 'package:likeminds_feed_flutter_core/src/views/search/search_screen.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 part 'feed_screen_configuration.dart';
@@ -474,8 +467,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   if (state is LMFeedNewPostUploadingState) {
                     return Container(
                       height: 60,
-                      color: feedThemeData.backgroundColor ??
-                          LikeMindsTheme.whiteColor,
+                      color: feedThemeData.backgroundColor,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
@@ -1139,7 +1131,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         style: LMFeedButtonStyle(
           borderRadius: 48,
           border: Border.all(
-            color: feedThemeData.primaryColor ?? LikeMindsTheme.onContainer,
+            color: feedThemeData.primaryColor,
             width: 2,
           ),
           height: 40,

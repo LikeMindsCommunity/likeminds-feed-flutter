@@ -22,7 +22,7 @@ export 'package:likeminds_feed_flutter_core/src/views/views.dart';
 export 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
 export 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart'
-    hide kRegexLinksAndTags, getImageFileDimensions, getNetworkImageDimensions;
+    hide kRegexLinksAndTags;
 export 'package:likeminds_feed/likeminds_feed.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';

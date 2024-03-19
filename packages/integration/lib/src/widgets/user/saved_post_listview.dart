@@ -3,11 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/saved_post/saved_post_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_core/src/views/report/report_bottom_sheet.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -68,8 +64,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
     addPageRequestListener();
   }
-
-
 
   void addPageRequestListener() {
     _pagingController.addPageRequestListener(
@@ -216,7 +210,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: post.user!,
+      user: post.user,
       isFeed: false,
       onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
@@ -243,7 +237,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: post.user!,
+              user: post.user,
             ),
           ),
         );
@@ -313,16 +307,16 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
 
   LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: postViewData.user!,
+      user: postViewData.user,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: _theme.headerStyle,
       onProfileTap: () {
         LMFeedCore.instance.lmFeedClient
-            .routeToProfile(postViewData.user!.sdkClientInfo!.uuid);
+            .routeToProfile(postViewData.user.sdkClientInfo.uuid);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            uuid: postViewData.user!.sdkClientInfo!.uuid,
+            uuid: postViewData.user.sdkClientInfo.uuid,
             context: context,
           ),
         );
@@ -398,7 +392,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: post.user!,
+              user: post.user,
             ),
           ),
         );
@@ -457,12 +451,12 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-             LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              post: postViewData,
-              actionType: postViewData.isLiked
-                  ? LMFeedPostActionType.like
-                  : LMFeedPostActionType.unlike,
-              postId: postViewData.id));
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                post: postViewData,
+                actionType: postViewData.isLiked
+                    ? LMFeedPostActionType.like
+                    : LMFeedPostActionType.unlike,
+                postId: postViewData.id));
           }
         },
       );
