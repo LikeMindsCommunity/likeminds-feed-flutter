@@ -204,21 +204,26 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 ),
               ),
               body: SafeArea(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 18),
-                      widget.composeUserHeaderBuilder?.call(context, user!) ??
-                          widgetUtility.composeScreenUserHeaderBuilder(
-                              context, user!),
-                      const SizedBox(height: 18),
-                      widget.composeContentBuilder?.call() ??
-                          _defContentInput(),
-                      const SizedBox(height: 18),
-                      widget.composeMediaPreviewBuilder?.call() ??
-                          _defMediaPreview(),
-                      const SizedBox(height: 150),
-                    ],
+                child: Container(
+                  margin: EdgeInsets.only(
+                    bottom: 150,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 18),
+                        widget.composeUserHeaderBuilder?.call(context, user!) ??
+                            widgetUtility.composeScreenUserHeaderBuilder(
+                                context, user!),
+                        const SizedBox(height: 18),
+                        widget.composeContentBuilder?.call() ??
+                            _defContentInput(),
+                        const SizedBox(height: 18),
+                        widget.composeMediaPreviewBuilder?.call() ??
+                            _defMediaPreview(),
+                        const SizedBox(height: 150),
+                      ],
+                    ),
                   ),
                 ),
               ),
