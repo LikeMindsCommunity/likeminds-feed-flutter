@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
@@ -6,12 +8,14 @@ class LMFeedProfilePicture extends StatelessWidget {
   const LMFeedProfilePicture({
     super.key,
     this.imageUrl,
+    this.filePath,
     required this.fallbackText,
     this.onTap,
     this.style,
   });
 
   final String? imageUrl;
+  final String? filePath;
   final String fallbackText;
   final Function()? onTap;
   final LMFeedProfilePictureStyle? style;
@@ -38,14 +42,17 @@ class LMFeedProfilePicture extends StatelessWidget {
           color: imageUrl != null && imageUrl!.isNotEmpty
               ? Colors.grey.shade300
               : LMFeedTheme.instance.theme.primaryColor,
-          image: imageUrl != null && imageUrl!.isNotEmpty
+          image: filePath != null
               ? DecorationImage(
-                  image: NetworkImage(imageUrl!),
-                  fit: BoxFit.cover,
-                )
-              : null,
+                  image: FileImage(File(filePath!)), fit: BoxFit.cover)
+              : imageUrl != null && imageUrl!.isNotEmpty
+                  ? DecorationImage(
+                      image: NetworkImage(imageUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
         ),
-        child: imageUrl == null || imageUrl!.isEmpty
+        child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
             ? Center(
                 child: LMFeedText(
                   text: getInitials(fallbackText).toUpperCase(),

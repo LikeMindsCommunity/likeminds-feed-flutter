@@ -314,4 +314,57 @@ class LMFeedMediaHandler {
       return [];
     }
   }
+
+  static Future<LMMediaModel?> pickSingleImage() async {
+    final FilePickerResult? list = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.image,
+    );
+    CommunityConfigurations? config = LMFeedLocalPreference.instance
+        .fetchCommunityConfiguration("media_limits");
+    if (config == null || config.value?["max_image_size"] == null) {
+      final configResponse =
+          await LMFeedCore.client.getCommunityConfigurations();
+      if (configResponse.success &&
+          configResponse.communityConfigurations != null &&
+          configResponse.communityConfigurations!.isNotEmpty) {
+        config = configResponse.communityConfigurations!.first;
+        LMFeedLocalPreference.instance.storeCommunityConfiguration(config);
+      }
+    }
+    final double sizeLimit;
+
+    if (config != null && config.value?["max_image_size"] != null) {
+      sizeLimit = config.value!["max_image_size"]! / 1024;
+    } else {
+      sizeLimit = 5;
+    }
+
+    if (list != null && list.files.isNotEmpty) {
+      for (PlatformFile image in list.files) {
+        int fileBytes = image.size;
+        double fileSize = getFileSizeInDouble(fileBytes);
+        if (fileSize > sizeLimit) {
+          LMFeedCore.showSnackBar(
+            LMFeedSnackBar(
+              content: LMFeedText(
+                text:
+                    'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
+              ),
+            ),
+          );
+          return null;
+        }
+      }
+      List<File> pickedFiles = list.files.map((e) => File(e.path!)).toList();
+      LMMediaModel mediaFile = LMMediaModel(
+        mediaFile: File(pickedFiles.first.path),
+        mediaType: LMMediaType.image,
+      );
+
+      return mediaFile;
+    } else {
+      return null;
+    }
+  }
 }

@@ -16,8 +16,13 @@ class LMFeedUserMetaGetEvent extends LMFeedUserMetaEvent {
 class LMFeedUserMetaUpdateEvent extends LMFeedUserMetaEvent {
   final LMUserViewData user;
   final Map<String, dynamic> metadata;
+  final File? imageFile;
 
-  const LMFeedUserMetaUpdateEvent({required this.metadata, required this.user});
+  const LMFeedUserMetaUpdateEvent({
+    required this.metadata,
+    required this.user,
+    this.imageFile,
+  });
   @override
   List<Object> get props => [metadata, user];
 }

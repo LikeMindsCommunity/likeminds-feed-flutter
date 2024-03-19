@@ -30,6 +30,8 @@ class LMFeedUserMetaUpdatedState extends LMFeedUserMetaState {
   List<Object> get props => [];
 }
 
+class LMFeedUserMetaUpdateLoadingState extends LMFeedUserMetaState {}
+
 class LMFeedUserMetaErrorState extends LMFeedUserMetaState {
   final String message;
   const LMFeedUserMetaErrorState({
