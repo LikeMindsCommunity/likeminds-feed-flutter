@@ -10,6 +10,7 @@ import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.d
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:likeminds_feed_flutter_core/src/views/report/report_bottom_sheet.dart';
+import 'package:likeminds_feed_flutter_core/src/views/search/search_screen.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 part 'feed_screen_configuration.dart';
@@ -609,6 +610,31 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       style: LMFeedAppBarStyle.basic().copyWith(
         backgroundColor: feedThemeData?.container,
       ),
+      trailing: [
+        LMFeedButton(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LMFeedSearchScreen(
+                  postBuilder: widget.postBuilder,
+                  emptyFeedViewBuilder: widget.noItemsFoundIndicatorBuilder,
+                  paginationLoaderBuilder: widget.newPageProgressIndicatorBuilder,
+                  feedErrorViewBuilder: widget.newPageErrorIndicatorBuilder,
+                  noNewPageWidgetBuilder: widget.noMoreItemsIndicatorBuilder,
+                  firstPageLoaderBuilder: widget.firstPageProgressIndicatorBuilder,
+                ),
+              ),
+            );
+          },
+          style: LMFeedButtonStyle.basic().copyWith(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.search,
+            ),
+          ),
+        )
+      ],
     );
   }
 
