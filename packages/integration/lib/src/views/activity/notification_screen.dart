@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/activity/notification_tile.dart';
 
 class LMFeedNotificationScreen extends StatefulWidget {

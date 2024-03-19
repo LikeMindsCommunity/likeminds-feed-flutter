@@ -1,9 +1,9 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -34,12 +34,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   Map<String, Post> repostedPosts = {};
   Map<String, Comment> filteredComments = {};
 
-  bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
+  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
 
-  LMUserViewData currentUser =
-      LMFeedUserLocalPreference.instance.fetchUserData();
+  LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
-  LMFeedThemeData? feedTheme;
+  LMFeedThemeData feedTheme = LMFeedCore.theme;
 
   @override
   void initState() {
@@ -102,12 +101,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedCore.theme;
     return Scaffold(
-      backgroundColor: feedTheme?.backgroundColor,
+      backgroundColor: feedTheme.backgroundColor,
       appBar: LMFeedAppBar(
         style: LMFeedAppBarStyle(
-          backgroundColor: feedTheme?.container,
+          backgroundColor: feedTheme.container,
           centerTitle: Platform.isAndroid ? false : true,
           height: 50,
         ),
@@ -175,19 +173,18 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 18),
                       decoration: BoxDecoration(
-                        color: feedTheme?.container,
+                        color: feedTheme.container,
                         border: Border(
                           bottom: BorderSide(
                             width: 0.2,
-                            color: feedTheme?.container.withOpacity(0.1) ??
-                                Colors.grey,
+                            color: feedTheme.container.withOpacity(0.1),
                           ),
                         ),
                       ),
                       child: Column(
                         children: [
                           Divider(
-                            color: feedTheme?.onContainer.withOpacity(0.05),
+                            color: feedTheme.onContainer.withOpacity(0.05),
                             thickness: 1,
                           ),
                           StatefulBuilder(
@@ -393,7 +390,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                         eventProperties: {
                           "post_id": postViewData.id,
                           "post_type": postType,
-                          "user_id": currentUser.sdkClientInfo.uuid,
+                          "user_id": currentUser?.sdkClientInfo.uuid,
                           "user_state": isCm ? "CM" : "member",
                         },
                       ),
@@ -593,11 +590,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
-            color: feedTheme?.primaryColor,
+            color: feedTheme.primaryColor,
           ),
         ),
       ),
-      style: feedTheme?.commentStyle.showRepliesButtonStyle,
+      style: feedTheme.commentStyle.showRepliesButtonStyle,
     );
   }
 

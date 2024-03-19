@@ -1,8 +1,7 @@
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+// ignore_for_file: deprecated_member_use_from_same_package
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
 import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/widgets.dart';
 
 part 'handler/likes_screen_handler.dart';

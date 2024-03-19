@@ -1,10 +1,11 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_feed_flutter_core/src/views/edit/edit_post_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/edit_post_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -35,22 +36,12 @@ class _LMFeedListState extends State<LMFeedList> {
 
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   bool right = true;
-  bool isCm = LMFeedUserLocalPreference.instance
-      .fetchMemberState(); // whether the logged in user is a community manager or not
+  bool isCm = LMFeedUserUtils
+      .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
-  LMUserViewData currentUser =
-      LMFeedUserLocalPreference.instance.fetchUserData();
+  LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
 
   bool userPostingRights = true;
-  bool checkPostCreationRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
-    return memberRights;
-  }
 
   Widget getLoaderThumbnail(LMMediaModel? media) {
     if (media != null) {
@@ -94,7 +85,7 @@ class _LMFeedListState extends State<LMFeedList> {
   void initState() {
     super.initState();
     Bloc.observer = LMFeedBlocObserver();
-    userPostingRights = checkPostCreationRights();
+    userPostingRights = LMFeedUserUtils.checkPostCreationRights();
     _addPaginationListener();
   }
 
@@ -139,8 +130,6 @@ class _LMFeedListState extends State<LMFeedList> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
-
     return BlocListener<LMFeedBloc, LMFeedState>(
       bloc: _feedBloc,
       listener: (context, LMFeedState state) => updatePagingControllers(state),

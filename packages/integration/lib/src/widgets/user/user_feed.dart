@@ -1,14 +1,8 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/constants.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedUserCreatedPostListView extends StatefulWidget {
@@ -62,24 +56,14 @@ class _LMFeedUserCreatedPostListViewState
   final PagingController<int, LMPostViewData> _pagingController =
       PagingController(firstPageKey: 1);
   bool userPostingRights = true;
-  LMFeedThemeData? feedThemeData;
+  LMFeedThemeData feedThemeData = LMFeedCore.theme;
   final ValueNotifier postUploading = ValueNotifier(false);
 
   @override
   void initState() {
     super.initState();
-    userPostingRights = checkPostCreationRights();
+    userPostingRights = LMFeedUserUtils.checkPostCreationRights();
     addPaginationListener();
-  }
-
-  bool checkPostCreationRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
-    return memberRights;
   }
 
   void addPaginationListener() {
@@ -146,7 +130,6 @@ class _LMFeedUserCreatedPostListViewState
 
   @override
   Widget build(BuildContext context) {
-    feedThemeData = LMFeedCore.theme;
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
     return BlocListener(
       bloc: newPostBloc,
@@ -160,11 +143,6 @@ class _LMFeedUserCreatedPostListViewState
               ),
             ),
           );
-          // TODO: remove old toast
-          // toast(
-          //   state.message,
-          //   duration: Toast.LENGTH_LONG,
-          // );
         }
         if (state is LMFeedNewPostUploadedState) {
           LMPostViewData? item = state.postData;
@@ -388,14 +366,14 @@ class _LMFeedUserCreatedPostListViewState
     return LMFeedPostTopic(
       topics: post.topics,
       post: post,
-      style: feedThemeData?.topicStyle,
+      style: feedThemeData.topicStyle,
     );
   }
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
       onTagTap: (String? uuid) {},
-      style: feedThemeData?.contentStyle,
+      style: feedThemeData.contentStyle,
       text: post.text,
       heading: post.heading,
     );
@@ -408,7 +386,7 @@ class _LMFeedUserCreatedPostListViewState
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
       repostButton: defRepostButton(post),
-      postFooterStyle: feedThemeData?.footerStyle,
+      postFooterStyle: feedThemeData.footerStyle,
       showRepostButton: !post.isRepost,
     );
   }
@@ -418,7 +396,7 @@ class _LMFeedUserCreatedPostListViewState
       user: users[postViewData.uuid]!,
       isFeed: true,
       postViewData: postViewData,
-      postHeaderStyle: feedThemeData?.headerStyle,
+      postHeaderStyle: feedThemeData.headerStyle,
       menuBuilder: (menu) {
         return menu.copyWith(
           removeItemIds: {postReportId, postEditId},
@@ -470,7 +448,7 @@ class _LMFeedUserCreatedPostListViewState
     return LMFeedPostMedia(
       attachments: post.attachments!,
       postId: post.id,
-      style: feedThemeData?.mediaStyle,
+      style: feedThemeData.mediaStyle,
       onMediaTap: () async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoController(
@@ -498,7 +476,7 @@ class _LMFeedUserCreatedPostListViewState
         text: LMFeedText(
             text: LMFeedPostUtils.getLikeCountTextWithCount(
                 postViewData.likeCount)),
-        style: feedThemeData?.footerStyle.likeButtonStyle,
+        style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -546,7 +524,7 @@ class _LMFeedUserCreatedPostListViewState
         text: LMFeedText(
           text: LMFeedPostUtils.getCommentCountTextWithCount(post.commentCount),
         ),
-        style: feedThemeData?.footerStyle.commentButtonStyle,
+        style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
           VideoController? postVideoController = LMFeedVideoProvider.instance
               .getVideoController(
@@ -616,7 +594,7 @@ class _LMFeedUserCreatedPostListViewState
             );
           }
         },
-        style: feedThemeData?.footerStyle.saveButtonStyle,
+        style: feedThemeData.footerStyle.saveButtonStyle,
       );
 
   LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
@@ -624,7 +602,7 @@ class _LMFeedUserCreatedPostListViewState
         onTap: () {
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
-        style: feedThemeData?.footerStyle.shareButtonStyle,
+        style: feedThemeData.footerStyle.shareButtonStyle,
       );
 
   LMFeedButton defRepostButton(LMPostViewData postViewData) => LMFeedButton(
@@ -632,7 +610,7 @@ class _LMFeedUserCreatedPostListViewState
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: postViewData.isRepostedByUser
-                  ? feedThemeData?.primaryColor
+                  ? feedThemeData.primaryColor
                   : null,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -674,27 +652,22 @@ class _LMFeedUserCreatedPostListViewState
                 ),
               ),
             );
-            // TODO: remove old toast
-            // toast(
-            //   'A post is already uploading.',
-            //   duration: Toast.LENGTH_LONG,
-            // );
           }
         },
-        style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
-            icon: feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+        style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color: postViewData.isRepostedByUser
-                          ? feedThemeData?.primaryColor
+                          ? feedThemeData.primaryColor
                           : null),
             ),
             activeIcon:
-                feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color: postViewData.isRepostedByUser
-                          ? feedThemeData?.primaryColor
+                          ? feedThemeData.primaryColor
                           : null),
             )),
       );
@@ -710,7 +683,7 @@ class _LMFeedUserCreatedPostListViewState
           ),
         ),
         borderRadius: 28,
-        backgroundColor: feedThemeData?.primaryColor,
+        backgroundColor: feedThemeData.primaryColor,
         height: 44,
         width: 153,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -757,11 +730,6 @@ class _LMFeedUserCreatedPostListViewState
                     ),
                   ),
                 );
-                // TODO: remove old toast
-                // toast(
-                //   'A post is already uploading.',
-                //   duration: Toast.LENGTH_LONG,
-                // );
               }
             }
           : () {
@@ -772,8 +740,6 @@ class _LMFeedUserCreatedPostListViewState
                   ),
                 ),
               );
-              // TODO: remove old toast
-              // toast("You do not have permission to create a post");
             },
     );
   }

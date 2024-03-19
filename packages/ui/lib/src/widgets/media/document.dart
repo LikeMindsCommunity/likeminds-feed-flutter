@@ -91,7 +91,6 @@ class _LMDocumentState extends State<LMFeedDocument> {
 
   @override
   void didUpdateWidget(covariant LMFeedDocument oldWidget) {
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
     if (oldWidget.documentFile != widget.documentFile ||
         oldWidget.documentUrl != widget.documentUrl) {

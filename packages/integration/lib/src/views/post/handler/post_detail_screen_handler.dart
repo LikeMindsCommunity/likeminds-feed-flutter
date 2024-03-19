@@ -18,12 +18,11 @@ class LMFeedPostDetailScreenHandler {
   LMFeedPostDetailScreenHandler(
       PagingController<int, LMCommentViewData> commetListPagingController,
       String postId) {
+    this.commentListPagingController = commetListPagingController;
+    this.postId = postId;
     commentHandlerBloc = LMFeedCommentBloc.instance;
     commentController = TextEditingController();
     focusNode = FocusNode();
-    this.commentListPagingController = commetListPagingController;
-    addCommentListPaginationListener();
-    this.postId = postId;
   }
 
   Future<LMPostViewData?> fetchCommentListWithPage(int page) async {
@@ -87,12 +86,6 @@ class LMFeedPostDetailScreenHandler {
           ),
         ),
       );
-      // TODO: remove old toast
-      // toast(
-      //   response.errorMessage ?? 'An error occurred',
-      //   duration: Toast.LENGTH_LONG,
-      // );
-
       return null;
     }
   }
@@ -111,16 +104,6 @@ class LMFeedPostDetailScreenHandler {
     commentListPagingController.addPageRequestListener((pageKey) async {
       await fetchCommentListWithPage(pageKey);
     });
-  }
-
-  bool checkCommentRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    bool memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(10);
-    return memberRights;
   }
 
   void handleBlocChanges(LMFeedCommentHandlerState state) {
@@ -271,11 +254,12 @@ class LMFeedPostDetailScreenHandler {
 
   void addTempReplyCommentToController(
       String tempId, String text, int level, String parentId, bool replyShown) {
-    LMUserViewData currentUser =
-        LMFeedUserLocalPreference.instance.fetchUserData();
+    LMUserViewData? currentUser =
+        LMFeedLocalPreference.instance.fetchUserData();
+
     LMCommentViewData commentViewData = (LMCommentViewDataBuilder()
           ..id(tempId)
-          ..uuid(currentUser.uuid)
+          ..uuid(currentUser!.uuid)
           ..text(text)
           ..level(level)
           ..likesCount(0)
@@ -308,7 +292,8 @@ class LMFeedPostDetailScreenHandler {
 
   void addTempCommentToController(String tempId, String text, int level) {
     LMUserViewData currentUser =
-        LMFeedUserLocalPreference.instance.fetchUserData();
+        LMFeedLocalPreference.instance.fetchUserData()!;
+
     LMCommentViewData commentViewData = (LMCommentViewDataBuilder()
           ..id(tempId)
           ..uuid(currentUser.uuid)

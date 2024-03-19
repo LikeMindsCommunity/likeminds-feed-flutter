@@ -26,11 +26,10 @@ class LMFeedFetchCommentReplyBloc
             forLoadMore: event.forLoadMore,
             emit: emit,
             lmFeedIntegration: lmFeedIntegration);
-      }
-      else if(event is LMFeedClearCommentRepliesEvent)
+      } else if (event is LMFeedClearCommentRepliesEvent)
         emit(LMFeedClearedCommentRepliesState());
-      else if(event is LMFeedAddLocalReplyEvent)
-        emit(LMFeedAddLocalReplyState(comment:event.comment));
+      else if (event is LMFeedAddLocalReplyEvent)
+        emit(LMFeedAddLocalReplyState(comment: event.comment));
     });
   }
 

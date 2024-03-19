@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-
 class LMFeedDeleteConfirmationDialog extends StatelessWidget {
   final String title;
   final String content;
@@ -26,10 +24,10 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     bool boolVarLoading = false;
     ValueNotifier<bool> rebuildReasonBox = ValueNotifier(false);
     DeleteReason? reasonForDeletion;
-    bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
+    bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
     // User Data of the logged in user
-    LMUserViewData? currentUser =
-        LMFeedUserLocalPreference.instance.fetchUserData();
+    LMUserViewData currentUser =
+        LMFeedLocalPreference.instance.fetchUserData()!;
     LMFeedThemeData feedTheme = LMFeedCore.theme;
 
     return Dialog(
@@ -212,9 +210,6 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                 ),
                                               ),
                                             );
-                                            // TODO: remove old toast
-                                            // toast(value.errorMessage ??
-                                            //     'An error occurred');
                                           }
                                           boolVarLoading = false;
                                           rebuildReasonBox.value =

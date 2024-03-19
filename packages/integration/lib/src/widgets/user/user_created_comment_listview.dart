@@ -49,11 +49,10 @@ class LMFeedUserCreatedCommentListView extends StatefulWidget {
 class _LMFeedUserCreatedCommentListViewState
     extends State<LMFeedUserCreatedCommentListView> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
-  int _page = 1;
   static const int pageSize = 10;
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
-  bool userPostingRights = true;
+  bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedThemeData? feedThemeData;
   final ValueNotifier postUploading = ValueNotifier(false);
   final LMFeedUserCreatedCommentBloc _userCreatedCommentBloc =
@@ -63,25 +62,7 @@ class _LMFeedUserCreatedCommentListViewState
   @override
   void initState() {
     super.initState();
-    userPostingRights = checkPostCreationRights();
     addPageRequestListener();
-    _userCreatedCommentBloc.add(
-      LMFeedUserCreatedCommentGetEvent(
-        uuid: widget.uuid,
-        page: _page,
-        pageSize: pageSize,
-      ),
-    );
-  }
-
-  bool checkPostCreationRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
-    return memberRights;
   }
 
   void addPageRequestListener() {
@@ -90,7 +71,7 @@ class _LMFeedUserCreatedCommentListViewState
         _userCreatedCommentBloc.add(
           LMFeedUserCreatedCommentGetEvent(
             uuid: widget.uuid,
-            page: _page,
+            page: pageKey,
             pageSize: pageSize,
           ),
         );
@@ -106,9 +87,8 @@ class _LMFeedUserCreatedCommentListViewState
       _pagingController.appendLastPage(state.comments);
       _posts.addAll(state.posts);
     } else {
-      _pagingController.appendPage(state.comments, _page + 1);
+      _pagingController.appendPage(state.comments, state.page + 1);
       _posts.addAll(state.posts);
-      _page++;
     }
   }
 
@@ -118,78 +98,60 @@ class _LMFeedUserCreatedCommentListViewState
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
     if (_pagingController.itemList != null) _pagingController.itemList?.clear();
-    _page = 1;
   }
 
   @override
   Widget build(BuildContext context) {
     feedThemeData = LMFeedCore.theme;
-    return BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
-      bloc: LMFeedPostBloc.instance,
-      listener: (context, state) {},
-      builder: (context, state) {
-        return BlocConsumer<LMFeedUserCreatedCommentBloc,
+    return BlocListener<LMFeedPostBloc, LMFeedPostState>(
+        bloc: LMFeedPostBloc.instance,
+        listener: (context, state) {},
+        child: BlocListener<LMFeedUserCreatedCommentBloc,
             LMFeedUserCreatedCommentState>(
           bloc: _userCreatedCommentBloc,
-          buildWhen: (previous, current) {
-            if (current is UserCreatedCommentPaginationLoadingState &&
-                (previous is UserCreatedCommentLoadingState ||
-                    previous is UserCreatedCommentLoadedState)) {
-              return false;
-            }
-            return true;
-          },
           listener: (context, state) {
             if (state is UserCreatedCommentLoadedState) {
               updatePagingControllers(state);
             }
           },
-          builder: (context, state) {
-            if (state is UserCreatedCommentLoadingState) {
-              return widget.firstPageLoaderBuilder?.call(context) ??
-                  const LMFeedLoader();
-            }
-            if (state is UserCreatedCommentLoadedState) {
-              return PagedListView(
-                // shrinkWrap: true,
-                pagingController: _pagingController,
-                builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
-                  noItemsFoundIndicatorBuilder: (context) {
-                    return widget.emptyFeedViewBuilder?.call(context) ??
-                        noPostInFeedWidget();
-                  },
-                  itemBuilder: (context, item, index) {
-                    LMFeedPostWidget postWidget = defPostWidget(
-                      feedThemeData,
-                      _posts[item.postId]!,
-                      item,
-                    );
-                    return Column(
-                      children: [
-                        const SizedBox(height: 2),
-                        widget.postBuilder?.call(
-                                context, postWidget, _posts[item.postId]!) ??
-                            LMFeedCore.widgetUtility?.postWidgetBuilder.call(
-                                context, postWidget, _posts[item.postId]!) ??
-                            postWidget,
-                        const Divider(),
-                      ],
-                    );
-                  },
-                  firstPageProgressIndicatorBuilder: (context) =>
-                      const LMFeedShimmer(),
-                  newPageProgressIndicatorBuilder: (context) => const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                ),
+          child: PagedSliverList(
+            // shrinkWrap: true,
+            pagingController: _pagingController,
+            builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
+                noItemsFoundIndicatorBuilder: (context) {
+              return widget.emptyFeedViewBuilder?.call(context) ??
+                  noPostInFeedWidget();
+            }, itemBuilder: (context, item, index) {
+              LMFeedPostWidget postWidget = defPostWidget(
+                feedThemeData,
+                _posts[item.postId]!,
+                item,
               );
-            }
-            return SizedBox.shrink();
-          },
-        );
-      },
-    );
+              return Column(
+                children: [
+                  const SizedBox(height: 2),
+                  widget.postBuilder
+                          ?.call(context, postWidget, _posts[item.postId]!) ??
+                      LMFeedCore.widgetUtility.postWidgetBuilder
+                          .call(context, postWidget, _posts[item.postId]!),
+                  const Divider(),
+                ],
+              );
+            }, firstPageProgressIndicatorBuilder: (context) {
+              return widget.firstPageLoaderBuilder?.call(context) ??
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: LMFeedLoader()),
+                  );
+            }, newPageProgressIndicatorBuilder: (context) {
+              return widget.paginationLoaderBuilder?.call(context) ??
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: LMFeedLoader()),
+                  );
+            }),
+          ),
+        ));
   }
 
   Widget getLoaderThumbnail(LMMediaModel? media) {
@@ -233,7 +195,7 @@ class _LMFeedUserCreatedCommentListViewState
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: post.user!,
+      user: post.user,
       isFeed: false,
       onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
@@ -316,7 +278,7 @@ class _LMFeedUserCreatedCommentListViewState
 
   LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: postViewData.user!,
+      user: postViewData.user,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData?.headerStyle,

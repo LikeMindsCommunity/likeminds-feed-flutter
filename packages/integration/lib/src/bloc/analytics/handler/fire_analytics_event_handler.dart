@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of '../analytics_bloc.dart';
 
 /// {@template fire_analytics_event_handler}

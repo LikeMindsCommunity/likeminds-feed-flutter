@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/sdk/sdk_client_info_view_data.dart';
 
 /// {@template lm_user_view_data}
@@ -34,6 +34,8 @@ class LMUserViewData {
   int? communityId;
   int? createdAt;
 
+  List<LMTopicViewData>? topics;
+
   /// widget for storing custom data
   LMWidgetViewData? widget;
 
@@ -55,6 +57,7 @@ class LMUserViewData {
     this.communityId,
     this.createdAt,
     this.isDeleted,
+    this.topics,
     this.widget,
   });
 }
@@ -79,6 +82,7 @@ class LMUserViewDataBuilder {
   int? _state;
   int? _communityId;
   int? _createdAt;
+  List<LMTopicViewData>? _topics;
   LMWidgetViewData? _widget;
 
   void id(int id) {
@@ -145,6 +149,10 @@ class LMUserViewDataBuilder {
     _createdAt = createdAt;
   }
 
+  void topics(List<LMTopicViewData> topics) {
+    _topics = topics;
+  }
+
   void widget(LMWidgetViewData widget) {
     _widget = widget;
   }
@@ -168,6 +176,7 @@ class LMUserViewDataBuilder {
       communityId: _communityId,
       createdAt: _createdAt,
       isDeleted: _isDeleted,
+      topics: _topics,
       widget: _widget,
     );
   }

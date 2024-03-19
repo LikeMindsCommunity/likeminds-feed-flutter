@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:async';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -6,9 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// {@template lm_feed_edit_post_screen}
@@ -46,7 +45,9 @@ class LMFeedEditPostScreen extends StatefulWidget {
   final PreferredSizeWidget Function(LMFeedAppBar oldAppBar)?
       composeAppBarBuilder;
   final Widget Function()? composeContentBuilder;
-  final Widget Function(List<LMTopicViewData>)? composeTopicSelectorBuilder;
+  final Widget Function(
+          BuildContext context, Widget topicSelector, List<LMTopicViewData>)?
+      composeTopicSelectorBuilder;
   final Widget Function()? composeMediaPreviewBuilder;
   final Widget Function(BuildContext context, LMUserViewData user)?
       composeUserHeaderBuilder;
@@ -60,8 +61,7 @@ class LMFeedEditPostScreen extends StatefulWidget {
 
 class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMPostViewData? postViewData;
-  final LMUserViewData user =
-      LMFeedUserLocalPreference.instance.fetchUserData();
+  final LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
@@ -215,8 +215,6 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           ),
         ),
       );
-      // TODO: remove old toast
-      // toast("Error while selecting media, please try again");
     }
   }
 
@@ -332,9 +330,15 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   },
                   builder: (context, state) {
                     if (state is LMFeedComposeFetchedTopicsState) {
-                      return widget.composeTopicSelectorBuilder
-                              ?.call(state.topics) ??
-                          _defTopicSelector(state.topics);
+                      return widget.composeTopicSelectorBuilder?.call(
+                              context,
+                              _defTopicSelector(state.topics),
+                              composeBloc.selectedTopics) ??
+                          LMFeedCore.widgetUtility
+                              .composeScreenTopicSelectorBuilder(
+                                  context,
+                                  _defTopicSelector(state.topics),
+                                  composeBloc.selectedTopics);
                     }
                     return const SizedBox.shrink();
                   },
@@ -345,9 +349,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 18),
-                      widget.composeUserHeaderBuilder?.call(context, user) ??
+                      widget.composeUserHeaderBuilder?.call(context, user!) ??
                           widgetUtility.composeScreenUserHeaderBuilder(
-                              context, user),
+                              context, user!),
                       const SizedBox(height: 18),
                       widget.composeContentBuilder?.call() ??
                           _defContentInput(),
@@ -820,8 +824,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                       padding: const EdgeInsets.only(top: 4.0),
                       margin: const EdgeInsets.only(right: 12),
                       child: LMFeedProfilePicture(
-                        fallbackText: widget.displayName ?? user.name,
-                        imageUrl: widget.displayUrl ?? user.imageUrl,
+                        fallbackText: widget.displayName ?? user!.name,
+                        imageUrl: widget.displayUrl ?? user!.imageUrl,
                         style: LMFeedProfilePictureStyle(
                           backgroundColor: theme.primaryColor,
                           size: 36,
@@ -1106,81 +1110,4 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
       ),
     );
   }
-}
-
-void sendPostCreationCompletedEvent(
-  List<LMMediaModel> postMedia,
-  List<LMUserTagViewData> usersTagged,
-  List<LMTopicViewData> topics,
-) {
-  Map<String, String> propertiesMap = {};
-
-  if (postMedia.isNotEmpty) {
-    if (postMedia.first.mediaType == LMMediaType.link) {
-      propertiesMap['link_attached'] = 'yes';
-      propertiesMap['link'] =
-          postMedia.first.ogTags?.url ?? postMedia.first.link!;
-    } else {
-      propertiesMap['link_attached'] = 'no';
-      int imageCount = 0;
-      int videoCount = 0;
-      int documentCount = 0;
-      for (LMMediaModel media in postMedia) {
-        if (media.mediaType == LMMediaType.image) {
-          imageCount++;
-        } else if (media.mediaType == LMMediaType.video) {
-          videoCount++;
-        } else if (media.mediaType == LMMediaType.document) {
-          documentCount++;
-        }
-      }
-      if (imageCount > 0) {
-        propertiesMap['image_attached'] = 'yes';
-        propertiesMap['image_count'] = imageCount.toString();
-      } else {
-        propertiesMap['image_attached'] = 'no';
-      }
-      if (videoCount > 0) {
-        propertiesMap['video_attached'] = 'yes';
-        propertiesMap['video_count'] = videoCount.toString();
-      } else {
-        propertiesMap['video_attached'] = 'no';
-      }
-
-      if (documentCount > 0) {
-        propertiesMap['document_attached'] = 'yes';
-        propertiesMap['document_count'] = documentCount.toString();
-      } else {
-        propertiesMap['document_attached'] = 'no';
-      }
-    }
-  }
-
-  if (usersTagged.isNotEmpty) {
-    int taggedUserCount = 0;
-    List<String> taggedUserId = [];
-
-    taggedUserCount = usersTagged.length;
-    taggedUserId =
-        usersTagged.map((e) => e.sdkClientInfo?.uuid ?? e.uuid!).toList();
-
-    propertiesMap['user_tagged'] = taggedUserCount == 0 ? 'no' : 'yes';
-    if (taggedUserCount > 0) {
-      propertiesMap['tagged_users_count'] = taggedUserCount.toString();
-      propertiesMap['tagged_users_id'] = taggedUserId.join(',');
-    }
-  }
-
-  if (topics.isNotEmpty) {
-    propertiesMap['topics_added'] = 'yes';
-    propertiesMap['topics'] = topics.map((e) => e.id).toList().join(',');
-  } else {
-    propertiesMap['topics_added'] = 'no';
-  }
-
-  LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-    eventName: LMFeedAnalyticsKeys.postCreationCompleted,
-    deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationCompleted,
-    eventProperties: propertiesMap,
-  ));
 }
