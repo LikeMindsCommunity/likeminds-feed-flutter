@@ -52,7 +52,7 @@ class _LMFeedUserCreatedCommentListViewState
   static const int pageSize = 10;
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
-  bool userPostingRights = true;
+  bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedThemeData? feedThemeData;
   final ValueNotifier postUploading = ValueNotifier(false);
   final LMFeedUserCreatedCommentBloc _userCreatedCommentBloc =
@@ -62,18 +62,7 @@ class _LMFeedUserCreatedCommentListViewState
   @override
   void initState() {
     super.initState();
-    userPostingRights = checkPostCreationRights();
     addPageRequestListener();
-  }
-
-  bool checkPostCreationRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
-    return memberRights;
   }
 
   void addPageRequestListener() {
@@ -125,7 +114,7 @@ class _LMFeedUserCreatedCommentListViewState
               updatePagingControllers(state);
             }
           },
-          child: PagedListView(
+          child: PagedSliverList(
             // shrinkWrap: true,
             pagingController: _pagingController,
             builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
@@ -152,13 +141,13 @@ class _LMFeedUserCreatedCommentListViewState
               return widget.firstPageLoaderBuilder?.call(context) ??
                   const Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: LMFeedLoader()),
                   );
             }, newPageProgressIndicatorBuilder: (context) {
               return widget.paginationLoaderBuilder?.call(context) ??
                   const Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: LMFeedLoader()),
                   );
             }),
           ),
@@ -361,14 +350,8 @@ class _LMFeedUserCreatedCommentListViewState
             postViewData.isLiked = true;
             postViewData.likeCount += 1;
           }
-
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              post: postViewData,
-              actionType: postViewData.isLiked
-                  ? LMFeedPostActionType.like
-                  : LMFeedPostActionType.unlike,
-              postId: postViewData.id));
+
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
@@ -389,12 +372,6 @@ class _LMFeedUserCreatedCommentListViewState
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-                post: postViewData,
-                actionType: postViewData.isLiked
-                    ? LMFeedPostActionType.like
-                    : LMFeedPostActionType.unlike,
-                postId: postViewData.id));
           }
         },
       );

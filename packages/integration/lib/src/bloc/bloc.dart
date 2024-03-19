@@ -18,4 +18,5 @@ export 'topic/topic_bloc.dart';
 export 'universal_feed/universal_feed_bloc.dart';
 export 'moderation/moderation_bloc.dart';
 export 'notification/notification_bloc.dart';
+export 'simple_bloc_observer.dart';
 export 'user_meta/user_meta_bloc.dart';

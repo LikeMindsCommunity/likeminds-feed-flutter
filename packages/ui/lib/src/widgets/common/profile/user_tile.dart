@@ -66,18 +66,16 @@ class LMFeedUserTile extends LMFeedTile {
             ),
           ),
       subtitle: subtitle ??
-          (user.sdkClientInfo != null
-              ? LMFeedText(
-                  text: "@${user.name.toLowerCase().split(' ').join()} ",
-                  style: const LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: LikeMindsTheme.kFontSmall,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                )
-              : null),
+          LMFeedText(
+            text: "@${user.name.toLowerCase().split(' ').join()} ",
+            style: const LMFeedTextStyle(
+              textStyle: TextStyle(
+                fontSize: LikeMindsTheme.kFontSmall,
+                color: Colors.grey,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ),
     );
   }
 }

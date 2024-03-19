@@ -1,5 +1,4 @@
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
-import 'package:likeminds_feed_flutter_ui/src/models/notification_feed/activity_entity_view_data.dart';
 
 class LMNotificationFeedItemViewData {
   String id;

@@ -9,6 +9,7 @@ class LMPostViewDataConvertor {
     Map<String, Post>? repostedPosts,
     required Map<String, User> users,
     Map<String, Topic>? topics,
+    Map<String, List<String>>? userTopics,
     Map<String, Comment>? filteredComments,
   }) {
     Map<String, LMWidgetViewData>? widgetMap = widgets?.map((key, value) =>
@@ -22,13 +23,13 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.text(post.text);
 
     List<LMTopicViewData> topicViewData = [];
-    if (topics != null) {
-      post.topicIds?.forEach((element) {
-        if (topics[element] != null) {
-          topicViewData.add(LMTopicViewDataConvertor.fromTopic(topics[element]!,
+    if (topics != null && post.topicIds != null) {
+      for (String topicId in post.topicIds!) {
+        if (topics[topicId] != null) {
+          topicViewData.add(LMTopicViewDataConvertor.fromTopic(topics[topicId]!,
               widgets: widgetMap));
         }
-      });
+      }
     }
     postViewDataBuilder.topics(topicViewData);
 
@@ -65,8 +66,11 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.uuid(post.uuid);
 
     if (users[post.uuid] != null) {
-      postViewDataBuilder
-          .user(LMUserViewDataConvertor.fromUser(users[post.uuid]!));
+      postViewDataBuilder.user(LMUserViewDataConvertor.fromUser(
+        users[post.uuid]!,
+        topics: topics,
+        userTopics: userTopics,
+      ));
     }
 
     postViewDataBuilder.likeCount(post.likeCount);
@@ -102,8 +106,9 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.repostCount(post.repostCount);
 
     postViewDataBuilder.isDeleted(post.isDeleted ?? false);
-
-    postViewDataBuilder.widgets(postWidget);
+    if(widgetMap != null) {
+      postViewDataBuilder.widgets(widgetMap);
+    }
 
     if (post.heading != null) postViewDataBuilder.heading(post.heading!);
 

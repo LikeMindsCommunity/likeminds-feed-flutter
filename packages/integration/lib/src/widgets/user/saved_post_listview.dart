@@ -48,7 +48,7 @@ class LMFeedSavedPostListView extends StatefulWidget {
 }
 
 class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
-  bool isCm = LMFeedUserLocalPreference.instance.fetchMemberState();
+  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
   LMFeedThemeData _theme = LMFeedCore.theme;
   Size? screenSize;
   PagingController<int, LMPostViewData> _pagingController =
@@ -59,26 +59,17 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
 
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
-  bool userPostingRights = true;
+  bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedScreenConfig? config;
 
   @override
   void initState() {
     super.initState();
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
-    userPostingRights = checkPostCreationRights();
     addPageRequestListener();
   }
 
-  bool checkPostCreationRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
-    return memberRights;
-  }
+
 
   void addPageRequestListener() {
     _pagingController.addPageRequestListener(

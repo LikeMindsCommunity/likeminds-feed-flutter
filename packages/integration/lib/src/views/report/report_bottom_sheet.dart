@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedReportBottomSheet extends StatefulWidget {
@@ -281,44 +280,3 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
     );
   }
 }
-
-
-  // if (deleteReason != null &&
-  //                         (deleteReason!.name.toLowerCase() == 'others' ||
-  //                             deleteReason!.name.toLowerCase() == 'other'))
-  //                       Container(
-  //                         margin: const EdgeInsets.symmetric(
-  //                             horizontal: 24.0, vertical: 16),
-  //                         child: TextField(
-  //                           cursorColor: Colors.black,
-  //                           style: const TextStyle(
-  //                             color: Colors.black,
-  //                           ),
-  //                           controller: reportReasonController,
-  //                           decoration: InputDecoration(
-  //                             fillColor: theme.primaryColor,
-  //                             enabledBorder: OutlineInputBorder(
-  //                               borderRadius: BorderRadius.circular(12.0),
-  //                               borderSide: BorderSide(
-  //                                 color: theme.primaryColor,
-  //                               ),
-  //                             ),
-  //                             focusColor: theme.primaryColor,
-  //                             border: OutlineInputBorder(
-  //                               borderRadius: BorderRadius.circular(12.0),
-  //                               borderSide: BorderSide(
-  //                                 color: theme.primaryColor,
-  //                               ),
-  //                             ),
-  //                             labelText: 'Reason',
-  //                             labelStyle: theme.contentStyle.textStyle,
-  //                             focusedBorder: OutlineInputBorder(
-  //                               borderRadius: BorderRadius.circular(12.0),
-  //                               borderSide: BorderSide(
-  //                                 color: theme.primaryColor,
-  //                               ),
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       ),
-                    

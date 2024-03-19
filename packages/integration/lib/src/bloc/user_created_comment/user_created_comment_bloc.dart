@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 part 'user_created_comment_event.dart';
@@ -24,7 +25,7 @@ class LMFeedUserCreatedCommentBloc
                   (key, value) =>
                       MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
               {};
-          comments =  response.comments?.map((comment) {
+           comments =  response.comments?.map((comment) {
              return LMCommentViewDataConvertor.fromComment(
               comment,
               users,
@@ -42,7 +43,8 @@ class LMFeedUserCreatedCommentBloc
               errorMessage: response.errorMessage ??
                   "An error occurred, Please try again"));
         }
-      } catch (e) {
+      } catch (e, s) {
+        debugPrint(s.toString());
         emit(UserCreatedCommentErrorState(errorMessage: e.toString()));
       }
     });

@@ -20,3 +20,5 @@ export 'tagging/tagging_textfield_ta.dart';
 
 export 'deep_link/deep_link_handler.dart';
 export 'builder/widget_utility.dart';
+
+export 'user/user_utils.dart';

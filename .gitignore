@@ -35,3 +35,5 @@ build/
 
 # FVM Version Cache
 .fvm/
+.fvmrc
+.vscode/

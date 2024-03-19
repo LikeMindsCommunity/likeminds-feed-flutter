@@ -197,8 +197,8 @@ class LMFeedTaggingHelper {
       // Add a TextSpan for the remaining text
       textSpans.add(TextSpan(
         text: text.substring(lastIndex),
-        style:
-            normalTextStyle ?? TextStyle(wordSpacing: 1.5, color: Colors.grey),
+        style: normalTextStyle ??
+            const TextStyle(wordSpacing: 1.5, color: Colors.grey),
       ));
     }
 
