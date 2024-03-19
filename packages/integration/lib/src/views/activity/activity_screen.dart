@@ -410,6 +410,20 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 ),
               );
             },
+            onPostEdit: () {
+              // Mute all video controllers
+              // to prevent video from playing in background
+              // while editing the post
+              LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => LMFeedEditPostScreen(
+                    postViewData: postViewData,
+                  ),
+                ),
+              );
+            },
           ),
         );
       },

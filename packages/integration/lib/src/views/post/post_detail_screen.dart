@@ -639,6 +639,20 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           onPostReport: () => handlePostReportAction(),
           onPostPin: () => handlePostPinAction(),
           onPostUnpin: () => handlePostPinAction(),
+          onPostEdit: () {
+            // Mute all video controllers
+            // to prevent video from playing in background
+            // while editing the post
+            LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => LMFeedEditPostScreen(
+                  postViewData: _postDetailScreenHandler!.postData!,
+                ),
+              ),
+            );
+          },
           onPostDelete: () {
             String postCreatorUUID =
                 _postDetailScreenHandler!.postData!.user.sdkClientInfo.uuid;

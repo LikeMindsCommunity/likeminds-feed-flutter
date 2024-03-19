@@ -328,6 +328,20 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           onPostReport: () => handlePostReportAction(postViewData),
           onPostUnpin: () => handlePostPinAction(postViewData),
           onPostPin: () => handlePostPinAction(postViewData),
+          onPostEdit: () {
+            // Mute all video controllers
+            // to prevent video from playing in background
+            // while editing the post
+            LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => LMFeedEditPostScreen(
+                  postViewData: postViewData,
+                ),
+              ),
+            );
+          },
           onPostDelete: () {
             showDialog(
               context: context,
