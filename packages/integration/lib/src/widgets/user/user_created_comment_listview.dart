@@ -572,6 +572,13 @@ class _LMFeedUserCreatedCommentListViewState
               actionType: LMFeedPostActionType.saved,
               postId: postViewData.id,
             ));
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+              ),
+            );
           }
         },
         style: feedThemeData?.footerStyle.saveButtonStyle,

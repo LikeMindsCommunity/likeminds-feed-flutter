@@ -673,6 +673,13 @@ class _LMFeedUserCreatedPostListViewState
                     : LMFeedPostActionType.unsaved,
               ),
             );
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+              ),
+            );
           }
         },
         style: feedThemeData.footerStyle.saveButtonStyle,

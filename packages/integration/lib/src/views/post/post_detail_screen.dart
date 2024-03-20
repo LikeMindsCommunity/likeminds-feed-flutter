@@ -182,8 +182,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         source: LMFeedWidgetSource.postDetailScreen,
                         resizeToAvoidBottomInset: true,
                         backgroundColor: feedTheme.backgroundColor,
-                        bottomNavigationBar: widget.bottomTextFieldBuilder?.call(
-                                context, _postDetailScreenHandler!.postData!) ??
+                        bottomNavigationBar: widget.bottomTextFieldBuilder
+                                ?.call(context,
+                                    _postDetailScreenHandler!.postData!) ??
                             defBottomTextField(),
                         appBar:
                             widget.appBarBuilder?.call(context, defAppBar()) ??
@@ -543,12 +544,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     );
   }
 
-  LMFeedPostFooter defPostFooter() {
-    return LMFeedPostFooter(
-      showRepostButton: !_postDetailScreenHandler!.postData!.isRepost,
-    );
-  }
-
   LMFeedPostWidget defPostWidget(BuildContext context) {
     return LMFeedPostWidget(
       post: _postDetailScreenHandler!.postData!,
@@ -858,6 +853,15 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   ? LMFeedPostActionType.saved
                   : LMFeedPostActionType.unsaved,
             ));
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: _postDetailScreenHandler!.postData!.isSaved
+                        ? "Post Saved"
+                        : "Post Unsaved"),
+              ),
+            );
           }
         },
         style: feedTheme.footerStyle.saveButtonStyle,
@@ -951,8 +955,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             )),
       );
 
-  LMFeedCommentWidget defCommentTile(
-      LMCommentViewData commentViewData, LMUserViewData userViewData, BuildContext context) {
+  LMFeedCommentWidget defCommentTile(LMCommentViewData commentViewData,
+      LMUserViewData userViewData, BuildContext context) {
     return LMFeedCommentWidget(
       user: userViewData,
       comment: commentViewData,

@@ -173,49 +173,50 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             if (state is LMFeedSavedPostLoadedState) {
               updatePagingControllers(state);
             }
-           if(state is LMFeedSavedPostErrorState){
-            debugPrint(state.stackTrace.toString());
-             _pagingController.error = state.errorMessage;
-           }
+            if (state is LMFeedSavedPostErrorState) {
+              debugPrint(state.stackTrace.toString());
+              _pagingController.error = state.errorMessage;
+            }
           },
           child: ValueListenableBuilder(
-            valueListenable: rebuildPostWidget,
-            builder: (context,_,__) {
-              return PagedListView<int, LMPostViewData>(
-                pagingController: _pagingController,
-                builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
-                  firstPageProgressIndicatorBuilder: (context) {
-                    return widget.firstPageProgressIndicatorBuilder
-                            ?.call(context) ??
-                        const Center(
-                          child: LMFeedLoader(),
-                        );
-                  },
-                  newPageProgressIndicatorBuilder: (context) {
-                    return widget.newPageProgressIndicatorBuilder?.call(context) ??
-                        const Center(
-                          child: LMFeedLoader(),
-                        );
-                  },
-                  newPageErrorIndicatorBuilder: (context) {
-                    return widget.newPageErrorIndicatorBuilder?.call(context) ??
-                        Center(
-                          child: LMFeedText(
-                            text: _pagingController.error.toString(),
-                          ),
-                        );
-                  
-                  },
-                  itemBuilder: (context, item, index) {
-                    LMFeedPostWidget postWidget = defPostWidget(_theme, item);
-                    return widget.postBuilder?.call(context, postWidget, item) ??
-                        LMFeedCore.widgetUtility.postWidgetBuilder
-                            .call(context, postWidget, item);
-                  },
-                ),
-              );
-            }
-          ),
+              valueListenable: rebuildPostWidget,
+              builder: (context, _, __) {
+                return PagedListView<int, LMPostViewData>(
+                  pagingController: _pagingController,
+                  builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
+                    firstPageProgressIndicatorBuilder: (context) {
+                      return widget.firstPageProgressIndicatorBuilder
+                              ?.call(context) ??
+                          const Center(
+                            child: LMFeedLoader(),
+                          );
+                    },
+                    newPageProgressIndicatorBuilder: (context) {
+                      return widget.newPageProgressIndicatorBuilder
+                              ?.call(context) ??
+                          const Center(
+                            child: LMFeedLoader(),
+                          );
+                    },
+                    newPageErrorIndicatorBuilder: (context) {
+                      return widget.newPageErrorIndicatorBuilder
+                              ?.call(context) ??
+                          Center(
+                            child: LMFeedText(
+                              text: _pagingController.error.toString(),
+                            ),
+                          );
+                    },
+                    itemBuilder: (context, item, index) {
+                      LMFeedPostWidget postWidget = defPostWidget(_theme, item);
+                      return widget.postBuilder
+                              ?.call(context, postWidget, item) ??
+                          LMFeedCore.widgetUtility.postWidgetBuilder
+                              .call(context, postWidget, item);
+                    },
+                  ),
+                );
+              }),
         );
       },
     );
@@ -562,6 +563,13 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               actionType: LMFeedPostActionType.saved,
               postId: postViewData.id, // This is to update the post in the feed
             ));
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+              ),
+            );
           }
         },
         style: _theme.footerStyle.saveButtonStyle,

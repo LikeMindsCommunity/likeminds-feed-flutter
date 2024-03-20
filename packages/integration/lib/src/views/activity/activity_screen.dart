@@ -548,6 +548,13 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                     ? LMFeedPostActionType.unsaved
                     : LMFeedPostActionType.saved));
             postViewData.isSaved = !postViewData.isSaved;
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+              ),
+            );
           }
         },
         style: feedTheme?.footerStyle.saveButtonStyle,
