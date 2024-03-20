@@ -120,7 +120,16 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         if (state is LMFeedAddLocalReplyState) {
           if (replies.isEmpty) {
             replies.add(state.comment);
+          } else {
+            int index = replies.indexWhere(
+                (element) => element.tempId == state.comment.tempId);
+            if (index == -1) {
+              replies.insert(0, state.comment);
+            } else {
+              replies[index] = state.comment;
+            }
           }
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -380,9 +389,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
               [];
-        } else if (state is LMFeedAddLocalReplyState) {
-          replies.insert(0, state.comment);
-        }
+        } 
         replyCount = replies.length;
       },
     );
