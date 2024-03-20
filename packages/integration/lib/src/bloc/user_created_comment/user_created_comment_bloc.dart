@@ -21,28 +21,41 @@ class LMFeedUserCreatedCommentBloc
             await LMFeedCore.client.getUserCreatedComments(request);
         if (response.success) {
           List<LMCommentViewData> comments = [];
+          Map<String, LMWidgetViewData> widgets = (response.widgets ?? {}).map(
+            (key, value) =>
+                MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)),
+          );
+
+          Map<String, LMTopicViewData> topics = (response.topics ?? {}).map(
+              (key, value) => MapEntry(key,
+                  LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
           Map<String, LMUserViewData> users = response.users?.map(
-                  (key, value) =>
-                      MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
+                  (key, value) => MapEntry(
+                      key,
+                      LMUserViewDataConvertor.fromUser(value,
+                          topics: topics,
+                          widgets: widgets,
+                          userTopics: response.userTopics))) ??
               {};
           comments = response.comments?.map((comment) {
-                return LMCommentViewDataConvertor.fromComment(
-                  comment,
-                  users,
-                );
+                return LMCommentViewDataConvertor.fromComment(comment, users);
               }).toList() ??
               [];
 
           final posts = response.posts?.map(
                 (key, value) => MapEntry(
-                  key,
-                  LMPostViewDataConvertor.fromPost(
-                    post: value,
-                    users: users,
-                  ),
-                ),
+                    key,
+                    LMPostViewDataConvertor.fromPost(
+                      post: value,
+                      users: users,
+                      topics: topics,
+                      widgets: widgets,
+                      userTopics: response.userTopics,
+                    )),
               ) ??
               {};
+
           emit(UserCreatedCommentLoadedState(
               comments: comments, posts: posts, page: event.page));
         } else {
