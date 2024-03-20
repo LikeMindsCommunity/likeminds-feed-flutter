@@ -132,17 +132,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           _pagingController.itemList = feedRoomItemList;
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
-        if (state is LMFeedPostUpdateState) {
-          List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-          int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post?.id) ??
-              -1;
-          if (index != -1) {
-            feedRoomItemList![index] = state.post!;
-          }
-          _pagingController.itemList = feedRoomItemList;
-          rebuildPostWidget.value = !rebuildPostWidget.value;
-        }
         if (state is LMFeedEditPostUploadedState) {
           LMPostViewData? item = state.postData;
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
@@ -158,11 +147,14 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post?.id) ??
+                  ?.indexWhere((element) => element.id == state.postId) ??
               -1;
           if (index != -1) {
-            feedRoomItemList?[index] = state.post!;
+            LMPostViewData updatePostViewData = feedRoomItemList![index];
+            updatePostViewData = LMFeedPostUtils.updatePostData(
+                updatePostViewData, state.actionType);
           }
+          _pagingController.itemList = feedRoomItemList;
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
       },
@@ -363,7 +355,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Comment',
+                title: 'Delete Post',
                 uuid: postViewData.uuid,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',
@@ -457,12 +449,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             postViewData.likeCount += 1;
           }
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              post: postViewData,
-              actionType: postViewData.isLiked
-                  ? LMFeedPostActionType.like
-                  : LMFeedPostActionType.unlike,
-              postId: postViewData.id));
+
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
@@ -483,12 +470,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-                post: postViewData,
-                actionType: postViewData.isLiked
-                    ? LMFeedPostActionType.like
-                    : LMFeedPostActionType.unlike,
-                postId: postViewData.id));
           }
         },
       );
