@@ -12,6 +12,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.profilePicture,
     this.titleText,
     this.subtitleText,
+    this.editedText,
     required this.lmFeedMenuAction,
     required this.onTagTap,
     this.menu,
@@ -23,6 +24,8 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.showRepliesButton,
     this.buttonSeparator,
     this.style,
+    this.subTextSeparator,
+    this.subTextStyle,
     this.customTitle,
   });
 
@@ -32,7 +35,9 @@ class LMFeedCommentWidget extends StatefulWidget {
   final LMFeedProfilePicture? profilePicture;
   final LMFeedText? titleText;
   final LMFeedText? subtitleText;
+  final Widget? subTextSeparator;
   final LMFeedText? customTitle;
+  final LMFeedText? editedText;
 
   /// {@macro feed_on_tag_tap}
   final LMFeedOnTagTap onTagTap;
@@ -51,6 +56,7 @@ class LMFeedCommentWidget extends StatefulWidget {
   final Widget? buttonSeparator;
 
   final LMFeedCommentStyle? style;
+  final LMFeedTextStyle? subTextStyle;
 
   @override
   State<LMFeedCommentWidget> createState() => _LMCommentTileState();
@@ -61,6 +67,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     LMFeedProfilePicture? profilePicture,
     LMFeedText? titleText,
     LMFeedText? subtitleText,
+    LMFeedText? editedText,
     Function(String)? onTagTap,
     Widget Function(LMFeedMenu)? menu,
     LMFeedMenuAction? lmFeedMenuAction,
@@ -72,6 +79,8 @@ class LMFeedCommentWidget extends StatefulWidget {
     Widget? buttonSeparator,
     LMFeedButton? showRepliesButton,
     LMFeedCommentStyle? style,
+     Widget? subTextSeparator,
+    LMFeedTextStyle? subTextStyle,
     LMFeedText? customTitle,
   }) {
     return LMFeedCommentWidget(
@@ -79,7 +88,9 @@ class LMFeedCommentWidget extends StatefulWidget {
       comment: comment ?? this.comment,
       profilePicture: profilePicture ?? this.profilePicture,
       titleText: titleText ?? this.titleText,
+      subTextSeparator: subTextSeparator ?? this.subTextSeparator,
       subtitleText: subtitleText ?? this.subtitleText,
+      editedText: editedText ?? this.editedText,
       onTagTap: onTagTap ?? this.onTagTap,
       menu: menu ?? this.menu,
       lmFeedMenuAction: lmFeedMenuAction ?? this.lmFeedMenuAction,
@@ -92,6 +103,7 @@ class LMFeedCommentWidget extends StatefulWidget {
       showRepliesButton: showRepliesButton ?? this.showRepliesButton,
       buttonSeparator: buttonSeparator ?? this.buttonSeparator,
       style: style ?? this.style,
+      subTextStyle: subTextStyle ?? this.subTextStyle,
       customTitle: customTitle ?? this.customTitle,
     );
   }
@@ -154,7 +166,39 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                   widget.subtitleText != null
                       ? Container(
                           padding: style?.subtitlePadding,
-                          child: widget.subtitleText,
+                          child: Row(
+                            children: [
+                              widget.subtitleText ?? const SizedBox.shrink(),
+                              if(widget.comment.isEdited) 
+                              LikeMindsTheme.kHorizontalPaddingSmall,
+                               if (widget.comment.isEdited)
+                                widget.subTextSeparator ??
+                                    LMFeedText(
+                                      text: widget.comment.isEdited ? '•' : '',
+                                      style: LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: LikeMindsTheme.kFontSmall,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                              LikeMindsTheme.kHorizontalPaddingSmall,
+                              widget.comment.isEdited
+                                  ? widget.editedText ??
+                                      LMFeedText(
+                                        text: widget.comment.isEdited
+                                            ? 'Edited'
+                                            : '',
+                                        style: LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize: LikeMindsTheme.kFontSmall,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                      )
+                                  : const SizedBox(),
+                            ],
+                          ),
                         )
                       : const SizedBox.shrink(),
                 ],

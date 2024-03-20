@@ -364,6 +364,7 @@ class LMFeedPostDetailScreenHandler {
 
   void addCommentToController(LMCommentViewData commentViewData) {
     commentListPagingController.itemList?.insert(0, commentViewData);
+    debugPrint('commentListPagingController.itemList: ${commentListPagingController.itemList}');
   }
 
   void deleteCommentFromController(String commentId) {

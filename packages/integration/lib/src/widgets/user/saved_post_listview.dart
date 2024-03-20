@@ -178,38 +178,43 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
              _pagingController.error = state.errorMessage;
            }
           },
-          child: PagedListView<int, LMPostViewData>(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
-              firstPageProgressIndicatorBuilder: (context) {
-                return widget.firstPageProgressIndicatorBuilder
-                        ?.call(context) ??
-                    const Center(
-                      child: LMFeedLoader(),
-                    );
-              },
-              newPageProgressIndicatorBuilder: (context) {
-                return widget.newPageProgressIndicatorBuilder?.call(context) ??
-                    const Center(
-                      child: LMFeedLoader(),
-                    );
-              },
-              newPageErrorIndicatorBuilder: (context) {
-                return widget.newPageErrorIndicatorBuilder?.call(context) ??
-                    Center(
-                      child: LMFeedText(
-                        text: _pagingController.error.toString(),
-                      ),
-                    );
-              
-              },
-              itemBuilder: (context, item, index) {
-                LMFeedPostWidget postWidget = defPostWidget(_theme, item);
-                return widget.postBuilder?.call(context, postWidget, item) ??
-                    LMFeedCore.widgetUtility.postWidgetBuilder
-                        .call(context, postWidget, item);
-              },
-            ),
+          child: ValueListenableBuilder(
+            valueListenable: rebuildPostWidget,
+            builder: (context,_,__) {
+              return PagedListView<int, LMPostViewData>(
+                pagingController: _pagingController,
+                builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
+                  firstPageProgressIndicatorBuilder: (context) {
+                    return widget.firstPageProgressIndicatorBuilder
+                            ?.call(context) ??
+                        const Center(
+                          child: LMFeedLoader(),
+                        );
+                  },
+                  newPageProgressIndicatorBuilder: (context) {
+                    return widget.newPageProgressIndicatorBuilder?.call(context) ??
+                        const Center(
+                          child: LMFeedLoader(),
+                        );
+                  },
+                  newPageErrorIndicatorBuilder: (context) {
+                    return widget.newPageErrorIndicatorBuilder?.call(context) ??
+                        Center(
+                          child: LMFeedText(
+                            text: _pagingController.error.toString(),
+                          ),
+                        );
+                  
+                  },
+                  itemBuilder: (context, item, index) {
+                    LMFeedPostWidget postWidget = defPostWidget(_theme, item);
+                    return widget.postBuilder?.call(context, postWidget, item) ??
+                        LMFeedCore.widgetUtility.postWidgetBuilder
+                            .call(context, postWidget, item);
+                  },
+                ),
+              );
+            }
           ),
         );
       },
