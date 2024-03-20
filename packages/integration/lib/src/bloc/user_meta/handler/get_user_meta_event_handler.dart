@@ -8,11 +8,20 @@ getUserMetaEventHandler(
         (GetUserFeedMetaRequestBuilder()..uuid(event.uuid)).build());
 
     final user = response.users?.entries.first.value;
+
+    Map<String, LMWidgetViewData> widgets =
+        (response.widgets ?? <String, WidgetModel>{}).map((key, value) =>
+            MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+    Map<String, LMTopicViewData> topics = (response.topics ?? <String, Topic>{})
+        .map((key, value) => MapEntry(
+            key, LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
     final userViewData = LMUserViewDataConvertor.fromUser(
       user!,
-      widgets: response.widgets,
+      widgets: widgets,
       userTopics: response.userTopics,
-      topics: response.topics,
+      topics: topics,
     );
 
     emit(LMFeedUserMetaLoadedState(

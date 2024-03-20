@@ -214,11 +214,11 @@ class LMFeedPostUtils {
 
   static LMPostViewData postViewDataFromActivity(
     UserActivityItem activity,
-    Map<String, WidgetModel>? widgets,
-    Map<String, User> users,
-    Map<String, Topic>? topics, {
-    Map<String, Comment>? filteredComments,
-    Map<String, Post>? repostedPosts,
+    Map<String, LMWidgetViewData>? widgets,
+    Map<String, LMUserViewData> users,
+    Map<String, LMTopicViewData>? topics, {
+    Map<String, LMCommentViewData>? filteredComments,
+    Map<String, LMPostViewData>? repostedPosts,
   }) {
     List<LMTopicViewData> topicViewData = [];
 
@@ -227,8 +227,7 @@ class LMFeedPostUtils {
         activity.activityEntityData.topicIds!.isNotEmpty) {
       for (var topicId in activity.activityEntityData.topicIds!) {
         if (topics[topicId] != null) {
-          topicViewData
-              .add(LMTopicViewDataConvertor.fromTopic(topics[topicId]!));
+          topicViewData.add(topics[topicId]!);
         }
       }
     }
@@ -253,18 +252,15 @@ class LMFeedPostUtils {
                       .toList() ??
                   [])
               ..replies(activity.activityEntityData.replies
-                      ?.map((e) => LMCommentViewDataConvertor.fromComment(
-                          e,
-                          users.map((key, value) => MapEntry(
-                              key, LMUserViewDataConvertor.fromUser(value)))))
+                      ?.map((e) =>
+                          LMCommentViewDataConvertor.fromComment(e, users))
                       .toList() ??
                   [])
               ..communityId(activity.activityEntityData.communityId)
               ..isPinned(activity.activityEntityData.isPinned!)
               ..topics(topicViewData)
               ..uuid(activity.activityEntityData.uuid!)
-              ..user(LMUserViewDataConvertor.fromUser(
-                  users[activity.activityEntityData.uuid!]!))
+              ..user(users[activity.activityEntityData.uuid!]!)
               ..likeCount(activity.activityEntityData.likesCount!)
               ..commentCount(activity.activityEntityData.commentsCount!)
               ..isSaved(activity.activityEntityData.isSaved!)
@@ -282,9 +278,7 @@ class LMFeedPostUtils {
               ..isDeleted(activity.activityEntityData.isDeleted ?? false)
               ..updatedAt(DateTime.fromMillisecondsSinceEpoch(
                   activity.activityEntityData.updatedAt!))
-              ..widgets(widgets?.map((key, value) => MapEntry(
-                      key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
-                  {}))
+              ..widgets(widgets ?? {}))
             .build();
   }
 

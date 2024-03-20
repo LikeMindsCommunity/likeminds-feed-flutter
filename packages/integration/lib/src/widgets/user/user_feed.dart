@@ -51,6 +51,7 @@ class _LMFeedUserCreatedPostListViewState
   Map<String, LMTopicViewData> topics = {};
   Map<String, LMWidgetViewData> widgets = {};
   Map<String, LMPostViewData> repostedPosts = {};
+  Map<String, LMCommentViewData> filteredComments = {};
 
   int _pageFeed = 1;
   final PagingController<int, LMPostViewData> _pagingController =
@@ -103,9 +104,24 @@ class _LMFeedUserCreatedPostListViewState
             key,
             LMUserViewDataConvertor.fromUser(
               value,
-              topics: response.topics,
-              widgets: response.widgets,
+              topics: topics,
+              widgets: widgets,
+              userTopics: response.userTopics,
             ))));
+      }
+
+      if (response.filteredComments != null) {
+        filteredComments.addAll(
+          response.filteredComments!.map(
+            (key, value) => MapEntry(
+              key,
+              LMCommentViewDataConvertor.fromComment(
+                value,
+                users,
+              ),
+            ),
+          ),
+        );
       }
 
       if (response.repostedPosts != null) {
@@ -115,12 +131,11 @@ class _LMFeedUserCreatedPostListViewState
               key,
               LMPostViewDataConvertor.fromPost(
                 post: value,
-                users: response.users!,
-                filteredComments: response.filteredComments,
-                repostedPosts: response.repostedPosts,
-                topics: response.topics,
+                users: users,
+                filteredComments: filteredComments,
+                topics: topics,
                 userTopics: response.userTopics,
-                widgets: response.widgets,
+                widgets: widgets,
               ),
             ),
           ),
@@ -129,11 +144,11 @@ class _LMFeedUserCreatedPostListViewState
       List<LMPostViewData> listOfPosts = response.posts!
           .map((e) => LMPostViewDataConvertor.fromPost(
               post: e,
-              widgets: response.widgets,
-              repostedPosts: response.repostedPosts,
-              topics: response.topics,
-              users: response.users!,
-              filteredComments: response.filteredComments,
+              widgets: widgets,
+              repostedPosts: repostedPosts,
+              topics: topics,
+              users: users,
+              filteredComments: filteredComments,
               userTopics: response.userTopics))
           .toList();
 
@@ -426,9 +441,10 @@ class _LMFeedUserCreatedPostListViewState
     return LMFeedPostHeader(
       user: users[postViewData.uuid]!,
       isFeed: true,
-      onProfileTap: (){
-         LMFeedCore.instance.lmFeedClient.routeToProfile(
-          postViewData.user.sdkClientInfo.uuid,);
+      onProfileTap: () {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(
+          postViewData.user.sdkClientInfo.uuid,
+        );
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: postViewData.user.sdkClientInfo.uuid,
@@ -795,7 +811,7 @@ class _LMFeedUserCreatedPostListViewState
   LMFeedButton createPostButton() {
     return LMFeedButton(
       style: LMFeedButtonStyle(
-        icon:  LMFeedIcon(
+        icon: LMFeedIcon(
           type: LMFeedIconType.icon,
           icon: Icons.add,
           style: LMFeedIconStyle(
@@ -810,7 +826,7 @@ class _LMFeedUserCreatedPostListViewState
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),
-      text:  LMFeedText(
+      text: LMFeedText(
         text: "Create Post",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
@@ -866,7 +882,7 @@ class _LMFeedUserCreatedPostListViewState
     );
   }
 
-   Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
+  Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
     return showModalBottomSheet(
       context: context,
       useRootNavigator: true,
@@ -893,7 +909,6 @@ class _LMFeedUserCreatedPostListViewState
       ),
     );
   }
-
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;

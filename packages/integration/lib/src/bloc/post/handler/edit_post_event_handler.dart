@@ -50,26 +50,48 @@ void editPostEventHandler(
     if (response.success) {
       // Convert the post response to [ViewData] models and
       // Emit [LMFeedEditPostUploadedState] with the post data
+      Map<String, LMWidgetViewData> widgets =
+          (response.widgets ?? <String, WidgetModel>{}).map((key, value) =>
+              MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+      Map<String, LMTopicViewData> topics =
+          (response.topics ?? <String, Topic>{}).map((key, value) => MapEntry(
+              key,
+              LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
+      Map<String, LMUserViewData> users =
+          (response.user ?? <String, User>{}).map((key, value) => MapEntry(
+              key,
+              LMUserViewDataConvertor.fromUser(
+                value,
+                topics: topics,
+                userTopics: response.userTopics,
+                widgets: widgets,
+              )));
+
+      Map<String, LMPostViewData> respostedPost =
+          response.repostedPosts?.map((key, value) => MapEntry(
+                  key,
+                  LMPostViewDataConvertor.fromPost(
+                    post: value,
+                    users: users,
+                    topics: topics,
+                    widgets: widgets,
+                  ))) ??
+              {};
+
       emit(
         LMFeedEditPostUploadedState(
           postData: LMPostViewDataConvertor.fromPost(
             post: response.post!,
-            widgets: response.widgets ?? {},
-            repostedPosts: response.repostedPosts ?? {},
-            users: response.user ?? {},
-            topics: response.topics ?? {},
+            widgets: widgets,
+            repostedPosts: respostedPost,
+            users: users,
+            topics: topics,
           ),
-          userData: (response.user ?? <String, User>{}).map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
-          topics: (response.topics ?? <String, Topic>{}).map(
-            (key, value) => MapEntry(
-              key,
-              LMTopicViewDataConvertor.fromTopic(value),
-            ),
-          ),
-          widgets: (response.widgets ?? <String, WidgetModel>{}).map((key,
-                  value) =>
-              MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value))),
+          userData: users,
+          topics: topics,
+          widgets: widgets,
         ),
       );
     } else {

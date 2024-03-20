@@ -13,15 +13,57 @@ getSavedPostEventHandler(LMFeedGetSavedPostEvent event, emit) async {
     );
     debugPrint(user?.uuid);
     if (savePostResponse.success) {
+      Map<String, LMWidgetViewData> widgets = (savePostResponse.widgets ??
+              <String, WidgetModel>{})
+          .map((key, value) =>
+              MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+      Map<String, LMTopicViewData> topics =
+          (savePostResponse.topics ?? <String, Topic>{}).map((key, value) =>
+              MapEntry(key,
+                  LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
+      Map<String, LMUserViewData> users =
+          (savePostResponse.users ?? <String, User>{})
+              .map((key, value) => MapEntry(
+                  key,
+                  LMUserViewDataConvertor.fromUser(
+                    value,
+                    topics: topics,
+                    userTopics: savePostResponse.userTopics,
+                    widgets: widgets,
+                  )));
+
+      Map<String, LMPostViewData> respostedPost =
+          savePostResponse.repostedPosts?.map((key, value) => MapEntry(
+                  key,
+                  LMPostViewDataConvertor.fromPost(
+                    post: value,
+                    users: users,
+                    topics: topics,
+                    widgets: widgets,
+                  ))) ??
+              {};
+
+      Map<String, LMCommentViewData> filteredComments =
+          savePostResponse.filteredComments?.map((key, value) => MapEntry(
+                  key,
+                  LMCommentViewDataConvertor.fromComment(
+                    value,
+                    users,
+                  ))) ??
+              {};
+
       List<LMPostViewData> savedPost = [];
+
       savePostResponse.posts?.forEach((post) {
         savedPost.add(LMPostViewDataConvertor.fromPost(
           post: post,
-          widgets: savePostResponse.widgets,
-          repostedPosts: savePostResponse.repostedPosts,
-          users: savePostResponse.users ?? {},
-          topics: savePostResponse.topics,
-          filteredComments: savePostResponse.filteredComments,
+          widgets: widgets,
+          repostedPosts: respostedPost,
+          users: users,
+          topics: topics,
+          filteredComments: filteredComments,
           userTopics: savePostResponse.userTopics,
         ));
       });
@@ -33,12 +75,11 @@ getSavedPostEventHandler(LMFeedGetSavedPostEvent event, emit) async {
         LMFeedSavedPostErrorState(
             errorMessage: savePostResponse.errorMessage ??
                 "An error occurred, Please try again",
-            stackTrace: StackTrace.current
-                ),
-                
+            stackTrace: StackTrace.current),
       );
     }
   } on Exception catch (e, stackTrace) {
-    emit(LMFeedSavedPostErrorState(errorMessage: e.toString(), stackTrace: stackTrace));
+    emit(LMFeedSavedPostErrorState(
+        errorMessage: e.toString(), stackTrace: stackTrace));
   }
 }

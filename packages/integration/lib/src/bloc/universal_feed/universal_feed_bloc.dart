@@ -79,6 +79,26 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
               key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
           {});
 
+      Map<String, LMCommentViewData> filteredComments =
+          response.filteredComments?.map((key, value) => MapEntry(
+                  key,
+                  LMCommentViewDataConvertor.fromComment(
+                    value,
+                    users,
+                  ))) ??
+              {};
+
+      Map<String, LMPostViewData> repostedPosts =
+          response.repostedPosts?.map((key, value) => MapEntry(
+                  key,
+                  LMPostViewDataConvertor.fromPost(
+                    post: value,
+                    users: users,
+                    topics: topics,
+                    widgets: widgets,
+                  ))) ??
+              {};
+
       emit(
         LMFeedUniversalFeedLoadedState(
           pageKey: event.pageKey,
@@ -86,11 +106,11 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
           posts: response.posts
                   ?.map((e) => LMPostViewDataConvertor.fromPost(
                         post: e,
-                        widgets: response.widgets,
-                        repostedPosts: response.repostedPosts,
-                        users: response.users ?? {},
-                        topics: response.topics,
-                        filteredComments: response.filteredComments,
+                        widgets: widgets,
+                        repostedPosts: repostedPosts,
+                        users: users,
+                        topics: topics,
+                        filteredComments: filteredComments,
                         userTopics: response.userTopics,
                       ))
                   .toList() ??

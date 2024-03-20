@@ -20,34 +20,36 @@ void getPostEventHandler(
         MapEntry(
             key, LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
 
-    Map<String, LMUserViewData> userData = response.users!.map((key, value) =>
+    Map<String, LMUserViewData> users = response.users!.map((key, value) =>
         MapEntry(
             key,
             LMUserViewDataConvertor.fromUser(value,
-                topics: response.topics, widgets: response.widgets)));
+                topics: topics,
+                widgets: widgets,
+                userTopics: response.userTopics)));
 
     final Map<String, LMPostViewData>? repostedPosts =
         response.repostedPosts?.map((key, value) => MapEntry(
             key,
             LMPostViewDataConvertor.fromPost(
               post: value,
-              users: response.users!,
-              topics: response.topics,
-              widgets: response.widgets,
+              users: users,
+              topics: topics,
+              widgets: widgets,
+              userTopics: response.userTopics,
             )));
 
     LMPostViewData postViewData = LMPostViewDataConvertor.fromPost(
-      post: response.post!,
-      users: response.users!,
-      topics: response.topics,
-      widgets: response.widgets,
-      repostedPosts: response.repostedPosts,
-    );
+        post: response.post!,
+        users: users,
+        topics: topics,
+        widgets: widgets,
+        repostedPosts: repostedPosts);
 
     emit(LMFeedGetPostSuccessState(
       post: postViewData,
       topics: topics,
-      userData: userData,
+      userData: users,
       widgets: widgets,
       repostedPosts: repostedPosts,
     ));

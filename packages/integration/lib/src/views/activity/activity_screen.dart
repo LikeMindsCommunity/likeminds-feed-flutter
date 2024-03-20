@@ -31,7 +31,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       PagingController(firstPageKey: 1);
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
-  Map<String, WidgetModel> widgets = {};
+  Map<String, LMWidgetViewData> widgets = {};
   Map<String, Post> repostedPosts = {};
   Map<String, Comment> filteredComments = {};
 
@@ -61,20 +61,31 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           await LMFeedCore.client.getUserActivity(request);
 
       if (userActivityResponse.success) {
+        widgets.addAll(userActivityResponse.widgets?.map((key, value) =>
+                MapEntry(
+                    key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+            {});
+
         Map<String, LMTopicViewData> topics = userActivityResponse.topics?.map(
-                (key, value) =>
-                    MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))) ??
+                (key, value) => MapEntry(
+                    key,
+                    LMTopicViewDataConvertor.fromTopic(value,
+                        widgets: widgets))) ??
             {};
 
         this.topics.addAll(topics);
 
-        Map<String, LMUserViewData> users = userActivityResponse.users?.map(
-                (key, value) =>
-                    MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
-            {};
+        Map<String, LMUserViewData> users =
+            userActivityResponse.users?.map((key, value) => MapEntry(
+                    key,
+                    LMUserViewDataConvertor.fromUser(
+                      value,
+                      topics: this.topics,
+                      widgets: widgets,
+                    ))) ??
+                {};
 
         this.users.addAll(users);
-        widgets.addAll(userActivityResponse.widgets ?? {});
 
         final isLastPage = userActivityResponse.activities == null ||
             userActivityResponse.activities!.length < 10;
@@ -156,10 +167,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                   LMFeedPostUtils.postViewDataFromActivity(
                 item,
                 widgets,
-                users.map((key, value) =>
-                    MapEntry(key, LMUserViewDataConvertor.toUser(value))),
-                topics.map((key, value) =>
-                    MapEntry(key, LMTopicViewDataConvertor.toTopic(value))),
+                users,
+                topics,
               );
               final user = users[item.activityEntityData.uuid]!;
 

@@ -25,19 +25,26 @@ class LMFeedUserCreatedCommentBloc
                   (key, value) =>
                       MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
               {};
-           comments =  response.comments?.map((comment) {
-             return LMCommentViewDataConvertor.fromComment(
-              comment,
-              users,
-            );
-          }).toList() ?? [];
+          comments = response.comments?.map((comment) {
+                return LMCommentViewDataConvertor.fromComment(
+                  comment,
+                  users,
+                );
+              }).toList() ??
+              [];
 
-          final posts = response.posts?.map((key, value) => MapEntry(
+          final posts = response.posts?.map(
+                (key, value) => MapEntry(
                   key,
                   LMPostViewDataConvertor.fromPost(
-                      post: value, users: response.users ?? {}))) ??
+                    post: value,
+                    users: users,
+                  ),
+                ),
+              ) ??
               {};
-          emit(UserCreatedCommentLoadedState(comments: comments, posts: posts, page: event.page));
+          emit(UserCreatedCommentLoadedState(
+              comments: comments, posts: posts, page: event.page));
         } else {
           emit(UserCreatedCommentErrorState(
               errorMessage: response.errorMessage ??

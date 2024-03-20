@@ -57,8 +57,8 @@ class LMFeedPostDetailScreenHandler {
             key,
             LMUserViewDataConvertor.fromUser(
               value,
-              topics: response.topics,
-              widgets: response.widgets,
+              topics: topics,
+              widgets: widgets,
               userTopics: userTopics,
             ),
           ),
@@ -71,10 +71,10 @@ class LMFeedPostDetailScreenHandler {
               key,
               LMPostViewDataConvertor.fromPost(
                 post: value,
-                widgets: response.widgets,
-                repostedPosts: response.repostedPosts,
-                users: response.users ?? {},
-                topics: response.topics ?? {},
+                widgets: widgets,
+                repostedPosts: repostedPosts,
+                users: users,
+                topics: topics,
                 userTopics: userTopics,
               ))) ??
           {});
@@ -83,10 +83,10 @@ class LMFeedPostDetailScreenHandler {
       // Add post data, and all supporting data to the map
       final LMPostViewData postViewData = LMPostViewDataConvertor.fromPost(
         post: response.post!,
-        widgets: response.widgets,
-        repostedPosts: response.repostedPosts,
-        users: response.users ?? {},
-        topics: response.topics ?? {},
+        widgets: widgets,
+        repostedPosts: repostedPosts,
+        users: users,
+        topics: topics,
         userTopics: userTopics,
       );
 
@@ -364,7 +364,8 @@ class LMFeedPostDetailScreenHandler {
 
   void addCommentToController(LMCommentViewData commentViewData) {
     commentListPagingController.itemList?.insert(0, commentViewData);
-    debugPrint('commentListPagingController.itemList: ${commentListPagingController.itemList}');
+    debugPrint(
+        'commentListPagingController.itemList: ${commentListPagingController.itemList}');
   }
 
   void deleteCommentFromController(String commentId) {
