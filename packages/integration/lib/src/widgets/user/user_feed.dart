@@ -251,19 +251,6 @@ class _LMFeedUserCreatedPostListViewState
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
 
-        if (state is LMFeedPostUpdateState) {
-          List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-          int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.postId) ??
-              -1;
-          if (index != -1) {
-            LMPostViewData? postViewData = feedRoomItemList?[index];
-            if (postViewData != null) {
-              LMFeedPostUtils.updatePostData(postViewData, state.actionType);
-            }
-          }
-          rebuildPostWidget.value = !rebuildPostWidget.value;
-        }
       },
       child: ValueListenableBuilder(
           valueListenable: rebuildPostWidget,

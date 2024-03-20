@@ -450,7 +450,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               title: 'Delete Comment',
               uuid: commentCreatorUUID,
               content:
-                  'Are you sure you want to delete this post. This action can not be reversed.',
+                  'Are you sure you want to delete this comment. This action can not be reversed.',
               action: (String reason) async {
                 Navigator.of(childContext).pop();
 
@@ -675,7 +675,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Comment',
+                title: 'Delete Post',
                 uuid: postCreatorUUID,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',
