@@ -151,8 +151,29 @@ class LMFeedPostDetailScreenHandler {
           AddCommentResponse response =
               commentSuccessState.commentActionResponse as AddCommentResponse;
 
+          widgets.addAll((response.widgets ?? {})
+              .map((key, value) => MapEntry(
+                  key, LMWidgetViewDataConvertor.fromWidgetModel(value)))
+              .cast<String, LMWidgetViewData>());
+
+          topics.addAll((response.topics ?? {})
+              .map((key, value) => MapEntry(key,
+                  LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)))
+              .cast<String, LMTopicViewData>());
+
+          users.addAll(response.users?.map((key, value) => MapEntry(
+                  key,
+                  LMUserViewDataConvertor.fromUser(
+                    value,
+                    topics: topics,
+                    widgets: widgets,
+                    userTopics: response.userTopics,
+                  ))) ??
+              {});
+
           LMCommentViewData commentViewData =
               LMCommentViewDataConvertor.fromComment(response.reply!, users);
+
           replaceTempCommentWithActualComment(commentViewData);
 
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
