@@ -795,10 +795,11 @@ class _LMFeedUserCreatedPostListViewState
   LMFeedButton createPostButton() {
     return LMFeedButton(
       style: LMFeedButtonStyle(
-        icon: const LMFeedIcon(
+        icon:  LMFeedIcon(
           type: LMFeedIconType.icon,
           icon: Icons.add,
           style: LMFeedIconStyle(
+            color: feedThemeData.onPrimary,
             size: 18,
           ),
         ),
@@ -809,10 +810,11 @@ class _LMFeedUserCreatedPostListViewState
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),
-      text: const LMFeedText(
+      text:  LMFeedText(
         text: "Create Post",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
+            color: feedThemeData.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),

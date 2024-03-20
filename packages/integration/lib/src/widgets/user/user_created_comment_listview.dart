@@ -120,18 +120,18 @@ class _LMFeedUserCreatedCommentListViewState
                     noPostInFeedWidget();
               },
               itemBuilder: (context, item, index) {
+                _posts[item.postId]?.topComments = [item];
                 LMFeedPostWidget postWidget = defPostWidget(
                   feedThemeData,
                   _posts[item.postId]!,
-                  item,
                 );
                 return Column(
                   children: [
                     const SizedBox(height: 2),
-                     widget.postBuilder
-                                ?.call(context, postWidget, _posts[item.postId]!) ??
-                            LMFeedCore.widgetUtility.postWidgetBuilder
-                                .call(context, postWidget,  _posts[item.postId]!),
+                    widget.postBuilder
+                            ?.call(context, postWidget, _posts[item.postId]!) ??
+                        LMFeedCore.widgetUtility.postWidgetBuilder
+                            .call(context, postWidget, _posts[item.postId]!),
                     const Divider(),
                   ],
                 );
@@ -191,8 +191,8 @@ class _LMFeedUserCreatedCommentListViewState
     }
   }
 
-  LMFeedPostWidget defPostWidget(LMFeedThemeData? feedThemeData,
-      LMPostViewData post, LMCommentViewData comment) {
+  LMFeedPostWidget defPostWidget(
+      LMFeedThemeData? feedThemeData, LMPostViewData post) {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
@@ -248,14 +248,115 @@ class _LMFeedUserCreatedCommentListViewState
       },
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
-      content: LMFeedPostCustomContent(
-        comment: comment,
-        post: post,
-        feedThemeData: feedThemeData,
-      ),
+      content: _defContentWidget(post),
+      media: _defPostMedia(post),
       topicWidget: _defTopicWidget(post),
     );
   }
+
+  LMFeedPostContent _defContentWidget(LMPostViewData post) {
+    return LMFeedPostContent(
+      onTagTap: (String? uuid) {},
+      style: feedThemeData?.contentStyle,
+      text: post.text,
+      heading: post.heading,
+    );
+  }
+
+  LMFeedPostMedia _defPostMedia(
+    LMPostViewData post,
+  ) {
+    return LMFeedPostMedia(
+      attachments: post.attachments!,
+      postId: post.id,
+      style: feedThemeData?.mediaStyle,
+      onMediaTap: () async {
+        VideoController? postVideoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
+
+        await postVideoController?.player.pause();
+        // ignore: use_build_context_synchronously
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMFeedMediaPreviewScreen(
+              postAttachments: post.attachments ?? [],
+              post: post,
+              user: post.user,
+            ),
+          ),
+        );
+        await postVideoController?.player.play();
+      },
+    );
+  }
+
+  // LMFeedPostWidget defPostWidget(LMFeedThemeData? feedThemeData,
+  //     LMPostViewData post, LMCommentViewData comment) {
+  //   return LMFeedPostWidget(
+  //     post: post,
+  //     topics: post.topics,
+  //     user: post.user,
+  //     isFeed: false,
+  //     onTagTap: (String uuid) {
+  //       LMFeedProfileBloc.instance.add(
+  //         LMFeedRouteToUserProfileEvent(
+  //           uuid: uuid,
+  //           context: context,
+  //         ),
+  //       );
+  //     },
+  //     disposeVideoPlayerOnInActive: () {
+  //       LMFeedVideoProvider.instance.clearPostController(post.id);
+  //     },
+  //     style: feedThemeData?.postStyle,
+  //     onMediaTap: () async {
+  //       VideoController? postVideoController = LMFeedVideoProvider.instance
+  //           .getVideoController(
+  //               LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
+
+  //       await postVideoController?.player.pause();
+  //       // ignore: use_build_context_synchronously
+  //       await Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => LMFeedMediaPreviewScreen(
+  //             postAttachments: post.attachments ?? [],
+  //             post: post,
+  //             user: post.user,
+  //           ),
+  //         ),
+  //       );
+  //       await postVideoController?.player.play();
+  //     },
+  //     onPostTap: (context, post) async {
+  //       VideoController? postVideoController = LMFeedVideoProvider.instance
+  //           .getVideoController(
+  //               LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
+
+  //       await postVideoController?.player.pause();
+  //       // ignore: use_build_context_synchronously
+  //       await Navigator.of(context, rootNavigator: true).push(
+  //         MaterialPageRoute(
+  //           builder: (context) => LMFeedPostDetailScreen(
+  //             postId: post.id,
+  //             postBuilder: widget.postBuilder,
+  //           ),
+  //         ),
+  //       );
+  //       await postVideoController?.player.play();
+  //     },
+  //     footer: _defFooterWidget(post),
+  //     header: _defPostHeader(post),
+  //     content: LMFeedPostCustomContent(
+  //       comment: comment,
+  //       post: post,
+  //       feedThemeData: feedThemeData,
+  //     ),
+  //     topicWidget: _defTopicWidget(post),
+  //   );
+  // }
 
   LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
     return LMFeedPostTopic(
@@ -282,9 +383,10 @@ class _LMFeedUserCreatedCommentListViewState
       user: postViewData.user,
       isFeed: true,
       postViewData: postViewData,
-      onProfileTap: (){
-         LMFeedCore.instance.lmFeedClient.routeToProfile(
-           postViewData.user.sdkClientInfo.uuid,);
+      onProfileTap: () {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(
+          postViewData.user.sdkClientInfo.uuid,
+        );
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
             uuid: postViewData.user.sdkClientInfo.uuid,
@@ -581,10 +683,11 @@ class _LMFeedUserCreatedCommentListViewState
             const SizedBox(height: 28),
             LMFeedButton(
               style: LMFeedButtonStyle(
-                icon: const LMFeedIcon(
+                icon: LMFeedIcon(
                   type: LMFeedIconType.icon,
                   icon: Icons.add,
                   style: LMFeedIconStyle(
+                    color: feedThemeData?.onPrimary,
                     size: 18,
                   ),
                 ),
@@ -596,10 +699,11 @@ class _LMFeedUserCreatedCommentListViewState
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 placement: LMFeedIconButtonPlacement.end,
               ),
-              text: const LMFeedText(
+              text: LMFeedText(
                 text: "Create Post",
                 style: LMFeedTextStyle(
                   textStyle: TextStyle(
+                    color: feedThemeData?.onPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
