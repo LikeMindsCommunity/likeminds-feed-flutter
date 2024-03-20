@@ -102,31 +102,28 @@ class _LMButtonState extends State<LMFeedButton> {
               GestureDetector(
                 onTap: inStyle.showText ? widget.onTextTap : null,
                 behavior: HitTestBehavior.translucent,
-                child: Container(
-                  color: Colors.teal,
-                  child: Row(
-                    children: [
-                      inStyle.placement == LMFeedIconButtonPlacement.start
-                          ? (inStyle.icon != null || inStyle.activeIcon != null)
-                              ? SizedBox(width: inStyle.margin ?? 8)
-                              : const SizedBox.shrink()
-                          : const SizedBox.shrink(),
-                      inStyle.showText
-                          ? Container(
-                              padding: inStyle.textPadding,
-                              child: _active
-                                  ? widget.activeText ??
-                                      widget.text ??
-                                      const SizedBox.shrink()
-                                  : widget.text ?? const SizedBox.shrink())
-                          : const SizedBox.shrink(),
-                      inStyle.placement == LMFeedIconButtonPlacement.end
-                          ? (inStyle.icon != null || inStyle.activeIcon != null)
-                              ? SizedBox(width: inStyle.margin ?? 8)
-                              : const SizedBox.shrink()
-                          : const SizedBox.shrink(),
-                    ],
-                  ),
+                child: Row(
+                  children: [
+                    inStyle.placement == LMFeedIconButtonPlacement.start
+                        ? (inStyle.icon != null || inStyle.activeIcon != null)
+                            ? SizedBox(width: inStyle.margin ?? 8)
+                            : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                    inStyle.showText
+                        ? Container(
+                            padding: inStyle.textPadding,
+                            child: _active
+                                ? widget.activeText ??
+                                    widget.text ??
+                                    const SizedBox.shrink()
+                                : widget.text ?? const SizedBox.shrink())
+                        : const SizedBox.shrink(),
+                    inStyle.placement == LMFeedIconButtonPlacement.end
+                        ? (inStyle.icon != null || inStyle.activeIcon != null)
+                            ? SizedBox(width: inStyle.margin ?? 8)
+                            : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                  ],
                 ),
               ),
               inStyle.placement == LMFeedIconButtonPlacement.end
