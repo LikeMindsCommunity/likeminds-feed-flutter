@@ -409,6 +409,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       attachments: post.attachments!,
       postId: post.id,
       style: _theme.mediaStyle,
+      carouselIndicatorBuilder: LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoController(

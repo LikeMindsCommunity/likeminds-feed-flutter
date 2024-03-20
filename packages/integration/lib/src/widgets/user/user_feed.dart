@@ -518,63 +518,6 @@ class _LMFeedUserCreatedPostListViewState
           },
         ),
       ),
-
-      // menuBuilder: (menu) {
-      //   return menu.copyWith(
-      //     removeItemIds: {postReportId, postEditId},
-      //     action: LMFeedMenuAction(
-      //       onPostUnpin: () => handlePostPinAction(postViewData),
-      //       onPostPin: () => handlePostPinAction(postViewData),
-      //       onPostEdit: () {
-      //         // Mute all video controllers
-      //         // to prevent video from playing in background
-      //         // while editing the post
-      //         LMFeedVideoProvider.instance.forcePauseAllControllers();
-
-      //         Navigator.of(context).push(
-      //           MaterialPageRoute(
-      //             builder: (context) => LMFeedEditPostScreen(
-      //               postViewData: postViewData,
-      //             ),
-      //           ),
-      //         );
-      //       },
-      //       onPostDelete: () {
-      //         showDialog(
-      //           context: context,
-      //           builder: (childContext) => LMFeedDeleteConfirmationDialog(
-      //             title: 'Delete Comment',
-      //             uuid: postViewData.uuid,
-      //             content:
-      //                 'Are you sure you want to delete this post. This action can not be reversed.',
-      //             action: (String reason) async {
-      //               Navigator.of(childContext).pop();
-
-      //               LMFeedAnalyticsBloc.instance.add(
-      //                 LMFeedFireAnalyticsEvent(
-      //                   eventName: LMFeedAnalyticsKeys.postDeleted,
-      //                   deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-      //                   eventProperties: {
-      //                     "post_id": postViewData.id,
-      //                   },
-      //                 ),
-      //               );
-
-      //               LMFeedPostBloc.instance.add(
-      //                 LMFeedDeletePostEvent(
-      //                   postId: postViewData.id,
-      //                   reason: reason,
-      //                   isRepost: postViewData.isRepost,
-      //                 ),
-      //               );
-      //             },
-      //             actionText: 'Delete',
-      //           ),
-      //         );
-      //       },
-      //     ),
-      //   );
-      // },
     );
   }
 
@@ -585,6 +528,8 @@ class _LMFeedUserCreatedPostListViewState
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData.mediaStyle,
+        carouselIndicatorBuilder:
+          _widgetsBuilder.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoController(

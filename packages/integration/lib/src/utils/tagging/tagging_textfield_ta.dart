@@ -139,6 +139,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       ),
       noItemsFoundBuilder: (context) => const SizedBox.shrink(),
       hideOnEmpty: true,
+      hideOnLoading: true,
       debounceDuration: const Duration(milliseconds: 500),
       textFieldConfiguration: TextFieldConfiguration(
         keyboardType: TextInputType.multiline,

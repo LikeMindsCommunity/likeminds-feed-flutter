@@ -270,6 +270,7 @@ class _LMFeedUserCreatedCommentListViewState
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData?.mediaStyle,
+      carouselIndicatorBuilder: LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoController(
