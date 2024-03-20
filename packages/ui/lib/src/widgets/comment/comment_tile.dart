@@ -23,6 +23,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.showRepliesButton,
     this.buttonSeparator,
     this.style,
+    this.customTitle,
   });
 
   final LMUserViewData user;
@@ -31,6 +32,7 @@ class LMFeedCommentWidget extends StatefulWidget {
   final LMFeedProfilePicture? profilePicture;
   final LMFeedText? titleText;
   final LMFeedText? subtitleText;
+  final LMFeedText? customTitle;
 
   /// {@macro feed_on_tag_tap}
   final LMFeedOnTagTap onTagTap;
@@ -70,6 +72,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     Widget? buttonSeparator,
     LMFeedButton? showRepliesButton,
     LMFeedCommentStyle? style,
+    LMFeedText? customTitle,
   }) {
     return LMFeedCommentWidget(
       user: user ?? this.user,
@@ -89,6 +92,7 @@ class LMFeedCommentWidget extends StatefulWidget {
       showRepliesButton: showRepliesButton ?? this.showRepliesButton,
       buttonSeparator: buttonSeparator ?? this.buttonSeparator,
       style: style ?? this.style,
+      customTitle: customTitle ?? this.customTitle,
     );
   }
 }
@@ -124,22 +128,28 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: style?.titlePadding,
-                    width: style!.width != null ? style!.width! * 0.6 : null,
-                    child: widget.titleText ??
-                        LMFeedText(
-                          text: widget.user.name,
-                          style: LMFeedTextStyle(
-                            textStyle: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: style?.textStyle?.color ??
-                                  feedTheme.onContainer,
+                  Row(
+                    children: [
+                      Container(
+                        padding: style?.titlePadding,
+                        width:
+                            style!.width != null ? style!.width! * 0.6 : null,
+                        child: widget.titleText ??
+                            LMFeedText(
+                              text: widget.user.name,
+                              style: LMFeedTextStyle(
+                                textStyle: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: style?.textStyle?.color ??
+                                      feedTheme.onContainer,
+                                ),
+                                maxLines: 1,
+                              ),
                             ),
-                            maxLines: 1,
-                          ),
-                        ),
+                      ),
+                      widget.customTitle ?? const SizedBox.shrink(),
+                    ],
                   ),
                   widget.subtitleText != null
                       ? Container(

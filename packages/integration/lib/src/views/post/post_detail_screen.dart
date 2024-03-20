@@ -147,7 +147,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 snapshot.hasData) {
               return BlocListener(
                 listener: (context, state) {
-                  if (state is LMFeedPostUpdateState) {
+                  if (state is LMFeedPostUpdateState &&
+                      state.actionType == LMFeedPostActionType.edited) {
                     if (state.postId == widget.postId) {
                       _postDetailScreenHandler!.postData =
                           LMFeedPostUtils.updatePostData(

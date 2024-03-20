@@ -115,8 +115,8 @@ class LMFeedPostHeader extends StatelessWidget {
                               LikeMindsTheme.kHorizontalPaddingMedium,
                               !headerStyle.showCustomTitle
                                   ? const SizedBox()
-                                  : ((user.customTitle == null ||
-                                              user.customTitle!.isEmpty) ||
+                                  : ((user.customTitle == null &&
+                                              customTitle == null) ||
                                           (user.isDeleted != null &&
                                               user.isDeleted!))
                                       ? const SizedBox()
@@ -126,18 +126,20 @@ class LMFeedPostHeader extends StatelessWidget {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          3.0),
-                                                  color: feedTheme.primaryColor,
-                                                ),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(4.0),
-                                                  child: customTitle ??
-                                                      LMFeedText(
+                                              customTitle ??
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              3.0),
+                                                      color: feedTheme
+                                                          .primaryColor,
+                                                    ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              4.0),
+                                                      child: LMFeedText(
                                                         text: user.customTitle!
                                                                 .isNotEmpty
                                                             ? user.customTitle!
@@ -166,8 +168,8 @@ class LMFeedPostHeader extends StatelessWidget {
                                                               ),
                                                             ),
                                                       ),
-                                                ),
-                                              ),
+                                                    ),
+                                                  ),
                                             ],
                                           ),
                                         ),
