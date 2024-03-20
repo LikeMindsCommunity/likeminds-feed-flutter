@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/saved_post/saved_post_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedSavedPostListView extends StatefulWidget {
   const LMFeedSavedPostListView({
@@ -175,6 +173,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             if (state is LMFeedSavedPostLoadedState) {
               updatePagingControllers(state);
             }
+           if(state is LMFeedSavedPostErrorState){
+            debugPrint(state.stackTrace.toString());
+             _pagingController.error = state.errorMessage;
+           }
           },
           child: PagedListView<int, LMPostViewData>(
             pagingController: _pagingController,
@@ -191,6 +193,15 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                     const Center(
                       child: LMFeedLoader(),
                     );
+              },
+              newPageErrorIndicatorBuilder: (context) {
+                return widget.newPageErrorIndicatorBuilder?.call(context) ??
+                    Center(
+                      child: LMFeedText(
+                        text: _pagingController.error.toString(),
+                      ),
+                    );
+              
               },
               itemBuilder: (context, item, index) {
                 LMFeedPostWidget postWidget = defPostWidget(_theme, item);

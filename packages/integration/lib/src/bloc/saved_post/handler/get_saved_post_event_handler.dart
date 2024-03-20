@@ -32,10 +32,13 @@ getSavedPostEventHandler(LMFeedGetSavedPostEvent event, emit) async {
       emit(
         LMFeedSavedPostErrorState(
             errorMessage: savePostResponse.errorMessage ??
-                "An error occurred, Please try again"),
+                "An error occurred, Please try again",
+            stackTrace: StackTrace.current
+                ),
+                
       );
     }
-  } catch (e) {
-    emit(LMFeedSavedPostErrorState(errorMessage: e.toString()));
+  } on Exception catch (e, stackTrace) {
+    emit(LMFeedSavedPostErrorState(errorMessage: e.toString(), stackTrace: stackTrace));
   }
 }

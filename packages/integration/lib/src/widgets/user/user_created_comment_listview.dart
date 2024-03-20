@@ -113,41 +113,44 @@ class _LMFeedUserCreatedCommentListViewState
             }
           },
           child: PagedSliverList(
-            // shrinkWrap: true,
             pagingController: _pagingController,
             builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
-                noItemsFoundIndicatorBuilder: (context) {
-              return widget.emptyFeedViewBuilder?.call(context) ??
-                  noPostInFeedWidget();
-            }, itemBuilder: (context, item, index) {
-              LMFeedPostWidget postWidget = defPostWidget(
-                feedThemeData,
-                _posts[item.postId]!,
-                item,
-              );
-              return Column(
-                children: [
-                  const SizedBox(height: 2),
-                  // widget.postBuilder
-                  //         ?.call(context, postWidget, _posts[item.postId]!) ??
-                      LMFeedCore.widgetUtility.postWidgetBuilder
-                          .call(context, postWidget, _posts[item.postId]!),
-                  const Divider(),
-                ],
-              );
-            }, firstPageProgressIndicatorBuilder: (context) {
-              return widget.firstPageLoaderBuilder?.call(context) ??
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: LMFeedLoader()),
-                  );
-            }, newPageProgressIndicatorBuilder: (context) {
-              return widget.paginationLoaderBuilder?.call(context) ??
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: LMFeedLoader()),
-                  );
-            }),
+              noItemsFoundIndicatorBuilder: (context) {
+                return widget.emptyFeedViewBuilder?.call(context) ??
+                    noPostInFeedWidget();
+              },
+              itemBuilder: (context, item, index) {
+                LMFeedPostWidget postWidget = defPostWidget(
+                  feedThemeData,
+                  _posts[item.postId]!,
+                  item,
+                );
+                return Column(
+                  children: [
+                    const SizedBox(height: 2),
+                     widget.postBuilder
+                                ?.call(context, postWidget, _posts[item.postId]!) ??
+                            LMFeedCore.widgetUtility.postWidgetBuilder
+                                .call(context, postWidget,  _posts[item.postId]!),
+                    const Divider(),
+                  ],
+                );
+              },
+              firstPageProgressIndicatorBuilder: (context) {
+                return widget.firstPageLoaderBuilder?.call(context) ??
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: LMFeedLoader()),
+                    );
+              },
+              newPageProgressIndicatorBuilder: (context) {
+                return widget.paginationLoaderBuilder?.call(context) ??
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: LMFeedLoader()),
+                    );
+              },
+            ),
           ),
         ));
   }
@@ -246,11 +249,9 @@ class _LMFeedUserCreatedCommentListViewState
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
       content: LMFeedPostCustomContent(
-        
         comment: comment,
         post: post,
         feedThemeData: feedThemeData,
-        
       ),
       topicWidget: _defTopicWidget(post),
     );
@@ -281,6 +282,16 @@ class _LMFeedUserCreatedCommentListViewState
       user: postViewData.user,
       isFeed: true,
       postViewData: postViewData,
+      onProfileTap: (){
+         LMFeedCore.instance.lmFeedClient.routeToProfile(
+           postViewData.user.sdkClientInfo.uuid,);
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            uuid: postViewData.user.sdkClientInfo.uuid,
+            context: context,
+          ),
+        );
+      },
       postHeaderStyle: feedThemeData?.headerStyle,
       menuBuilder: (menu) {
         return menu.copyWith(
@@ -680,7 +691,7 @@ class _LMFeedUserCreatedCommentListViewState
 }
 
 class LMFeedPostCustomContent extends LMFeedPostContent {
-   LMFeedPostCustomContent({
+  LMFeedPostCustomContent({
     required this.comment,
     required this.post,
     this.feedThemeData,
@@ -694,12 +705,12 @@ class LMFeedPostCustomContent extends LMFeedPostContent {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-       LMFeedPostContent(
-      onTagTap: (String? uuid) {},
-      style: feedThemeData?.contentStyle,
-      text: post.text,
-      heading: post.heading,
-    ),
+        LMFeedPostContent(
+          onTagTap: (String? uuid) {},
+          style: feedThemeData?.contentStyle,
+          text: post.text,
+          heading: post.heading,
+        ),
         _defCommentBuilder(context),
       ],
     );

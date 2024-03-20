@@ -58,6 +58,8 @@ class _LMFeedUserCreatedPostListViewState
   bool userPostingRights = true;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   final ValueNotifier postUploading = ValueNotifier(false);
+  LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
+  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
 
   @override
   void initState() {
@@ -424,64 +426,139 @@ class _LMFeedUserCreatedPostListViewState
     return LMFeedPostHeader(
       user: users[postViewData.uuid]!,
       isFeed: true,
-      postViewData: postViewData,
-      postHeaderStyle: feedThemeData.headerStyle,
-      menuBuilder: (menu) {
-        return menu.copyWith(
-          removeItemIds: {postReportId, postEditId},
-          action: LMFeedMenuAction(
-            onPostUnpin: () => handlePostPinAction(postViewData),
-            onPostPin: () => handlePostPinAction(postViewData),
-            onPostEdit: () {
-              // Mute all video controllers
-              // to prevent video from playing in background
-              // while editing the post
-              LMFeedVideoProvider.instance.forcePauseAllControllers();
-
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => LMFeedEditPostScreen(
-                    postViewData: postViewData,
-                  ),
-                ),
-              );
-            },
-            onPostDelete: () {
-              showDialog(
-                context: context,
-                builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Comment',
-                  uuid: postViewData.uuid,
-                  content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
-                  action: (String reason) async {
-                    Navigator.of(childContext).pop();
-
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                        },
-                      ),
-                    );
-
-                    LMFeedPostBloc.instance.add(
-                      LMFeedDeletePostEvent(
-                        postId: postViewData.id,
-                        reason: reason,
-                        isRepost: postViewData.isRepost,
-                      ),
-                    );
-                  },
-                  actionText: 'Delete',
-                ),
-              );
-            },
+      onProfileTap: (){
+         LMFeedCore.instance.lmFeedClient.routeToProfile(
+          postViewData.user.sdkClientInfo.uuid,);
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            uuid: postViewData.user.sdkClientInfo.uuid,
+            context: context,
           ),
         );
       },
+      postViewData: postViewData,
+      postHeaderStyle: feedThemeData.headerStyle,
+      menu: LMFeedMenu(
+        menuItems: postViewData.menuItems,
+        removeItemIds: {postReportId, postEditId},
+        action: LMFeedMenuAction(
+          onPostEdit: () {
+            // Mute all video controllers
+            // to prevent video from playing in background
+            // while editing the post
+            LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => LMFeedEditPostScreen(
+                  postViewData: postViewData,
+                ),
+              ),
+            );
+          },
+          onPostReport: () => handlePostReportAction(postViewData),
+          onPostUnpin: () => handlePostPinAction(postViewData),
+          onPostPin: () => handlePostPinAction(postViewData),
+          onPostDelete: () {
+            String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
+
+            showDialog(
+              context: context,
+              builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                title: 'Delete Comment',
+                uuid: postCreatorUUID,
+                content:
+                    'Are you sure you want to delete this post. This action can not be reversed.',
+                action: (String reason) async {
+                  Navigator.of(childContext).pop();
+
+                  String postType =
+                      LMFeedPostUtils.getPostType(postViewData.attachments);
+
+                  LMFeedAnalyticsBloc.instance.add(
+                    LMFeedFireAnalyticsEvent(
+                      eventName: LMFeedAnalyticsKeys.postDeleted,
+                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      eventProperties: {
+                        "post_id": postViewData.id,
+                        "post_type": postType,
+                        "user_id": currentUser?.sdkClientInfo.uuid,
+                        "user_state": isCm ? "CM" : "member",
+                      },
+                    ),
+                  );
+
+                  LMFeedPostBloc.instance.add(
+                    LMFeedDeletePostEvent(
+                      postId: postViewData.id,
+                      reason: reason,
+                      isRepost: postViewData.isRepost,
+                    ),
+                  );
+                },
+                actionText: 'Delete',
+              ),
+            );
+          },
+        ),
+      ),
+
+      // menuBuilder: (menu) {
+      //   return menu.copyWith(
+      //     removeItemIds: {postReportId, postEditId},
+      //     action: LMFeedMenuAction(
+      //       onPostUnpin: () => handlePostPinAction(postViewData),
+      //       onPostPin: () => handlePostPinAction(postViewData),
+      //       onPostEdit: () {
+      //         // Mute all video controllers
+      //         // to prevent video from playing in background
+      //         // while editing the post
+      //         LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+      //         Navigator.of(context).push(
+      //           MaterialPageRoute(
+      //             builder: (context) => LMFeedEditPostScreen(
+      //               postViewData: postViewData,
+      //             ),
+      //           ),
+      //         );
+      //       },
+      //       onPostDelete: () {
+      //         showDialog(
+      //           context: context,
+      //           builder: (childContext) => LMFeedDeleteConfirmationDialog(
+      //             title: 'Delete Comment',
+      //             uuid: postViewData.uuid,
+      //             content:
+      //                 'Are you sure you want to delete this post. This action can not be reversed.',
+      //             action: (String reason) async {
+      //               Navigator.of(childContext).pop();
+
+      //               LMFeedAnalyticsBloc.instance.add(
+      //                 LMFeedFireAnalyticsEvent(
+      //                   eventName: LMFeedAnalyticsKeys.postDeleted,
+      //                   deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+      //                   eventProperties: {
+      //                     "post_id": postViewData.id,
+      //                   },
+      //                 ),
+      //               );
+
+      //               LMFeedPostBloc.instance.add(
+      //                 LMFeedDeletePostEvent(
+      //                   postId: postViewData.id,
+      //                   reason: reason,
+      //                   isRepost: postViewData.isRepost,
+      //                 ),
+      //               );
+      //             },
+      //             actionText: 'Delete',
+      //           ),
+      //         );
+      //       },
+      //     ),
+      //   );
+      // },
     );
   }
 
@@ -786,6 +863,35 @@ class _LMFeedUserCreatedPostListViewState
             },
     );
   }
+
+   Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
+    return showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      useSafeArea: true,
+      isScrollControlled: true,
+      elevation: 10,
+      enableDrag: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+        minHeight: MediaQuery.of(context).size.height * 0.3,
+      ),
+      backgroundColor: feedThemeData.container,
+      clipBehavior: Clip.hardEdge,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) => LMFeedReportBottomSheet(
+        entityId: postViewData.id,
+        entityType: 5,
+        entityCreatorId: postViewData.uuid,
+      ),
+    );
+  }
+
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;

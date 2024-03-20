@@ -2,7 +2,7 @@ part of '../user_meta_bloc.dart';
 
 getUserMetaEventHandler(
     LMFeedUserMetaGetEvent event, Emitter<LMFeedUserMetaState> emit) async {
-  emit(LMFeedUserMetaLoadingState());
+  emit(LMFeedUserMetaLoadingState(uuid: event.uuid));
   try {
     final response = await LMFeedCore.instance.lmFeedClient.getUserFeedMeta(
         (GetUserFeedMetaRequestBuilder()..uuid(event.uuid)).build());
