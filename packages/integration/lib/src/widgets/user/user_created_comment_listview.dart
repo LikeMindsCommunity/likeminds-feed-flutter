@@ -3,10 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/user_created_comment/user_created_comment_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -56,6 +52,7 @@ class _LMFeedUserCreatedCommentListViewState
   final LMFeedUserCreatedCommentBloc _userCreatedCommentBloc =
       LMFeedUserCreatedCommentBloc();
   final Map<String, LMPostViewData> _posts = {};
+  LMFeedPostBloc lmFeedPostBloc = LMFeedPostBloc.instance;
 
   @override
   void initState() {
@@ -102,57 +99,76 @@ class _LMFeedUserCreatedCommentListViewState
   Widget build(BuildContext context) {
     feedThemeData = LMFeedCore.theme;
     return BlocListener<LMFeedPostBloc, LMFeedPostState>(
-        bloc: LMFeedPostBloc.instance,
-        listener: (context, state) {},
-        child: BlocListener<LMFeedUserCreatedCommentBloc,
-            LMFeedUserCreatedCommentState>(
-          bloc: _userCreatedCommentBloc,
-          listener: (context, state) {
-            if (state is UserCreatedCommentLoadedState) {
-              updatePagingControllers(state);
+        bloc: lmFeedPostBloc,
+        listener: (context, state) {
+          if (state is LMFeedEditPostUploadedState) {
+            _posts[state.postData.id] = state.postData;
+
+            rebuildPostWidget.value = !rebuildPostWidget.value;
+          }
+          if (state is LMFeedPostUpdateState) {
+            LMPostViewData? post = _posts[state.postId];
+
+            if (post != null) {
+              post = LMFeedPostUtils.updatePostData(post, state.actionType);
+              _posts[state.postId] = post;
+              rebuildPostWidget.value = !rebuildPostWidget.value;
             }
-          },
-          child: PagedSliverList(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
-              noItemsFoundIndicatorBuilder: (context) {
-                return widget.emptyFeedViewBuilder?.call(context) ??
-                    noPostInFeedWidget();
-              },
-              itemBuilder: (context, item, index) {
-                _posts[item.postId]?.topComments = [item];
-                LMFeedPostWidget postWidget = defPostWidget(
-                  feedThemeData,
-                  _posts[item.postId]!,
-                );
-                return Column(
-                  children: [
-                    const SizedBox(height: 2),
-                    widget.postBuilder
-                            ?.call(context, postWidget, _posts[item.postId]!) ??
-                        LMFeedCore.widgetUtility.postWidgetBuilder
-                            .call(context, postWidget, _posts[item.postId]!),
-                    const Divider(),
-                  ],
-                );
-              },
-              firstPageProgressIndicatorBuilder: (context) {
-                return widget.firstPageLoaderBuilder?.call(context) ??
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(child: LMFeedLoader()),
-                    );
-              },
-              newPageProgressIndicatorBuilder: (context) {
-                return widget.paginationLoaderBuilder?.call(context) ??
-                    const Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Center(child: LMFeedLoader()),
-                    );
-              },
-            ),
-          ),
-        ));
+          }
+        },
+        child: ValueListenableBuilder(
+            valueListenable: rebuildPostWidget,
+            builder: (context, _, __) {
+              return BlocListener<LMFeedUserCreatedCommentBloc,
+                  LMFeedUserCreatedCommentState>(
+                bloc: _userCreatedCommentBloc,
+                listener: (context, state) {
+                  if (state is UserCreatedCommentLoadedState) {
+                    updatePagingControllers(state);
+                  }
+                },
+                child: PagedSliverList(
+                  pagingController: _pagingController,
+                  builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
+                    noItemsFoundIndicatorBuilder: (context) {
+                      return widget.emptyFeedViewBuilder?.call(context) ??
+                          noPostInFeedWidget();
+                    },
+                    itemBuilder: (context, item, index) {
+                      _posts[item.postId]?.topComments = [item];
+                      LMFeedPostWidget postWidget = defPostWidget(
+                        feedThemeData,
+                        _posts[item.postId]!,
+                      );
+                      return Column(
+                        children: [
+                          const SizedBox(height: 2),
+                          widget.postBuilder?.call(
+                                  context, postWidget, _posts[item.postId]!) ??
+                              LMFeedCore.widgetUtility.postWidgetBuilder.call(
+                                  context, postWidget, _posts[item.postId]!),
+                          const Divider(),
+                        ],
+                      );
+                    },
+                    firstPageProgressIndicatorBuilder: (context) {
+                      return widget.firstPageLoaderBuilder?.call(context) ??
+                          const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Center(child: LMFeedLoader()),
+                          );
+                    },
+                    newPageProgressIndicatorBuilder: (context) {
+                      return widget.paginationLoaderBuilder?.call(context) ??
+                          const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Center(child: LMFeedLoader()),
+                          );
+                    },
+                  ),
+                ),
+              );
+            }));
   }
 
   Widget getLoaderThumbnail(LMMediaModel? media) {
@@ -270,7 +286,8 @@ class _LMFeedUserCreatedCommentListViewState
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData?.mediaStyle,
-      carouselIndicatorBuilder: LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
+      carouselIndicatorBuilder:
+          LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoController(
@@ -292,72 +309,6 @@ class _LMFeedUserCreatedCommentListViewState
       },
     );
   }
-
-  // LMFeedPostWidget defPostWidget(LMFeedThemeData? feedThemeData,
-  //     LMPostViewData post, LMCommentViewData comment) {
-  //   return LMFeedPostWidget(
-  //     post: post,
-  //     topics: post.topics,
-  //     user: post.user,
-  //     isFeed: false,
-  //     onTagTap: (String uuid) {
-  //       LMFeedProfileBloc.instance.add(
-  //         LMFeedRouteToUserProfileEvent(
-  //           uuid: uuid,
-  //           context: context,
-  //         ),
-  //       );
-  //     },
-  //     disposeVideoPlayerOnInActive: () {
-  //       LMFeedVideoProvider.instance.clearPostController(post.id);
-  //     },
-  //     style: feedThemeData?.postStyle,
-  //     onMediaTap: () async {
-  //       VideoController? postVideoController = LMFeedVideoProvider.instance
-  //           .getVideoController(
-  //               LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-  //       await postVideoController?.player.pause();
-  //       // ignore: use_build_context_synchronously
-  //       await Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (context) => LMFeedMediaPreviewScreen(
-  //             postAttachments: post.attachments ?? [],
-  //             post: post,
-  //             user: post.user,
-  //           ),
-  //         ),
-  //       );
-  //       await postVideoController?.player.play();
-  //     },
-  //     onPostTap: (context, post) async {
-  //       VideoController? postVideoController = LMFeedVideoProvider.instance
-  //           .getVideoController(
-  //               LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-  //       await postVideoController?.player.pause();
-  //       // ignore: use_build_context_synchronously
-  //       await Navigator.of(context, rootNavigator: true).push(
-  //         MaterialPageRoute(
-  //           builder: (context) => LMFeedPostDetailScreen(
-  //             postId: post.id,
-  //             postBuilder: widget.postBuilder,
-  //           ),
-  //         ),
-  //       );
-  //       await postVideoController?.player.play();
-  //     },
-  //     footer: _defFooterWidget(post),
-  //     header: _defPostHeader(post),
-  //     content: LMFeedPostCustomContent(
-  //       comment: comment,
-  //       post: post,
-  //       feedThemeData: feedThemeData,
-  //     ),
-  //     topicWidget: _defTopicWidget(post),
-  //   );
-  // }
 
   LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
     return LMFeedPostTopic(
@@ -437,7 +388,7 @@ class _LMFeedUserCreatedCommentListViewState
                       ),
                     );
 
-                    LMFeedPostBloc.instance.add(
+                    lmFeedPostBloc.add(
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
@@ -471,14 +422,12 @@ class _LMFeedUserCreatedCommentListViewState
           );
         },
         onTap: () async {
-          if (postViewData.isLiked) {
-            postViewData.isLiked = false;
-            postViewData.likeCount -= 1;
-          } else {
-            postViewData.isLiked = true;
-            postViewData.likeCount += 1;
-          }
-          rebuildPostWidget.value = !rebuildPostWidget.value;
+          lmFeedPostBloc.add(LMFeedUpdatePostEvent(
+            actionType: postViewData.isLiked
+                ? LMFeedPostActionType.unlike
+                : LMFeedPostActionType.like,
+            postId: postViewData.id,
+          ));
 
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
@@ -495,11 +444,12 @@ class _LMFeedUserCreatedCommentListViewState
               await LMFeedCore.client.likePost(likePostRequest);
 
           if (!response.success) {
-            postViewData.isLiked = !postViewData.isLiked;
-            postViewData.likeCount = postViewData.isLiked
-                ? postViewData.likeCount + 1
-                : postViewData.likeCount - 1;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
+            lmFeedPostBloc.add(LMFeedUpdatePostEvent(
+              actionType: postViewData.isLiked
+                  ? LMFeedPostActionType.unlike
+                  : LMFeedPostActionType.like,
+              postId: postViewData.id,
+            ));
           }
         },
       );
@@ -550,11 +500,11 @@ class _LMFeedUserCreatedCommentListViewState
   LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
         isActive: postViewData.isSaved,
         onTap: () async {
-          postViewData.isSaved = !postViewData.isSaved;
-          rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          lmFeedPostBloc.add(LMFeedUpdatePostEvent(
             post: postViewData,
-            actionType: LMFeedPostActionType.saved,
+            actionType: postViewData.isSaved
+                ? LMFeedPostActionType.unsaved
+                : LMFeedPostActionType.saved,
             postId: postViewData.id,
           ));
 
@@ -565,11 +515,11 @@ class _LMFeedUserCreatedCommentListViewState
               await LMFeedCore.client.savePost(savePostRequest);
 
           if (!response.success) {
-            postViewData.isSaved = !postViewData.isSaved;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+            lmFeedPostBloc.add(LMFeedUpdatePostEvent(
               post: postViewData,
-              actionType: LMFeedPostActionType.saved,
+              actionType: postViewData.isSaved
+                  ? LMFeedPostActionType.unsaved
+                  : LMFeedPostActionType.saved,
               postId: postViewData.id,
             ));
           } else {
@@ -757,8 +707,13 @@ class _LMFeedUserCreatedCommentListViewState
       );
 
   void handlePostPinAction(LMPostViewData postViewData) async {
-    postViewData.isPinned = !postViewData.isPinned;
-    rebuildPostWidget.value = !rebuildPostWidget.value;
+    lmFeedPostBloc.add(LMFeedUpdatePostEvent(
+      post: postViewData,
+      actionType: postViewData.isPinned
+          ? LMFeedPostActionType.unpinned
+          : LMFeedPostActionType.pinned,
+      postId: postViewData.id,
+    ));
 
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
@@ -766,18 +721,12 @@ class _LMFeedUserCreatedCommentListViewState
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-      post: postViewData,
-      actionType: LMFeedPostActionType.pinned,
-      postId: postViewData.id,
-    ));
-
     if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
-      rebuildPostWidget.value = !rebuildPostWidget.value;
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+      lmFeedPostBloc.add(LMFeedUpdatePostEvent(
         post: postViewData,
-        actionType: LMFeedPostActionType.pinned,
+        actionType: postViewData.isPinned
+            ? LMFeedPostActionType.unpinned
+            : LMFeedPostActionType.pinned,
         postId: postViewData.id,
       ));
     } else {
