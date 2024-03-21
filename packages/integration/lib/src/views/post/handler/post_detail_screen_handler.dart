@@ -331,6 +331,7 @@ class LMFeedPostDetailScreenHandler {
       parentComment.replies?.insert(0, commentViewData);
       updateCommentInController(parentComment);
       commentViewData.parentComment = parentComment;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
     }
 
     // if (!replyShown)
