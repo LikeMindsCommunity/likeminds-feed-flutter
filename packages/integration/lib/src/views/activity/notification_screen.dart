@@ -169,18 +169,34 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     );
   }
 
-  Padding _defEmptyNotificationFeedView() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: const LMFeedText(
-        text: "Opps! You don't have any notifications yet.",
-        style: LMFeedTextStyle(
-          textAlign: TextAlign.center,
-          textStyle: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+  Widget _defEmptyNotificationFeedView() {
+    LMFeedThemeData feedThemeData = LMFeedCore.theme;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: Icons.post_add,
+            style: LMFeedIconStyle(
+              size: 48,
+              color: feedThemeData.onContainer,            ),
           ),
-        ),
+          const SizedBox(height: 12),
+          LMFeedText(
+            text: 'No notifications to show',
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: feedThemeData.onContainer,
+              ),
+            ),
+          ),
+         SizedBox(
+          height: 48,
+         )
+        ],
       ),
     );
   }
