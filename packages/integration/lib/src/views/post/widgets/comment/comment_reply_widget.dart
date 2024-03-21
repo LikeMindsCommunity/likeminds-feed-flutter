@@ -268,6 +268,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                     if (index != -1) {
                       replies[index] = LMCommentViewDataConvertor.fromComment(
                           response.reply!, users);
+                      rebuildReplyList.value = !rebuildReplyList.value;
                     }
                   }
                   break;
@@ -281,6 +282,8 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                           LMFeedCommentActionType.delete &&
                       state.commentMetaData.commentActionEntity ==
                           LMFeedCommentType.reply) {
+                    _commentRepliesBloc!.add(LMFeedDeleteLocalReplyEvent(
+                        replyId: state.commentMetaData.replyId ?? ""));
                     replies.removeWhere((element) =>
                         element.id == state.commentMetaData.replyId);
                     reply!.repliesCount -= 1;
@@ -373,6 +376,10 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         );
       }),
       listener: (context, state) {
+        if (state is LMFeedDeleteLocalReplyState) {
+          replies.removeWhere((element) => element.id == state.replyId);
+          rebuildReplyList.value = !rebuildReplyList.value;
+        }
         if (state is LMFeedCommentRepliesLoadedState) {
           users = state.commentDetails.users!.map((key, value) =>
               MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
