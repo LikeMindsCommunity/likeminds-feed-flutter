@@ -484,6 +484,12 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   _commentHandlerBloc!.add(LMFeedCommentActionEvent(
                       commentActionRequest: request,
                       commentMetaData: commentMetaData));
+
+                  LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                    postId: widget.post.id,
+                    commentId: widget.reply.id,
+                    actionType: LMFeedPostActionType.replyDeleted,
+                  ));
                 },
                 actionText: 'Delete'));
       },

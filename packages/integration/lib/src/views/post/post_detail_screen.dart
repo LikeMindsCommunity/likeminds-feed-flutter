@@ -475,14 +475,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 _postDetailScreenHandler!.rebuildPostWidget.value =
                     !_postDetailScreenHandler!.rebuildPostWidget.value;
 
-                postBloc.add(LMFeedUpdatePostEvent(
-                    actionType: LMFeedPostActionType.commentDeleted,
-                    postId: widget.postId));
-
                 _postDetailScreenHandler!.commentHandlerBloc.add(
                     LMFeedCommentActionEvent(
                         commentActionRequest: deleteCommentRequest,
                         commentMetaData: commentMetaData));
+
+                LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                  postId: _postDetailScreenHandler!.postData!.id,
+                  commentId: commentViewData.id,
+                  actionType: LMFeedPostActionType.commentDeleted,
+                ));
               },
               actionText: 'Delete',
             ),

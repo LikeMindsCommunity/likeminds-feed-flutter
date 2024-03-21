@@ -216,9 +216,6 @@ class LMFeedPostDetailScreenHandler {
 
           if (commentSuccessState.commentMetaData.commentActionEntity ==
               LMFeedCommentType.parent) {
-            // deleteCommentFromController(
-            //     commentSuccessState.commentMetaData.commentId!);
-            // postData!.commentCount -= 1;
           } else {
             LMCommentViewData? commentViewData =
                 commentListPagingController.itemList?.firstWhere((element) =>
@@ -228,15 +225,6 @@ class LMFeedPostDetailScreenHandler {
               updateCommentInController(commentViewData);
             }
           }
-
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              postId: postData!.id,
-              commentId: commentSuccessState.commentMetaData.commentId,
-              actionType:
-                  commentSuccessState.commentMetaData.commentActionEntity ==
-                          LMFeedCommentType.parent
-                      ? LMFeedPostActionType.commentDeleted
-                      : LMFeedPostActionType.replyDeleted));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
