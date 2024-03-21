@@ -176,9 +176,9 @@ class LMFeedPostDetailScreenHandler {
 
           replaceTempCommentWithActualComment(commentViewData);
 
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              postId: postData!.id,
-              actionType: LMFeedPostActionType.commentAdded));
+          // LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          //     postId: postData!.id,
+          //     actionType: LMFeedPostActionType.commentAdded));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
@@ -385,6 +385,9 @@ class LMFeedPostDetailScreenHandler {
 
   void addCommentToController(LMCommentViewData commentViewData) {
     commentListPagingController.itemList?.insert(0, commentViewData);
+     LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postData!.id,
+              actionType: LMFeedPostActionType.commentAdded));
     debugPrint(
         'commentListPagingController.itemList: ${commentListPagingController.itemList}');
   }
