@@ -145,9 +145,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                     builder: (context, setReplyState) {
                       return widget.commentBuilder?.call(
                               context,
-                              _defCommetWidget(commentViewData, setReplyState),
+                              _defCommentWidget(commentViewData, setReplyState),
                               widget.post) ??
-                          _defCommetWidget(commentViewData, setReplyState);
+                          _defCommentWidget(commentViewData, setReplyState);
                     },
                   );
                 },
@@ -317,9 +317,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                     builder: (context, setReplyState) {
                       return widget.commentBuilder?.call(
                               context,
-                              _defCommetWidget(commentViewData, setReplyState),
+                              _defCommentWidget(commentViewData, setReplyState),
                               widget.post) ??
-                          _defCommetWidget(commentViewData, setReplyState);
+                          _defCommentWidget(commentViewData, setReplyState);
                     },
                   );
                 },
@@ -389,13 +389,13 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
               [];
-        } 
+        }
         replyCount = replies.length;
       },
     );
   }
 
-  LMFeedCommentWidget _defCommetWidget(
+  LMFeedCommentWidget _defCommentWidget(
     LMCommentViewData commentViewData,
     StateSetter setReplyState,
   ) {

@@ -79,7 +79,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     Widget? buttonSeparator,
     LMFeedButton? showRepliesButton,
     LMFeedCommentStyle? style,
-     Widget? subTextSeparator,
+    Widget? subTextSeparator,
     LMFeedTextStyle? subTextStyle,
     LMFeedText? customTitle,
   }) {
@@ -169,9 +169,9 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                           child: Row(
                             children: [
                               widget.subtitleText ?? const SizedBox.shrink(),
-                              if(widget.comment.isEdited) 
-                              LikeMindsTheme.kHorizontalPaddingSmall,
-                               if (widget.comment.isEdited)
+                              if (widget.comment.isEdited)
+                                LikeMindsTheme.kHorizontalPaddingSmall,
+                              if (widget.comment.isEdited)
                                 widget.subTextSeparator ??
                                     LMFeedText(
                                       text: widget.comment.isEdited ? '•' : '',
@@ -214,9 +214,10 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
             child: LMFeedExpandableText(
               widget.comment.text,
               onTagTap: widget.onTagTap,
-              expandText: "see more",
+              expandText: style!.expandText ?? "see more",
               animation: true,
               maxLines: 4,
+              prefixStyle: style!.expandTextStyle,
               hashtagStyle: style!.linkStyle ??
                   Theme.of(context)
                       .textTheme
@@ -401,6 +402,9 @@ class LMFeedCommentStyle {
   final EdgeInsets? titlePadding;
   final EdgeInsets? subtitlePadding;
 
+  final TextStyle? expandTextStyle;
+  final String? expandText;
+
   final bool? showTimestamp;
 
   const LMFeedCommentStyle({
@@ -424,6 +428,8 @@ class LMFeedCommentStyle {
     this.titlePadding,
     this.subtitlePadding,
     this.showTimestamp = true,
+    this.expandTextStyle,
+    this.expandText,
   });
 
   LMFeedCommentStyle copyWith({
@@ -447,6 +453,8 @@ class LMFeedCommentStyle {
     EdgeInsets? titlePadding,
     EdgeInsets? subtitlePadding,
     bool? showTimestamp,
+    TextStyle? expandTextStyle,
+    String? expandText,
   }) {
     return LMFeedCommentStyle(
       textStyle: textStyle ?? this.textStyle,
@@ -472,6 +480,8 @@ class LMFeedCommentStyle {
       titlePadding: titlePadding ?? this.titlePadding,
       subtitlePadding: subtitlePadding ?? this.subtitlePadding,
       showTimestamp: showTimestamp ?? this.showTimestamp,
+      expandText: expandText ?? this.expandText,
+      expandTextStyle: expandTextStyle ?? this.expandTextStyle,
     );
   }
 
