@@ -8,15 +8,13 @@ addLinkPreviewEventHandler(
   Emitter<LMFeedComposeState> emitter,
 ) async {
   try {
-    List<LMMediaModel> mediaList = LMFeedComposeBloc.instance.postMedia;
+    LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
 
-    mediaList.removeWhere((element) => element.mediaType == LMMediaType.link);
-
-    for (LMMediaModel media in mediaList) {
-      if (media.mediaType != LMMediaType.link ||
-          media.mediaType != LMMediaType.widget) {
-        return;
-      }
+    if (composeBloc.imageCount +
+            composeBloc.videoCount +
+            composeBloc.documentCount >
+        0) {
+      return;
     }
 
     String url = getFirstValidLinkFromString(event.url);
@@ -40,7 +38,7 @@ addLinkPreviewEventHandler(
         ),
       );
 
-      LMFeedComposeBloc.instance.postMedia.add(linkModel);
+      LMFeedComposeBloc.instance.postMedia = [linkModel];
 
       LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.linkAttachedInPost,
@@ -51,6 +49,8 @@ addLinkPreviewEventHandler(
       ));
 
       emitter(LMFeedComposeAddedLinkPreviewState(url: event.url));
+    } else {
+      emitter(LMFeedComposeInitialState());
     }
   } on Exception catch (err, stacktrace) {
     LMFeedLogger.instance.handleException(err, stacktrace);
