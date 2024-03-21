@@ -732,6 +732,30 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   ...composeBloc.selectedTopics
                 ];
 
+                if (config!.enableHeading &&
+                    config!.headingRequiredToCreatePost &&
+                    (heading == null || heading.isEmpty)) {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without heading",
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                if (config!.textRequiredToCreatePost && postText.isEmpty) {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without text",
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
                 // Check if topics are required to create/edit a post
                 // if yes, check if the selected topics list is empty
                 // if it is, then show a snackbar and return

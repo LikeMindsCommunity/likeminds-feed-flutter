@@ -627,6 +627,30 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   ...composeBloc.selectedTopics
                 ];
 
+                if (config!.enableHeading &&
+                    config!.headingRequiredToCreatePost &&
+                    (heading == null || heading.isEmpty)) {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without heading",
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                if (config!.textRequiredToCreatePost && postText.isEmpty) {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without text",
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
                 if (config!.topicRequiredToCreatePost &&
                     selectedTopics.isEmpty &&
                     config!.enableTopics) {

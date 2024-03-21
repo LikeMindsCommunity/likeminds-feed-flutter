@@ -34,6 +34,8 @@ class LMFeedComposeScreenConfig {
     this.enableVideos = true,
     this.enableHeading = false,
     this.topicRequiredToCreatePost = false,
+    this.headingRequiredToCreatePost = false,
+    this.textRequiredToCreatePost = false,
     this.userDisplayType = LMFeedComposeUserDisplayType.profilePicture,
     this.multipleTopicsSelectable = false,
   });
@@ -79,6 +81,12 @@ class LMFeedComposeScreenConfig {
   /// [bool] to make topic required for post creation
   final bool topicRequiredToCreatePost;
 
+  /// [bool] to make heading required for post creation
+  final bool headingRequiredToCreatePost;
+
+  /// [bool] to make text required for post creation
+  final bool textRequiredToCreatePost;
+
   /// [bool] to make multiple topics selectable
   final bool multipleTopicsSelectable;
 
@@ -96,6 +104,8 @@ class LMFeedComposeScreenConfig {
     bool? enableHeading,
     String? headingHint,
     bool? multipleTopicsSelectable,
+    bool? headingRequiredToCreatePost,
+    bool? textRequiredToCreatePost,
   }) {
     return LMFeedComposeScreenConfig(
       composeSystemOverlayStyle:
@@ -114,6 +124,10 @@ class LMFeedComposeScreenConfig {
       multipleTopicsSelectable:
           multipleTopicsSelectable ?? this.multipleTopicsSelectable,
       userDisplayType: userDisplayType ?? this.userDisplayType,
+      headingRequiredToCreatePost:
+          headingRequiredToCreatePost ?? this.headingRequiredToCreatePost,
+      textRequiredToCreatePost:
+          textRequiredToCreatePost ?? this.textRequiredToCreatePost,
     );
   }
 }
