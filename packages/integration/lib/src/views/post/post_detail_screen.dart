@@ -147,8 +147,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 snapshot.hasData) {
               return BlocListener(
                 listener: (context, state) {
-                  if (state is LMFeedPostUpdateState &&
-                      state.actionType == LMFeedPostActionType.edited) {
+                  if (state is LMFeedPostUpdateState) {
                     if (state.postId == widget.postId) {
                       _postDetailScreenHandler!.postData =
                           LMFeedPostUtils.updatePostData(
@@ -156,6 +155,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         state.actionType,
                         commentId: state.commentId,
                       );
+                      _postDetailScreenHandler!.rebuildPostWidget.value =
+                          !_postDetailScreenHandler!.rebuildPostWidget.value;
                     }
                   }
                   if (state is LMFeedEditPostUploadedState) {
@@ -471,9 +472,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     .build();
                 _postDetailScreenHandler!
                     .deleteCommentFromController(commentViewData.id);
-                _postDetailScreenHandler!.postData!.commentCount -= 1;
                 _postDetailScreenHandler!.rebuildPostWidget.value =
                     !_postDetailScreenHandler!.rebuildPostWidget.value;
+
+                postBloc.add(LMFeedUpdatePostEvent(
+                    actionType: LMFeedPostActionType.commentDeleted,
+                    postId: widget.postId));
 
                 _postDetailScreenHandler!.commentHandlerBloc.add(
                     LMFeedCommentActionEvent(
@@ -763,21 +767,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           );
         },
         onTap: () async {
-          if (_postDetailScreenHandler!.postData!.isLiked) {
-            _postDetailScreenHandler!.postData!.isLiked = false;
-            _postDetailScreenHandler!.postData!.likeCount -= 1;
-          } else {
-            _postDetailScreenHandler!.postData!.isLiked = true;
-            _postDetailScreenHandler!.postData!.likeCount += 1;
-          }
-          _postDetailScreenHandler!.rebuildPostWidget.value =
-              !_postDetailScreenHandler!.rebuildPostWidget.value;
-
           postBloc.add(LMFeedUpdatePostEvent(
               postId: _postDetailScreenHandler!.postData!.id,
               actionType: _postDetailScreenHandler!.postData!.isLiked
-                  ? LMFeedPostActionType.like
-                  : LMFeedPostActionType.unlike));
+                  ? LMFeedPostActionType.unlike
+                  : LMFeedPostActionType.like));
 
           final likePostRequest = (LikePostRequestBuilder()
                 ..postId(_postDetailScreenHandler!.postData!.id))
@@ -787,20 +781,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               await LMFeedCore.client.likePost(likePostRequest);
 
           if (!response.success) {
-            _postDetailScreenHandler!.postData!.isLiked =
-                !_postDetailScreenHandler!.postData!.isLiked;
-            _postDetailScreenHandler!.postData!.likeCount =
-                _postDetailScreenHandler!.postData!.isLiked
-                    ? _postDetailScreenHandler!.postData!.likeCount + 1
-                    : _postDetailScreenHandler!.postData!.likeCount - 1;
-            _postDetailScreenHandler!.rebuildPostWidget.value =
-                !_postDetailScreenHandler!.rebuildPostWidget.value;
-
             postBloc.add(LMFeedUpdatePostEvent(
                 postId: _postDetailScreenHandler!.postData!.id,
                 actionType: _postDetailScreenHandler!.postData!.isLiked
-                    ? LMFeedPostActionType.like
-                    : LMFeedPostActionType.unlike));
+                    ? LMFeedPostActionType.unlike
+                    : LMFeedPostActionType.like));
           }
         },
       );
@@ -822,16 +807,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   LMFeedButton defSaveButton() => LMFeedButton(
         isActive: _postDetailScreenHandler!.postData!.isSaved,
         onTap: () async {
-          _postDetailScreenHandler!.postData!.isSaved =
-              !_postDetailScreenHandler!.postData!.isSaved;
-          _postDetailScreenHandler!.rebuildPostWidget.value =
-              !_postDetailScreenHandler!.rebuildPostWidget.value;
-
           postBloc.add(LMFeedUpdatePostEvent(
             postId: _postDetailScreenHandler!.postData!.id,
             actionType: _postDetailScreenHandler!.postData!.isSaved
-                ? LMFeedPostActionType.saved
-                : LMFeedPostActionType.unsaved,
+                ? LMFeedPostActionType.unsaved
+                : LMFeedPostActionType.saved,
           ));
 
           final savePostRequest = (SavePostRequestBuilder()
@@ -842,16 +822,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               await LMFeedCore.client.savePost(savePostRequest);
 
           if (!response.success) {
-            _postDetailScreenHandler!.postData!.isSaved =
-                !_postDetailScreenHandler!.postData!.isSaved;
-            _postDetailScreenHandler!.rebuildPostWidget.value =
-                !_postDetailScreenHandler!.rebuildPostWidget.value;
-
             postBloc.add(LMFeedUpdatePostEvent(
               postId: _postDetailScreenHandler!.postData!.id,
               actionType: _postDetailScreenHandler!.postData!.isSaved
-                  ? LMFeedPostActionType.saved
-                  : LMFeedPostActionType.unsaved,
+                  ? LMFeedPostActionType.unsaved
+                  : LMFeedPostActionType.saved,
             ));
           } else {
             LMFeedCore.showSnackBar(
@@ -1518,11 +1493,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   void handlePostPinAction() async {
-    _postDetailScreenHandler!.postData!.isPinned =
-        !_postDetailScreenHandler!.postData!.isPinned;
-    _postDetailScreenHandler!.rebuildPostWidget.value =
-        !_postDetailScreenHandler!.rebuildPostWidget.value;
-
     final pinPostRequest = (PinPostRequestBuilder()
           ..postId(_postDetailScreenHandler!.postData!.id))
         .build();
@@ -1530,24 +1500,19 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     postBloc.add(LMFeedUpdatePostEvent(
       postId: _postDetailScreenHandler!.postData!.id,
       actionType: _postDetailScreenHandler!.postData!.isPinned
-          ? LMFeedPostActionType.pinned
-          : LMFeedPostActionType.unpinned,
+          ? LMFeedPostActionType.unpinned
+          : LMFeedPostActionType.pinned,
     ));
 
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
     if (!response.success) {
-      _postDetailScreenHandler!.postData!.isPinned =
-          !_postDetailScreenHandler!.postData!.isPinned;
-      _postDetailScreenHandler!.rebuildPostWidget.value =
-          !_postDetailScreenHandler!.rebuildPostWidget.value;
-
       postBloc.add(LMFeedUpdatePostEvent(
         postId: _postDetailScreenHandler!.postData!.id,
         actionType: _postDetailScreenHandler!.postData!.isPinned
-            ? LMFeedPostActionType.pinned
-            : LMFeedPostActionType.unpinned,
+            ? LMFeedPostActionType.unpinned
+            : LMFeedPostActionType.pinned,
       ));
     } else {
       String postType = LMFeedPostUtils.getPostType(

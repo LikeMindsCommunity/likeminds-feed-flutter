@@ -359,7 +359,6 @@ class LMFeedPostDetailScreenHandler {
           ..user(currentUser)
           ..tempId(tempId))
         .build();
-    postData!.commentCount += 1;
     addCommentToController(commentViewData);
   }
 
@@ -385,9 +384,8 @@ class LMFeedPostDetailScreenHandler {
 
   void addCommentToController(LMCommentViewData commentViewData) {
     commentListPagingController.itemList?.insert(0, commentViewData);
-     LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              postId: postData!.id,
-              actionType: LMFeedPostActionType.commentAdded));
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postData!.id, actionType: LMFeedPostActionType.commentAdded));
     debugPrint(
         'commentListPagingController.itemList: ${commentListPagingController.itemList}');
   }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 part 'feed_screen_configuration.dart';
@@ -81,7 +80,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
-  bool right = true;
 
   LMFeedScreenConfig? config;
   /* 
@@ -1072,7 +1070,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ? ''
               : postViewData.repostCount.toString(),
         ),
-        onTap: right
+        onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
                   LMFeedAnalyticsBloc.instance.add(
@@ -1186,7 +1184,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           ),
         ),
       ),
-      onTap: right
+      onTap: userPostingRights
           ? () async {
               if (!postUploading.value) {
                 LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
@@ -1240,8 +1238,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           height: 44,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           borderRadius: 28,
-          backgroundColor:
-              right ? feedThemeData.primaryColor : feedThemeData.disabledColor,
+          backgroundColor: userPostingRights
+              ? feedThemeData.primaryColor
+              : feedThemeData.disabledColor,
           placement: LMFeedIconButtonPlacement.end,
           margin: 5.0,
         ),
@@ -1255,7 +1254,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         ),
-        onTap: right
+        onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
                   LMFeedAnalyticsBloc.instance.add(
