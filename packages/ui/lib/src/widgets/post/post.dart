@@ -133,6 +133,7 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   bool? isPinned;
   ValueNotifier<bool> rebuildLikeWidget = ValueNotifier(false);
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
+  LMFeedThemeData lmFeedThemeData = LMFeedTheme.instance.theme;
 
   LMFeedPostStyle? style;
 
@@ -144,7 +145,6 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData lmFeedThemeData = LMFeedTheme.instance.theme;
     style = widget.style ?? LMFeedTheme.instance.theme.postStyle;
     return GestureDetector(
       onTap: () {
