@@ -4,13 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/edit_post_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
-import 'package:likeminds_feed_flutter_core/src/views/report/report_bottom_sheet.dart';
-import 'package:likeminds_feed_flutter_core/src/views/search/search_screen.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 part 'feed_screen_configuration.dart';
@@ -87,7 +80,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
-  bool right = true;
 
   LMFeedScreenConfig? config;
   /* 
@@ -255,7 +247,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   @override
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
-    return Scaffold(
+    return _widgetsBuilder.scaffold(
+      source: LMFeedWidgetSource.universalFeed,
       backgroundColor: feedThemeData.backgroundColor,
       appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
       floatingActionButton: ValueListenableBuilder(
@@ -433,7 +426,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         -1;
                     if (index != -1) {
                       feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
-                          feedRoomItemList[index], curr.actionType);
+                          feedRoomItemList[index], curr.actionType,
+                          commentId: curr.commentId);
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }
@@ -473,8 +467,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   if (state is LMFeedNewPostUploadingState) {
                     return Container(
                       height: 60,
-                      color: feedThemeData.backgroundColor ??
-                          LikeMindsTheme.whiteColor,
+                      color: feedThemeData.backgroundColor,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
@@ -827,7 +820,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => LMFeedEditPostScreen(
-                  postViewData: postViewData,
+                  postId: postViewData.id,
                 ),
               ),
             );
@@ -1040,6 +1033,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 actionType: postViewData.isSaved
                     ? LMFeedPostActionType.saved
                     : LMFeedPostActionType.unsaved));
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+              ),
+            );
           }
         },
         style: feedThemeData.footerStyle.saveButtonStyle,
@@ -1070,7 +1070,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ? ''
               : postViewData.repostCount.toString(),
         ),
-        onTap: right
+        onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
                   LMFeedAnalyticsBloc.instance.add(
@@ -1138,7 +1138,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         style: LMFeedButtonStyle(
           borderRadius: 48,
           border: Border.all(
-            color: feedThemeData.primaryColor ?? LikeMindsTheme.onContainer,
+            color: feedThemeData.primaryColor,
             width: 2,
           ),
           height: 40,
@@ -1184,7 +1184,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           ),
         ),
       ),
-      onTap: right
+      onTap: userPostingRights
           ? () async {
               if (!postUploading.value) {
                 LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
@@ -1238,8 +1238,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           height: 44,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           borderRadius: 28,
-          backgroundColor:
-              right ? feedThemeData.primaryColor : feedThemeData.disabledColor,
+          backgroundColor: userPostingRights
+              ? feedThemeData.primaryColor
+              : feedThemeData.disabledColor,
           placement: LMFeedIconButtonPlacement.end,
           margin: 5.0,
         ),
@@ -1253,7 +1254,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         ),
-        onTap: right
+        onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
                   LMFeedAnalyticsBloc.instance.add(

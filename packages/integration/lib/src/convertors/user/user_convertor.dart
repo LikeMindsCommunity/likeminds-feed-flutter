@@ -1,11 +1,10 @@
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/sdk/sdk_client_info_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMUserViewDataConvertor {
   static LMUserViewData fromUser(User user,
-      {Map<String, Topic>? topics, Map<String, List<String>>? userTopics, Map<String, WidgetModel>? widgets}) {
+      {Map<String, LMTopicViewData>? topics,
+      Map<String, List<String>>? userTopics,
+      Map<String, LMWidgetViewData>? widgets}) {
     LMUserViewDataBuilder userViewDataBuilder = LMUserViewDataBuilder();
 
     userViewDataBuilder.id(user.id);
@@ -61,15 +60,13 @@ class LMUserViewDataConvertor {
 
       userTopics[user.uuid]?.forEach((element) {
         if (topics[element] != null) {
-          userTopicsList
-              .add(LMTopicViewDataConvertor.fromTopic(topics[element]!));
+          userTopicsList.add(topics[element]!);
         }
       });
       userViewDataBuilder.topics(userTopicsList);
     }
     if (widgets != null && widgets[user.sdkClientInfo.widgetId] != null) {
-      userViewDataBuilder.widget(LMWidgetViewDataConvertor.fromWidgetModel(
-          widgets[user.sdkClientInfo.widgetId]!));
+      userViewDataBuilder.widget(widgets[user.sdkClientInfo.widgetId]!);
     }
     return userViewDataBuilder.build();
   }

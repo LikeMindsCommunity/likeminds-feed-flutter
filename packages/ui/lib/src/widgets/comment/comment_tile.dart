@@ -12,6 +12,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.profilePicture,
     this.titleText,
     this.subtitleText,
+    this.editedText,
     required this.lmFeedMenuAction,
     required this.onTagTap,
     this.menu,
@@ -23,6 +24,9 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.showRepliesButton,
     this.buttonSeparator,
     this.style,
+    this.subTextSeparator,
+    this.subTextStyle,
+    this.customTitle,
   });
 
   final LMUserViewData user;
@@ -31,6 +35,9 @@ class LMFeedCommentWidget extends StatefulWidget {
   final LMFeedProfilePicture? profilePicture;
   final LMFeedText? titleText;
   final LMFeedText? subtitleText;
+  final Widget? subTextSeparator;
+  final LMFeedText? customTitle;
+  final LMFeedText? editedText;
 
   /// {@macro feed_on_tag_tap}
   final LMFeedOnTagTap onTagTap;
@@ -49,6 +56,7 @@ class LMFeedCommentWidget extends StatefulWidget {
   final Widget? buttonSeparator;
 
   final LMFeedCommentStyle? style;
+  final LMFeedTextStyle? subTextStyle;
 
   @override
   State<LMFeedCommentWidget> createState() => _LMCommentTileState();
@@ -59,6 +67,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     LMFeedProfilePicture? profilePicture,
     LMFeedText? titleText,
     LMFeedText? subtitleText,
+    LMFeedText? editedText,
     Function(String)? onTagTap,
     Widget Function(LMFeedMenu)? menu,
     LMFeedMenuAction? lmFeedMenuAction,
@@ -70,13 +79,18 @@ class LMFeedCommentWidget extends StatefulWidget {
     Widget? buttonSeparator,
     LMFeedButton? showRepliesButton,
     LMFeedCommentStyle? style,
+    Widget? subTextSeparator,
+    LMFeedTextStyle? subTextStyle,
+    LMFeedText? customTitle,
   }) {
     return LMFeedCommentWidget(
       user: user ?? this.user,
       comment: comment ?? this.comment,
       profilePicture: profilePicture ?? this.profilePicture,
       titleText: titleText ?? this.titleText,
+      subTextSeparator: subTextSeparator ?? this.subTextSeparator,
       subtitleText: subtitleText ?? this.subtitleText,
+      editedText: editedText ?? this.editedText,
       onTagTap: onTagTap ?? this.onTagTap,
       menu: menu ?? this.menu,
       lmFeedMenuAction: lmFeedMenuAction ?? this.lmFeedMenuAction,
@@ -89,6 +103,8 @@ class LMFeedCommentWidget extends StatefulWidget {
       showRepliesButton: showRepliesButton ?? this.showRepliesButton,
       buttonSeparator: buttonSeparator ?? this.buttonSeparator,
       style: style ?? this.style,
+      subTextStyle: subTextStyle ?? this.subTextStyle,
+      customTitle: customTitle ?? this.customTitle,
     );
   }
 }
@@ -124,27 +140,65 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: style?.titlePadding,
-                    width: style!.width != null ? style!.width! * 0.6 : null,
-                    child: widget.titleText ??
-                        LMFeedText(
-                          text: widget.user.name,
-                          style: LMFeedTextStyle(
-                            textStyle: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: style?.textStyle?.color ??
-                                  feedTheme.onContainer,
+                  Row(
+                    children: [
+                      Container(
+                        padding: style?.titlePadding,
+                        width:
+                            style!.width != null ? style!.width! * 0.6 : null,
+                        child: widget.titleText ??
+                            LMFeedText(
+                              text: widget.user.name,
+                              style: LMFeedTextStyle(
+                                textStyle: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: style?.textStyle?.color ??
+                                      feedTheme.onContainer,
+                                ),
+                                maxLines: 1,
+                              ),
                             ),
-                            maxLines: 1,
-                          ),
-                        ),
+                      ),
+                      widget.customTitle ?? const SizedBox.shrink(),
+                    ],
                   ),
                   widget.subtitleText != null
                       ? Container(
                           padding: style?.subtitlePadding,
-                          child: widget.subtitleText,
+                          child: Row(
+                            children: [
+                              widget.subtitleText ?? const SizedBox.shrink(),
+                              if (widget.comment.isEdited)
+                                LikeMindsTheme.kHorizontalPaddingSmall,
+                              if (widget.comment.isEdited)
+                                widget.subTextSeparator ??
+                                    LMFeedText(
+                                      text: widget.comment.isEdited ? '•' : '',
+                                      style: LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: LikeMindsTheme.kFontSmall,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                              LikeMindsTheme.kHorizontalPaddingSmall,
+                              widget.comment.isEdited
+                                  ? widget.editedText ??
+                                      LMFeedText(
+                                        text: widget.comment.isEdited
+                                            ? 'Edited'
+                                            : '',
+                                        style: LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize: LikeMindsTheme.kFontSmall,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                      )
+                                  : const SizedBox(),
+                            ],
+                          ),
                         )
                       : const SizedBox.shrink(),
                 ],
@@ -160,9 +214,10 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
             child: LMFeedExpandableText(
               widget.comment.text,
               onTagTap: widget.onTagTap,
-              expandText: "see more",
+              expandText: style!.expandText ?? "see more",
               animation: true,
               maxLines: 4,
+              prefixStyle: style!.expandTextStyle,
               hashtagStyle: style!.linkStyle ??
                   Theme.of(context)
                       .textTheme
@@ -347,6 +402,9 @@ class LMFeedCommentStyle {
   final EdgeInsets? titlePadding;
   final EdgeInsets? subtitlePadding;
 
+  final TextStyle? expandTextStyle;
+  final String? expandText;
+
   final bool? showTimestamp;
 
   const LMFeedCommentStyle({
@@ -370,6 +428,8 @@ class LMFeedCommentStyle {
     this.titlePadding,
     this.subtitlePadding,
     this.showTimestamp = true,
+    this.expandTextStyle,
+    this.expandText,
   });
 
   LMFeedCommentStyle copyWith({
@@ -393,6 +453,8 @@ class LMFeedCommentStyle {
     EdgeInsets? titlePadding,
     EdgeInsets? subtitlePadding,
     bool? showTimestamp,
+    TextStyle? expandTextStyle,
+    String? expandText,
   }) {
     return LMFeedCommentStyle(
       textStyle: textStyle ?? this.textStyle,
@@ -418,6 +480,8 @@ class LMFeedCommentStyle {
       titlePadding: titlePadding ?? this.titlePadding,
       subtitlePadding: subtitlePadding ?? this.subtitlePadding,
       showTimestamp: showTimestamp ?? this.showTimestamp,
+      expandText: expandText ?? this.expandText,
+      expandTextStyle: expandTextStyle ?? this.expandTextStyle,
     );
   }
 

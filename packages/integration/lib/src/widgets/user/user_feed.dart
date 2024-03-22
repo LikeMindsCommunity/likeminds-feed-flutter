@@ -49,8 +49,9 @@ class _LMFeedUserCreatedPostListViewState
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
-  Map<String, WidgetModel> widgets = {};
-  Map<String, Post> repostedPosts = {};
+  Map<String, LMWidgetViewData> widgets = {};
+  Map<String, LMPostViewData> repostedPosts = {};
+  Map<String, LMCommentViewData> filteredComments = {};
 
   int _pageFeed = 1;
   final PagingController<int, LMPostViewData> _pagingController =
@@ -58,6 +59,8 @@ class _LMFeedUserCreatedPostListViewState
   bool userPostingRights = true;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   final ValueNotifier postUploading = ValueNotifier(false);
+  LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
+  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
 
   @override
   void initState() {
@@ -85,30 +88,70 @@ class _LMFeedUserCreatedPostListViewState
   void updatePagingControllers(GetUserPostResponse response) {
     if (response.success) {
       _pageFeed++;
+      if (response.widgets != null) {
+        widgets.addAll(response.widgets?.map((key, value) => MapEntry(
+                key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+            {});
+      }
       if (response.topics != null) {
-        topics.addAll(response.topics!.map((key, value) =>
-            MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
+        topics.addAll(response.topics!.map((key, value) => MapEntry(
+              key,
+              LMTopicViewDataConvertor.fromTopic(value, widgets: widgets),
+            )));
       }
       if (response.users != null) {
-        users.addAll(response.users!.map((key, value) =>
-            MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
+        users.addAll(response.users!.map((key, value) => MapEntry(
+            key,
+            LMUserViewDataConvertor.fromUser(
+              value,
+              topics: topics,
+              widgets: widgets,
+              userTopics: response.userTopics,
+            ))));
       }
-      if (response.widgets != null) {
-        widgets.addAll(response.widgets!);
+
+      if (response.filteredComments != null) {
+        filteredComments.addAll(
+          response.filteredComments!.map(
+            (key, value) => MapEntry(
+              key,
+              LMCommentViewDataConvertor.fromComment(
+                value,
+                users,
+              ),
+            ),
+          ),
+        );
       }
+
       if (response.repostedPosts != null) {
-        repostedPosts.addAll(response.repostedPosts!);
+        repostedPosts.addAll(
+          response.repostedPosts!.map(
+            (key, value) => MapEntry(
+              key,
+              LMPostViewDataConvertor.fromPost(
+                post: value,
+                users: users,
+                filteredComments: filteredComments,
+                topics: topics,
+                userTopics: response.userTopics,
+                widgets: widgets,
+              ),
+            ),
+          ),
+        );
       }
       List<LMPostViewData> listOfPosts = response.posts!
           .map((e) => LMPostViewDataConvertor.fromPost(
               post: e,
               widgets: widgets,
               repostedPosts: repostedPosts,
-              topics: topics.map((key, value) =>
-                  MapEntry(key, LMTopicViewDataConvertor.toTopic(value))),
-              users: users.map((key, value) =>
-                  MapEntry(key, LMUserViewDataConvertor.toUser(value)))))
+              topics: topics,
+              users: users,
+              filteredComments: filteredComments,
+              userTopics: response.userTopics))
           .toList();
+
       if (listOfPosts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
@@ -203,22 +246,8 @@ class _LMFeedUserCreatedPostListViewState
           }
           users.addAll(state.userData);
           topics.addAll(state.topics);
-          widgets.addAll(state.widgets.map((key, value) =>
-              MapEntry(key, LMWidgetViewDataConvertor.toWidgetModel(value))));
-          rebuildPostWidget.value = !rebuildPostWidget.value;
-        }
+          widgets.addAll(state.widgets);
 
-        if (state is LMFeedPostUpdateState) {
-          List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-          int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.postId) ??
-              -1;
-          if (index != -1) {
-            LMPostViewData? postViewData = feedRoomItemList?[index];
-            if (postViewData != null) {
-              LMFeedPostUtils.updatePostData(postViewData, state.actionType);
-            }
-          }
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
       },
@@ -250,11 +279,14 @@ class _LMFeedUserCreatedPostListViewState
                           createPostButton: createPostButton());
                 },
                 firstPageProgressIndicatorBuilder: (context) =>
+                    widget.firstPageProgressIndicatorBuilder?.call(context) ??
                     const LMFeedShimmer(),
-                newPageProgressIndicatorBuilder: (context) => const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
+                newPageProgressIndicatorBuilder: (context) =>
+                    widget.newPageProgressIndicatorBuilder?.call(context) ??
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
               ),
             );
           }),
@@ -395,50 +427,83 @@ class _LMFeedUserCreatedPostListViewState
     return LMFeedPostHeader(
       user: users[postViewData.uuid]!,
       isFeed: true,
-      postViewData: postViewData,
-      postHeaderStyle: feedThemeData.headerStyle,
-      menuBuilder: (menu) {
-        return menu.copyWith(
-          removeItemIds: {postReportId, postEditId},
-          action: LMFeedMenuAction(
-            onPostUnpin: () => handlePostPinAction(postViewData),
-            onPostPin: () => handlePostPinAction(postViewData),
-            onPostDelete: () {
-              showDialog(
-                context: context,
-                builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Comment',
-                  uuid: postViewData.uuid,
-                  content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
-                  action: (String reason) async {
-                    Navigator.of(childContext).pop();
-
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                        },
-                      ),
-                    );
-
-                    LMFeedPostBloc.instance.add(
-                      LMFeedDeletePostEvent(
-                        postId: postViewData.id,
-                        reason: reason,
-                        isRepost: postViewData.isRepost,
-                      ),
-                    );
-                  },
-                  actionText: 'Delete',
-                ),
-              );
-            },
+      onProfileTap: () {
+        LMFeedCore.instance.lmFeedClient.routeToProfile(
+          postViewData.user.sdkClientInfo.uuid,
+        );
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            uuid: postViewData.user.sdkClientInfo.uuid,
+            context: context,
           ),
         );
       },
+      postViewData: postViewData,
+      postHeaderStyle: feedThemeData.headerStyle,
+      menu: LMFeedMenu(
+        menuItems: postViewData.menuItems,
+        removeItemIds: {postReportId, postEditId},
+        action: LMFeedMenuAction(
+          onPostEdit: () {
+            // Mute all video controllers
+            // to prevent video from playing in background
+            // while editing the post
+            LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => LMFeedEditPostScreen(
+                  postId: postViewData.id,
+                ),
+              ),
+            );
+          },
+          onPostReport: () => handlePostReportAction(postViewData),
+          onPostUnpin: () => handlePostPinAction(postViewData),
+          onPostPin: () => handlePostPinAction(postViewData),
+          onPostDelete: () {
+            String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
+
+            showDialog(
+              context: context,
+              builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                title: 'Delete Comment',
+                uuid: postCreatorUUID,
+                content:
+                    'Are you sure you want to delete this post. This action can not be reversed.',
+                action: (String reason) async {
+                  Navigator.of(childContext).pop();
+
+                  String postType =
+                      LMFeedPostUtils.getPostType(postViewData.attachments);
+
+                  LMFeedAnalyticsBloc.instance.add(
+                    LMFeedFireAnalyticsEvent(
+                      eventName: LMFeedAnalyticsKeys.postDeleted,
+                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      eventProperties: {
+                        "post_id": postViewData.id,
+                        "post_type": postType,
+                        "user_id": currentUser?.sdkClientInfo.uuid,
+                        "user_state": isCm ? "CM" : "member",
+                      },
+                    ),
+                  );
+
+                  LMFeedPostBloc.instance.add(
+                    LMFeedDeletePostEvent(
+                      postId: postViewData.id,
+                      reason: reason,
+                      isRepost: postViewData.isRepost,
+                    ),
+                  );
+                },
+                actionText: 'Delete',
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -449,6 +514,8 @@ class _LMFeedUserCreatedPostListViewState
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData.mediaStyle,
+      carouselIndicatorBuilder:
+          _widgetsBuilder.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoController(
@@ -592,6 +659,13 @@ class _LMFeedUserCreatedPostListViewState
                     : LMFeedPostActionType.unsaved,
               ),
             );
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+              ),
+            );
           }
         },
         style: feedThemeData.footerStyle.saveButtonStyle,
@@ -675,10 +749,11 @@ class _LMFeedUserCreatedPostListViewState
   LMFeedButton createPostButton() {
     return LMFeedButton(
       style: LMFeedButtonStyle(
-        icon: const LMFeedIcon(
+        icon: LMFeedIcon(
           type: LMFeedIconType.icon,
           icon: Icons.add,
           style: LMFeedIconStyle(
+            color: feedThemeData.onPrimary,
             size: 18,
           ),
         ),
@@ -689,10 +764,11 @@ class _LMFeedUserCreatedPostListViewState
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),
-      text: const LMFeedText(
+      text: LMFeedText(
         text: "Create Post",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
+            color: feedThemeData.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -741,6 +817,34 @@ class _LMFeedUserCreatedPostListViewState
                 ),
               );
             },
+    );
+  }
+
+  Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
+    return showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      useSafeArea: true,
+      isScrollControlled: true,
+      elevation: 10,
+      enableDrag: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+        minHeight: MediaQuery.of(context).size.height * 0.3,
+      ),
+      backgroundColor: feedThemeData.container,
+      clipBehavior: Clip.hardEdge,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) => LMFeedReportBottomSheet(
+        entityId: postViewData.id,
+        entityType: 5,
+        entityCreatorId: postViewData.uuid,
+      ),
     );
   }
 

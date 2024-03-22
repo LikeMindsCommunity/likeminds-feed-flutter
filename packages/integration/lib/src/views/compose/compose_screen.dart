@@ -61,6 +61,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
+  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
@@ -155,9 +156,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedCore.theme;
     screenSize = MediaQuery.of(context).size;
-    LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+
     return WillPopScope(
       onWillPop: () {
         widget.composeDiscardDialogBuilder?.call(context) ??
@@ -171,7 +171,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
             bloc: composeBloc,
             listener: _composeBlocListener,
-            child: Scaffold(
+            child: widgetUtility.scaffold(
+              source: LMFeedWidgetSource.createPostScreen,
               backgroundColor: feedTheme.container,
               bottomSheet: _defMediaPicker(),
               appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
@@ -203,21 +204,26 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 ),
               ),
               body: SafeArea(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 18),
-                      widget.composeUserHeaderBuilder?.call(context, user!) ??
-                          widgetUtility.composeScreenUserHeaderBuilder(
-                              context, user!),
-                      const SizedBox(height: 18),
-                      widget.composeContentBuilder?.call() ??
-                          _defContentInput(),
-                      const SizedBox(height: 18),
-                      widget.composeMediaPreviewBuilder?.call() ??
-                          _defMediaPreview(),
-                      const SizedBox(height: 150),
-                    ],
+                child: Container(
+                  margin: EdgeInsets.only(
+                    bottom: 150,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 18),
+                        widget.composeUserHeaderBuilder?.call(context, user!) ??
+                            widgetUtility.composeScreenUserHeaderBuilder(
+                                context, user!),
+                        const SizedBox(height: 18),
+                        widget.composeContentBuilder?.call() ??
+                            _defContentInput(),
+                        const SizedBox(height: 18),
+                        widget.composeMediaPreviewBuilder?.call() ??
+                            _defMediaPreview(),
+                        const SizedBox(height: 150),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -621,6 +627,30 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   ...composeBloc.selectedTopics
                 ];
 
+                if (config!.enableHeading &&
+                    config!.headingRequiredToCreatePost &&
+                    (heading == null || heading.isEmpty)) {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without heading",
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                if (config!.textRequiredToCreatePost && postText.isEmpty) {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without text",
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
                 if (config!.topicRequiredToCreatePost &&
                     selectedTopics.isEmpty &&
                     config!.enableTopics) {
@@ -688,6 +718,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           (config?.enableHeading ?? false)
               ? TextField(
                   controller: _headingController,
+                  textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,

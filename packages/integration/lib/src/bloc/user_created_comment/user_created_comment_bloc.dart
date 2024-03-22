@@ -21,23 +21,43 @@ class LMFeedUserCreatedCommentBloc
             await LMFeedCore.client.getUserCreatedComments(request);
         if (response.success) {
           List<LMCommentViewData> comments = [];
-          Map<String, LMUserViewData> users = response.users?.map(
-                  (key, value) =>
-                      MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
-              {};
-           comments =  response.comments?.map((comment) {
-             return LMCommentViewDataConvertor.fromComment(
-              comment,
-              users,
-            );
-          }).toList() ?? [];
+          Map<String, LMWidgetViewData> widgets = (response.widgets ?? {}).map(
+            (key, value) =>
+                MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)),
+          );
 
-          final posts = response.posts?.map((key, value) => MapEntry(
-                  key,
-                  LMPostViewDataConvertor.fromPost(
-                      post: value, users: response.users ?? {}))) ??
+          Map<String, LMTopicViewData> topics = (response.topics ?? {}).map(
+              (key, value) => MapEntry(key,
+                  LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
+          Map<String, LMUserViewData> users = response.users?.map(
+                  (key, value) => MapEntry(
+                      key,
+                      LMUserViewDataConvertor.fromUser(value,
+                          topics: topics,
+                          widgets: widgets,
+                          userTopics: response.userTopics))) ??
               {};
-          emit(UserCreatedCommentLoadedState(comments: comments, posts: posts, page: event.page));
+          comments = response.comments?.map((comment) {
+                return LMCommentViewDataConvertor.fromComment(comment, users);
+              }).toList() ??
+              [];
+
+          final posts = response.posts?.map(
+                (key, value) => MapEntry(
+                    key,
+                    LMPostViewDataConvertor.fromPost(
+                      post: value,
+                      users: users,
+                      topics: topics,
+                      widgets: widgets,
+                      userTopics: response.userTopics,
+                    )),
+              ) ??
+              {};
+
+          emit(UserCreatedCommentLoadedState(
+              comments: comments, posts: posts, page: event.page));
         } else {
           emit(UserCreatedCommentErrorState(
               errorMessage: response.errorMessage ??

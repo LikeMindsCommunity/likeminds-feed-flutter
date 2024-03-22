@@ -26,11 +26,12 @@ class LMFeedActivityScreen extends StatefulWidget {
 }
 
 class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
+  LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
   final PagingController<int, UserActivityItem> _pagingController =
       PagingController(firstPageKey: 1);
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
-  Map<String, WidgetModel> widgets = {};
+  Map<String, LMWidgetViewData> widgets = {};
   Map<String, Post> repostedPosts = {};
   Map<String, Comment> filteredComments = {};
 
@@ -60,20 +61,31 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           await LMFeedCore.client.getUserActivity(request);
 
       if (userActivityResponse.success) {
+        widgets.addAll(userActivityResponse.widgets?.map((key, value) =>
+                MapEntry(
+                    key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+            {});
+
         Map<String, LMTopicViewData> topics = userActivityResponse.topics?.map(
-                (key, value) =>
-                    MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))) ??
+                (key, value) => MapEntry(
+                    key,
+                    LMTopicViewDataConvertor.fromTopic(value,
+                        widgets: widgets))) ??
             {};
 
         this.topics.addAll(topics);
 
-        Map<String, LMUserViewData> users = userActivityResponse.users?.map(
-                (key, value) =>
-                    MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
-            {};
+        Map<String, LMUserViewData> users =
+            userActivityResponse.users?.map((key, value) => MapEntry(
+                    key,
+                    LMUserViewDataConvertor.fromUser(
+                      value,
+                      topics: this.topics,
+                      widgets: widgets,
+                    ))) ??
+                {};
 
         this.users.addAll(users);
-        widgets.addAll(userActivityResponse.widgets ?? {});
 
         final isLastPage = userActivityResponse.activities == null ||
             userActivityResponse.activities!.length < 10;
@@ -101,7 +113,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _widgetUtility.scaffold(
+      source: LMFeedWidgetSource.activityScreen,
       backgroundColor: feedTheme.backgroundColor,
       appBar: LMFeedAppBar(
         style: LMFeedAppBarStyle(
@@ -154,10 +167,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                   LMFeedPostUtils.postViewDataFromActivity(
                 item,
                 widgets,
-                users.map((key, value) =>
-                    MapEntry(key, LMUserViewDataConvertor.toUser(value))),
-                topics.map((key, value) =>
-                    MapEntry(key, LMTopicViewDataConvertor.toTopic(value))),
+                users,
+                topics,
               );
               final user = users[item.activityEntityData.uuid]!;
 
@@ -408,6 +419,20 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 ),
               );
             },
+            onPostEdit: () {
+              // Mute all video controllers
+              // to prevent video from playing in background
+              // while editing the post
+              LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => LMFeedEditPostScreen(
+                    postId: postViewData.id,
+                  ),
+                ),
+              );
+            },
           ),
         );
       },
@@ -523,6 +548,13 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                     ? LMFeedPostActionType.unsaved
                     : LMFeedPostActionType.saved));
             postViewData.isSaved = !postViewData.isSaved;
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+              ),
+            );
           }
         },
         style: feedTheme?.footerStyle.saveButtonStyle,

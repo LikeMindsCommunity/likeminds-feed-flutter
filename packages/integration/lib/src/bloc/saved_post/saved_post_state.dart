@@ -8,6 +8,7 @@ abstract class LMFeedSavedPostState extends Equatable {
 final class LMFeedSavedPostInitialState extends LMFeedSavedPostState {}
 
 final class LMFeedSavedPostLoadingState extends LMFeedSavedPostState {}
+
 final class LMFeedSavedPostLoadedState extends LMFeedSavedPostState {
   final int page;
   final List<LMPostViewData> posts;
@@ -18,7 +19,11 @@ final class LMFeedSavedPostLoadedState extends LMFeedSavedPostState {
 
 final class LMFeedSavedPostErrorState extends LMFeedSavedPostState {
   final String errorMessage;
-  LMFeedSavedPostErrorState({required this.errorMessage});
+  final StackTrace stackTrace;
+  LMFeedSavedPostErrorState({
+    required this.errorMessage,
+    required this.stackTrace,
+  });
   @override
-  List<Object> get props => [errorMessage];
+  List<Object> get props => [errorMessage, stackTrace];
 }

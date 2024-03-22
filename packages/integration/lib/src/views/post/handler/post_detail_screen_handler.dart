@@ -13,6 +13,7 @@ class LMFeedPostDetailScreenHandler {
   Map<String, LMTopicViewData> topics = {};
   Map<String, LMPostViewData> repostedPosts = {};
   Map<String, LMWidgetViewData> widgets = {};
+  Map<String, List<String>> userTopics = {};
   LMPostViewData? postData;
 
   LMFeedPostDetailScreenHandler(
@@ -31,18 +32,38 @@ class LMFeedPostDetailScreenHandler {
           ..page(page))
         .build();
 
-    final response = await LMFeedCore.client.getPostDetails(postDetailRequest);
+    final PostDetailResponse response =
+        await LMFeedCore.client.getPostDetails(postDetailRequest);
 
     if (response.success) {
-      // Convert [User] to [LMUserViewData]
-      // Add users to the map
-      users.addAll(response.users!.map((key, value) =>
-          MapEntry(key, LMUserViewDataConvertor.fromUser(value))));
+      // Convert [WidgetModel] to [LMWidgetViewData]
+      // Add widgets to the map
+      widgets.addAll(response.widgets?.map((key, value) => MapEntry(
+              key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+          {});
 
       // Convert [Topic] to [LMTopicViewData]
       // Add topics to the map
-      topics.addAll(response.topics!.map((key, value) =>
-          MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))));
+      topics.addAll(response.topics!.map((key, value) => MapEntry(
+          key, LMTopicViewDataConvertor.fromTopic(value, widgets: widgets))));
+
+      userTopics.addAll(response.userTopics!);
+
+      // Convert [User] to [LMUserViewData]
+      // Add users to the map
+      users.addAll(
+        response.users!.map(
+          (key, value) => MapEntry(
+            key,
+            LMUserViewDataConvertor.fromUser(
+              value,
+              topics: topics,
+              widgets: widgets,
+              userTopics: userTopics,
+            ),
+          ),
+        ),
+      );
 
       // Convert [Post] to [LMPostViewData]
       // Add reposted posts to the map
@@ -50,27 +71,23 @@ class LMFeedPostDetailScreenHandler {
               key,
               LMPostViewDataConvertor.fromPost(
                 post: value,
-                widgets: response.widgets,
-                repostedPosts: response.repostedPosts,
-                users: response.users ?? {},
-                topics: response.topics ?? {},
+                widgets: widgets,
+                repostedPosts: repostedPosts,
+                users: users,
+                topics: topics,
+                userTopics: userTopics,
               ))) ??
-          {});
-
-      // Convert [WidgetModel] to [LMWidgetViewData]
-      // Add widgets to the map
-      widgets.addAll(response.widgets?.map((key, value) => MapEntry(
-              key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
           {});
 
       // Convert [Post] to [LMPostViewData]
       // Add post data, and all supporting data to the map
       final LMPostViewData postViewData = LMPostViewDataConvertor.fromPost(
         post: response.post!,
-        widgets: response.widgets,
-        repostedPosts: response.repostedPosts,
-        users: response.users ?? {},
-        topics: response.topics ?? {},
+        widgets: widgets,
+        repostedPosts: repostedPosts,
+        users: users,
+        topics: topics,
+        userTopics: userTopics,
       );
 
       final List<LMCommentViewData> commentList = postViewData.replies;
@@ -108,8 +125,16 @@ class LMFeedPostDetailScreenHandler {
 
   void handleBlocChanges(LMFeedCommentHandlerState state) {
     switch (state.runtimeType) {
+      case LMFeedCommentCanceledState:
+        {
+          commentController.clear();
+          closeOnScreenKeyboard();
+          break;
+        }
       case LMFeedCommentActionOngoingState:
         {
+          openOnScreenKeyboard();
+
           LMCommentMetaData commentMetaData =
               (state as LMFeedCommentActionOngoingState).commentMetaData;
 
@@ -126,13 +151,30 @@ class LMFeedPostDetailScreenHandler {
           AddCommentResponse response =
               commentSuccessState.commentActionResponse as AddCommentResponse;
 
+          widgets.addAll((response.widgets ?? {})
+              .map((key, value) => MapEntry(
+                  key, LMWidgetViewDataConvertor.fromWidgetModel(value)))
+              .cast<String, LMWidgetViewData>());
+
+          topics.addAll((response.topics ?? {})
+              .map((key, value) => MapEntry(key,
+                  LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)))
+              .cast<String, LMTopicViewData>());
+
+          users.addAll(response.users?.map((key, value) => MapEntry(
+                  key,
+                  LMUserViewDataConvertor.fromUser(
+                    value,
+                    topics: topics,
+                    widgets: widgets,
+                    userTopics: response.userTopics,
+                  ))) ??
+              {});
+
           LMCommentViewData commentViewData =
               LMCommentViewDataConvertor.fromComment(response.reply!, users);
-          replaceTempCommentWithActualComment(commentViewData);
 
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              postId: postData!.id,
-              actionType: LMFeedPostActionType.commentAdded));
+          replaceTempCommentWithActualComment(commentViewData);
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
@@ -170,9 +212,6 @@ class LMFeedPostDetailScreenHandler {
 
           if (commentSuccessState.commentMetaData.commentActionEntity ==
               LMFeedCommentType.parent) {
-            // deleteCommentFromController(
-            //     commentSuccessState.commentMetaData.commentId!);
-            // postData!.commentCount -= 1;
           } else {
             LMCommentViewData? commentViewData =
                 commentListPagingController.itemList?.firstWhere((element) =>
@@ -182,14 +221,6 @@ class LMFeedPostDetailScreenHandler {
               updateCommentInController(commentViewData);
             }
           }
-
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              postId: postData!.id,
-              actionType:
-                  commentSuccessState.commentMetaData.commentActionEntity ==
-                          LMFeedCommentType.parent
-                      ? LMFeedPostActionType.commentDeleted
-                      : LMFeedPostActionType.replyDeleted));
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
@@ -202,12 +233,41 @@ class LMFeedPostDetailScreenHandler {
           AddCommentReplyResponse response = commentSuccessState
               .commentActionResponse as AddCommentReplyResponse;
 
+          Map<String, LMWidgetViewData> responseWidgets = response.widgets?.map(
+                  (key, value) => MapEntry(
+                      key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+              {};
+
+          Map<String, LMTopicViewData> responseTopics = response.topics?.map(
+                  (key, value) => MapEntry(
+                      key,
+                      LMTopicViewDataConvertor.fromTopic(value,
+                          widgets: responseWidgets))) ??
+              {};
+
+          Map<String, LMUserViewData> responseUsers =
+              response.users?.map((key, value) => MapEntry(
+                      key,
+                      LMUserViewDataConvertor.fromUser(
+                        value,
+                        topics: responseTopics,
+                        widgets: responseWidgets,
+                        userTopics: response.userTopics,
+                      ))) ??
+                  {};
+
           LMCommentViewData commentViewData =
-              LMCommentViewDataConvertor.fromComment(response.reply!, users);
+              LMCommentViewDataConvertor.fromComment(
+            response.reply!,
+            responseUsers,
+          );
 
           if (response.reply!.parentComment != null) {
             updateCommentInController(commentViewData.parentComment!);
           }
+          LMFeedFetchCommentReplyBloc.instance.add(LMFeedAddLocalReplyEvent(
+            comment: commentViewData,
+          ));
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
@@ -281,6 +341,7 @@ class LMFeedPostDetailScreenHandler {
       parentComment.replies?.insert(0, commentViewData);
       updateCommentInController(parentComment);
       commentViewData.parentComment = parentComment;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
     }
 
     // if (!replyShown)
@@ -290,7 +351,8 @@ class LMFeedPostDetailScreenHandler {
     }
   }
 
-  void addTempCommentToController(String tempId, String text, int level) {
+  void addTempCommentToController(String tempId, String text, int level,
+      {DateTime? createdTime}) {
     LMUserViewData currentUser =
         LMFeedLocalPreference.instance.fetchUserData()!;
 
@@ -303,13 +365,12 @@ class LMFeedPostDetailScreenHandler {
           ..isEdited(false)
           ..repliesCount(0)
           ..menuItems([])
-          ..createdAt(DateTime.now())
-          ..updatedAt(DateTime.now())
+          ..createdAt(createdTime ?? DateTime.now())
+          ..updatedAt(createdTime ?? DateTime.now())
           ..isLiked(false)
           ..user(currentUser)
           ..tempId(tempId))
         .build();
-    postData!.commentCount += 1;
     addCommentToController(commentViewData);
   }
 
@@ -335,6 +396,10 @@ class LMFeedPostDetailScreenHandler {
 
   void addCommentToController(LMCommentViewData commentViewData) {
     commentListPagingController.itemList?.insert(0, commentViewData);
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postData!.id, actionType: LMFeedPostActionType.commentAdded));
+    debugPrint(
+        'commentListPagingController.itemList: ${commentListPagingController.itemList}');
   }
 
   void deleteCommentFromController(String commentId) {

@@ -19,12 +19,20 @@ enum LMFeedPostDeleteViewType { dialog, bottomSheet }
 enum LMFeedPostMenuType { popUp, bottomSheet }
 
 /// enum to describe the source of widget
-enum LMFeedWidgetSourceScreen {
+enum LMFeedWidgetSource {
   universalFeed,
   feedroom,
   postDetailScreen,
   userFeed,
-  userActivityFeed,
+  activityScreen,
+  createPostScreen,
+  editPostScreen,
+  notificationScreen,
+  topicSelectScreen,
+  likesScreen,
+  mediaPreviewScreen,
+  reportScreen,
+  searchScreen,
 }
 
 /// enum to describe the type of action on a post

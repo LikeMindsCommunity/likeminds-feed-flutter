@@ -5,16 +5,13 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 class LMPostViewDataConvertor {
   static LMPostViewData fromPost({
     required Post post,
-    Map<String, WidgetModel>? widgets,
-    Map<String, Post>? repostedPosts,
-    required Map<String, User> users,
-    Map<String, Topic>? topics,
+    Map<String, LMWidgetViewData>? widgets,
+    Map<String, LMPostViewData>? repostedPosts,
+    required Map<String, LMUserViewData> users,
+    Map<String, LMTopicViewData>? topics,
     Map<String, List<String>>? userTopics,
-    Map<String, Comment>? filteredComments,
+    Map<String, LMCommentViewData>? filteredComments,
   }) {
-    Map<String, LMWidgetViewData>? widgetMap = widgets?.map((key, value) =>
-        MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
-
     LMPostViewDataBuilder postViewDataBuilder = LMPostViewDataBuilder();
     Map<String, LMWidgetViewData> postWidget = {};
 
@@ -26,8 +23,7 @@ class LMPostViewDataConvertor {
     if (topics != null && post.topicIds != null) {
       for (String topicId in post.topicIds!) {
         if (topics[topicId] != null) {
-          topicViewData.add(LMTopicViewDataConvertor.fromTopic(topics[topicId]!,
-              widgets: widgetMap));
+          topicViewData.add(topics[topicId]!);
         }
       }
     }
@@ -40,22 +36,18 @@ class LMPostViewDataConvertor {
         if (e.attachmentType == 5 && widgets != null) {
           String? key = e.attachmentMeta.meta?['entity_id'];
           if (key != null && widgets[key] != null) {
-            postWidget[key] =
-                LMWidgetViewDataConvertor.fromWidgetModel(widgets[key]!);
+            postWidget[key] = widgets[key]!;
           }
         } else if (e.attachmentType == 8 &&
             repostedPosts != null &&
             repostedPosts[e.attachmentMeta.entityId] != null) {
-          repost = LMPostViewDataConvertor.fromPost(
-            post: repostedPosts[e.attachmentMeta.entityId]!,
-            widgets: widgets,
-            users: users,
-            topics: topics,
-          );
+          repost = repostedPosts[e.attachmentMeta.entityId]!;
         }
 
         return LMAttachmentViewDataConvertor.fromAttachment(
-            attachment: e, repost: repost);
+          attachment: e,
+          repost: repost,
+        );
       }).toList());
     }
 
@@ -66,11 +58,7 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.uuid(post.uuid);
 
     if (users[post.uuid] != null) {
-      postViewDataBuilder.user(LMUserViewDataConvertor.fromUser(
-        users[post.uuid]!,
-        topics: topics,
-        userTopics: userTopics,
-      ));
+      postViewDataBuilder.user(users[post.uuid]!);
     }
 
     postViewDataBuilder.likeCount(post.likeCount);
@@ -90,10 +78,7 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.isEdited(post.isEdited);
 
     postViewDataBuilder.replies(post.replies
-            ?.map((e) => LMCommentViewDataConvertor.fromComment(
-                e,
-                users.map((key, value) =>
-                    MapEntry(key, LMUserViewDataConvertor.fromUser(value)))))
+            ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
             .toList() ??
         []);
 
@@ -106,23 +91,23 @@ class LMPostViewDataConvertor {
     postViewDataBuilder.repostCount(post.repostCount);
 
     postViewDataBuilder.isDeleted(post.isDeleted ?? false);
-    if(widgetMap != null) {
-      postViewDataBuilder.widgets(widgetMap);
+
+    if (widgets != null) {
+      postViewDataBuilder.widgets(widgets);
     }
 
     if (post.heading != null) postViewDataBuilder.heading(post.heading!);
 
     if (post.commentIds != null && post.commentIds!.isNotEmpty) {
-      postViewDataBuilder.commentIds(post.commentIds!);
+      postViewDataBuilder.commentIds(
+        post.commentIds!,
+      );
 
       List<LMCommentViewData> topComments = [];
       if (filteredComments != null && filteredComments.isNotEmpty) {
         post.commentIds?.forEach((element) {
           if (filteredComments[element] != null)
-            topComments.add(LMCommentViewDataConvertor.fromComment(
-                filteredComments[element]!,
-                users.map((key, value) =>
-                    MapEntry(key, LMUserViewDataConvertor.fromUser(value)))));
+            topComments.add(filteredComments[element]!);
         });
       }
 

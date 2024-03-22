@@ -112,6 +112,7 @@ class LMFeedExpandableTextState extends State<LMFeedExpandableText>
         oldWidget.onUrlTap != widget.onUrlTap ||
         oldWidget.onHashtagTap != widget.onHashtagTap ||
         oldWidget.onMentionTap != widget.onMentionTap) {
+      _expanded = widget.expanded;
       _updateText();
     }
   }

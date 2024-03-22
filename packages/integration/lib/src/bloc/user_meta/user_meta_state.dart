@@ -9,7 +9,14 @@ class LMFeedUserMetaState extends Equatable {
 
 class LMFeedUserMetaInitialState extends LMFeedUserMetaState {}
 
-class LMFeedUserMetaLoadingState extends LMFeedUserMetaState {}
+class LMFeedUserMetaLoadingState extends LMFeedUserMetaState {
+  final String uuid;
+  const LMFeedUserMetaLoadingState({
+    required this.uuid,
+  });
+  @override
+  List<Object> get props => [uuid];
+}
 
 class LMFeedUserMetaLoadedState extends LMFeedUserMetaState {
   final LMUserViewData user;
@@ -29,6 +36,8 @@ class LMFeedUserMetaUpdatedState extends LMFeedUserMetaState {
   @override
   List<Object> get props => [];
 }
+
+class LMFeedUserMetaUpdateLoadingState extends LMFeedUserMetaState {}
 
 class LMFeedUserMetaErrorState extends LMFeedUserMetaState {
   final String message;

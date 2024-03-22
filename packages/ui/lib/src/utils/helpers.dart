@@ -73,10 +73,6 @@ class LMFeedTaggingHelper {
     return tags;
   }
 
-  static void routeToProfile(String uuid) {
-    debugPrint(uuid);
-  }
-
   static String convertRouteToTag(String text, {bool withTilde = true}) {
     final Iterable<RegExpMatch> matches =
         RegExp(notificationTagRoute).allMatches(text);

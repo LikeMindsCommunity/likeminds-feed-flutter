@@ -43,7 +43,7 @@ class LMFeedTopicChip extends StatelessWidget {
             : feedTheme.topicStyle.inactiveChipStyle);
 
     Widget topicText = LMFeedText(
-      text: "${(style?.showHashTag ?? false) ? "" : "#"}${topic.name}",
+      text: topic.name,
       style: LMFeedTextStyle(
         textStyle: style?.textStyle,
         textAlign: TextAlign.center,
@@ -165,8 +165,6 @@ class LMFeedTopicChipStyle {
   final EdgeInsets? margin;
   final bool gripChip;
 
-  final bool showHashTag;
-
   const LMFeedTopicChipStyle({
     this.backgroundColor,
     this.borderColor,
@@ -180,7 +178,6 @@ class LMFeedTopicChipStyle {
     this.height,
     this.margin,
     this.gripChip = false,
-    this.showHashTag = false,
   });
 
   LMFeedTopicChipStyle copyWith({
@@ -196,7 +193,6 @@ class LMFeedTopicChipStyle {
     double? height,
     EdgeInsets? margin,
     bool? gripChip,
-    bool? showHashTag,
   }) {
     return LMFeedTopicChipStyle(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -211,7 +207,6 @@ class LMFeedTopicChipStyle {
       height: height ?? this.height,
       margin: margin ?? this.margin,
       gripChip: gripChip ?? this.gripChip,
-      showHashTag: showHashTag ?? this.showHashTag,
     );
   }
 

@@ -25,6 +25,9 @@ class LMFeedMediaPreviewScreen extends StatefulWidget {
 }
 
 class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
+  final DateFormat formatter = DateFormat('MMMM d, hh:mm');
+  final LMFeedThemeData feedTheme = LMFeedCore.theme;
+  final LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   late List<LMAttachmentViewData> postAttachments;
   late LMPostViewData post;
   late LMUserViewData user;
@@ -60,10 +63,9 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final DateFormat formatter = DateFormat('MMMM d, hh:mm');
     final String formatted = formatter.format(post.createdAt);
-    final LMFeedThemeData feedTheme = LMFeedCore.theme;
-    return Scaffold(
+    return widgetUtility.scaffold(
+      source: LMFeedWidgetSource.mediaPreviewScreen,
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
@@ -139,7 +141,6 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                       return LMFeedVideo(
                         videoUrl: postAttachments[index].attachmentMeta.url,
                         postId: widget.post.id,
-                        isMute: false,
                         autoPlay: true,
                         style: LMFeedPostVideoStyle.basic().copyWith(
                           showControls: true,
@@ -164,40 +165,45 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                     }
                   }),
             ),
-            ValueListenableBuilder(
-              valueListenable: rebuildCurr,
-              builder: (context, _, __) {
-                return Column(
-                  children: [
-                    checkIfMultipleAttachments()
-                        ? LikeMindsTheme.kVerticalPaddingMedium
-                        : const SizedBox(),
-                    checkIfMultipleAttachments()
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: postAttachments.map((url) {
-                              int index = postAttachments.indexOf(url);
-                              return Container(
-                                width: 8.0,
-                                height: 8.0,
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 7.0, horizontal: 2.0),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: currPosition == index
-                                      ? feedTheme.primaryColor
-                                      : feedTheme.container,
-                                ),
-                              );
-                            }).toList())
-                        : const SizedBox(),
-                  ],
-                );
-              },
-            ),
+            if (checkIfMultipleAttachments())
+              ValueListenableBuilder(
+                valueListenable: rebuildCurr,
+                builder: (context, _, __) {
+                  return widgetUtility.postMediaCarouselIndicatorBuilder(
+                      context,
+                      currPosition,
+                      postAttachments.length,
+                      carouselIndexIndicatorWidget());
+                },
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget carouselIndexIndicatorWidget() {
+    return Column(
+      children: [
+        LikeMindsTheme.kVerticalPaddingMedium,
+        Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: postAttachments.map((url) {
+              int index = postAttachments.indexOf(url);
+              return Container(
+                width: 8.0,
+                height: 8.0,
+                margin:
+                    const EdgeInsets.symmetric(vertical: 7.0, horizontal: 2.0),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: currPosition == index
+                      ? feedTheme.primaryColor
+                      : feedTheme.container,
+                ),
+              );
+            }).toList())
+      ],
     );
   }
 }

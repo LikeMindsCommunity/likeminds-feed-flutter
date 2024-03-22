@@ -47,8 +47,10 @@ class LMFeedPostMedia extends StatefulWidget {
     Function(VideoController)? initialiseVideoController,
     Function(String, StackTrace)? onError,
     LMFeedPostMediaStyle? style,
-    Widget Function(int, Widget)? carouselIndicatorBuilder,
+    Widget Function(BuildContext, int, int, Widget)? carouselIndicatorBuilder,
     VoidCallback? onMediaTap,
+    LMFeedVideoBuilder? videoBuilder,
+    LMFeedImageBuilder? imageBuilder,
   }) {
     return LMFeedPostMedia(
       attachments: attachments ?? this.attachments,
@@ -60,6 +62,8 @@ class LMFeedPostMedia extends StatefulWidget {
       carouselIndicatorBuilder:
           carouselIndicatorBuilder ?? this.carouselIndicatorBuilder,
       onMediaTap: onMediaTap ?? this.onMediaTap,
+      imageBuilder: imageBuilder ?? this.imageBuilder,
+      videoBuilder: videoBuilder ?? this.videoBuilder,
     );
   }
 }

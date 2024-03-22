@@ -67,17 +67,39 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
           message: response.errorMessage ??
               "An error occurred, please check your network connection"));
     } else {
-      users.addAll(response.users?.map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
-          {});
-
-      topics.addAll(response.topics?.map((key, value) =>
-              MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))) ??
-          {});
-
       widgets.addAll(response.widgets?.map((key, value) => MapEntry(
               key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
           {});
+
+      topics.addAll(response.topics?.map((key, value) => MapEntry(key,
+              LMTopicViewDataConvertor.fromTopic(value, widgets: widgets))) ??
+          {});
+
+      users.addAll(response.users?.map((key, value) => MapEntry(
+                key,
+                LMUserViewDataConvertor.fromUser(value,
+                    topics: topics,
+                    userTopics: response.userTopics,
+                    widgets: widgets),
+              )) ??
+          {});
+
+      Map<String, LMCommentViewData> filteredComments =
+          response.filteredComments?.map((key, value) => MapEntry(
+                  key, LMCommentViewDataConvertor.fromComment(value, users))) ??
+              {};
+
+      Map<String, LMPostViewData> repostedPosts = response.repostedPosts?.map(
+              (key, value) => MapEntry(
+                  key,
+                  LMPostViewDataConvertor.fromPost(
+                      post: value,
+                      users: users,
+                      topics: topics,
+                      widgets: widgets,
+                      filteredComments: filteredComments,
+                      userTopics: response.userTopics))) ??
+          {};
 
       emit(
         LMFeedUniversalFeedLoadedState(
@@ -86,11 +108,11 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
           posts: response.posts
                   ?.map((e) => LMPostViewDataConvertor.fromPost(
                         post: e,
-                        widgets: response.widgets,
-                        repostedPosts: response.repostedPosts,
-                        users: response.users ?? {},
-                        topics: response.topics,
-                        filteredComments: response.filteredComments,
+                        widgets: widgets,
+                        repostedPosts: repostedPosts,
+                        users: users,
+                        topics: topics,
+                        filteredComments: filteredComments,
                         userTopics: response.userTopics,
                       ))
                   .toList() ??

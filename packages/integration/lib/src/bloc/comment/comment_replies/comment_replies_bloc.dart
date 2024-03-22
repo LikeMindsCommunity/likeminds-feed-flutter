@@ -19,6 +19,8 @@ class LMFeedFetchCommentReplyBloc
 
   LMFeedCore lmFeedIntegration = LMFeedCore.instance;
   LMFeedFetchCommentReplyBloc._() : super(LMFeedCommentRepliesInitialState()) {
+    on<LMFeedDeleteLocalReplyEvent>((event, emit) =>
+        emit(LMFeedDeleteLocalReplyState(replyId: event.replyId)));
     on<LMFeedCommentRepliesEvent>((event, emit) async {
       if (event is LMFeedGetCommentRepliesEvent) {
         await _mapGetCommentRepliesToState(

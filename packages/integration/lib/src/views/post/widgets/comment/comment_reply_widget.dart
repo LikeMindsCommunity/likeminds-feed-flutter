@@ -120,7 +120,16 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         if (state is LMFeedAddLocalReplyState) {
           if (replies.isEmpty) {
             replies.add(state.comment);
+          } else {
+            int index = replies.indexWhere(
+                (element) => element.tempId == state.comment.tempId);
+            if (index == -1) {
+              replies.insert(0, state.comment);
+            } else {
+              replies[index] = state.comment;
+            }
           }
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -136,9 +145,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                     builder: (context, setReplyState) {
                       return widget.commentBuilder?.call(
                               context,
-                              _defCommetWidget(commentViewData, setReplyState),
+                              _defCommentWidget(commentViewData, setReplyState),
                               widget.post) ??
-                          _defCommetWidget(commentViewData, setReplyState);
+                          _defCommentWidget(commentViewData, setReplyState);
                     },
                   );
                 },
@@ -259,6 +268,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                     if (index != -1) {
                       replies[index] = LMCommentViewDataConvertor.fromComment(
                           response.reply!, users);
+                      rebuildReplyList.value = !rebuildReplyList.value;
                     }
                   }
                   break;
@@ -272,6 +282,8 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                           LMFeedCommentActionType.delete &&
                       state.commentMetaData.commentActionEntity ==
                           LMFeedCommentType.reply) {
+                    _commentRepliesBloc!.add(LMFeedDeleteLocalReplyEvent(
+                        replyId: state.commentMetaData.replyId ?? ""));
                     replies.removeWhere((element) =>
                         element.id == state.commentMetaData.replyId);
                     reply!.repliesCount -= 1;
@@ -308,9 +320,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                     builder: (context, setReplyState) {
                       return widget.commentBuilder?.call(
                               context,
-                              _defCommetWidget(commentViewData, setReplyState),
+                              _defCommentWidget(commentViewData, setReplyState),
                               widget.post) ??
-                          _defCommetWidget(commentViewData, setReplyState);
+                          _defCommentWidget(commentViewData, setReplyState);
                     },
                   );
                 },
@@ -364,31 +376,59 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         );
       }),
       listener: (context, state) {
+        if (state is LMFeedDeleteLocalReplyState) {
+          replies.removeWhere((element) => element.id == state.replyId);
+          rebuildReplyList.value = !rebuildReplyList.value;
+        }
         if (state is LMFeedCommentRepliesLoadedState) {
-          users = state.commentDetails.users!.map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
+          Map<String, LMWidgetViewData>? widgets = state.commentDetails.widgets
+              ?.map((key, value) => MapEntry(
+                  key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+          Map<String, LMTopicViewData>? topics = state.commentDetails.topics
+              ?.map((key, value) =>
+                  MapEntry(key, LMTopicViewDataConvertor.fromTopic(value)));
+
+          users = state.commentDetails.users!.map((key, value) => MapEntry(
+              key,
+              LMUserViewDataConvertor.fromUser(value,
+                  topics: topics,
+                  userTopics: state.commentDetails.userTopics,
+                  widgets: widgets)));
+
           users.putIfAbsent(user.uuid, () => user);
           replies = state.commentDetails.postReplies!.replies
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
               [];
         } else if (state is LMFeedPaginatedCommentRepliesLoadingState) {
-          users = state.prevCommentDetails.users!.map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
+          Map<String, LMWidgetViewData>? widgets =
+              state.prevCommentDetails.widgets?.map((key, value) => MapEntry(
+                  key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+          Map<String, LMTopicViewData>? topics = state.prevCommentDetails.topics
+              ?.map((key, value) => MapEntry(key,
+                  LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
+          users = state.prevCommentDetails.users!.map((key, value) => MapEntry(
+              key,
+              LMUserViewDataConvertor.fromUser(value,
+                  topics: topics,
+                  userTopics: state.prevCommentDetails.userTopics,
+                  widgets: widgets)));
+
           users.putIfAbsent(user.uuid, () => user);
           replies = state.prevCommentDetails.postReplies!.replies
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
                   .toList() ??
               [];
-        } else if (state is LMFeedAddLocalReplyState) {
-          replies.insert(0, state.comment);
         }
         replyCount = replies.length;
       },
     );
   }
 
-  LMFeedCommentWidget _defCommetWidget(
+  LMFeedCommentWidget _defCommentWidget(
     LMCommentViewData commentViewData,
     StateSetter setReplyState,
   ) {
@@ -396,6 +436,13 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       style: replyStyle,
       comment: commentViewData,
       onTagTap: (String uuid) {
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            uuid: commentViewData.user.sdkClientInfo.uuid,
+            context: context,
+          ),
+        );
+
         LMFeedCore.instance.lmFeedClient.routeToProfile(uuid);
       },
       user: commentViewData.user,
@@ -407,8 +454,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         ),
         fallbackText: commentViewData.user.name,
         onTap: () {
+          LMFeedProfileBloc.instance.add(
+            LMFeedRouteToUserProfileEvent(
+              uuid: commentViewData.user.sdkClientInfo.uuid,
+              context: context,
+            ),
+          );
+
           LMFeedCore.instance.lmFeedClient
-              .routeToProfile(user.sdkClientInfo.uuid);
+              .routeToProfile(commentViewData.user.sdkClientInfo.uuid);
         },
       ),
       lmFeedMenuAction: defLMFeedMenuAction(
@@ -477,6 +531,12 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   _commentHandlerBloc!.add(LMFeedCommentActionEvent(
                       commentActionRequest: request,
                       commentMetaData: commentMetaData));
+
+                  LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                    postId: widget.post.id,
+                    commentId: widget.reply.id,
+                    actionType: LMFeedPostActionType.replyDeleted,
+                  ));
                 },
                 actionText: 'Delete'));
       },

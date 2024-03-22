@@ -25,7 +25,8 @@ class LMFeedLikesScreen extends StatefulWidget {
 
 class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
   LMLikesScreenHandler? handler;
-  LMFeedThemeData? feedTheme;
+  LMFeedThemeData feedTheme = LMFeedCore.theme;
+  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
 
   @override
   void initState() {
@@ -61,14 +62,14 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedCore.theme;
     return WillPopScope(
       onWillPop: () {
         Navigator.of(context).pop();
         return Future(() => false);
       },
-      child: Scaffold(
-          backgroundColor: feedTheme?.container,
+      child: widgetUtility.scaffold(
+          source: LMFeedWidgetSource.likesScreen,
+          backgroundColor: feedTheme.container,
           appBar: getAppBar(),
           body: getLikesLoadedView()),
     );
@@ -77,7 +78,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
   LMFeedAppBar getAppBar() {
     return LMFeedAppBar(
       style: LMFeedAppBarStyle(
-        backgroundColor: feedTheme?.container,
+        backgroundColor: feedTheme.container,
         height: 60,
       ),
       leading: IconButton(

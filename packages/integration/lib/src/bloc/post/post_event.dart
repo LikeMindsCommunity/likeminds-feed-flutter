@@ -15,9 +15,12 @@ abstract class LMFeedPostEvents extends Equatable {
 /// {@endtemplate}
 class LMFeedGetPostEvent extends LMFeedPostEvents {
   final String postId;
+  final int page;
+  final int pageSize;
 
   ///{@macro lm_feed_get_post_event}
-  LMFeedGetPostEvent({required this.postId});
+  LMFeedGetPostEvent(
+      {required this.postId, required this.page, required this.pageSize});
 }
 
 /// {@template lm_feed_create_new_post_event}
@@ -97,11 +100,17 @@ class LMFeedUpdatePostEvent extends LMFeedPostEvents {
   final LMPostViewData? post;
   final LMFeedPostActionType actionType;
   final String postId;
+  final LMFeedWidgetSource? source;
+  // This variable stores the id of comment
+  // that is deleted
+  final String? commentId;
 
   LMFeedUpdatePostEvent({
     this.post,
     required this.actionType,
     required this.postId,
+    this.commentId,
+    this.source,
   });
 
   @override

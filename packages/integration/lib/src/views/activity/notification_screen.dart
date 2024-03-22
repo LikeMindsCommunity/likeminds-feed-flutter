@@ -39,7 +39,8 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   LMFeedNotificationsBloc? _notificationsBloc;
 
   int _page = 1;
-  LMFeedThemeData? _theme;
+  LMFeedThemeData _theme = LMFeedCore.theme;
+  LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
 
   @override
   void initState() {
@@ -80,9 +81,9 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
-    _theme = LMFeedCore.theme;
-    return Scaffold(
-      backgroundColor: _theme?.backgroundColor,
+    return _widgetUtility.scaffold(
+      source: LMFeedWidgetSource.notificationScreen,
+      backgroundColor: _theme.backgroundColor,
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       body: BlocConsumer(
         bloc: _notificationsBloc,
@@ -124,12 +125,12 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
       style: LMFeedAppBarStyle(
-        backgroundColor: _theme?.backgroundColor,
+        backgroundColor: _theme.backgroundColor,
         border: Border(),
         padding: EdgeInsets.zero,
       ),
       leading: BackButton(
-        color: _theme?.onContainer,
+        color: _theme.onContainer,
       ),
     );
   }
@@ -168,18 +169,34 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     );
   }
 
-  Padding _defEmptyNotificationFeedView() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: const LMFeedText(
-        text: "Opps! You don't have any notifications yet.",
-        style: LMFeedTextStyle(
-          textAlign: TextAlign.center,
-          textStyle: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+  Widget _defEmptyNotificationFeedView() {
+    LMFeedThemeData feedThemeData = LMFeedCore.theme;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: Icons.post_add,
+            style: LMFeedIconStyle(
+              size: 48,
+              color: feedThemeData.onContainer,            ),
           ),
-        ),
+          const SizedBox(height: 12),
+          LMFeedText(
+            text: 'No notifications to show',
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: feedThemeData.onContainer,
+              ),
+            ),
+          ),
+         SizedBox(
+          height: 48,
+         )
+        ],
       ),
     );
   }
@@ -189,7 +206,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     return LMFeedNotificationTile(
       notificationItemViewData: item,
       style: LMFeedNotificationTileStyle.basic().copyWith(
-        activeBackgroundColor: _theme?.disabledColor.withOpacity(0.5),
+        activeBackgroundColor: _theme.disabledColor.withOpacity(0.5),
         crossAxisAlignment: CrossAxisAlignment.start,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       ),
