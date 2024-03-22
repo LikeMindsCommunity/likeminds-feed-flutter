@@ -279,7 +279,7 @@ class _LMFeedListState extends State<LMFeedList> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => LMFeedEditPostScreen(
-                  postViewData: postViewData,
+                  postId: postViewData.id,
                 ),
               ),
             );

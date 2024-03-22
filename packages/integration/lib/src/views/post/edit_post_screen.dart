@@ -32,7 +32,7 @@ class LMFeedEditPostScreen extends StatefulWidget {
     // Style for the screen
     this.style,
     // Post data to be edited
-    required this.postViewData,
+    required this.postId,
     this.displayName,
     this.displayUrl,
   });
@@ -51,7 +51,7 @@ class LMFeedEditPostScreen extends StatefulWidget {
   final Widget Function()? composeMediaPreviewBuilder;
   final Widget Function(BuildContext context, LMUserViewData user)?
       composeUserHeaderBuilder;
-  final LMPostViewData postViewData;
+  final String postId;
   final String? displayName;
   final String? displayUrl;
 
@@ -72,7 +72,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
-  final TextEditingController _controller = TextEditingController();
+  TextEditingController _controller = TextEditingController();
   TextEditingController? _headingController = TextEditingController();
   final CustomPopupMenuController _controllerPopUp =
       CustomPopupMenuController();
@@ -91,9 +91,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
   // This function handles all the actions
   // for populating edit post screen with post data
-  void onBoardPostDetails() {
+  void onBoardPostDetails(LMPostViewData postViewData) {
     // Set the postViewData from the widget
-    postViewData = widget.postViewData;
+    this.postViewData = postViewData;
     // Check if the post is a repost
     // If it is, then populate the repost object to generate
     // the repost preview
@@ -114,7 +114,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     // Map the list of [AttachmentViewData] to [LMMediaModel]
     // and set the list in the compose bloc
-    composeBloc.postMedia = postViewData!.attachments
+    composeBloc.postMedia = postViewData.attachments
             ?.map((e) => LMMediaModel.fromAttachmentViewData(e))
             .toList() ??
         [];
@@ -129,7 +129,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
       }
     }
 
-    composeBloc.selectedTopics = postViewData!.topics;
+    composeBloc.selectedTopics = postViewData.topics;
     // Open the on screen keyboard
     if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
@@ -141,7 +141,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     super.initState();
     // populate the post details
     // when the screen is initialized
-    onBoardPostDetails();
+    LMFeedPostBloc.instance
+        .add(LMFeedGetPostEvent(postId: widget.postId, page: 1, pageSize: 10));
   }
 
   @override
@@ -149,7 +150,6 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     super.didUpdateWidget(oldWidget);
     // populate the post details
     // when the widget is updated
-    onBoardPostDetails();
   }
 
   @override
@@ -179,6 +179,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
     String postText = LMFeedTaggingHelper.convertRouteToTag(postViewData!.text);
 
+    _controller = TextEditingController();
     _controller.text = postText;
   }
 
@@ -308,72 +309,101 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
             _showDefaultDiscardDialog(context);
         return Future.value(false);
       },
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: config!.composeSystemOverlayStyle,
-        child: GestureDetector(
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
-            bloc: composeBloc,
-            listener: _composeBlocListener,
-            child: widgetUtility.scaffold(
-              source: LMFeedWidgetSource.editPostScreen,
-              backgroundColor: feedTheme.container,
-              appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
-                  _defAppBar(),
-              floatingActionButton: Padding(
-                padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
-                child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
-                  bloc: composeBloc,
-                  buildWhen: (previous, current) {
-                    if (current is LMFeedComposeFetchedTopicsState) {
-                      return true;
-                    }
-                    return false;
-                  },
-                  builder: (context, state) {
-                    if (state is LMFeedComposeFetchedTopicsState) {
-                      return widget.composeTopicSelectorBuilder?.call(
-                              context,
-                              _defTopicSelector(state.topics),
-                              composeBloc.selectedTopics) ??
-                          LMFeedCore.widgetUtility
-                              .composeScreenTopicSelectorBuilder(
-                                  context,
-                                  _defTopicSelector(state.topics),
-                                  composeBloc.selectedTopics);
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-              ),
-              body: SafeArea(
-                child: Container(
-                  margin: EdgeInsets.only(
-                    bottom: 150,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 18),
-                        widget.composeUserHeaderBuilder?.call(context, user!) ??
-                            widgetUtility.composeScreenUserHeaderBuilder(
-                                context, user!),
-                        const SizedBox(height: 18),
-                        widget.composeContentBuilder?.call() ??
-                            _defContentInput(),
-                        const SizedBox(height: 18),
-                        widget.composeMediaPreviewBuilder?.call() ??
-                            _defMediaPreview(),
-                        const SizedBox(height: 150),
-                      ],
+      child: BlocConsumer(
+          listener: (prev, curr) {
+            if (curr is LMFeedGetPostSuccessState) {
+              onBoardPostDetails(curr.post);
+            } else if (curr is LMFeedPostErrorState) {
+              LMFeedCore.showSnackBar(LMFeedSnackBar(
+                  content: LMFeedText(
+                text: curr.errorMessage,
+              )));
+            }
+          },
+          bloc: LMFeedPostBloc.instance,
+          builder: (context, state) {
+            if (state is LMFeedGetPostLoadingState) {
+              return Scaffold(
+                backgroundColor: feedTheme.container,
+                body: Center(child: LMFeedLoader()),
+              );
+            } else if (state is LMFeedGetPostSuccessState) {
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: config!.composeSystemOverlayStyle,
+                child: GestureDetector(
+                  onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                  child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
+                    bloc: composeBloc,
+                    listener: _composeBlocListener,
+                    child: widgetUtility.scaffold(
+                      source: LMFeedWidgetSource.editPostScreen,
+                      backgroundColor: feedTheme.container,
+                      appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
+                          _defAppBar(),
+                      floatingActionButton: Padding(
+                        padding: const EdgeInsets.only(left: 16.0),
+                        child:
+                            BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
+                          bloc: composeBloc,
+                          buildWhen: (previous, current) {
+                            if (current is LMFeedComposeFetchedTopicsState) {
+                              return true;
+                            }
+                            return false;
+                          },
+                          builder: (context, state) {
+                            if (state is LMFeedComposeFetchedTopicsState) {
+                              return widget.composeTopicSelectorBuilder?.call(
+                                      context,
+                                      _defTopicSelector(state.topics),
+                                      composeBloc.selectedTopics) ??
+                                  LMFeedCore.widgetUtility
+                                      .composeScreenTopicSelectorBuilder(
+                                          context,
+                                          _defTopicSelector(state.topics),
+                                          composeBloc.selectedTopics);
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                      body: SafeArea(
+                        child: Container(
+                          margin: EdgeInsets.only(
+                            bottom: 100,
+                          ),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 18),
+                                widget.composeUserHeaderBuilder
+                                        ?.call(context, user!) ??
+                                    widgetUtility
+                                        .composeScreenUserHeaderBuilder(
+                                            context, user!),
+                                const SizedBox(height: 18),
+                                widget.composeContentBuilder?.call() ??
+                                    _defContentInput(),
+                                const SizedBox(height: 18),
+                                widget.composeMediaPreviewBuilder?.call() ??
+                                    _defMediaPreview(),
+                                const SizedBox(height: 150),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
-        ),
-      ),
+              );
+            } else {
+              return Scaffold(
+                backgroundColor: feedTheme.container,
+                body: const SizedBox(),
+              );
+            }
+          }),
     );
   }
 
@@ -1057,9 +1087,6 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     }
 
     return Container(
-      margin: const EdgeInsets.only(
-        bottom: 25,
-      ),
       child: Row(
         children: [
           Align(

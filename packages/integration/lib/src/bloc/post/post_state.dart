@@ -111,12 +111,14 @@ class LMFeedPostUpdateState extends LMFeedPostState {
   final LMFeedPostActionType actionType;
   final String postId;
   final String? commentId;
+  final LMFeedWidgetSource? source;
 
   const LMFeedPostUpdateState({
     this.post,
     required this.postId,
     required this.actionType,
     this.commentId,
+    this.source,
   });
 
   @override

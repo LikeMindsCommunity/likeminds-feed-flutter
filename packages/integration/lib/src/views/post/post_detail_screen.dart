@@ -158,15 +158,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                       _postDetailScreenHandler!.rebuildPostWidget.value =
                           !_postDetailScreenHandler!.rebuildPostWidget.value;
                     }
-                  }
-                  if (state is LMFeedEditPostUploadedState) {
+                  } else if (state is LMFeedEditPostUploadedState) {
                     LMPostViewData editedPost = state.postData;
 
                     _postDetailScreenHandler!.postData = editedPost;
                     _postDetailScreenHandler!.rebuildPostWidget.value =
                         !_postDetailScreenHandler!.rebuildPostWidget.value;
-                  }
-                  if (state is LMFeedPostDeletionErrorState) {
+                  } else if (state is LMFeedPostDeletionErrorState) {
                     LMFeedCore.showSnackBar(
                       LMFeedSnackBar(
                         content: LMFeedText(text: (state).message),
@@ -669,7 +667,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => LMFeedEditPostScreen(
-                  postViewData: _postDetailScreenHandler!.postData!,
+                  postId: widget.postId,
                 ),
               ),
             );

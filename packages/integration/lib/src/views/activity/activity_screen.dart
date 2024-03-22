@@ -428,7 +428,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => LMFeedEditPostScreen(
-                    postViewData: postViewData,
+                    postId: postViewData.id,
                   ),
                 ),
               );

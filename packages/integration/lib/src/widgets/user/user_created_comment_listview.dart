@@ -362,7 +362,7 @@ class _LMFeedUserCreatedCommentListViewState
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => LMFeedEditPostScreen(
-                    postViewData: postViewData,
+                    postId: postViewData.id,
                   ),
                 ),
               );
@@ -619,7 +619,7 @@ class _LMFeedUserCreatedCommentListViewState
             ),
             const SizedBox(height: 12),
             const LMFeedText(
-              text: 'No posts to show',
+              text: 'No Replies to show',
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 24,

@@ -250,7 +250,6 @@ class _LMFeedUserCreatedPostListViewState
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
-
       },
       child: ValueListenableBuilder(
           valueListenable: rebuildPostWidget,
@@ -454,7 +453,7 @@ class _LMFeedUserCreatedPostListViewState
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => LMFeedEditPostScreen(
-                  postViewData: postViewData,
+                  postId: postViewData.id,
                 ),
               ),
             );
@@ -515,7 +514,7 @@ class _LMFeedUserCreatedPostListViewState
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData.mediaStyle,
-        carouselIndicatorBuilder:
+      carouselIndicatorBuilder:
           _widgetsBuilder.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
         VideoController? postVideoController = LMFeedVideoProvider.instance

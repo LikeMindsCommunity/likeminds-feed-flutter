@@ -473,7 +473,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => LMFeedEditPostScreen(
-                    postViewData: postViewData,
+                    postId: postViewData.id,
                   ),
                 ),
               );

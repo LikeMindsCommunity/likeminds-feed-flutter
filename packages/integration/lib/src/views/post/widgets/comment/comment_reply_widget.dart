@@ -402,8 +402,21 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   .toList() ??
               [];
         } else if (state is LMFeedPaginatedCommentRepliesLoadingState) {
-          users = state.prevCommentDetails.users!.map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
+          Map<String, LMWidgetViewData>? widgets =
+              state.prevCommentDetails.widgets?.map((key, value) => MapEntry(
+                  key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+          Map<String, LMTopicViewData>? topics = state.prevCommentDetails.topics
+              ?.map((key, value) => MapEntry(key,
+                  LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
+          users = state.prevCommentDetails.users!.map((key, value) => MapEntry(
+              key,
+              LMUserViewDataConvertor.fromUser(value,
+                  topics: topics,
+                  userTopics: state.prevCommentDetails.userTopics,
+                  widgets: widgets)));
+
           users.putIfAbsent(user.uuid, () => user);
           replies = state.prevCommentDetails.postReplies!.replies
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
@@ -423,6 +436,13 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       style: replyStyle,
       comment: commentViewData,
       onTagTap: (String uuid) {
+        LMFeedProfileBloc.instance.add(
+          LMFeedRouteToUserProfileEvent(
+            uuid: commentViewData.user.sdkClientInfo.uuid,
+            context: context,
+          ),
+        );
+
         LMFeedCore.instance.lmFeedClient.routeToProfile(uuid);
       },
       user: commentViewData.user,
@@ -434,8 +454,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         ),
         fallbackText: commentViewData.user.name,
         onTap: () {
+          LMFeedProfileBloc.instance.add(
+            LMFeedRouteToUserProfileEvent(
+              uuid: commentViewData.user.sdkClientInfo.uuid,
+              context: context,
+            ),
+          );
+
           LMFeedCore.instance.lmFeedClient
-              .routeToProfile(user.sdkClientInfo.uuid);
+              .routeToProfile(commentViewData.user.sdkClientInfo.uuid);
         },
       ),
       lmFeedMenuAction: defLMFeedMenuAction(

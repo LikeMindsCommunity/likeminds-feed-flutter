@@ -2,6 +2,8 @@ part of '../post_bloc.dart';
 
 void getPostEventHandler(
     LMFeedGetPostEvent event, Emitter<LMFeedPostState> emit) async {
+  emit(LMFeedGetPostLoadingState());
+
   PostDetailRequest postDetailRequest = (PostDetailRequestBuilder()
         ..postId(event.postId)
         ..page(event.page)
