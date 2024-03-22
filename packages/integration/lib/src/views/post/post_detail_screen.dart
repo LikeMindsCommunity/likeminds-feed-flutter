@@ -1419,6 +1419,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                             commentMetaData: commentMetaData));
                                   }
                                 } else {
+                                  DateTime currentTime = DateTime.now();
+
                                   LMCommentMetaData commentMetaData =
                                       (LMCommentMetaDataBuilder()
                                             ..commentActionEntity(
@@ -1440,6 +1442,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     addCommentRequest.tempId ?? '',
                                     commentText,
                                     0,
+                                    createdTime: currentTime,
                                   );
                                   _postDetailScreenHandler!.commentHandlerBloc
                                       .add(LMFeedCommentActionEvent(

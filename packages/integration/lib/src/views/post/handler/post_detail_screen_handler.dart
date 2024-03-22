@@ -176,10 +176,6 @@ class LMFeedPostDetailScreenHandler {
 
           replaceTempCommentWithActualComment(commentViewData);
 
-          // LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-          //     postId: postData!.id,
-          //     actionType: LMFeedPostActionType.commentAdded));
-
           rebuildPostWidget.value = !rebuildPostWidget.value;
           break;
         }
@@ -237,8 +233,34 @@ class LMFeedPostDetailScreenHandler {
           AddCommentReplyResponse response = commentSuccessState
               .commentActionResponse as AddCommentReplyResponse;
 
+          Map<String, LMWidgetViewData> responseWidgets = response.widgets?.map(
+                  (key, value) => MapEntry(
+                      key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
+              {};
+
+          Map<String, LMTopicViewData> responseTopics = response.topics?.map(
+                  (key, value) => MapEntry(
+                      key,
+                      LMTopicViewDataConvertor.fromTopic(value,
+                          widgets: responseWidgets))) ??
+              {};
+
+          Map<String, LMUserViewData> responseUsers =
+              response.users?.map((key, value) => MapEntry(
+                      key,
+                      LMUserViewDataConvertor.fromUser(
+                        value,
+                        topics: responseTopics,
+                        widgets: responseWidgets,
+                        userTopics: response.userTopics,
+                      ))) ??
+                  {};
+
           LMCommentViewData commentViewData =
-              LMCommentViewDataConvertor.fromComment(response.reply!, users);
+              LMCommentViewDataConvertor.fromComment(
+            response.reply!,
+            responseUsers,
+          );
 
           if (response.reply!.parentComment != null) {
             updateCommentInController(commentViewData.parentComment!);
@@ -329,7 +351,8 @@ class LMFeedPostDetailScreenHandler {
     }
   }
 
-  void addTempCommentToController(String tempId, String text, int level) {
+  void addTempCommentToController(String tempId, String text, int level,
+      {DateTime? createdTime}) {
     LMUserViewData currentUser =
         LMFeedLocalPreference.instance.fetchUserData()!;
 
@@ -342,8 +365,8 @@ class LMFeedPostDetailScreenHandler {
           ..isEdited(false)
           ..repliesCount(0)
           ..menuItems([])
-          ..createdAt(DateTime.now())
-          ..updatedAt(DateTime.now())
+          ..createdAt(createdTime ?? DateTime.now())
+          ..updatedAt(createdTime ?? DateTime.now())
           ..isLiked(false)
           ..user(currentUser)
           ..tempId(tempId))

@@ -381,8 +381,21 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
           rebuildReplyList.value = !rebuildReplyList.value;
         }
         if (state is LMFeedCommentRepliesLoadedState) {
-          users = state.commentDetails.users!.map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value)));
+          Map<String, LMWidgetViewData>? widgets = state.commentDetails.widgets
+              ?.map((key, value) => MapEntry(
+                  key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+          Map<String, LMTopicViewData>? topics = state.commentDetails.topics
+              ?.map((key, value) =>
+                  MapEntry(key, LMTopicViewDataConvertor.fromTopic(value)));
+
+          users = state.commentDetails.users!.map((key, value) => MapEntry(
+              key,
+              LMUserViewDataConvertor.fromUser(value,
+                  topics: topics,
+                  userTopics: state.commentDetails.userTopics,
+                  widgets: widgets)));
+
           users.putIfAbsent(user.uuid, () => user);
           replies = state.commentDetails.postReplies!.replies
                   ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
