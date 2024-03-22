@@ -718,6 +718,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           (config?.enableHeading ?? false)
               ? TextField(
                   controller: _headingController,
+                  textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
