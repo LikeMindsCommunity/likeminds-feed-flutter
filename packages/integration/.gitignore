@@ -81,3 +81,4 @@ build/
 .fvm/
 .fvmrc
 .vscode/
+/pubspec.lock

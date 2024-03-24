@@ -34,6 +34,6 @@ build/
 .metadata
 
 # FVM Version Cache
-.fvm/
-.fvmrc
-.vscode/
+/.fvm/
+/.fvmrc
+/.vscode/
