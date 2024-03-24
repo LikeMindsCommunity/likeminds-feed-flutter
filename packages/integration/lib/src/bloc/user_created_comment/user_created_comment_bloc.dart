@@ -8,9 +8,10 @@ part 'user_created_comment_state.dart';
 
 class LMFeedUserCreatedCommentBloc
     extends Bloc<LMFeedUserCreatedCommentEvent, LMFeedUserCreatedCommentState> {
-  LMFeedUserCreatedCommentBloc() : super(UserCreatedCommentInitialState()) {
-    on<LMFeedUserCreatedCommentGetEvent>((event, emit) async {
-      emit(UserCreatedCommentLoadingState());
+  LMFeedUserCreatedCommentBloc()
+      : super(LMFeedUserCreatedCommentInitialState()) {
+    on<LMFeedGetUserCreatedCommentEvent>((event, emit) async {
+      emit(LMFeedUserCreatedCommentLoadingState());
       try {
         final request = (GetUserCommentsRequestBuilder()
               ..page(event.page)
@@ -56,16 +57,16 @@ class LMFeedUserCreatedCommentBloc
               ) ??
               {};
 
-          emit(UserCreatedCommentLoadedState(
+          emit(LMFeedUserCreatedCommentLoadedState(
               comments: comments, posts: posts, page: event.page));
         } else {
-          emit(UserCreatedCommentErrorState(
+          emit(LMFeedUserCreatedCommentErrorState(
               errorMessage: response.errorMessage ??
                   "An error occurred, Please try again"));
         }
       } catch (e, s) {
         debugPrint(s.toString());
-        emit(UserCreatedCommentErrorState(errorMessage: e.toString()));
+        emit(LMFeedUserCreatedCommentErrorState(errorMessage: e.toString()));
       }
     });
   }
