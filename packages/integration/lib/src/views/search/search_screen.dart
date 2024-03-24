@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:async/async.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedSearchScreen extends StatefulWidget {
   const LMFeedSearchScreen({
@@ -185,9 +184,12 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         listener: (context, state) {
           if (state is LMFeedNewPostErrorState) {
             postUploading.value = false;
-            toast(
-              state.errorMessage,
-              duration: Toast.LENGTH_LONG,
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                  text: state.errorMessage,
+                ),
+              ),
             );
           }
           if (state is LMFeedNewPostUploadedState) {
@@ -267,7 +269,13 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           },
           listener: (context, state) {
             if (state is LMFeedSearchErrorState) {
-              toast(state.message);
+              LMFeedCore.showSnackBar(
+                LMFeedSnackBar(
+                  content: LMFeedText(
+                    text: state.message,
+                  ),
+                ),
+              );
             }
             if (state is LMFeedSearchLoadedState) {
               // FocusScope.of(context).unfocus();
@@ -714,9 +722,12 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               ),
             );
           } else {
-            toast(
-              'A post is already uploading.',
-              duration: Toast.LENGTH_LONG,
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                  text: 'A post is already uploading.',
+                ),
+              ),
             );
           }
         },
@@ -821,13 +832,22 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                         );
                         await postVideoController?.player.pause();
                       } else {
-                        toast(
-                          'A post is already uploading.',
-                          duration: Toast.LENGTH_LONG,
+                        LMFeedCore.showSnackBar(
+                          LMFeedSnackBar(
+                            content: LMFeedText(
+                              text: 'A post is already uploading.',
+                            ),
+                          ),
                         );
                       }
                     }
-                  : () => toast("You do not have permission to create a post"),
+                  : () => LMFeedCore.showSnackBar(
+                        LMFeedSnackBar(
+                          content: LMFeedText(
+                            text: "You do not have permission to create a post",
+                          ),
+                        ),
+                      ),
             ),
           ],
         ),
