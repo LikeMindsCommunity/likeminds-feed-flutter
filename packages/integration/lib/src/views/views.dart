@@ -14,5 +14,4 @@ export 'activity/notification_screen.dart';
 export 'search/search_screen.dart';
 export 'media/media_preview_screen.dart';
 
-export 'post/widgets/delete_dialog.dart';
 export 'post/edit_post_screen.dart';
