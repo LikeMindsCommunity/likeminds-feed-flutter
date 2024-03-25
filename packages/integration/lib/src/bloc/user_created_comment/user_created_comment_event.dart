@@ -5,11 +5,11 @@ abstract class LMFeedUserCreatedCommentEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LMFeedUserCreatedCommentGetEvent extends LMFeedUserCreatedCommentEvent {
+class LMFeedGetUserCreatedCommentEvent extends LMFeedUserCreatedCommentEvent {
   final String uuid;
   final int page;
   final int pageSize;
-  LMFeedUserCreatedCommentGetEvent({
+  LMFeedGetUserCreatedCommentEvent({
     required this.uuid,
     required this.page,
     required this.pageSize,

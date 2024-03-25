@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedDeleteConfirmationDialog extends StatelessWidget {
   final String title;
@@ -46,9 +47,12 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            LMFeedText(
+                text: title,
+                style: LMFeedTextStyle(
+                    textStyle: const TextStyle(fontWeight: FontWeight.bold))),
             LikeMindsTheme.kVerticalPaddingLarge,
-            Text(content),
+            LMFeedText(text: content),
             currentUser.sdkClientInfo.uuid == uuid
                 ? const SizedBox.shrink()
                 : isCm
@@ -113,17 +117,23 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                           padding:
                                                               EdgeInsets.only(
                                                                   left: 10.0),
-                                                          child: Text(
-                                                            'Reason for deletion',
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize:
-                                                                  LikeMindsTheme
-                                                                      .kFontMedium,
+                                                          child: LMFeedText(
+                                                            text:
+                                                                'Reason for deletion',
+                                                            style:
+                                                                LMFeedTextStyle(
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                              textStyle:
+                                                                  TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize:
+                                                                    LikeMindsTheme
+                                                                        .kFontMedium,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -179,9 +189,9 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                                         ),
                                                                         LikeMindsTheme
                                                                             .kHorizontalPaddingLarge,
-                                                                        Text(
-                                                                          reportTags[index]
-                                                                              .name,
+                                                                        LMFeedText(
+                                                                          text:
+                                                                              reportTags[index].name,
                                                                         ),
                                                                       ],
                                                                     ),
@@ -234,8 +244,8 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          reasonForDeletion == null
+                                        LMFeedText(
+                                          text: reasonForDeletion == null
                                               ? 'Reason for deletion'
                                               : reasonForDeletion!.name,
                                         ),
@@ -262,11 +272,13 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      color: feedTheme.onContainer.withOpacity(0.8),
-                      fontWeight: FontWeight.w600,
+                  child: LMFeedText(
+                    text: 'Cancel',
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        color: feedTheme.onContainer.withOpacity(0.8),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -293,11 +305,13 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                       EdgeInsets.zero,
                     ),
                   ),
-                  child: Text(
-                    actionText,
-                    style: TextStyle(
-                      color: feedTheme.primaryColor,
-                      fontWeight: FontWeight.w600,
+                  child: LMFeedText(
+                    text: actionText,
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        color: feedTheme.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 )

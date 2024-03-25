@@ -7,7 +7,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/edit_post_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/post/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedList extends StatefulWidget {

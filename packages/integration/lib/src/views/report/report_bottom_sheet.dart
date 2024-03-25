@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedReportBottomSheet extends StatefulWidget {
   final String entityId; // post, comment, reply id
@@ -98,15 +97,17 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
           bloc: reportBloc,
           listener: (context, state) {
             if (state is LMFeedReportSubmitFailedState) {
-              toast(
-                state.error,
-              );
+              LMFeedCore.showSnackBar(LMFeedSnackBar(
+                  content: LMFeedText(
+                text: state.error,
+              )));
             } else if (state is LMFeedReportSubmittedState) {
               Navigator.of(context).pop();
-              toast(
-                widget.successMessage ??
+              LMFeedCore.showSnackBar(LMFeedSnackBar(
+                  content: LMFeedText(
+                text: widget.successMessage ??
                     'Reported! Thanks for making our community a safe place',
-              );
+              )));
             }
           },
           builder: (context, state) {

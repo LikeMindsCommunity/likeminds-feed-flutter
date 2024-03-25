@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/user_created_comment/user_created_comment_bloc.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class LMFeedUserCreatedCommentListView extends StatefulWidget {
   const LMFeedUserCreatedCommentListView({
@@ -64,7 +62,7 @@ class _LMFeedUserCreatedCommentListViewState
     _pagingController.addPageRequestListener(
       (pageKey) {
         _userCreatedCommentBloc.add(
-          LMFeedUserCreatedCommentGetEvent(
+          LMFeedGetUserCreatedCommentEvent(
             uuid: widget.uuid,
             page: pageKey,
             pageSize: pageSize,
@@ -77,7 +75,7 @@ class _LMFeedUserCreatedCommentListViewState
   void refresh() => _pagingController.refresh();
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(UserCreatedCommentLoadedState state) {
+  void updatePagingControllers(LMFeedUserCreatedCommentLoadedState state) {
     if (state.comments.length < 10) {
       _pagingController.appendLastPage(state.comments);
       _posts.addAll(state.posts);
@@ -123,7 +121,7 @@ class _LMFeedUserCreatedCommentListViewState
                   LMFeedUserCreatedCommentState>(
                 bloc: _userCreatedCommentBloc,
                 listener: (context, state) {
-                  if (state is UserCreatedCommentLoadedState) {
+                  if (state is LMFeedUserCreatedCommentLoadedState) {
                     updatePagingControllers(state);
                   }
                 },
@@ -582,9 +580,12 @@ class _LMFeedUserCreatedCommentListViewState
               ),
             );
           } else {
-            toast(
-              'A post is already uploading.',
-              duration: Toast.LENGTH_LONG,
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                  text: 'A post is already uploading.',
+                ),
+              ),
             );
           }
         },
@@ -694,13 +695,22 @@ class _LMFeedUserCreatedCommentListViewState
                         );
                         await postVideoController?.player.pause();
                       } else {
-                        toast(
-                          'A post is already uploading.',
-                          duration: Toast.LENGTH_LONG,
+                        LMFeedCore.showSnackBar(
+                          LMFeedSnackBar(
+                            content: LMFeedText(
+                              text: 'A post is already uploading.',
+                            ),
+                          ),
                         );
                       }
                     }
-                  : () => toast("You do not have permission to create a post"),
+                  : () => LMFeedCore.showSnackBar(
+                        LMFeedSnackBar(
+                          content: const Text(
+                            'You do not have permission to create a post',
+                          ),
+                        ),
+                      ),
             ),
           ],
         ),

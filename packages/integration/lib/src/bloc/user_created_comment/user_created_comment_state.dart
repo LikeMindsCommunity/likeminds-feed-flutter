@@ -5,19 +5,19 @@ abstract class LMFeedUserCreatedCommentState extends Equatable {
   List<Object> get props => [];
 }
 
-final class UserCreatedCommentInitialState
+final class LMFeedUserCreatedCommentInitialState
     extends LMFeedUserCreatedCommentState {}
 
-final class UserCreatedCommentLoadingState
+final class LMFeedUserCreatedCommentLoadingState
     extends LMFeedUserCreatedCommentState {}
 
-final class UserCreatedCommentLoadedState
+final class LMFeedUserCreatedCommentLoadedState
     extends LMFeedUserCreatedCommentState {
   final List<LMCommentViewData> comments;
   final Map<String, LMPostViewData> posts;
   final int page;
 
-  UserCreatedCommentLoadedState({
+  LMFeedUserCreatedCommentLoadedState({
     required this.comments,
     required this.posts,
     required this.page,
@@ -26,9 +26,10 @@ final class UserCreatedCommentLoadedState
   List<Object> get props => [comments, posts];
 }
 
-final class UserCreatedCommentErrorState extends LMFeedUserCreatedCommentState {
+final class LMFeedUserCreatedCommentErrorState
+    extends LMFeedUserCreatedCommentState {
   final String errorMessage;
-  UserCreatedCommentErrorState({required this.errorMessage});
+  LMFeedUserCreatedCommentErrorState({required this.errorMessage});
   @override
   List<Object> get props => [errorMessage];
 }
