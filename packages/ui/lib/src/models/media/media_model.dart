@@ -50,6 +50,86 @@ class LMMediaModel {
       throw 'no valid media type provided';
     }
   }
+
+  LMAttachmentViewData toAttachmentViewData() {
+    LMAttachmentViewDataBuilder attachmentViewData =
+        LMAttachmentViewDataBuilder();
+    int attachmentType = mapMediaTypeToInt();
+
+    attachmentViewData.attachmentType(attachmentType);
+
+    LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
+        LMAttachmentMetaViewDataBuilder();
+
+    if (link != null) {
+      attachmentMetaViewDataBuilder.url(link!);
+    }
+
+    if (format != null) {
+      attachmentMetaViewDataBuilder.format(format!);
+    }
+
+    if (size != null) {
+      attachmentMetaViewDataBuilder.size(size!);
+    }
+
+    if (duration != null) {
+      attachmentMetaViewDataBuilder.duration(duration!);
+    }
+
+    if (ogTags != null) {
+      attachmentMetaViewDataBuilder.ogTags(ogTags!);
+    }
+
+    if (mediaType == LMMediaType.repost) {
+      attachmentMetaViewDataBuilder.repost(post!);
+    }
+
+    if (mediaType == LMMediaType.widget) {
+      attachmentMetaViewDataBuilder.meta(widgetsMeta!);
+    }
+
+    attachmentViewData.attachmentMeta(attachmentMetaViewDataBuilder.build());
+
+    return attachmentViewData.build();
+  }
+
+  static LMMediaModel fromAttachmentViewData(LMAttachmentViewData attachment) {
+    LMMediaType mediaType = mapIntToMediaType(attachment.attachmentType);
+    LMMediaModel mediaModel = LMMediaModel(mediaType: mediaType);
+
+    LMAttachmentMetaViewData attachmentMeta = attachment.attachmentMeta;
+
+    if (attachmentMeta.url != null) {
+      mediaModel.link = attachmentMeta.url;
+    }
+
+    if (attachmentMeta.format != null) {
+      mediaModel.format = attachmentMeta.format;
+    }
+
+    if (attachmentMeta.size != null) {
+      mediaModel.size = attachmentMeta.size;
+    }
+
+    if (attachmentMeta.duration != null) {
+      mediaModel.duration = attachmentMeta.duration;
+    }
+
+    if (attachmentMeta.ogTags != null) {
+      mediaModel.ogTags = attachmentMeta.ogTags;
+    }
+
+    if (attachmentMeta.meta != null) {
+      mediaModel.widgetsMeta = attachmentMeta.meta;
+    }
+
+    if (attachmentMeta.repost != null) {
+      mediaModel.post = attachmentMeta.repost;
+    }
+
+    return mediaModel;
+  }
 }
 
 LMMediaType mapIntToMediaType(int attachmentType) {

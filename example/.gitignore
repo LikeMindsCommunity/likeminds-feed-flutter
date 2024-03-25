@@ -49,3 +49,9 @@ app.*.map.json
 
 
 google-services.json
+.env.fb
+
+.fvm
+.fvmrc
+/.pubspec.lock
+.vscode

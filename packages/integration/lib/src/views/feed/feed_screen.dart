@@ -1,18 +1,21 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/widgets/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 part 'feed_screen_configuration.dart';
 
+/// {@template feed_screen}
+/// A screen to display the feed.
+/// The feed can be customized by passing in the required parameters
+/// Post creation can be enabled or disabled
+/// Post Builder can be used to customize the post widget
+/// Topic Chip Builder can be used to customize the topic chip widget
+///
+/// {@endtemplate}
 class LMFeedScreen extends StatefulWidget {
   const LMFeedScreen({
     super.key,
@@ -20,25 +23,24 @@ class LMFeedScreen extends StatefulWidget {
     this.customWidgetBuilder,
     this.topicChipBuilder,
     this.postBuilder,
-    this.floatingActionButton,
-    this.emptyFeedViewBuilder,
-    this.firstPageLoaderBuilder,
-    this.paginationLoaderBuilder,
-    this.feedErrorViewBuilder,
-    this.noNewPageWidgetBuilder,
-    this.enablePostCreation = true,
+    this.floatingActionButtonBuilder,
     this.config,
     this.topicBarBuilder,
+    this.floatingActionButtonLocation,
+    this.noItemsFoundIndicatorBuilder,
+    this.firstPageProgressIndicatorBuilder,
+    this.newPageProgressIndicatorBuilder,
+    this.noMoreItemsIndicatorBuilder,
+    this.firstPageErrorIndicatorBuilder,
+    this.newPageErrorIndicatorBuilder,
   });
 
-  //Builder for appbar
+  // Builder for appbar
   final LMFeedPostAppBarBuilder? appBar;
 
-  //Callback for activity
-
-  //Builder for custom widget on top
+  // Builder for custom widget on top
   final LMFeedContextWidgetBuilder? customWidgetBuilder;
-  //Builder for topic chip [Button]
+  // Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
 
@@ -47,22 +49,24 @@ class LMFeedScreen extends StatefulWidget {
   final LMFeedPostWidgetBuilder? postBuilder;
   // Floating action button
   // i.e. new post button
-  final Widget? floatingActionButton;
+  final LMFeedContextButtonBuilder? floatingActionButtonBuilder;
   // {@macro context_widget_builder}
   // Builder for empty feed view
-  final LMFeedContextWidgetBuilder? emptyFeedViewBuilder;
+  final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
   // Builder for first page loader when no post are there
-  final LMFeedContextWidgetBuilder? firstPageLoaderBuilder;
+  final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;
   // Builder for pagination loader when more post are there
-  final LMFeedContextWidgetBuilder? paginationLoaderBuilder;
-  // Builder for error view when error occurs
-  final LMFeedContextWidgetBuilder? feedErrorViewBuilder;
+  final LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder;
   // Builder for widget when no more post are there
-  final LMFeedContextWidgetBuilder? noNewPageWidgetBuilder;
+  final LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder;
+  // Builder for error view while loading a new page
+  final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
+  // Builder for error view while loading the first page
+  final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
   final LMFeedTopicBarBuilder? topicBarBuilder;
 
-  final bool enablePostCreation;
+  final FloatingActionButtonLocation? floatingActionButtonLocation;
 
   final LMFeedScreenConfig? config;
 
@@ -71,9 +75,11 @@ class LMFeedScreen extends StatefulWidget {
 }
 
 class _LMFeedScreenState extends State<LMFeedScreen> {
+  LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
+  LMFeedThemeData feedThemeData = LMFeedCore.theme;
+  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
-  bool right = true;
 
   LMFeedScreenConfig? config;
   /* 
@@ -91,11 +97,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   // bloc to handle universal feed
   late final LMFeedBloc _feedBloc; // bloc to fetch the feedroom data
-  bool isCm = LMFeedUserLocalPreference.instance
-      .fetchMemberState(); // whether the logged in user is a community manager or not
+  bool isCm = LMFeedUserUtils
+      .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
-  LMUserViewData user = LMUserViewDataConvertor.fromUser(
-      LMFeedUserLocalPreference.instance.fetchUserData());
+  LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
   // future to get the unread notification count
   late Future<GetUnreadNotificationCountResponse> getUnreadNotificationCount;
@@ -109,8 +114,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   bool userPostingRights = true;
 
-  LMFeedThemeData? feedThemeData;
-
   @override
   void initState() {
     super.initState();
@@ -123,7 +126,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedBloc.instance;
-    userPostingRights = checkPostCreationRights();
+    userPostingRights = LMFeedUserUtils.checkPostCreationRights();
 
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
@@ -136,24 +139,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
-  bool checkPostCreationRights() {
-    final MemberStateResponse memberStateResponse =
-        LMFeedUserLocalPreference.instance.fetchMemberRights();
-    if (!memberStateResponse.success || memberStateResponse.state == 1) {
-      return true;
-    }
-    final memberRights = LMFeedUserLocalPreference.instance.fetchMemberRight(9);
-    return memberRights;
-  }
-
   void updateSelectedTopics(List<LMTopicViewData> topics) {
     _feedBloc.selectedTopics = topics;
     rebuildTopicFeed.value = !rebuildTopicFeed.value;
     clearPagingController();
     _feedBloc.add(
       LMFeedGetUniversalFeedEvent(
-        offset: 1,
-        topics: _feedBloc.selectedTopics,
+        pageKey: 1,
+        topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
       ),
     );
   }
@@ -173,15 +166,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
-  int _pageFeed = 1; // current index of FeedRoom
-
   void _addPaginationListener() {
     _pagingController.addPageRequestListener(
       (pageKey) {
         _feedBloc.add(
           LMFeedGetUniversalFeedEvent(
-            offset: pageKey,
-            topics: _feedBloc.selectedTopics,
+            pageKey: pageKey,
+            topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
           ),
         );
       },
@@ -191,9 +182,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   void refresh() => _pagingController.refresh();
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(Object? state) {
+  void updatePagingControllers(LMFeedState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
-      _pageFeed++;
       List<LMPostViewData> listOfPosts = state.posts;
 
       _feedBloc.users.addAll(state.users);
@@ -203,7 +193,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       if (state.posts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
-        _pagingController.appendPage(listOfPosts, _pageFeed);
+        _pagingController.appendPage(listOfPosts, state.pageKey + 1);
       }
     }
   }
@@ -214,16 +204,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
     if (_pagingController.itemList != null) _pagingController.itemList?.clear();
-    _pageFeed = 1;
   }
 
-  void showTopicSelectSheet() {
+  void showTopicSelectSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       elevation: 5,
       isDismissible: true,
       useRootNavigator: true,
-      backgroundColor: feedThemeData?.container,
+      backgroundColor: feedThemeData.container,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(28.0),
@@ -242,7 +231,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
-  void navigateToTopicSelectScreen() {
+  void navigateToTopicSelectScreen(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -257,20 +246,27 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
-    feedThemeData = LMFeedTheme.of(context);
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
-    return Scaffold(
-      backgroundColor: feedThemeData?.backgroundColor,
+    return _widgetsBuilder.scaffold(
+      source: LMFeedWidgetSource.universalFeed,
+      backgroundColor: feedThemeData.backgroundColor,
       appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
-      floatingActionButton: defFloatingActionButton(),
+      floatingActionButton: ValueListenableBuilder(
+        valueListenable: rebuildPostWidget,
+        builder: (context, _, __) {
+          return widget.floatingActionButtonBuilder
+                  ?.call(context, defFloatingActionButton(context)) ??
+              defFloatingActionButton(context);
+        },
+      ),
+      floatingActionButtonLocation: widget.floatingActionButtonLocation,
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
           refresh();
           clearPagingController();
         },
-        color: feedThemeData?.primaryColor,
-        backgroundColor: feedThemeData?.container,
+        color: feedThemeData.primaryColor,
+        backgroundColor: feedThemeData.container,
         child: CustomScrollView(
           controller: _controller,
           slivers: [
@@ -297,9 +293,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                           builder: (context) =>
                                               const LMFeedComposeScreen()));
                                 }
-                              : () => toast(
-                                  "You do not have permission to create a post"),
-                        )
+                              : () {
+                                  LMFeedCore.showSnackBar(
+                                    LMFeedSnackBar(
+                                      content: LMFeedText(
+                                        text:
+                                            "You do not have permission to create a post",
+                                      ),
+                                    ),
+                                  );
+                                })
                       : widget.customWidgetBuilder!(context)
                   : const SizedBox(),
             ),
@@ -336,6 +339,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 bloc: newPostBloc,
                 listener: (prev, curr) {
                   if (curr is LMFeedPostDeletedState) {
+                    // show a snackbar when post is deleted
+                    // will only be shown if a messenger key is provided
+                    LMFeedCore.showSnackBar(
+                      LMFeedSnackBar(
+                        content: LMFeedText(
+                          text: 'Post Deleted',
+                        ),
+                      ),
+                    );
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     feedRoomItemList
@@ -398,28 +410,40 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   }
                   if (curr is LMFeedNewPostErrorState) {
                     postUploading.value = false;
-                    toast(
-                      curr.message,
-                      duration: Toast.LENGTH_LONG,
+                    LMFeedCore.showSnackBar(
+                      LMFeedSnackBar(
+                        content: LMFeedText(
+                          text: curr.errorMessage,
+                        ),
+                      ),
                     );
                   }
                   if (curr is LMFeedPostUpdateState) {
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     int index = feedRoomItemList?.indexWhere(
-                            (element) => element.id == curr.post.id) ??
+                            (element) => element.id == curr.postId) ??
                         -1;
                     if (index != -1) {
-                      feedRoomItemList![index] = curr.post;
+                      feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
+                          feedRoomItemList[index], curr.actionType,
+                          commentId: curr.commentId);
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
+                  }
+                  if (curr is LMFeedPostDeletionErrorState) {
+                    LMFeedCore.showSnackBar(
+                      LMFeedSnackBar(
+                        content: LMFeedText(text: (curr).message),
+                      ),
+                    );
                   }
                 },
                 builder: (context, state) {
                   if (state is LMFeedEditPostUploadingState) {
                     return Container(
                       height: 60,
-                      color: feedThemeData?.container,
+                      color: feedThemeData.container,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: const Row(
@@ -443,8 +467,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   if (state is LMFeedNewPostUploadingState) {
                     return Container(
                       height: 60,
-                      color: feedThemeData?.backgroundColor ??
-                          LikeMindsTheme.whiteColor,
+                      color: feedThemeData.backgroundColor,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
@@ -470,7 +493,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                         ? null
                                         : snapshot.data?.toDouble()),
                                     valueColor: AlwaysStoppedAnimation(
-                                        feedThemeData?.primaryColor),
+                                        feedThemeData.primaryColor),
                                     strokeWidth: 3,
                                   ),
                                 );
@@ -484,44 +507,65 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 },
               ),
             ),
-            BlocListener(
+            BlocListener<LMFeedBloc, LMFeedState>(
               bloc: _feedBloc,
-              listener: (context, state) => updatePagingControllers(state),
+              listener: (context, LMFeedState state) =>
+                  updatePagingControllers(state),
               child: ValueListenableBuilder(
                 valueListenable: rebuildPostWidget,
                 builder: (context, _, __) {
                   return PagedSliverList<int, LMPostViewData>(
                     pagingController: _pagingController,
                     builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
+                      itemBuilder: (context, item, index) {
+                        if (_feedBloc.users[item.uuid] == null) {
+                          return const SizedBox();
+                        }
+                        LMFeedPostWidget postWidget =
+                            defPostWidget(context, feedThemeData, item);
+                        return widget.postBuilder
+                                ?.call(context, postWidget, item) ??
+                            LMFeedCore.widgetUtility.postWidgetBuilder
+                                .call(context, postWidget, item);
+                      },
                       noItemsFoundIndicatorBuilder: (context) {
                         if (_feedBloc.state is LMFeedUniversalFeedLoadedState &&
                             (_feedBloc.state as LMFeedUniversalFeedLoadedState)
                                 .topics
                                 .isNotEmpty) {
-                          return noPostUnderTopicWidget();
+                          return _widgetsBuilder.noPostUnderTopicFeed(context,
+                              actionable: changeFilter(context));
                         }
-                        return noPostInFeedWidget();
+                        return _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(
+                            context,
+                            createPostButton: createPostButton(context));
                       },
-                      itemBuilder: (context, item, index) {
-                        if (_feedBloc.users[item.userId] == null) {
-                          return const SizedBox();
-                        }
-                        return widget.postBuilder?.call(
-                                context,
-                                defPostWidget(
-                                  feedThemeData,
-                                  item,
-                                ),
-                                item) ??
-                            defPostWidget(
-                              feedThemeData,
-                              item,
-                            );
+                      noMoreItemsIndicatorBuilder: (context) {
+                        return widget.noMoreItemsIndicatorBuilder
+                                ?.call(context) ??
+                            _widgetsBuilder
+                                .noMoreItemsIndicatorBuilderFeed(context);
+                      },
+                      newPageProgressIndicatorBuilder: (context) {
+                        return widget.newPageProgressIndicatorBuilder
+                                ?.call(context) ??
+                            _widgetsBuilder
+                                .newPageProgressIndicatorBuilderFeed(context);
                       },
                       firstPageProgressIndicatorBuilder: (context) =>
-                          LMFeedLoader(
-                        color: feedThemeData?.primaryColor,
-                      ),
+                          widget.firstPageProgressIndicatorBuilder
+                              ?.call(context) ??
+                          _widgetsBuilder
+                              .firstPageProgressIndicatorBuilderFeed(context),
+                      firstPageErrorIndicatorBuilder: (context) =>
+                          widget.firstPageErrorIndicatorBuilder
+                              ?.call(context) ??
+                          _widgetsBuilder
+                              .firstPageErrorIndicatorBuilderFeed(context),
+                      newPageErrorIndicatorBuilder: (context) =>
+                          widget.newPageErrorIndicatorBuilder?.call(context) ??
+                          _widgetsBuilder
+                              .newPageErrorIndicatorBuilderFeed(context),
                     ),
                   );
                 },
@@ -546,7 +590,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             text: "Feed",
             style: LMFeedTextStyle(
               textStyle: TextStyle(
-                color: feedThemeData?.onContainer,
+                color: feedThemeData.onContainer,
                 fontSize: 27,
                 fontWeight: FontWeight.w700,
               ),
@@ -555,8 +599,35 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         ),
       ),
       style: LMFeedAppBarStyle.basic().copyWith(
-        backgroundColor: feedThemeData?.container,
+        backgroundColor: feedThemeData.container,
       ),
+      trailing: [
+        LMFeedButton(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LMFeedSearchScreen(
+                  postBuilder: widget.postBuilder,
+                  emptyFeedViewBuilder: widget.noItemsFoundIndicatorBuilder,
+                  paginationLoaderBuilder:
+                      widget.newPageProgressIndicatorBuilder,
+                  feedErrorViewBuilder: widget.newPageErrorIndicatorBuilder,
+                  noNewPageWidgetBuilder: widget.noMoreItemsIndicatorBuilder,
+                  firstPageLoaderBuilder:
+                      widget.firstPageProgressIndicatorBuilder,
+                ),
+              ),
+            );
+          },
+          style: LMFeedButtonStyle.basic().copyWith(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.search,
+            ),
+          ),
+        )
+      ],
     );
   }
 
@@ -570,15 +641,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
-  void openTopicSelector() {
+  void openTopicSelector(BuildContext context) {
     LMFeedTopicSelectionWidgetType topicSelectionWidgetType =
         config!.topicSelectionWidgetType;
     if (topicSelectionWidgetType ==
         LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet) {
-      showTopicSelectSheet();
+      showTopicSelectSheet(context);
     } else if (topicSelectionWidgetType ==
         LMFeedTopicSelectionWidgetType.showTopicSelectionScreen) {
-      navigateToTopicSelectScreen();
+      navigateToTopicSelectScreen(context);
     }
   }
 
@@ -601,15 +672,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           ),
         );
       } else if (media.mediaType == LMMediaType.document) {
-        return const LMFeedIcon(
-          type: LMFeedIconType.svg,
-          assetPath: kAssetDocPDFIcon,
-          style: LMFeedIconStyle(
-            color: Colors.red,
-            size: 35,
-            boxPadding: 0,
-          ),
-        );
+        return LMFeedTheme
+                .instance.theme.mediaStyle.documentStyle.documentIcon ??
+            LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.picture_as_pdf,
+              style: LMFeedIconStyle(
+                color: Colors.red,
+                size: 35,
+                boxPadding: 0,
+              ),
+            );
       } else {
         return const SizedBox.shrink();
       }
@@ -618,17 +691,18 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     }
   }
 
-  LMFeedPostWidget defPostWidget(
+  LMFeedPostWidget defPostWidget(BuildContext context,
       LMFeedThemeData? feedThemeData, LMPostViewData post) {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: _feedBloc.users[post.userId]!,
+      user: _feedBloc.users[post.uuid]!,
       isFeed: false,
-      onTagTap: (String userId) {
+      onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId,
+            uuid: uuid,
+            context: context,
           ),
         );
       },
@@ -649,7 +723,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: _feedBloc.users[post.userId]!,
+              user: _feedBloc.users[post.uuid]!,
             ),
           ),
         );
@@ -672,10 +746,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         );
         await postVideoController?.player.play();
       },
-      footer: _defFooterWidget(post),
-      header: _defPostHeader(post),
+      footer: _defFooterWidget(context, post),
+      header: _defPostHeader(context, post),
       content: _defContentWidget(post),
-      media: _defPostMedia(post),
+      media: _defPostMedia(context, post),
       topicWidget: _defTopicWidget(post),
     );
   }
@@ -684,108 +758,134 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return LMFeedPostTopic(
       topics: post.topics,
       post: post,
-      style: feedThemeData?.topicStyle,
+      style: feedThemeData.topicStyle,
     );
   }
 
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
-      onTagTap: (String? userId) {
+      onTagTap: (String? uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: userId ?? post.userId,
+            uuid: uuid ?? post.uuid,
+            context: context,
           ),
         );
       },
-      style: feedThemeData?.contentStyle,
+      style: feedThemeData.contentStyle,
+      text: post.text,
+      heading: post.heading,
     );
   }
 
-  LMFeedPostFooter _defFooterWidget(LMPostViewData post) {
+  LMFeedPostFooter _defFooterWidget(BuildContext context, LMPostViewData post) {
     return LMFeedPostFooter(
-      likeButton: defLikeButton(post),
-      commentButton: defCommentButton(post),
+      likeButton: defLikeButton(context, post),
+      commentButton: defCommentButton(context, post),
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
-      repostButton: defRepostButton(post),
-      postFooterStyle: feedThemeData?.footerStyle,
+      repostButton: defRepostButton(context, post),
+      postFooterStyle: feedThemeData.footerStyle,
       showRepostButton: !post.isRepost,
     );
   }
 
-  LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
+  LMFeedPostHeader _defPostHeader(
+      BuildContext context, LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: _feedBloc.users[postViewData.userId]!,
+      user: _feedBloc.users[postViewData.uuid]!,
       isFeed: true,
       postViewData: postViewData,
-      postHeaderStyle: feedThemeData?.headerStyle,
+      postHeaderStyle: feedThemeData.headerStyle,
       onProfileTap: () {
         LMFeedCore.instance.lmFeedClient.routeToProfile(
-            _feedBloc.users[postViewData.userId]!.sdkClientInfo!.userUniqueId);
+            _feedBloc.users[postViewData.uuid]!.sdkClientInfo.uuid);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            userUniqueId: _feedBloc
-                .users[postViewData.userId]!.sdkClientInfo!.userUniqueId,
+            uuid: _feedBloc.users[postViewData.uuid]!.sdkClientInfo.uuid,
+            context: context,
           ),
         );
       },
       menu: LMFeedMenu(
-          menuItems: postViewData.menuItems,
-          isFeed: true,
-          removeItemIds: {postReportId, postEditId},
-          action: LMFeedMenuAction(
-              onPostUnpin: () => handlePostPinAction(postViewData),
-              onPostPin: () => handlePostPinAction(postViewData),
-              onPostDelete: () {
-                showDialog(
-                  context: context,
-                  builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                    title: 'Delete Comment',
-                    userId: postViewData.userId,
-                    content:
-                        'Are you sure you want to delete this post. This action can not be reversed.',
-                    action: (String reason) async {
-                      Navigator.of(childContext).pop();
+        menuItems: postViewData.menuItems,
+        removeItemIds: {postReportId, postEditId},
+        action: LMFeedMenuAction(
+          onPostEdit: () {
+            // Mute all video controllers
+            // to prevent video from playing in background
+            // while editing the post
+            LMFeedVideoProvider.instance.forcePauseAllControllers();
 
-                      String postType =
-                          LMFeedPostUtils.getPostType(postViewData.attachments);
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => LMFeedEditPostScreen(
+                  postId: postViewData.id,
+                ),
+              ),
+            );
+          },
+          onPostReport: () => handlePostReportAction(postViewData),
+          onPostUnpin: () => handlePostPinAction(postViewData),
+          onPostPin: () => handlePostPinAction(postViewData),
+          onPostDelete: () {
+            String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
 
-                      LMFeedAnalyticsBloc.instance.add(
-                        LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postDeleted,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postDeleted,
-                          eventProperties: {
-                            "post_id": postViewData.id,
-                            "post_type": postType,
-                            "user_id": postViewData.userId,
-                            "user_state": isCm ? "CM" : "member",
-                          },
-                        ),
-                      );
+            showDialog(
+              context: context,
+              builder: (childContext) => LMFeedDeleteConfirmationDialog(
+                title: 'Delete Comment',
+                uuid: postCreatorUUID,
+                content:
+                    'Are you sure you want to delete this post. This action can not be reversed.',
+                action: (String reason) async {
+                  Navigator.of(childContext).pop();
 
-                      LMFeedPostBloc.instance.add(
-                        LMFeedDeletePostEvent(
-                          postId: postViewData.id,
-                          reason: reason,
-                          isRepost: postViewData.isRepost,
-                        ),
-                      );
-                    },
-                    actionText: 'Delete',
-                  ),
-                );
-              })),
+                  String postType =
+                      LMFeedPostUtils.getPostType(postViewData.attachments);
+
+                  LMFeedAnalyticsBloc.instance.add(
+                    LMFeedFireAnalyticsEvent(
+                      eventName: LMFeedAnalyticsKeys.postDeleted,
+                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      eventProperties: {
+                        "post_id": postViewData.id,
+                        "post_type": postType,
+                        "user_id": currentUser?.sdkClientInfo.uuid,
+                        "user_state": isCm ? "CM" : "member",
+                      },
+                    ),
+                  );
+
+                  LMFeedPostBloc.instance.add(
+                    LMFeedDeletePostEvent(
+                      postId: postViewData.id,
+                      reason: reason,
+                      isRepost: postViewData.isRepost,
+                    ),
+                  );
+                },
+                actionText: 'Delete',
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
   LMFeedPostMedia _defPostMedia(
+    BuildContext context,
     LMPostViewData post,
   ) {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       postId: post.id,
-      style: feedThemeData?.mediaStyle,
+      style: feedThemeData.mediaStyle,
+      carouselIndicatorBuilder:
+          LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
+      imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
+      videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
       onMediaTap: () async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoController(
@@ -799,7 +899,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: _feedBloc.users[post.userId]!,
+              user: _feedBloc.users[post.uuid]!,
             ),
           ),
         );
@@ -808,12 +908,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
-  LMFeedButton defLikeButton(LMPostViewData postViewData) => LMFeedButton(
+  LMFeedButton defLikeButton(
+          BuildContext context, LMPostViewData postViewData) =>
+      LMFeedButton(
         isActive: postViewData.isLiked,
         text: LMFeedText(
             text: LMFeedPostUtils.getLikeCountTextWithCount(
                 postViewData.likeCount)),
-        style: feedThemeData?.footerStyle.likeButtonStyle,
+        style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
           VideoController? videoController =
               LMFeedVideoProvider.instance.getVideoController(postViewData.id);
@@ -862,11 +964,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         },
       );
 
-  LMFeedButton defCommentButton(LMPostViewData post) => LMFeedButton(
+  LMFeedButton defCommentButton(BuildContext context, LMPostViewData post) =>
+      LMFeedButton(
         text: LMFeedText(
           text: LMFeedPostUtils.getCommentCountTextWithCount(post.commentCount),
         ),
-        style: feedThemeData?.footerStyle.commentButtonStyle,
+        style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
           VideoController? postVideoController = LMFeedVideoProvider.instance
               .getVideoController(
@@ -906,11 +1009,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       );
 
   LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
+        isActive: postViewData.isSaved,
         onTap: () async {
           postViewData.isSaved = !postViewData.isSaved;
           rebuildPostWidget.value = !rebuildPostWidget.value;
-          LMFeedPostBloc.instance
-              .add(LMFeedUpdatePostEvent(post: postViewData));
+          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+              postId: postViewData.id,
+              actionType: postViewData.isSaved
+                  ? LMFeedPostActionType.saved
+                  : LMFeedPostActionType.unsaved));
 
           final savePostRequest =
               (SavePostRequestBuilder()..postId(postViewData.id)).build();
@@ -921,11 +1028,21 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           if (!response.success) {
             postViewData.isSaved = !postViewData.isSaved;
             rebuildPostWidget.value = !rebuildPostWidget.value;
-            LMFeedPostBloc.instance
-                .add(LMFeedUpdatePostEvent(post: postViewData));
+            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+                postId: postViewData.id,
+                actionType: postViewData.isSaved
+                    ? LMFeedPostActionType.saved
+                    : LMFeedPostActionType.unsaved));
+          } else {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(
+                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+              ),
+            );
           }
         },
-        style: feedThemeData?.footerStyle.saveButtonStyle,
+        style: feedThemeData.footerStyle.saveButtonStyle,
       );
 
   LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
@@ -933,15 +1050,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         onTap: () {
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
-        style: feedThemeData?.footerStyle.shareButtonStyle,
+        style: feedThemeData.footerStyle.shareButtonStyle,
       );
 
-  LMFeedButton defRepostButton(LMPostViewData postViewData) => LMFeedButton(
+  LMFeedButton defRepostButton(
+          BuildContext context, LMPostViewData postViewData) =>
+      LMFeedButton(
         text: LMFeedText(
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: postViewData.isRepostedByUser
-                  ? feedThemeData?.primaryColor
+                  ? feedThemeData.primaryColor
                   : null,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -951,7 +1070,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ? ''
               : postViewData.repostCount.toString(),
         ),
-        onTap: right
+        onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
                   LMFeedAnalyticsBloc.instance.add(
@@ -979,236 +1098,237 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     ),
                   );
                 } else {
-                  toast(
-                    'A post is already uploading.',
-                    duration: Toast.LENGTH_LONG,
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: 'A post is already uploading.',
+                      ),
+                    ),
                   );
                 }
               }
-            : () => toast("You do not have permission to create a post"),
-        style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
-            icon: feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+            : () {
+                LMFeedCore.showSnackBar(
+                  LMFeedSnackBar(
+                    content: LMFeedText(
+                      text: "You do not have permission to create a post",
+                    ),
+                  ),
+                );
+              },
+        style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color: postViewData.isRepostedByUser
-                          ? feedThemeData?.primaryColor
+                          ? feedThemeData.primaryColor
                           : null),
             ),
             activeIcon:
-                feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color: postViewData.isRepostedByUser
-                          ? feedThemeData?.primaryColor
+                          ? feedThemeData.primaryColor
                           : null),
             )),
       );
 
-  Widget noPostUnderTopicWidget() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const LMFeedText(
-              text: "Looks like there are no posts for this topic yet.",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  height: 0,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                LMFeedButton(
-                  style: LMFeedButtonStyle(
-                    borderRadius: 48,
-                    border: Border.all(
-                      color: feedThemeData?.primaryColor ??
-                          LikeMindsTheme.onContainer,
-                      width: 2,
-                    ),
-                    height: 40,
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  ),
-                  text: LMFeedText(
-                    text: "Change Filter",
-                    style: LMFeedTextStyle(
-                      textAlign: TextAlign.center,
-                      textStyle: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: feedThemeData?.primaryColor),
-                    ),
-                  ),
-                  onTap: () => openTopicSelector(),
-                ),
-              ],
-            ),
-          ],
+  LMFeedButton changeFilter(BuildContext context) => LMFeedButton(
+        style: LMFeedButtonStyle(
+          borderRadius: 48,
+          border: Border.all(
+            color: feedThemeData.primaryColor,
+            width: 2,
+          ),
+          height: 40,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         ),
-      );
-
-  Widget noPostInFeedWidget() => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.post_add,
-              style: LMFeedIconStyle(
-                size: 48,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const LMFeedText(
-              text: 'No posts to show',
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const LMFeedText(
-              text: "Be the first one to post here",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: LikeMindsTheme.greyColor,
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            LMFeedButton(
-              style: LMFeedButtonStyle(
-                icon: const LMFeedIcon(
-                  type: LMFeedIconType.icon,
-                  icon: Icons.add,
-                  style: LMFeedIconStyle(
-                    size: 18,
-                  ),
-                ),
-                borderRadius: 28,
-                backgroundColor: feedThemeData?.primaryColor,
-                height: 44,
-                width: 153,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                placement: LMFeedIconButtonPlacement.end,
-              ),
-              text: const LMFeedText(
-                text: "Create Post",
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              onTap: right
-                  ? () async {
-                      if (!postUploading.value) {
-                        LMFeedAnalyticsBloc.instance.add(
-                            const LMFeedFireAnalyticsEvent(
-                                eventName:
-                                    LMFeedAnalyticsKeys.postCreationStarted,
-                                deprecatedEventName:
-                                    LMFeedAnalyticsKeysDep.postCreationStarted,
-                                eventProperties: {}));
-
-                        LMFeedVideoProvider.instance.forcePauseAllControllers();
-                        // ignore: use_build_context_synchronously
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LMFeedComposeScreen(),
-                          ),
-                        );
-                      } else {
-                        toast(
-                          'A post is already uploading.',
-                          duration: Toast.LENGTH_LONG,
-                        );
-                      }
-                    }
-                  : () => toast("You do not have permission to create a post"),
-            ),
-          ],
+        text: LMFeedText(
+          text: "Change Filter",
+          style: LMFeedTextStyle(
+            textAlign: TextAlign.center,
+            textStyle: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: feedThemeData.primaryColor),
+          ),
         ),
+        onTap: () => openTopicSelector(context),
       );
 
-  Widget defFloatingActionButton() => ValueListenableBuilder(
-        valueListenable: rebuildPostWidget,
-        builder: (context, _, __) {
-          return LMFeedButton(
-            style: LMFeedButtonStyle(
-              icon: LMFeedIcon(
-                type: LMFeedIconType.icon,
-                icon: Icons.add,
-                style: LMFeedIconStyle(
-                  fit: BoxFit.cover,
-                  size: 18,
-                  color: feedThemeData?.onPrimary,
-                ),
-              ),
-              width: 153,
-              height: 44,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-              borderRadius: 28,
-              backgroundColor: right
-                  ? feedThemeData?.primaryColor
-                  : feedThemeData?.disabledColor,
-              placement: LMFeedIconButtonPlacement.end,
-              margin: 5.0,
-            ),
-            text: LMFeedText(
-              text: "Create Post",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  color: feedThemeData?.onPrimary,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-            onTap: right
-                ? () async {
-                    if (!postUploading.value) {
-                      LMFeedAnalyticsBloc.instance.add(
-                          const LMFeedFireAnalyticsEvent(
-                              eventName:
-                                  LMFeedAnalyticsKeys.postCreationStarted,
-                              deprecatedEventName:
-                                  LMFeedAnalyticsKeysDep.postCreationStarted,
-                              eventProperties: {}));
+  LMFeedButton createPostButton(BuildContext context) {
+    return LMFeedButton(
+      style: LMFeedButtonStyle(
+        icon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.add,
+          style: LMFeedIconStyle(
+            size: 18,
+            color: feedThemeData.onPrimary,
+          ),
+        ),
+        borderRadius: 28,
+        backgroundColor: feedThemeData.primaryColor,
+        height: 44,
+        width: 160,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        placement: LMFeedIconButtonPlacement.end,
+      ),
+      text: LMFeedText(
+        text: "Create Post",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: feedThemeData.onPrimary,
+          ),
+        ),
+      ),
+      onTap: userPostingRights
+          ? () async {
+              if (!postUploading.value) {
+                LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
+                    eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                    deprecatedEventName:
+                        LMFeedAnalyticsKeysDep.postCreationStarted,
+                    eventProperties: {}));
 
-                      LMFeedVideoProvider.instance.forcePauseAllControllers();
-                      // ignore: use_build_context_synchronously
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LMFeedComposeScreen(),
-                        ),
-                      );
-                    } else {
-                      toast(
-                        'A post is already uploading.',
-                        duration: Toast.LENGTH_LONG,
-                      );
-                    }
-                  }
-                : () => toast("You do not have permission to create a post"),
-          );
-        },
+                LMFeedVideoProvider.instance.forcePauseAllControllers();
+                // ignore: use_build_context_synchronously
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LMFeedComposeScreen(),
+                  ),
+                );
+              } else {
+                LMFeedCore.showSnackBar(
+                  LMFeedSnackBar(
+                    content: LMFeedText(
+                      text: 'A post is already uploading.',
+                    ),
+                  ),
+                );
+              }
+            }
+          : () {
+              LMFeedCore.showSnackBar(
+                LMFeedSnackBar(
+                  content: LMFeedText(
+                    text: "You do not have permission to create a post",
+                  ),
+                ),
+              );
+            },
+    );
+  }
+
+  LMFeedButton defFloatingActionButton(BuildContext context) => LMFeedButton(
+        style: LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: Icons.add,
+            style: LMFeedIconStyle(
+              fit: BoxFit.cover,
+              size: 18,
+              color: feedThemeData.onPrimary,
+            ),
+          ),
+          width: 153,
+          height: 44,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+          borderRadius: 28,
+          backgroundColor: userPostingRights
+              ? feedThemeData.primaryColor
+              : feedThemeData.disabledColor,
+          placement: LMFeedIconButtonPlacement.end,
+          margin: 5.0,
+        ),
+        text: LMFeedText(
+          text: "Create Post",
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: feedThemeData.onPrimary,
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        onTap: userPostingRights
+            ? () async {
+                if (!postUploading.value) {
+                  LMFeedAnalyticsBloc.instance.add(
+                      const LMFeedFireAnalyticsEvent(
+                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          deprecatedEventName:
+                              LMFeedAnalyticsKeysDep.postCreationStarted,
+                          eventProperties: {}));
+
+                  LMFeedVideoProvider.instance.forcePauseAllControllers();
+                  // ignore: use_build_context_synchronously
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMFeedComposeScreen(),
+                    ),
+                  );
+                } else {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: 'A post is already uploading.',
+                      ),
+                    ),
+                  );
+                }
+              }
+            : () {
+                LMFeedCore.showSnackBar(
+                  LMFeedSnackBar(
+                    content: LMFeedText(
+                      text: "You do not have permission to create a post",
+                    ),
+                  ),
+                );
+              },
       );
+
+  Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
+    return showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      useSafeArea: true,
+      isScrollControlled: true,
+      elevation: 10,
+      enableDrag: true,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.7,
+        minHeight: MediaQuery.of(context).size.height * 0.3,
+      ),
+      backgroundColor: feedThemeData.container,
+      clipBehavior: Clip.hardEdge,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      builder: (context) => LMFeedReportBottomSheet(
+        entityId: postViewData.id,
+        entityType: 5,
+        entityCreatorId: postViewData.uuid,
+      ),
+    );
+  }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;
+
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postViewData.id,
+        actionType: postViewData.isPinned
+            ? LMFeedPostActionType.pinned
+            : LMFeedPostActionType.unpinned));
 
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
@@ -1220,7 +1340,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     } else {
       int index = postViewData.menuItems
           .indexWhere((element) => element.id == postPinId);
-
       if (index != -1) {
         postViewData.menuItems[index]
           ..title = "Pin This Post"
@@ -1232,8 +1351,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
 
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
@@ -1262,7 +1379,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
       rebuildPostWidget.value = !rebuildPostWidget.value;
 
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(post: postViewData));
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          postId: postViewData.id,
+          actionType: postViewData.isPinned
+              ? LMFeedPostActionType.pinned
+              : LMFeedPostActionType.unpinned));
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 
@@ -1275,7 +1396,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
-            'created_by_id': postViewData.userId,
+            'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,
             'post_type': postType,
           },

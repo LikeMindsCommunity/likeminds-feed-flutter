@@ -31,7 +31,7 @@ class LMFeedUserTile extends LMFeedTile {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     return LMFeedTile(
       onTap: onTap,
       style: style ??
@@ -66,18 +66,16 @@ class LMFeedUserTile extends LMFeedTile {
             ),
           ),
       subtitle: subtitle ??
-          (user.sdkClientInfo != null
-              ? LMFeedText(
-                  text: "@${user.name.toLowerCase().split(' ').join()} ",
-                  style: const LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: LikeMindsTheme.kFontSmall,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w300,
-                    ),
-                  ),
-                )
-              : null),
+          LMFeedText(
+            text: "@${user.name.toLowerCase().split(' ').join()} ",
+            style: const LMFeedTextStyle(
+              textStyle: TextStyle(
+                fontSize: LikeMindsTheme.kFontSmall,
+                color: Colors.grey,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ),
     );
   }
 }

@@ -10,13 +10,20 @@ class LMFeedTopicBloc extends Bloc<LMFeedTopicEvent, LMFeedTopicState> {
   LMFeedTopicBloc() : super(LMFeedTopicInitialState()) {
     on<LMFeedTopicEvent>((event, emit) async {
       if (event is LMFeedInitTopicEvent) {
-        emit(LMFeedTopicLoadingState());
+        emit(LMFeedTopicInitialState());
       } else if (event is LMFeedGetTopicEvent) {
-        emit(LMFeedTopicLoadingState());
+        if (event.getTopicFeedRequest.page == 1) {
+          emit(LMFeedTopicLoadingState());
+        } else {
+          emit(LMFeedTopicPaginationLoadingState());
+        }
         GetTopicsResponse response =
             await LMFeedCore.client.getTopics(event.getTopicFeedRequest);
         if (response.success) {
-          emit(LMFeedTopicLoadedState(response));
+          emit(LMFeedTopicLoadedState(
+            response,
+            event.getTopicFeedRequest.page,
+          ));
         } else {
           emit(LMFeedTopicErrorState(response.errorMessage!));
         }

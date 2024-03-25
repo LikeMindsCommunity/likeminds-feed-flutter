@@ -2,9 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
+// This widget is used to display a topic feed bar
+// A [LMFeedTopicBar] displays a list of selected topics
+// The [LMFeedTopicBar] can be customized by
+// passing in the required parameters
 class LMFeedTopicBar extends StatelessWidget {
   final List<LMTopicViewData> selectedTopics;
-  final VoidCallback openTopicSelector;
+  final Function(BuildContext) openTopicSelector;
   final Function(LMTopicViewData)? removeTopicFromSelection;
   final LMFeedTopicBarStyle? style;
 
@@ -18,7 +22,7 @@ class LMFeedTopicBar extends StatelessWidget {
 
   LMFeedTopicBar copyWith({
     List<LMTopicViewData>? selectedTopics,
-    VoidCallback? openTopicSelector,
+    Function(BuildContext)? openTopicSelector,
     Function(LMTopicViewData)? removeTopicFromSelection,
     LMFeedTopicBarStyle? style,
   }) {
@@ -33,7 +37,7 @@ class LMFeedTopicBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
+    LMFeedThemeData feedThemeData = LMFeedTheme.instance.theme;
     return Container(
       width: style?.width,
       decoration: BoxDecoration(
@@ -46,7 +50,7 @@ class LMFeedTopicBar extends StatelessWidget {
       padding: style?.padding ??
           const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
       child: GestureDetector(
-        onTap: openTopicSelector,
+        onTap: () => openTopicSelector(context),
         child: Row(
           children: [
             selectedTopics.isEmpty

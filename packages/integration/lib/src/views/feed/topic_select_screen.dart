@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedTopicSelectScreen extends StatefulWidget {
@@ -24,6 +23,8 @@ class LMFeedTopicSelectScreen extends StatefulWidget {
 }
 
 class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
+  LMFeedThemeData feedThemeData = LMFeedCore.theme;
+  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   List<LMTopicViewData> selectedTopics = [];
   FocusNode keyboardNode = FocusNode();
   Set<String> selectedTopicId = {};
@@ -129,8 +130,8 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.of(context);
-    return Scaffold(
+    return widgetUtility.scaffold(
+      source: LMFeedWidgetSource.topicSelectScreen,
       backgroundColor: feedThemeData.backgroundColor,
       floatingActionButton: FloatingActionButton(
         onPressed: () {

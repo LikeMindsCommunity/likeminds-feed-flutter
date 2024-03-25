@@ -26,6 +26,7 @@ class LMFeedText extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.translucent,
       child: Container(
         color: Colors.transparent,
         child: Text(

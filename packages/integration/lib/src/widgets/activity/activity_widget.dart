@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:video_player/video_player.dart';
 
 class LMFeedActivityWidget extends StatefulWidget {
@@ -42,7 +41,7 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return Container(
       color: feedTheme.container,
       child: FutureBuilder<GetUserActivityResponse>(
@@ -75,12 +74,8 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                               final activity =
                                   activityResponse.activities![index];
                               final LMPostViewData postData =
-                                  LMFeedPostUtils.postViewDataFromActivity(
-                                activity,
-                                activityResponse.widgets,
-                                activityResponse.users,
-                                activityResponse.topics,
-                              );
+                                  convertPostData(activityResponse, activity);
+
                               late final VideoPlayerController controller;
                               late final Future<void> futureValue;
                               if (postData.attachments!.isNotEmpty &&
@@ -142,7 +137,8 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                                         padding: const EdgeInsets.symmetric(
                                           vertical: 2,
                                         ),
-                                        child: ExpandableText(postData.text,
+                                        child: LMFeedExpandableText(
+                                            postData.text,
                                             expandText: 'Read More',
                                             maxLines: 2, onTagTap: (tag) {
                                           debugPrint(tag);
@@ -304,6 +300,33 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
               return const Center(child: LMFeedLoader());
             }
           }),
+    );
+  }
+
+  LMPostViewData convertPostData(
+      GetUserActivityResponse response, UserActivityItem activity) {
+    Map<String, LMWidgetViewData> widgets =
+        (response.widgets ?? <String, WidgetModel>{}).map((key, value) =>
+            MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+    Map<String, LMTopicViewData> topics = (response.topics ?? <String, Topic>{})
+        .map((key, value) => MapEntry(
+            key, LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
+    Map<String, LMUserViewData> users =
+        (response.users ?? <String, User>{}).map((key, value) => MapEntry(
+            key,
+            LMUserViewDataConvertor.fromUser(
+              value,
+              topics: topics,
+              widgets: widgets,
+            )));
+
+    return LMFeedPostUtils.postViewDataFromActivity(
+      activity,
+      widgets,
+      users,
+      topics,
     );
   }
 }

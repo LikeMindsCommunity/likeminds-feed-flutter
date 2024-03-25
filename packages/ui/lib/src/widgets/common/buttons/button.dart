@@ -99,31 +99,33 @@ class _LMButtonState extends State<LMFeedButton> {
                           const SizedBox.shrink()
                       : inStyle.icon ?? const SizedBox.shrink()
                   : const SizedBox.shrink(),
-              inStyle.placement == LMFeedIconButtonPlacement.start
-                  ? (inStyle.icon != null || inStyle.activeIcon != null)
-                      ? SizedBox(width: inStyle.margin ?? 8)
-                      : const SizedBox.shrink()
-                  : const SizedBox.shrink(),
-              inStyle.showText
-                  ? GestureDetector(
-                      onTap: widget.onTextTap,
-                      child: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.transparent,
-                          ),
-                          padding: inStyle.textPadding,
-                          child: _active
-                              ? widget.activeText ??
-                                  widget.text ??
-                                  const SizedBox.shrink()
-                              : widget.text ?? const SizedBox.shrink()),
-                    )
-                  : const SizedBox.shrink(),
-              inStyle.placement == LMFeedIconButtonPlacement.end
-                  ? (inStyle.icon != null || inStyle.activeIcon != null)
-                      ? SizedBox(width: inStyle.margin ?? 8)
-                      : const SizedBox.shrink()
-                  : const SizedBox.shrink(),
+              GestureDetector(
+                onTap: inStyle.showText ? widget.onTextTap : null,
+                behavior: HitTestBehavior.translucent,
+                child: Row(
+                  children: [
+                    inStyle.placement == LMFeedIconButtonPlacement.start
+                        ? (inStyle.icon != null || inStyle.activeIcon != null)
+                            ? SizedBox(width: inStyle.margin ?? 8)
+                            : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                    inStyle.showText
+                        ? Container(
+                            padding: inStyle.textPadding,
+                            child: _active
+                                ? widget.activeText ??
+                                    widget.text ??
+                                    const SizedBox.shrink()
+                                : widget.text ?? const SizedBox.shrink())
+                        : const SizedBox.shrink(),
+                    inStyle.placement == LMFeedIconButtonPlacement.end
+                        ? (inStyle.icon != null || inStyle.activeIcon != null)
+                            ? SizedBox(width: inStyle.margin ?? 8)
+                            : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                  ],
+                ),
+              ),
               inStyle.placement == LMFeedIconButtonPlacement.end
                   ? _active
                       ? inStyle.activeIcon ??
@@ -295,7 +297,6 @@ class LMFeedButtonStyle {
           style: LMFeedIconStyle.basic().copyWith(
             color: primaryColor,
           ),
-         
         ),
         height: 44,
         activeIcon: LMFeedIcon(

@@ -39,7 +39,7 @@ class LMFeedPostFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     LMFeedPostFooterStyle footerStyle =
-        postFooterStyle ?? LMFeedTheme.of(context).footerStyle;
+        postFooterStyle ?? LMFeedTheme.instance.theme.footerStyle;
     _populateButtonList(footerStyle);
     return Container(
       width: footerStyle.width,

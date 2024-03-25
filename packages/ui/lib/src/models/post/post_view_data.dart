@@ -9,8 +9,12 @@ class LMPostViewData {
   final String id;
 
   /// content of the post [nullable]
-  /// might contain tags and mentions
+  /// might contain tags and mentions>
   String text;
+
+  /// post heading [nullable]
+  /// might contain tags and mentions
+  String? heading;
 
   /// topics of the post [nullable]
   List<LMTopicViewData> topics;
@@ -25,10 +29,10 @@ class LMPostViewData {
   bool isPinned;
 
   /// user id of the user who created the post
-  final String userId;
+  final String uuid;
 
-  /// user dat of the user who created the post
-  final LMUserViewData? user;
+  /// user data of the user who created the post
+  final LMUserViewData user;
 
   int likeCount;
 
@@ -44,6 +48,8 @@ class LMPostViewData {
 
   List<LMCommentViewData> replies;
 
+  List<String>? commentIds;
+
   bool isRepost;
   bool isRepostedByUser;
   int repostCount;
@@ -52,6 +58,10 @@ class LMPostViewData {
   /// widget map to hold custom widget data
   Map<String, LMWidgetViewData>? widgets;
 
+  List<LMCommentViewData>? topComments;
+
+  String? tempId;
+
   /// {@macro post_view_data}
   LMPostViewData._({
     required this.id,
@@ -59,8 +69,8 @@ class LMPostViewData {
     required this.attachments,
     required this.communityId,
     required this.isPinned,
-    required this.userId,
-    this.user,
+    required this.uuid,
+    required this.user,
     required this.likeCount,
     required this.isSaved,
     required this.topics,
@@ -76,6 +86,10 @@ class LMPostViewData {
     required this.repostCount,
     this.isDeleted = false,
     this.widgets,
+    this.commentIds,
+    this.heading,
+    this.topComments,
+    this.tempId,
   });
 }
 
@@ -86,7 +100,7 @@ class LMPostViewDataBuilder {
   List<LMAttachmentViewData>? _attachments;
   int? _communityId;
   bool? _isPinned;
-  String? _userId;
+  String? _uuid;
   LMUserViewData? _user;
   int? _likeCount;
   int? _commentCount;
@@ -102,6 +116,10 @@ class LMPostViewDataBuilder {
   int? _repostCount;
   bool? _isDeleted;
   Map<String, LMWidgetViewData>? _widgets;
+  String? _heading;
+  List<String>? _commentIds;
+  List<LMCommentViewData>? _topComments;
+  String? _tempId;
 
   void id(String id) {
     _id = id;
@@ -127,8 +145,8 @@ class LMPostViewDataBuilder {
     _isPinned = isPinned;
   }
 
-  void userId(String userId) {
-    _userId = userId;
+  void uuid(String uuid) {
+    _uuid = uuid;
   }
 
   void user(LMUserViewData user) {
@@ -191,6 +209,22 @@ class LMPostViewDataBuilder {
     _widgets = widgets;
   }
 
+  void heading(String heading) {
+    _heading = heading;
+  }
+
+  void commentIds(List<String> commentIds) {
+    _commentIds = commentIds;
+  }
+
+  void topComments(List<LMCommentViewData> topComments) {
+    _topComments = topComments;
+  }
+
+  void tempId(String tempId) {
+    _tempId = tempId;
+  }
+
   LMPostViewData build() {
     return LMPostViewData._(
       id: _id!,
@@ -199,8 +233,8 @@ class LMPostViewDataBuilder {
       attachments: _attachments,
       communityId: _communityId!,
       isPinned: _isPinned!,
-      userId: _userId!,
-      user: _user,
+      uuid: _uuid!,
+      user: _user!,
       likeCount: _likeCount!,
       commentCount: _commentCount!,
       isSaved: _isSaved!,
@@ -215,6 +249,10 @@ class LMPostViewDataBuilder {
       isRepostedByUser: _isRepostedByUser!,
       repostCount: _repostCount!,
       widgets: _widgets,
+      heading: _heading,
+      commentIds: _commentIds,
+      topComments: _topComments,
+      tempId: _tempId,
     );
   }
 }

@@ -27,8 +27,8 @@ class LMUserTagViewDataConvertor {
       userTagViewDataBuilder.isGuest(userTag.isGuest!);
     }
 
-    if (userTag.userUniqueId != null) {
-      userTagViewDataBuilder.userUniqueId(userTag.userUniqueId!);
+    if (userTag.uuid != null) {
+      userTagViewDataBuilder.uuid(userTag.uuid!);
     }
 
     if (userTag.sdkClientInfo != null) {
@@ -47,7 +47,7 @@ class LMUserTagViewDataConvertor {
       customTitle: userTagViewData.customTitle,
       id: userTagViewData.id,
       isGuest: userTagViewData.isGuest,
-      userUniqueId: userTagViewData.userUniqueId,
+      uuid: userTagViewData.uuid,
       sdkClientInfo: userTagViewData.sdkClientInfo != null
           ? LMSDKClientInfoViewDataConvertor.toSDKClientInfo(
               userTagViewData.sdkClientInfo!)

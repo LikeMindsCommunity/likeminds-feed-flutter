@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 
 import 'package:flutter/gestures.dart';
@@ -141,7 +143,7 @@ import 'package:extended_text_field/extended_text_field.dart';
 ///           onPressed: () {
 ///             if (this._formKey.currentState.validate()) {
 ///               this._formKey.currentState.save();
-///               Scaffold.of(context).showSnackBar(SnackBar(
+///               Scaffold.of(context).showSnackBar(LMFeedSnackBar(
 ///                 content: Text('Your Favorite City is ${this._selectedCity}')
 ///               ));
 ///             }

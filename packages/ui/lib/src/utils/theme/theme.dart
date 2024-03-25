@@ -2,20 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 export 'styles/styles.dart';
 
-class LMFeedTheme extends InheritedWidget {
-  const LMFeedTheme({super.key, required this.theme, required super.child});
+class LMFeedTheme {
+  static LMFeedTheme? _instance;
+  static LMFeedTheme get instance => _instance ??= LMFeedTheme._();
 
-  final LMFeedThemeData theme;
+  LMFeedTheme._();
 
-  @override
-  bool updateShouldNotify(covariant LMFeedTheme oldWidget) {
-    return theme != oldWidget.theme;
-  }
+  late final LMFeedThemeData theme;
 
-  static LMFeedThemeData of(BuildContext context) {
-    final lmTheme = context.dependOnInheritedWidgetOfExactType<LMFeedTheme>();
-
-    return lmTheme?.theme ?? LMFeedThemeData.light();
+  void initialise({LMFeedThemeData? theme}) {
+    this.theme = theme ?? LMFeedThemeData.light();
   }
 }
 
@@ -34,6 +30,9 @@ class LMFeedThemeData {
   final LMFeedDialogStyle dialogStyle;
   final LMFeedPopUpMenuStyle popUpMenuStyle;
   final LMFeedComposeScreenStyle composeScreenStyle;
+  final LMFeedLoaderStyle loaderStyle;
+  final LMFeedBottomSheetStyle bottomSheetStyle;
+  final LMFeedSnackBarStyle snackBarTheme;
 
   final Color primaryColor;
   final Color backgroundColor;
@@ -77,6 +76,9 @@ class LMFeedThemeData {
     required this.dialogStyle,
     required this.popUpMenuStyle,
     required this.composeScreenStyle,
+    required this.loaderStyle,
+    required this.bottomSheetStyle,
+    required this.snackBarTheme,
   });
 
   factory LMFeedThemeData.fromThemeData(ThemeData theme) {
@@ -122,6 +124,9 @@ class LMFeedThemeData {
     Color? container,
     Color? onContainer,
     Color? onPrimary,
+    LMFeedLoaderStyle? loaderStyle,
+    LMFeedBottomSheetStyle? bottomSheetStyle,
+    LMFeedSnackBarStyle? snackBarTheme,
   }) {
     return LMFeedThemeData(
       backgroundColor: backgroundColor ?? LikeMindsTheme.backgroundColor,
@@ -160,6 +165,15 @@ class LMFeedThemeData {
           LMFeedComposeScreenStyle.basic(
             primaryColor: primaryColor,
           ),
+      loaderStyle: LMFeedLoaderStyle(
+        color: primaryColor ?? LikeMindsTheme.primaryColor,
+      ),
+      bottomSheetStyle: bottomSheetStyle ?? const LMFeedBottomSheetStyle(),
+      snackBarTheme: snackBarTheme ??
+          LMFeedSnackBarStyle(
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: primaryColor ?? LikeMindsTheme.primaryColor,
+          ),
     );
   }
 
@@ -191,6 +205,9 @@ class LMFeedThemeData {
     LMFeedPostMediaStyle? mediaStyle,
     LMFeedPostFooterStyle? footerStyle,
     LMFeedComposeScreenStyle? composeScreenStyle,
+    LMFeedLoaderStyle? loaderStyle,
+    LMFeedBottomSheetStyle? bottomSheetStyle,
+    LMFeedSnackBarStyle? snackBarTheme,
   }) {
     return LMFeedThemeData(
       postStyle: postStyle ?? this.postStyle,
@@ -220,6 +237,9 @@ class LMFeedThemeData {
       mediaStyle: mediaStyle ?? this.mediaStyle,
       footerStyle: footerStyle ?? this.footerStyle,
       composeScreenStyle: composeScreenStyle ?? this.composeScreenStyle,
+      loaderStyle: loaderStyle ?? this.loaderStyle,
+      bottomSheetStyle: bottomSheetStyle ?? this.bottomSheetStyle,
+      snackBarTheme: snackBarTheme ?? this.snackBarTheme,
     );
   }
 }

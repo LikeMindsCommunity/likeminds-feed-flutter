@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of '../comment_handler_bloc.dart';
 
 /// {@template delete_comment_event_handler}
@@ -36,11 +38,6 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
 
     // Check if the response is success or not
     if (response.success) {
-      // Show the toast message for comment deleted
-      toast(
-        'Comment Deleted',
-        duration: Toast.LENGTH_LONG,
-      );
       // Notify the UI to change the view to Success
       // and remove the comment from the UI
       // and update the comment count
@@ -65,12 +62,6 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
         ),
       );
     } else {
-      // Notify the UI to change the view to Error
-      // and show the error message
-      toast(
-        response.errorMessage ?? '',
-        duration: Toast.LENGTH_LONG,
-      );
       emit(LMFeedCommentErrorState(
         commentActionResponse: response,
         commentMetaData: event.commentMetaData,
@@ -78,9 +69,5 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
     }
   } on Exception catch (err, stacktrace) {
     LMFeedLogger.instance.handleException(err, stacktrace);
-    toast(
-      'An error occcurred while deleting comment',
-      duration: Toast.LENGTH_LONG,
-    );
   }
 }

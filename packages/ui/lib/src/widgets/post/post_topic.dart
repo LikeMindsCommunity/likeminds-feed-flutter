@@ -4,6 +4,7 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 class LMFeedPostTopic extends StatelessWidget {
   final LMPostViewData post;
   final List<LMTopicViewData> topics;
+  final Function(BuildContext, LMTopicViewData)? onTopicTap;
 
   final Widget Function(BuildContext, LMFeedTopicChip)? topicChipBuilder;
 
@@ -14,21 +15,21 @@ class LMFeedPostTopic extends StatelessWidget {
     required this.post,
     required this.topics,
     this.topicChipBuilder,
+    this.onTopicTap,
     this.style,
   });
 
   @override
   Widget build(BuildContext context) {
     LMFeedPostTopicStyle topicStyle =
-        style ?? LMFeedTheme.of(context).topicStyle;
+        style ?? LMFeedTheme.instance.theme.topicStyle;
     return Container(
       margin: topicStyle.margin,
       padding: topicStyle.padding,
       child: Wrap(
         children: post.topics
             .map((e) =>
-                topicChipBuilder?.call(
-                    context, defTopicChip(e, topicStyle)) ??
+                topicChipBuilder?.call(context, defTopicChip(e, topicStyle)) ??
                 defTopicChip(e, topicStyle))
             .toList(),
       ),
@@ -40,6 +41,7 @@ class LMFeedPostTopic extends StatelessWidget {
       LMFeedTopicChip(
         topic: topicViewData,
         style: topicStyle.activeChipStyle,
+        onTap: onTopicTap,
         isSelected: true,
       );
 
@@ -48,12 +50,14 @@ class LMFeedPostTopic extends StatelessWidget {
     List<LMTopicViewData>? topics,
     Widget Function(BuildContext, LMFeedTopicChip)? topicChipBuilder,
     LMFeedPostTopicStyle? style,
+    Function(BuildContext, LMTopicViewData)? onTopicTap,
   }) {
     return LMFeedPostTopic(
       post: post ?? this.post,
       topics: topics ?? this.topics,
       topicChipBuilder: topicChipBuilder ?? this.topicChipBuilder,
       style: style ?? this.style,
+      onTopicTap: onTopicTap ?? this.onTopicTap,
     );
   }
 }

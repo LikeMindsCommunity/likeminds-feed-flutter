@@ -91,7 +91,6 @@ class _LMDocumentState extends State<LMFeedDocument> {
 
   @override
   void didUpdateWidget(covariant LMFeedDocument oldWidget) {
-    // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
     if (oldWidget.documentFile != widget.documentFile ||
         oldWidget.documentUrl != widget.documentUrl) {
@@ -101,7 +100,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
 
   @override
   Widget build(BuildContext context) {
-    style = widget.style ?? LMFeedTheme.of(context).mediaStyle.documentStyle;
+    style = widget.style ?? LMFeedTheme.instance.theme.mediaStyle.documentStyle;
     Size screenSize = MediaQuery.of(context).size;
     return FutureBuilder(
         future: fileLoaderFuture,

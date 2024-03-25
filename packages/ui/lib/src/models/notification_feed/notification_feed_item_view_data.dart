@@ -1,19 +1,19 @@
-import 'package:likeminds_feed_flutter_ui/src/models/notification_feed/activity_entity_view_data.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMNotificationFeedItemViewData {
   String id;
   int action;
-  List<String> actionBy;
+  List<LMUserViewData> actionBy;
   String actionOn;
   LMActivityEntityViewData activityEntityData;
   String activityText;
   String? cta;
-  int createdAt;
+  DateTime createdAt;
   String entityId;
   String? entityOwnerId;
   int entityType;
   bool isRead;
-  int updatedAt;
+  DateTime updatedAt;
 
   LMNotificationFeedItemViewData._({
     required this.id,
@@ -35,17 +35,17 @@ class LMNotificationFeedItemViewData {
 class LMNotificationFeedItemViewDataBuilder {
   String? _id;
   int? _action;
-  List<String>? _actionBy;
+  List<LMUserViewData>? _actionBy;
   String? _actionOn;
   LMActivityEntityViewData? _activityEntityData;
   String? _activityText;
   String? _cta;
-  int? _createdAt;
+  DateTime? _createdAt;
   String? _entityId;
   String? _entityOwnerId;
   int? _entityType;
   bool? _isRead;
-  int? _updatedAt;
+  DateTime? _updatedAt;
 
   void id(String id) {
     _id = id;
@@ -55,7 +55,7 @@ class LMNotificationFeedItemViewDataBuilder {
     _action = action;
   }
 
-  void actionBy(List<String> actionBy) {
+  void actionBy(List<LMUserViewData> actionBy) {
     _actionBy = actionBy;
   }
 
@@ -75,7 +75,7 @@ class LMNotificationFeedItemViewDataBuilder {
     _cta = cta;
   }
 
-  void createdAt(int createdAt) {
+  void createdAt(DateTime createdAt) {
     _createdAt = createdAt;
   }
 
@@ -95,7 +95,7 @@ class LMNotificationFeedItemViewDataBuilder {
     _isRead = isRead;
   }
 
-  void updatedAt(int updatedAt) {
+  void updatedAt(DateTime updatedAt) {
     _updatedAt = updatedAt;
   }
 

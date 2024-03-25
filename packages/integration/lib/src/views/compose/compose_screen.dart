@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:async';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -6,10 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
@@ -19,13 +17,14 @@ class LMFeedComposeScreen extends StatefulWidget {
   // Builder for bottom bar for buttons
   const LMFeedComposeScreen({
     super.key,
-    //Widget builder functions for customizations
+    // Widget builder functions for customizations
     this.composeDiscardDialogBuilder,
     this.composeAppBarBuilder,
     this.composeContentBuilder,
     this.composeTopicSelectorBuilder,
     this.composeMediaPreviewBuilder,
-    //Config for the screen
+    this.composeUserHeaderBuilder,
+    // Config for the screen
     this.config,
     this.style,
     this.attachments,
@@ -41,8 +40,12 @@ class LMFeedComposeScreen extends StatefulWidget {
   final PreferredSizeWidget Function(LMFeedAppBar oldAppBar)?
       composeAppBarBuilder;
   final Widget Function()? composeContentBuilder;
-  final Widget Function(List<LMTopicViewData>)? composeTopicSelectorBuilder;
+  final Widget Function(
+          BuildContext context, Widget topicSelector, List<LMTopicViewData>)?
+      composeTopicSelectorBuilder;
   final Widget Function()? composeMediaPreviewBuilder;
+  final Widget Function(BuildContext context, LMUserViewData user)?
+      composeUserHeaderBuilder;
   final List<LMAttachmentViewData>? attachments;
   final String? displayName;
   final String? displayUrl;
@@ -53,23 +56,29 @@ class LMFeedComposeScreen extends StatefulWidget {
 
 class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Required blocs and data for basic functionality, or state management
-  final User user = LMFeedUserLocalPreference.instance.fetchUserData();
+
+  final LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
-  LMFeedThemeData? feedTheme;
+  LMFeedThemeData feedTheme = LMFeedCore.theme;
+  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
-  bool isCustomWidget = false;
   LMPostViewData? repost;
 
   /// Controllers and other helper classes' objects
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
+  TextEditingController? _headingController;
   final CustomPopupMenuController _controllerPopUp =
       CustomPopupMenuController();
   Timer? _debounce;
   String? result;
   Size? screenSize;
+  // bool to check if the user has tapped on the cancel icon
+  // of link preview, in that case toggle the bool to true
+  // and don't generate link preview any further
+  bool linkCancelled = false;
 
   /// Value notifiers to rebuild small widgets throughout the screen
   /// Rather than handling state management from complex classes
@@ -79,13 +88,27 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   void initState() {
     super.initState();
+    style = widget.style ?? feedTheme.composeScreenStyle;
     _checkForRepost();
-    isCustomWidget = _checkForCustomWidget();
-
+    config = widget.config ?? LMFeedCore.config.composeConfig;
+    _headingController =
+        (config?.enableHeading ?? false) ? TextEditingController() : null;
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
     }
+  }
+
+  @override
+  void didUpdateWidget(LMFeedComposeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _checkForRepost();
+    style = widget.style ?? feedTheme.composeScreenStyle;
+    _checkForRepost();
+    config = widget.config ?? LMFeedCore.config.composeConfig;
+    _headingController =
+        (config?.enableHeading ?? false) ? TextEditingController() : null;
+    composeBloc.add(LMFeedComposeFetchTopicsEvent());
   }
 
   @override
@@ -97,17 +120,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     }
     composeBloc.add(LMFeedComposeCloseEvent());
     super.dispose();
-  }
-
-  bool _checkForCustomWidget() {
-    if (widget.attachments != null) {
-      for (LMAttachmentViewData attachment in widget.attachments!) {
-        if (attachment.attachmentType == 5) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   void _checkForRepost() {
@@ -132,16 +144,20 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Handles all the events and states emitted by the compose bloc
   _composeBlocListener(BuildContext context, LMFeedComposeState state) {
     if (state is LMFeedComposeMediaErrorState) {
-      toast("Error while selecting media, please try again");
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(
+            text: 'Error while selecting media, please try again',
+          ),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedTheme.of(context);
-    style = widget.style ?? feedTheme?.composeScreenStyle;
     screenSize = MediaQuery.of(context).size;
-    config = widget.config ?? LMFeedCore.config.composeConfig;
+
     return WillPopScope(
       onWillPop: () {
         widget.composeDiscardDialogBuilder?.call(context) ??
@@ -155,8 +171,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
             bloc: composeBloc,
             listener: _composeBlocListener,
-            child: Scaffold(
-              backgroundColor: feedTheme?.container,
+            child: widgetUtility.scaffold(
+              source: LMFeedWidgetSource.createPostScreen,
+              backgroundColor: feedTheme.container,
               bottomSheet: _defMediaPicker(),
               appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
                   _defAppBar(),
@@ -172,26 +189,41 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   },
                   builder: (context, state) {
                     if (state is LMFeedComposeFetchedTopicsState) {
-                      return widget.composeTopicSelectorBuilder
-                              ?.call(state.topics) ??
-                          _defTopicSelector(state.topics);
+                      return widget.composeTopicSelectorBuilder?.call(
+                              context,
+                              _defTopicSelector(state.topics),
+                              composeBloc.selectedTopics) ??
+                          LMFeedCore.widgetUtility
+                              .composeScreenTopicSelectorBuilder(
+                                  context,
+                                  _defTopicSelector(state.topics),
+                                  composeBloc.selectedTopics);
                     }
                     return const SizedBox.shrink();
                   },
                 ),
               ),
               body: SafeArea(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 18),
-                      widget.composeContentBuilder?.call() ??
-                          _defContentInput(),
-                      const SizedBox(height: 18),
-                      widget.composeMediaPreviewBuilder?.call() ??
-                          _defMediaPreview(),
-                      const SizedBox(height: 150),
-                    ],
+                child: Container(
+                  margin: EdgeInsets.only(
+                    bottom: 150,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 18),
+                        widget.composeUserHeaderBuilder?.call(context, user!) ??
+                            widgetUtility.composeScreenUserHeaderBuilder(
+                                context, user!),
+                        const SizedBox(height: 18),
+                        widget.composeContentBuilder?.call() ??
+                            _defContentInput(),
+                        const SizedBox(height: 18),
+                        widget.composeMediaPreviewBuilder?.call() ??
+                            _defMediaPreview(),
+                        const SizedBox(height: 150),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -208,7 +240,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       builder: (dialogContext) => DefaultTextStyle(
         style: const TextStyle(),
         child: AlertDialog(
-          backgroundColor: feedTheme?.container,
+          backgroundColor: feedTheme.container,
           title: const Text('Discard Post'),
           content:
               const Text('Are you sure you want to discard the current post?'),
@@ -223,7 +255,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     text: "No",
                     style: LMFeedTextStyle(
                       textStyle: TextStyle(
-                        color: LMFeedTheme.of(context).primaryColor,
+                        color: LMFeedCore.theme.primaryColor,
                         fontSize: 16,
                         fontWeight: FontWeight.normal,
                       ),
@@ -240,7 +272,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     text: "Yes",
                     style: LMFeedTextStyle(
                       textStyle: TextStyle(
-                        color: LMFeedTheme.of(context).primaryColor,
+                        color: LMFeedCore.theme.primaryColor,
                         fontSize: 16,
                         fontWeight: FontWeight.normal,
                       ),
@@ -285,7 +317,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       padding: const EdgeInsets.all(8.0),
                       child: LMFeedPostWidget(
                         post: repost!,
-                        user: repost!.user!,
+                        user: repost!.user,
                         isFeed: false,
                         topics: repost?.topics ?? [],
                         footerBuilder: (context, footer, footerData) =>
@@ -299,9 +331,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                             borderRadius: BorderRadius.circular(8),
                             padding: const EdgeInsets.all(8),
                             border: Border.all(
-                              color: LMFeedTheme.of(context)
-                                  .onContainer
-                                  .withOpacity(0.1),
+                              color:
+                                  LMFeedCore.theme.onContainer.withOpacity(0.1),
                             )),
                         onPostTap: (context, postData) {
                           debugPrint('Post tapped');
@@ -329,7 +360,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         height: 24,
                         child: Icon(
                           Icons.cancel,
-                          color: feedTheme?.disabledColor,
+                          color: feedTheme.disabledColor,
                         ),
                       ),
                     ),
@@ -358,7 +389,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     mediaWidget = Container(
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
-                        color: feedTheme?.onContainer ?? Colors.black,
+                        color: feedTheme.onContainer,
                         borderRadius:
                             style?.mediaStyle?.imageStyle?.borderRadius,
                       ),
@@ -380,7 +411,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       width: style?.mediaStyle?.videoStyle?.width ??
                           screenSize?.width,
                       decoration: BoxDecoration(
-                        color: feedTheme?.onContainer ?? Colors.black,
+                        color: feedTheme.onContainer,
                         borderRadius:
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),
@@ -483,6 +514,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           right: 7.5,
                           child: GestureDetector(
                             onTap: () {
+                              if (composeBloc.postMedia[index].mediaType ==
+                                  LMMediaType.link) {
+                                linkCancelled = true;
+                              }
                               composeBloc.add(
                                 LMFeedComposeRemoveAttachmentEvent(
                                   index: index,
@@ -498,7 +533,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                               height: 24,
                               child: Icon(
                                 Icons.cancel,
-                                color: feedTheme?.disabledColor,
+                                color: feedTheme.disabledColor,
                               ),
                             ),
                           ),
@@ -517,10 +552,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   LMFeedAppBar _defAppBar() {
-    final theme = LMFeedTheme.of(context);
+    final theme = LMFeedCore.theme;
     return LMFeedAppBar(
         style: LMFeedAppBarStyle(
-          backgroundColor: feedTheme?.container ?? Colors.white,
+          backgroundColor: feedTheme.container,
           height: 72,
           centerTitle: true,
           padding: const EdgeInsets.symmetric(
@@ -579,20 +614,52 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             onTap: () {
               _focusNode.unfocus();
 
+              String? heading = _headingController?.text;
+              heading = heading?.trim();
+
               String postText = _controller.text;
               postText = postText.trim();
-              if (postText.isNotEmpty || composeBloc.postMedia.isNotEmpty) {
+              if ((heading?.isNotEmpty ?? false) ||
+                  postText.isNotEmpty ||
+                  composeBloc.postMedia.isNotEmpty) {
                 List<LMUserTagViewData> userTags = [...composeBloc.userTags];
                 List<LMTopicViewData> selectedTopics = [
                   ...composeBloc.selectedTopics
                 ];
 
+                if (config!.enableHeading &&
+                    config!.headingRequiredToCreatePost &&
+                    (heading == null || heading.isEmpty)) {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without heading",
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
+                if (config!.textRequiredToCreatePost && postText.isEmpty) {
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without text",
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
                 if (config!.topicRequiredToCreatePost &&
                     selectedTopics.isEmpty &&
                     config!.enableTopics) {
-                  toast(
-                    "Can't create a post without topic",
-                    duration: Toast.LENGTH_LONG,
+                  LMFeedCore.showSnackBar(
+                    LMFeedSnackBar(
+                      content: LMFeedText(
+                        text: "Can't create a post without topic",
+                      ),
+                    ),
                   );
                   return;
                 }
@@ -617,17 +684,21 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   );
                 }
                 LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-                  user: user,
+                  user: user!,
                   postText: result!,
                   selectedTopics: selectedTopics,
                   postMedia: [...composeBloc.postMedia],
+                  heading: _headingController?.text,
                 ));
 
                 Navigator.pop(context);
               } else {
-                toast(
-                  "Can't create a post without text or attachments",
-                  duration: Toast.LENGTH_LONG,
+                LMFeedCore.showSnackBar(
+                  LMFeedSnackBar(
+                    content: LMFeedText(
+                      text: "Can't create a post without text or attachments",
+                    ),
+                  ),
                 );
               }
             },
@@ -636,69 +707,99 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   Widget _defContentInput() {
-    final theme = LMFeedTheme.of(context);
+    final theme = LMFeedCore.theme;
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 12,
-        vertical: 4,
+        vertical: 6,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 4.0),
-            child: LMFeedProfilePicture(
-              fallbackText: widget.displayName ?? user.name,
-              imageUrl: widget.displayUrl ?? user.imageUrl,
-              style: LMFeedProfilePictureStyle(
-                backgroundColor: theme.primaryColor,
-                size: 36,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width - 82,
-                decoration: BoxDecoration(
-                  color: theme.container,
-                ),
-                child: LMTaggingAheadTextField(
-                  isDown: true,
-                  minLines: 3,
-                  enabled: config!.enableTagging,
-                  // maxLines: 200,
-                  decoration: const InputDecoration(
+          (config?.enableHeading ?? false)
+              ? TextField(
+                  controller: _headingController,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     errorBorder: InputBorder.none,
                     disabledBorder: InputBorder.none,
                     focusedErrorBorder: InputBorder.none,
+                    hintText: config?.headingHint,
+                    hintStyle: TextStyle(
+                      color: theme.onContainer.withOpacity(0.5),
+                    ),
                   ),
-                  onTagSelected: (tag) {
-                    composeBloc.userTags.add(tag);
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.userTaggedInPost,
-                        deprecatedEventName:
-                            LMFeedAnalyticsKeysDep.userTaggedInPost,
-                        eventProperties: {
-                          'tagged_user_id': tag.sdkClientInfo?.userUniqueId ??
-                              tag.userUniqueId,
-                          'tagged_user_count':
-                              composeBloc.userTags.length.toString(),
-                        },
+                  style: TextStyle(
+                    color: theme.onContainer,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                )
+              : const SizedBox.shrink(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              !(config?.enableHeading ?? false)
+                  ? Container(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      margin: const EdgeInsets.only(right: 12),
+                      child: LMFeedProfilePicture(
+                        fallbackText: widget.displayName ?? user!.name,
+                        imageUrl: widget.displayUrl ?? user!.imageUrl,
+                        style: LMFeedProfilePictureStyle(
+                          backgroundColor: theme.primaryColor,
+                          size: 36,
+                        ),
                       ),
-                    );
-                  },
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  onChange: _onTextChanged,
-                ),
+                    )
+                  : const SizedBox.shrink(),
+              Column(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width - 82,
+                    decoration: BoxDecoration(
+                      color: theme.container,
+                    ),
+                    child: LMTaggingAheadTextField(
+                      isDown: true,
+                      minLines: 3,
+                      enabled: config!.enableTagging,
+                      // maxLines: 200,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        hintText: config?.composeHint,
+                      ),
+                      onTagSelected: (tag) {
+                        composeBloc.userTags.add(tag);
+                        LMFeedAnalyticsBloc.instance.add(
+                          LMFeedFireAnalyticsEvent(
+                            eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+                            deprecatedEventName:
+                                LMFeedAnalyticsKeysDep.userTaggedInPost,
+                            eventProperties: {
+                              'tagged_user_id':
+                                  tag.sdkClientInfo?.uuid ?? tag.uuid,
+                              'tagged_user_count':
+                                  composeBloc.userTags.length.toString(),
+                            },
+                          ),
+                        );
+                      },
+                      controller: _controller,
+                      focusNode: _focusNode,
+                      onChange: _onTextChanged,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
               ),
-              const SizedBox(height: 24),
             ],
           ),
         ],
@@ -714,7 +815,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       _debounce?.cancel();
     }
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      handleTextLinks(p0);
+      if (!linkCancelled) handleTextLinks(p0);
     });
   }
 
@@ -729,7 +830,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   Widget _defMediaPicker() {
-    final theme = LMFeedTheme.of(context);
+    final theme = LMFeedCore.theme;
     return BlocBuilder(
       bloc: composeBloc,
       builder: (context, state) {
@@ -893,9 +994,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           margin: const EdgeInsets.only(left: 16.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(500),
-                            color: LMFeedTheme.of(context).container,
+                            color: LMFeedCore.theme.container,
                             border: Border.all(
-                              color: LMFeedTheme.of(context).primaryColor,
+                              color: LMFeedCore.theme.primaryColor,
                             ),
                           ),
                           child: LMFeedTopicChip(
@@ -909,14 +1010,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                                 : composeBloc.selectedTopics.first,
                             style: LMFeedTopicChipStyle(
                               textStyle: TextStyle(
-                                color: LMFeedTheme.of(context).primaryColor,
+                                color: LMFeedCore.theme.primaryColor,
                               ),
                               icon: LMFeedIcon(
                                 type: LMFeedIconType.icon,
                                 icon: CupertinoIcons.chevron_down,
                                 style: LMFeedIconStyle(
                                   size: 16,
-                                  color: LMFeedTheme.of(context).primaryColor,
+                                  color: LMFeedCore.theme.primaryColor,
                                 ),
                               ),
                             ),
@@ -986,9 +1087,8 @@ void sendPostCreationCompletedEvent(
     List<String> taggedUserId = [];
 
     taggedUserCount = usersTagged.length;
-    taggedUserId = usersTagged
-        .map((e) => e.sdkClientInfo?.userUniqueId ?? e.userUniqueId!)
-        .toList();
+    taggedUserId =
+        usersTagged.map((e) => e.sdkClientInfo?.uuid ?? e.uuid!).toList();
 
     propertiesMap['user_tagged'] = taggedUserCount == 0 ? 'no' : 'yes';
     if (taggedUserCount > 0) {

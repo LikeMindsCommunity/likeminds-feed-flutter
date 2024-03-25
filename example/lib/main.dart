@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/cred_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
@@ -26,7 +25,7 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LMFeedCore.instance.initialize(
-    apiKey: "YOUR_API_KEY",
+    apiKey: "6b51af13-ce28-444b-a571-53a3fb125444",
     domain: "feedsx://www.feedsx.com/",
   );
   setupNotifications();
@@ -109,9 +108,12 @@ Future<String?> setupMessaging() async {
     debugPrint("Token - $token");
     return token.toString();
   } else {
-    toast(
-      'User declined or has not accepted notification permissions',
-      duration: Toast.LENGTH_LONG,
+    LMFeedCore.showSnackBar(
+      LMFeedSnackBar(
+        content: const Text(
+          'User declined or has not accepted notification permissions',
+        ),
+      ),
     );
     return null;
   }

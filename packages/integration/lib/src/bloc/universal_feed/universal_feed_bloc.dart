@@ -12,7 +12,7 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
   List<LMTopicViewData> selectedTopics = [];
   // list of all the topics
   Map<String, LMTopicViewData> topics = {};
-  // list of all the users
+// list of all the users
   Map<String, LMUserViewData> users = {};
   // list of all the widgets
   Map<String, LMWidgetViewData> widgets = {};
@@ -52,17 +52,12 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
     } else {
       emit(LMFeedUniversalFeedLoadingState());
     }
-    List<Topic> selectedTopics = [];
 
-    if (event.topics != null && event.topics!.isNotEmpty) {
-      selectedTopics = event.topics!
-          .map((e) => LMTopicViewDataConvertor.toTopic(e))
-          .toList();
-    }
-    GetFeedResponse response = await LMFeedCore.instance.lmFeedClient.getFeed(
+    GetFeedResponse response =
+        await LMFeedCore.instance.lmFeedClient.getUniversalFeed(
       (GetFeedRequestBuilder()
-            ..page(event.offset)
-            ..topics(selectedTopics)
+            ..page(event.pageKey)
+            ..topicIds(event.topicsIds)
             ..pageSize(10))
           .build(),
     );
@@ -72,28 +67,53 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
           message: response.errorMessage ??
               "An error occurred, please check your network connection"));
     } else {
-      users.addAll(response.users?.map((key, value) =>
-              MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
-          {});
-
-      topics.addAll(response.topics?.map((key, value) =>
-              MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))) ??
-          {});
-
       widgets.addAll(response.widgets?.map((key, value) => MapEntry(
               key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
           {});
 
+      topics.addAll(response.topics?.map((key, value) => MapEntry(key,
+              LMTopicViewDataConvertor.fromTopic(value, widgets: widgets))) ??
+          {});
+
+      users.addAll(response.users?.map((key, value) => MapEntry(
+                key,
+                LMUserViewDataConvertor.fromUser(value,
+                    topics: topics,
+                    userTopics: response.userTopics,
+                    widgets: widgets),
+              )) ??
+          {});
+
+      Map<String, LMCommentViewData> filteredComments =
+          response.filteredComments?.map((key, value) => MapEntry(
+                  key, LMCommentViewDataConvertor.fromComment(value, users))) ??
+              {};
+
+      Map<String, LMPostViewData> repostedPosts = response.repostedPosts?.map(
+              (key, value) => MapEntry(
+                  key,
+                  LMPostViewDataConvertor.fromPost(
+                      post: value,
+                      users: users,
+                      topics: topics,
+                      widgets: widgets,
+                      filteredComments: filteredComments,
+                      userTopics: response.userTopics))) ??
+          {};
+
       emit(
         LMFeedUniversalFeedLoadedState(
+          pageKey: event.pageKey,
           topics: topics,
           posts: response.posts
                   ?.map((e) => LMPostViewDataConvertor.fromPost(
                         post: e,
-                        widgets: response.widgets,
-                        repostedPosts: response.repostedPosts,
-                        users: response.users,
-                        topics: response.topics,
+                        widgets: widgets,
+                        repostedPosts: repostedPosts,
+                        users: users,
+                        topics: topics,
+                        filteredComments: filteredComments,
+                        userTopics: response.userTopics,
                       ))
                   .toList() ??
               [],

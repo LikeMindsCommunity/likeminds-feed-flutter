@@ -15,6 +15,9 @@ class LMFeedPostMedia extends StatefulWidget {
     this.onError,
     this.style,
     this.onMediaTap,
+    this.carouselIndicatorBuilder,
+    this.videoBuilder,
+    this.imageBuilder,
   });
 
   final List<LMAttachmentViewData> attachments;
@@ -28,6 +31,10 @@ class LMFeedPostMedia extends StatefulWidget {
   final VoidCallback? onMediaTap;
 
   final LMFeedPostMediaStyle? style;
+  final LMFeedCarouselIndicatorBuilder? carouselIndicatorBuilder;
+
+  final LMFeedVideoBuilder? videoBuilder;
+  final LMFeedImageBuilder? imageBuilder;
 
   @override
   State<LMFeedPostMedia> createState() => _LMPostMediaState();
@@ -40,6 +47,10 @@ class LMFeedPostMedia extends StatefulWidget {
     Function(VideoController)? initialiseVideoController,
     Function(String, StackTrace)? onError,
     LMFeedPostMediaStyle? style,
+    Widget Function(BuildContext, int, int, Widget)? carouselIndicatorBuilder,
+    VoidCallback? onMediaTap,
+    LMFeedVideoBuilder? videoBuilder,
+    LMFeedImageBuilder? imageBuilder,
   }) {
     return LMFeedPostMedia(
       attachments: attachments ?? this.attachments,
@@ -48,6 +59,11 @@ class LMFeedPostMedia extends StatefulWidget {
       subtitle: subtitle ?? this.subtitle,
       onError: onError ?? this.onError,
       style: style ?? this.style,
+      carouselIndicatorBuilder:
+          carouselIndicatorBuilder ?? this.carouselIndicatorBuilder,
+      onMediaTap: onMediaTap ?? this.onMediaTap,
+      imageBuilder: imageBuilder ?? this.imageBuilder,
+      videoBuilder: videoBuilder ?? this.videoBuilder,
     );
   }
 }
@@ -78,11 +94,10 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
-    style = widget.style ?? LMFeedTheme.of(context).mediaStyle;
+    style = widget.style ?? LMFeedTheme.instance.theme.mediaStyle;
     if (attachments == null || attachments!.isEmpty) {
       return const SizedBox();
     }
-    // attachments = InheritedPostProvider.of(context)?.post.attachments ?? [];
     if (attachments!.first.attachmentType == 3) {
       /// If the attachment is a document,
       /// we need to call the method 'getDocumentList'
@@ -107,6 +122,10 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         imageStyle: widget.style?.imageStyle,
         videoStyle: widget.style?.videoStyle,
         onMediaTap: widget.onMediaTap,
+        carouselIndicatorBuilder: widget.carouselIndicatorBuilder,
+        imageBuilder: widget.imageBuilder,
+        videoBuilder: widget.videoBuilder,
+        style: widget.style?.carouselStyle,
       );
     } else if (attachments!.first.attachmentType == 8) {
       final repostData = attachments!.first.attachmentMeta.repost!;
@@ -115,7 +134,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         child: repostData.isDeleted ?? false
             ? Container(
                 decoration: BoxDecoration(
-                  color: LMFeedTheme.of(context).onContainer.withOpacity(0.2),
+                  color:
+                      LMFeedTheme.instance.theme.onContainer.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 height: 120,
@@ -128,7 +148,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
               )
             : LMFeedPostWidget(
                 post: repostData,
-                user: repostData.user!,
+                user: repostData.user,
                 isFeed: true,
                 topics: repostData.topics,
                 footerBuilder: (context, footer, footerData) =>
@@ -138,12 +158,12 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
                     return const SizedBox.shrink();
                   });
                 },
-                style: LMFeedTheme.of(context).postStyle.copyWith(
+                style: LMFeedTheme.instance.theme.postStyle.copyWith(
                     borderRadius: BorderRadius.circular(8),
                     padding: const EdgeInsets.all(8),
                     border: Border.all(
-                      color:
-                          LMFeedTheme.of(context).onContainer.withOpacity(0.1),
+                      color: LMFeedTheme.instance.theme.onContainer
+                          .withOpacity(0.1),
                     )),
                 onPostTap: (context, postData) {},
               ),

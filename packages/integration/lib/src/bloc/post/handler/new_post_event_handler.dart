@@ -61,7 +61,7 @@ void newPostEventHandler(
         } else {
           File mediaFile = media.mediaFile!;
           final String? response = await LMFeedMediaService.instance
-              .uploadFile(mediaFile, event.user.userUniqueId);
+              .uploadFile(mediaFile, event.user.sdkClientInfo.uuid);
           if (response != null) {
             attachments.add(
               Attachment(
@@ -74,9 +74,7 @@ void newPostEventHandler(
                     format: media.mediaType == LMMediaType.document
                         ? media.format
                         : null,
-                    duration: media.mediaType == LMMediaType.video
-                        ? 10
-                        : null),
+                    duration: media.mediaType == LMMediaType.video ? 10 : null),
               ),
             );
             progress.add(index / postMedia.length);
@@ -96,10 +94,21 @@ void newPostEventHandler(
     List<Topic> postTopics = event.selectedTopics
         .map((e) => LMTopicViewDataConvertor.toTopic(e))
         .toList();
+    String? postText = event.postText;
+    String? headingText = event.heading;
+
     final requestBuilder = AddPostRequestBuilder()
-      ..text(event.postText)
       ..attachments(attachments)
-      ..topics(postTopics);
+      ..topicIds(postTopics.map((e) => e.id).toList())
+      ..tempId('${-DateTime.now().millisecondsSinceEpoch}');
+
+    if (headingText != null) {
+      requestBuilder.heading(headingText);
+    }
+
+    if (postText != null) {
+      requestBuilder.text(postText);
+    }
 
     if (isRepost != null) {
       requestBuilder.isRepost(isRepost);
@@ -108,39 +117,58 @@ void newPostEventHandler(
         await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
 
     if (response.success) {
+      Map<String, LMWidgetViewData> widgets =
+          (response.widgets ?? <String, WidgetModel>{}).map((key, value) =>
+              MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
+
+      Map<String, LMTopicViewData> topics =
+          (response.topics ?? <String, Topic>{}).map((key, value) => MapEntry(
+              key,
+              LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+
+      Map<String, LMUserViewData> users =
+          (response.user ?? <String, User>{}).map((key, value) => MapEntry(
+              key,
+              LMUserViewDataConvertor.fromUser(
+                value,
+                topics: topics,
+                userTopics: response.userTopics,
+                widgets: widgets,
+              )));
+
+      Map<String, LMPostViewData> repostedPosts =
+          response.repostedPosts?.map((key, value) => MapEntry(
+                  key,
+                  LMPostViewDataConvertor.fromPost(
+                    post: value,
+                    users: users,
+                    topics: topics,
+                    widgets: widgets,
+                  ))) ??
+              {};
+
       emit(
         LMFeedNewPostUploadedState(
             postData: LMPostViewDataConvertor.fromPost(
               post: response.post!,
-              widgets: response.widgets ?? {},
-              repostedPosts: response.repostedPosts ?? {},
-              users: response.user ?? {},
-              topics: response.topics ?? {},
+              widgets: widgets,
+              repostedPosts: repostedPosts,
+              users: users,
+              topics: topics,
             ),
-            userData: (response.user ?? <String, User>{}).map((key, value) =>
-                MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
-            topics: (response.topics ?? <String, Topic>{}).map(
-              (key, value) => MapEntry(
-                key,
-                LMTopicViewDataConvertor.fromTopic(value),
-              ),
-            ),
-            widgets: (response.widgets ?? <String, WidgetModel>{}).map(
-              (key, value) => MapEntry(
-                key,
-                LMWidgetViewDataConvertor.fromWidgetModel(value),
-              ),
-            )),
+            userData: users,
+            topics: topics,
+            widgets: widgets),
       );
     } else {
-      emit(LMFeedNewPostErrorState(message: response.errorMessage!));
+      emit(LMFeedNewPostErrorState(errorMessage: response.errorMessage!));
     }
 
     LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
   } on Exception catch (err, stacktrace) {
     LMFeedLogger.instance.handleException(err, stacktrace);
 
-    emit(const LMFeedNewPostErrorState(message: 'An error occurred'));
+    emit(const LMFeedNewPostErrorState(errorMessage: 'An error occurred'));
     debugPrint(err.toString());
   }
 }

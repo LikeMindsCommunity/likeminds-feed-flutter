@@ -33,3 +33,7 @@ migrate_working_dir/
 build/
 .metadata
 
+# FVM Version Cache
+/.fvm/
+/.fvmrc
+/.vscode/

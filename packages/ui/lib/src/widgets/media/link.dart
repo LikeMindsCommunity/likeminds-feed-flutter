@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
-import 'package:likeminds_feed_flutter_ui/src/utils/theme/theme.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /*
@@ -44,8 +42,8 @@ class LMFeedLinkPreview extends StatelessWidget {
   final LMFeedText? url;
 
   // defaults to false, to show link url
-
-  final Function(String, StackTrace)? onError;
+  /// {@macro feed_error_handler}
+  final LMFeedErrorHandler? onError;
 
   final LMFeedPostLinkPreviewStyle? style;
 
@@ -61,7 +59,7 @@ class LMFeedLinkPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    final LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     final LMFeedPostLinkPreviewStyle style =
         this.style ?? feedTheme.mediaStyle.linkStyle;
     return GestureDetector(

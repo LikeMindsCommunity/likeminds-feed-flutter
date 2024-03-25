@@ -25,7 +25,7 @@ class LMFeedMediaService {
     _poolId = isProd ? CredsProd.poolId : CredsDev.poolId;
   }
 
-  Future<String?> uploadFile(File file, String userUniqueId) async {
+  Future<String?> uploadFile(File file, String uuid) async {
     try {
       String extension = path.extension(file.path);
       String fileName = path.basenameWithoutExtension(file.path);
@@ -43,7 +43,7 @@ class LMFeedMediaService {
         _bucketName,
         _poolId,
         _region,
-        s3FolderPath: "files/post/$userUniqueId",
+        s3FolderPath: "files/post/$uuid",
       );
 
       return result;

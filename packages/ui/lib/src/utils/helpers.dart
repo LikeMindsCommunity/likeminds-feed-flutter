@@ -10,7 +10,7 @@ class LMFeedTaggingHelper {
   static const String notificationTagRoute =
       r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9_]+)>>';
   static const String tagRoute =
-      r'<<([^<>]+)\|route://member/([a-zA-Z-0-9_]+)>>';
+      r'<<([^<>]+)\|route://user_profile/([a-zA-Z-0-9_]+)>>';
   static const String linkRoute =
       r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)';
 
@@ -23,7 +23,7 @@ class LMFeedTaggingHelper {
           userTags.firstWhereOrNull((element) => element.name! == tag);
       if (userTag != null) {
         string = string.replaceAll('@$tag~',
-            '<<${userTag.name}|route://member/${userTag.sdkClientInfo?.userUniqueId ?? userTag.userUniqueId}>>');
+            '<<${userTag.name}|route://user_profile/${userTag.sdkClientInfo?.uuid ?? userTag.uuid}>>');
       }
     }
     return string;
@@ -37,7 +37,7 @@ class LMFeedTaggingHelper {
     for (final match in matches) {
       final String tag = match.group(1)!;
       final String id = match.group(3)!;
-      string = string.replaceAll('<<$tag|route://member/$id>>', '@$tag');
+      string = string.replaceAll('<<$tag|route://user_profile/$id>>', '@$tag');
       result.addAll({tag: id});
     }
     return result;
@@ -71,13 +71,6 @@ class LMFeedTaggingHelper {
       }
     }
     return tags;
-  }
-
-  static void routeToProfile(String userId) {
-    debugPrint(userId);
-    // if (!locator<LikeMindsService>().isProd) {
-    //   toast('Profile call back fired');
-    // }
   }
 
   static String convertRouteToTag(String text, {bool withTilde = true}) {
@@ -125,7 +118,7 @@ class LMFeedTaggingHelper {
 
       userTagViewDataBuilder
         ..name(tag)
-        ..userUniqueId(id);
+        ..uuid(id);
 
       userTags.add(userTagViewDataBuilder.build());
     }
@@ -146,14 +139,18 @@ class LMFeedTaggingHelper {
 
       userTagViewDataBuilder
         ..name(tag)
-        ..userUniqueId(id);
+        ..uuid(id);
 
       userTags.add(userTagViewDataBuilder.build());
     }
     return userTags;
   }
 
-  static List<TextSpan> extractNotificationTags(String text) {
+  static List<TextSpan> extractNotificationTags(
+    String text, {
+    TextStyle? normalTextStyle,
+    TextStyle? tagTextStyle,
+  }) {
     List<TextSpan> textSpans = [];
     final Iterable<RegExpMatch> matches =
         RegExp(notificationTagRoute).allMatches(text);
@@ -168,10 +165,11 @@ class LMFeedTaggingHelper {
         textSpans.add(
           TextSpan(
             text: text.substring(lastIndex, startIndex),
-            style: const TextStyle(
-              wordSpacing: 1.5,
-              color: Colors.grey,
-            ),
+            style: normalTextStyle ??
+                const TextStyle(
+                  wordSpacing: 1.5,
+                  color: Colors.grey,
+                ),
           ),
         );
       }
@@ -179,11 +177,12 @@ class LMFeedTaggingHelper {
       textSpans.add(
         TextSpan(
           text: LMFeedTaggingHelper.decodeNotificationString(link!).keys.first,
-          style: const TextStyle(
-            wordSpacing: 1.5,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey,
-          ),
+          style: tagTextStyle ??
+              const TextStyle(
+                wordSpacing: 1.5,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
         ),
       );
 
@@ -194,7 +193,8 @@ class LMFeedTaggingHelper {
       // Add a TextSpan for the remaining text
       textSpans.add(TextSpan(
         text: text.substring(lastIndex),
-        style: const TextStyle(wordSpacing: 1.5, color: Colors.grey),
+        style: normalTextStyle ??
+            const TextStyle(wordSpacing: 1.5, color: Colors.grey),
       ));
     }
 

@@ -19,6 +19,8 @@ class LMFeedFetchCommentReplyBloc
 
   LMFeedCore lmFeedIntegration = LMFeedCore.instance;
   LMFeedFetchCommentReplyBloc._() : super(LMFeedCommentRepliesInitialState()) {
+    on<LMFeedDeleteLocalReplyEvent>((event, emit) =>
+        emit(LMFeedDeleteLocalReplyState(replyId: event.replyId)));
     on<LMFeedCommentRepliesEvent>((event, emit) async {
       if (event is LMFeedGetCommentRepliesEvent) {
         await _mapGetCommentRepliesToState(
@@ -26,13 +28,11 @@ class LMFeedFetchCommentReplyBloc
             forLoadMore: event.forLoadMore,
             emit: emit,
             lmFeedIntegration: lmFeedIntegration);
-      }
-    });
-    on<LMFeedClearCommentRepliesEvent>(
-      (event, emit) {
+      } else if (event is LMFeedClearCommentRepliesEvent)
         emit(LMFeedClearedCommentRepliesState());
-      },
-    );
+      else if (event is LMFeedAddLocalReplyEvent)
+        emit(LMFeedAddLocalReplyState(comment: event.comment));
+    });
   }
 
   FutureOr<void> _mapGetCommentRepliesToState(

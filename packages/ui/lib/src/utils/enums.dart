@@ -9,3 +9,45 @@ enum LMFeedAlignment { left, centre, right }
 
 /// enum to describe type of icon for any LMFeedIcon
 enum LMFeedIconType { icon, svg, png }
+
+/// enum to describe type of list for LMFeedPostLikesList
+enum LMFeedPostLikesListViewType { screen, bottomSheet }
+
+enum LMFeedPostDeleteViewType { dialog, bottomSheet }
+
+/// enum to describe type of menu for LMFeedPostMenu
+enum LMFeedPostMenuType { popUp, bottomSheet }
+
+/// enum to describe the source of widget
+enum LMFeedWidgetSource {
+  universalFeed,
+  feedroom,
+  postDetailScreen,
+  userFeed,
+  activityScreen,
+  createPostScreen,
+  editPostScreen,
+  notificationScreen,
+  topicSelectScreen,
+  likesScreen,
+  mediaPreviewScreen,
+  reportScreen,
+  searchScreen,
+}
+
+/// enum to describe the type of action on a post
+enum LMFeedPostActionType {
+  like,
+  unlike,
+  commentAdded,
+  commentEdited,
+  commentDeleted,
+  replyAdded,
+  replyEdited,
+  replyDeleted,
+  saved,
+  unsaved,
+  pinned,
+  unpinned,
+  edited,
+}

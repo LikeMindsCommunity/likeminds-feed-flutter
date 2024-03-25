@@ -63,3 +63,19 @@ class LMFeedClearedCommentRepliesState extends LMFeedCommentRepliesState {
   @override
   List<Object?> get props => [time];
 }
+
+class LMFeedAddLocalReplyState extends LMFeedCommentRepliesState {
+  final LMCommentViewData comment;
+  const LMFeedAddLocalReplyState({required this.comment});
+  @override
+  List<Object?> get props => [comment];
+}
+
+class LMFeedDeleteLocalReplyState extends LMFeedCommentRepliesState {
+  final String replyId;
+
+  const LMFeedDeleteLocalReplyState({required this.replyId});
+
+  @override
+  List<Object?> get props => [replyId];
+}

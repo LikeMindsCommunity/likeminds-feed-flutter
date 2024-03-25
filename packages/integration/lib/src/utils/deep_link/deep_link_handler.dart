@@ -23,7 +23,6 @@ class LMFeedDeepLinkHandler {
 
   // Below functions takes the user outside of the application
   // using the domain provided at the time of initialization
-  // TODO: Add prefix text, image as per your requirements
   void sharePost(String postId) {
     String postUrl = createLink(postId);
     Share.share(postUrl);
@@ -63,7 +62,7 @@ class LMFeedDeepLinkHandler {
     } else {
       InitiateUserResponse response =
           await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-                ..userId(request.userId)
+                ..uuid(request.uuid)
                 ..userName(request.userName))
               .build());
       if (response.success) {
@@ -91,7 +90,7 @@ class LMFeedDeepLinkHandler {
   ) async {
     InitiateUserResponse response =
         await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-              ..userId(request.userId)
+              ..uuid(request.uuid)
               ..userName(request.userName))
             .build());
     if (response.success) {
@@ -127,7 +126,7 @@ class LMFeedDeepLinkHandler {
     } else {
       InitiateUserResponse response =
           await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-                ..userId(request.userId)
+                ..uuid(request.uuid)
                 ..userName(request.userName))
               .build());
       if (response.success) {

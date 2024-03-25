@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
@@ -8,7 +10,12 @@ part 'get_post_video_controller_request.dart';
 /// post with videos.
 /// It also manages the lifecycle of the video controllers.
 /// Any Controller that goes out of scope is disposed by the LMVideoProvider.
-class LMFeedVideoProvider {
+class LMFeedVideoProvider with ChangeNotifier {
+  // This variable holds the mute state of the video controllers.
+  // If the value is true, then all the video controllers are muted.
+  // If the value is false, then all the video controllers are unmuted.
+  ValueNotifier<bool> isMuted = ValueNotifier(true);
+
   /// Map of postId to VideoPlayerController
   /// This map holds all the video controllers that are currently in use.
   /// The video controllers are disposed when they are removed from this map.
@@ -50,8 +57,10 @@ class LMFeedVideoProvider {
           await initialisePostVideoController(request);
     }
 
-    if (request.isMuted) {
+    if (isMuted.value) {
       videoController.player.setVolume(0.0);
+    } else {
+      videoController.player.setVolume(100.0);
     }
 
     return videoController;
@@ -82,7 +91,7 @@ class LMFeedVideoProvider {
       configuration: PlayerConfiguration(
         bufferSize: 24 * 1024 * 1024,
         ready: () {},
-        muted: request.isMuted,
+        muted: isMuted.value,
       ),
     );
     controller = VideoController(
@@ -116,6 +125,22 @@ class LMFeedVideoProvider {
     for (var controller in _videoControllers.values) {
       controller.player.setVolume(0.0);
     }
+    isMuted.value = true;
+  }
+
+  void toggleVolumeState() {
+    if (isMuted.value) {
+      for (var controller in _videoControllers.values) {
+        controller.player.setVolume(100.0);
+      }
+      isMuted.value = false;
+    } else {
+      for (var controller in _videoControllers.values) {
+        controller.player.setVolume(0.0);
+      }
+      isMuted.value = true;
+    }
+    notifyListeners();
   }
 
   /// This functions pause all the controller in the map.

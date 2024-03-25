@@ -1,125 +1,85 @@
-import 'dart:convert';
-
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
+class LMFeedLocalPreference {
+  static LMFeedLocalPreference? _instance;
 
-class LMFeedUserLocalPreference {
-  SharedPreferences? _sharedPreferences;
+  static LMFeedLocalPreference get instance =>
+      _instance ??= LMFeedLocalPreference._();
 
-  static LMFeedUserLocalPreference? _instance;
+  LMFeedLocalPreference._();
 
-  static LMFeedUserLocalPreference get instance =>
-      _instance ??= LMFeedUserLocalPreference._();
-
-  LMFeedUserLocalPreference._();
-
-  final String _userKey = 'user';
-  final String _memberStateKey = 'isCm';
-
-  Future<void> initialize() async {
-    _sharedPreferences = await SharedPreferences.getInstance();
+  Future<LMResponse> storeUserData(User user) async {
+    return await LMFeedCore.client.insertOrUpdateLoggedInUser(user);
   }
 
-  Future<void> storeUserData(User user) async {
-    UserEntity userEntity = user.toEntity();
-    Map<String, dynamic> userData = userEntity.toJson();
-    String userString = jsonEncode(userData);
-    await _sharedPreferences!.setString(_userKey, userString);
-  }
+  LMUserViewData? fetchUserData() {
+    LMResponse response = LMFeedCore.client.getLoggedInUser();
 
-  User fetchUserData() {
-    String? userDataString = _sharedPreferences!.getString(_userKey);
-
-    Map<String, dynamic> userData = jsonDecode(userDataString!);
-    return User.fromEntity(UserEntity.fromJson(userData));
-  }
-
-  Future<void> storeMemberState(bool isCm) async {
-    await _sharedPreferences!.setBool(_memberStateKey, isCm);
-  }
-
-  bool fetchMemberState() {
-    return _sharedPreferences!.getBool(_memberStateKey) ?? true;
-  }
-
-  Future<void> storeMemberRights(MemberStateResponse response) async {
-    final entity = response.toEntity();
-    Map<String, dynamic> memberRights = entity.toJson();
-    String memberRightsString = jsonEncode(memberRights);
-    await storeMemberState(response.state == 1);
-    await _sharedPreferences!.setString('memberRights', memberRightsString);
-  }
-
-  MemberStateResponse fetchMemberRights() {
-    String? getMemberStateString =
-        _sharedPreferences!.getString('memberRights');
-
-    if (getMemberStateString == null) {
-      LMFeedCore.instance.lmFeedClient.getMemberState();
-      return MemberStateResponse(
-          success: false, errorMessage: "An error occurred");
-    }
-
-    Map<String, dynamic> memberRights =
-        jsonDecode(_sharedPreferences!.getString('memberRights')!);
-    return MemberStateResponse.fromJson(memberRights);
-  }
-
-  bool fetchMemberRight(int id) {
-    MemberStateResponse memberStateResponse = fetchMemberRights();
-    if (memberStateResponse.success == false ||
-        memberStateResponse.memberRights == null) {
-      return true;
-    }
-    final memberRights = memberStateResponse.memberRights;
-
-    final right = memberRights!.where((element) => element.state == id);
-    if (right.isEmpty) {
-      return true;
+    if (response.success) {
+      return LMUserViewDataConvertor.fromUser(response.data!);
     } else {
-      return right.first.isSelected;
+      return null;
     }
   }
 
-  Future<void> setUserDataFromInitiateUserResponse(
-      InitiateUserResponse response) async {
+  Future<LMResponse> clearUserData() async {
+    return await LMFeedCore.client.deleteLoggedInUser();
+  }
+
+  Future<LMResponse> storeCommunityConfiguration(
+      CommunityConfigurations communityConfiguration) async {
+    return await LMFeedCore.client
+        .insertOrUpdateCommunityConfigurationsDB([communityConfiguration]);
+  }
+
+  CommunityConfigurations? fetchCommunityConfiguration(String type) {
+    LMResponse response = LMFeedCore.client.getCommunityConfigurationsDB(type);
+
     if (response.success) {
-      await LMFeedUserLocalPreference.instance.storeUserData(response.user!);
+      return response.data!;
+    } else {
+      return null;
     }
   }
 
-  Future<void> storeMemberRightsFromMemberStateResponse(
-      MemberStateResponse response) async {
+  Future<LMResponse> storeMemberState(MemberStateResponse memberStateResponse) {
+    return LMFeedCore.client
+        .insertOrUpdateLoggedInMemberState(memberStateResponse);
+  }
+
+  Future<LMResponse> clearMemberState() {
+    return LMFeedCore.client.deleteLoggedInMemberState();
+  }
+
+  MemberStateResponse? fetchMemberState() {
+    LMResponse response = LMFeedCore.client.getLoggedInMemberState();
+
     if (response.success) {
-      await LMFeedUserLocalPreference.instance.storeMemberRights(response);
+      return response.data!;
+    } else {
+      return null;
     }
   }
 
-  Future<void> storeCommunityConfigurations(
-      CommunityConfigurations configurations) async {
-    final configString = jsonEncode(configurations.toEntity().toJson());
-    await _sharedPreferences!
-        .setString('communityConfigurations', configString);
+  Future<LMResponse> storeCache(LMCache cache) {
+    return LMFeedCore.client.insertOrUpdateCache(cache);
   }
 
-  Future<CommunityConfigurations> getCommunityConfigurations() async {
-    String? communityConfigurationString =
-        _sharedPreferences!.getString('communityConfigurations');
+  LMCache? fetchCache(String key) {
+    LMResponse response = LMFeedCore.client.getCache(key);
 
-    if (communityConfigurationString == null) {
-      return CommunityConfigurations(value: {}, type: '', description: '');
+    if (response.success) {
+      return response.data!;
+    } else {
+      return null;
     }
-
-    Map<String, dynamic> communityConfigurations =
-        jsonDecode(communityConfigurationString);
-
-    final entity =
-        CommunityConfigurationsEntity.fromJson(communityConfigurations);
-    return CommunityConfigurations.fromEntity(entity);
   }
 
-  Future<void> clearLocalPrefs() async {
-    await _sharedPreferences!.clear();
+  Future<LMResponse> deleteCache(String key) {
+    return LMFeedCore.client.deleteCache(key);
+  }
+
+  Future<LMResponse> clearCache() {
+    return LMFeedCore.client.clearCache();
   }
 }

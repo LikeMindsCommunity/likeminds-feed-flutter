@@ -6,6 +6,8 @@ class LMFeedTopicInitialState extends LMFeedTopicState {}
 
 class LMFeedTopicLoadingState extends LMFeedTopicState {}
 
+class LMFeedTopicPaginationLoadingState extends LMFeedTopicState {}
+
 class LMFeedTopicErrorState extends LMFeedTopicState {
   final String errorMessage;
 
@@ -14,6 +16,7 @@ class LMFeedTopicErrorState extends LMFeedTopicState {
 
 class LMFeedTopicLoadedState extends LMFeedTopicState {
   final GetTopicsResponse getTopicFeedResponse;
+  final int page;
 
-  LMFeedTopicLoadedState(this.getTopicFeedResponse);
+  LMFeedTopicLoadedState(this.getTopicFeedResponse, this.page);
 }

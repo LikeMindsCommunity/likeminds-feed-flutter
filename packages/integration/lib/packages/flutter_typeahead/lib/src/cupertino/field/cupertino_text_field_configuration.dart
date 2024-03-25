@@ -179,7 +179,8 @@ class CupertinoTextFieldConfiguration {
       cursorColor: cursorColor ?? this.cursorColor,
       keyboardAppearance: keyboardAppearance ?? this.keyboardAppearance,
       scrollPadding: scrollPadding ?? this.scrollPadding,
-      enableInteractiveSelection: enableInteractiveSelection ?? this.enableInteractiveSelection,
+      enableInteractiveSelection:
+          enableInteractiveSelection ?? this.enableInteractiveSelection,
     );
   }
 }

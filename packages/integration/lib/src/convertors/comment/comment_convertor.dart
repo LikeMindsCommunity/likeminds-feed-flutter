@@ -1,14 +1,13 @@
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/common/popup_menu_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMCommentViewDataConvertor {
-  static LMCommentViewData fromComment(Comment comment) {
+  static LMCommentViewData fromComment(
+      Comment comment, Map<String, LMUserViewData> users) {
     LMCommentViewDataBuilder commentViewDataBuilder =
         LMCommentViewDataBuilder();
     commentViewDataBuilder
       ..id(comment.id)
-      ..userId(comment.userId)
+      ..uuid(comment.uuid)
       ..text(comment.text)
       ..level(comment.level ?? 0)
       ..likesCount(comment.likesCount)
@@ -20,9 +19,12 @@ class LMCommentViewDataConvertor {
       ..updatedAt(DateTime.fromMillisecondsSinceEpoch(comment.updatedAt))
       ..isLiked(comment.isLiked)
       ..isEdited(comment.isEdited)
-      ..uuid(comment.uuid)
+      ..user(users[comment.uuid]!)
+      ..tempId(comment.tempId ?? '')
+      ..postId(comment.postId ?? '')
       ..parentComment(comment.parentComment != null
-          ? LMCommentViewDataConvertor.fromComment(comment.parentComment!)
+          ? LMCommentViewDataConvertor.fromComment(
+              comment.parentComment!, users)
           : null);
 
     return commentViewDataBuilder.build();
@@ -30,7 +32,7 @@ class LMCommentViewDataConvertor {
 
   static Comment toComment(LMCommentViewData commentViewData) {
     return Comment(
-      userId: commentViewData.userId,
+      uuid: commentViewData.uuid,
       text: commentViewData.text,
       level: commentViewData.level,
       likesCount: commentViewData.likesCount,
@@ -49,8 +51,8 @@ class LMCommentViewDataConvertor {
       replies: commentViewData.replies
           ?.map((e) => LMCommentViewDataConvertor.toComment(e))
           .toList(),
-      uuid: commentViewData.uuid,
       tempId: commentViewData.tempId,
+      postId: commentViewData.postId,
     );
   }
 }

@@ -1,9 +1,10 @@
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/sdk/sdk_client_info_convertor.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMUserViewDataConvertor {
-  static LMUserViewData fromUser(User user) {
+  static LMUserViewData fromUser(User user,
+      {Map<String, LMTopicViewData>? topics,
+      Map<String, List<String>>? userTopics,
+      Map<String, LMWidgetViewData>? widgets}) {
     LMUserViewDataBuilder userViewDataBuilder = LMUserViewDataBuilder();
 
     userViewDataBuilder.id(user.id);
@@ -11,6 +12,9 @@ class LMUserViewDataConvertor {
     userViewDataBuilder.name(user.name);
 
     userViewDataBuilder.imageUrl(user.imageUrl);
+
+    userViewDataBuilder.sdkClientInfo(
+        LMSDKClientInfoViewDataConvertor.fromSDKClientInfo(user.sdkClientInfo));
 
     if (user.isGuest != null) {
       userViewDataBuilder.isGuest(user.isGuest!);
@@ -20,16 +24,11 @@ class LMUserViewDataConvertor {
       userViewDataBuilder.isDeleted(user.isDeleted!);
     }
 
-    userViewDataBuilder.userUniqueId(user.userUniqueId);
+    userViewDataBuilder.uuid(user.uuid);
     if (user.organisationName != null) {
       userViewDataBuilder.organisationName(user.organisationName!);
     }
 
-    if (user.sdkClientInfo != null) {
-      userViewDataBuilder.sdkClientInfo(
-          LMSDKClientInfoViewDataConvertor.fromSDKClientInfo(
-              user.sdkClientInfo!));
-    }
     if (user.updatedAt != null) {
       userViewDataBuilder.updatedAt(user.updatedAt!);
     }
@@ -55,6 +54,20 @@ class LMUserViewDataConvertor {
       userViewDataBuilder.createdAt(user.createdAt!);
     }
 
+    if ((topics != null && topics.isNotEmpty) &&
+        (userTopics != null && userTopics.isNotEmpty)) {
+      List<LMTopicViewData> userTopicsList = [];
+
+      userTopics[user.uuid]?.forEach((element) {
+        if (topics[element] != null) {
+          userTopicsList.add(topics[element]!);
+        }
+      });
+      userViewDataBuilder.topics(userTopicsList);
+    }
+    if (widgets != null && widgets[user.sdkClientInfo.widgetId] != null) {
+      userViewDataBuilder.widget(widgets[user.sdkClientInfo.widgetId]!);
+    }
     return userViewDataBuilder.build();
   }
 
@@ -64,12 +77,10 @@ class LMUserViewDataConvertor {
       name: userViewData.name,
       imageUrl: userViewData.imageUrl,
       isGuest: userViewData.isGuest,
-      userUniqueId: userViewData.userUniqueId,
+      uuid: userViewData.uuid,
       organisationName: userViewData.organisationName,
-      sdkClientInfo: userViewData.sdkClientInfo != null
-          ? LMSDKClientInfoViewDataConvertor.toSDKClientInfo(
-              userViewData.sdkClientInfo!)
-          : null,
+      sdkClientInfo: LMSDKClientInfoViewDataConvertor.toSDKClientInfo(
+          userViewData.sdkClientInfo),
       updatedAt: userViewData.updatedAt,
       isOwner: userViewData.isOwner,
       customTitle: userViewData.customTitle,

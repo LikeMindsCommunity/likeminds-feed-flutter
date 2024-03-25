@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:overlay_support/overlay_support.dart';
 
 class StoryBookApp extends StatefulWidget {
   const StoryBookApp({super.key});
@@ -12,10 +11,8 @@ class StoryBookApp extends StatefulWidget {
 class _StoryBookAppState extends State<StoryBookApp> {
   @override
   Widget build(BuildContext context) {
-    return const OverlaySupport.global(
-      child: MaterialApp(
-        home: StoryBookPage(),
-      ),
+    return const MaterialApp(
+      home: StoryBookPage(),
     );
   }
 }
@@ -61,5 +58,5 @@ final storyUser = (LMUserViewDataBuilder()
       ..name("Divu")
       ..id(123456)
       ..imageUrl("https://picsum.photos/200")
-      ..userUniqueId("sdbi13i42iciw2"))
+      ..uuid("sdbi13i42iciw2"))
     .build();

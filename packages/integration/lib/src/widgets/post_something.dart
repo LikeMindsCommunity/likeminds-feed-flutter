@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 
 class LMFeedPostSomething extends StatelessWidget {
   final VoidCallback? onTap;
@@ -18,9 +17,9 @@ class LMFeedPostSomething extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    User user = LMFeedUserLocalPreference.instance.fetchUserData();
+    LMUserViewData user = LMFeedLocalPreference.instance.fetchUserData()!;
     Size screenSize = MediaQuery.of(context).size;
-    LMFeedThemeData feedTheme = LMFeedTheme.of(context);
+    LMFeedThemeData feedTheme = LMFeedCore.theme;
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
@@ -48,10 +47,7 @@ class LMFeedPostSomething extends StatelessWidget {
                 ),
                 imageUrl: user.imageUrl,
                 onTap: () {
-                  if (user.sdkClientInfo != null) {
-                    LMFeedCore.client
-                        .routeToProfile(user.sdkClientInfo!.userUniqueId);
-                  }
+                  LMFeedCore.client.routeToProfile(user.sdkClientInfo.uuid);
                 },
               ),
               LikeMindsTheme.kHorizontalPaddingMedium,

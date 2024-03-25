@@ -1,3 +1,4 @@
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/sdk/sdk_client_info_view_data.dart';
 
 /// {@template lm_user_view_data}
@@ -14,9 +15,9 @@ class LMUserViewData {
   String? imageUrl;
   bool? isGuest;
   bool? isDeleted;
-  String userUniqueId;
+  String uuid;
   String? organisationName;
-  LMSDKClientInfoViewData? sdkClientInfo;
+  LMSDKClientInfoViewData sdkClientInfo;
   int? updatedAt;
   bool? isOwner;
 
@@ -33,15 +34,20 @@ class LMUserViewData {
   int? communityId;
   int? createdAt;
 
+  List<LMTopicViewData>? topics;
+
+  /// widget for storing custom data
+  LMWidgetViewData? widget;
+
   /// {@macro user_view_data}
   LMUserViewData._({
     required this.id,
     required this.name,
     this.imageUrl,
-    required this.isGuest,
-    required this.userUniqueId,
+    this.isGuest,
+    required this.uuid,
     this.organisationName,
-    this.sdkClientInfo,
+    required this.sdkClientInfo,
     this.updatedAt,
     this.isOwner,
     this.customTitle,
@@ -51,6 +57,8 @@ class LMUserViewData {
     this.communityId,
     this.createdAt,
     this.isDeleted,
+    this.topics,
+    this.widget,
   });
 }
 
@@ -63,7 +71,7 @@ class LMUserViewDataBuilder {
   String? _imageUrl;
   bool? _isGuest;
   bool? _isDeleted;
-  String? _userUniqueId;
+  String? _uuid;
   String? _organisationName;
   LMSDKClientInfoViewData? _sdkClientInfo;
   int? _updatedAt;
@@ -74,6 +82,8 @@ class LMUserViewDataBuilder {
   int? _state;
   int? _communityId;
   int? _createdAt;
+  List<LMTopicViewData>? _topics;
+  LMWidgetViewData? _widget;
 
   void id(int id) {
     _id = id;
@@ -95,8 +105,8 @@ class LMUserViewDataBuilder {
     _isDeleted = isDeleted;
   }
 
-  void userUniqueId(String userUniqueId) {
-    _userUniqueId = userUniqueId;
+  void uuid(String uuid) {
+    _uuid = uuid;
   }
 
   void organisationName(String organisationName) {
@@ -139,6 +149,14 @@ class LMUserViewDataBuilder {
     _createdAt = createdAt;
   }
 
+  void topics(List<LMTopicViewData> topics) {
+    _topics = topics;
+  }
+
+  void widget(LMWidgetViewData widget) {
+    _widget = widget;
+  }
+
   /// {@macro user_view_data_builder}
   LMUserViewData build() {
     return LMUserViewData._(
@@ -146,9 +164,9 @@ class LMUserViewDataBuilder {
       name: _name!,
       imageUrl: _imageUrl,
       isGuest: _isGuest,
-      userUniqueId: _userUniqueId!,
+      uuid: _uuid!,
       organisationName: _organisationName,
-      sdkClientInfo: _sdkClientInfo,
+      sdkClientInfo: _sdkClientInfo!,
       updatedAt: _updatedAt,
       isOwner: _isOwner,
       customTitle: _customTitle,
@@ -158,6 +176,8 @@ class LMUserViewDataBuilder {
       communityId: _communityId,
       createdAt: _createdAt,
       isDeleted: _isDeleted,
+      topics: _topics,
+      widget: _widget,
     );
   }
 }
