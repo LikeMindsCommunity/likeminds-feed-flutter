@@ -27,7 +27,7 @@ enum LMFeedTopicSelectionWidgetType {
 /// {@endtemplate}
 class LMFeedScreenConfig {
   const LMFeedScreenConfig({
-    this.composeSystemOverlayStyle = SystemUiOverlayStyle.dark,
+    this.feedSystemOverlayStyle = SystemUiOverlayStyle.light,
     this.enableTopicFiltering = true,
     this.topicSelectionWidgetType =
         LMFeedTopicSelectionWidgetType.showTopicSelectionScreen,
@@ -37,7 +37,7 @@ class LMFeedScreenConfig {
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]
   /// to support changing light and dark style of overall system
   /// elements in accordance to the screen's background
-  final SystemUiOverlayStyle composeSystemOverlayStyle;
+  final SystemUiOverlayStyle feedSystemOverlayStyle;
 
   /// [bool] to enable/disable topic selection
   final bool enableTopicFiltering;
@@ -62,8 +62,8 @@ class LMFeedScreenConfig {
     bool? showCustomWidget,
   }) {
     return LMFeedScreenConfig(
-      composeSystemOverlayStyle:
-          composeSystemOverlayStyle ?? this.composeSystemOverlayStyle,
+      feedSystemOverlayStyle:
+          composeSystemOverlayStyle ?? this.feedSystemOverlayStyle,
       enableTopicFiltering: enableTopicFiltering ?? this.enableTopicFiltering,
       topicSelectionWidgetType:
           topicSelectionWidgetType ?? this.topicSelectionWidgetType,
