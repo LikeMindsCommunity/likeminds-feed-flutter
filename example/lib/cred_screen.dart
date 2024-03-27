@@ -5,6 +5,7 @@ import 'package:likeminds_feed_sample/main.dart';
 import 'package:likeminds_feed_sample/tab_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_sample/utils/utils.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
@@ -245,7 +246,7 @@ class _CredScreenState extends State<CredScreen> {
               ),
               const SizedBox(height: 36),
               GestureDetector(
-                onTap: () {
+                onTap: () async {
                   String uuid = _uuidController.text;
                   String userName = _usernameController.text;
 
@@ -266,11 +267,18 @@ class _CredScreenState extends State<CredScreen> {
                   }
 
                   // Call initiateUser
+                  String? accessToken, refreshToken;
 
-                  // TODO: Change token
+                  (accessToken, refreshToken) =
+                      await initiateUser(uuid, userName);
+
+                  if (accessToken == null || refreshToken == null) {
+                    return;
+                  }
+
                   lmFeed = LMSampleApp(
-                    refreshToken: _uuidController.text,
-                    accessToken: _usernameController.text,
+                    refreshToken: refreshToken,
+                    accessToken: accessToken,
                   );
 
                   MaterialPageRoute route = MaterialPageRoute(
