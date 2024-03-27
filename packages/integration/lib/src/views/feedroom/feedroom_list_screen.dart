@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
+// import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feedroom/feedroom_screen.dart';
 
 class FeedRoomListScreen extends StatefulWidget {
   const FeedRoomListScreen({

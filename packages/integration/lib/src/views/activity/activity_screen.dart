@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/delete_dialog.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+// import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -283,11 +283,13 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         );
       },
       onMediaTap: () async {
-        VideoController? videoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
+        // VideoController? videoController = LMFeedVideoProvider.instance
+        //     .getVideoController(
+        //         LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
-        await videoController?.player.pause();
+        // await videoController?.player.pause();
+
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         await Navigator.push(
           context,
@@ -300,7 +302,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           ),
         );
 
-        await videoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       onPostTap: (context, post) {
         navigateToLMFeedPostDetailsScreen(post.id);
@@ -447,11 +449,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       style: feedTheme?.mediaStyle,
       postId: post.id,
       onMediaTap: () async {
-        VideoController? videoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await videoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         await Navigator.push(
           context,
@@ -464,7 +462,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           ),
         );
 
-        await videoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
     );
   }
@@ -770,21 +768,21 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                   ),
                 );
 
-                DeleteCommentRequest deleteCommentRequest =
-                    (DeleteCommentRequestBuilder()
-                          ..postId(postViewData.id)
-                          ..commentId(commentViewData.id)
-                          ..reason(
-                              reason.isEmpty ? "Reason for deletion" : reason))
-                        .build();
+                // DeleteCommentRequest deleteCommentRequest =
+                //     (DeleteCommentRequestBuilder()
+                //           ..postId(postViewData.id)
+                //           ..commentId(commentViewData.id)
+                //           ..reason(
+                //               reason.isEmpty ? "Reason for deletion" : reason))
+                //         .build();
 
-                LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-                      ..commentActionEntity(LMFeedCommentType.parent)
-                      ..postId(postViewData.id)
-                      ..commentActionType(LMFeedCommentActionType.delete)
-                      ..level(0)
-                      ..commentId(commentViewData.id))
-                    .build();
+                // LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
+                //       ..commentActionEntity(LMFeedCommentType.parent)
+                //       ..postId(postViewData.id)
+                //       ..commentActionType(LMFeedCommentActionType.delete)
+                //       ..level(0)
+                //       ..commentId(commentViewData.id))
+                //     .build();
               },
               actionText: 'Delete',
             ),
@@ -793,11 +791,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       );
 
   void navigateToLMFeedPostDetailsScreen(String postId) async {
-    VideoController? videoController = LMFeedVideoProvider.instance
-        .getVideoController(
-            LMFeedVideoProvider.instance.currentVisiblePostId ?? postId);
-
-    await videoController?.player.pause();
+    LMFeedVideoProvider.instance.pauseCurrentVideo();
 
     await Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
@@ -810,7 +804,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       ),
     );
 
-    await videoController?.player.play();
+    LMFeedVideoProvider.instance.playCurrentVideo();
   }
 
   void handlePostPinAction(LMPostViewData postViewData) async {

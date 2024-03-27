@@ -129,6 +129,12 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 style: widget.videoStyle,
                 postId: widget.postId,
                 onMediaTap: widget.onMediaTap,
+                videoController:
+                    LMFeedVideoProvider.instance.getVideoControllers(
+                  widget.postId,
+                  widget.attachments.indexOf(e),
+                ),
+                position: widget.attachments.indexOf(e),
               ),
         );
       } else {

@@ -20,12 +20,14 @@ class LMFeedVideoProvider with ChangeNotifier {
   /// This map holds all the video controllers that are currently in use.
   /// The video controllers are disposed when they are removed from this map.
   /// This map is also used to check if a video controller is already in use.
-  final Map<String, VideoController> _videoControllers = {};
+  final Map<String, Map<int, VideoController>> _videoControllers = {};
 
   /// This variable holds the postId of the post that is currently visible.
   /// It variable is used to pause the video when the post is not visible
   /// or to resume the video when the post becomes visible.
   String? currentVisiblePostId;
+
+  int? currentVisiblePostPosition;
 
   static LMFeedVideoProvider? _instance;
 
@@ -33,8 +35,28 @@ class LMFeedVideoProvider with ChangeNotifier {
       _instance ??= LMFeedVideoProvider._();
   LMFeedVideoProvider._();
 
-  VideoController? getVideoController(String postId) {
-    return _videoControllers[postId];
+  // VideoController? getVideoController(String postId) {
+  //   return _videoControllers[postId]?.values.first;
+  // }
+
+  VideoController? getVideoControllers(String postId, int position) {
+    return _videoControllers[postId]?[position];
+  }
+
+  void pauseCurrentVideo() {
+    if (currentVisiblePostId != null && currentVisiblePostPosition != null) {
+      _videoControllers[currentVisiblePostId]![currentVisiblePostPosition]!
+          .player
+          .pause();
+    }
+  }
+
+  void playCurrentVideo() {
+    if (currentVisiblePostId != null && currentVisiblePostPosition != null) {
+      _videoControllers[currentVisiblePostId]![currentVisiblePostPosition]!
+          .player
+          .play();
+    }
   }
 
   /// Returns a VideoPlayerController for the given postId.
@@ -50,11 +72,13 @@ class LMFeedVideoProvider with ChangeNotifier {
       LMFeedGetPostVideoControllerRequest request) async {
     String postId = request.postId;
     VideoController videoController;
-    if (_videoControllers.containsKey(postId)) {
-      videoController = _videoControllers[postId]!;
+    if (_videoControllers.containsKey(postId) &&
+        _videoControllers[postId]!.containsKey(request.position)) {
+      videoController = _videoControllers[postId]![request.position]!;
     } else {
-      videoController = _videoControllers[postId] =
-          await initialisePostVideoController(request);
+      videoController = await initialisePostVideoController(request);
+      _videoControllers[postId] ??= {};
+      _videoControllers[postId]![request.position] = videoController;
     }
 
     if (isMuted.value) {
@@ -70,10 +94,11 @@ class LMFeedVideoProvider with ChangeNotifier {
   /// the map.
   /// This method must be called when the video controller is not in use
   /// anymore.
-  ///
   void clearPostController(String postId) {
     // dispose the controller if it exists
-    _videoControllers[postId]?.player.dispose();
+    _videoControllers[postId]?.values.forEach((element) {
+      element.player.dispose();
+    });
     // remove the controller from the map
     _videoControllers.remove(postId);
   }
@@ -123,7 +148,9 @@ class LMFeedVideoProvider with ChangeNotifier {
   /// This functions mutes all the controller in the map.
   void forceMuteAllControllers() {
     for (var controller in _videoControllers.values) {
-      controller.player.setVolume(0.0);
+      for (var element in controller.values) {
+        element.player.setVolume(0.0);
+      }
     }
     isMuted.value = true;
   }
@@ -131,12 +158,16 @@ class LMFeedVideoProvider with ChangeNotifier {
   void toggleVolumeState() {
     if (isMuted.value) {
       for (var controller in _videoControllers.values) {
-        controller.player.setVolume(100.0);
+        for (var element in controller.values) {
+          element.player.setVolume(100.0);
+        }
       }
       isMuted.value = false;
     } else {
       for (var controller in _videoControllers.values) {
-        controller.player.setVolume(0.0);
+        for (var element in controller.values) {
+          element.player.setVolume(0.0);
+        }
       }
       isMuted.value = true;
     }
@@ -146,7 +177,11 @@ class LMFeedVideoProvider with ChangeNotifier {
   /// This functions pause all the controller in the map.
   void forcePauseAllControllers() {
     for (var controller in _videoControllers.values) {
-      controller.player.pause();
+      for (var element in controller.values) {
+        if (element.player.state.playing) {
+          element.player.pause();
+        }
+      }
     }
   }
 }

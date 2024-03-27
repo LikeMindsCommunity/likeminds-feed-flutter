@@ -21,12 +21,16 @@ class LMFeedVideo extends StatefulWidget {
     this.muteButton,
     this.style,
     this.onMediaTap,
+    this.videoController,
+    this.position,
     this.autoPlay = false,
   }) : assert(videoUrl != null || videoFile != null);
 
   //Video asset variables
   final String? videoUrl;
   final File? videoFile;
+  final VideoController? videoController;
+  final int? position;
 
   final String postId;
 
@@ -123,6 +127,11 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   }
 
   Future<void> initialiseControllers() async {
+    if (widget.videoController != null) {
+      controller = widget.videoController;
+      return;
+    }
+
     LMFeedGetPostVideoControllerRequestBuilder requestBuilder =
         LMFeedGetPostVideoControllerRequestBuilder();
 
@@ -132,16 +141,23 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
       requestBuilder
         ..autoPlay(widget.autoPlay)
         ..videoSource(widget.videoUrl!)
-        ..videoType(LMFeedVideoSourceType.network);
+        ..videoType(LMFeedVideoSourceType.network)
+        ..position(widget.position ?? 0);
     } else {
       requestBuilder
         ..autoPlay(widget.autoPlay)
         ..videoSource(widget.videoFile!.uri.toString())
-        ..videoType(LMFeedVideoSourceType.file);
+        ..videoType(LMFeedVideoSourceType.file)
+        ..position(widget.position ?? 0);
     }
 
     controller = await LMFeedVideoProvider.instance
         .videoControllerProvider(requestBuilder.build());
+
+    if (widget.position != null && widget.position != 0) {
+      LMFeedVideoProvider.instance.currentVisiblePostPosition =
+          widget.position!;
+    }
   }
 
   @override

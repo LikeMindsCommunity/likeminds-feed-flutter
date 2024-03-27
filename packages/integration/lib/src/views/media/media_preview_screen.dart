@@ -145,6 +145,12 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                         style: LMFeedPostVideoStyle.basic().copyWith(
                           showControls: true,
                         ),
+                        videoController:
+                            LMFeedVideoProvider.instance.getVideoControllers(
+                          post.id,
+                          index,
+                        ),
+                        position: index,
                       );
                     } else if (postAttachments[index].attachmentType == 1) {
                       return Container(
