@@ -184,135 +184,127 @@ class _CredScreenState extends State<CredScreen> {
   @override
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedCore.theme;
-    // return lmFeed;
-    uuid = null; // UserLocalPreference.instance.fetchuuid();
-    // If the local prefs have user id stored
-    // Login using that user Id
-    // otherwise show the cred screen for login
-    if (uuid != null && uuid!.isNotEmpty) {
-      return lmFeed = LMSampleApp(
-        uuid: uuid,
-        userName: 'Test User',
-      );
-    } else {
-      return Scaffold(
-        backgroundColor: feedTheme.primaryColor,
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 72),
-                const Text(
-                  "LikeMinds Feed\nSample App",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+
+    return Scaffold(
+      backgroundColor: feedTheme.primaryColor,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 72),
+              const Text(
+                "LikeMinds Feed\nSample App",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 64),
+              const Text(
+                "Enter your credentials",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 18),
+              TextField(
+                cursorColor: Colors.white,
+                style: const TextStyle(color: Colors.white),
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  focusColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'Username',
+                  labelStyle: const TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 64),
-                const Text(
-                  "Enter your credentials",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                TextField(
-                  cursorColor: Colors.white,
-                  style: const TextStyle(color: Colors.white),
-                  controller: _usernameController,
-                  decoration: InputDecoration(
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                cursorColor: Colors.white,
+                controller: _uuidController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
                     fillColor: Colors.white,
                     focusColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    labelText: 'Username',
+                    labelText: 'User ID',
                     labelStyle: const TextStyle(
                       color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  cursorColor: Colors.white,
-                  controller: _uuidController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      focusColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      labelText: 'User ID',
-                      labelStyle: const TextStyle(
-                        color: Colors.white,
-                      )),
-                ),
-                const SizedBox(height: 36),
-                GestureDetector(
-                  onTap: () {
-                    String uuid = _uuidController.text;
-                    String userName = _usernameController.text;
+                    )),
+              ),
+              const SizedBox(height: 36),
+              GestureDetector(
+                onTap: () {
+                  String uuid = _uuidController.text;
+                  String userName = _usernameController.text;
 
-                    if (userName.isEmpty && uuid.isEmpty) {
-                      LMFeedCore.showSnackBar(
-                        LMFeedSnackBar(
-                          content: Container(
-                            child: const LMFeedText(
-                              text: "Username cannot be empty",
-                              style: LMFeedTextStyle(
-                                  textStyle: TextStyle(color: Colors.black)),
-                            ),
+                  if (userName.isEmpty && uuid.isEmpty) {
+                    LMFeedCore.showSnackBar(
+                      LMFeedSnackBar(
+                        content: Container(
+                          child: const LMFeedText(
+                            text: "Username cannot be empty",
+                            style: LMFeedTextStyle(
+                                textStyle: TextStyle(color: Colors.black)),
                           ),
                         ),
-                      );
-                      //toast("Username cannot be empty");
-                      return;
-                    }
-
-                    lmFeed = LMSampleApp(
-                      uuid: _uuidController.text,
-                      userName: _usernameController.text,
-                    );
-
-                    MaterialPageRoute route = MaterialPageRoute(
-                      // INIT - Get the LMFeed instance and pass the credentials (if any)
-                      builder: (context) => ExampleTabScreen(
-                        feedWidget: lmFeed!,
-                        uuid: uuid,
                       ),
                     );
-                    Navigator.of(context).push(route);
-                  },
-                  child: Container(
-                    width: 200,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                    //toast("Username cannot be empty");
+                    return;
+                  }
+
+                  // Call initiateUser
+
+                  // TODO: Change token
+                  lmFeed = LMSampleApp(
+                    refreshToken: _uuidController.text,
+                    accessToken: _usernameController.text,
+                  );
+
+                  MaterialPageRoute route = MaterialPageRoute(
+                    // INIT - Get the LMFeed instance and pass the credentials (if any)
+                    builder: (context) => ExampleTabScreen(
+                      feedWidget: lmFeed!,
+                      uuid: uuid,
                     ),
-                    child: const Center(child: Text("Submit")),
-                  ),
-                ),
-                const SizedBox(height: 72),
-                const Text(
-                  "If no credentials are provided, the app will run with the default credentials of Bot user in your community",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
+                  );
+                  Navigator.of(context).push(route);
+                },
+                child: Container(
+                  width: 200,
+                  height: 42,
+                  decoration: BoxDecoration(
                     color: Colors.white,
-                    fontSize: 12,
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                  child: const Center(child: Text("Submit")),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 72),
+              const Text(
+                "If no credentials are provided, the app will run with the default credentials of Bot user in your community",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 }

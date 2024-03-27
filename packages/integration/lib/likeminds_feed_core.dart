@@ -98,8 +98,8 @@ class LMFeedCore {
     await LMFeedAnalyticsBloc.instance.close();
   }
 
-  Future<InitiateUserResponse> initiateUser(InitiateUserRequest request) async {
-    InitiateUserResponse response = await lmFeedClient.initiateUser(request);
+  Future<ValidateUserResponse> validateUser(ValidateUserRequest request) async {
+    ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
     await LMFeedLocalPreference.instance.clearUserData();
     if (response.success) {
