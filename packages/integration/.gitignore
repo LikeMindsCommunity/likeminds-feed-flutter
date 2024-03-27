@@ -81,4 +81,6 @@ build/
 .fvm/
 .fvmrc
 .vscode/
-/pubspec.lock
+pubspec.lock
+.flutter-plugins-dependencies
+.flutter-plugins

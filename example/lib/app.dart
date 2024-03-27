@@ -18,10 +18,10 @@ class _LMSampleAppState extends State<LMSampleApp> {
   @override
   void initState() {
     super.initState();
-    callInitiateUser();
+    callValidateUser();
   }
 
-  void callInitiateUser() {
+  void callValidateUser() {
     ValidateUserRequestBuilder request = ValidateUserRequestBuilder();
 
     if (widget.accessToken != null && widget.accessToken!.isNotEmpty) {
@@ -82,7 +82,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
                 LikeMindsTheme.kVerticalPaddingLarge,
                 GestureDetector(
                   onTap: () {
-                    callInitiateUser();
+                    callValidateUser();
                     setState(() {});
                   },
                   child: Container(

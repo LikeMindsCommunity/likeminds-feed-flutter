@@ -25,12 +25,18 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   // Loading .env file
+
+  String apiKey = dotenv.get('API_KEY');
+
+  LMFeedClient lmFeedClient = (LMFeedClientBuilder()..apiKey(apiKey)).build();
+
+  // Loading .env file
   await dotenv.load(fileName: ".env");
   await LMFeedCore.instance.initialize(
-    apiKey: dotenv.get('API_KEY'),
+    lmFeedClient: lmFeedClient,
     domain: "feedsx://www.feedsx.com/",
   );
+
   setupNotifications();
   runApp(const MyApp());
 }
