@@ -1,12 +1,12 @@
-// ignore_for_file: deprecated_member_use_from_same_package
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
-part 'feed_screen_configuration.dart';
+part 'feedroom_screen_configuration.dart';
 
 /// {@template feed_screen}
 /// A screen to display the feed.
@@ -16,9 +16,10 @@ part 'feed_screen_configuration.dart';
 /// Topic Chip Builder can be used to customize the topic chip widget
 ///
 /// {@endtemplate}
-class LMFeedScreen extends StatefulWidget {
-  const LMFeedScreen({
+class LMFeedRoomScreen extends StatefulWidget {
+  const LMFeedRoomScreen({
     super.key,
+    required this.feedroomId,
     this.appBar,
     this.customWidgetBuilder,
     this.topicChipBuilder,
@@ -34,6 +35,8 @@ class LMFeedScreen extends StatefulWidget {
     this.firstPageErrorIndicatorBuilder,
     this.newPageErrorIndicatorBuilder,
   });
+
+  final int feedroomId;
 
   // Builder for appbar
   final LMFeedPostAppBarBuilder? appBar;
@@ -68,21 +71,22 @@ class LMFeedScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedRoomScreenConfig? config;
 
   @override
-  State<LMFeedScreen> createState() => _LMFeedScreenState();
+  State<LMFeedRoomScreen> createState() => _LMFeedRoomScreenState();
 }
 
-class _LMFeedScreenState extends State<LMFeedScreen> {
+class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
+  bool right = true;
 
-  LMFeedScreenConfig? config;
-  /* 
+  LMFeedRoomScreenConfig? config;
+  /*
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
   * it is set to 62 if the topics are not empty
@@ -96,7 +100,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   Future<GetTopicsResponse>? getTopicsResponse;
 
   // bloc to handle universal feed
-  late final LMFeedBloc _feedBloc; // bloc to fetch the feedroom data
+  late final LMFeedRoomBloc _feedBloc; // bloc to fetch the feedroom data
   bool isCm = LMFeedUserUtils
       .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
@@ -125,7 +129,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           .build(),
     );
     Bloc.observer = LMFeedBlocObserver();
-    _feedBloc = LMFeedBloc.instance;
+    _feedBloc = LMFeedRoomBloc.instance;
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
 
     LMFeedAnalyticsBloc.instance.add(
@@ -144,9 +148,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     rebuildTopicFeed.value = !rebuildTopicFeed.value;
     clearPagingController();
     _feedBloc.add(
-      LMFeedGetUniversalFeedEvent(
-        pageKey: 1,
-        topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
+      LMFeedGetFeedRoomEvent(
+        offset: 1,
+        feedRoomId: widget.feedroomId,
+        topics: _feedBloc.selectedTopics,
       ),
     );
   }
@@ -170,9 +175,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     _pagingController.addPageRequestListener(
       (pageKey) {
         _feedBloc.add(
-          LMFeedGetUniversalFeedEvent(
-            pageKey: pageKey,
-            topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
+          LMFeedGetFeedRoomEvent(
+            offset: pageKey,
+            feedRoomId: widget.feedroomId,
+            topics: _feedBloc.selectedTopics,
           ),
         );
       },
@@ -182,8 +188,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   void refresh() => _pagingController.refresh();
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(LMFeedState? state) {
-    if (state is LMFeedUniversalFeedLoadedState) {
+  void updatePagingControllers(LMFeedRoomState? state) {
+    if (state is LMFeedRoomLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts;
 
       _feedBloc.users.addAll(state.users);
@@ -246,9 +252,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
-    return _widgetsBuilder.scaffold(
-      source: LMFeedWidgetSource.universalFeed,
+    config = widget.config ?? LMFeedCore.config.feedRoomScreenConfig;
+    return Scaffold(
       backgroundColor: feedThemeData.backgroundColor,
       appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
       floatingActionButton: ValueListenableBuilder(
@@ -426,8 +431,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         -1;
                     if (index != -1) {
                       feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
-                          feedRoomItemList[index], curr.actionType,
-                          commentId: curr.commentId);
+                          feedRoomItemList[index], curr.actionType);
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }
@@ -507,9 +511,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 },
               ),
             ),
-            BlocListener<LMFeedBloc, LMFeedState>(
+            BlocListener<LMFeedRoomBloc, LMFeedRoomState>(
               bloc: _feedBloc,
-              listener: (context, LMFeedState state) =>
+              listener: (context, LMFeedRoomState state) =>
                   updatePagingControllers(state),
               child: ValueListenableBuilder(
                 valueListenable: rebuildPostWidget,
@@ -711,16 +715,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       },
       style: feedThemeData?.postStyle,
       onMediaTap: () async {
-        // VideoController? postVideoController =
-        //     LMFeedVideoProvider.instance.getVideoControllers(
-        //   LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id,
-        //   LMFeedVideoProvider.instance.currentVisiblePostPosition ?? 0,
-        // );
+        VideoController? postVideoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
-        // await postVideoController.player.pause();
-
-        LMFeedVideoProvider.instance.pauseCurrentVideo();
-
+        await postVideoController?.player.pause();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -732,19 +731,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         );
-        // await postVideoController.player.play();
-        LMFeedVideoProvider.instance.playCurrentVideo();
+        await postVideoController?.player.play();
       },
       onPostTap: (context, post) async {
-        // VideoController? postVideoController =
-        //     LMFeedVideoProvider.instance.getVideoControllers(
-        //   LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id,
-        //   LMFeedVideoProvider.instance.currentVisiblePostPosition ?? 0,
-        // );
+        VideoController? postVideoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
-        // await postVideoController.player.pause();
-
-        LMFeedVideoProvider.instance.pauseCurrentVideo();
+        await postVideoController?.player.pause();
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
@@ -754,7 +748,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         );
-        LMFeedVideoProvider.instance.playCurrentVideo();
+        await postVideoController?.player.play();
       },
       footer: _defFooterWidget(context, post),
       header: _defPostHeader(context, post),
@@ -807,9 +801,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData.headerStyle,
-      createdAt: LMFeedText(
-        text: LMFeedTimeAgo.instance.format(postViewData.createdAt),
-      ),
       onProfileTap: () {
         LMFeedCore.instance.lmFeedClient.routeToProfile(
             _feedBloc.users[postViewData.uuid]!.sdkClientInfo.uuid);
@@ -900,15 +891,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
       onMediaTap: () async {
-        // VideoController? postVideoController =
-        //     LMFeedVideoProvider.instance.getVideoControllers(
-        //   LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id,
-        //   LMFeedVideoProvider.instance.currentVisiblePostPosition ?? 0,
-        // );
+        VideoController? postVideoController = LMFeedVideoProvider.instance
+            .getVideoController(
+                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
-        // await postVideoController?.player.pause();
-
-        LMFeedVideoProvider.instance.pauseCurrentVideo();
+        await postVideoController?.player.pause();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -920,7 +907,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         );
-        LMFeedVideoProvider.instance.playCurrentVideo();
+        await postVideoController?.player.play();
       },
     );
   }
@@ -934,15 +921,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 postViewData.likeCount)),
         style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
-          // VideoController? videoController =
-          //     LMFeedVideoProvider.instance.getVideoControllers(
-          //   postViewData.id,
-          //   LMFeedVideoProvider.instance.currentVisiblePostPosition ?? 0,
-          // );
+          VideoController? videoController =
+              LMFeedVideoProvider.instance.getVideoController(postViewData.id);
 
-          // videoController.player.pause();
-
-          LMFeedVideoProvider.instance.pauseCurrentVideo();
+          videoController?.player.pause();
 
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -993,15 +975,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         ),
         style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
-          // VideoController? postVideoController =
-          //     LMFeedVideoProvider.instance.getVideoControllers(
-          //   LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id,
-          //   LMFeedVideoProvider.instance.currentVisiblePostPosition ?? 0,
-          // );
+          VideoController? postVideoController = LMFeedVideoProvider.instance
+              .getVideoController(
+                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
-          // await postVideoController.player.pause();
-
-          LMFeedVideoProvider.instance.pauseCurrentVideo();
+          await postVideoController?.player.pause();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -1012,18 +990,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ),
             ),
           );
-          LMFeedVideoProvider.instance.playCurrentVideo();
+          await postVideoController?.player.play();
         },
         onTextTap: () async {
-          // VideoController? postVideoController =
-          //     LMFeedVideoProvider.instance.getVideoControllers(
-          //   LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id,
-          //   LMFeedVideoProvider.instance.currentVisiblePostPosition ?? 0,
-          // );
+          VideoController? postVideoController = LMFeedVideoProvider.instance
+              .getVideoController(
+                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
 
-          // await postVideoController.player.pause();
-
-          LMFeedVideoProvider.instance.pauseCurrentVideo();
+          await postVideoController?.player.pause();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -1034,8 +1008,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ),
             ),
           );
-          // await postVideoController.player.play();
-          LMFeedVideoProvider.instance.playCurrentVideo();
+          await postVideoController?.player.play();
         },
       );
 
@@ -1064,13 +1037,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 actionType: postViewData.isSaved
                     ? LMFeedPostActionType.saved
                     : LMFeedPostActionType.unsaved));
-          } else {
-            LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
-              ),
-            );
           }
         },
         style: feedThemeData.footerStyle.saveButtonStyle,
@@ -1101,7 +1067,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ? ''
               : postViewData.repostCount.toString(),
         ),
-        onTap: userPostingRights
+        onTap: right
             ? () async {
                 if (!postUploading.value) {
                   LMFeedAnalyticsBloc.instance.add(
@@ -1169,7 +1135,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         style: LMFeedButtonStyle(
           borderRadius: 48,
           border: Border.all(
-            color: feedThemeData.primaryColor,
+            color: feedThemeData.primaryColor ?? LikeMindsTheme.onContainer,
             width: 2,
           ),
           height: 40,
@@ -1215,7 +1181,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           ),
         ),
       ),
-      onTap: userPostingRights
+      onTap: right
           ? () async {
               if (!postUploading.value) {
                 LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
@@ -1269,9 +1235,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           height: 44,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           borderRadius: 28,
-          backgroundColor: userPostingRights
-              ? feedThemeData.primaryColor
-              : feedThemeData.disabledColor,
+          backgroundColor:
+              right ? feedThemeData.primaryColor : feedThemeData.disabledColor,
           placement: LMFeedIconButtonPlacement.end,
           margin: 5.0,
         ),
@@ -1285,7 +1250,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         ),
-        onTap: userPostingRights
+        onTap: right
             ? () async {
                 if (!postUploading.value) {
                   LMFeedAnalyticsBloc.instance.add(
