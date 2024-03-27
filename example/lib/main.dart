@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/cred_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
@@ -24,8 +25,10 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+   // Loading .env file
+  await dotenv.load(fileName: ".env");
   await LMFeedCore.instance.initialize(
-    apiKey: "6b51af13-ce28-444b-a571-53a3fb125444",
+    apiKey: dotenv.get('API_KEY'),
     domain: "feedsx://www.feedsx.com/",
   );
   setupNotifications();
