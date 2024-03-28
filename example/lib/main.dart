@@ -24,11 +24,14 @@ final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
+  // Loading .env file
+  await dotenv.load(fileName: ".env");
+
   WidgetsFlutterBinding.ensureInitialized();
 
   String apiKey = dotenv.get('API_KEY');
 
-  LMFeedClient lmFeedClient = (LMFeedClientBuilder()..apiKey(apiKey)).build();
+  LMFeedClient lmFeedClient = (LMFeedClientBuilder()).build();
 
   // Loading .env file
   await dotenv.load(fileName: ".env");

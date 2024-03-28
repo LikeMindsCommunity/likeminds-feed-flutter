@@ -72,14 +72,14 @@ class LMFeedCore {
   LMFeedCore._();
 
   Future<void> initialize({
-    required LMFeedClient lmFeedClient,
+    LMFeedClient? lmFeedClient,
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
     GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
     LMFeedThemeData? theme,
   }) async {
-    this.lmFeedClient = lmFeedClient;
+    this.lmFeedClient = lmFeedClient ?? LMFeedClientBuilder().build();
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
