@@ -127,7 +127,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
               child: CarouselSlider.builder(
                   options: CarouselOptions(
                       initialPage: position ?? 0,
-                      aspectRatio: 9 / 16,
+                      aspectRatio: 16 / 9,
                       enableInfiniteScroll: false,
                       enlargeFactor: 0.0,
                       viewportFraction: 1.0,

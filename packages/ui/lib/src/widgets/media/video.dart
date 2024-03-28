@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -75,6 +76,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   bool _onTouch = true;
   bool initialiseOverlay = false;
   ValueNotifier<bool>? isMuted;
+  ValueNotifier<bool>? isFullscreen;
   ValueNotifier<bool> rebuildVideo = ValueNotifier(false);
   VideoController? controller;
 
@@ -103,6 +105,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   void initState() {
     super.initState();
     isMuted = LMFeedVideoProvider.instance.isMuted;
+    isFullscreen = ValueNotifier(false);
     initialiseVideo = initialiseControllers();
   }
 
@@ -238,7 +241,13 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                           alignment: Alignment.center,
                           child: MaterialVideoControlsTheme(
                             normal: MaterialVideoControlsThemeData(
-                              bottomButtonBar: [],
+                              bottomButtonBar: [
+                                widget.muteButton ?? _defMuteButton(),
+                                const Spacer(),
+                                const MaterialFullscreenButton(),
+                              ],
+                              bottomButtonBarMargin:
+                                  const EdgeInsets.symmetric(horizontal: 8),
                               seekBarMargin: const EdgeInsets.symmetric(
                                 horizontal: 4,
                                 vertical: 8,
@@ -249,7 +258,26 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                               seekBarThumbColor: widget.style?.seekBarColor ??
                                   feedTheme.primaryColor,
                             ),
-                            fullscreen: const MaterialVideoControlsThemeData(),
+                            fullscreen: MaterialVideoControlsThemeData(
+                              seekBarMargin: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 8,
+                              ),
+                              seekBarPositionColor:
+                                  widget.style?.seekBarColor ??
+                                      feedTheme.primaryColor,
+                              seekBarThumbColor: widget.style?.seekBarColor ??
+                                  feedTheme.primaryColor,
+                              bottomButtonBar: [
+                                const MaterialPositionIndicator(),
+                                const Spacer(),
+                                widget.muteButton ?? _defMuteButton(),
+                                const SizedBox(width: 4),
+                                const MaterialFullscreenButton(),
+                              ],
+                              bottomButtonBarMargin:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                            ),
                             child: Video(
                               controller: controller!,
                               controls: widget.style?.showControls != null &&
@@ -257,93 +285,12 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                                   ? media_kit_video_controls
                                       .AdaptiveVideoControls
                                   : (state) {
-                                      return ValueListenableBuilder(
-                                        valueListenable: rebuildOverlay,
-                                        builder: (context, _, __) {
-                                          return Visibility(
-                                            visible: _onTouch ||
-                                                !controller!
-                                                    .player.state.playing,
-                                            child: Container(
-                                              alignment: Alignment.center,
-                                              child: TextButton(
-                                                style: ButtonStyle(
-                                                  shape:
-                                                      MaterialStateProperty.all(
-                                                    const CircleBorder(
-                                                      side: BorderSide(
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                child: Icon(
-                                                  controller != null &&
-                                                          controller!.player
-                                                              .state.playing
-                                                      ? Icons.pause
-                                                      : Icons.play_arrow,
-                                                  size: 28,
-                                                  color: Colors.white,
-                                                ),
-                                                onPressed: () {
-                                                  _timer?.cancel();
-                                                  if (controller == null) {
-                                                    return;
-                                                  }
-                                                  controller!
-                                                          .player.state.playing
-                                                      ? state.widget.controller
-                                                          .player
-                                                          .pause()
-                                                      : state.widget.controller
-                                                          .player
-                                                          .play();
-                                                  rebuildOverlay.value =
-                                                      !rebuildOverlay.value;
-                                                  _timer = Timer.periodic(
-                                                    const Duration(
-                                                        milliseconds: 2500),
-                                                    (_) {
-                                                      _onTouch = false;
-                                                      rebuildOverlay.value =
-                                                          !rebuildOverlay.value;
-                                                    },
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      );
+                                      return _defVideoControls(state);
                                     },
                             ),
                           ),
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: ValueListenableBuilder(
-                            valueListenable: isMuted!,
-                            builder: (context, state, _) {
-                              return IconButton(
-                                onPressed: () {
-                                  LMFeedVideoProvider.instance
-                                      .toggleVolumeState();
-                                },
-                                icon: LMFeedIcon(
-                                  type: LMFeedIconType.icon,
-                                  style: const LMFeedIconStyle(
-                                    color: Colors.white,
-                                  ),
-                                  icon: state
-                                      ? Icons.volume_off
-                                      : Icons.volume_up,
-                                ),
-                              );
-                            },
-                          ),
-                        )
+                        // widget.muteButton ?? _defMuteButton()
                       ],
                     ),
                   );
@@ -355,6 +302,113 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
           },
         ),
       ),
+    );
+  }
+
+  _defMuteButton() {
+    return ValueListenableBuilder(
+      valueListenable: isMuted!,
+      builder: (context, state, _) {
+        return IconButton(
+          onPressed: () {
+            LMFeedVideoProvider.instance.toggleVolumeState();
+          },
+          icon: LMFeedIcon(
+            type: LMFeedIconType.icon,
+            style: const LMFeedIconStyle(
+              color: Colors.white,
+            ),
+            icon: state ? Icons.volume_off : Icons.volume_up,
+          ),
+        );
+      },
+    );
+  }
+
+  Stack _defVideoControls(VideoState state) {
+    return Stack(
+      children: [
+        Positioned(
+          bottom: 2,
+          left: 2,
+          child: widget.muteButton ?? _defMuteButton(),
+        ),
+        Positioned(
+          left: 0,
+          bottom: 0,
+          right: 0,
+          top: 0,
+          child: ValueListenableBuilder(
+            valueListenable: rebuildOverlay,
+            builder: (context, _, __) {
+              return Visibility(
+                visible: _onTouch || !controller!.player.state.playing,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all(
+                        const CircleBorder(
+                          side: BorderSide(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    child: Icon(
+                      controller != null && controller!.player.state.playing
+                          ? Icons.pause
+                          : Icons.play_arrow,
+                      size: 28,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _timer?.cancel();
+                      if (controller == null) {
+                        return;
+                      }
+                      controller!.player.state.playing
+                          ? state.widget.controller.player.pause()
+                          : state.widget.controller.player.play();
+                      rebuildOverlay.value = !rebuildOverlay.value;
+                      _timer = Timer.periodic(
+                        const Duration(milliseconds: 2500),
+                        (_) {
+                          _onTouch = false;
+                          rebuildOverlay.value = !rebuildOverlay.value;
+                        },
+                      );
+                      // enterFullscreen(
+                      //     context);
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        // Positioned(
+        //   bottom: 0,
+        //   right: 0,
+        //   child: ValueListenableBuilder(
+        //     valueListenable: isMuted!,
+        //     builder: (context, state, _) {
+        //       return IconButton(
+        //         onPressed: () {
+        //           toggleFullscreen(context);
+        //         },
+        //         icon: const LMFeedIcon(
+        //           type: LMFeedIconType.icon,
+        //           style: LMFeedIconStyle(
+        //             color: Colors.white,
+        //           ),
+        //           icon: Icons.fullscreen,
+        //         ),
+        //       );
+        //     },
+        //   ),
+        // )
+      ],
     );
   }
 }
