@@ -53,5 +53,7 @@ google-services.json
 
 .fvm
 .fvmrc
-/.pubspec.lock
+.pubspec.lock
 .vscode
+.flutter-plugins-dependencies
+.flutter-plugins

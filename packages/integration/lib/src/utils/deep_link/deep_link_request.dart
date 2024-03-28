@@ -3,14 +3,14 @@ part of 'deep_link_handler.dart';
 class LMFeedDeepLinkRequest {
   LMFeedDeepLinkPath path;
   Map<String, dynamic>? data;
-  String uuid;
-  String userName;
+  String accessToken;
+  String refreshToken;
 
   LMFeedDeepLinkRequest._({
     required this.path,
     this.data,
-    required this.uuid,
-    required this.userName,
+    required this.accessToken,
+    required this.refreshToken,
   });
 }
 
@@ -29,8 +29,8 @@ class LMFeedDeepLinkRequestBuilder {
     return LMFeedDeepLinkRequest._(
       path: _path!,
       data: _data,
-      uuid: _uuid!,
-      userName: _userName!,
+      accessToken: _uuid!,
+      refreshToken: _userName!,
     );
   }
 }
