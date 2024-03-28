@@ -252,4 +252,14 @@ class LMFeedWidgetUtility {
       Widget topicSelector, List<LMTopicViewData> selectedTopics) {
     return topicSelector;
   }
+
+  Widget composeScreenHeadingTextfieldBuilder(
+      BuildContext context, TextField headingTextField) {
+    return headingTextField;
+  }
+
+  Widget composeScreenContentTextfieldBuilder(
+      BuildContext context, LMTaggingAheadTextField contentTextField) {
+    return contentTextField;
+  }
 }

@@ -33,6 +33,8 @@ enum LMFeedWidgetSource {
   mediaPreviewScreen,
   reportScreen,
   searchScreen,
+  savedPostScreen,
+  userCreatedCommentScreen,
 }
 
 /// enum to describe the type of action on a post
