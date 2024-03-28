@@ -273,11 +273,11 @@ class LMFeedPostDetailScreenHandler {
         }
       case const (LMFeedCommentSuccessState<EditCommentReplyResponse>):
         {
-          final LMFeedCommentSuccessState commentSuccessState =
-              state as LMFeedCommentSuccessState;
+          // final LMFeedCommentSuccessState commentSuccessState =
+          //     state as LMFeedCommentSuccessState;
 
-          EditCommentReplyResponse response = commentSuccessState
-              .commentActionResponse as EditCommentReplyResponse;
+          // EditCommentReplyResponse response = commentSuccessState
+          //     .commentActionResponse as EditCommentReplyResponse;
 
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }

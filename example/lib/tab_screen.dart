@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_sample/activity_widget_screen.dart';
 
 class ExampleTabScreen extends StatefulWidget {
   final Widget feedWidget;
@@ -32,44 +31,56 @@ class _ExampleTabScreenState extends State<ExampleTabScreen>
   Widget build(BuildContext context) {
     LMFeedThemeData lmFeedTheme = LMFeedCore.theme;
     return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: tabController.index,
-        onDestinationSelected: (index) {
-          tabController.animateTo(index);
-          setState(() {});
-        },
-        elevation: 10,
-        indicatorColor: lmFeedTheme.primaryColor,
-        backgroundColor: lmFeedTheme.container,
-        destinations: [
-          NavigationDestination(
-            icon: Icon(
-              Icons.home,
-              color: lmFeedTheme.onContainer,
-            ),
-            selectedIcon: Icon(Icons.home, color: lmFeedTheme.onPrimary),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(boxShadow: [
+          BoxShadow(
+            color: lmFeedTheme.onContainer.withOpacity(0.2),
+            offset: Offset.fromDirection(180),
+            spreadRadius: 4,
+            blurRadius: 4,
           ),
-          NavigationDestination(
-            icon: Icon(
-              Icons.person_2_sharp,
-              color: lmFeedTheme.onContainer,
+        ]),
+        child: NavigationBar(
+          selectedIndex: tabController.index,
+          onDestinationSelected: (index) {
+            tabController.animateTo(index);
+            setState(() {});
+          },
+          elevation: 30,
+          indicatorColor: lmFeedTheme.primaryColor,
+          backgroundColor: lmFeedTheme.container,
+          shadowColor: lmFeedTheme.onContainer,
+          destinations: [
+            NavigationDestination(
+              icon: Icon(
+                Icons.home,
+                color: lmFeedTheme.onContainer,
+              ),
+              selectedIcon: Icon(Icons.home, color: lmFeedTheme.onPrimary),
+              label: 'Home',
             ),
-            selectedIcon: Icon(
-              Icons.person_2_sharp,
-              color: lmFeedTheme.onPrimary,
+            NavigationDestination(
+              icon: Icon(
+                Icons.person_2_sharp,
+                color: lmFeedTheme.onContainer,
+              ),
+              selectedIcon: Icon(
+                Icons.person_2_sharp,
+                color: lmFeedTheme.onPrimary,
+              ),
+              label: 'Activity',
             ),
-            label: 'Activity',
-          ),
-        ],
+          ],
+        ),
       ),
       body: TabBarView(
         controller: tabController,
+        physics: const NeverScrollableScrollPhysics(),
         children: [
           HomeScreen(
             feedWidget: widget.feedWidget,
           ),
-          LMFeedActivityWidgetScreen(
+          LMFeedActivityScreen(
             uuid: widget.uuid,
           ),
         ],

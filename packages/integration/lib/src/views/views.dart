@@ -15,3 +15,6 @@ export 'search/search_screen.dart';
 export 'media/media_preview_screen.dart';
 
 export 'post/edit_post_screen.dart';
+
+export 'feedroom/feedroom_list_screen.dart';
+export 'feedroom/feedroom_screen.dart' hide LMFeedTopicSelectionWidgetType;
