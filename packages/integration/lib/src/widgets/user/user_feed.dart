@@ -269,7 +269,11 @@ class _LMFeedUserCreatedPostListViewState
                       const SizedBox(height: 2),
                       widget.postBuilder?.call(context, postWidget, item) ??
                           _widgetsBuilder.postWidgetBuilder(
-                              context, postWidget, item),
+                            context,
+                            postWidget,
+                            item,
+                            source: LMFeedWidgetSource.userFeed,
+                          ),
                     ],
                   );
                 },

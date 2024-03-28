@@ -219,8 +219,9 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                             defPostWidget(_theme, item);
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
-                            LMFeedCore.widgetUtility.postWidgetBuilder
-                                .call(context, postWidget, item);
+                            LMFeedCore.widgetUtility.postWidgetBuilder.call(
+                                context, postWidget, item,
+                                source: LMFeedWidgetSource.activityScreen);
                       },
                     ),
                   ),

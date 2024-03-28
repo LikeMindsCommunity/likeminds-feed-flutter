@@ -144,7 +144,9 @@ class _LMFeedUserCreatedCommentListViewState
                           widget.postBuilder?.call(
                                   context, postWidget, _posts[item.postId]!) ??
                               LMFeedCore.widgetUtility.postWidgetBuilder.call(
-                                  context, postWidget, _posts[item.postId]!),
+                                  context, postWidget, _posts[item.postId]!,
+                                  source: LMFeedWidgetSource
+                                      .userCreatedCommentScreen),
                           const Divider(),
                         ],
                       );
