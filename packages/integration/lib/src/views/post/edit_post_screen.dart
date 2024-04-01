@@ -926,6 +926,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         LMFeedAnalyticsBloc.instance.add(
                           LMFeedFireAnalyticsEvent(
                             eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+                            widgetSource: LMFeedWidgetSource.editPostScreen,
                             deprecatedEventName:
                                 LMFeedAnalyticsKeysDep.userTaggedInPost,
                             eventProperties: {

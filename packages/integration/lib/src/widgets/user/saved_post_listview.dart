@@ -387,6 +387,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                     LMFeedFireAnalyticsEvent(
                       eventName: LMFeedAnalyticsKeys.postDeleted,
                       deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      widgetSource: LMFeedWidgetSource.savedPostScreen,
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
@@ -476,6 +477,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+              widgetSource: LMFeedWidgetSource.savedPostScreen,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -602,6 +604,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                   LMFeedAnalyticsBloc.instance.add(
                       const LMFeedFireAnalyticsEvent(
                           eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          widgetSource: LMFeedWidgetSource.savedPostScreen,
                           deprecatedEventName:
                               LMFeedAnalyticsKeysDep.postCreationStarted,
                           eventProperties: {}));
@@ -718,6 +721,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                             const LMFeedFireAnalyticsEvent(
                                 eventName:
                                     LMFeedAnalyticsKeys.postCreationStarted,
+                                widgetSource:
+                                    LMFeedWidgetSource.savedPostScreen,
                                 deprecatedEventName:
                                     LMFeedAnalyticsKeysDep.postCreationStarted,
                                 eventProperties: {}));
@@ -844,6 +849,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.savedPostScreen,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

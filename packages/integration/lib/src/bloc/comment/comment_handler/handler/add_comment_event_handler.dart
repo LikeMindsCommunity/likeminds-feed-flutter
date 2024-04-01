@@ -55,6 +55,7 @@ Future<void> _handleAddCommentAction(LMFeedCommentActionEvent event,
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
       eventName: LMFeedAnalyticsKeys.commentPosted,
       deprecatedEventName: LMFeedAnalyticsKeysDep.commentPosted,
+      widgetSource: LMFeedWidgetSource.postDetailScreen,
       eventProperties: {
         "post_id": addCommentRequest.postId,
         "comment_id": response.reply?.id,
@@ -112,6 +113,7 @@ Future<void> _handleAddReplyAction(LMFeedCommentActionEvent event,
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.replyPosted,
         deprecatedEventName: LMFeedAnalyticsKeysDep.replyPosted,
+        widgetSource: LMFeedWidgetSource.postDetailScreen,
         eventProperties: {
           "post_id": addCommentReplyRequest.postId,
           "comment_id": addCommentReplyRequest.commentId,

@@ -99,6 +99,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.commentListOpen,
+        widgetSource: LMFeedWidgetSource.postDetailScreen,
         deprecatedEventName: LMFeedAnalyticsKeysDep.commentListOpen,
         eventProperties: {
           'postId': widget.postId,
@@ -692,6 +693,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   LMFeedAnalyticsBloc.instance.add(
                     LMFeedFireAnalyticsEvent(
                       eventName: LMFeedAnalyticsKeys.postDeleted,
+                      widgetSource: LMFeedWidgetSource.postDetailScreen,
                       deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
                       eventProperties: {
                         "post_id": _postDetailScreenHandler!.postData!.id,
@@ -871,6 +873,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   LMFeedAnalyticsBloc.instance.add(
                       const LMFeedFireAnalyticsEvent(
                           eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          widgetSource: LMFeedWidgetSource.postDetailScreen,
                           deprecatedEventName:
                               LMFeedAnalyticsKeysDep.postCreationStarted,
                           eventProperties: {}));
@@ -1526,6 +1529,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           eventName: _postDetailScreenHandler!.postData!.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.postDetailScreen,
           deprecatedEventName: _postDetailScreenHandler!.postData!.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

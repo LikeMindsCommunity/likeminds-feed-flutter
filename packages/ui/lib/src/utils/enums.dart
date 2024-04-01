@@ -18,7 +18,9 @@ enum LMFeedPostDeleteViewType { dialog, bottomSheet }
 /// enum to describe type of menu for LMFeedPostMenu
 enum LMFeedPostMenuType { popUp, bottomSheet }
 
+/// {@template lm_feed_widget_source}
 /// enum to describe the source of widget
+/// {@endtemplate}
 enum LMFeedWidgetSource {
   universalFeed,
   feedroom,
@@ -37,6 +39,7 @@ enum LMFeedWidgetSource {
   userCreatedCommentScreen,
 }
 
+/// {@macro lm_feed_post_action_type}
 /// enum to describe the type of action on a post
 enum LMFeedPostActionType {
   like,

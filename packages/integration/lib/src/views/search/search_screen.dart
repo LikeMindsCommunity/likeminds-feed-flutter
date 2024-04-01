@@ -501,6 +501,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                        widgetSource: LMFeedWidgetSource.searchScreen,
                         eventProperties: {
                           "post_id": postViewData.id,
                         },
@@ -586,6 +587,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+              widgetSource: LMFeedWidgetSource.searchScreen,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -702,6 +704,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
                 eventName: LMFeedAnalyticsKeys.postCreationStarted,
                 deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
+                widgetSource: LMFeedWidgetSource.searchScreen,
                 eventProperties: {}));
 
             LMFeedVideoProvider.instance.forcePauseAllControllers();
@@ -813,6 +816,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                                     LMFeedAnalyticsKeys.postCreationStarted,
                                 deprecatedEventName:
                                     LMFeedAnalyticsKeysDep.postCreationStarted,
+                                widgetSource: LMFeedWidgetSource.searchScreen,
                                 eventProperties: {}));
 
                         String? currentVisiblePost =
@@ -885,6 +889,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.searchScreen,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
