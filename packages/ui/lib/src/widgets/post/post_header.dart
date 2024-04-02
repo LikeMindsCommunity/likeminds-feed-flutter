@@ -196,7 +196,11 @@ class LMFeedPostHeader extends StatelessWidget {
                                     ),
                               if (createdAt != null && subText != null)
                                 LikeMindsTheme.kHorizontalPaddingXSmall,
-                              createdAt ?? const SizedBox.shrink(),
+                              createdAt ??
+                                  LMFeedText(
+                                    text: LMFeedTimeAgo.instance
+                                        .format(postViewData.createdAt),
+                                  ),
                               LikeMindsTheme.kHorizontalPaddingSmall,
                               if (postViewData.isEdited)
                                 subTextSeparator ??

@@ -129,7 +129,6 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 style: widget.videoStyle,
                 postId: widget.postId,
                 onMediaTap: widget.onMediaTap,
-                autoPlay: true,
                 videoController:
                     LMFeedVideoProvider.instance.getVideoControllers(
                   widget.postId,
@@ -172,7 +171,11 @@ class _LMCarouselState extends State<LMFeedCarousel> {
               borderRadius: style!.carouselBorderRadius ?? BorderRadius.zero,
               child: CarouselSlider.builder(
                 itemCount: mediaWidgets.length,
-                itemBuilder: (context, index, _) => mediaWidgets[index],
+                itemBuilder: (context, index, _) {
+                  LMFeedVideoProvider.instance.currentVisiblePostPosition =
+                      index;
+                  return mediaWidgets[index];
+                },
                 options: style!.carouselOptions?.copyWith(
                       onPageChanged: (index, reason) {
                         currPosition = index;

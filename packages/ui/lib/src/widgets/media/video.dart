@@ -279,6 +279,9 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                                   const EdgeInsets.symmetric(horizontal: 8),
                             ),
                             child: Video(
+                              onEnterFullscreen: () async {
+                                LMFeedVideoProvider.instance.playCurrentVideo();
+                              },
                               controller: controller!,
                               controls: widget.style?.showControls != null &&
                                       widget.style!.showControls!
