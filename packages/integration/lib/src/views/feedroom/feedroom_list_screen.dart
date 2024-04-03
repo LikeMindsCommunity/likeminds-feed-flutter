@@ -4,16 +4,39 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart';
 
-class FeedRoomListScreen extends StatefulWidget {
-  const FeedRoomListScreen({
+class LMFeedRoomListScreen extends StatefulWidget {
+  final Widget Function()? feedroomTileBuilder;
+  final LMFeedPostAppBarBuilder? appBarBuilder;
+  // Builder for empty feed view
+  final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
+  // Builder for first page loader when no post are there
+  final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;
+  // Builder for pagination loader when more post are there
+  final LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder;
+  // Builder for widget when no more post are there
+  final LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder;
+  // Builder for error view while loading a new page
+  final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
+  // Builder for error view while loading the first page
+  final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
+
+  const LMFeedRoomListScreen({
     super.key,
+    this.appBarBuilder,
+    this.feedroomTileBuilder,
+    this.noItemsFoundIndicatorBuilder,
+    this.firstPageProgressIndicatorBuilder,
+    this.newPageProgressIndicatorBuilder,
+    this.noMoreItemsIndicatorBuilder,
+    this.firstPageErrorIndicatorBuilder,
+    this.newPageErrorIndicatorBuilder,
   });
 
   @override
-  State<FeedRoomListScreen> createState() => _FeedRoomListScreenState();
+  State<LMFeedRoomListScreen> createState() => _LMFeedRoomListScreenState();
 }
 
-class _FeedRoomListScreenState extends State<FeedRoomListScreen> {
+class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
   final List<LMFeedRoomViewData> _feedRoomList = [];
   LMFeedRoomBloc? _feedRoomListBloc;
   final PagingController<int, LMFeedRoomViewData>
@@ -66,10 +89,7 @@ class _FeedRoomListScreenState extends State<FeedRoomListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Choose FeedRoom"),
-        backgroundColor: LMFeedCore.theme.primaryColor,
-      ),
+      appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       body: RefreshIndicator(
         onRefresh: () async {
           _feedRoomListBloc!.add(const LMFeedGetFeedRoomListEvent(offset: 1));
@@ -87,7 +107,7 @@ class _FeedRoomListScreenState extends State<FeedRoomListScreen> {
           },
           builder: ((context, state) {
             if (state is LMFeedRoomListLoadedState) {
-              return FeedRoomListView(
+              return LMFeedRoomList(
                 pagingControllerFeedRoomList: _pagingControllerFeedRoomList,
                 feedRoomBloc: _feedRoomListBloc!,
               );
@@ -107,31 +127,78 @@ class _FeedRoomListScreenState extends State<FeedRoomListScreen> {
       ),
     );
   }
+
+  Widget getFeedRoomListEmptyView() {
+    return widget.noItemsFoundIndicatorBuilder?.call(context) ??
+        const Center(
+          child: Text("No feedrooms found"),
+        );
+  }
+
+  Widget getFeedRoomListErrorView(String message) {
+    return widget.firstPageErrorIndicatorBuilder?.call(context) ??
+        Center(
+          child: Text(message),
+        );
+  }
+
+  Widget getFeedRoomListLoadingView() {
+    return widget.firstPageProgressIndicatorBuilder?.call(context) ??
+        const LMFeedLoader();
+  }
+
+  LMFeedAppBar _defAppBar() {
+    return LMFeedAppBar(
+      leading: const SizedBox.shrink(),
+      title: Padding(
+        padding: const EdgeInsets.only(left: 4.0),
+        child: LMFeedText(
+          text: "Choose FeedRoom",
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: LMFeedCore.theme.onContainer,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+      style: LMFeedAppBarStyle.basic().copyWith(
+        backgroundColor: LMFeedCore.theme.container,
+      ),
+    );
+  }
 }
 
-Widget getFeedRoomListEmptyView() {
-  return const Center(
-    child: Text("No feedrooms found"),
-  );
-}
-
-Widget getFeedRoomListErrorView(String message) {
-  return Center(
-    child: Text(message),
-  );
-}
-
-Widget getFeedRoomListLoadingView() {
-  return const LMFeedLoader();
-}
-
-class FeedRoomListView extends StatelessWidget {
+class LMFeedRoomList extends StatelessWidget {
   final LMFeedRoomBloc feedRoomBloc;
+  final LMFeedRoomTileBuilder? feedroomTileBuilder;
+  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
+  // Builder for first page loader when no post are there
+  final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;
+  // Builder for pagination loader when more post are there
+  final LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder;
+  // Builder for widget when no more post are there
+  final LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder;
+  // Builder for error view while loading a new page
+  final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
+  // Builder for error view while loading the first page
+  final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
   final PagingController<int, LMFeedRoomViewData> pagingControllerFeedRoomList;
-  const FeedRoomListView({
+
+  const LMFeedRoomList({
     super.key,
     required this.pagingControllerFeedRoomList,
     required this.feedRoomBloc,
+    this.appBarBuilder,
+    this.feedroomTileBuilder,
+    this.noItemsFoundIndicatorBuilder,
+    this.firstPageProgressIndicatorBuilder,
+    this.newPageProgressIndicatorBuilder,
+    this.noMoreItemsIndicatorBuilder,
+    this.firstPageErrorIndicatorBuilder,
+    this.newPageErrorIndicatorBuilder,
   });
 
   @override
@@ -150,48 +217,57 @@ class FeedRoomListView extends StatelessWidget {
                       body: LMFeedLoader(),
                     ),
                 itemBuilder: (context, item, index) {
-                  return LMFeedTile(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => LMFeedRoomScreen(
-                            feedroomId: item.id,
-                            // feedRoomTitle: item.title,
-                          ),
-                        ),
-                      );
-                    },
-                    leading: LMFeedProfilePicture(
-                      fallbackText: item.title,
-                      imageUrl: item.chatroomImageUrl,
-                      style: LMFeedProfilePictureStyle(
-                        size: 64,
-                        boxShape: BoxShape.circle,
-                      ),
-                    ),
-                    title: LMFeedText(
-                      text: item.header,
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    subtitle: LMFeedText(
-                      text: "${item.participantsCount} participants",
-                      style: LMFeedTextStyle(
-                        textStyle: const TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  );
+                  return feedroomTileBuilder?.call(
+                        context,
+                        item,
+                        _defFeedRoomTile(context, item),
+                      ) ??
+                      _defFeedRoomTile(context, item);
                 }),
           ),
         )
       ],
+    );
+  }
+
+  LMFeedTile _defFeedRoomTile(BuildContext context, LMFeedRoomViewData item) {
+    return LMFeedTile(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => LMFeedRoomScreen(
+              feedroomId: item.id,
+              // feedRoomTitle: item.title,
+            ),
+          ),
+        );
+      },
+      leading: LMFeedProfilePicture(
+        fallbackText: item.title,
+        imageUrl: item.chatroomImageUrl,
+        style: LMFeedProfilePictureStyle(
+          size: 64,
+          boxShape: BoxShape.circle,
+        ),
+      ),
+      title: LMFeedText(
+        text: item.header,
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      subtitle: LMFeedText(
+        text: "${item.participantsCount} participants",
+        style: LMFeedTextStyle(
+          textStyle: const TextStyle(
+            fontStyle: FontStyle.italic,
+            fontSize: 14,
+          ),
+        ),
+      ),
     );
   }
 }

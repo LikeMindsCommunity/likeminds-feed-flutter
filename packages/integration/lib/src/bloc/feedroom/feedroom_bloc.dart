@@ -146,11 +146,8 @@ FutureOr<void> _mapLMGetFeedRoomListToState({
 
     if (response.success) {
       final List<LMFeedRoomViewData> feedList = response.chatrooms!
-          .map(
-            (e) => LMFeedRoomViewDataConvertor.fromFeedRoomModel(
-              feedRoomModel: e,
-            ),
-          )
+          .map((e) =>
+              LMFeedRoomViewDataConvertor.fromFeedRoomModel(feedRoomModel: e))
           .toList();
       emit(
         LMFeedRoomListLoadedState(
@@ -238,12 +235,7 @@ FutureOr<void> _mapLMGetFeedRoomListToState({
 //               ),
 //             );
 //           }
-//           GetFeedRoomResponse feedRoomResponse =
-//               await LMFeedCore.client.getFeedRoom(
-//             (GetFeedRoomRequestBuilder()
-//                   ..feedroomId(event.feedRoomId)
-//                   ..page(event.offset))
-//                 .build(),
+          
 //           );
 //           if (!feedRoomResponse.success) {
 //             emit(

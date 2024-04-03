@@ -114,7 +114,7 @@ class LMFeedVideoProvider with ChangeNotifier {
 
     Player player = Player(
       configuration: PlayerConfiguration(
-        bufferSize: 24 * 1024 * 1024,
+        bufferSize: 2 * 1024 * 1024,
         ready: () {},
         muted: isMuted.value,
       ),

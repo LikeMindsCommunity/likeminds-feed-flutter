@@ -19,7 +19,7 @@ class LMFeedRoomScreen extends StatefulWidget {
   const LMFeedRoomScreen({
     super.key,
     required this.feedroomId,
-    this.appBar,
+    this.appBarBuilder,
     this.customWidgetBuilder,
     this.topicChipBuilder,
     this.postBuilder,
@@ -38,7 +38,7 @@ class LMFeedRoomScreen extends StatefulWidget {
   final int feedroomId;
 
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  final LMFeedPostAppBarBuilder? appBarBuilder;
 
   // Builder for custom widget on top
   final LMFeedContextWidgetBuilder? customWidgetBuilder;
@@ -85,11 +85,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   bool right = true;
 
   LMFeedRoomScreenConfig? config;
-  /*
-  * defines the height of topic feed bar
-  * initialy set to 0, after fetching the topics
-  * it is set to 62 if the topics are not empty
-  */
   final ScrollController _controller = ScrollController();
 
   // notifies value listenable builder to rebuild the topic feed
@@ -117,6 +112,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   bool userPostingRights = true;
 
+  LMFeedRoomViewData? feedroom;
+
   @override
   void initState() {
     super.initState();
@@ -136,7 +133,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         eventName: LMFeedAnalyticsKeys.feedOpened,
         deprecatedEventName: LMFeedAnalyticsKeysDep.feedOpened,
         eventProperties: {
-          'feed_type': 'universal_feed',
+          'feed_type': 'feedroom',
         },
       ),
     );
@@ -200,6 +197,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
       } else {
         _pagingController.appendPage(listOfPosts, state.pageKey + 1);
       }
+
+      feedroom = state.feedRoom;
+      _rebuildAppBar.value = !_rebuildAppBar.value;
     }
   }
 
@@ -254,7 +254,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
     config = widget.config ?? LMFeedCore.config.feedRoomScreenConfig;
     return Scaffold(
       backgroundColor: feedThemeData.backgroundColor,
-      appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
+      appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
@@ -293,9 +293,10 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                                       .forcePauseAllControllers();
                                   // ignore: use_build_context_synchronously
                                   await Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const LMFeedComposeScreen()));
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const LMFeedComposeScreen()),
+                                  );
                                 }
                               : () {
                                   LMFeedCore.showSnackBar(
@@ -589,48 +590,29 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         },
         child: Padding(
           padding: const EdgeInsets.only(left: 4.0),
-          child: LMFeedText(
-            text: "Feed",
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                color: feedThemeData.onContainer,
-                fontSize: 27,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+          child: ValueListenableBuilder(
+            valueListenable: _rebuildAppBar,
+            builder: (context, value, __) {
+              if (feedroom == null) {
+                return LMFeedTileShimmer();
+              }
+              return LMFeedText(
+                text: feedroom!.title,
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    color: feedThemeData.onContainer,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
       style: LMFeedAppBarStyle.basic().copyWith(
         backgroundColor: feedThemeData.container,
       ),
-      trailing: [
-        LMFeedButton(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LMFeedSearchScreen(
-                  postBuilder: widget.postBuilder,
-                  emptyFeedViewBuilder: widget.noItemsFoundIndicatorBuilder,
-                  paginationLoaderBuilder:
-                      widget.newPageProgressIndicatorBuilder,
-                  feedErrorViewBuilder: widget.newPageErrorIndicatorBuilder,
-                  noNewPageWidgetBuilder: widget.noMoreItemsIndicatorBuilder,
-                  firstPageLoaderBuilder:
-                      widget.firstPageProgressIndicatorBuilder,
-                ),
-              ),
-            );
-          },
-          style: LMFeedButtonStyle.basic().copyWith(
-            icon: LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.search,
-            ),
-          ),
-        )
-      ],
     );
   }
 
