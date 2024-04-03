@@ -42,6 +42,11 @@ class LMFeedSavedPostListView extends StatefulWidget {
 }
 
 class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
   LMFeedThemeData _theme = LMFeedCore.theme;
   Size? screenSize;
@@ -373,10 +378,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Post',
+                title: 'Delete $postTitleFirstCap',
                 uuid: postViewData.uuid,
                 content:
-                    'Are you sure you want to delete this post. This action can not be reversed.',
+                    'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
 
@@ -569,7 +574,9 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+                    text: postViewData.isSaved
+                        ? "$postTitleFirstCap Saved"
+                        : "$postTitleFirstCap Unsaved"),
               ),
             );
           }
@@ -628,13 +635,14 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(LMFeedSnackBar(
-                      content:
-                          LMFeedText(text: "A post is already uploading.")));
+                      content: LMFeedText(
+                          text: "A $postTitleSmallCap is already uploading.")));
                 }
               }
             : () => LMFeedCore.showSnackBar(LMFeedSnackBar(
                 content: LMFeedText(
-                    text: "You do not have permission to create a post."))),
+                    text:
+                        "You do not have permission to create a $postTitleSmallCap."))),
         style: _theme.footerStyle.repostButtonStyle?.copyWith(
             icon: _theme.footerStyle.repostButtonStyle?.icon?.copyWith(
               style: _theme.footerStyle.repostButtonStyle?.icon?.style
@@ -666,7 +674,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             ),
             const SizedBox(height: 12),
             LMFeedText(
-              text: 'No posts to show',
+              text:
+                  'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 24,
@@ -677,7 +686,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             ),
             const SizedBox(height: 12),
             LMFeedText(
-              text: "Be the first one to post here",
+              text: "Be the first one to create a $postTitleSmallCap here",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 16,
@@ -706,7 +715,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                 placement: LMFeedIconButtonPlacement.end,
               ),
               text: LMFeedText(
-                text: "Create Post",
+                text: "Create $postTitleFirstCap",
                 style: LMFeedTextStyle(
                   textStyle: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -738,13 +747,14 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                       } else {
                         LMFeedCore.showSnackBar(LMFeedSnackBar(
                             content: LMFeedText(
-                                text: "A post is already uploading.")));
+                                text:
+                                    "A $postTitleSmallCap is already uploading.")));
                       }
                     }
                   : () => LMFeedCore.showSnackBar(LMFeedSnackBar(
                       content: LMFeedText(
                           text:
-                              "You do not have permission to create a post."))),
+                              "You do not have permission to create a $postTitleSmallCap."))),
             ),
           ],
         ),
@@ -785,7 +795,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       int index = postViewData.menuItems
           .indexWhere((element) => element.id == postUnpinId);
       if (index != -1) {
-        postViewData.menuItems[index].title = "Unpin This Post";
+        postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
         postViewData.menuItems[index].id = postUnpinId;
       }
     } else {
@@ -794,7 +804,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
 
       if (index != -1) {
         postViewData.menuItems[index]
-          ..title = "Pin This Post"
+          ..title = "Pin This $postTitleFirstCap"
           ..id = postPinId;
       }
     }
@@ -820,7 +830,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             .indexWhere((element) => element.id == postUnpinId);
         if (index != -1) {
           postViewData.menuItems[index]
-            ..title = "Unpin This Post"
+            ..title = "Unpin This $postTitleFirstCap"
             ..id = postUnpinId;
         }
       } else {
@@ -829,7 +839,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
 
         if (index != -1) {
           postViewData.menuItems[index]
-            ..title = "Pin This Post"
+            ..title = "Pin This $postTitleFirstCap"
             ..id = postPinId;
         }
       }

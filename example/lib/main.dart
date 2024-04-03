@@ -38,6 +38,7 @@ void main() async {
   await LMFeedCore.instance.initialize(
     lmFeedClient: lmFeedClient,
     domain: "feedsx://www.feedsx.com/",
+    scaffoldMessengerKey: rootScaffoldMessengerKey,
   );
 
   setupNotifications();

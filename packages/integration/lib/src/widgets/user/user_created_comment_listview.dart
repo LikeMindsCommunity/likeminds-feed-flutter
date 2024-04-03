@@ -40,6 +40,11 @@ class LMFeedUserCreatedCommentListView extends StatefulWidget {
 
 class _LMFeedUserCreatedCommentListViewState
     extends State<LMFeedUserCreatedCommentListView> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   static const int pageSize = 10;
   final PagingController<int, LMCommentViewData> _pagingController =
@@ -371,10 +376,10 @@ class _LMFeedUserCreatedCommentListViewState
               showDialog(
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Comment',
+                  title: 'Delete $postTitleFirstCap',
                   uuid: postViewData.uuid,
                   content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
+                      'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
@@ -529,7 +534,9 @@ class _LMFeedUserCreatedCommentListViewState
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+                    text: postViewData.isSaved
+                        ? "$postTitleFirstCap Saved"
+                        : "$postTitleFirstCap Unsaved"),
               ),
             );
           }
@@ -589,7 +596,7 @@ class _LMFeedUserCreatedCommentListViewState
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                  text: 'A post is already uploading.',
+                  text: 'A $postTitleSmallCap is already uploading.',
                 ),
               ),
             );
@@ -635,8 +642,8 @@ class _LMFeedUserCreatedCommentListViewState
               ),
             ),
             const SizedBox(height: 12),
-            const LMFeedText(
-              text: "Be the first one to post here",
+            LMFeedText(
+              text: "Be the first one to create a $postTitleSmallCap here",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 16,
@@ -665,7 +672,7 @@ class _LMFeedUserCreatedCommentListViewState
                 placement: LMFeedIconButtonPlacement.end,
               ),
               text: LMFeedText(
-                text: "Create Post",
+                text: "Create $postTitleFirstCap",
                 style: LMFeedTextStyle(
                   textStyle: TextStyle(
                     color: feedThemeData?.onPrimary,
@@ -706,7 +713,8 @@ class _LMFeedUserCreatedCommentListViewState
                         LMFeedCore.showSnackBar(
                           LMFeedSnackBar(
                             content: LMFeedText(
-                              text: 'A post is already uploading.',
+                              text:
+                                  'A $postTitleSmallCap is already uploading.',
                             ),
                           ),
                         );
@@ -714,8 +722,8 @@ class _LMFeedUserCreatedCommentListViewState
                     }
                   : () => LMFeedCore.showSnackBar(
                         LMFeedSnackBar(
-                          content: const Text(
-                            'You do not have permission to create a post',
+                          content: Text(
+                            'You do not have permission to create a $postTitleSmallCap',
                           ),
                         ),
                       ),

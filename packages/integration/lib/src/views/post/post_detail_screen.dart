@@ -65,6 +65,11 @@ class LMFeedPostDetailScreen extends StatefulWidget {
 }
 
 class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
   final LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
   LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
   final ValueNotifier _rebuildComment = ValueNotifier(false);
@@ -516,7 +521,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           LMFeedText(
-            text: "Post",
+            text: postTitleFirstCap,
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 fontSize: 20,
@@ -570,7 +575,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         );
       },
       onPostTap: (context, post) {
-        debugPrint("Post in detail screen tapped");
         widget.onPostTap?.call();
       },
       isFeed: false,
@@ -680,10 +684,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Post',
+                title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
                 content:
-                    'Are you sure you want to delete this post. This action can not be reversed.',
+                    'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
 
@@ -835,8 +839,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               LMFeedSnackBar(
                 content: LMFeedText(
                     text: _postDetailScreenHandler!.postData!.isSaved
-                        ? "Post Saved"
-                        : "Post Unsaved"),
+                        ? "$postTitleFirstCap Saved"
+                        : "$postTitleFirstCap Unsaved"),
               ),
             );
           }
@@ -899,7 +903,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: 'A post is already uploading.',
+                        text: 'A $postTitleSmallCap is already uploading.',
                       ),
                     ),
                   );
@@ -909,7 +913,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: 'You do not have permission to create a post',
+                      text:
+                          'You do not have permission to create a $postTitleSmallCap',
                     ),
                   ),
                 );
@@ -1293,7 +1298,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                 height: 18,
                               ),
                               text: LMFeedText(
-                                text: "Post",
+                                text:
+                                    "${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)}",
                                 style: LMFeedTextStyle(
                                   textAlign: TextAlign.center,
                                   textStyle: TextStyle(

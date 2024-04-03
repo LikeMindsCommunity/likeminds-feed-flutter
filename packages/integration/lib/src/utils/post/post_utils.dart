@@ -6,6 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedPostUtils {
+  static String getPostTitle(LMFeedPluralizeWordAction action) {
+    String postTitle = 'Resource';
+
+    return LMFeedPluralize.instance.pluralizeOrCapitalize(postTitle, action);
+  }
+
+  static String getCommentTitle(LMFeedPluralizeWordAction action) {
+    String commentTitle = 'Response';
+
+    return LMFeedPluralize.instance.pluralizeOrCapitalize(commentTitle, action);
+  }
+
   static LMPostViewData updatePostData(
       LMPostViewData postViewData, LMFeedPostActionType actionType,
       {String? commentId}) {
