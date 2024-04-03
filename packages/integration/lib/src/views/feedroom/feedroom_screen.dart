@@ -252,7 +252,13 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   @override
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.feedRoomScreenConfig;
-    return Scaffold(
+    return LMFeedCore.widgetUtility.scaffold(
+      onPopInvoked: (p0) {
+        if (p0) {
+          _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
+          // Navigator.pop(context);
+        }
+      },
       backgroundColor: feedThemeData.backgroundColor,
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       floatingActionButton: ValueListenableBuilder(
@@ -264,6 +270,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         },
       ),
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
           refresh();
@@ -583,7 +590,17 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
-      leading: const SizedBox.shrink(),
+      leading: LMFeedButton(
+        onTap: () {
+          // _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
+          Navigator.pop(context);
+        },
+        style: LMFeedButtonStyle.basic().copyWith(
+            icon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.arrow_back,
+        )),
+      ),
       title: GestureDetector(
         onTap: () {
           _scrollToTop();
@@ -601,7 +618,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 style: LMFeedTextStyle(
                   textStyle: TextStyle(
                     color: feedThemeData.onContainer,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -612,6 +629,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
       ),
       style: LMFeedAppBarStyle.basic().copyWith(
         backgroundColor: feedThemeData.container,
+        height: 48,
       ),
     );
   }
@@ -1040,7 +1058,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         ),
         onTap: right
             ? () async {
-                if (!postUploading.value) {
+                if (!postUploading.value && feedroom != null) {
                   LMFeedAnalyticsBloc.instance.add(
                       const LMFeedFireAnalyticsEvent(
                           eventName: LMFeedAnalyticsKeys.postCreationStarted,
@@ -1062,6 +1080,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
+                        feedroomId: feedroom!.id,
                       ),
                     ),
                   );

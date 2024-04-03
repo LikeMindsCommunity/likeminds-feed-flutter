@@ -37,7 +37,7 @@ class LMFeedRoomListScreen extends StatefulWidget {
 }
 
 class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
-  final List<LMFeedRoomViewData> _feedRoomList = [];
+  // final List<LMFeedRoomViewData> _feedRoomList = [];
   LMFeedRoomBloc? _feedRoomListBloc;
   final PagingController<int, LMFeedRoomViewData>
       _pagingControllerFeedRoomList = PagingController(firstPageKey: 1);
@@ -51,7 +51,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
   @override
   void initState() {
     super.initState();
-    // Bloc.observer = SimpleBlocObserver();
+    Bloc.observer = LMFeedBlocObserver();
     _feedRoomListBloc = LMFeedRoomBloc.instance;
     _addPaginationListener();
     _feedRoomListBloc!.add(const LMFeedGetFeedRoomListEvent(offset: 1));
@@ -66,41 +66,40 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
 
   void updatePagingControllers(Object? state) {
     if (state is LMFeedRoomListLoadedState) {
-      _offset++;
       if (state.size < 10) {
         _pagingControllerFeedRoomList.appendLastPage(state.feedList);
       } else {
-        _pagingControllerFeedRoomList.appendPage(state.feedList, _offset);
+        _pagingControllerFeedRoomList.appendPage(state.feedList, state.offset);
       }
     }
   }
 
+  /// Clearing paging controller while changing the
+  /// event to prevent duplication of list
   void clearPagingController() {
-    /* Clearing paging controller while changing the
-     event to prevent duplication of list */
     if (_pagingControllerFeedRoomList.itemList != null) {
       _pagingControllerFeedRoomList.itemList!.clear();
     }
-    _offset = 1;
   }
-
-  int _offset = 1;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return LMFeedCore.widgetUtility.scaffold(
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
-      body: RefreshIndicator(
+      body: RefreshIndicator.adaptive(
         onRefresh: () async {
           _feedRoomListBloc!.add(const LMFeedGetFeedRoomListEvent(offset: 1));
           clearPagingController();
         },
+        color: LMFeedCore.theme.primaryColor,
+        backgroundColor: LMFeedCore.theme.container,
         child: BlocConsumer<LMFeedRoomBloc, LMFeedRoomState>(
           bloc: _feedRoomListBloc,
+          // listenWhen: (previous, current) => previous is LMFeedRoomInitialState,
           listener: (context, state) => updatePagingControllers(state),
           buildWhen: (previous, current) {
             if (current is LMFeedRoomListLoadingState &&
-                _feedRoomList.isNotEmpty) {
+                _pagingControllerFeedRoomList.itemList!.isNotEmpty) {
               return false;
             }
             return true;
@@ -150,6 +149,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
       leading: const SizedBox.shrink(),
+      trailing: [const SizedBox.shrink()],
       title: Padding(
         padding: const EdgeInsets.only(left: 4.0),
         child: LMFeedText(
@@ -157,13 +157,22 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: LMFeedCore.theme.onContainer,
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
       ),
       style: LMFeedAppBarStyle.basic().copyWith(
+        // centerTitle: true,
+        height: 48,
+        shadow: [
+          BoxShadow(
+            color: LMFeedCore.theme.primaryColor.withOpacity(0.2),
+            spreadRadius: 4,
+            blurRadius: 4,
+          )
+        ],
         backgroundColor: LMFeedCore.theme.container,
       ),
     );
@@ -241,12 +250,13 @@ class LMFeedRoomList extends StatelessWidget {
             ),
           ),
         );
+        pagingControllerFeedRoomList.itemList?.clear();
       },
       leading: LMFeedProfilePicture(
         fallbackText: item.title,
         imageUrl: item.chatroomImageUrl,
         style: LMFeedProfilePictureStyle(
-          size: 64,
+          size: 48,
           boxShape: BoxShape.circle,
         ),
       ),
@@ -254,7 +264,7 @@ class LMFeedRoomList extends StatelessWidget {
         text: item.header,
         style: LMFeedTextStyle(
           textStyle: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -263,8 +273,8 @@ class LMFeedRoomList extends StatelessWidget {
         text: "${item.participantsCount} participants",
         style: LMFeedTextStyle(
           textStyle: const TextStyle(
-            fontStyle: FontStyle.italic,
-            fontSize: 14,
+            fontSize: 12,
+            fontWeight: FontWeight.w300,
           ),
         ),
       ),

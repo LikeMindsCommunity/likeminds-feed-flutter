@@ -262,6 +262,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         },
       ),
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
           refresh();

@@ -41,6 +41,7 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
   final String? heading;
   final LMUserViewData user;
   final List<LMTopicViewData> selectedTopics;
+  final int? feedroomId;
 
   ///{@macro lm_feed_create_new_post_event}
   LMFeedCreateNewPostEvent({
@@ -49,6 +50,7 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
     this.postText,
     required this.selectedTopics,
     this.heading,
+    this.feedroomId,
   }) : assert(postMedia != null || postText != null || heading != null);
 }
 

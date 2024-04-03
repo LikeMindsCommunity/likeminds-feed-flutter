@@ -11,10 +11,6 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
-  // Builder for appbar
-  // Builder for content
-  // Builder for media preview
-  // Builder for bottom bar for buttons
   const LMFeedComposeScreen({
     super.key,
     // Widget builder functions for customizations
@@ -30,6 +26,7 @@ class LMFeedComposeScreen extends StatefulWidget {
     this.attachments,
     this.displayName,
     this.displayUrl,
+    this.feedroomId,
   });
 
   final LMFeedComposeScreenConfig? config;
@@ -49,6 +46,7 @@ class LMFeedComposeScreen extends StatefulWidget {
   final List<LMAttachmentViewData>? attachments;
   final String? displayName;
   final String? displayUrl;
+  final int? feedroomId;
 
   @override
   State<LMFeedComposeScreen> createState() => _LMFeedComposeScreenState();
@@ -693,6 +691,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   selectedTopics: selectedTopics,
                   postMedia: [...composeBloc.postMedia],
                   heading: _headingController?.text,
+                  feedroomId: widget.feedroomId,
                 ));
 
                 Navigator.pop(context);

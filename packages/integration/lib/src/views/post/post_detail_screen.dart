@@ -1263,6 +1263,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                             .routeToProfile(currentUser.sdkClientInfo.uuid);
                       },
                     ),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: LMTaggingAheadTextField(
                         isDown: false,

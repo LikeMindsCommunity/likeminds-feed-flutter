@@ -89,7 +89,12 @@ class LMFeedRoomListEmptyState extends LMFeedRoomState {}
 class LMFeedRoomListLoadedState extends LMFeedRoomState {
   final List<LMFeedRoomViewData> feedList;
   final int size;
-  const LMFeedRoomListLoadedState({required this.feedList, required this.size});
+  final int offset;
+  const LMFeedRoomListLoadedState({
+    required this.feedList,
+    required this.size,
+    required this.offset,
+  });
   @override
   List<Object> get props => [feedList];
 }
