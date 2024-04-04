@@ -13,17 +13,10 @@ class LMFeedTileShimmer extends StatelessWidget {
         bottom: 4.0,
       ),
       child: Shimmer.fromColors(
-        baseColor: Colors.black26,
-        highlightColor: Colors.black12,
+        baseColor: Colors.grey.withOpacity(0.4),
+        highlightColor: Colors.grey.withOpacity(0.1),
         child: Row(
           children: [
-            // const SizedBox(
-            //   height: 50,
-            //   width: 50,
-            //   child: CircleAvatar(
-            //     backgroundColor: Colors.white,
-            //   ),
-            // ),
             LikeMindsTheme.kHorizontalPaddingXLarge,
             Container(
               height: 24,

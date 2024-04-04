@@ -172,8 +172,6 @@ class _LMCarouselState extends State<LMFeedCarousel> {
               child: CarouselSlider.builder(
                 itemCount: mediaWidgets.length,
                 itemBuilder: (context, index, _) {
-                  LMFeedVideoProvider.instance.currentVisiblePostPosition =
-                      index;
                   return mediaWidgets[index];
                 },
                 options: style!.carouselOptions?.copyWith(

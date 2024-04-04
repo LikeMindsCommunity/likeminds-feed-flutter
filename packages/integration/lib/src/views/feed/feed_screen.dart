@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:video_compress/video_compress.dart';
 // import 'package:media_kit_video/media_kit_video.dart';
 
 part 'feed_screen_configuration.dart';
@@ -129,7 +130,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedBloc.instance;
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
-
+    postUploading.value = newPostBloc.state is LMFeedNewPostUploadingState ||
+        newPostBloc.state is LMFeedEditPostUploadingState;
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.feedOpened,
@@ -445,7 +447,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 builder: (context, state) {
                   if (state is LMFeedEditPostUploadingState) {
                     return Container(
-                      height: 96,
+                      height: 72,
                       color: feedThemeData.container,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(
@@ -472,10 +474,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   }
                   if (state is LMFeedNewPostUploadingState) {
                     return Container(
-                      height: 60,
+                      height: 72,
                       color: feedThemeData.backgroundColor,
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 6,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -483,7 +488,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                             children: <Widget>[
                               getLoaderThumbnail(state.thumbnailMedia),
                               LikeMindsTheme.kHorizontalPaddingMedium,
-                              const Text('Posting')
+                              const Text('Uploading post')
                             ],
                           ),
                           StreamBuilder<num>(
@@ -504,6 +509,43 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                   ),
                                 );
                               }),
+                        ],
+                      ),
+                    );
+                  }
+                  if (state is LMFeedNewPostErrorState) {
+                    return Container(
+                      height: 72,
+                      color: feedThemeData.backgroundColor,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          LMFeedText(
+                            text: "Post uploading failed.. try again",
+                            style: LMFeedTextStyle(
+                              maxLines: 1,
+                              textStyle: TextStyle(
+                                color: Colors.red,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          LMFeedButton(
+                            onTap: () {
+                              newPostBloc.add(state.event!);
+                            },
+                            style: LMFeedButtonStyle(
+                              icon: LMFeedIcon(
+                                type: LMFeedIconType.icon,
+                                icon: Icons.refresh_rounded,
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     );
@@ -710,6 +752,35 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 boxPadding: 0,
               ),
             );
+      } else if (media.mediaType == LMMediaType.video) {
+        final thumbnailFile = VideoCompress.getFileThumbnail(
+          media.mediaFile!.path,
+          quality: 50, // default(100)
+          position: -1, // default(-1)
+        );
+        return FutureBuilder(
+          future: thumbnailFile,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Container(
+                height: 50,
+                width: 50,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(6.0),
+                ),
+                child: LMFeedImage(
+                  imageFile: snapshot.data,
+                  style: const LMFeedPostImageStyle(
+                    boxFit: BoxFit.contain,
+                  ),
+                ),
+              );
+            }
+            return LMFeedLoader();
+          },
+        );
       } else {
         return const SizedBox.shrink();
       }
@@ -859,7 +930,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Comment',
+                title: 'Delete Post',
                 uuid: postCreatorUUID,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',

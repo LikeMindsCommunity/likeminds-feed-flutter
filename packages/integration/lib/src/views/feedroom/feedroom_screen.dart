@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart';
+import 'package:video_compress/video_compress.dart';
 
 part 'feedroom_screen_configuration.dart';
 
@@ -127,7 +128,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedRoomBloc.instance;
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
-
+    postUploading.value = newPostBloc.state is LMFeedNewPostUploadingState ||
+        newPostBloc.state is LMFeedEditPostUploadingState;
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.feedOpened,
@@ -455,10 +457,13 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 builder: (context, state) {
                   if (state is LMFeedEditPostUploadingState) {
                     return Container(
-                      height: 60,
+                      height: 72,
                       color: feedThemeData.container,
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 6,
+                      ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -479,10 +484,13 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   }
                   if (state is LMFeedNewPostUploadingState) {
                     return Container(
-                      height: 60,
-                      color: feedThemeData.backgroundColor,
+                      height: 72,
+                      color: feedThemeData.container,
                       alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 6,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -490,7 +498,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                             children: <Widget>[
                               getLoaderThumbnail(state.thumbnailMedia),
                               LikeMindsTheme.kHorizontalPaddingMedium,
-                              const Text('Posting')
+                              const Text('Uploading Post')
                             ],
                           ),
                           StreamBuilder<num>(
@@ -511,6 +519,43 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                                   ),
                                 );
                               }),
+                        ],
+                      ),
+                    );
+                  }
+                  if (state is LMFeedNewPostErrorState) {
+                    return Container(
+                      height: 72,
+                      color: feedThemeData.backgroundColor,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          LMFeedText(
+                            text: "Post uploading failed.. try again",
+                            style: LMFeedTextStyle(
+                              maxLines: 1,
+                              textStyle: TextStyle(
+                                color: Colors.red,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          LMFeedButton(
+                            onTap: () {
+                              newPostBloc.add(state.event!);
+                            },
+                            style: LMFeedButtonStyle(
+                              icon: LMFeedIcon(
+                                type: LMFeedIconType.icon,
+                                icon: Icons.refresh_rounded,
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     );
@@ -690,6 +735,35 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 boxPadding: 0,
               ),
             );
+      } else if (media.mediaType == LMMediaType.video) {
+        final thumbnailFile = VideoCompress.getFileThumbnail(
+          media.mediaFile!.path,
+          quality: 50, // default(100)
+          position: -1, // default(-1)
+        );
+        return FutureBuilder(
+          future: thumbnailFile,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Container(
+                height: 50,
+                width: 50,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(6.0),
+                ),
+                child: LMFeedImage(
+                  imageFile: snapshot.data,
+                  style: const LMFeedPostImageStyle(
+                    boxFit: BoxFit.contain,
+                  ),
+                ),
+              );
+            }
+            return LMFeedLoader();
+          },
+        );
       } else {
         return const SizedBox.shrink();
       }

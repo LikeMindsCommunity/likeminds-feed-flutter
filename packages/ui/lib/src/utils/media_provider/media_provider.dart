@@ -114,7 +114,7 @@ class LMFeedVideoProvider with ChangeNotifier {
 
     Player player = Player(
       configuration: PlayerConfiguration(
-        bufferSize: 2 * 1024 * 1024,
+        bufferSize: 4 * 1024 * 1024,
         ready: () {},
         muted: isMuted.value,
       ),
@@ -122,7 +122,7 @@ class LMFeedVideoProvider with ChangeNotifier {
     controller = VideoController(
       player,
       configuration: const VideoControllerConfiguration(
-        scale: 0.2,
+        scale: 0.5,
       ),
     );
 

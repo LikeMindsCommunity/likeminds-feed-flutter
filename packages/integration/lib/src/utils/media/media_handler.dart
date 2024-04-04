@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:video_compress/video_compress.dart';
 
 class LMFeedMediaHandler {
   static Future<bool> handlePermissions(int mediaType) async {
@@ -160,19 +159,10 @@ class LMFeedMediaHandler {
                 ),
               );
             } else {
-              debugPrint("Started compression of video");
-              final info = await VideoCompress.compressVideo(
-                file.path,
-                quality: VideoQuality.MediumQuality,
-                deleteOrigin: false,
-                includeAudio: true,
-              );
-              debugPrint("Finished compression of video");
-              File video = File(info!.path!);
               LMMediaModel videoFile = LMMediaModel(
                 mediaType: LMMediaType.video,
-                mediaFile: video,
-                size: fileBytes,
+                mediaFile: file,
+                size: fileSize.toInt(),
                 duration: 0,
               );
               videoFiles.add(videoFile);

@@ -11,11 +11,11 @@ class LMFeedDeepLinkHandler {
   // below function creates a link from domain and post id
   String createLink(String postId) {
     String? domain = LMFeedCore.domain;
-    if (domain != null) {
+    if (domain == null) {
       return '';
     }
     int length = LMFeedCore.domain!.length;
-    if (domain![length - 1] == '/') {
+    if (domain[length - 1] == '/') {
       return "${domain}post?post_id=$postId";
     } else {
       return "$domain/post?post_id=$postId";

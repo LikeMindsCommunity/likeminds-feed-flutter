@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:visibility_aware_state/visibility_aware_state.dart';
 
 /// {@template post_widget}
 /// A widget that displays a post on the feed.
@@ -126,7 +127,7 @@ class LMFeedPostWidget extends StatefulWidget {
   }
 }
 
-class _LMPostWidgetState extends State<LMFeedPostWidget> {
+class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
   int postLikes = 0;
   int comments = 0;
   bool? isLiked;
@@ -141,6 +142,22 @@ class _LMPostWidgetState extends State<LMFeedPostWidget> {
   void dispose() {
     widget.disposeVideoPlayerOnInActive?.call();
     super.dispose();
+  }
+
+  @override
+  void deactivate() async {
+    widget.disposeVideoPlayerOnInActive?.call();
+    super.deactivate();
+  }
+
+  @override
+  void onVisibilityChanged(WidgetVisibility visibility) {
+    if (visibility == WidgetVisibility.INVISIBLE) {
+      widget.disposeVideoPlayerOnInActive?.call();
+    } else if (visibility == WidgetVisibility.GONE) {
+      widget.disposeVideoPlayerOnInActive?.call();
+    }
+    super.onVisibilityChanged(visibility);
   }
 
   @override

@@ -23,6 +23,7 @@ void newPostEventHandler(
                   : postMedia[0],
         ),
       );
+      try {} catch (e) {}
       for (final media in postMedia) {
         if (media.mediaType == LMMediaType.repost) {
           attachments.add(
@@ -60,6 +61,42 @@ void newPostEventHandler(
           );
         } else {
           File mediaFile = media.mediaFile!;
+          if (media.mediaType == LMMediaType.video) {
+            int originalSize = media.size!;
+            debugPrint(
+                "Started compression of video of ${originalSize.toStringAsFixed(2)}MB");
+            if (bool.fromEnvironment('DEBUG')) {
+              LMFeedCore.showSnackBar(
+                LMFeedSnackBar(
+                  content: LMFeedText(
+                    text:
+                        "Started compression of video of ${originalSize.toStringAsFixed(2)}MBs",
+                  ),
+                ),
+              );
+            }
+            var tempFile = await VideoCompress.compressVideo(
+              mediaFile.path,
+              deleteOrigin: false,
+              includeAudio: true,
+            );
+            double reducedSize = getFileSizeInDouble(tempFile!.filesize!);
+            double compression = (reducedSize / originalSize) * 100;
+            if (bool.fromEnvironment('DEBUG')) {
+              LMFeedCore.showSnackBar(
+                LMFeedSnackBar(
+                  content: LMFeedText(
+                    text:
+                        'Finished compression (${compression.toStringAsFixed(2)}) reduced to ${reducedSize}MBs',
+                  ),
+                ),
+              );
+            }
+            mediaFile = tempFile.file!;
+            debugPrint(
+              'Finished compression (${compression.toStringAsFixed(2)}) reduced to ${reducedSize}MBs',
+            );
+          }
           final String? response = await LMFeedMediaService.instance
               .uploadFile(mediaFile, event.user.sdkClientInfo.uuid);
           if (response != null) {
@@ -106,6 +143,10 @@ void newPostEventHandler(
       requestBuilder.heading(headingText);
     }
 
+    if (event.feedroomId != null) {
+      requestBuilder.feedroomId(event.feedroomId!);
+    }
+
     if (postText != null) {
       requestBuilder.text(postText);
     }
@@ -149,26 +190,33 @@ void newPostEventHandler(
 
       emit(
         LMFeedNewPostUploadedState(
-            postData: LMPostViewDataConvertor.fromPost(
-              post: response.post!,
-              widgets: widgets,
-              repostedPosts: repostedPosts,
-              users: users,
-              topics: topics,
-            ),
-            userData: users,
+          postData: LMPostViewDataConvertor.fromPost(
+            post: response.post!,
+            widgets: widgets,
+            repostedPosts: repostedPosts,
+            users: users,
             topics: topics,
-            widgets: widgets),
+          ),
+          userData: users,
+          topics: topics,
+          widgets: widgets,
+        ),
       );
     } else {
-      emit(LMFeedNewPostErrorState(errorMessage: response.errorMessage!));
+      emit(LMFeedNewPostErrorState(
+        errorMessage: response.errorMessage!,
+        event: event,
+      ));
     }
 
     LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
   } on Exception catch (err, stacktrace) {
     LMFeedLogger.instance.handleException(err, stacktrace);
 
-    emit(const LMFeedNewPostErrorState(errorMessage: 'An error occurred'));
+    emit(LMFeedNewPostErrorState(
+      errorMessage: 'An error occurred',
+      event: event,
+    ));
     debugPrint(err.toString());
   }
 }
