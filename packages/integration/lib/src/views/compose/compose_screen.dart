@@ -558,7 +558,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     return LMFeedAppBar(
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme.container,
-          height: 72,
+          height: 48,
           centerTitle: true,
           padding: const EdgeInsets.symmetric(
             horizontal: 18.0,

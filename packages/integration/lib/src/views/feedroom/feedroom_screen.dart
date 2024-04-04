@@ -302,7 +302,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                                   await Navigator.of(context).push(
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const LMFeedComposeScreen()),
+                                            LMFeedComposeScreen(
+                                              feedroomId: widget.feedroomId,
+                                            )),
                                   );
                                 }
                               : () {
@@ -590,17 +592,19 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
-      leading: LMFeedButton(
-        onTap: () {
-          // _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
-          Navigator.pop(context);
-        },
-        style: LMFeedButtonStyle.basic().copyWith(
-            icon: LMFeedIcon(
-          type: LMFeedIconType.icon,
-          icon: Icons.arrow_back,
-        )),
-      ),
+      leading: LMFeedUserUtils.checkIfCurrentUserIsCM()
+          ? LMFeedButton(
+              onTap: () {
+                // _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
+                Navigator.pop(context);
+              },
+              style: LMFeedButtonStyle.basic().copyWith(
+                  icon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.arrow_back,
+              )),
+            )
+          : null,
       title: GestureDetector(
         onTap: () {
           _scrollToTop();
@@ -714,14 +718,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
       },
       style: feedThemeData?.postStyle,
       onMediaTap: () async {
-        // VideoController? postVideoController = LMFeedVideoProvider.instance
-        //     .getVideoController(
-        //         LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        // await postVideoController?.player.pause();
-
         LMFeedVideoProvider.instance.pauseCurrentVideo();
-
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -733,12 +730,10 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             ),
           ),
         );
-
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
       onPostTap: (context, post) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
-
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
@@ -821,7 +816,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             // to prevent video from playing in background
             // while editing the post
             LMFeedVideoProvider.instance.forcePauseAllControllers();
-
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => LMFeedEditPostScreen(
@@ -835,7 +829,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           onPostPin: () => handlePostPinAction(postViewData),
           onPostDelete: () {
             String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
-
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
@@ -1080,7 +1073,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
-                        feedroomId: feedroom!.id,
+                        feedroomId: widget.feedroomId,
                       ),
                     ),
                   );
@@ -1173,7 +1166,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
       ),
       onTap: right
           ? () async {
-              if (!postUploading.value) {
+              if (!postUploading.value &&
+                  LMFeedPostBloc.instance.state != LMFeedUploadingState()) {
                 LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
                     eventName: LMFeedAnalyticsKeys.postCreationStarted,
                     deprecatedEventName:
@@ -1185,7 +1179,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LMFeedComposeScreen(),
+                    builder: (context) => LMFeedComposeScreen(
+                      feedroomId: widget.feedroomId,
+                    ),
                   ),
                 );
               } else {
@@ -1255,7 +1251,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(),
+                      builder: (context) => LMFeedComposeScreen(
+                        feedroomId: widget.feedroomId,
+                      ),
                     ),
                   );
                 } else {

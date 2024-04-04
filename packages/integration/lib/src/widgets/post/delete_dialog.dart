@@ -52,7 +52,12 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                 style: LMFeedTextStyle(
                     textStyle: const TextStyle(fontWeight: FontWeight.bold))),
             LikeMindsTheme.kVerticalPaddingLarge,
-            LMFeedText(text: content),
+            LMFeedText(
+              text: content,
+              style: LMFeedTextStyle(
+                maxLines: 2,
+              ),
+            ),
             currentUser.sdkClientInfo.uuid == uuid
                 ? const SizedBox.shrink()
                 : isCm

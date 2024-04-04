@@ -117,7 +117,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                 padding: style?.padding ??
                     const EdgeInsets.all(LikeMindsTheme.kPaddingLarge),
                 width: style?.width ?? screenSize.width - 40,
-                height: style?.height ?? 72,
+                height: style?.height ?? 80,
                 decoration: BoxDecoration(
                   color: style!.backgroundColor,
                   border: style!.showBorder
