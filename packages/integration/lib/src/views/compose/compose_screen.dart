@@ -611,7 +611,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             ),
             style: LMFeedButtonStyle(
               backgroundColor: theme.primaryColor,
-              width: 48,
               borderRadius: 6,
               height: 34,
             ),
