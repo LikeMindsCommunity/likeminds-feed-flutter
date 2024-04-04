@@ -76,6 +76,26 @@ FutureOr<void> _mapLMGetFeedRoomToState({
   // widgets.addAll(response.widgets.map((key, value) =>
   //         MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value)),),);
 
+  Map<String, LMWidgetViewData>? responseWidgets =
+      response.widgets?.map((key, value) => MapEntry(
+            key,
+            LMWidgetViewDataConvertor.fromWidgetModel(value),
+          ));
+
+  Map<String, LMTopicViewData> responseTopics = response.topics.map(
+      (key, value) => MapEntry(key,
+          LMTopicViewDataConvertor.fromTopic(value, widgets: responseWidgets)));
+
+  Map<String, LMUserViewData> responseUsers =
+      response.users.map((key, value) => MapEntry(
+          key,
+          LMUserViewDataConvertor.fromUser(
+            value,
+            topics: responseTopics,
+            widgets: responseWidgets,
+            userTopics: response.userTopics,
+          )));
+
   emit(
     LMFeedRoomLoadedState(
       feedRoom: LMFeedRoomViewDataConvertor.fromFeedRoomModel(
@@ -84,14 +104,10 @@ FutureOr<void> _mapLMGetFeedRoomToState({
       posts: response.posts
               ?.map((e) => LMPostViewDataConvertor.fromPost(
                     post: e,
-                    // widgets: response.widgets,
-                    // repostedPosts: response.repostedPosts,
-                    users: response.users.map((key, value) =>
-                        MapEntry(key, LMUserViewDataConvertor.fromUser(value))),
-                    topics: response.topics.map((key, value) => MapEntry(
-                        key, LMTopicViewDataConvertor.fromTopic(value))),
-                    // filteredComments: response.filteredComments,
-                    // userTopics: response.userTopics,
+                    widgets: responseWidgets,
+                    users: responseUsers,
+                    topics: responseTopics,
+                    userTopics: response.userTopics,
                   ))
               .toList() ??
           [],

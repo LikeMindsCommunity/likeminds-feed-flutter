@@ -13,12 +13,12 @@ part 'handler/get_feedroom_list_event_handler.dart';
 class LMFeedRoomBloc extends Bloc<LMFeedRoomEvent, LMFeedRoomState> {
   // list of selected topics by the user
   List<LMTopicViewData> selectedTopics = [];
-  // list of all the topics
-  Map<String, LMTopicViewData> topics = {};
-// list of all the users
-  Map<String, LMUserViewData> users = {};
-  // list of all the widgets
-  Map<String, LMWidgetViewData> widgets = {};
+//   // list of all the topics
+//   Map<String, LMTopicViewData> topics = {};
+// // list of all the users
+//   Map<String, LMUserViewData> users = {};
+//   // list of all the widgets
+//   Map<String, LMWidgetViewData> widgets = {};
 
   static LMFeedRoomBloc? _instance;
 

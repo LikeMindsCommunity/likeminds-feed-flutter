@@ -189,11 +189,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   void updatePagingControllers(LMFeedRoomState? state) {
     if (state is LMFeedRoomLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts;
-
-      _feedBloc.users.addAll(state.users);
-      _feedBloc.topics.addAll(state.topics);
-      _feedBloc.widgets.addAll(state.widgets);
-
       if (state.posts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
@@ -258,6 +253,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
       onPopInvoked: (p0) {
         if (p0) {
           _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
+          _feedBloc.selectedTopics = [];
           // Navigator.pop(context);
         }
       },
@@ -403,8 +399,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                         feedRoomItemList.length > 10) {
                       feedRoomItemList.removeLast();
                     }
-                    _feedBloc.users.addAll(curr.userData);
-                    _feedBloc.topics.addAll(curr.topics);
                     _pagingController.itemList = feedRoomItemList;
                     postUploading.value = false;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -419,8 +413,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     if (index != -1) {
                       feedRoomItemList![index] = item;
                     }
-                    _feedBloc.users.addAll(curr.userData);
-                    _feedBloc.topics.addAll(curr.topics);
                     postUploading.value = false;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }
@@ -576,9 +568,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     pagingController: _pagingController,
                     builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
                       itemBuilder: (context, item, index) {
-                        if (_feedBloc.users[item.uuid] == null) {
-                          return const SizedBox();
-                        }
                         LMFeedPostWidget postWidget =
                             defPostWidget(context, feedThemeData, item);
                         return widget.postBuilder
@@ -637,10 +626,11 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
-      leading: LMFeedUserUtils.checkIfCurrentUserIsCM()
+      leading: isCm
           ? LMFeedButton(
               onTap: () {
                 // _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
+                _feedBloc.selectedTopics = [];
                 Navigator.pop(context);
               },
               style: LMFeedButtonStyle.basic().copyWith(
@@ -777,7 +767,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: _feedBloc.users[post.uuid]!,
+      user: post.user,
       isFeed: false,
       onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
@@ -800,7 +790,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: _feedBloc.users[post.uuid]!,
+              user: post.user,
             ),
           ),
         );
@@ -867,16 +857,16 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   LMFeedPostHeader _defPostHeader(
       BuildContext context, LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: _feedBloc.users[postViewData.uuid]!,
+      user: postViewData.user,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData.headerStyle,
       onProfileTap: () {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(
-            _feedBloc.users[postViewData.uuid]!.sdkClientInfo.uuid);
+        LMFeedCore.instance.lmFeedClient
+            .routeToProfile(postViewData.user.sdkClientInfo.uuid);
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
-            uuid: _feedBloc.users[postViewData.uuid]!.sdkClientInfo.uuid,
+            uuid: postViewData.user.sdkClientInfo.uuid,
             context: context,
           ),
         );
@@ -906,7 +896,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Comment',
+                title: 'Delete Post',
                 uuid: postCreatorUUID,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',
@@ -968,7 +958,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: _feedBloc.users[post.uuid]!,
+              user: post.user,
             ),
           ),
         );
@@ -1390,14 +1380,14 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
+          .indexWhere((element) => element.id == postPinId);
       if (index != -1) {
         postViewData.menuItems[index].title = "Unpin This Post";
         postViewData.menuItems[index].id = postUnpinId;
       }
     } else {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
+          .indexWhere((element) => element.id == postUnpinId);
       if (index != -1) {
         postViewData.menuItems[index]
           ..title = "Pin This Post"

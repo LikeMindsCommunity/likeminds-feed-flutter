@@ -386,7 +386,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               showDialog(
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Comment',
+                  title: 'Delete Post',
                   uuid: postCreatorUUID,
                   content:
                       'Are you sure you want to delete this post. This action can not be reversed.',
@@ -750,7 +750,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
-              title: 'Delete Comment',
+              title: 'Delete Post',
               uuid: commentCreatorUUID,
               content:
                   'Are you sure you want to delete this post. This action can not be reversed.',

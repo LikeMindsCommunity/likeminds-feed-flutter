@@ -1414,14 +1414,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
+          .indexWhere((element) => element.id == postPinId);
       if (index != -1) {
         postViewData.menuItems[index].title = "Unpin This Post";
         postViewData.menuItems[index].id = postUnpinId;
       }
     } else {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
+          .indexWhere((element) => element.id == postUnpinId);
       if (index != -1) {
         postViewData.menuItems[index]
           ..title = "Pin This Post"
