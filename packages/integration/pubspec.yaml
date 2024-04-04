@@ -1,6 +1,6 @@
 name: likeminds_feed_flutter_core
 description: Core package of LikeMinds Feed Flutter SDK, provides access to screens, BLoCs, and other utilities.
-version: 1.1.0
+version: 1.1.5
 homepage: "https://www.likeminds.community/"
 
 environment:
