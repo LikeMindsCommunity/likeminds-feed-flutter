@@ -25,7 +25,15 @@ class LMFeedDeepLinkHandler {
   // using the domain provided at the time of initialization
   void sharePost(String postId) {
     String postUrl = createLink(postId);
-    Share.share(postUrl);
+    if (postUrl.isEmpty) {
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(text: "The post sharing feature is unavailable"),
+        ),
+      );
+    } else {
+      Share.share(postUrl);
+    }
   }
 
   @deprecated

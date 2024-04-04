@@ -107,7 +107,7 @@ class LMFeedMediaHandler {
       // final XFile? pickedFile =
       List<LMMediaModel> videoFiles = [];
       final FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
-        allowMultiple: false,
+        allowMultiple: true,
         type: FileType.video,
       );
 
@@ -135,7 +135,7 @@ class LMFeedMediaHandler {
       }
 
       if (pickedFiles.files.isNotEmpty) {
-        if (currentMediaLength + 1 > 10) {
+        if (currentMediaLength >= 10) {
           LMFeedCore.showSnackBar(
             LMFeedSnackBar(
               content: LMFeedText(
@@ -159,11 +159,10 @@ class LMFeedMediaHandler {
                 ),
               );
             } else {
-              File video = File(file.path);
               LMMediaModel videoFile = LMMediaModel(
                 mediaType: LMMediaType.video,
-                mediaFile: video,
-                size: fileBytes,
+                mediaFile: file,
+                size: fileSize.toInt(),
                 duration: 0,
               );
               videoFiles.add(videoFile);

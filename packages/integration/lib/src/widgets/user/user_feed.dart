@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedUserCreatedPostListView extends StatefulWidget {
   const LMFeedUserCreatedPostListView({
@@ -351,11 +350,7 @@ class _LMFeedUserCreatedPostListViewState
       },
       style: feedThemeData?.postStyle,
       onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -367,14 +362,10 @@ class _LMFeedUserCreatedPostListViewState
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       onPostTap: (context, post) async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
@@ -384,7 +375,7 @@ class _LMFeedUserCreatedPostListViewState
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
@@ -467,7 +458,7 @@ class _LMFeedUserCreatedPostListViewState
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Comment',
+                title: 'Delete Post',
                 uuid: postCreatorUUID,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',
@@ -517,11 +508,7 @@ class _LMFeedUserCreatedPostListViewState
       carouselIndicatorBuilder:
           _widgetsBuilder.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -533,7 +520,7 @@ class _LMFeedUserCreatedPostListViewState
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
     );
   }
@@ -593,11 +580,7 @@ class _LMFeedUserCreatedPostListViewState
         ),
         style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
-          VideoController? postVideoController = LMFeedVideoProvider.instance
-              .getVideoController(
-                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-          await postVideoController?.player.pause();
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -608,14 +591,10 @@ class _LMFeedUserCreatedPostListViewState
               ),
             ),
           );
-          await postVideoController?.player.play();
+          LMFeedVideoProvider.instance.playCurrentVideo();
         },
         onTextTap: () async {
-          VideoController? postVideoController = LMFeedVideoProvider.instance
-              .getVideoController(
-                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-          await postVideoController?.player.pause();
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -626,7 +605,7 @@ class _LMFeedUserCreatedPostListViewState
               ),
             ),
           );
-          await postVideoController?.player.play();
+          LMFeedVideoProvider.instance.playCurrentVideo();
         },
       );
 
@@ -782,14 +761,7 @@ class _LMFeedUserCreatedPostListViewState
                         LMFeedAnalyticsKeysDep.postCreationStarted,
                     eventProperties: {}));
 
-                String? currentVisiblePost =
-                    LMFeedVideoProvider.instance.currentVisiblePostId;
-
-                VideoController? postVideoController = LMFeedVideoProvider
-                    .instance
-                    .getVideoController(currentVisiblePost ?? '');
-
-                await postVideoController?.player.pause();
+                LMFeedVideoProvider.instance.pauseCurrentVideo();
                 // ignore: use_build_context_synchronously
                 await Navigator.push(
                   context,
@@ -797,7 +769,7 @@ class _LMFeedUserCreatedPostListViewState
                     builder: (context) => const LMFeedComposeScreen(),
                   ),
                 );
-                await postVideoController?.player.pause();
+                LMFeedVideoProvider.instance.playCurrentVideo();
               } else {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(

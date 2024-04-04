@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:async/async.dart';
-import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedSearchScreen extends StatefulWidget {
   const LMFeedSearchScreen({
@@ -388,11 +387,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       },
       style: theme.postStyle,
       onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -404,14 +399,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       onPostTap: (context, post) async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
@@ -421,7 +412,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
@@ -490,7 +481,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               showDialog(
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Comment',
+                  title: 'Delete Post',
                   uuid: postViewData.uuid,
                   content:
                       'Are you sure you want to delete this post. This action can not be reversed.',
@@ -533,11 +524,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       postId: post.id,
       style: theme.mediaStyle,
       onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -549,7 +536,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
     );
   }
@@ -609,11 +596,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         ),
         style: theme.footerStyle.commentButtonStyle,
         onTap: () async {
-          VideoController? postVideoController = LMFeedVideoProvider.instance
-              .getVideoController(
-                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-          await postVideoController?.player.pause();
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -624,14 +607,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               ),
             ),
           );
-          await postVideoController?.player.play();
+          LMFeedVideoProvider.instance.playCurrentVideo();
         },
         onTextTap: () async {
-          VideoController? postVideoController = LMFeedVideoProvider.instance
-              .getVideoController(
-                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-          await postVideoController?.player.pause();
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -642,7 +621,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               ),
             ),
           );
-          await postVideoController?.player.play();
+          LMFeedVideoProvider.instance.playCurrentVideo();
         },
       );
 
@@ -815,14 +794,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                                     LMFeedAnalyticsKeysDep.postCreationStarted,
                                 eventProperties: {}));
 
-                        String? currentVisiblePost =
-                            LMFeedVideoProvider.instance.currentVisiblePostId;
-
-                        VideoController? postVideoController =
-                            LMFeedVideoProvider.instance
-                                .getVideoController(currentVisiblePost ?? '');
-
-                        await postVideoController?.player.pause();
+                        LMFeedVideoProvider.instance.pauseCurrentVideo();
                         // ignore: use_build_context_synchronously
                         await Navigator.push(
                           context,
@@ -830,7 +802,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                             builder: (context) => const LMFeedComposeScreen(),
                           ),
                         );
-                        await postVideoController?.player.pause();
+                        LMFeedVideoProvider.instance.playCurrentVideo();
                       } else {
                         LMFeedCore.showSnackBar(
                           LMFeedSnackBar(

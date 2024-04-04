@@ -2,6 +2,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:likeminds_feed_sample/cred_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
@@ -25,9 +26,16 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LMFeedCore.instance.initialize(
-    apiKey: "6b51af13-ce28-444b-a571-53a3fb125444",
+    apiKey: "YOUR-API-KEY",
     domain: "feedsx://www.feedsx.com/",
+    scaffoldMessengerKey: rootScaffoldMessengerKey,
   );
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
   setupNotifications();
   runApp(const MyApp());
 }
@@ -94,7 +102,6 @@ Future<String?> setupMessaging() async {
   final messaging = FirebaseMessaging.instance;
   NotificationSettings settings = await messaging.requestPermission(
     alert: true,
-    announcement: false,
     badge: true,
     carPlay: false,
     criticalAlert: false,
