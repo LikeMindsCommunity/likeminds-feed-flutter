@@ -12,44 +12,24 @@ class LMFeedRoomInitialState extends LMFeedRoomState {}
 class LMFeedRoomLoadingState extends LMFeedRoomState {}
 
 class LMFeedRoomPaginationLoadingState extends LMFeedRoomState {
-  final List<LMPostViewData> posts;
-  final Map<String, LMUserViewData> users;
-  final Map<String, LMWidgetViewData> widgets;
-  final Map<String, LMTopicViewData> topics;
   final LMFeedRoomViewData feedRoom;
 
   const LMFeedRoomPaginationLoadingState({
     required this.feedRoom,
-    required this.posts,
-    required this.users,
-    required this.widgets,
-    required this.topics,
   });
 
   @override
-  List<Object> get props => [feedRoom, posts, users, widgets, topics];
+  List<Object> get props => [feedRoom];
 }
 
 class LMFeedRoomEmptyState extends LMFeedRoomState {
-  final List<LMPostViewData> posts;
-  final Map<String, LMUserViewData> users;
-  final Map<String, LMWidgetViewData> widgets;
-  final Map<String, LMTopicViewData> topics;
   final LMFeedRoomViewData feedRoom;
   const LMFeedRoomEmptyState({
     required this.feedRoom,
-    required this.posts,
-    required this.users,
-    required this.widgets,
-    required this.topics,
   });
   @override
   List<Object> get props => [
         feedRoom,
-        posts,
-        users,
-        widgets,
-        topics,
       ];
 }
 

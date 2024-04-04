@@ -241,6 +241,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           onTopicSelected: (updatedTopics) {
             updateSelectedTopics(updatedTopics);
           },
+          selectedTopics: _feedBloc.selectedTopics,
         ),
       ),
     );

@@ -23,7 +23,6 @@ void newPostEventHandler(
                   : postMedia[0],
         ),
       );
-      try {} catch (e) {}
       for (final media in postMedia) {
         if (media.mediaType == LMMediaType.repost) {
           attachments.add(
@@ -120,7 +119,6 @@ void newPostEventHandler(
           }
         }
       }
-      // For counting the no of attachments
     } else {
       emit(
         LMFeedNewPostUploadingState(

@@ -16,10 +16,6 @@ FutureOr<void> _mapLMGetFeedRoomToState({
     widgets = prevState.widgets;
 
     emit(LMFeedRoomPaginationLoadingState(
-      posts: prevState.posts,
-      users: prevState.users,
-      widgets: prevState.widgets,
-      topics: prevState.topics,
       feedRoom: prevState.feedRoom,
     ));
   } else {

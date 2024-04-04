@@ -243,6 +243,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           onTopicSelected: (updatedTopics) {
             updateSelectedTopics(updatedTopics);
           },
+          selectedTopics: _feedBloc.selectedTopics,
         ),
       ),
     );

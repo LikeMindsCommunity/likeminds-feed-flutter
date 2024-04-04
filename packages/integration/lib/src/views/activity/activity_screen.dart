@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/delete_dialog.dart';
-// import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -283,12 +282,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         );
       },
       onMediaTap: () async {
-        // VideoController? videoController = LMFeedVideoProvider.instance
-        //     .getVideoController(
-        //         LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        // await videoController?.player.pause();
-
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         await Navigator.push(
@@ -492,7 +485,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             postViewData.isLiked = true;
             postViewData.likeCount += 1;
           }
-          // rebuildPostWidget.value = !rebuildPostWidget.value;
 
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
@@ -767,22 +759,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                     },
                   ),
                 );
-
-                // DeleteCommentRequest deleteCommentRequest =
-                //     (DeleteCommentRequestBuilder()
-                //           ..postId(postViewData.id)
-                //           ..commentId(commentViewData.id)
-                //           ..reason(
-                //               reason.isEmpty ? "Reason for deletion" : reason))
-                //         .build();
-
-                // LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-                //       ..commentActionEntity(LMFeedCommentType.parent)
-                //       ..postId(postViewData.id)
-                //       ..commentActionType(LMFeedCommentActionType.delete)
-                //       ..level(0)
-                //       ..commentId(commentViewData.id))
-                //     .build();
               },
               actionText: 'Delete',
             ),
