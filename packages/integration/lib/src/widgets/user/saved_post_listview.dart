@@ -793,14 +793,14 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
 
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
+          .indexWhere((element) => element.id == postPinId);
       if (index != -1) {
         postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
         postViewData.menuItems[index].id = postUnpinId;
       }
     } else {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
+          .indexWhere((element) => element.id == postUnpinId);
 
       if (index != -1) {
         postViewData.menuItems[index]
@@ -827,7 +827,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
 
       if (postViewData.isPinned) {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
+            .indexWhere((element) => element.id == postPinId);
         if (index != -1) {
           postViewData.menuItems[index]
             ..title = "Unpin This $postTitleFirstCap"
@@ -835,7 +835,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         }
       } else {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
+            .indexWhere((element) => element.id == postUnpinId);
 
         if (index != -1) {
           postViewData.menuItems[index]

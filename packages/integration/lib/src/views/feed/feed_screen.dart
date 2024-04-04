@@ -80,6 +80,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
+  String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  String commentTitleSmallCapPlural =
+      LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
@@ -842,7 +851,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Comment',
+                title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
@@ -1251,7 +1260,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
           height: 44,
-          width: 145,
+          width: 185,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           borderRadius: 28,
           backgroundColor: userPostingRights
@@ -1350,14 +1359,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
+          .indexWhere((element) => element.id == postPinId);
       if (index != -1) {
         postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
         postViewData.menuItems[index].id = postUnpinId;
       }
     } else {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
+          .indexWhere((element) => element.id == postUnpinId);
       if (index != -1) {
         postViewData.menuItems[index]
           ..title = "Pin This $postTitleFirstCap"
@@ -1378,7 +1387,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
       if (postViewData.isPinned) {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
+            .indexWhere((element) => element.id == postPinId);
         if (index != -1) {
           postViewData.menuItems[index]
             ..title = "Unpin This $postTitleFirstCap"
@@ -1386,7 +1395,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         }
       } else {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
+            .indexWhere((element) => element.id == postUnpinId);
 
         if (index != -1) {
           postViewData.menuItems[index]

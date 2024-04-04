@@ -600,7 +600,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         trailing: [
           LMFeedButton(
             text: LMFeedText(
-              text: "Post",
+              text: "Create",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   color: theme.onPrimary,

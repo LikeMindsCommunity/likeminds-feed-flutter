@@ -49,6 +49,7 @@ class _LMFeedUserCreatedCommentListViewState
   static const int pageSize = 10;
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
+  LMUserViewData? userViewData = LMFeedLocalPreference.instance.fetchUserData();
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedThemeData? feedThemeData;
   final ValueNotifier postUploading = ValueNotifier(false);
@@ -642,92 +643,6 @@ class _LMFeedUserCreatedCommentListViewState
               ),
             ),
             const SizedBox(height: 12),
-            LMFeedText(
-              text: "Be the first one to create a $postTitleSmallCap here",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: LikeMindsTheme.greyColor,
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            LMFeedButton(
-              style: LMFeedButtonStyle(
-                icon: LMFeedIcon(
-                  type: LMFeedIconType.icon,
-                  icon: Icons.add,
-                  style: LMFeedIconStyle(
-                    color: feedThemeData?.onPrimary,
-                    size: 18,
-                  ),
-                ),
-                borderRadius: 28,
-                backgroundColor: feedThemeData?.primaryColor,
-                height: 44,
-                width: 153,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                placement: LMFeedIconButtonPlacement.end,
-              ),
-              text: LMFeedText(
-                text: "Create $postTitleFirstCap",
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    color: feedThemeData?.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              onTap: userPostingRights
-                  ? () async {
-                      if (!postUploading.value) {
-                        LMFeedAnalyticsBloc.instance.add(
-                            const LMFeedFireAnalyticsEvent(
-                                eventName:
-                                    LMFeedAnalyticsKeys.postCreationStarted,
-                                deprecatedEventName:
-                                    LMFeedAnalyticsKeysDep.postCreationStarted,
-                                widgetSource:
-                                    LMFeedWidgetSource.userCreatedCommentScreen,
-                                eventProperties: {}));
-
-                        String? currentVisiblePost =
-                            LMFeedVideoProvider.instance.currentVisiblePostId;
-
-                        VideoController? postVideoController =
-                            LMFeedVideoProvider.instance
-                                .getVideoController(currentVisiblePost ?? '');
-
-                        await postVideoController?.player.pause();
-                        // ignore: use_build_context_synchronously
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LMFeedComposeScreen(),
-                          ),
-                        );
-                        await postVideoController?.player.pause();
-                      } else {
-                        LMFeedCore.showSnackBar(
-                          LMFeedSnackBar(
-                            content: LMFeedText(
-                              text:
-                                  'A $postTitleSmallCap is already uploading.',
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  : () => LMFeedCore.showSnackBar(
-                        LMFeedSnackBar(
-                          content: Text(
-                            'You do not have permission to create a $postTitleSmallCap',
-                          ),
-                        ),
-                      ),
-            ),
           ],
         ),
       );

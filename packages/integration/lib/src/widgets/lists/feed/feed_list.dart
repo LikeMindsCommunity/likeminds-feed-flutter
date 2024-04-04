@@ -4,10 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/simple_bloc_observer.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/edit_post_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post/delete_dialog.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedList extends StatefulWidget {
@@ -605,14 +601,14 @@ class _LMFeedListState extends State<LMFeedList> {
 
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
+          .indexWhere((element) => element.id == postPinId);
       if (index != -1) {
         postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
         postViewData.menuItems[index].id = postUnpinId;
       }
     } else {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
+          .indexWhere((element) => element.id == postUnpinId);
 
       if (index != -1) {
         postViewData.menuItems[index]
@@ -634,7 +630,7 @@ class _LMFeedListState extends State<LMFeedList> {
 
       if (postViewData.isPinned) {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
+            .indexWhere((element) => element.id == postPinId);
         if (index != -1) {
           postViewData.menuItems[index]
             ..title = "Unpin This $postTitleFirstCap"
@@ -642,7 +638,7 @@ class _LMFeedListState extends State<LMFeedList> {
         }
       } else {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
+            .indexWhere((element) => element.id == postUnpinId);
 
         if (index != -1) {
           postViewData.menuItems[index]

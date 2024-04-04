@@ -7,13 +7,13 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedPostUtils {
   static String getPostTitle(LMFeedPluralizeWordAction action) {
-    String postTitle = 'Resource';
+    String postTitle = LMFeedLocalPreference.instance.getPostVariable();
 
     return LMFeedPluralize.instance.pluralizeOrCapitalize(postTitle, action);
   }
 
   static String getCommentTitle(LMFeedPluralizeWordAction action) {
-    String commentTitle = 'Response';
+    String commentTitle = LMFeedLocalPreference.instance.getCommentVariable();
 
     return LMFeedPluralize.instance.pluralizeOrCapitalize(commentTitle, action);
   }
@@ -136,19 +136,29 @@ class LMFeedPostUtils {
 
   static String getCommentCountText(int comment) {
     if (comment == 1) {
-      return 'Comment';
+      String commentTitle =
+          getCommentTitle(LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+      return commentTitle;
     } else {
-      return 'Comments';
+      String commentTitle =
+          getCommentTitle(LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+      return commentTitle;
     }
   }
 
   static String getCommentCountTextWithCount(int comment) {
     if (comment == 0) {
-      return 'Add Comment';
+      String commentTitle =
+          getCommentTitle(LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+      return 'Add $commentTitle';
     } else if (comment == 1) {
-      return '1 Comment';
+      String commentTitle =
+          getCommentTitle(LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+      return '1 $commentTitle';
     } else {
-      return '$comment Comments';
+      String commentTitle =
+          getCommentTitle(LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+      return '$comment $commentTitle';
     }
   }
 

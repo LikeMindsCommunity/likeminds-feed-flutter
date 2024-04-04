@@ -70,6 +70,15 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
+  String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  String commentTitleSmallCapPlural =
+      LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   final LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
   LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
   final ValueNotifier _rebuildComment = ValueNotifier(false);
@@ -452,10 +461,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
-              title: 'Delete Comment',
+              title: 'Delete $commentTitleFirstCapSingular',
               uuid: commentCreatorUUID,
               content:
-                  'Are you sure you want to delete this comment. This action can not be reversed.',
+                  'Are you sure you want to $commentTitleSmallCapSingular this comment. This action can not be reversed.',
               action: (String reason) async {
                 Navigator.of(childContext).pop();
 
@@ -535,7 +544,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ? const SizedBox.shrink()
               : LMFeedText(
                   text: LMFeedPostUtils.getCommentCountTextWithCount(
-                      _postDetailScreenHandler!.postData?.commentCount ?? 0),
+                          _postDetailScreenHandler!.postData?.commentCount ?? 0)
+                      .toLowerCase(),
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
                       fontSize: 13,
@@ -1193,7 +1203,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                           LMFeedText(
                             text: state.commentMetaData.commentActionType ==
                                     LMFeedCommentActionType.edit
-                                ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : 'comment'} "
+                                ? "Editing ${state.commentMetaData.replyId != null ? 'reply' : '$commentTitleSmallCapSingular'} "
                                 : "Replying to ",
                             style: LMFeedTextStyle(
                               textStyle: TextStyle(
@@ -1281,8 +1291,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                           enabled: right,
                           hintText: right
                               ? feedTheme.textFieldStyle.decoration?.hintText ??
-                                  'Write a comment'
-                              : "You do not have permission to comment.",
+                                  'Write a $commentTitleSmallCapSingular'
+                              : "You do not have permission to create a $commentTitleSmallCapSingular.",
                         ),
                         focusNode: _postDetailScreenHandler!.focusNode,
                         onChange: (String p0) {},
@@ -1298,8 +1308,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                 height: 18,
                               ),
                               text: LMFeedText(
-                                text:
-                                    "${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)}",
+                                text: "Create",
                                 style: LMFeedTextStyle(
                                   textAlign: TextAlign.center,
                                   textStyle: TextStyle(
@@ -1325,7 +1334,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                   LMFeedCore.showSnackBar(
                                     LMFeedSnackBar(
                                       content: LMFeedText(
-                                        text: "Please write something to post",
+                                        text:
+                                            "Please write something to create a $commentTitleSmallCapSingular",
                                       ),
                                     ),
                                   );

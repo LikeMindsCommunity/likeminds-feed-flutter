@@ -136,7 +136,6 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           widget.onTopicSelected(selectedTopics);
-          //locator<NavigationService>().goBack();
           Navigator.of(context).pop();
         },
         backgroundColor: feedThemeData.primaryColor,

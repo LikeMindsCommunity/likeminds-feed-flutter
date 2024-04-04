@@ -28,6 +28,16 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
+  String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  String commentTitleSmallCapPlural =
+      LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
   final PagingController<int, UserActivityItem> _pagingController =
       PagingController(firstPageKey: 1);
@@ -756,10 +766,10 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
-              title: 'Delete Comment',
+              title: 'Delete $commentTitleFirstCapSingular',
               uuid: commentCreatorUUID,
               content:
-                  'Are you sure you want to delete this comment. This action can not be reversed.',
+                  'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
               action: (String reason) async {
                 Navigator.of(childContext).pop();
 
