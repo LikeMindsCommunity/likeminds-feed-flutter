@@ -17,3 +17,14 @@ Added support for repost and user profile feed
 ## 1.0.4
 
 Fixed minor bug and ui issues
+
+## 1.1.0
+
+Adding support for topic categories
+Searcgh support, and more features
+
+## 1.1.5
+
+Adding feedroom support
+Adding multiple media support
+Improvements, and bug fixes

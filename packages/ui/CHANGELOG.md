@@ -21,3 +21,9 @@ Bugfix and improvements
 ## 1.1.0
 
 Added topic categories and bug fixes
+
+## 1.1.5
+
+Upgrading video management
+Adding Feedroom support
+Adding multiple media support
