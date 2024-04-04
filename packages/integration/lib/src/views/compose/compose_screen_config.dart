@@ -36,6 +36,7 @@ class LMFeedComposeScreenConfig {
     this.topicRequiredToCreatePost = false,
     this.headingRequiredToCreatePost = false,
     this.textRequiredToCreatePost = false,
+    this.showMediaCount = true,
     this.userDisplayType = LMFeedComposeUserDisplayType.profilePicture,
     this.multipleTopicsSelectable = false,
   });
@@ -77,6 +78,9 @@ class LMFeedComposeScreenConfig {
   /// [bool] to enable/disable heading feature
   /// This feature is used to add a heading to the post
   final bool enableHeading;
+
+  /// [bool] to enable/disable showing attached media count in media picker
+  final bool showMediaCount;
 
   /// [bool] to make topic required for post creation
   final bool topicRequiredToCreatePost;

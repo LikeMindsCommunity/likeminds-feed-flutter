@@ -129,6 +129,12 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 style: widget.videoStyle,
                 postId: widget.postId,
                 onMediaTap: widget.onMediaTap,
+                videoController:
+                    LMFeedVideoProvider.instance.getVideoControllers(
+                  widget.postId,
+                  widget.attachments.indexOf(e),
+                ),
+                position: widget.attachments.indexOf(e),
               ),
         );
       } else {
@@ -165,7 +171,9 @@ class _LMCarouselState extends State<LMFeedCarousel> {
               borderRadius: style!.carouselBorderRadius ?? BorderRadius.zero,
               child: CarouselSlider.builder(
                 itemCount: mediaWidgets.length,
-                itemBuilder: (context, index, _) => mediaWidgets[index],
+                itemBuilder: (context, index, _) {
+                  return mediaWidgets[index];
+                },
                 options: style!.carouselOptions?.copyWith(
                       onPageChanged: (index, reason) {
                         currPosition = index;

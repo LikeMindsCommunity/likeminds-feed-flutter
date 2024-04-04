@@ -2,7 +2,7 @@ import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/user/user_convertor.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
-class LMFeedViewDataConvertor {
+class LMFeedRoomViewDataConvertor {
   static LMFeedRoomViewData fromFeedRoomModel(
       {required FeedRoom feedRoomModel}) {
     LMFeedRoomViewDataBuilder feedRoomViewDataBuilder =

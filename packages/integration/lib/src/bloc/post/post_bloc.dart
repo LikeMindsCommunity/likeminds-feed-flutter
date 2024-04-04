@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
+import 'package:video_compress/video_compress.dart';
 
 part 'post_event.dart';
 part 'post_state.dart';
