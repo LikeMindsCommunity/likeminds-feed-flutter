@@ -464,7 +464,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               title: 'Delete $commentTitleFirstCapSingular',
               uuid: commentCreatorUUID,
               content:
-                  'Are you sure you want to $commentTitleSmallCapSingular this comment. This action can not be reversed.',
+                  'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
               action: (String reason) async {
                 Navigator.of(childContext).pop();
 
