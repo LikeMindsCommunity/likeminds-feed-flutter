@@ -53,6 +53,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   LMFeedThemeData feedTheme = LMFeedCore.theme;
 
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.activityScreen;
+
   @override
   void initState() {
     _pagingController.addPageRequestListener((pageKey) {
@@ -126,7 +128,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   @override
   Widget build(BuildContext context) {
     return _widgetUtility.scaffold(
-      source: LMFeedWidgetSource.activityScreen,
+      source: widgetSource,
       backgroundColor: feedTheme.backgroundColor,
       appBar: LMFeedAppBar(
         style: LMFeedAppBarStyle(
@@ -191,8 +193,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               return Column(
                 children: [
                   widget.postBuilder?.call(context, postWidget, postViewData) ??
-                      LMFeedCore.widgetUtility
-                          .postWidgetBuilder(context, postWidget, postViewData),
+                      _widgetUtility.postWidgetBuilder(
+                          context, postWidget, postViewData,
+                          source: widgetSource),
                   if (item.action == 7)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -233,7 +236,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
                               return widget.commentBuilder?.call(
                                       context, commentWidget, postViewData) ??
-                                  LMFeedCore.widgetUtility.commentBuilder(
+                                  _widgetUtility.commentBuilder(
                                       context, commentWidget, postViewData);
                             },
                           ),
