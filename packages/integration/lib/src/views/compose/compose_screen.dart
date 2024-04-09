@@ -71,6 +71,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMPostViewData? repost;
 
   /// Controllers and other helper classes' objects
+  FocusNode? _headingFocusNode;
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
   TextEditingController? _headingController;
@@ -98,7 +99,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     _headingController =
         (config?.enableHeading ?? false) ? TextEditingController() : null;
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
-    if (_focusNode.canRequestFocus) {
+    if (_headingController != null) {
+      _headingFocusNode = FocusNode();
+      _headingFocusNode?.requestFocus();
+    } else if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
     }
   }
@@ -779,6 +783,12 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         disabledBorder: InputBorder.none,
         focusedErrorBorder: InputBorder.none,
         hintText: config?.composeHint,
+        hintStyle: TextStyle(
+          overflow: TextOverflow.visible,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: feedTheme.onContainer.withOpacity(0.5),
+        ),
       ),
       onTagSelected: (tag) {
         composeBloc.userTags.add(tag);
@@ -802,6 +812,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   TextField _defHeadingTextfield(LMFeedThemeData theme) {
     return TextField(
+      focusNode: _headingFocusNode,
       controller: _headingController,
       textCapitalization: TextCapitalization.sentences,
       decoration: InputDecoration(
@@ -814,11 +825,13 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         hintText: config?.headingHint,
         hintStyle: TextStyle(
           color: theme.onContainer.withOpacity(0.5),
+          overflow: TextOverflow.visible,
         ),
       ),
+      cursorColor: theme.primaryColor,
       style: TextStyle(
         color: theme.onContainer,
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: FontWeight.w500,
       ),
     );
