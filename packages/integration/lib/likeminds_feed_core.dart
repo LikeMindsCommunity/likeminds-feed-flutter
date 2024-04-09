@@ -95,6 +95,29 @@ class LMFeedCore {
     await LMFeedAnalyticsBloc.instance.close();
   }
 
+  Future<LMResponse> initialiseFeed(ValidateUserRequest request) async {
+    ValidateUserResponse validateUserResponse = await validateUser(request);
+    if (validateUserResponse.success) {
+      MemberStateResponse memberStateResponse = await getMemberState();
+      GetCommunityConfigurationsResponse communityConfigurationsResponse =
+          await getCommunityConfigurations();
+
+      if (!memberStateResponse.success) {
+        return LMResponse(
+            success: false, errorMessage: memberStateResponse.errorMessage);
+      } else if (!communityConfigurationsResponse.success) {
+        return LMResponse(
+            success: false,
+            errorMessage: communityConfigurationsResponse.errorMessage);
+      }
+    } else {
+      return LMResponse(
+          success: false, errorMessage: validateUserResponse.errorMessage);
+    }
+
+    return LMResponse(success: true, data: validateUserResponse);
+  }
+
   Future<ValidateUserResponse> validateUser(ValidateUserRequest request) async {
     ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
