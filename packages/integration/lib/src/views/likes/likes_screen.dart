@@ -90,6 +90,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const LMFeedText(
             text: 'Likes',

@@ -127,10 +127,10 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
               child: CarouselSlider.builder(
                   options: CarouselOptions(
                       initialPage: position ?? 0,
-                      aspectRatio: 9 / 16,
                       enableInfiniteScroll: false,
                       enlargeFactor: 0.0,
                       viewportFraction: 1.0,
+                      aspectRatio: 1,
                       onPageChanged: (index, reason) {
                         currPosition = index;
                         rebuildCurr.value = !rebuildCurr.value;
@@ -145,6 +145,12 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                         style: LMFeedPostVideoStyle.basic().copyWith(
                           showControls: true,
                         ),
+                        videoController:
+                            LMFeedVideoProvider.instance.getVideoControllers(
+                          post.id,
+                          index,
+                        ),
+                        position: index,
                       );
                     } else if (postAttachments[index].attachmentType == 1) {
                       return Container(

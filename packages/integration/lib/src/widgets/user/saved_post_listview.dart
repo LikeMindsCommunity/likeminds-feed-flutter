@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/saved_post/saved_post_bloc.dart';
-import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedSavedPostListView extends StatefulWidget {
   const LMFeedSavedPostListView({
@@ -252,11 +250,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       },
       style: feedThemeData?.postStyle,
       onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -268,14 +262,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       onPostTap: (context, post) async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
@@ -286,7 +276,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
@@ -424,11 +414,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -440,7 +426,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
     );
   }
@@ -501,11 +487,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         ),
         style: _theme.footerStyle.commentButtonStyle,
         onTap: () async {
-          VideoController? postVideoController = LMFeedVideoProvider.instance
-              .getVideoController(
-                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-          await postVideoController?.player.pause();
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -517,14 +499,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               ),
             ),
           );
-          await postVideoController?.player.play();
+          LMFeedVideoProvider.instance.playCurrentVideo();
         },
         onTextTap: () async {
-          VideoController? postVideoController = LMFeedVideoProvider.instance
-              .getVideoController(
-                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-          await postVideoController?.player.pause();
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -536,7 +514,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               ),
             ),
           );
-          await postVideoController?.player.play();
+          LMFeedVideoProvider.instance.playCurrentVideo();
         },
       );
 

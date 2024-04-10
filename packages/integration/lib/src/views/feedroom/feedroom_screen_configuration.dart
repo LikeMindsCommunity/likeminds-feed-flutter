@@ -1,4 +1,4 @@
-part of 'feed_screen.dart';
+part of 'feedroom_screen.dart';
 
 /// {@template topic_selection_widget_type}
 /// [LMFeedTopicSelectionWidgetType] to select the type of topic selection widget
@@ -25,9 +25,9 @@ enum LMFeedTopicSelectionWidgetType {
 /// to select the type of topic selection widget
 /// to be shown
 /// {@endtemplate}
-class LMFeedScreenConfig {
-  const LMFeedScreenConfig({
-    this.feedSystemOverlayStyle = SystemUiOverlayStyle.light,
+class LMFeedRoomScreenConfig {
+  const LMFeedRoomScreenConfig({
+    this.composeSystemOverlayStyle = SystemUiOverlayStyle.dark,
     this.enableTopicFiltering = true,
     this.topicSelectionWidgetType =
         LMFeedTopicSelectionWidgetType.showTopicSelectionScreen,
@@ -37,7 +37,7 @@ class LMFeedScreenConfig {
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]
   /// to support changing light and dark style of overall system
   /// elements in accordance to the screen's background
-  final SystemUiOverlayStyle feedSystemOverlayStyle;
+  final SystemUiOverlayStyle composeSystemOverlayStyle;
 
   /// [bool] to enable/disable topic selection
   final bool enableTopicFiltering;
@@ -54,16 +54,16 @@ class LMFeedScreenConfig {
 
   final bool showCustomWidget;
 
-  LMFeedScreenConfig copyWith({
+  LMFeedRoomScreenConfig copyWith({
     SystemUiOverlayStyle? composeSystemOverlayStyle,
     bool? enableTopicFiltering,
     bool? allowMultipleTopicsSelection,
     LMFeedTopicSelectionWidgetType? topicSelectionWidgetType,
     bool? showCustomWidget,
   }) {
-    return LMFeedScreenConfig(
-      feedSystemOverlayStyle:
-          composeSystemOverlayStyle ?? this.feedSystemOverlayStyle,
+    return LMFeedRoomScreenConfig(
+      composeSystemOverlayStyle:
+          composeSystemOverlayStyle ?? this.composeSystemOverlayStyle,
       enableTopicFiltering: enableTopicFiltering ?? this.enableTopicFiltering,
       topicSelectionWidgetType:
           topicSelectionWidgetType ?? this.topicSelectionWidgetType,

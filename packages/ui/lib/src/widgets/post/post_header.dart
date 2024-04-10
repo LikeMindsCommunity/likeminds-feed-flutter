@@ -118,8 +118,9 @@ class LMFeedPostHeader extends StatelessWidget {
                               LikeMindsTheme.kHorizontalPaddingMedium,
                               !headerStyle.showCustomTitle
                                   ? const SizedBox()
-                                  : ((user.customTitle == null &&
-                                              customTitle == null) ||
+                                  : ((user.customTitle == null ||
+                                              user.customTitle!.isEmpty &&
+                                                  customTitle == null) ||
                                           (user.isDeleted != null &&
                                               user.isDeleted!))
                                       ? const SizedBox()
@@ -206,7 +207,11 @@ class LMFeedPostHeader extends StatelessWidget {
                                     ),
                               if (createdAt != null && subText != null)
                                 LikeMindsTheme.kHorizontalPaddingXSmall,
-                              createdAt ?? const SizedBox.shrink(),
+                              createdAt ??
+                                  LMFeedText(
+                                    text: LMFeedTimeAgo.instance
+                                        .format(postViewData.createdAt),
+                                  ),
                               LikeMindsTheme.kHorizontalPaddingSmall,
                               if (postViewData.isEdited)
                                 subTextSeparator ??

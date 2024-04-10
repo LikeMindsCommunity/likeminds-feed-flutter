@@ -9,7 +9,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+// import 'package:media_kit_video/media_kit_video.dart';
 
 part 'post_detail_screen_configuration.dart';
 
@@ -447,7 +447,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
-              title: 'Delete Comment',
+              title: 'Delete Post',
               uuid: commentCreatorUUID,
               content:
                   'Are you sure you want to delete this comment. This action can not be reversed.',
@@ -755,10 +755,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 _postDetailScreenHandler!.postData!.likeCount)),
         style: feedTheme.footerStyle.likeButtonStyle,
         onTextTap: () {
-          VideoController? videoController = LMFeedVideoProvider.instance
-              .getVideoController(_postDetailScreenHandler!.postData!.id);
+          // VideoController? videoController = LMFeedVideoProvider.instance
+          //     .getVideoController(_postDetailScreenHandler!.postData!.id);
 
-          videoController?.player.pause();
+          // videoController?.player.pause();
+
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
 
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -1024,10 +1026,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
       ),
       onTextTap: () {
-        VideoController? videoController = LMFeedVideoProvider.instance
-            .getVideoController(_postDetailScreenHandler!.postData!.id);
+        // VideoController? videoController = LMFeedVideoProvider.instance
+        //     .getVideoController(_postDetailScreenHandler!.postData!.id);
 
-        videoController?.player.pause();
+        // videoController?.player.pause();
+
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
@@ -1262,6 +1266,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                             .routeToProfile(currentUser.sdkClientInfo.uuid);
                       },
                     ),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: LMTaggingAheadTextField(
                         isDown: false,

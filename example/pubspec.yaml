@@ -2,7 +2,7 @@ name: likeminds_feed_sample
 description: Master sample app for LikeMinds Feed SDK
 publish_to: "none"
 
-version: 1.1.0
+version: 1.1.5
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -23,13 +23,16 @@ dependencies:
   envied: ^0.3.0+3
   flutter_dotenv:
 
+dependency_overrides:
+  extended_text_field: ^14.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   envied_generator:
   build_runner:
 
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   uses-material-design: true

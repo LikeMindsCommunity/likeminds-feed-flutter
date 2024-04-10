@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedWidgetUtility {
@@ -38,33 +39,43 @@ class LMFeedWidgetUtility {
     bool endDrawerEnableOpenDragGesture = true,
     String? restorationId,
     LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed,
+    bool canPop = true,
+    Function(bool)? onPopInvoked,
   }) {
-    return Scaffold(
-      key: key,
-      extendBody: extendBody,
-      extendBodyBehindAppBar: extendBodyBehindAppBar,
-      appBar: appBar,
-      body: body,
-      floatingActionButton: floatingActionButton,
-      floatingActionButtonLocation: floatingActionButtonLocation,
-      floatingActionButtonAnimator: floatingActionButtonAnimator,
-      persistentFooterButtons: persistentFooterButtons,
-      persistentFooterAlignment: persistentFooterAlignment,
-      drawer: drawer,
-      onDrawerChanged: onDrawerChanged,
-      endDrawer: endDrawer,
-      onEndDrawerChanged: onEndDrawerChanged,
-      drawerScrimColor: drawerScrimColor,
-      backgroundColor: backgroundColor,
-      bottomNavigationBar: bottomNavigationBar,
-      bottomSheet: bottomSheet,
-      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-      primary: primary,
-      drawerDragStartBehavior: drawerDragStartBehavior,
-      drawerEdgeDragWidth: drawerEdgeDragWidth,
-      drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
-      endDrawerEnableOpenDragGesture: endDrawerEnableOpenDragGesture,
-      restorationId: restorationId,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: LMFeedCore.config.globalSystemOverlayStyle ??
+          SystemUiOverlayStyle.dark,
+      child: PopScope(
+        canPop: canPop,
+        onPopInvoked: onPopInvoked,
+        child: Scaffold(
+          key: key,
+          extendBody: extendBody,
+          extendBodyBehindAppBar: extendBodyBehindAppBar,
+          appBar: appBar,
+          body: body,
+          floatingActionButton: floatingActionButton,
+          floatingActionButtonLocation: floatingActionButtonLocation,
+          floatingActionButtonAnimator: floatingActionButtonAnimator,
+          persistentFooterButtons: persistentFooterButtons,
+          persistentFooterAlignment: persistentFooterAlignment,
+          drawer: drawer,
+          onDrawerChanged: onDrawerChanged,
+          endDrawer: endDrawer,
+          onEndDrawerChanged: onEndDrawerChanged,
+          drawerScrimColor: drawerScrimColor,
+          backgroundColor: backgroundColor,
+          bottomNavigationBar: bottomNavigationBar,
+          bottomSheet: bottomSheet,
+          resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+          primary: primary,
+          drawerDragStartBehavior: drawerDragStartBehavior,
+          drawerEdgeDragWidth: drawerEdgeDragWidth,
+          drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
+          endDrawerEnableOpenDragGesture: endDrawerEnableOpenDragGesture,
+          restorationId: restorationId,
+        ),
+      ),
     );
   }
 
