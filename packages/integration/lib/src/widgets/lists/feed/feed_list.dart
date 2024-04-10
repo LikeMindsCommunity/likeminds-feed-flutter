@@ -25,6 +25,11 @@ class LMFeedList extends StatefulWidget {
 }
 
 class _LMFeedListState extends State<LMFeedList> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
   LMFeedThemeData feedThemeData = LMFeedTheme.instance.theme;
   LMFeedBloc _feedBloc = LMFeedBloc.instance;
   final ValueNotifier postUploading = ValueNotifier(false);
@@ -279,10 +284,10 @@ class _LMFeedListState extends State<LMFeedList> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Post',
+                title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
                 content:
-                    'Are you sure you want to delete this post. This action can not be reversed.',
+                    'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
 
@@ -526,7 +531,7 @@ class _LMFeedListState extends State<LMFeedList> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: 'A post is already uploading.',
+                        text: 'A $postTitleSmallCap is already uploading.',
                       ),
                     ),
                   );
@@ -536,7 +541,8 @@ class _LMFeedListState extends State<LMFeedList> {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: "You do not have permission to create a post",
+                      text:
+                          "You do not have permission to create a $postTitleSmallCap",
                     ),
                   ),
                 );
@@ -570,18 +576,18 @@ class _LMFeedListState extends State<LMFeedList> {
 
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
+          .indexWhere((element) => element.id == postPinId);
       if (index != -1) {
-        postViewData.menuItems[index].title = "Unpin This Post";
+        postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
         postViewData.menuItems[index].id = postUnpinId;
       }
     } else {
       int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
+          .indexWhere((element) => element.id == postUnpinId);
 
       if (index != -1) {
         postViewData.menuItems[index]
-          ..title = "Pin This Post"
+          ..title = "Pin This $postTitleFirstCap"
           ..id = postPinId;
       }
     }
@@ -599,19 +605,19 @@ class _LMFeedListState extends State<LMFeedList> {
 
       if (postViewData.isPinned) {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
+            .indexWhere((element) => element.id == postPinId);
         if (index != -1) {
           postViewData.menuItems[index]
-            ..title = "Unpin This Post"
+            ..title = "Unpin This $postTitleFirstCap"
             ..id = postUnpinId;
         }
       } else {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
+            .indexWhere((element) => element.id == postUnpinId);
 
         if (index != -1) {
           postViewData.menuItems[index]
-            ..title = "Pin This Post"
+            ..title = "Pin This $postTitleFirstCap"
             ..id = postPinId;
         }
       }

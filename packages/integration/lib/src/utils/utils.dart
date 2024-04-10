@@ -22,3 +22,5 @@ export 'deep_link/deep_link_handler.dart';
 export 'builder/widget_utility.dart';
 
 export 'user/user_utils.dart';
+
+export '../../packages/pluralize/pluralize.dart';

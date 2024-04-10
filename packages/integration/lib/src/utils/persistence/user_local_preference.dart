@@ -51,6 +51,10 @@ class LMFeedLocalPreference {
     return LMFeedCore.client.deleteLoggedInMemberState();
   }
 
+  Future<LMResponse> clearCommunityConfiguration() {
+    return LMFeedCore.client.clearCommunityConfigurationsDB();
+  }
+
   MemberStateResponse? fetchMemberState() {
     LMResponse response = LMFeedCore.client.getLoggedInMemberState();
 
@@ -81,5 +85,67 @@ class LMFeedLocalPreference {
 
   Future<LMResponse> clearCache() {
     return LMFeedCore.client.clearCache();
+  }
+
+  String getPostVariable() {
+    String postVar = "Post";
+
+    LMCache? postCache = fetchCache("lm-feed-post-var");
+
+    if (postCache != null) {
+      postVar = postCache.value as String;
+    } else {
+      CommunityConfigurations? communityConfigurations =
+          fetchCommunityConfiguration("feed_metadata");
+
+      if (communityConfigurations != null &&
+          communityConfigurations.value != null &&
+          communityConfigurations.value!.containsKey('post')) {
+        postVar = communityConfigurations.value?['post'] ?? "Post";
+        storePostVariable(postVar);
+      }
+    }
+
+    return postVar;
+  }
+
+  String getCommentVariable() {
+    String postVar = "Comment";
+
+    LMCache? postCache = fetchCache("lm-feed-comment-var");
+
+    if (postCache != null) {
+      postVar = postCache.value as String;
+    } else {
+      CommunityConfigurations? communityConfigurations =
+          fetchCommunityConfiguration("feed_metadata");
+
+      if (communityConfigurations != null &&
+          communityConfigurations.value != null &&
+          communityConfigurations.value!.containsKey('comment')) {
+        postVar = communityConfigurations.value?['comment'] ?? "Comment";
+        storeCommentVariable(postVar);
+      }
+    }
+
+    return postVar;
+  }
+
+  Future<LMResponse> storePostVariable(String postVar) {
+    LMCache cache = (LMCacheBuilder()
+          ..key("lm-feed-post-var")
+          ..value(postVar))
+        .build();
+
+    return storeCache(cache);
+  }
+
+  Future<LMResponse> storeCommentVariable(String commentVar) async {
+    LMCache cache = (LMCacheBuilder()
+          ..key("lm-feed-comment-var")
+          ..value(commentVar))
+        .build();
+
+    return storeCache(cache);
   }
 }

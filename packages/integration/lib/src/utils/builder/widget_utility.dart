@@ -169,7 +169,8 @@ class LMFeedWidgetUtility {
           ),
           const SizedBox(height: 12),
           LMFeedText(
-            text: 'No posts to show',
+            text:
+                'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 fontSize: 24,
@@ -180,7 +181,8 @@ class LMFeedWidgetUtility {
           ),
           const SizedBox(height: 12),
           LMFeedText(
-            text: "Be the first one to post here",
+            text:
+                "Be the first one to create a ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)} here",
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 fontSize: 16,
@@ -202,8 +204,9 @@ class LMFeedWidgetUtility {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const LMFeedText(
-            text: "Looks like there are no posts for this topic yet.",
+          LMFeedText(
+            text:
+                "Looks like there are no ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} for this topic yet.",
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 fontSize: 15,

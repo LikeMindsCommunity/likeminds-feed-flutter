@@ -14,6 +14,7 @@ class LMSampleApp extends StatefulWidget {
 class _LMSampleAppState extends State<LMSampleApp> {
   Future<ValidateUserResponse>? validateUser;
   Future<MemberStateResponse>? memberState;
+  Future<GetCommunityConfigurationsResponse>? communityConfigurations;
 
   @override
   void initState() {
@@ -37,6 +38,8 @@ class _LMSampleAppState extends State<LMSampleApp> {
         (value) async {
           if (value.success) {
             memberState = LMFeedCore.instance.getMemberState();
+            communityConfigurations =
+                LMFeedCore.instance.getCommunityConfigurations();
           }
         },
       );
@@ -55,7 +58,23 @@ class _LMSampleAppState extends State<LMSampleApp> {
                   if (ConnectionState.done == snapshot.connectionState &&
                       snapshot.hasData &&
                       snapshot.data!.success) {
-                    return const LMFeedScreen();
+                    return FutureBuilder(
+                        future: communityConfigurations,
+                        builder: (context, snapshot) {
+                          if (ConnectionState.done ==
+                                  snapshot.connectionState &&
+                              snapshot.hasData &&
+                              snapshot.data!.success) {
+                            return const LMFeedScreen();
+                          } else if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const LMFeedLoader();
+                          } else {
+                            return const Center(
+                              child: Text("An error occurred"),
+                            );
+                          }
+                        });
                   } else if (snapshot.connectionState ==
                       ConnectionState.waiting) {
                     return const LMFeedLoader();

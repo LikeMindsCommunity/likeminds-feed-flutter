@@ -16,7 +16,7 @@ Widget noItemLikesView() => Center(
           ),
           SizedBox(height: 12),
           Text(
-            "Be the first one to like this post",
+            "Be the first one to like this ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)}",
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w300,

@@ -4,8 +4,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post/delete_dialog.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -25,6 +23,20 @@ class LMFeedActivityScreen extends StatefulWidget {
 }
 
 class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
+  String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  String commentTitleSmallCapPlural =
+      LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
   final PagingController<int, UserActivityItem> _pagingController =
       PagingController(firstPageKey: 1);
@@ -137,7 +149,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           pagingController: _pagingController,
           builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(
             noItemsFoundIndicatorBuilder: (context) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -149,7 +161,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                       ),
                     ),
                     LMFeedText(
-                        text: 'No Posts to show',
+                        text:
+                            'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
                         style: LMFeedTextStyle(
                           textStyle: TextStyle(
                             fontSize: 20,
@@ -379,10 +392,10 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               showDialog(
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Post',
+                  title: 'Delete $postTitleFirstCap',
                   uuid: postCreatorUUID,
                   content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
+                      'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
@@ -543,7 +556,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+                    text: postViewData.isSaved
+                        ? "$postTitleFirstCap Saved"
+                        : "$postTitleFirstCap Unsaved"),
               ),
             );
           }
@@ -715,8 +730,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           LMCommentViewData commentViewData, LMPostViewData postViewData) =>
       LMFeedMenuAction(
         onCommentEdit: () {
-          debugPrint('Editing functionality');
-
           LMCommentMetaDataBuilder commentMetaDataBuilder =
               LMCommentMetaDataBuilder()
                 ..postId(postViewData.id)
@@ -743,10 +756,10 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
-              title: 'Delete Post',
+              title: 'Delete $commentTitleFirstCapSingular',
               uuid: commentCreatorUUID,
               content:
-                  'Are you sure you want to delete this post. This action can not be reversed.',
+                  'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
               action: (String reason) async {
                 Navigator.of(childContext).pop();
 

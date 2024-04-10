@@ -54,6 +54,10 @@ class LMFeedComposeScreen extends StatefulWidget {
 
 class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Required blocs and data for basic functionality, or state management
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   final LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
@@ -239,9 +243,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         style: const TextStyle(),
         child: AlertDialog(
           backgroundColor: feedTheme.container,
-          title: const Text('Discard Post'),
-          content:
-              const Text('Are you sure you want to discard the current post?'),
+          title: Text('Discard $postTitleFirstCap'),
+          content: Text(
+              'Are you sure you want to discard the current $postTitleSmallCap?'),
           actionsAlignment: MainAxisAlignment.center,
           actionsPadding: const EdgeInsets.all(8),
           actions: <Widget>[
@@ -586,7 +590,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           style: const LMFeedButtonStyle(),
         ),
         title: LMFeedText(
-          text: "Create Post",
+          text: "Create $postTitleFirstCap",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               fontSize: 18,
@@ -598,7 +602,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         trailing: [
           LMFeedButton(
             text: LMFeedText(
-              text: "Post",
+              text: "Create",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   color: theme.onPrimary,
@@ -609,7 +613,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             ),
             style: LMFeedButtonStyle(
               backgroundColor: theme.primaryColor,
-              width: 48,
               borderRadius: 6,
               height: 34,
             ),
@@ -635,7 +638,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: "Can't create a post without heading",
+                        text:
+                            "Can't create a $postTitleSmallCap without heading",
                       ),
                     ),
                   );
@@ -646,7 +650,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: "Can't create a post without text",
+                        text: "Can't create a $postTitleSmallCap without text",
                       ),
                     ),
                   );
@@ -659,7 +663,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: "Can't create a post without topic",
+                        text: "Can't create a $postTitleSmallCap without topic",
                       ),
                     ),
                   );
@@ -699,7 +703,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: "Can't create a post without text or attachments",
+                      text:
+                          "Can't create a $postTitleSmallCap without text or attachments",
                     ),
                   ),
                 );

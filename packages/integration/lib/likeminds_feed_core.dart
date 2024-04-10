@@ -122,6 +122,28 @@ class LMFeedCore {
 
     return response;
   }
+
+  Future<GetCommunityConfigurationsResponse>
+      getCommunityConfigurations() async {
+    GetCommunityConfigurationsResponse response =
+        await lmFeedClient.getCommunityConfigurations();
+    await LMFeedLocalPreference.instance.clearCommunityConfiguration();
+
+    if (response.success) {
+      for (CommunityConfigurations conf in response.communityConfigurations!) {
+        if (conf.type == 'feed_metadata') {
+          String postVar = conf.value?['post'] ?? 'Post';
+          String commentVar = conf.value?['comment'] ?? 'Comment';
+
+          LMFeedLocalPreference.instance.storePostVariable(postVar);
+          LMFeedLocalPreference.instance.storeCommentVariable(commentVar);
+        }
+        await LMFeedLocalPreference.instance.storeCommunityConfiguration(conf);
+      }
+    }
+
+    return response;
+  }
 }
 
 class LMFeedConfig {

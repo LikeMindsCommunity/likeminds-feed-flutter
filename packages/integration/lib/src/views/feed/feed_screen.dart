@@ -78,6 +78,20 @@ class LMFeedScreen extends StatefulWidget {
 }
 
 class _LMFeedScreenState extends State<LMFeedScreen> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
+  String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  String commentTitleSmallCapPlural =
+      LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
@@ -307,7 +321,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                     LMFeedSnackBar(
                                       content: LMFeedText(
                                         text:
-                                            "You do not have permission to create a post",
+                                            "You do not have permission to create a $postTitleSmallCap",
                                       ),
                                     ),
                                   );
@@ -353,7 +367,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     LMFeedCore.showSnackBar(
                       LMFeedSnackBar(
                         content: LMFeedText(
-                          text: 'Post Deleted',
+                          text: '$postTitleFirstCap Deleted',
                         ),
                       ),
                     );
@@ -458,7 +472,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         horizontal: 20.0,
                         vertical: 6,
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Row(
@@ -468,7 +482,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                 height: 50,
                               ),
                               LikeMindsTheme.kHorizontalPaddingMedium,
-                              Text('Saving')
+                              Text('Saving $postTitleSmallCap')
                             ],
                           ),
                           LMFeedLoader(),
@@ -492,10 +506,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                             children: <Widget>[
                               getLoaderThumbnail(state.thumbnailMedia),
                               LikeMindsTheme.kHorizontalPaddingMedium,
-                              const Text('Uploading post')
+                              Text('Creating $postTitleSmallCap')
                             ],
                           ),
-                          StreamBuilder<num>(
+                          StreamBuilder<double>(
                               initialData: 0,
                               stream: state.progress,
                               builder: (context, snapshot) {
@@ -506,7 +520,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                     value: (snapshot.data == null ||
                                             snapshot.data == 0.0
                                         ? null
-                                        : snapshot.data?.toDouble()),
+                                        : snapshot.data),
                                     valueColor: AlwaysStoppedAnimation(
                                         feedThemeData.primaryColor),
                                     strokeWidth: 3,
@@ -934,10 +948,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Post',
+                title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
                 content:
-                    'Are you sure you want to delete this post. This action can not be reversed.',
+                    'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
 
@@ -1125,7 +1139,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+                    text: postViewData.isSaved
+                        ? "$postTitleFirstCap Saved"
+                        : "$postTitleFirstCap Unsaved"),
               ),
             );
           }
@@ -1190,7 +1206,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: 'A post is already uploading.',
+                        text: 'A $postTitleSmallCap is already uploading.',
                       ),
                     ),
                   );
@@ -1200,7 +1216,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: "You do not have permission to create a post",
+                      text:
+                          "You do not have permission to create a $postTitleSmallCap",
                     ),
                   ),
                 );
@@ -1265,7 +1282,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         placement: LMFeedIconButtonPlacement.end,
       ),
       text: LMFeedText(
-        text: "Create Post",
+        text: "Create $postTitleFirstCap",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontWeight: FontWeight.bold,
@@ -1295,7 +1312,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: 'A post is already uploading.',
+                      text: 'A $postTitleSmallCap is already uploading.',
                     ),
                   ),
                 );
@@ -1305,7 +1322,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               LMFeedCore.showSnackBar(
                 LMFeedSnackBar(
                   content: LMFeedText(
-                    text: "You do not have permission to create a post",
+                    text:
+                        "You do not have permission to create a $postTitleSmallCap",
                   ),
                 ),
               );
@@ -1324,8 +1342,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               color: feedThemeData.onPrimary,
             ),
           ),
-          width: 153,
           height: 44,
+          width: 185,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           borderRadius: 28,
           backgroundColor: userPostingRights
@@ -1335,7 +1353,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           margin: 5.0,
         ),
         text: LMFeedText(
-          text: "Create Post",
+          text: "Create $postTitleFirstCap",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: feedThemeData.onPrimary,
@@ -1367,7 +1385,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: 'A post is already uploading.',
+                        text: 'A $postTitleSmallCap is already uploading.',
                       ),
                     ),
                   );
@@ -1377,7 +1395,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: "You do not have permission to create a post",
+                      text:
+                          "You do not have permission to create a $postTitleSmallCap",
                     ),
                   ),
                 );
@@ -1425,7 +1444,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       int index = postViewData.menuItems
           .indexWhere((element) => element.id == postPinId);
       if (index != -1) {
-        postViewData.menuItems[index].title = "Unpin This Post";
+        postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
         postViewData.menuItems[index].id = postUnpinId;
       }
     } else {
@@ -1433,7 +1452,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           .indexWhere((element) => element.id == postUnpinId);
       if (index != -1) {
         postViewData.menuItems[index]
-          ..title = "Pin This Post"
+          ..title = "Pin This $postTitleFirstCap"
           ..id = postPinId;
       }
     }
@@ -1451,19 +1470,19 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
       if (postViewData.isPinned) {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
+            .indexWhere((element) => element.id == postPinId);
         if (index != -1) {
           postViewData.menuItems[index]
-            ..title = "Unpin This Post"
+            ..title = "Unpin This $postTitleFirstCap"
             ..id = postUnpinId;
         }
       } else {
         int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
+            .indexWhere((element) => element.id == postUnpinId);
 
         if (index != -1) {
           postViewData.menuItems[index]
-            ..title = "Pin This Post"
+            ..title = "Pin This $postTitleFirstCap"
             ..id = postPinId;
         }
       }

@@ -58,6 +58,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedThemeData? feedTheme;
   LMFeedCommentStyle? replyStyle;
 
+  String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  String commentTitleSmallCapPlural =
+      LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   LMCommentViewData? reply;
   late final LMUserViewData user;
   late final String postId;
@@ -503,10 +512,10 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         showDialog(
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Post',
+                title: 'Delete $commentTitleFirstCapSingular',
                 uuid: commentCreatorUUID,
                 content:
-                    'Are you sure you want to delete this comment. This action can not be reversed.',
+                    'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
                   //Implement delete post analytics tracking

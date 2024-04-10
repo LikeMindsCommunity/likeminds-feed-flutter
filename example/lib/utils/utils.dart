@@ -18,8 +18,6 @@ Future<(String?, String?)> initiateUser(String uuid, String userName) async {
         'userName': userName,
       });
 
-  print(response.data);
-
   if (response.data['success']) {
     return (
       response.data['data']['access_token'] as String,
