@@ -13,7 +13,6 @@ class LMSampleApp extends StatefulWidget {
 
 class _LMSampleAppState extends State<LMSampleApp> {
   Future<LMResponse>? initialiseFeed;
-  Future<MemberStateResponse>? memberState;
 
   @override
   void initState() {
