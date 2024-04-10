@@ -719,26 +719,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       child: Column(
         children: [
           (config?.enableHeading ?? false)
-              ? TextField(
-                  controller: _headingController,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    hintText: config?.headingHint,
-                    hintStyle: TextStyle(
-                      color: theme.onContainer.withOpacity(0.5),
-                    ),
-                  ),
-                  style: TextStyle(
-                    color: theme.onContainer,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+              ? LMFeedCore.widgetUtility.composeScreenHeadingTextfieldBuilder(
+                  context,
+                  _defHeadingTextfield(theme),
                 )
               : const SizedBox.shrink(),
           Row(
@@ -761,51 +744,80 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               Column(
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width - 82,
-                    decoration: BoxDecoration(
-                      color: theme.container,
-                    ),
-                    child: LMTaggingAheadTextField(
-                      isDown: true,
-                      minLines: 3,
-                      enabled: config!.enableTagging,
-                      // maxLines: 200,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        focusedErrorBorder: InputBorder.none,
-                        hintText: config?.composeHint,
+                      width: MediaQuery.of(context).size.width - 82,
+                      decoration: BoxDecoration(
+                        color: theme.container,
                       ),
-                      onTagSelected: (tag) {
-                        composeBloc.userTags.add(tag);
-                        LMFeedAnalyticsBloc.instance.add(
-                          LMFeedFireAnalyticsEvent(
-                            eventName: LMFeedAnalyticsKeys.userTaggedInPost,
-                            deprecatedEventName:
-                                LMFeedAnalyticsKeysDep.userTaggedInPost,
-                            eventProperties: {
-                              'tagged_user_id':
-                                  tag.sdkClientInfo?.uuid ?? tag.uuid,
-                              'tagged_user_count':
-                                  composeBloc.userTags.length.toString(),
-                            },
-                          ),
-                        );
-                      },
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      onChange: _onTextChanged,
-                    ),
-                  ),
+                      child: LMFeedCore.widgetUtility
+                          .composeScreenContentTextfieldBuilder(
+                        context,
+                        _defContentTextField(),
+                      )),
                   const SizedBox(height: 24),
                 ],
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  LMTaggingAheadTextField _defContentTextField() {
+    return LMTaggingAheadTextField(
+      isDown: true,
+      minLines: 3,
+      enabled: config!.enableTagging,
+      // maxLines: 200,
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        hintText: config?.composeHint,
+      ),
+      onTagSelected: (tag) {
+        composeBloc.userTags.add(tag);
+        LMFeedAnalyticsBloc.instance.add(
+          LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+            deprecatedEventName: LMFeedAnalyticsKeysDep.userTaggedInPost,
+            widgetSource: LMFeedWidgetSource.createPostScreen,
+            eventProperties: {
+              'tagged_user_id': tag.sdkClientInfo?.uuid ?? tag.uuid,
+              'tagged_user_count': composeBloc.userTags.length.toString(),
+            },
+          ),
+        );
+      },
+      controller: _controller,
+      focusNode: _focusNode,
+      onChange: _onTextChanged,
+    );
+  }
+
+  TextField _defHeadingTextfield(LMFeedThemeData theme) {
+    return TextField(
+      controller: _headingController,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        hintText: config?.headingHint,
+        hintStyle: TextStyle(
+          color: theme.onContainer.withOpacity(0.5),
+        ),
+      ),
+      style: TextStyle(
+        color: theme.onContainer,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
       ),
     );
   }
@@ -1121,6 +1133,7 @@ void sendPostCreationCompletedEvent(
 
   LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.postCreationCompleted,
+    widgetSource: LMFeedWidgetSource.createPostScreen,
     deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationCompleted,
     eventProperties: propertiesMap,
   ));

@@ -9,6 +9,7 @@ class LMFeedPostHeader extends StatelessWidget {
     required this.user,
     this.titleText,
     this.subText,
+    this.subTextBuilder,
     this.subTextSeparator,
     this.menuBuilder,
     this.editedText,
@@ -25,6 +26,8 @@ class LMFeedPostHeader extends StatelessWidget {
   final LMFeedText? titleText;
   final LMFeedText? customTitle;
   final LMFeedText? subText;
+  final Widget? Function(BuildContext context, LMFeedText subtext)?
+      subTextBuilder;
   final Widget? subTextSeparator;
   final LMFeedText? editedText;
 
@@ -179,7 +182,15 @@ class LMFeedPostHeader extends StatelessWidget {
                           LikeMindsTheme.kVerticalPaddingSmall,
                           Row(
                             children: [
-                              Flexible(child: subText ?? const SizedBox()),
+                              Flexible(
+                                  child: subTextBuilder?.call(
+                                          context,
+                                          subText ??
+                                              const LMFeedText(
+                                                text: '',
+                                              )) ??
+                                      subText ??
+                                      const SizedBox()),
                               subText != null
                                   ? LikeMindsTheme.kHorizontalPaddingXSmall
                                   : const SizedBox(),
@@ -264,6 +275,7 @@ class LMFeedPostHeader extends StatelessWidget {
     LMUserViewData? user,
     LMFeedText? titleText,
     LMFeedText? subText,
+    Widget? Function(BuildContext context, LMFeedText subtext)? subTextBuilder,
     Widget? subTextSeparator,
     LMFeedText? editedText,
     Widget Function(LMFeedMenu)? menuBuilder,
@@ -280,6 +292,7 @@ class LMFeedPostHeader extends StatelessWidget {
       user: user ?? this.user,
       titleText: titleText ?? this.titleText,
       subText: subText ?? this.subText,
+      subTextBuilder: subTextBuilder ?? this.subTextBuilder,
       subTextSeparator: subTextSeparator ?? this.subTextSeparator,
       editedText: editedText ?? this.editedText,
       menuBuilder: menuBuilder ?? this.menuBuilder,

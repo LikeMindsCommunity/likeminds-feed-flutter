@@ -74,7 +74,6 @@ class LMFeedCore {
   LMFeedCore._();
 
   Future<void> initialize({
-    String? apiKey,
     LMFeedClient? lmFeedClient,
     String? domain,
     LMFeedConfig? config,
@@ -82,9 +81,7 @@ class LMFeedCore {
     GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
     LMFeedThemeData? theme,
   }) async {
-    assert(apiKey != null || lmFeedClient != null);
-    this.lmFeedClient =
-        lmFeedClient ?? (LMFeedClientBuilder()..apiKey(apiKey!)).build();
+    this.lmFeedClient = lmFeedClient ?? LMFeedClientBuilder().build();
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
@@ -100,8 +97,8 @@ class LMFeedCore {
     await LMFeedAnalyticsBloc.instance.close();
   }
 
-  Future<InitiateUserResponse> initiateUser(InitiateUserRequest request) async {
-    InitiateUserResponse response = await lmFeedClient.initiateUser(request);
+  Future<ValidateUserResponse> validateUser(ValidateUserRequest request) async {
+    ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
     await LMFeedLocalPreference.instance.clearUserData();
     if (response.success) {

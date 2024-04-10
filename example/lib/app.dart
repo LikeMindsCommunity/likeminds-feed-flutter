@@ -3,36 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMSampleApp extends StatefulWidget {
-  final String? uuid;
-  final String userName;
-  const LMSampleApp({super.key, this.uuid, required this.userName});
+  final String? accessToken;
+  final String? refreshToken;
+  const LMSampleApp({super.key, this.accessToken, required this.refreshToken});
 
   @override
   State<LMSampleApp> createState() => _LMSampleAppState();
 }
 
 class _LMSampleAppState extends State<LMSampleApp> {
-  Future<InitiateUserResponse>? initiateUser;
+  Future<ValidateUserResponse>? validateUser;
   Future<MemberStateResponse>? memberState;
 
   @override
   void initState() {
     super.initState();
-    callInitiateUser();
+    callValidateUser();
   }
 
-  void callInitiateUser() {
-    InitiateUserRequestBuilder request = InitiateUserRequestBuilder();
+  void callValidateUser() {
+    ValidateUserRequestBuilder request = ValidateUserRequestBuilder();
 
-    if (widget.uuid != null && widget.uuid!.isNotEmpty) {
-      request.uuid(widget.uuid!);
+    if (widget.accessToken != null && widget.accessToken!.isNotEmpty) {
+      request.accessToken(widget.accessToken!);
     }
 
-    if (widget.userName.isNotEmpty) {
-      request.userName(widget.userName);
+    if (widget.refreshToken != null && widget.refreshToken!.isNotEmpty) {
+      request.refreshToken(widget.refreshToken!);
     }
 
-    initiateUser = LMFeedCore.instance.initiateUser(request.build())
+    validateUser = LMFeedCore.instance.validateUser(request.build())
       ..then(
         (value) async {
           if (value.success) {
@@ -46,7 +46,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: initiateUser,
+        future: validateUser,
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data!.success) {
             return FutureBuilder(
@@ -82,7 +82,7 @@ class _LMSampleAppState extends State<LMSampleApp> {
                 LikeMindsTheme.kVerticalPaddingLarge,
                 GestureDetector(
                   onTap: () {
-                    callInitiateUser();
+                    callValidateUser();
                     setState(() {});
                   },
                   child: Container(

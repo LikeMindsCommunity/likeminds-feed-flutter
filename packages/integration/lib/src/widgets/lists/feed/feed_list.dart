@@ -293,6 +293,7 @@ class _LMFeedListState extends State<LMFeedList> {
                     LMFeedFireAnalyticsEvent(
                       eventName: LMFeedAnalyticsKeys.postDeleted,
                       deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      widgetSource: LMFeedWidgetSource.universalFeed,
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
@@ -384,6 +385,7 @@ class _LMFeedListState extends State<LMFeedList> {
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+              widgetSource: LMFeedWidgetSource.universalFeed,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -498,6 +500,7 @@ class _LMFeedListState extends State<LMFeedList> {
                   LMFeedAnalyticsBloc.instance.add(
                       const LMFeedFireAnalyticsEvent(
                           eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          widgetSource: LMFeedWidgetSource.universalFeed,
                           deprecatedEventName:
                               LMFeedAnalyticsKeysDep.postCreationStarted,
                           eventProperties: {}));
@@ -628,6 +631,7 @@ class _LMFeedListState extends State<LMFeedList> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.universalFeed,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

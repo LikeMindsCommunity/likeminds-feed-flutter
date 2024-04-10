@@ -17,6 +17,7 @@ addVideoEventHandler(
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
     deprecatedEventName: LMFeedAnalyticsKeysDep.clickedOnAttachment,
+    widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'video'},
   ));
   final result = await LMFeedMediaHandler.handlePermissions(2);
@@ -35,6 +36,7 @@ addVideoEventHandler(
           LMFeedFireAnalyticsEvent(
             eventName: LMFeedAnalyticsKeys.videoAttachedToPost,
             deprecatedEventName: LMFeedAnalyticsKeysDep.videoAttachedToPost,
+            widgetSource: LMFeedWidgetSource.createPostScreen,
             eventProperties: {
               'video_count': countOfPickedVideos,
             },

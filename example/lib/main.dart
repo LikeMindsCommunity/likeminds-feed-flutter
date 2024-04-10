@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:likeminds_feed_sample/cred_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
@@ -24,9 +25,17 @@ final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
+  // Loading .env file
+  await dotenv.load(fileName: ".env");
+
   WidgetsFlutterBinding.ensureInitialized();
+
+  LMFeedClient lmFeedClient = (LMFeedClientBuilder()).build();
+
+  // Loading .env file
+  await dotenv.load(fileName: ".env");
   await LMFeedCore.instance.initialize(
-    apiKey: "YOUR-API-KEY",
+    lmFeedClient: lmFeedClient,
     domain: "feedsx://www.feedsx.com/",
     scaffoldMessengerKey: rootScaffoldMessengerKey,
   );

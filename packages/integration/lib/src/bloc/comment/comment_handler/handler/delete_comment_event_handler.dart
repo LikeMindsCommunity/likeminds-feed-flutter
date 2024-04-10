@@ -52,6 +52,7 @@ Future<void> _handleDeleteCommentAction(LMFeedCommentActionEvent event,
         LMFeedFireAnalyticsEvent(
           eventName: LMFeedAnalyticsKeys.commentDeleted,
           deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
+          widgetSource: LMFeedWidgetSource.postDetailScreen,
           eventProperties: {
             "post_id": event.commentMetaData.postId,
             "comment_id": event.commentMetaData.commentId,

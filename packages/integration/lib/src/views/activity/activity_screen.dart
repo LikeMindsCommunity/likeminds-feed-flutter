@@ -393,6 +393,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                        widgetSource: LMFeedWidgetSource.activityScreen,
                         eventProperties: {
                           "post_id": postViewData.id,
                           "post_type": postType,
@@ -753,6 +754,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                   LMFeedFireAnalyticsEvent(
                     eventName: LMFeedAnalyticsKeys.commentDeleted,
                     deprecatedEventName: LMFeedAnalyticsKeysDep.commentDeleted,
+                    widgetSource: LMFeedWidgetSource.activityScreen,
                     eventProperties: {
                       "post_id": postViewData,
                       "comment_id": commentViewData.id,
@@ -813,6 +815,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.activityScreen,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

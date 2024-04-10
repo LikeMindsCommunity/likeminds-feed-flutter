@@ -135,6 +135,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.feedOpened,
+        widgetSource: LMFeedWidgetSource.universalFeed,
         deprecatedEventName: LMFeedAnalyticsKeysDep.feedOpened,
         eventProperties: {
           'feed_type': 'universal_feed',
@@ -286,6 +287,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                       .add(const LMFeedFireAnalyticsEvent(
                                     eventName:
                                         LMFeedAnalyticsKeys.postCreationStarted,
+                                    widgetSource:
+                                        LMFeedWidgetSource.universalFeed,
                                     deprecatedEventName: LMFeedAnalyticsKeysDep
                                         .postCreationStarted,
                                     eventProperties: {},
@@ -945,6 +948,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     LMFeedFireAnalyticsEvent(
                       eventName: LMFeedAnalyticsKeys.postDeleted,
                       deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      widgetSource: LMFeedWidgetSource.universalFeed,
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
@@ -1037,6 +1041,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+              widgetSource: LMFeedWidgetSource.universalFeed,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -1159,6 +1164,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   LMFeedAnalyticsBloc.instance.add(
                       const LMFeedFireAnalyticsEvent(
                           eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          widgetSource: LMFeedWidgetSource.universalFeed,
                           deprecatedEventName:
                               LMFeedAnalyticsKeysDep.postCreationStarted,
                           eventProperties: {}));
@@ -1272,6 +1278,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               if (!postUploading.value) {
                 LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
                     eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                    widgetSource: LMFeedWidgetSource.universalFeed,
                     deprecatedEventName:
                         LMFeedAnalyticsKeysDep.postCreationStarted,
                     eventProperties: {}));
@@ -1343,6 +1350,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   LMFeedAnalyticsBloc.instance.add(
                       const LMFeedFireAnalyticsEvent(
                           eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                          widgetSource: LMFeedWidgetSource.universalFeed,
                           deprecatedEventName:
                               LMFeedAnalyticsKeysDep.postCreationStarted,
                           eventProperties: {}));
@@ -1475,6 +1483,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.universalFeed,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

@@ -268,7 +268,11 @@ class _LMFeedUserCreatedPostListViewState
                       const SizedBox(height: 2),
                       widget.postBuilder?.call(context, postWidget, item) ??
                           _widgetsBuilder.postWidgetBuilder(
-                              context, postWidget, item),
+                            context,
+                            postWidget,
+                            item,
+                            source: LMFeedWidgetSource.userFeed,
+                          ),
                     ],
                   );
                 },
@@ -472,6 +476,7 @@ class _LMFeedUserCreatedPostListViewState
                     LMFeedFireAnalyticsEvent(
                       eventName: LMFeedAnalyticsKeys.postDeleted,
                       deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      widgetSource: LMFeedWidgetSource.userFeed,
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
@@ -557,6 +562,7 @@ class _LMFeedUserCreatedPostListViewState
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+              widgetSource: LMFeedWidgetSource.userFeed,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -678,6 +684,7 @@ class _LMFeedUserCreatedPostListViewState
             LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
                 eventName: LMFeedAnalyticsKeys.postCreationStarted,
                 deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
+                widgetSource: LMFeedWidgetSource.userFeed,
                 eventProperties: {}));
 
             LMFeedVideoProvider.instance.forcePauseAllControllers();
@@ -759,6 +766,7 @@ class _LMFeedUserCreatedPostListViewState
                     eventName: LMFeedAnalyticsKeys.postCreationStarted,
                     deprecatedEventName:
                         LMFeedAnalyticsKeysDep.postCreationStarted,
+                    widgetSource: LMFeedWidgetSource.userFeed,
                     eventProperties: {}));
 
                 LMFeedVideoProvider.instance.pauseCurrentVideo();
@@ -852,6 +860,7 @@ class _LMFeedUserCreatedPostListViewState
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.userFeed,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

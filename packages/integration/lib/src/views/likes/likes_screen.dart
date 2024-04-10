@@ -38,6 +38,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.likeListOpen,
         deprecatedEventName: LMFeedAnalyticsKeysDep.likeListOpen,
+        widgetSource: LMFeedWidgetSource.likesScreen,
         eventProperties: {
           'postId': widget.postId,
         },

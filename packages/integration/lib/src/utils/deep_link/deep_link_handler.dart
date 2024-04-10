@@ -68,10 +68,10 @@ class LMFeedDeepLinkHandler {
         errorMessage: 'Invalid request, post id should not be null',
       );
     } else {
-      InitiateUserResponse response =
-          await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-                ..uuid(request.uuid)
-                ..userName(request.userName))
+      ValidateUserResponse response =
+          await LMFeedCore.instance.validateUser((ValidateUserRequestBuilder()
+                ..accessToken(request.accessToken)
+                ..refreshToken(request.refreshToken))
               .build());
       if (response.success) {
         navigatorKey.currentState!.push(
@@ -96,10 +96,10 @@ class LMFeedDeepLinkHandler {
     LMFeedDeepLinkRequest request,
     GlobalKey<NavigatorState> navigatorKey,
   ) async {
-    InitiateUserResponse response =
-        await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-              ..uuid(request.uuid)
-              ..userName(request.userName))
+    ValidateUserResponse response =
+        await LMFeedCore.instance.validateUser((ValidateUserRequestBuilder()
+              ..accessToken(request.accessToken)
+              ..refreshToken(request.refreshToken))
             .build());
     if (response.success) {
       navigatorKey.currentState!.push(
@@ -132,10 +132,10 @@ class LMFeedDeepLinkHandler {
             'Invalid request, post id and comment id should not be null',
       );
     } else {
-      InitiateUserResponse response =
-          await LMFeedCore.instance.initiateUser((InitiateUserRequestBuilder()
-                ..uuid(request.uuid)
-                ..userName(request.userName))
+      ValidateUserResponse response =
+          await LMFeedCore.instance.validateUser((ValidateUserRequestBuilder()
+                ..accessToken(request.accessToken)
+                ..refreshToken(request.refreshToken))
               .build());
       if (response.success) {
         navigatorKey.currentState!.push(
