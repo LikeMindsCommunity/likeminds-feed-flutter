@@ -113,3 +113,9 @@ typedef LMFeedOnTagTap = void Function(String);
 /// must return a widget, takes in [LMFeedButton] as params
 /// {@endtemplate}
 typedef LMFeedButtonBuilder = Widget Function(LMFeedButton);
+
+typedef LMFeedRoomTileBuilder = Widget Function(
+  BuildContext context,
+  LMFeedRoomViewData viewData,
+  LMFeedTile oldWidget,
+);

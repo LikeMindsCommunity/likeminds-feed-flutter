@@ -11,10 +11,6 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
-  // Builder for appbar
-  // Builder for content
-  // Builder for media preview
-  // Builder for bottom bar for buttons
   const LMFeedComposeScreen({
     super.key,
     // Widget builder functions for customizations
@@ -30,6 +26,7 @@ class LMFeedComposeScreen extends StatefulWidget {
     this.attachments,
     this.displayName,
     this.displayUrl,
+    this.feedroomId,
   });
 
   final LMFeedComposeScreenConfig? config;
@@ -49,6 +46,7 @@ class LMFeedComposeScreen extends StatefulWidget {
   final List<LMAttachmentViewData>? attachments;
   final String? displayName;
   final String? displayUrl;
+  final int? feedroomId;
 
   @override
   State<LMFeedComposeScreen> createState() => _LMFeedComposeScreenState();
@@ -481,25 +479,29 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     break;
                   case LMMediaType.document:
                     {
-                      mediaWidget = LMFeedDocument(
-                        onRemove: () {
-                          composeBloc.add(
-                            LMFeedComposeRemoveAttachmentEvent(
-                              index: index,
-                            ),
-                          );
-                        },
-                        documentFile: composeBloc.postMedia[index].mediaFile,
-                        style: style?.mediaStyle?.documentStyle?.copyWith(
-                              width: style?.mediaStyle?.documentStyle?.width ??
-                                  MediaQuery.of(context).size.width - 84,
-                            ) ??
-                            LMFeedPostDocumentStyle(
-                              width: screenSize!.width - 84,
-                              height: 90,
-                            ),
-                        size: PostHelper.getFileSizeString(
-                            bytes: composeBloc.postMedia[index].size ?? 0),
+                      mediaWidget = Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                        child: LMFeedDocument(
+                          onRemove: () {
+                            composeBloc.add(
+                              LMFeedComposeRemoveAttachmentEvent(
+                                index: index,
+                              ),
+                            );
+                          },
+                          documentFile: composeBloc.postMedia[index].mediaFile,
+                          style: style?.mediaStyle?.documentStyle?.copyWith(
+                                width:
+                                    style?.mediaStyle?.documentStyle?.width ??
+                                        MediaQuery.of(context).size.width,
+                              ) ??
+                              LMFeedPostDocumentStyle(
+                                width: screenSize!.width,
+                                height: 90,
+                              ),
+                          size: PostHelper.getFileSizeString(
+                              bytes: composeBloc.postMedia[index].size ?? 0),
+                        ),
                       );
                       break;
                     }
@@ -507,7 +509,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     mediaWidget = const SizedBox();
                 }
                 return Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
+                  padding: EdgeInsets.zero,
                   child: Stack(
                     children: <Widget>[
                       mediaWidget,
@@ -560,7 +562,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     return LMFeedAppBar(
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme.container,
-          height: 72,
+          height: 48,
           centerTitle: true,
           padding: const EdgeInsets.symmetric(
             horizontal: 18.0,
@@ -693,6 +695,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   selectedTopics: selectedTopics,
                   postMedia: [...composeBloc.postMedia],
                   heading: _headingController?.text,
+                  feedroomId: widget.feedroomId,
                 ));
 
                 Navigator.pop(context);
@@ -848,10 +851,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   Widget _defMediaPicker() {
     final theme = LMFeedCore.theme;
-    return BlocBuilder(
+    return BlocConsumer(
       bloc: composeBloc,
+      listener: (context, state) {
+        if (state is LMFeedComposeAddedDocumentState ||
+            state is LMFeedComposeAddedImageState ||
+            state is LMFeedComposeAddedVideoState) {
+          rebuildTopicFloatingButton.value = !rebuildTopicFloatingButton.value;
+        }
+      },
       builder: (context, state) {
-        if (composeBloc.postMedia.length == 10 || composeBloc.videoCount == 1) {
+        if (composeBloc.postMedia.length == 10) {
           return const SizedBox();
         }
         if (composeBloc.postMedia.isNotEmpty &&
@@ -898,10 +908,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     composeBloc.add(LMFeedComposeAddImageEvent());
                   },
                 ),
-              if (composeBloc.documentCount == 0 &&
-                  composeBloc.imageCount == 0 &&
-                  composeBloc.videoCount == 0 &&
-                  config!.enableVideos)
+              if (composeBloc.documentCount == 0 && config!.enableVideos)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
@@ -947,6 +954,16 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     composeBloc.add(LMFeedComposeAddDocumentEvent());
                   },
                 ),
+              Spacer(),
+              composeBloc.postMedia.length > 0 && config!.showMediaCount
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: LMFeedText(
+                        text: "${composeBloc.postMedia.length}/10",
+                        style: LMFeedTextStyle.basic(),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         );
@@ -959,95 +976,93 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      margin: const EdgeInsets.only(
-        bottom: 25,
-      ),
-      child: Row(
-        children: [
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: ValueListenableBuilder(
-                valueListenable: rebuildTopicFloatingButton,
-                builder: (context, _, __) {
-                  return GestureDetector(
-                    onTap: () async {
-                      if (_focusNode.hasFocus) {
-                        FocusScopeNode currentFocus = FocusScope.of(context);
-                        currentFocus.unfocus();
-                        await Future.delayed(const Duration(milliseconds: 500));
-                      }
-                      _controllerPopUp.showMenu();
-                    },
-                    child: AbsorbPointer(
-                      child: CustomPopupMenu(
-                        controller: _controllerPopUp,
-                        showArrow: false,
-                        horizontalMargin: 16.0,
-                        pressType: PressType.singleClick,
-                        menuBuilder: () => LMFeedTopicList(
-                          selectedTopics: composeBloc.selectedTopics,
-                          isEnabled: true,
-                          onTopicSelected: (updatedTopics, tappedTopic) {
-                            if (composeBloc.selectedTopics.isEmpty) {
-                              composeBloc.selectedTopics.add(tappedTopic);
+    return ValueListenableBuilder(
+        valueListenable: rebuildTopicFloatingButton,
+        builder: (context, _, __) {
+          return Container(
+            margin: EdgeInsets.only(
+              bottom: composeBloc.postMedia.length == 10 ? 0 : 25,
+            ),
+            child: Row(children: [
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: GestureDetector(
+                  onTap: () async {
+                    if (_focusNode.hasFocus) {
+                      FocusScopeNode currentFocus = FocusScope.of(context);
+                      currentFocus.unfocus();
+                      await Future.delayed(const Duration(milliseconds: 500));
+                    }
+                    _controllerPopUp.showMenu();
+                  },
+                  child: AbsorbPointer(
+                    child: CustomPopupMenu(
+                      controller: _controllerPopUp,
+                      showArrow: false,
+                      horizontalMargin: 16.0,
+                      pressType: PressType.singleClick,
+                      menuBuilder: () => LMFeedTopicList(
+                        selectedTopics: composeBloc.selectedTopics,
+                        isEnabled: true,
+                        onTopicSelected: (updatedTopics, tappedTopic) {
+                          if (composeBloc.selectedTopics.isEmpty) {
+                            composeBloc.selectedTopics.add(tappedTopic);
+                          } else {
+                            if (composeBloc.selectedTopics.first.id ==
+                                tappedTopic.id) {
+                              composeBloc.selectedTopics.clear();
                             } else {
-                              if (composeBloc.selectedTopics.first.id ==
-                                  tappedTopic.id) {
-                                composeBloc.selectedTopics.clear();
-                              } else {
-                                composeBloc.selectedTopics.clear();
-                                composeBloc.selectedTopics.add(tappedTopic);
-                              }
+                              composeBloc.selectedTopics.clear();
+                              composeBloc.selectedTopics.add(tappedTopic);
                             }
-                            _controllerPopUp.hideMenu();
-                            rebuildTopicFloatingButton.value =
-                                !rebuildTopicFloatingButton.value;
-                          },
+                          }
+                          _controllerPopUp.hideMenu();
+                          rebuildTopicFloatingButton.value =
+                              !rebuildTopicFloatingButton.value;
+                        },
+                      ),
+                      child: Container(
+                        height: 36,
+                        alignment: Alignment.bottomLeft,
+                        margin: const EdgeInsets.only(left: 16.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(500),
+                          color: LMFeedCore.theme.container,
+                          border: Border.all(
+                            color: LMFeedCore.theme.primaryColor,
+                          ),
                         ),
-                        child: Container(
-                          height: 36,
-                          alignment: Alignment.bottomLeft,
-                          margin: const EdgeInsets.only(left: 16.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(500),
-                            color: LMFeedCore.theme.container,
-                            border: Border.all(
+                        child: LMFeedTopicChip(
+                          isSelected: false,
+                          topic: composeBloc.selectedTopics.isEmpty
+                              ? (LMTopicViewDataBuilder()
+                                    ..id("0")
+                                    ..isEnabled(true)
+                                    ..name("Topic"))
+                                  .build()
+                              : composeBloc.selectedTopics.first,
+                          style: LMFeedTopicChipStyle(
+                            textStyle: TextStyle(
                               color: LMFeedCore.theme.primaryColor,
                             ),
-                          ),
-                          child: LMFeedTopicChip(
-                            isSelected: false,
-                            topic: composeBloc.selectedTopics.isEmpty
-                                ? (LMTopicViewDataBuilder()
-                                      ..id("0")
-                                      ..isEnabled(true)
-                                      ..name("Topic"))
-                                    .build()
-                                : composeBloc.selectedTopics.first,
-                            style: LMFeedTopicChipStyle(
-                              textStyle: TextStyle(
+                            icon: LMFeedIcon(
+                              type: LMFeedIconType.icon,
+                              icon: CupertinoIcons.chevron_down,
+                              style: LMFeedIconStyle(
+                                size: 16,
                                 color: LMFeedCore.theme.primaryColor,
-                              ),
-                              icon: LMFeedIcon(
-                                type: LMFeedIconType.icon,
-                                icon: CupertinoIcons.chevron_down,
-                                style: LMFeedIconStyle(
-                                  size: 16,
-                                  color: LMFeedCore.theme.primaryColor,
-                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  );
-                }),
-          ),
-        ],
-      ),
-    );
+                  ),
+                ),
+              ),
+            ]),
+          );
+        });
   }
 }
 
