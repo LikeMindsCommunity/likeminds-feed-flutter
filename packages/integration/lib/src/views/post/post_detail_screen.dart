@@ -80,7 +80,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       LMFeedPluralizeWordAction.allSmallSingular);
 
   final LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
-  LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
+  final LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
+  final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   final ValueNotifier _rebuildComment = ValueNotifier(false);
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
@@ -193,7 +194,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         _postDetailScreenHandler!.rebuildPostWidget,
                     builder: (context, _, __) {
                       return _widgetBuilder.scaffold(
-                        source: LMFeedWidgetSource.postDetailScreen,
+                        source: _widgetSource,
                         resizeToAvoidBottomInset: true,
                         backgroundColor: feedTheme.backgroundColor,
                         bottomNavigationBar: widget.bottomTextFieldBuilder
@@ -214,7 +215,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     _widgetBuilder.postWidgetBuilder.call(
                                         context,
                                         defPostWidget(context),
-                                        _postDetailScreenHandler!.postData!),
+                                        _postDetailScreenHandler!.postData!,
+                                        source: _widgetSource),
                               ),
                               SliverToBoxAdapter(
                                 child: BlocListener<LMFeedCommentBloc,
@@ -308,8 +310,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                                 commentWidget,
                                                                 _postDetailScreenHandler!
                                                                     .postData!) ??
-                                                            LMFeedCore
-                                                                .widgetUtility
+                                                            _widgetBuilder
                                                                 .commentBuilder
                                                                 .call(
                                                                     context,
@@ -628,6 +629,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       style: feedTheme.contentStyle,
       text: post.text,
       heading: post.heading,
+      expanded: true,
     );
   }
 

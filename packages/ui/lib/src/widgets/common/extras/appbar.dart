@@ -79,6 +79,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     Expanded(
+                      flex: 2,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [title ?? const SizedBox.shrink()],

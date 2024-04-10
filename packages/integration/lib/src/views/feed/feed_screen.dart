@@ -95,6 +95,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.universalFeed;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
 
@@ -268,7 +269,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
     return _widgetsBuilder.scaffold(
-      source: LMFeedWidgetSource.universalFeed,
+      source: _widgetSource,
       backgroundColor: feedThemeData.backgroundColor,
       appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
       floatingActionButton: ValueListenableBuilder(
@@ -591,8 +592,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                             defPostWidget(context, feedThemeData, item);
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
-                            LMFeedCore.widgetUtility.postWidgetBuilder
-                                .call(context, postWidget, item);
+                            _widgetsBuilder.postWidgetBuilder.call(
+                                context, postWidget, item,
+                                source: _widgetSource);
                       },
                       noItemsFoundIndicatorBuilder: (context) {
                         if (_feedBloc.state is LMFeedUniversalFeedLoadedState &&

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
@@ -142,23 +143,28 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        padding: style?.titlePadding,
-                        width:
-                            style!.width != null ? style!.width! * 0.6 : null,
-                        child: widget.titleText ??
-                            LMFeedText(
-                              text: widget.user.name,
-                              style: LMFeedTextStyle(
-                                textStyle: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: style?.textStyle?.color ??
-                                      feedTheme.onContainer,
+                      GestureDetector(
+                        onTap: () =>
+                            widget.onTagTap(widget.user.sdkClientInfo.uuid),
+                        behavior: HitTestBehavior.translucent,
+                        child: Container(
+                          padding: style?.titlePadding,
+                          width:
+                              style!.width != null ? style!.width! * 0.6 : null,
+                          child: widget.titleText ??
+                              LMFeedText(
+                                text: widget.user.name,
+                                style: LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: style?.textStyle?.color ??
+                                        feedTheme.onContainer,
+                                  ),
+                                  maxLines: 1,
                                 ),
-                                maxLines: 1,
                               ),
-                            ),
+                        ),
                       ),
                       widget.customTitle ?? const SizedBox.shrink(),
                     ],

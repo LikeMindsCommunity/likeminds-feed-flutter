@@ -12,9 +12,7 @@ class LMSampleApp extends StatefulWidget {
 }
 
 class _LMSampleAppState extends State<LMSampleApp> {
-  Future<ValidateUserResponse>? validateUser;
-  Future<MemberStateResponse>? memberState;
-  Future<GetCommunityConfigurationsResponse>? communityConfigurations;
+  Future<LMResponse>? initialiseFeed;
 
   @override
   void initState() {
@@ -33,57 +31,17 @@ class _LMSampleAppState extends State<LMSampleApp> {
       request.refreshToken(widget.refreshToken!);
     }
 
-    validateUser = LMFeedCore.instance.validateUser(request.build())
-      ..then(
-        (value) async {
-          if (value.success) {
-            memberState = LMFeedCore.instance.getMemberState();
-            communityConfigurations =
-                LMFeedCore.instance.getCommunityConfigurations();
-          }
-        },
-      );
+    initialiseFeed = LMFeedCore.instance.initialiseFeed(request.build());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: validateUser,
+        future: initialiseFeed,
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data!.success) {
-            return FutureBuilder(
-                future: memberState,
-                builder: (context, snapshot) {
-                  if (ConnectionState.done == snapshot.connectionState &&
-                      snapshot.hasData &&
-                      snapshot.data!.success) {
-                    return FutureBuilder(
-                        future: communityConfigurations,
-                        builder: (context, snapshot) {
-                          if (ConnectionState.done ==
-                                  snapshot.connectionState &&
-                              snapshot.hasData &&
-                              snapshot.data!.success) {
-                            return const LMFeedScreen();
-                          } else if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const LMFeedLoader();
-                          } else {
-                            return const Center(
-                              child: Text("An error occurred"),
-                            );
-                          }
-                        });
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const LMFeedLoader();
-                  } else {
-                    return const Center(
-                      child: Text("An error occurred"),
-                    );
-                  }
-                });
+            return const LMFeedScreen();
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const LMFeedLoader();
           } else {
@@ -92,10 +50,11 @@ class _LMSampleAppState extends State<LMSampleApp> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 LikeMindsTheme.kVerticalPaddingLarge,
-                const Center(
+                Center(
                   child: LMFeedText(
-                    text: "An error occurred, please try again later",
-                    style: LMFeedTextStyle(textAlign: TextAlign.center),
+                    text: snapshot.data?.errorMessage ??
+                        "An error occurred, please try again later",
+                    style: const LMFeedTextStyle(textAlign: TextAlign.center),
                   ),
                 ),
                 LikeMindsTheme.kVerticalPaddingLarge,

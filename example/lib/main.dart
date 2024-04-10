@@ -39,12 +39,14 @@ void main() async {
     domain: "feedsx://www.feedsx.com/",
     scaffoldMessengerKey: rootScaffoldMessengerKey,
   );
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
+
   setupNotifications();
   runApp(const MyApp());
 }

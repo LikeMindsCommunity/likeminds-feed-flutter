@@ -41,6 +41,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   int _page = 1;
   LMFeedThemeData _theme = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.notificationScreen;
 
   @override
   void initState() {
@@ -82,7 +83,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
     return _widgetUtility.scaffold(
-      source: LMFeedWidgetSource.notificationScreen,
+      source: _widgetSource,
       backgroundColor: _theme.backgroundColor,
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       body: BlocConsumer(
@@ -180,7 +181,8 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
             icon: Icons.post_add,
             style: LMFeedIconStyle(
               size: 48,
-              color: feedThemeData.onContainer,            ),
+              color: feedThemeData.onContainer,
+            ),
           ),
           const SizedBox(height: 12),
           LMFeedText(
@@ -193,9 +195,9 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
               ),
             ),
           ),
-         SizedBox(
-          height: 48,
-         )
+          SizedBox(
+            height: 48,
+          )
         ],
       ),
     );
