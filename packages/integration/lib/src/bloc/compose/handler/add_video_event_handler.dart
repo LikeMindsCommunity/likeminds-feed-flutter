@@ -38,7 +38,7 @@ addVideoEventHandler(
             deprecatedEventName: LMFeedAnalyticsKeysDep.videoAttachedToPost,
             widgetSource: LMFeedWidgetSource.createPostScreen,
             eventProperties: {
-              'imageCount': countOfPickedVideos,
+              'video_count': countOfPickedVideos,
             },
           ),
         );

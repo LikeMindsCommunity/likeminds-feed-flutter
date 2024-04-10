@@ -11,6 +11,8 @@ class LMFeedTaggingHelper {
       r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9_]+)>>';
   static const String tagRoute =
       r'<<([^<>]+)\|route://user_profile/([a-zA-Z-0-9_]+)>>';
+  static const String depTagRoute =
+      r'<<([^<>]+)\|route://member/([a-zA-Z-0-9_]+)>>';
   static const String linkRoute =
       r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)';
 

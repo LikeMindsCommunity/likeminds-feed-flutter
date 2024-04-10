@@ -1,6 +1,7 @@
 library likeminds_feed_flutter_core;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/analytics/analytics_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
@@ -12,6 +13,7 @@ import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_pre
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feedroom/feedroom_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit/media_kit.dart';
@@ -171,22 +173,28 @@ class LMFeedConfig {
   final LMFeedScreenConfig feedScreenConfig;
   final LMFeedComposeScreenConfig composeConfig;
   final LMPostDetailScreenConfig postDetailConfig;
+  final LMFeedRoomScreenConfig feedRoomScreenConfig;
+  final SystemUiOverlayStyle? globalSystemOverlayStyle;
 
   LMFeedConfig({
     this.feedScreenConfig = const LMFeedScreenConfig(),
     this.composeConfig = const LMFeedComposeScreenConfig(),
     this.postDetailConfig = const LMPostDetailScreenConfig(),
+    this.feedRoomScreenConfig = const LMFeedRoomScreenConfig(),
+    this.globalSystemOverlayStyle,
   });
 
   LMFeedConfig copyWith({
     LMFeedScreenConfig? config,
     LMFeedComposeScreenConfig? composeConfig,
     LMPostDetailScreenConfig? postDetailConfig,
+    LMFeedRoomScreenConfig? feedRoomScreenConfig,
   }) {
     return LMFeedConfig(
       feedScreenConfig: config ?? feedScreenConfig,
       composeConfig: composeConfig ?? this.composeConfig,
       postDetailConfig: postDetailConfig ?? this.postDetailConfig,
+      feedRoomScreenConfig: feedRoomScreenConfig ?? this.feedRoomScreenConfig,
     );
   }
 }

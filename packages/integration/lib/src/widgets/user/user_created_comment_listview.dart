@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/user_created_comment/user_created_comment_bloc.dart';
-import 'package:media_kit_video/media_kit_video.dart';
 
 class LMFeedUserCreatedCommentListView extends StatefulWidget {
   const LMFeedUserCreatedCommentListView({
@@ -233,11 +232,7 @@ class _LMFeedUserCreatedCommentListViewState
       },
       style: feedThemeData?.postStyle,
       onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -249,14 +244,10 @@ class _LMFeedUserCreatedCommentListViewState
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       onPostTap: (context, post) async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
@@ -266,7 +257,7 @@ class _LMFeedUserCreatedCommentListViewState
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
       footer: _defFooterWidget(post),
       header: _defPostHeader(post),
@@ -295,11 +286,7 @@ class _LMFeedUserCreatedCommentListViewState
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
-        VideoController? postVideoController = LMFeedVideoProvider.instance
-            .getVideoController(
-                LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-        await postVideoController?.player.pause();
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
           context,
@@ -311,7 +298,7 @@ class _LMFeedUserCreatedCommentListViewState
             ),
           ),
         );
-        await postVideoController?.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
       },
     );
   }
@@ -469,11 +456,7 @@ class _LMFeedUserCreatedCommentListViewState
         ),
         style: feedThemeData?.footerStyle.commentButtonStyle,
         onTap: () async {
-          VideoController? postVideoController = LMFeedVideoProvider.instance
-              .getVideoController(
-                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-          await postVideoController?.player.pause();
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -484,14 +467,10 @@ class _LMFeedUserCreatedCommentListViewState
               ),
             ),
           );
-          await postVideoController?.player.play();
+          LMFeedVideoProvider.instance.playCurrentVideo();
         },
         onTextTap: () async {
-          VideoController? postVideoController = LMFeedVideoProvider.instance
-              .getVideoController(
-                  LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id);
-
-          await postVideoController?.player.pause();
+          LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -502,7 +481,7 @@ class _LMFeedUserCreatedCommentListViewState
               ),
             ),
           );
-          await postVideoController?.player.play();
+          LMFeedVideoProvider.instance.playCurrentVideo();
         },
       );
 

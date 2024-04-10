@@ -63,6 +63,7 @@ class LMFeedTopicBar extends StatelessWidget {
                     style: style?.topicChipStyle ??
                         feedThemeData.topicStyle.inactiveChipStyle,
                     isSelected: false,
+                    onTap: (p0, p1) => openTopicSelector(context),
                   )
                 : selectedTopics.length == 1
                     ? LMFeedTopicChip(
@@ -73,6 +74,7 @@ class LMFeedTopicBar extends StatelessWidget {
                             .build(),
                         style: feedThemeData.topicStyle.activeChipStyle,
                         isSelected: false,
+                        onTap: (p0, p1) => openTopicSelector(context),
                       )
                     : LMFeedTopicChip(
                         topic: (LMTopicViewDataBuilder()
@@ -81,6 +83,7 @@ class LMFeedTopicBar extends StatelessWidget {
                               ..name("Topics"))
                             .build(),
                         isSelected: false,
+                        onTap: (p0, p1) => openTopicSelector(context),
                         style:
                             feedThemeData.topicStyle.activeChipStyle?.copyWith(
                           icon: Row(
