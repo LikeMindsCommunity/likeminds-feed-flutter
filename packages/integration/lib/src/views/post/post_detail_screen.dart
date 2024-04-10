@@ -629,6 +629,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       style: feedTheme.contentStyle,
       text: post.text,
       heading: post.heading,
+      expanded: true,
     );
   }
 

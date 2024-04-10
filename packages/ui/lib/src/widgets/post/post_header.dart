@@ -99,6 +99,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                       onProfileTap!();
                                     }
                                   },
+                                  behavior: HitTestBehavior.translucent,
                                   child: titleText ??
                                       LMFeedText(
                                         text: user.name,

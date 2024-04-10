@@ -40,7 +40,6 @@ void main() async {
     domain: "feedsx://www.feedsx.com/",
     scaffoldMessengerKey: rootScaffoldMessengerKey,
   );
-
   setupNotifications();
   runApp(const MyApp());
 }
