@@ -146,7 +146,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
         if (state is LMFeedEditPostUploadedState) {
-          LMPostViewData? item = state.postData;
+          LMPostViewData? item = state.postData.copyWith();
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
                   ?.indexWhere((element) => element.id == item.id) ??
@@ -165,7 +165,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           if (index != -1) {
             LMPostViewData updatePostViewData = feedRoomItemList![index];
             updatePostViewData = LMFeedPostUtils.updatePostData(
-                updatePostViewData, state.actionType);
+                postViewData: updatePostViewData, actionType: state.actionType);
           }
           _pagingController.itemList = feedRoomItemList;
           rebuildPostWidget.value = !rebuildPostWidget.value;

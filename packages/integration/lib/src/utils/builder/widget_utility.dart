@@ -45,9 +45,11 @@ class LMFeedWidgetUtility {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: LMFeedCore.config.globalSystemOverlayStyle ??
           SystemUiOverlayStyle.dark,
-      child: PopScope(
-        canPop: canPop,
-        onPopInvoked: onPopInvoked,
+      child: WillPopScope(
+        onWillPop: () async {
+          onPopInvoked?.call(canPop);
+          return Future.value(canPop);
+        },
         child: Scaffold(
           key: key,
           extendBody: extendBody,

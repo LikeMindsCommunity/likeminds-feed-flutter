@@ -164,72 +164,70 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
 
-    return WillPopScope(
-      onWillPop: () {
-        widget.composeDiscardDialogBuilder?.call(context) ??
-            _showDefaultDiscardDialog(context);
-        return Future.value(false);
-      },
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: config!.composeSystemOverlayStyle,
-        child: GestureDetector(
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
-            bloc: composeBloc,
-            listener: _composeBlocListener,
-            child: widgetUtility.scaffold(
-              source: LMFeedWidgetSource.createPostScreen,
-              backgroundColor: feedTheme.container,
-              bottomSheet: _defMediaPicker(),
-              appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
-                  _defAppBar(),
-              floatingActionButton: Padding(
-                padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
-                child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
-                  bloc: composeBloc,
-                  buildWhen: (previous, current) {
-                    if (current is LMFeedComposeFetchedTopicsState) {
-                      return true;
-                    }
-                    return false;
-                  },
-                  builder: (context, state) {
-                    if (state is LMFeedComposeFetchedTopicsState) {
-                      return widget.composeTopicSelectorBuilder?.call(
-                              context,
-                              _defTopicSelector(state.topics),
-                              composeBloc.selectedTopics) ??
-                          LMFeedCore.widgetUtility
-                              .composeScreenTopicSelectorBuilder(
-                                  context,
-                                  _defTopicSelector(state.topics),
-                                  composeBloc.selectedTopics);
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: config!.composeSystemOverlayStyle,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
+          bloc: composeBloc,
+          listener: _composeBlocListener,
+          child: widgetUtility.scaffold(
+            source: LMFeedWidgetSource.createPostScreen,
+            backgroundColor: feedTheme.container,
+            bottomSheet: _defMediaPicker(),
+            appBar:
+                widget.composeAppBarBuilder?.call(_defAppBar()) ?? _defAppBar(),
+            canPop: false,
+            onPopInvoked: (canPop) {
+              widget.composeDiscardDialogBuilder?.call(context) ??
+                  _showDefaultDiscardDialog(context);
+            },
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
+              child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
+                bloc: composeBloc,
+                buildWhen: (previous, current) {
+                  if (current is LMFeedComposeFetchedTopicsState) {
+                    return true;
+                  }
+                  return false;
+                },
+                builder: (context, state) {
+                  if (state is LMFeedComposeFetchedTopicsState) {
+                    return widget.composeTopicSelectorBuilder?.call(
+                            context,
+                            _defTopicSelector(state.topics),
+                            composeBloc.selectedTopics) ??
+                        LMFeedCore.widgetUtility
+                            .composeScreenTopicSelectorBuilder(
+                                context,
+                                _defTopicSelector(state.topics),
+                                composeBloc.selectedTopics);
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
-              body: SafeArea(
-                child: Container(
-                  margin: EdgeInsets.only(
-                    bottom: 150,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 18),
-                        widget.composeUserHeaderBuilder?.call(context, user!) ??
-                            widgetUtility.composeScreenUserHeaderBuilder(
-                                context, user!),
-                        const SizedBox(height: 18),
-                        widget.composeContentBuilder?.call() ??
-                            _defContentInput(),
-                        const SizedBox(height: 18),
-                        widget.composeMediaPreviewBuilder?.call() ??
-                            _defMediaPreview(),
-                        const SizedBox(height: 150),
-                      ],
-                    ),
+            ),
+            body: SafeArea(
+              child: Container(
+                margin: EdgeInsets.only(
+                  bottom: 150,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 18),
+                      widget.composeUserHeaderBuilder?.call(context, user!) ??
+                          widgetUtility.composeScreenUserHeaderBuilder(
+                              context, user!),
+                      const SizedBox(height: 18),
+                      widget.composeContentBuilder?.call() ??
+                          _defContentInput(),
+                      const SizedBox(height: 18),
+                      widget.composeMediaPreviewBuilder?.call() ??
+                          _defMediaPreview(),
+                      const SizedBox(height: 150),
+                    ],
                   ),
                 ),
               ),
