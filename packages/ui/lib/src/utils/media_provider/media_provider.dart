@@ -43,9 +43,10 @@ class LMFeedVideoProvider with ChangeNotifier {
     return _videoControllers[postId]?[position];
   }
 
-  void pauseCurrentVideo() {
+  Future<void> pauseCurrentVideo() async {
     if (currentVisiblePostId != null && currentVisiblePostPosition != null) {
-      _videoControllers[currentVisiblePostId]![currentVisiblePostPosition]!
+      await _videoControllers[currentVisiblePostId]![
+              currentVisiblePostPosition]!
           .player
           .pause();
     }
