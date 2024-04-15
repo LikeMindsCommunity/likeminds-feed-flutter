@@ -198,11 +198,13 @@ class LMFeedPostDetailScreenHandler {
         }
       case const (LMFeedCommentSuccessState<DeleteCommentResponse>):
         {
+          String commentTitle = LMFeedPostUtils.getCommentTitle(
+              LMFeedPluralizeWordAction.firstLetterCapitalSingular);
           // Show the toast message for comment deleted
           LMFeedCore.showSnackBar(
             LMFeedSnackBar(
               content: LMFeedText(
-                text: 'Comment Deleted',
+                text: '$commentTitle Deleted',
               ),
             ),
           );
@@ -314,6 +316,7 @@ class LMFeedPostDetailScreenHandler {
 
   void addTempReplyCommentToController(
       String tempId, String text, int level, String parentId, bool replyShown) {
+    DateTime createdAt = DateTime.now();
     LMUserViewData? currentUser =
         LMFeedLocalPreference.instance.fetchUserData();
 
@@ -326,8 +329,8 @@ class LMFeedPostDetailScreenHandler {
           ..isEdited(false)
           ..repliesCount(0)
           ..menuItems([])
-          ..createdAt(DateTime.now())
-          ..updatedAt(DateTime.now())
+          ..createdAt(createdAt)
+          ..updatedAt(createdAt)
           ..isLiked(false)
           ..user(currentUser)
           ..tempId(tempId))
@@ -353,6 +356,7 @@ class LMFeedPostDetailScreenHandler {
 
   void addTempCommentToController(String tempId, String text, int level,
       {DateTime? createdTime}) {
+    DateTime createdAt = DateTime.now();
     LMUserViewData currentUser =
         LMFeedLocalPreference.instance.fetchUserData()!;
 
@@ -365,8 +369,8 @@ class LMFeedPostDetailScreenHandler {
           ..isEdited(false)
           ..repliesCount(0)
           ..menuItems([])
-          ..createdAt(createdTime ?? DateTime.now())
-          ..updatedAt(createdTime ?? DateTime.now())
+          ..createdAt(createdTime ?? createdAt)
+          ..updatedAt(createdTime ?? createdAt)
           ..isLiked(false)
           ..user(currentUser)
           ..tempId(tempId))

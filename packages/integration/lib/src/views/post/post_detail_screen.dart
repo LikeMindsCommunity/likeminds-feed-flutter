@@ -163,9 +163,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 snapshot.hasData) {
               return BlocListener(
                 listener: (context, state) {
-                  if (state is LMFeedPostUpdateState &&
-                      state.source != null &&
-                      state.source == LMFeedWidgetSource.postDetailScreen) {
+                  if (state is LMFeedPostUpdateState) {
                     if (state.postId == widget.postId) {
                       LMFeedPostUtils.updatePostData(
                         postViewData: _postDetailScreenHandler!.postData!,
@@ -1303,7 +1301,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                             feedTheme.textFieldStyle.decoration?.copyWith(
                           enabled: right,
                           hintText: right
-                              ? feedTheme.textFieldStyle.decoration?.hintText ??
+                              ? config?.commentTextFieldHint ??
                                   'Write a $commentTitleSmallCapSingular'
                               : "You do not have permission to create a $commentTitleSmallCapSingular.",
                         ),

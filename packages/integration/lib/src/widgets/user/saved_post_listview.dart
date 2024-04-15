@@ -58,6 +58,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   final ValueNotifier postUploading = ValueNotifier(false);
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedScreenConfig? config;
+  LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
 
   @override
   void initState() {
@@ -107,7 +108,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
     return BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
-      bloc: LMFeedPostBloc.instance,
+      bloc: postBloc,
       listener: (context, state) {
         if (state is LMFeedNewPostErrorState) {
           postUploading.value = false;
@@ -452,14 +453,12 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           );
         },
         onTap: () async {
-          if (postViewData.isLiked) {
-            postViewData.isLiked = false;
-            postViewData.likeCount -= 1;
-          } else {
-            postViewData.isLiked = true;
-            postViewData.likeCount += 1;
-          }
-          rebuildPostWidget.value = !rebuildPostWidget.value;
+          postBloc.add(LMFeedUpdatePostEvent(
+            actionType: postViewData.isLiked
+                ? LMFeedPostActionType.unlike
+                : LMFeedPostActionType.like,
+            postId: postViewData.id,
+          ));
 
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
@@ -477,11 +476,12 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               await LMFeedCore.client.likePost(likePostRequest);
 
           if (!response.success) {
-            postViewData.isLiked = !postViewData.isLiked;
-            postViewData.likeCount = postViewData.isLiked
-                ? postViewData.likeCount + 1
-                : postViewData.likeCount - 1;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
+            postBloc.add(LMFeedUpdatePostEvent(
+              actionType: postViewData.isLiked
+                  ? LMFeedPostActionType.unlike
+                  : LMFeedPostActionType.like,
+              postId: postViewData.id,
+            ));
           }
         },
       );
@@ -526,8 +526,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
         isActive: postViewData.isSaved,
         onTap: () async {
-          postViewData.isSaved = !postViewData.isSaved;
-          rebuildPostWidget.value = !rebuildPostWidget.value;
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
               postId: postViewData.id,
               actionType: postViewData.isSaved
@@ -541,8 +539,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               await LMFeedCore.client.savePost(savePostRequest);
 
           if (!response.success) {
-            postViewData.isSaved = !postViewData.isSaved;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
             LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
                 postId: postViewData.id,
                 actionType: postViewData.isSaved

@@ -195,7 +195,8 @@ class LMFeedPostHeader extends StatelessWidget {
                               subText != null
                                   ? LikeMindsTheme.kHorizontalPaddingXSmall
                                   : const SizedBox(),
-                              if (createdAt != null)
+                              if (createdAt != null &&
+                                  headerStyle.showTimeStamp)
                                 subTextSeparator ??
                                     LMFeedText(
                                       text: subText != null ? '·' : '',
@@ -206,13 +207,16 @@ class LMFeedPostHeader extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                              if (createdAt != null && subText != null)
+                              if (createdAt != null &&
+                                  subText != null &&
+                                  headerStyle.showTimeStamp)
                                 LikeMindsTheme.kHorizontalPaddingXSmall,
-                              createdAt ??
-                                  LMFeedText(
-                                    text: LMFeedTimeAgo.instance
-                                        .format(postViewData.createdAt),
-                                  ),
+                              if (headerStyle.showTimeStamp)
+                                createdAt ??
+                                    LMFeedText(
+                                      text: LMFeedTimeAgo.instance
+                                          .format(postViewData.createdAt),
+                                    ),
                               LikeMindsTheme.kHorizontalPaddingSmall,
                               if (postViewData.isEdited)
                                 subTextSeparator ??
@@ -330,6 +334,7 @@ class LMFeedPostHeaderStyle {
   final LMFeedTextStyle? subTextStyle;
   final LMFeedTextStyle? customTitleTextStyle;
   final LMFeedMenuStyle? menuStyle;
+  final bool showTimeStamp;
 
   final bool showPinnedIcon;
 
@@ -346,6 +351,7 @@ class LMFeedPostHeaderStyle {
     this.subTextStyle,
     this.customTitleTextStyle,
     this.menuStyle,
+    this.showTimeStamp = true,
   });
 
   LMFeedPostHeaderStyle copyWith({
@@ -361,6 +367,7 @@ class LMFeedPostHeaderStyle {
     LMFeedTextStyle? subTextStyle,
     LMFeedTextStyle? customTitleTextStyle,
     LMFeedMenuStyle? menuStyle,
+    bool? showTimeStamp,
   }) {
     return LMFeedPostHeaderStyle(
       padding: padding ?? this.padding,
@@ -375,6 +382,7 @@ class LMFeedPostHeaderStyle {
       subTextStyle: subTextStyle ?? this.subTextStyle,
       customTitleTextStyle: customTitleTextStyle ?? this.customTitleTextStyle,
       menuStyle: menuStyle ?? this.menuStyle,
+      showTimeStamp: showTimeStamp ?? this.showTimeStamp,
     );
   }
 

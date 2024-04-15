@@ -617,6 +617,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               backgroundColor: theme.primaryColor,
               borderRadius: 6,
               height: 34,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
             ),
             onTap: () {
               _focusNode.unfocus();
