@@ -21,3 +21,7 @@ const String kAssetNoPostsIcon =
     "packages/likeminds_feed_flutter_ui/assets/icons/mistery-box.svg";
 const String lmRepostSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/repost.svg";
+const String lmNoResponsePng =
+    "packages/likeminds_feed_flutter_ui/assets/icons/no-response.png";
+const String lmPollSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/poll.svg";

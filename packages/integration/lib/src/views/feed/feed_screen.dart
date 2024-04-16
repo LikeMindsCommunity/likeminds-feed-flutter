@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/create_poll_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/poll_result_screen.dart';
 import 'package:video_compress/video_compress.dart';
 // import 'package:media_kit_video/media_kit_video.dart';
 
@@ -906,7 +908,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       },
       menu: LMFeedMenu(
         menuItems: postViewData.menuItems,
-        removeItemIds: {postReportId, postEditId},
+        removeItemIds: {},
         action: LMFeedMenuAction(
           onPostEdit: () {
             // Mute all video controllers
@@ -1337,43 +1339,51 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         ),
-        onTap: userPostingRights
-            ? () async {
-                if (!postUploading.value) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
-                  LMFeedVideoProvider.instance.forcePauseAllControllers();
-                  // ignore: use_build_context_synchronously
-                  await Navigator.push(
+        onTap: false
+            ? () {
+                Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(),
-                    ),
-                  );
-                } else {
-                  LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A post is already uploading.',
-                      ),
-                    ),
-                  );
-                }
+                        builder: (context) => CreatePollScreen()));
               }
-            : () {
-                LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: "You do not have permission to create a post",
-                    ),
-                  ),
-                );
-              },
+            : userPostingRights
+                ? () async {
+                    if (!postUploading.value) {
+                      LMFeedAnalyticsBloc.instance.add(
+                          const LMFeedFireAnalyticsEvent(
+                              eventName:
+                                  LMFeedAnalyticsKeys.postCreationStarted,
+                              deprecatedEventName:
+                                  LMFeedAnalyticsKeysDep.postCreationStarted,
+                              eventProperties: {}));
+
+                      LMFeedVideoProvider.instance.forcePauseAllControllers();
+                      // ignore: use_build_context_synchronously
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LMFeedComposeScreen(),
+                        ),
+                      );
+                    } else {
+                      LMFeedCore.showSnackBar(
+                        LMFeedSnackBar(
+                          content: LMFeedText(
+                            text: 'A post is already uploading.',
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                : () {
+                    LMFeedCore.showSnackBar(
+                      LMFeedSnackBar(
+                        content: LMFeedText(
+                          text: "You do not have permission to create a post",
+                        ),
+                      ),
+                    );
+                  },
       );
 
   Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
