@@ -75,6 +75,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
 
   /// Controllers and other helper classes' objects
+  FocusNode? _headingFocusNode;
   final FocusNode _focusNode = FocusNode();
   TextEditingController _controller = TextEditingController();
   TextEditingController? _headingController = TextEditingController();
@@ -135,7 +136,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
     composeBloc.selectedTopics = postViewData.topics;
     // Open the on screen keyboard
-    if (_focusNode.canRequestFocus) {
+    if (_headingController != null && config?.enableHeading == true) {
+      _headingFocusNode = FocusNode();
+      _headingFocusNode?.requestFocus();
+    } else if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
     }
   }
@@ -866,8 +870,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         children: [
           (config?.enableHeading ?? false)
               ? TextField(
+                  focusNode: _headingFocusNode,
                   controller: _headingController,
                   textCapitalization: TextCapitalization.sentences,
+                  cursorColor: feedTheme.primaryColor,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,

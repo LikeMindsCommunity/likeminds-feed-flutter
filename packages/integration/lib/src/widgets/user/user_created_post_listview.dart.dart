@@ -65,6 +65,7 @@ class _LMFeedUserCreatedPostListViewState
   final ValueNotifier postUploading = ValueNotifier(false);
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+  LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
 
   @override
   void initState() {
@@ -177,7 +178,6 @@ class _LMFeedUserCreatedPostListViewState
 
   @override
   Widget build(BuildContext context) {
-    LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
     return BlocListener(
       bloc: newPostBloc,
       listener: (context, state) {
@@ -284,6 +284,9 @@ class _LMFeedUserCreatedPostListViewState
                 noItemsFoundIndicatorBuilder: (context) {
                   return widget.noItemsFoundIndicatorBuilder?.call(context) ??
                       _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(context,
+                          isSelfPost:
+                              widget.uuid == currentUser?.sdkClientInfo.uuid ||
+                                  widget.uuid == currentUser?.uuid,
                           createPostButton: createPostButton());
                 },
                 firstPageProgressIndicatorBuilder: (context) =>
@@ -551,14 +554,12 @@ class _LMFeedUserCreatedPostListViewState
           );
         },
         onTap: () async {
-          if (postViewData.isLiked) {
-            postViewData.isLiked = false;
-            postViewData.likeCount -= 1;
-          } else {
-            postViewData.isLiked = true;
-            postViewData.likeCount += 1;
-          }
-          rebuildPostWidget.value = !rebuildPostWidget.value;
+          newPostBloc.add(LMFeedUpdatePostEvent(
+              postId: postViewData.id,
+              source: LMFeedWidgetSource.postDetailScreen,
+              actionType: postViewData.isLiked
+                  ? LMFeedPostActionType.unlike
+                  : LMFeedPostActionType.like));
 
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
@@ -623,13 +624,11 @@ class _LMFeedUserCreatedPostListViewState
   LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
         isActive: postViewData.isSaved,
         onTap: () async {
-          postViewData.isSaved = !postViewData.isSaved;
-          rebuildPostWidget.value = !rebuildPostWidget.value;
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
             postId: postViewData.id,
             actionType: postViewData.isSaved
-                ? LMFeedPostActionType.saved
-                : LMFeedPostActionType.unsaved,
+                ? LMFeedPostActionType.unsaved
+                : LMFeedPostActionType.saved,
           ));
 
           final savePostRequest =
@@ -639,14 +638,12 @@ class _LMFeedUserCreatedPostListViewState
               await LMFeedCore.client.savePost(savePostRequest);
 
           if (!response.success) {
-            postViewData.isSaved = !postViewData.isSaved;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
             LMFeedPostBloc.instance.add(
               LMFeedUpdatePostEvent(
                 postId: postViewData.id,
                 actionType: postViewData.isSaved
-                    ? LMFeedPostActionType.saved
-                    : LMFeedPostActionType.unsaved,
+                    ? LMFeedPostActionType.unsaved
+                    : LMFeedPostActionType.saved,
               ),
             );
           } else {
@@ -753,7 +750,6 @@ class _LMFeedUserCreatedPostListViewState
         borderRadius: 28,
         backgroundColor: feedThemeData.primaryColor,
         height: 44,
-        width: 153,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),

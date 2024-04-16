@@ -89,53 +89,52 @@ class _LMButtonState extends State<LMFeedButton> {
           borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 0),
           border: inStyle.border,
         ),
-        child: Center(
-          child: Row(
-            mainAxisAlignment:
-                inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
-            children: [
-              inStyle.placement == LMFeedIconButtonPlacement.start
-                  ? _active
-                      ? (inStyle.activeIcon ?? inStyle.icon) ??
-                          const SizedBox.shrink()
-                      : inStyle.icon ?? const SizedBox.shrink()
-                  : const SizedBox.shrink(),
-              GestureDetector(
-                onTap: inStyle.showText ? widget.onTextTap : null,
-                behavior: HitTestBehavior.translucent,
-                child: Row(
-                  children: [
-                    inStyle.placement == LMFeedIconButtonPlacement.start
-                        ? (inStyle.icon != null || inStyle.activeIcon != null)
-                            ? SizedBox(width: inStyle.margin ?? 8)
-                            : const SizedBox.shrink()
-                        : const SizedBox.shrink(),
-                    inStyle.showText
-                        ? Container(
-                            padding: inStyle.textPadding,
-                            child: _active
-                                ? widget.activeText ??
-                                    widget.text ??
-                                    const SizedBox.shrink()
-                                : widget.text ?? const SizedBox.shrink())
-                        : const SizedBox.shrink(),
-                    inStyle.placement == LMFeedIconButtonPlacement.end
-                        ? (inStyle.icon != null || inStyle.activeIcon != null)
-                            ? SizedBox(width: inStyle.margin ?? 8)
-                            : const SizedBox.shrink()
-                        : const SizedBox.shrink(),
-                  ],
-                ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment:
+              inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
+          children: [
+            inStyle.placement == LMFeedIconButtonPlacement.start
+                ? _active
+                    ? (inStyle.activeIcon ?? inStyle.icon) ??
+                        const SizedBox.shrink()
+                    : inStyle.icon ?? const SizedBox.shrink()
+                : const SizedBox.shrink(),
+            GestureDetector(
+              onTap: inStyle.showText ? widget.onTextTap : null,
+              behavior: HitTestBehavior.translucent,
+              child: Row(
+                children: [
+                  inStyle.placement == LMFeedIconButtonPlacement.start
+                      ? (inStyle.icon != null || inStyle.activeIcon != null)
+                          ? SizedBox(width: inStyle.margin ?? 8)
+                          : const SizedBox.shrink()
+                      : const SizedBox.shrink(),
+                  inStyle.showText
+                      ? Container(
+                          padding: inStyle.textPadding,
+                          child: _active
+                              ? widget.activeText ??
+                                  widget.text ??
+                                  const SizedBox.shrink()
+                              : widget.text ?? const SizedBox.shrink())
+                      : const SizedBox.shrink(),
+                  inStyle.placement == LMFeedIconButtonPlacement.end
+                      ? (inStyle.icon != null || inStyle.activeIcon != null)
+                          ? SizedBox(width: inStyle.margin ?? 8)
+                          : const SizedBox.shrink()
+                      : const SizedBox.shrink(),
+                ],
               ),
-              inStyle.placement == LMFeedIconButtonPlacement.end
-                  ? _active
-                      ? inStyle.activeIcon ??
-                          inStyle.icon ??
-                          const SizedBox.shrink()
-                      : inStyle.icon ?? const SizedBox.shrink()
-                  : const SizedBox.shrink(),
-            ],
-          ),
+            ),
+            inStyle.placement == LMFeedIconButtonPlacement.end
+                ? _active
+                    ? inStyle.activeIcon ??
+                        inStyle.icon ??
+                        const SizedBox.shrink()
+                    : inStyle.icon ?? const SizedBox.shrink()
+                : const SizedBox.shrink(),
+          ],
         ),
       ),
     );

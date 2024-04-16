@@ -155,7 +155,7 @@ class LMFeedWidgetUtility {
   }
 
   Widget noItemsFoundIndicatorBuilderFeed(BuildContext context,
-      {LMFeedButton? createPostButton}) {
+      {LMFeedButton? createPostButton, bool isSelfPost = true}) {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return Center(
       child: Column(
@@ -181,20 +181,21 @@ class LMFeedWidgetUtility {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          LMFeedText(
-            text:
-                "Be the first one to create a ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)} here",
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w300,
-                color: feedThemeData.onContainer,
+          if (isSelfPost) const SizedBox(height: 12),
+          if (isSelfPost)
+            LMFeedText(
+              text:
+                  "Be the first one to create a ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)} here",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,
+                  color: feedThemeData.onContainer,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 28),
-          if (createPostButton != null) createPostButton,
+          if (isSelfPost) const SizedBox(height: 28),
+          if (createPostButton != null && isSelfPost) createPostButton,
         ],
       ),
     );

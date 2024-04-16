@@ -44,6 +44,9 @@ class _LMFeedUserCreatedCommentListViewState
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
+  String commentTitleSmallPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   static const int pageSize = 10;
   final PagingController<int, LMCommentViewData> _pagingController =
@@ -613,8 +616,8 @@ class _LMFeedUserCreatedCommentListViewState
               ),
             ),
             const SizedBox(height: 12),
-            const LMFeedText(
-              text: 'No Replies to show',
+            LMFeedText(
+              text: 'No $commentTitleSmallPlural to show',
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 24,

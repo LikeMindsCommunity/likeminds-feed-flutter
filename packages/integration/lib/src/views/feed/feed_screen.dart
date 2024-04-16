@@ -1040,14 +1040,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
         },
         onTap: () async {
-          if (postViewData.isLiked) {
-            postViewData.isLiked = false;
-            postViewData.likeCount -= 1;
-          } else {
-            postViewData.isLiked = true;
-            postViewData.likeCount += 1;
-          }
-          rebuildPostWidget.value = !rebuildPostWidget.value;
+          newPostBloc.add(LMFeedUpdatePostEvent(
+            actionType: postViewData.isLiked
+                ? LMFeedPostActionType.unlike
+                : LMFeedPostActionType.like,
+            postId: postViewData.id,
+          ));
 
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
@@ -1065,11 +1063,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               await LMFeedCore.client.likePost(likePostRequest);
 
           if (!response.success) {
-            postViewData.isLiked = !postViewData.isLiked;
-            postViewData.likeCount = postViewData.isLiked
-                ? postViewData.likeCount + 1
-                : postViewData.likeCount - 1;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
+            newPostBloc.add(LMFeedUpdatePostEvent(
+              actionType: postViewData.isLiked
+                  ? LMFeedPostActionType.unlike
+                  : LMFeedPostActionType.like,
+              postId: postViewData.id,
+            ));
           }
         },
       );
@@ -1114,8 +1113,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
         isActive: postViewData.isSaved,
         onTap: () async {
-          postViewData.isSaved = !postViewData.isSaved;
-          rebuildPostWidget.value = !rebuildPostWidget.value;
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
               postId: postViewData.id,
               actionType: postViewData.isSaved
@@ -1129,8 +1126,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               await LMFeedCore.client.savePost(savePostRequest);
 
           if (!response.success) {
-            postViewData.isSaved = !postViewData.isSaved;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
             LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
                 postId: postViewData.id,
                 actionType: postViewData.isSaved
