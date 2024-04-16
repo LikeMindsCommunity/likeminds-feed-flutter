@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class LMPostMediaShimmer extends StatelessWidget {
+  // defines the structure of the shimmer
+  final Widget? childWidget;
   final LMPostMediaShimmerStyle? style;
 
-  const LMPostMediaShimmer({super.key, this.style});
+  const LMPostMediaShimmer({super.key, this.style, this.childWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +16,12 @@ class LMPostMediaShimmer extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: shimmerStyle.baseColor ?? Colors.grey.shade300,
       highlightColor: shimmerStyle.highlightColor ?? Colors.grey.shade100,
-      child: Container(
-        color: Colors.white,
-        width: shimmerStyle.width ?? screenSize.width,
-        height: shimmerStyle.height ?? screenSize.width,
-      ),
+      child: childWidget ??
+          Container(
+            color: Colors.white,
+            width: shimmerStyle.width ?? screenSize.width,
+            height: shimmerStyle.height ?? screenSize.width,
+          ),
     );
   }
 }

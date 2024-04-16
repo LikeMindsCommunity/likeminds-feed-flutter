@@ -414,6 +414,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     _pagingController.itemList = feedRoomItemList;
                     postUploading.value = false;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
+
+                    LMFeedCore.showSnackBar(LMFeedSnackBar(
+                        content:
+                            LMFeedText(text: "$postTitleFirstCap Created")));
                   }
                   if (curr is LMFeedEditPostUploadedState) {
                     LMPostViewData? item = curr.postData.copyWith();
@@ -429,6 +433,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     _feedBloc.topics.addAll(curr.topics);
                     postUploading.value = false;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
+
+                    LMFeedCore.showSnackBar(LMFeedSnackBar(
+                        content:
+                            LMFeedText(text: "$postTitleFirstCap Edited")));
                   }
                   if (curr is LMFeedNewPostErrorState) {
                     postUploading.value = false;
