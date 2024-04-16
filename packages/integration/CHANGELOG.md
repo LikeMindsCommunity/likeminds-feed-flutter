@@ -28,3 +28,9 @@ Searcgh support, and more features
 Adding feedroom support
 Adding multiple media support
 Improvements, and bug fixes
+
+## 1.2.0
+
+Adding API Security
+Adding Post and Comment as variable
+Fixing minor bugs
