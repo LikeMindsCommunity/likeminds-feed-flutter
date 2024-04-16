@@ -763,8 +763,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
-    postViewData.isPinned = !postViewData.isPinned;
-
     if (postViewData.isPinned) {
       int index = postViewData.menuItems
           .indexWhere((element) => element.id == postPinId);
@@ -783,21 +781,23 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       }
     }
 
-    rebuildPostWidget.value = !rebuildPostWidget.value;
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
     LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
         post: postViewData,
         actionType: LMFeedPostActionType.pinned,
         postId: postViewData.id));
 
+    final pinPostRequest =
+        (PinPostRequestBuilder()..postId(postViewData.id)).build();
+
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
     if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        post: postViewData,
+        actionType: LMFeedPostActionType.pinned,
+        postId: postViewData.id,
+      ));
 
       if (postViewData.isPinned) {
         int index = postViewData.menuItems
@@ -817,14 +817,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             ..id = postPinId;
         }
       }
-
-      rebuildPostWidget.value = !rebuildPostWidget.value;
-
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        post: postViewData,
-        actionType: LMFeedPostActionType.pinned,
-        postId: postViewData.id,
-      ));
     } else {
       String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
 

@@ -833,8 +833,11 @@ class _LMFeedUserCreatedPostListViewState
   }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
-    postViewData.isPinned = !postViewData.isPinned;
-    rebuildPostWidget.value = !rebuildPostWidget.value;
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postViewData.id,
+        actionType: postViewData.isPinned
+            ? LMFeedPostActionType.pinned
+            : LMFeedPostActionType.unpinned));
 
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
@@ -842,15 +845,7 @@ class _LMFeedUserCreatedPostListViewState
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        postId: postViewData.id,
-        actionType: postViewData.isPinned
-            ? LMFeedPostActionType.pinned
-            : LMFeedPostActionType.unpinned));
-
     if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
-      rebuildPostWidget.value = !rebuildPostWidget.value;
       LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
           postId: postViewData.id,
           actionType: postViewData.isPinned
