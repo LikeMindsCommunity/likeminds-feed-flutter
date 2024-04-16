@@ -60,6 +60,10 @@ class LMFeedEditPostScreen extends StatefulWidget {
 }
 
 class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
   LMPostViewData? postViewData;
   final LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
@@ -71,6 +75,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
 
   /// Controllers and other helper classes' objects
+  FocusNode? _headingFocusNode;
   final FocusNode _focusNode = FocusNode();
   TextEditingController _controller = TextEditingController();
   TextEditingController? _headingController = TextEditingController();
@@ -131,7 +136,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
     composeBloc.selectedTopics = postViewData.topics;
     // Open the on screen keyboard
-    if (_focusNode.canRequestFocus) {
+    if (_headingController != null && config?.enableHeading == true) {
+      _headingFocusNode = FocusNode();
+      _headingFocusNode?.requestFocus();
+    } else if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
     }
   }
@@ -249,7 +257,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                       color: feedTheme.onContainer),
                 ),
                 content: Text(
-                  "The following topics have been disabled. Please remove them to save the post.\n${disabledTopics.join(', ')}.",
+                  "The following topics have been disabled. Please remove them to save the $postTitleSmallCap.\n${disabledTopics.join(', ')}.",
                   style: TextStyle(
                     fontSize: 14,
                     color: feedTheme.onContainer,
@@ -288,7 +296,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
       LMFeedCore.showSnackBar(
         LMFeedSnackBar(
           content: LMFeedText(
-            text: "Can't create a post without topic",
+            text: "Can't create a $postTitleSmallCap without topic",
           ),
         ),
       );
@@ -414,9 +422,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         style: const TextStyle(),
         child: AlertDialog(
           backgroundColor: feedTheme.container,
-          title: const Text('Discard Post'),
-          content:
-              const Text('Are you sure you want to discard the current post?'),
+          title: Text('Discard $postTitleFirstCap'),
+          content: Text(
+              'Are you sure you want to discard the current $postTitleSmallCap?'),
           actionsAlignment: MainAxisAlignment.center,
           actionsPadding: const EdgeInsets.all(8),
           actions: <Widget>[
@@ -507,9 +515,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                               color:
                                   LMFeedCore.theme.onContainer.withOpacity(0.1),
                             )),
-                        onPostTap: (context, postData) {
-                          debugPrint('Post tapped');
-                        },
+                        onPostTap: (context, postData) {},
                       ),
                     ),
                   ),
@@ -722,7 +728,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           style: const LMFeedButtonStyle(),
         ),
         title: LMFeedText(
-          text: "Edit Post",
+          text: "Edit $postTitleFirstCap",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               fontSize: 18,
@@ -773,7 +779,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: "Can't create a post without heading",
+                        text:
+                            "Can't create a $postTitleSmallCap without heading",
                       ),
                     ),
                   );
@@ -784,7 +791,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: "Can't create a post without text",
+                        text: "Can't create a $postTitleSmallCap without text",
                       ),
                     ),
                   );
@@ -841,7 +848,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: "Can't create a post without text or attachments",
+                      text:
+                          "Can't create a $postTitleSmallCap without text or attachments",
                     ),
                   ),
                 );
@@ -862,8 +870,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         children: [
           (config?.enableHeading ?? false)
               ? TextField(
+                  focusNode: _headingFocusNode,
                   controller: _headingController,
                   textCapitalization: TextCapitalization.sentences,
+                  cursorColor: feedTheme.primaryColor,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
@@ -926,6 +936,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         LMFeedAnalyticsBloc.instance.add(
                           LMFeedFireAnalyticsEvent(
                             eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+                            widgetSource: LMFeedWidgetSource.editPostScreen,
                             deprecatedEventName:
                                 LMFeedAnalyticsKeysDep.userTaggedInPost,
                             eventProperties: {

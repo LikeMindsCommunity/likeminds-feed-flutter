@@ -67,8 +67,8 @@ class _LMImageState extends State<LMFeedImage> {
               padding: style?.padding,
               margin: style?.margin,
               decoration: BoxDecoration(
-                borderRadius: style!.borderRadius ?? BorderRadius.zero,
-              ),
+                  borderRadius: style!.borderRadius ?? BorderRadius.zero,
+                  color: style?.backgroundColor),
               clipBehavior: Clip.hardEdge,
               child: CachedNetworkImage(
                 cacheKey: widget.imageUrl!,
@@ -115,9 +115,12 @@ class _LMImageState extends State<LMFeedImage> {
               ),
             )
           : widget.imageFile != null
-              ? ClipRRect(
-                  clipBehavior: Clip.hardEdge,
-                  borderRadius: style!.borderRadius ?? BorderRadius.zero,
+              ? Container(
+                  padding: style?.padding,
+                  margin: style?.margin,
+                  decoration: BoxDecoration(
+                      borderRadius: style!.borderRadius ?? BorderRadius.zero,
+                      color: style?.backgroundColor),
                   child: Image.file(
                     widget.imageFile!,
                     height: style!.height,
@@ -138,6 +141,7 @@ class LMFeedPostImageStyle {
   final Color? borderColor;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
+  final Color? backgroundColor;
 
   final Widget? loaderWidget;
   final Widget? errorWidget;
@@ -157,6 +161,7 @@ class LMFeedPostImageStyle {
     this.boxFit,
     this.padding,
     this.margin,
+    this.backgroundColor,
   });
 
   LMFeedPostImageStyle copyWith({
@@ -171,6 +176,7 @@ class LMFeedPostImageStyle {
     BoxFit? boxFit,
     EdgeInsets? padding,
     EdgeInsets? margin,
+    Color? backgroundColor,
   }) {
     return LMFeedPostImageStyle(
       height: height ?? this.height,
@@ -184,6 +190,7 @@ class LMFeedPostImageStyle {
       boxFit: boxFit ?? this.boxFit,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
     );
   }
 

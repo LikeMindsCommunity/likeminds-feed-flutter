@@ -43,6 +43,11 @@ class LMFeedUserCreatedPostListView extends StatefulWidget {
 
 class _LMFeedUserCreatedPostListViewState
     extends State<LMFeedUserCreatedPostListView> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   static const int pageSize = 10;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -60,6 +65,7 @@ class _LMFeedUserCreatedPostListViewState
   final ValueNotifier postUploading = ValueNotifier(false);
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+  LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
 
   @override
   void initState() {
@@ -172,7 +178,6 @@ class _LMFeedUserCreatedPostListViewState
 
   @override
   Widget build(BuildContext context) {
-    LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
     return BlocListener(
       bloc: newPostBloc,
       listener: (context, state) {
@@ -229,13 +234,13 @@ class _LMFeedUserCreatedPostListViewState
           if (index != -1) {
             LMPostViewData updatePostViewData = feedRoomItemList![index];
             updatePostViewData = LMFeedPostUtils.updatePostData(
-                updatePostViewData, state.actionType);
+                postViewData: updatePostViewData, actionType: state.actionType);
           }
           _pagingController.itemList = feedRoomItemList;
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
         if (state is LMFeedEditPostUploadedState) {
-          LMPostViewData? item = state.postData;
+          LMPostViewData? item = state.postData.copyWith();
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
                   ?.indexWhere((element) => element.id == item.id) ??
@@ -268,13 +273,20 @@ class _LMFeedUserCreatedPostListViewState
                       const SizedBox(height: 2),
                       widget.postBuilder?.call(context, postWidget, item) ??
                           _widgetsBuilder.postWidgetBuilder(
-                              context, postWidget, item),
+                            context,
+                            postWidget,
+                            item,
+                            source: LMFeedWidgetSource.userFeed,
+                          ),
                     ],
                   );
                 },
                 noItemsFoundIndicatorBuilder: (context) {
                   return widget.noItemsFoundIndicatorBuilder?.call(context) ??
                       _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(context,
+                          isSelfPost:
+                              widget.uuid == currentUser?.sdkClientInfo.uuid ||
+                                  widget.uuid == currentUser?.uuid,
                           createPostButton: createPostButton());
                 },
                 firstPageProgressIndicatorBuilder: (context) =>
@@ -458,10 +470,10 @@ class _LMFeedUserCreatedPostListViewState
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete Post',
+                title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
                 content:
-                    'Are you sure you want to delete this post. This action can not be reversed.',
+                    'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
 
@@ -472,6 +484,7 @@ class _LMFeedUserCreatedPostListViewState
                     LMFeedFireAnalyticsEvent(
                       eventName: LMFeedAnalyticsKeys.postDeleted,
                       deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                      widgetSource: LMFeedWidgetSource.userFeed,
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
@@ -541,14 +554,12 @@ class _LMFeedUserCreatedPostListViewState
           );
         },
         onTap: () async {
-          if (postViewData.isLiked) {
-            postViewData.isLiked = false;
-            postViewData.likeCount -= 1;
-          } else {
-            postViewData.isLiked = true;
-            postViewData.likeCount += 1;
-          }
-          rebuildPostWidget.value = !rebuildPostWidget.value;
+          newPostBloc.add(LMFeedUpdatePostEvent(
+              postId: postViewData.id,
+              source: LMFeedWidgetSource.postDetailScreen,
+              actionType: postViewData.isLiked
+                  ? LMFeedPostActionType.unlike
+                  : LMFeedPostActionType.like));
 
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
@@ -557,6 +568,7 @@ class _LMFeedUserCreatedPostListViewState
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+              widgetSource: LMFeedWidgetSource.userFeed,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -612,13 +624,11 @@ class _LMFeedUserCreatedPostListViewState
   LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
         isActive: postViewData.isSaved,
         onTap: () async {
-          postViewData.isSaved = !postViewData.isSaved;
-          rebuildPostWidget.value = !rebuildPostWidget.value;
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
             postId: postViewData.id,
             actionType: postViewData.isSaved
-                ? LMFeedPostActionType.saved
-                : LMFeedPostActionType.unsaved,
+                ? LMFeedPostActionType.unsaved
+                : LMFeedPostActionType.saved,
           ));
 
           final savePostRequest =
@@ -628,21 +638,21 @@ class _LMFeedUserCreatedPostListViewState
               await LMFeedCore.client.savePost(savePostRequest);
 
           if (!response.success) {
-            postViewData.isSaved = !postViewData.isSaved;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
             LMFeedPostBloc.instance.add(
               LMFeedUpdatePostEvent(
                 postId: postViewData.id,
                 actionType: postViewData.isSaved
-                    ? LMFeedPostActionType.saved
-                    : LMFeedPostActionType.unsaved,
+                    ? LMFeedPostActionType.unsaved
+                    : LMFeedPostActionType.saved,
               ),
             );
           } else {
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+                    text: postViewData.isSaved
+                        ? "$postTitleFirstCap Saved"
+                        : "$postTitleFirstCap Unsaved"),
               ),
             );
           }
@@ -678,6 +688,7 @@ class _LMFeedUserCreatedPostListViewState
             LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
                 eventName: LMFeedAnalyticsKeys.postCreationStarted,
                 deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
+                widgetSource: LMFeedWidgetSource.userFeed,
                 eventProperties: {}));
 
             LMFeedVideoProvider.instance.forcePauseAllControllers();
@@ -701,7 +712,7 @@ class _LMFeedUserCreatedPostListViewState
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                  text: 'A post is already uploading.',
+                  text: 'A $postTitleSmallCap is already uploading.',
                 ),
               ),
             );
@@ -739,12 +750,11 @@ class _LMFeedUserCreatedPostListViewState
         borderRadius: 28,
         backgroundColor: feedThemeData.primaryColor,
         height: 44,
-        width: 153,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),
       text: LMFeedText(
-        text: "Create Post",
+        text: "Create $postTitleFirstCap",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             color: feedThemeData.onPrimary,
@@ -759,6 +769,7 @@ class _LMFeedUserCreatedPostListViewState
                     eventName: LMFeedAnalyticsKeys.postCreationStarted,
                     deprecatedEventName:
                         LMFeedAnalyticsKeysDep.postCreationStarted,
+                    widgetSource: LMFeedWidgetSource.userFeed,
                     eventProperties: {}));
 
                 LMFeedVideoProvider.instance.pauseCurrentVideo();
@@ -774,7 +785,7 @@ class _LMFeedUserCreatedPostListViewState
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: 'A post is already uploading.',
+                      text: 'A $postTitleSmallCap is already uploading.',
                     ),
                   ),
                 );
@@ -784,7 +795,8 @@ class _LMFeedUserCreatedPostListViewState
               LMFeedCore.showSnackBar(
                 LMFeedSnackBar(
                   content: LMFeedText(
-                    text: 'You do not have permission to create a post',
+                    text:
+                        'You do not have permission to create a $postTitleSmallCap',
                   ),
                 ),
               );
@@ -821,8 +833,11 @@ class _LMFeedUserCreatedPostListViewState
   }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
-    postViewData.isPinned = !postViewData.isPinned;
-    rebuildPostWidget.value = !rebuildPostWidget.value;
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+        postId: postViewData.id,
+        actionType: postViewData.isPinned
+            ? LMFeedPostActionType.pinned
+            : LMFeedPostActionType.unpinned));
 
     final pinPostRequest =
         (PinPostRequestBuilder()..postId(postViewData.id)).build();
@@ -830,15 +845,7 @@ class _LMFeedUserCreatedPostListViewState
     final PinPostResponse response =
         await LMFeedCore.client.pinPost(pinPostRequest);
 
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        postId: postViewData.id,
-        actionType: postViewData.isPinned
-            ? LMFeedPostActionType.pinned
-            : LMFeedPostActionType.unpinned));
-
     if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
-      rebuildPostWidget.value = !rebuildPostWidget.value;
       LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
           postId: postViewData.id,
           actionType: postViewData.isPinned
@@ -852,6 +859,7 @@ class _LMFeedUserCreatedPostListViewState
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.userFeed,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

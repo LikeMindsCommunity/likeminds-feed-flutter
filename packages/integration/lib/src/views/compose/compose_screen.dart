@@ -54,6 +54,10 @@ class LMFeedComposeScreen extends StatefulWidget {
 
 class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   /// Required blocs and data for basic functionality, or state management
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   final LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
@@ -65,6 +69,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMPostViewData? repost;
 
   /// Controllers and other helper classes' objects
+  FocusNode? _headingFocusNode;
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
   TextEditingController? _headingController;
@@ -92,7 +97,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     _headingController =
         (config?.enableHeading ?? false) ? TextEditingController() : null;
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
-    if (_focusNode.canRequestFocus) {
+    if (_headingController != null) {
+      _headingFocusNode = FocusNode();
+      _headingFocusNode?.requestFocus();
+    } else if (_focusNode.canRequestFocus) {
       _focusNode.requestFocus();
     }
   }
@@ -156,72 +164,70 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   Widget build(BuildContext context) {
     screenSize = MediaQuery.of(context).size;
 
-    return WillPopScope(
-      onWillPop: () {
-        widget.composeDiscardDialogBuilder?.call(context) ??
-            _showDefaultDiscardDialog(context);
-        return Future.value(false);
-      },
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: config!.composeSystemOverlayStyle,
-        child: GestureDetector(
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
-            bloc: composeBloc,
-            listener: _composeBlocListener,
-            child: widgetUtility.scaffold(
-              source: LMFeedWidgetSource.createPostScreen,
-              backgroundColor: feedTheme.container,
-              bottomSheet: _defMediaPicker(),
-              appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
-                  _defAppBar(),
-              floatingActionButton: Padding(
-                padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
-                child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
-                  bloc: composeBloc,
-                  buildWhen: (previous, current) {
-                    if (current is LMFeedComposeFetchedTopicsState) {
-                      return true;
-                    }
-                    return false;
-                  },
-                  builder: (context, state) {
-                    if (state is LMFeedComposeFetchedTopicsState) {
-                      return widget.composeTopicSelectorBuilder?.call(
-                              context,
-                              _defTopicSelector(state.topics),
-                              composeBloc.selectedTopics) ??
-                          LMFeedCore.widgetUtility
-                              .composeScreenTopicSelectorBuilder(
-                                  context,
-                                  _defTopicSelector(state.topics),
-                                  composeBloc.selectedTopics);
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: config!.composeSystemOverlayStyle,
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
+          bloc: composeBloc,
+          listener: _composeBlocListener,
+          child: widgetUtility.scaffold(
+            source: LMFeedWidgetSource.createPostScreen,
+            backgroundColor: feedTheme.container,
+            bottomSheet: _defMediaPicker(),
+            appBar:
+                widget.composeAppBarBuilder?.call(_defAppBar()) ?? _defAppBar(),
+            canPop: false,
+            onPopInvoked: (canPop) {
+              widget.composeDiscardDialogBuilder?.call(context) ??
+                  _showDefaultDiscardDialog(context);
+            },
+            floatingActionButton: Padding(
+              padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
+              child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
+                bloc: composeBloc,
+                buildWhen: (previous, current) {
+                  if (current is LMFeedComposeFetchedTopicsState) {
+                    return true;
+                  }
+                  return false;
+                },
+                builder: (context, state) {
+                  if (state is LMFeedComposeFetchedTopicsState) {
+                    return widget.composeTopicSelectorBuilder?.call(
+                            context,
+                            _defTopicSelector(state.topics),
+                            composeBloc.selectedTopics) ??
+                        LMFeedCore.widgetUtility
+                            .composeScreenTopicSelectorBuilder(
+                                context,
+                                _defTopicSelector(state.topics),
+                                composeBloc.selectedTopics);
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
-              body: SafeArea(
-                child: Container(
-                  margin: EdgeInsets.only(
-                    bottom: 150,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 18),
-                        widget.composeUserHeaderBuilder?.call(context, user!) ??
-                            widgetUtility.composeScreenUserHeaderBuilder(
-                                context, user!),
-                        const SizedBox(height: 18),
-                        widget.composeContentBuilder?.call() ??
-                            _defContentInput(),
-                        const SizedBox(height: 18),
-                        widget.composeMediaPreviewBuilder?.call() ??
-                            _defMediaPreview(),
-                        const SizedBox(height: 150),
-                      ],
-                    ),
+            ),
+            body: SafeArea(
+              child: Container(
+                margin: EdgeInsets.only(
+                  bottom: 150,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 18),
+                      widget.composeUserHeaderBuilder?.call(context, user!) ??
+                          widgetUtility.composeScreenUserHeaderBuilder(
+                              context, user!),
+                      const SizedBox(height: 18),
+                      widget.composeContentBuilder?.call() ??
+                          _defContentInput(),
+                      const SizedBox(height: 18),
+                      widget.composeMediaPreviewBuilder?.call() ??
+                          _defMediaPreview(),
+                      const SizedBox(height: 150),
+                    ],
                   ),
                 ),
               ),
@@ -239,9 +245,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         style: const TextStyle(),
         child: AlertDialog(
           backgroundColor: feedTheme.container,
-          title: const Text('Discard Post'),
-          content:
-              const Text('Are you sure you want to discard the current post?'),
+          title: Text('Discard $postTitleFirstCap'),
+          content: Text(
+              'Are you sure you want to discard the current $postTitleSmallCap?'),
           actionsAlignment: MainAxisAlignment.center,
           actionsPadding: const EdgeInsets.all(8),
           actions: <Widget>[
@@ -384,41 +390,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 Widget mediaWidget;
                 switch (composeBloc.postMedia[index].mediaType) {
                   case LMMediaType.image:
-                    mediaWidget = Container(
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        color: feedTheme.onContainer,
-                        borderRadius:
-                            style?.mediaStyle?.imageStyle?.borderRadius,
-                      ),
-                      height: style?.mediaStyle?.imageStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.imageStyle?.width ??
-                          screenSize?.width,
-                      child: LMFeedImage(
-                        imageFile: composeBloc.postMedia[index].mediaFile,
-                        style: style?.mediaStyle?.imageStyle,
-                      ),
+                    mediaWidget = LMFeedImage(
+                      imageFile: composeBloc.postMedia[index].mediaFile,
+                      style: style?.mediaStyle?.imageStyle,
                     );
                     break;
                   case LMMediaType.video:
-                    mediaWidget = Container(
-                      clipBehavior: Clip.hardEdge,
-                      height: style?.mediaStyle?.videoStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.videoStyle?.width ??
-                          screenSize?.width,
-                      decoration: BoxDecoration(
-                        color: feedTheme.onContainer,
-                        borderRadius:
-                            style?.mediaStyle?.videoStyle?.borderRadius,
-                      ),
-                      child: LMFeedVideo(
-                        videoFile: composeBloc.postMedia[index].mediaFile,
-                        style: style?.mediaStyle?.videoStyle,
-                        postId: composeBloc.postMedia[index].mediaFile!.uri
-                            .toString(),
-                      ),
+                    mediaWidget = LMFeedVideo(
+                      videoFile: composeBloc.postMedia[index].mediaFile,
+                      style: style?.mediaStyle?.videoStyle,
+                      postId:
+                          "${composeBloc.postMedia[index].mediaFile!.uri.toString()}$index",
                     );
                     break;
                   case LMMediaType.link:
@@ -475,29 +457,25 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     break;
                   case LMMediaType.document:
                     {
-                      mediaWidget = Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                        child: LMFeedDocument(
-                          onRemove: () {
-                            composeBloc.add(
-                              LMFeedComposeRemoveAttachmentEvent(
-                                index: index,
-                              ),
-                            );
-                          },
-                          documentFile: composeBloc.postMedia[index].mediaFile,
-                          style: style?.mediaStyle?.documentStyle?.copyWith(
-                                width:
-                                    style?.mediaStyle?.documentStyle?.width ??
-                                        MediaQuery.of(context).size.width,
-                              ) ??
-                              LMFeedPostDocumentStyle(
-                                width: screenSize!.width,
-                                height: 90,
-                              ),
-                          size: PostHelper.getFileSizeString(
-                              bytes: composeBloc.postMedia[index].size ?? 0),
-                        ),
+                      mediaWidget = LMFeedDocument(
+                        onRemove: () {
+                          composeBloc.add(
+                            LMFeedComposeRemoveAttachmentEvent(
+                              index: index,
+                            ),
+                          );
+                        },
+                        documentFile: composeBloc.postMedia[index].mediaFile,
+                        style: style?.mediaStyle?.documentStyle?.copyWith(
+                              width: style?.mediaStyle?.documentStyle?.width ??
+                                  MediaQuery.of(context).size.width,
+                            ) ??
+                            LMFeedPostDocumentStyle(
+                              width: screenSize!.width,
+                              height: 90,
+                            ),
+                        size: PostHelper.getFileSizeString(
+                            bytes: composeBloc.postMedia[index].size ?? 0),
                       );
                       break;
                     }
@@ -516,10 +494,16 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           right: 7.5,
                           child: GestureDetector(
                             onTap: () {
-                              if (composeBloc.postMedia[index].mediaType ==
-                                  LMMediaType.link) {
+                              LMMediaModel removedMedia =
+                                  composeBloc.postMedia[index];
+                              if (removedMedia.mediaType == LMMediaType.link) {
                                 linkCancelled = true;
+                              } else if (removedMedia.mediaType ==
+                                  LMMediaType.video) {
+                                LMFeedVideoProvider.instance.clearPostController(
+                                    "${removedMedia.mediaFile!.uri.toString()}$index");
                               }
+
                               composeBloc.add(
                                 LMFeedComposeRemoveAttachmentEvent(
                                   index: index,
@@ -586,7 +570,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           style: const LMFeedButtonStyle(),
         ),
         title: LMFeedText(
-          text: "Create Post",
+          text: "Create $postTitleFirstCap",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               fontSize: 18,
@@ -598,7 +582,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         trailing: [
           LMFeedButton(
             text: LMFeedText(
-              text: "Post",
+              text: "Create",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   color: theme.onPrimary,
@@ -609,9 +593,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             ),
             style: LMFeedButtonStyle(
               backgroundColor: theme.primaryColor,
-              width: 48,
               borderRadius: 6,
               height: 34,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
             ),
             onTap: () {
               _focusNode.unfocus();
@@ -635,7 +620,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: "Can't create a post without heading",
+                        text:
+                            "Can't create a $postTitleSmallCap without heading",
                       ),
                     ),
                   );
@@ -646,7 +632,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: "Can't create a post without text",
+                        text: "Can't create a $postTitleSmallCap without text",
                       ),
                     ),
                   );
@@ -659,7 +645,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   LMFeedCore.showSnackBar(
                     LMFeedSnackBar(
                       content: LMFeedText(
-                        text: "Can't create a post without topic",
+                        text: "Can't create a $postTitleSmallCap without topic",
                       ),
                     ),
                   );
@@ -699,7 +685,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 LMFeedCore.showSnackBar(
                   LMFeedSnackBar(
                     content: LMFeedText(
-                      text: "Can't create a post without text or attachments",
+                      text:
+                          "Can't create a $postTitleSmallCap without text or attachments",
                     ),
                   ),
                 );
@@ -719,26 +706,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       child: Column(
         children: [
           (config?.enableHeading ?? false)
-              ? TextField(
-                  controller: _headingController,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    hintText: config?.headingHint,
-                    hintStyle: TextStyle(
-                      color: theme.onContainer.withOpacity(0.5),
-                    ),
-                  ),
-                  style: TextStyle(
-                    color: theme.onContainer,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+              ? LMFeedCore.widgetUtility.composeScreenHeadingTextfieldBuilder(
+                  context,
+                  _defHeadingTextfield(theme),
                 )
               : const SizedBox.shrink(),
           Row(
@@ -761,51 +731,89 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               Column(
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width - 82,
-                    decoration: BoxDecoration(
-                      color: theme.container,
-                    ),
-                    child: LMTaggingAheadTextField(
-                      isDown: true,
-                      minLines: 3,
-                      enabled: config!.enableTagging,
-                      // maxLines: 200,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        focusedErrorBorder: InputBorder.none,
-                        hintText: config?.composeHint,
+                      width: MediaQuery.of(context).size.width - 82,
+                      decoration: BoxDecoration(
+                        color: theme.container,
                       ),
-                      onTagSelected: (tag) {
-                        composeBloc.userTags.add(tag);
-                        LMFeedAnalyticsBloc.instance.add(
-                          LMFeedFireAnalyticsEvent(
-                            eventName: LMFeedAnalyticsKeys.userTaggedInPost,
-                            deprecatedEventName:
-                                LMFeedAnalyticsKeysDep.userTaggedInPost,
-                            eventProperties: {
-                              'tagged_user_id':
-                                  tag.sdkClientInfo?.uuid ?? tag.uuid,
-                              'tagged_user_count':
-                                  composeBloc.userTags.length.toString(),
-                            },
-                          ),
-                        );
-                      },
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      onChange: _onTextChanged,
-                    ),
-                  ),
+                      child: LMFeedCore.widgetUtility
+                          .composeScreenContentTextfieldBuilder(
+                        context,
+                        _defContentTextField(),
+                      )),
                   const SizedBox(height: 24),
                 ],
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  LMTaggingAheadTextField _defContentTextField() {
+    return LMTaggingAheadTextField(
+      isDown: true,
+      minLines: 3,
+      enabled: config!.enableTagging,
+      // maxLines: 200,
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        hintText: config?.composeHint,
+        hintStyle: TextStyle(
+          overflow: TextOverflow.visible,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: feedTheme.onContainer.withOpacity(0.5),
+        ),
+      ),
+      onTagSelected: (tag) {
+        composeBloc.userTags.add(tag);
+        LMFeedAnalyticsBloc.instance.add(
+          LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+            deprecatedEventName: LMFeedAnalyticsKeysDep.userTaggedInPost,
+            widgetSource: LMFeedWidgetSource.createPostScreen,
+            eventProperties: {
+              'tagged_user_id': tag.sdkClientInfo?.uuid ?? tag.uuid,
+              'tagged_user_count': composeBloc.userTags.length.toString(),
+            },
+          ),
+        );
+      },
+      controller: _controller,
+      focusNode: _focusNode,
+      onChange: _onTextChanged,
+    );
+  }
+
+  TextField _defHeadingTextfield(LMFeedThemeData theme) {
+    return TextField(
+      focusNode: _headingFocusNode,
+      controller: _headingController,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        hintText: config?.headingHint,
+        hintStyle: TextStyle(
+          color: theme.onContainer.withOpacity(0.5),
+          overflow: TextOverflow.visible,
+        ),
+      ),
+      cursorColor: theme.primaryColor,
+      style: TextStyle(
+        color: theme.onContainer,
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
       ),
     );
   }
@@ -1121,6 +1129,7 @@ void sendPostCreationCompletedEvent(
 
   LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.postCreationCompleted,
+    widgetSource: LMFeedWidgetSource.createPostScreen,
     deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationCompleted,
     eventProperties: propertiesMap,
   ));

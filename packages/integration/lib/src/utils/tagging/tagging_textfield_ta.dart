@@ -31,6 +31,32 @@ class LMTaggingAheadTextField extends StatefulWidget {
 
   @override
   State<LMTaggingAheadTextField> createState() => _TaggingAheadTextFieldState();
+
+  LMTaggingAheadTextField copyWith({
+    bool? isDown,
+    FocusNode? focusNode,
+    Function(LMUserTagViewData)? onTagSelected,
+    TextEditingController? controller,
+    InputDecoration? decoration,
+    Function(String)? onChange,
+    int? maxLines,
+    int? minLines,
+    bool? enabled,
+    ScrollPhysics? scrollPhysics,
+  }) {
+    return LMTaggingAheadTextField(
+      isDown: isDown ?? this.isDown,
+      focusNode: focusNode ?? this.focusNode,
+      onTagSelected: onTagSelected ?? this.onTagSelected,
+      controller: controller ?? this.controller,
+      decoration: decoration ?? this.decoration,
+      onChange: onChange ?? this.onChange,
+      maxLines: maxLines ?? this.maxLines,
+      minLines: minLines ?? this.minLines,
+      enabled: enabled ?? this.enabled,
+      scrollPhysics: scrollPhysics ?? this.scrollPhysics,
+    );
+  }
 }
 
 class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {

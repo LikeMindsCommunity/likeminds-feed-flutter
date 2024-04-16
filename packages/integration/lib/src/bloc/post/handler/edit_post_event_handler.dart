@@ -88,6 +88,7 @@ void editPostEventHandler(
             repostedPosts: respostedPost,
             users: users,
             topics: topics,
+            userTopics: response.userTopics,
           ),
           userData: users,
           topics: topics,

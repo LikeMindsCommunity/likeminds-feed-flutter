@@ -17,6 +17,7 @@ addDocumentEventHandler(
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
     deprecatedEventName: LMFeedAnalyticsKeysDep.clickedOnAttachment,
+    widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'file'},
   ));
   final result = await LMFeedMediaHandler.handlePermissions(3);
@@ -35,6 +36,7 @@ addDocumentEventHandler(
           LMFeedFireAnalyticsEvent(
             eventName: LMFeedAnalyticsKeys.documentAttachedInPost,
             deprecatedEventName: LMFeedAnalyticsKeysDep.documentAttachedInPost,
+            widgetSource: LMFeedWidgetSource.createPostScreen,
             eventProperties: {
               'imageCount': countOfPickedDocument,
             },

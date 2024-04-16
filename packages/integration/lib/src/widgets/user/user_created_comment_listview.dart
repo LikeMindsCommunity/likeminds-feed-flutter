@@ -39,10 +39,19 @@ class LMFeedUserCreatedCommentListView extends StatefulWidget {
 
 class _LMFeedUserCreatedCommentListViewState
     extends State<LMFeedUserCreatedCommentListView> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
+  String commentTitleSmallPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   static const int pageSize = 10;
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
+  LMUserViewData? userViewData = LMFeedLocalPreference.instance.fetchUserData();
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedThemeData? feedThemeData;
   final ValueNotifier postUploading = ValueNotifier(false);
@@ -99,7 +108,7 @@ class _LMFeedUserCreatedCommentListViewState
         bloc: lmFeedPostBloc,
         listener: (context, state) {
           if (state is LMFeedEditPostUploadedState) {
-            _posts[state.postData.id] = state.postData;
+            _posts[state.postData.id] = state.postData.copyWith();
 
             rebuildPostWidget.value = !rebuildPostWidget.value;
           }
@@ -107,7 +116,8 @@ class _LMFeedUserCreatedCommentListViewState
             LMPostViewData? post = _posts[state.postId];
 
             if (post != null) {
-              post = LMFeedPostUtils.updatePostData(post, state.actionType);
+              post = LMFeedPostUtils.updatePostData(
+                  postViewData: post, actionType: state.actionType);
               _posts[state.postId] = post;
               rebuildPostWidget.value = !rebuildPostWidget.value;
             }
@@ -143,7 +153,9 @@ class _LMFeedUserCreatedCommentListViewState
                           widget.postBuilder?.call(
                                   context, postWidget, _posts[item.postId]!) ??
                               LMFeedCore.widgetUtility.postWidgetBuilder.call(
-                                  context, postWidget, _posts[item.postId]!),
+                                  context, postWidget, _posts[item.postId]!,
+                                  source: LMFeedWidgetSource
+                                      .userCreatedCommentScreen),
                           const Divider(),
                         ],
                       );
@@ -356,10 +368,10 @@ class _LMFeedUserCreatedCommentListViewState
               showDialog(
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Post',
+                  title: 'Delete $postTitleFirstCap',
                   uuid: postViewData.uuid,
                   content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
+                      'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
@@ -367,6 +379,8 @@ class _LMFeedUserCreatedCommentListViewState
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                        widgetSource:
+                            LMFeedWidgetSource.userCreatedCommentScreen,
                         eventProperties: {
                           "post_id": postViewData.id,
                         },
@@ -421,6 +435,7 @@ class _LMFeedUserCreatedCommentListViewState
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+              widgetSource: LMFeedWidgetSource.userCreatedCommentScreen,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -503,7 +518,9 @@ class _LMFeedUserCreatedCommentListViewState
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                    text: postViewData.isSaved ? "Post Saved" : "Post Unsaved"),
+                    text: postViewData.isSaved
+                        ? "$postTitleFirstCap Saved"
+                        : "$postTitleFirstCap Unsaved"),
               ),
             );
           }
@@ -539,6 +556,7 @@ class _LMFeedUserCreatedCommentListViewState
             LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
                 eventName: LMFeedAnalyticsKeys.postCreationStarted,
                 deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
+                widgetSource: LMFeedWidgetSource.userCreatedCommentScreen,
                 eventProperties: {}));
 
             LMFeedVideoProvider.instance.forcePauseAllControllers();
@@ -562,7 +580,7 @@ class _LMFeedUserCreatedCommentListViewState
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                  text: 'A post is already uploading.',
+                  text: 'A $postTitleSmallCap is already uploading.',
                 ),
               ),
             );
@@ -598,8 +616,8 @@ class _LMFeedUserCreatedCommentListViewState
               ),
             ),
             const SizedBox(height: 12),
-            const LMFeedText(
-              text: 'No Replies to show',
+            LMFeedText(
+              text: 'No $commentTitleSmallPlural to show',
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 24,
@@ -608,82 +626,6 @@ class _LMFeedUserCreatedCommentListViewState
               ),
             ),
             const SizedBox(height: 12),
-            const LMFeedText(
-              text: "Be the first one to post here",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: LikeMindsTheme.greyColor,
-                ),
-              ),
-            ),
-            const SizedBox(height: 28),
-            LMFeedButton(
-              style: LMFeedButtonStyle(
-                icon: LMFeedIcon(
-                  type: LMFeedIconType.icon,
-                  icon: Icons.add,
-                  style: LMFeedIconStyle(
-                    color: feedThemeData?.onPrimary,
-                    size: 18,
-                  ),
-                ),
-                borderRadius: 28,
-                backgroundColor: feedThemeData?.primaryColor,
-                height: 44,
-                width: 153,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                placement: LMFeedIconButtonPlacement.end,
-              ),
-              text: LMFeedText(
-                text: "Create Post",
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    color: feedThemeData?.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              onTap: userPostingRights
-                  ? () async {
-                      if (!postUploading.value) {
-                        LMFeedAnalyticsBloc.instance.add(
-                            const LMFeedFireAnalyticsEvent(
-                                eventName:
-                                    LMFeedAnalyticsKeys.postCreationStarted,
-                                deprecatedEventName:
-                                    LMFeedAnalyticsKeysDep.postCreationStarted,
-                                eventProperties: {}));
-
-                        LMFeedVideoProvider.instance.pauseCurrentVideo();
-                        // ignore: use_build_context_synchronously
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LMFeedComposeScreen(),
-                          ),
-                        );
-                        LMFeedVideoProvider.instance.playCurrentVideo();
-                      } else {
-                        LMFeedCore.showSnackBar(
-                          LMFeedSnackBar(
-                            content: LMFeedText(
-                              text: 'A post is already uploading.',
-                            ),
-                          ),
-                        );
-                      }
-                    }
-                  : () => LMFeedCore.showSnackBar(
-                        LMFeedSnackBar(
-                          content: const Text(
-                            'You do not have permission to create a post',
-                          ),
-                        ),
-                      ),
-            ),
           ],
         ),
       );
@@ -719,6 +661,7 @@ class _LMFeedUserCreatedCommentListViewState
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.userCreatedCommentScreen,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

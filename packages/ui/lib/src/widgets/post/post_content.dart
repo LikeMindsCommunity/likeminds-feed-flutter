@@ -38,8 +38,9 @@ class LMFeedPostContent extends StatelessWidget {
                   LMFeedExpandableText(
                     heading!,
                     expandText: "",
-                    expanded: true,
                     collapseText: "",
+                    expanded: expanded,
+                    maxLines: contentStyle.headingVisibleLines ?? 2,
                     hashtagStyle: contentStyle.linkStyle ??
                         Theme.of(context)
                             .textTheme
@@ -113,6 +114,7 @@ class LMFeedPostContentStyle {
   final TextAlign? textAlign;
   final String? expandText;
   final bool? animation;
+  final int? headingVisibleLines;
   final int? visibleLines;
   final double? width;
   final double? height;
@@ -132,6 +134,7 @@ class LMFeedPostContentStyle {
     this.height,
     this.padding,
     this.margin,
+    this.headingVisibleLines,
     this.headingSeparator = const SizedBox.shrink(),
   });
 
@@ -144,6 +147,7 @@ class LMFeedPostContentStyle {
     String? expandText,
     bool? animation,
     int? visibleLines,
+    int? headingVisibleLines,
     double? width,
     double? height,
     EdgeInsets? padding,
@@ -164,6 +168,7 @@ class LMFeedPostContentStyle {
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
       headingSeparator: headingSeparator ?? this.headingSeparator,
+      headingVisibleLines: headingVisibleLines ?? this.headingVisibleLines,
     );
   }
 

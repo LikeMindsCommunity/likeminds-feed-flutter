@@ -15,6 +15,7 @@ class LMFeedPostDetailScreenHandler {
   Map<String, LMWidgetViewData> widgets = {};
   Map<String, List<String>> userTopics = {};
   LMPostViewData? postData;
+  int commentListPageSize = 10;
 
   LMFeedPostDetailScreenHandler(
       PagingController<int, LMCommentViewData> commetListPagingController,
@@ -24,11 +25,13 @@ class LMFeedPostDetailScreenHandler {
     commentHandlerBloc = LMFeedCommentBloc.instance;
     commentController = TextEditingController();
     focusNode = FocusNode();
+    addCommentListPaginationListener();
   }
 
   Future<LMPostViewData?> fetchCommentListWithPage(int page) async {
     PostDetailRequest postDetailRequest = (PostDetailRequestBuilder()
           ..postId(postId)
+          ..pageSize(commentListPageSize)
           ..page(page))
         .build();
 
@@ -90,6 +93,10 @@ class LMFeedPostDetailScreenHandler {
         userTopics: userTopics,
       );
 
+      if (page == 1) {
+        rebuildPostWidget.value = !rebuildPostWidget.value;
+      }
+
       final List<LMCommentViewData> commentList = postViewData.replies;
 
       addCommentListToController(commentList, page + 1);
@@ -109,7 +116,7 @@ class LMFeedPostDetailScreenHandler {
 
   void addCommentListToController(
       List<LMCommentViewData> commentList, int nextPageKey) {
-    final isLastPage = commentList.length < 10;
+    final isLastPage = commentList.length < commentListPageSize;
     if (isLastPage) {
       commentListPagingController.appendLastPage(commentList);
     } else {
@@ -198,11 +205,13 @@ class LMFeedPostDetailScreenHandler {
         }
       case const (LMFeedCommentSuccessState<DeleteCommentResponse>):
         {
+          String commentTitle = LMFeedPostUtils.getCommentTitle(
+              LMFeedPluralizeWordAction.firstLetterCapitalSingular);
           // Show the toast message for comment deleted
           LMFeedCore.showSnackBar(
             LMFeedSnackBar(
               content: LMFeedText(
-                text: 'Comment Deleted',
+                text: '$commentTitle Deleted',
               ),
             ),
           );
@@ -314,6 +323,7 @@ class LMFeedPostDetailScreenHandler {
 
   void addTempReplyCommentToController(
       String tempId, String text, int level, String parentId, bool replyShown) {
+    DateTime createdAt = DateTime.now();
     LMUserViewData? currentUser =
         LMFeedLocalPreference.instance.fetchUserData();
 
@@ -326,8 +336,8 @@ class LMFeedPostDetailScreenHandler {
           ..isEdited(false)
           ..repliesCount(0)
           ..menuItems([])
-          ..createdAt(DateTime.now())
-          ..updatedAt(DateTime.now())
+          ..createdAt(createdAt)
+          ..updatedAt(createdAt)
           ..isLiked(false)
           ..user(currentUser)
           ..tempId(tempId))
@@ -353,6 +363,7 @@ class LMFeedPostDetailScreenHandler {
 
   void addTempCommentToController(String tempId, String text, int level,
       {DateTime? createdTime}) {
+    DateTime createdAt = DateTime.now();
     LMUserViewData currentUser =
         LMFeedLocalPreference.instance.fetchUserData()!;
 
@@ -365,8 +376,8 @@ class LMFeedPostDetailScreenHandler {
           ..isEdited(false)
           ..repliesCount(0)
           ..menuItems([])
-          ..createdAt(createdTime ?? DateTime.now())
-          ..updatedAt(createdTime ?? DateTime.now())
+          ..createdAt(createdTime ?? createdAt)
+          ..updatedAt(createdTime ?? createdAt)
           ..isLiked(false)
           ..user(currentUser)
           ..tempId(tempId))
@@ -383,6 +394,7 @@ class LMFeedPostDetailScreenHandler {
       commentViewData.isEdited = true;
       commentViewData.text = editedText;
       commentListPagingController.itemList![index] = commentViewData;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
     }
   }
 

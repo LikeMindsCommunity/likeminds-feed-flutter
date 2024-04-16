@@ -91,6 +91,37 @@ class LMPostViewData {
     this.topComments,
     this.tempId,
   });
+
+  LMPostViewData copyWith() {
+    return LMPostViewData._(
+      id: id,
+      text: text,
+      attachments: attachments,
+      communityId: communityId,
+      isPinned: isPinned,
+      uuid: uuid,
+      user: user,
+      likeCount: likeCount,
+      isSaved: isSaved,
+      topics: topics,
+      menuItems: menuItems,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      isLiked: isLiked,
+      commentCount: commentCount,
+      isEdited: isEdited,
+      replies: replies,
+      isRepost: isRepost,
+      isRepostedByUser: isRepostedByUser,
+      repostCount: repostCount,
+      isDeleted: isDeleted,
+      widgets: widgets,
+      commentIds: commentIds,
+      heading: heading,
+      topComments: topComments,
+      tempId: tempId,
+    );
+  }
 }
 
 class LMPostViewDataBuilder {

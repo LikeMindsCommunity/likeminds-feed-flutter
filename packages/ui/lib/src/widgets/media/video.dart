@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -112,11 +111,8 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   @override
   void didUpdateWidget(LMFeedVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.videoUrl != widget.videoUrl) {
-      controller?.player.pause();
-      isMuted = LMFeedVideoProvider.instance.isMuted;
-      initialiseVideo = initialiseControllers();
-    }
+    isMuted = LMFeedVideoProvider.instance.isMuted;
+    initialiseVideo = initialiseControllers();
   }
 
   @override
@@ -197,7 +193,12 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
               future: initialiseVideo,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const LMPostMediaShimmer();
+                  return LMPostMediaShimmer(
+                    style: LMPostMediaShimmerStyle(
+                      width: widget.style?.width ?? screenSize.width,
+                      height: widget.style?.height,
+                    ),
+                  );
                 } else if (snapshot.connectionState == ConnectionState.done) {
                   if (!initialiseOverlay) {
                     _timer =

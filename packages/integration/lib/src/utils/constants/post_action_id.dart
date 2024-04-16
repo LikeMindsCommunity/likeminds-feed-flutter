@@ -9,3 +9,7 @@ const int postEditId = 5;
 const int commentDeleteId = 6;
 const int commentReportId = 7;
 const int commentEditId = 8;
+
+const int postEntityId = 5;
+const int commentEntityId = 6;
+const int replyEntityId = 7;

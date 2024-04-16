@@ -17,6 +17,7 @@ addImageEventHandler(
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
     deprecatedEventName: LMFeedAnalyticsKeysDep.clickedOnAttachment,
+    widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'image'},
   ));
   final result = await LMFeedMediaHandler.handlePermissions(1);
@@ -32,6 +33,7 @@ addImageEventHandler(
           LMFeedFireAnalyticsEvent(
             eventName: LMFeedAnalyticsKeys.imageAttachedToPost,
             deprecatedEventName: LMFeedAnalyticsKeysDep.imageAttachedToPost,
+            widgetSource: LMFeedWidgetSource.createPostScreen,
             eventProperties: {
               'imageCount': countOfPickedImages,
             },

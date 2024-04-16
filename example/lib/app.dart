@@ -3,68 +3,45 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMSampleApp extends StatefulWidget {
-  final String? uuid;
-  final String userName;
-  const LMSampleApp({super.key, this.uuid, required this.userName});
+  final String? accessToken;
+  final String? refreshToken;
+  const LMSampleApp({super.key, this.accessToken, required this.refreshToken});
 
   @override
   State<LMSampleApp> createState() => _LMSampleAppState();
 }
 
 class _LMSampleAppState extends State<LMSampleApp> {
-  Future<InitiateUserResponse>? initiateUser;
-  Future<MemberStateResponse>? memberState;
+  Future<LMResponse>? initialiseFeed;
 
   @override
   void initState() {
     super.initState();
-    callInitiateUser();
+    callValidateUser();
   }
 
-  void callInitiateUser() {
-    InitiateUserRequestBuilder request = InitiateUserRequestBuilder();
+  void callValidateUser() {
+    ValidateUserRequestBuilder request = ValidateUserRequestBuilder();
 
-    if (widget.uuid != null && widget.uuid!.isNotEmpty) {
-      request.uuid(widget.uuid!);
+    if (widget.accessToken != null && widget.accessToken!.isNotEmpty) {
+      request.accessToken(widget.accessToken!);
     }
 
-    if (widget.userName.isNotEmpty) {
-      request.userName(widget.userName);
+    if (widget.refreshToken != null && widget.refreshToken!.isNotEmpty) {
+      request.refreshToken(widget.refreshToken!);
     }
 
-    initiateUser = LMFeedCore.instance.initiateUser(request.build())
-      ..then(
-        (value) async {
-          if (value.success) {
-            memberState = LMFeedCore.instance.getMemberState();
-          }
-        },
-      );
+    initialiseFeed = LMFeedCore.instance.initialiseFeed(request.build());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future: initiateUser,
+        future: initialiseFeed,
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data!.success) {
-            return FutureBuilder(
-                future: memberState,
-                builder: (context, snapshot) {
-                  if (ConnectionState.done == snapshot.connectionState &&
-                      snapshot.hasData &&
-                      snapshot.data!.success) {
-                    return const LMFeedScreen();
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const LMFeedLoader();
-                  } else {
-                    return const Center(
-                      child: Text("An error occurred"),
-                    );
-                  }
-                });
+            return const LMFeedScreen();
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return const LMFeedLoader();
           } else {
@@ -73,16 +50,17 @@ class _LMSampleAppState extends State<LMSampleApp> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 LikeMindsTheme.kVerticalPaddingLarge,
-                const Center(
+                Center(
                   child: LMFeedText(
-                    text: "An error occurred, please try again later",
-                    style: LMFeedTextStyle(textAlign: TextAlign.center),
+                    text: snapshot.data?.errorMessage ??
+                        "An error occurred, please try again later",
+                    style: const LMFeedTextStyle(textAlign: TextAlign.center),
                   ),
                 ),
                 LikeMindsTheme.kVerticalPaddingLarge,
                 GestureDetector(
                   onTap: () {
-                    callInitiateUser();
+                    callValidateUser();
                     setState(() {});
                   },
                   child: Container(

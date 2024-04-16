@@ -28,6 +28,16 @@ class LMFeedAddLocalReplyEvent extends LMFeedCommentRepliesEvent {
   List<Object?> get props => [comment];
 }
 
+class LMFeedEditLocalReplyEvent extends LMFeedCommentRepliesEvent {
+  final String text;
+  final String replyId;
+
+  const LMFeedEditLocalReplyEvent({required this.text, required this.replyId});
+
+  @override
+  List<Object?> get props => [text];
+}
+
 class LMFeedDeleteLocalReplyEvent extends LMFeedCommentRepliesEvent {
   final String replyId;
 
