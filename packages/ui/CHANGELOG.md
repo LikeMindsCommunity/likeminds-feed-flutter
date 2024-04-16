@@ -27,3 +27,9 @@ Added topic categories and bug fixes
 Upgrading video management
 Adding Feedroom support
 Adding multiple media support
+
+## 1.2.0
+
+Adding API Security
+Adding Post and Comment as variable
+Fixing minor bugs
