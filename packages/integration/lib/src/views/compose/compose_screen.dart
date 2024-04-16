@@ -399,8 +399,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     mediaWidget = LMFeedVideo(
                       videoFile: composeBloc.postMedia[index].mediaFile,
                       style: style?.mediaStyle?.videoStyle,
-                      postId: composeBloc.postMedia[index].mediaFile!.uri
-                          .toString(),
+                      postId:
+                          "${composeBloc.postMedia[index].mediaFile!.uri.toString()}$index",
                     );
                     break;
                   case LMMediaType.link:
