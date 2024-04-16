@@ -269,6 +269,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                         child: LMFeedLoader(),
                                       );
                                     },
+                                    newPageProgressIndicatorBuilder: (context) {
+                                      return _widgetBuilder
+                                          .newPageProgressIndicatorBuilderFeed(
+                                              context);
+                                    },
                                     noItemsFoundIndicatorBuilder: (context) =>
                                         const LMFeedEmptyCommentWidget(),
                                     itemBuilder:
