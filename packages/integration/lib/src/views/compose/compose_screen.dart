@@ -494,10 +494,16 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                           right: 7.5,
                           child: GestureDetector(
                             onTap: () {
-                              if (composeBloc.postMedia[index].mediaType ==
-                                  LMMediaType.link) {
+                              LMMediaModel removedMedia =
+                                  composeBloc.postMedia[index];
+                              if (removedMedia.mediaType == LMMediaType.link) {
                                 linkCancelled = true;
+                              } else if (removedMedia.mediaType ==
+                                  LMMediaType.video) {
+                                LMFeedVideoProvider.instance.clearPostController(
+                                    "${removedMedia.mediaFile!.uri.toString()}$index");
                               }
+
                               composeBloc.add(
                                 LMFeedComposeRemoveAttachmentEvent(
                                   index: index,
