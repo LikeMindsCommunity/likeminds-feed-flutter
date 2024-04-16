@@ -284,6 +284,9 @@ class _LMFeedUserCreatedPostListViewState
                 noItemsFoundIndicatorBuilder: (context) {
                   return widget.noItemsFoundIndicatorBuilder?.call(context) ??
                       _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(context,
+                          isSelfPost:
+                              widget.uuid == currentUser?.sdkClientInfo.uuid ||
+                                  widget.uuid == currentUser?.uuid,
                           createPostButton: createPostButton());
                 },
                 firstPageProgressIndicatorBuilder: (context) =>
@@ -747,7 +750,6 @@ class _LMFeedUserCreatedPostListViewState
         borderRadius: 28,
         backgroundColor: feedThemeData.primaryColor,
         height: 44,
-        width: 153,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),

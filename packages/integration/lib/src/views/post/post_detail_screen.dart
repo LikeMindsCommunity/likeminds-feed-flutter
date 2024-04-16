@@ -129,7 +129,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.postId != widget.postId) {
       _pagingController.itemList?.clear();
-      _pagingController.refresh();
       _postDetailScreenHandler =
           LMFeedPostDetailScreenHandler(_pagingController, widget.postId);
       updatePostAndCommentData();
@@ -148,10 +147,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return Scaffold(
       body: RefreshIndicator.adaptive(
         onRefresh: () {
-          _pagingController.itemList?.clear();
           _pagingController.refresh();
           _commentRepliesBloc.add(LMFeedClearCommentRepliesEvent());
-          updatePostAndCommentData();
           return Future.value();
         },
         color: feedTheme.primaryColor,
@@ -192,6 +189,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     valueListenable:
                         _postDetailScreenHandler!.rebuildPostWidget,
                     builder: (context, _, __) {
+                      if (_postDetailScreenHandler!.postData == null) {
+                        return const SizedBox.shrink();
+                      }
                       return _widgetBuilder.scaffold(
                         source: _widgetSource,
                         resizeToAvoidBottomInset: true,
@@ -218,148 +218,131 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                         source: _widgetSource),
                               ),
                               SliverToBoxAdapter(
-                                child: BlocListener<LMFeedCommentBloc,
-                                    LMFeedCommentHandlerState>(
-                                  bloc: _postDetailScreenHandler!
-                                      .commentHandlerBloc,
-                                  listener: (context, state) {
-                                    _postDetailScreenHandler!
-                                        .handleBlocChanges(state);
-                                  },
-                                  child: Column(
-                                    children: [
-                                      _postDetailScreenHandler!
-                                                      .postData!.commentCount ==
-                                                  0 ||
-                                              !config!.showCommentCountOnList
-                                          ? const SizedBox.shrink()
-                                          : Container(
-                                              decoration: BoxDecoration(
-                                                  color: feedTheme.container),
-                                              margin: const EdgeInsets.only(
-                                                  top: 10.0),
-                                              padding: feedTheme
-                                                      .commentStyle.padding ??
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 16.0,
-                                                  ),
-                                              alignment: Alignment.topLeft,
-                                              child: LMFeedText(
-                                                text: LMFeedPostUtils
-                                                    .getCommentCountTextWithCount(
-                                                        _postDetailScreenHandler!
-                                                            .postData!
-                                                            .commentCount),
-                                                style: LMFeedTextStyle(
-                                                  textStyle: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                    color:
-                                                        feedTheme.onContainer,
-                                                  ),
+                                child: _postDetailScreenHandler!
+                                                .postData!.commentCount ==
+                                            0 ||
+                                        !config!.showCommentCountOnList
+                                    ? const SizedBox.shrink()
+                                    : Container(
+                                        decoration: BoxDecoration(
+                                            color: feedTheme.container),
+                                        margin:
+                                            const EdgeInsets.only(top: 10.0),
+                                        padding:
+                                            feedTheme.commentStyle.padding ??
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 16.0,
                                                 ),
-                                              ),
+                                        alignment: Alignment.topLeft,
+                                        child: LMFeedText(
+                                          text: LMFeedPostUtils
+                                              .getCommentCountTextWithCount(
+                                                  _postDetailScreenHandler!
+                                                      .postData!.commentCount),
+                                          style: LMFeedTextStyle(
+                                            textStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: feedTheme.onContainer,
                                             ),
-                                      PagedListView.separated(
-                                        pagingController:
-                                            _postDetailScreenHandler!
-                                                .commentListPagingController,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        shrinkWrap: true,
-                                        builderDelegate:
-                                            PagedChildBuilderDelegate<
-                                                LMCommentViewData>(
-                                          firstPageProgressIndicatorBuilder:
-                                              (context) {
-                                            return const Padding(
-                                              padding:
-                                                  EdgeInsets.only(top: 150.0),
-                                              child: LMFeedLoader(),
-                                            );
-                                          },
-                                          noItemsFoundIndicatorBuilder:
-                                              (context) =>
-                                                  const LMFeedEmptyCommentWidget(),
-                                          itemBuilder: (context,
-                                              commentViewData, index) {
-                                            LMUserViewData userViewData;
-                                            if (!_postDetailScreenHandler!.users
-                                                .containsKey(
-                                                    commentViewData.uuid)) {
-                                              return const SizedBox.shrink();
-                                            }
-                                            userViewData =
-                                                _postDetailScreenHandler!.users[
-                                                    commentViewData.uuid]!;
-
-                                            LMFeedCommentWidget commentWidget =
-                                                defCommentTile(commentViewData,
-                                                    userViewData, context);
-
-                                            return ValueListenableBuilder(
-                                                valueListenable:
-                                                    _rebuildComment,
-                                                builder: (context, _, __) {
-                                                  return SizedBox(
-                                                    child: Column(
-                                                      children: [
-                                                        widget.commentBuilder?.call(
-                                                                context,
-                                                                commentWidget,
-                                                                _postDetailScreenHandler!
-                                                                    .postData!) ??
-                                                            _widgetBuilder
-                                                                .commentBuilder
-                                                                .call(
-                                                                    context,
-                                                                    commentWidget,
-                                                                    _postDetailScreenHandler!
-                                                                        .postData!),
-                                                        (replyShown &&
-                                                                commentIdReplyId ==
-                                                                    commentViewData
-                                                                        .id)
-                                                            ? LMFeedCommentReplyWidget(
-                                                                post: _postDetailScreenHandler!
-                                                                    .postData!,
-                                                                commentBuilder: widget
-                                                                        .commentBuilder ??
-                                                                    LMFeedCore
-                                                                        .widgetUtility
-                                                                        .commentBuilder,
-                                                                refresh: () {
-                                                                  _pagingController
-                                                                      .refresh();
-                                                                },
-                                                                postId: widget
-                                                                    .postId,
-                                                                reply:
-                                                                    commentViewData,
-                                                                user: _postDetailScreenHandler!
-                                                                        .users[
-                                                                    commentViewData
-                                                                        .uuid]!,
-                                                              )
-                                                            : const SizedBox
-                                                                .shrink()
-                                                      ],
-                                                    ),
-                                                  );
-                                                });
-                                          },
+                                          ),
                                         ),
-                                        padding: EdgeInsets.zero,
-                                        separatorBuilder: (context, index) =>
-                                            widget.commentSeparatorBuilder
-                                                ?.call(context) ??
-                                            const Divider(
-                                              thickness: 0.2,
-                                              height: 0,
-                                            ),
                                       ),
-                                    ],
+                              ),
+                              BlocListener<LMFeedCommentBloc,
+                                  LMFeedCommentHandlerState>(
+                                bloc: _postDetailScreenHandler!
+                                    .commentHandlerBloc,
+                                listener: (context, state) {
+                                  _postDetailScreenHandler!
+                                      .handleBlocChanges(state);
+                                },
+                                child: PagedSliverList.separated(
+                                  pagingController: _postDetailScreenHandler!
+                                      .commentListPagingController,
+                                  builderDelegate: PagedChildBuilderDelegate<
+                                      LMCommentViewData>(
+                                    firstPageProgressIndicatorBuilder:
+                                        (context) {
+                                      return const Padding(
+                                        padding: EdgeInsets.only(top: 150.0),
+                                        child: LMFeedLoader(),
+                                      );
+                                    },
+                                    noItemsFoundIndicatorBuilder: (context) =>
+                                        const LMFeedEmptyCommentWidget(),
+                                    itemBuilder:
+                                        (context, commentViewData, index) {
+                                      LMUserViewData userViewData;
+                                      if (!_postDetailScreenHandler!.users
+                                          .containsKey(commentViewData.uuid)) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      userViewData = _postDetailScreenHandler!
+                                          .users[commentViewData.uuid]!;
+
+                                      LMFeedCommentWidget commentWidget =
+                                          defCommentTile(commentViewData,
+                                              userViewData, context);
+
+                                      return ValueListenableBuilder(
+                                          valueListenable: _rebuildComment,
+                                          builder: (context, _, __) {
+                                            return SizedBox(
+                                              child: Column(
+                                                children: [
+                                                  widget.commentBuilder?.call(
+                                                          context,
+                                                          commentWidget,
+                                                          _postDetailScreenHandler!
+                                                              .postData!) ??
+                                                      _widgetBuilder
+                                                          .commentBuilder
+                                                          .call(
+                                                              context,
+                                                              commentWidget,
+                                                              _postDetailScreenHandler!
+                                                                  .postData!),
+                                                  (replyShown &&
+                                                          commentIdReplyId ==
+                                                              commentViewData
+                                                                  .id)
+                                                      ? LMFeedCommentReplyWidget(
+                                                          post:
+                                                              _postDetailScreenHandler!
+                                                                  .postData!,
+                                                          commentBuilder: widget
+                                                                  .commentBuilder ??
+                                                              LMFeedCore
+                                                                  .widgetUtility
+                                                                  .commentBuilder,
+                                                          refresh: () {
+                                                            _pagingController
+                                                                .refresh();
+                                                          },
+                                                          postId: widget.postId,
+                                                          reply:
+                                                              commentViewData,
+                                                          user:
+                                                              _postDetailScreenHandler!
+                                                                      .users[
+                                                                  commentViewData
+                                                                      .uuid]!,
+                                                        )
+                                                      : const SizedBox.shrink()
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    },
                                   ),
+                                  separatorBuilder: (context, index) =>
+                                      widget.commentSeparatorBuilder
+                                          ?.call(context) ??
+                                      const Divider(
+                                        thickness: 0.2,
+                                        height: 0,
+                                      ),
                                 ),
                               ),
                               const SliverToBoxAdapter(

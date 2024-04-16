@@ -93,6 +93,10 @@ class LMFeedPostDetailScreenHandler {
         userTopics: userTopics,
       );
 
+      if (page == 1) {
+        rebuildPostWidget.value = !rebuildPostWidget.value;
+      }
+
       final List<LMCommentViewData> commentList = postViewData.replies;
 
       addCommentListToController(commentList, page + 1);
