@@ -68,7 +68,7 @@ class _LMImageState extends State<LMFeedImage> {
               margin: style?.margin,
               decoration: BoxDecoration(
                   borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                  color: Colors.transparent),
+                  color: style?.backgroundColor ?? Colors.black),
               clipBehavior: Clip.hardEdge,
               child: CachedNetworkImage(
                 cacheKey: widget.imageUrl!,
@@ -115,9 +115,12 @@ class _LMImageState extends State<LMFeedImage> {
               ),
             )
           : widget.imageFile != null
-              ? ClipRRect(
-                  clipBehavior: Clip.hardEdge,
-                  borderRadius: style!.borderRadius ?? BorderRadius.zero,
+              ? Container(
+                  padding: style?.padding,
+                  margin: style?.margin,
+                  decoration: BoxDecoration(
+                      borderRadius: style!.borderRadius ?? BorderRadius.zero,
+                      color: style?.backgroundColor ?? Colors.black),
                   child: Image.file(
                     widget.imageFile!,
                     height: style!.height,

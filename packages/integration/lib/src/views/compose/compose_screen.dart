@@ -390,41 +390,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 Widget mediaWidget;
                 switch (composeBloc.postMedia[index].mediaType) {
                   case LMMediaType.image:
-                    mediaWidget = Container(
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        color: feedTheme.onContainer,
-                        borderRadius:
-                            style?.mediaStyle?.imageStyle?.borderRadius,
-                      ),
-                      height: style?.mediaStyle?.imageStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.imageStyle?.width ??
-                          screenSize?.width,
-                      child: LMFeedImage(
-                        imageFile: composeBloc.postMedia[index].mediaFile,
-                        style: style?.mediaStyle?.imageStyle,
-                      ),
+                    mediaWidget = LMFeedImage(
+                      imageFile: composeBloc.postMedia[index].mediaFile,
+                      style: style?.mediaStyle?.imageStyle,
                     );
                     break;
                   case LMMediaType.video:
-                    mediaWidget = Container(
-                      clipBehavior: Clip.hardEdge,
-                      height: style?.mediaStyle?.videoStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.videoStyle?.width ??
-                          screenSize?.width,
-                      decoration: BoxDecoration(
-                        color: feedTheme.onContainer,
-                        borderRadius:
-                            style?.mediaStyle?.videoStyle?.borderRadius,
-                      ),
-                      child: LMFeedVideo(
-                        videoFile: composeBloc.postMedia[index].mediaFile,
-                        style: style?.mediaStyle?.videoStyle,
-                        postId: composeBloc.postMedia[index].mediaFile!.uri
-                            .toString(),
-                      ),
+                    mediaWidget = LMFeedVideo(
+                      videoFile: composeBloc.postMedia[index].mediaFile,
+                      style: style?.mediaStyle?.videoStyle,
+                      postId: composeBloc.postMedia[index].mediaFile!.uri
+                          .toString(),
                     );
                     break;
                   case LMMediaType.link:
@@ -481,29 +457,25 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     break;
                   case LMMediaType.document:
                     {
-                      mediaWidget = Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                        child: LMFeedDocument(
-                          onRemove: () {
-                            composeBloc.add(
-                              LMFeedComposeRemoveAttachmentEvent(
-                                index: index,
-                              ),
-                            );
-                          },
-                          documentFile: composeBloc.postMedia[index].mediaFile,
-                          style: style?.mediaStyle?.documentStyle?.copyWith(
-                                width:
-                                    style?.mediaStyle?.documentStyle?.width ??
-                                        MediaQuery.of(context).size.width,
-                              ) ??
-                              LMFeedPostDocumentStyle(
-                                width: screenSize!.width,
-                                height: 90,
-                              ),
-                          size: PostHelper.getFileSizeString(
-                              bytes: composeBloc.postMedia[index].size ?? 0),
-                        ),
+                      mediaWidget = LMFeedDocument(
+                        onRemove: () {
+                          composeBloc.add(
+                            LMFeedComposeRemoveAttachmentEvent(
+                              index: index,
+                            ),
+                          );
+                        },
+                        documentFile: composeBloc.postMedia[index].mediaFile,
+                        style: style?.mediaStyle?.documentStyle?.copyWith(
+                              width: style?.mediaStyle?.documentStyle?.width ??
+                                  MediaQuery.of(context).size.width,
+                            ) ??
+                            LMFeedPostDocumentStyle(
+                              width: screenSize!.width,
+                              height: 90,
+                            ),
+                        size: PostHelper.getFileSizeString(
+                            bytes: composeBloc.postMedia[index].size ?? 0),
                       );
                       break;
                     }

@@ -1370,11 +1370,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     .commentMetaData.commentId!)
                                                 ..text(commentText))
                                               .build();
+
                                       _postDetailScreenHandler!
                                           .addTempEditingComment(
                                               state.commentMetaData.commentId ??
                                                   '',
                                               commentText);
+
                                       _postDetailScreenHandler!
                                           .commentHandlerBloc
                                           .add(LMFeedCommentActionEvent(
@@ -1393,6 +1395,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                                     .commentMetaData.replyId!)
                                                 ..text(commentText))
                                               .build();
+
+                                      _commentRepliesBloc.add(
+                                          LMFeedEditLocalReplyEvent(
+                                              text: commentText,
+                                              replyId: state
+                                                  .commentMetaData.replyId!));
 
                                       _postDetailScreenHandler!
                                           .commentHandlerBloc

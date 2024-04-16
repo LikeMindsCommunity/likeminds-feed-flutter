@@ -15,6 +15,7 @@ class LMFeedPostDetailScreenHandler {
   Map<String, LMWidgetViewData> widgets = {};
   Map<String, List<String>> userTopics = {};
   LMPostViewData? postData;
+  int commentListPageSize = 10;
 
   LMFeedPostDetailScreenHandler(
       PagingController<int, LMCommentViewData> commetListPagingController,
@@ -24,11 +25,13 @@ class LMFeedPostDetailScreenHandler {
     commentHandlerBloc = LMFeedCommentBloc.instance;
     commentController = TextEditingController();
     focusNode = FocusNode();
+    addCommentListPaginationListener();
   }
 
   Future<LMPostViewData?> fetchCommentListWithPage(int page) async {
     PostDetailRequest postDetailRequest = (PostDetailRequestBuilder()
           ..postId(postId)
+          ..pageSize(commentListPageSize)
           ..page(page))
         .build();
 
@@ -109,7 +112,7 @@ class LMFeedPostDetailScreenHandler {
 
   void addCommentListToController(
       List<LMCommentViewData> commentList, int nextPageKey) {
-    final isLastPage = commentList.length < 10;
+    final isLastPage = commentList.length < commentListPageSize;
     if (isLastPage) {
       commentListPagingController.appendLastPage(commentList);
     } else {
@@ -387,6 +390,7 @@ class LMFeedPostDetailScreenHandler {
       commentViewData.isEdited = true;
       commentViewData.text = editedText;
       commentListPagingController.itemList![index] = commentViewData;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
     }
   }
 
