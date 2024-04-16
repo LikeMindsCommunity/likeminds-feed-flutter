@@ -1,9 +1,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:video_compress/video_compress.dart';
@@ -418,7 +416,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }
                   if (curr is LMFeedEditPostUploadedState) {
-                    LMPostViewData? item = curr.postData;
+                    LMPostViewData? item = curr.postData.copyWith();
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     int index = feedRoomItemList
@@ -450,7 +448,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         -1;
                     if (index != -1) {
                       feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
-                          feedRoomItemList[index], curr.actionType,
+                          postViewData: feedRoomItemList[index],
+                          actionType: curr.actionType,
                           commentId: curr.commentId);
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -925,7 +924,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       },
       menu: LMFeedMenu(
         menuItems: postViewData.menuItems,
-        removeItemIds: {postReportId, postEditId},
+        removeItemIds: {postReportId},
         action: LMFeedMenuAction(
           onPostEdit: () {
             // Mute all video controllers

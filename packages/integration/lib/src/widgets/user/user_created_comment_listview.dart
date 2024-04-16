@@ -105,7 +105,7 @@ class _LMFeedUserCreatedCommentListViewState
         bloc: lmFeedPostBloc,
         listener: (context, state) {
           if (state is LMFeedEditPostUploadedState) {
-            _posts[state.postData.id] = state.postData;
+            _posts[state.postData.id] = state.postData.copyWith();
 
             rebuildPostWidget.value = !rebuildPostWidget.value;
           }
@@ -113,7 +113,8 @@ class _LMFeedUserCreatedCommentListViewState
             LMPostViewData? post = _posts[state.postId];
 
             if (post != null) {
-              post = LMFeedPostUtils.updatePostData(post, state.actionType);
+              post = LMFeedPostUtils.updatePostData(
+                  postViewData: post, actionType: state.actionType);
               _posts[state.postId] = post;
               rebuildPostWidget.value = !rebuildPostWidget.value;
             }

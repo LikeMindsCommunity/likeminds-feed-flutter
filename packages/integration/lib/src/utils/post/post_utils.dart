@@ -19,17 +19,20 @@ class LMFeedPostUtils {
   }
 
   static LMPostViewData updatePostData(
-      LMPostViewData postViewData, LMFeedPostActionType actionType,
-      {String? commentId}) {
+      {required LMPostViewData postViewData,
+      required LMFeedPostActionType actionType,
+      String? commentId}) {
     switch (actionType) {
-      case LMFeedPostActionType.like:
-        postViewData.isLiked = true;
-        postViewData.likeCount += 1;
-        break;
-      case LMFeedPostActionType.unlike:
-        postViewData.isLiked = false;
-        postViewData.likeCount -= 1;
-        break;
+      case (LMFeedPostActionType.like || LMFeedPostActionType.unlike):
+        {
+          if (postViewData.isLiked) {
+            postViewData.likeCount -= 1;
+          } else {
+            postViewData.likeCount += 1;
+          }
+          postViewData.isLiked = !postViewData.isLiked;
+          break;
+        }
       case LMFeedPostActionType.commentAdded:
         postViewData.commentCount += 1;
         break;
@@ -44,17 +47,11 @@ class LMFeedPostUtils {
           postViewData.commentCount -= 1;
           break;
         }
-      case LMFeedPostActionType.pinned:
-        postViewData.isPinned = true;
+      case (LMFeedPostActionType.pinned || LMFeedPostActionType.unpinned):
+        postViewData.isPinned = !postViewData.isPinned;
         break;
-      case LMFeedPostActionType.unpinned:
-        postViewData.isPinned = false;
-        break;
-      case LMFeedPostActionType.saved:
-        postViewData.isSaved = true;
-        break;
-      case LMFeedPostActionType.unsaved:
-        postViewData.isSaved = false;
+      case (LMFeedPostActionType.saved || LMFeedPostActionType.unsaved):
+        postViewData.isSaved = !postViewData.isSaved;
         break;
       default:
         break;

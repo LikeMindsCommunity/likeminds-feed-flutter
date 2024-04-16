@@ -238,7 +238,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             rebuildPostWidget.value = !rebuildPostWidget.value;
           }
           if (state is LMFeedEditPostUploadedState) {
-            LMPostViewData? item = state.postData;
+            LMPostViewData? item = state.postData.copyWith();
             List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
             int index = feedRoomItemList
                     ?.indexWhere((element) => element.id == item.id) ??

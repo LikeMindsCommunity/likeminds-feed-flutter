@@ -163,19 +163,20 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 snapshot.hasData) {
               return BlocListener(
                 listener: (context, state) {
-                  if (state is LMFeedPostUpdateState) {
+                  if (state is LMFeedPostUpdateState &&
+                      state.source != null &&
+                      state.source == LMFeedWidgetSource.postDetailScreen) {
                     if (state.postId == widget.postId) {
-                      _postDetailScreenHandler!.postData =
-                          LMFeedPostUtils.updatePostData(
-                        _postDetailScreenHandler!.postData!,
-                        state.actionType,
+                      LMFeedPostUtils.updatePostData(
+                        postViewData: _postDetailScreenHandler!.postData!,
+                        actionType: state.actionType,
                         commentId: state.commentId,
                       );
                       _postDetailScreenHandler!.rebuildPostWidget.value =
                           !_postDetailScreenHandler!.rebuildPostWidget.value;
                     }
                   } else if (state is LMFeedEditPostUploadedState) {
-                    LMPostViewData editedPost = state.postData;
+                    LMPostViewData editedPost = state.postData.copyWith();
 
                     _postDetailScreenHandler!.postData = editedPost;
                     _postDetailScreenHandler!.rebuildPostWidget.value =
@@ -498,6 +499,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   postId: _postDetailScreenHandler!.postData!.id,
                   commentId: commentViewData.id,
                   actionType: LMFeedPostActionType.commentDeleted,
+                  source: LMFeedWidgetSource.postDetailScreen,
                 ));
               },
               actionText: 'Delete',
@@ -670,7 +672,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       },
       menu: LMFeedMenu(
         menuItems: _postDetailScreenHandler!.postData?.menuItems ?? [],
-        removeItemIds: {postReportId, postEditId},
+        removeItemIds: {postReportId},
         action: LMFeedMenuAction(
           onPostReport: () => handlePostReportAction(),
           onPostPin: () => handlePostPinAction(),
@@ -789,6 +791,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         onTap: () async {
           postBloc.add(LMFeedUpdatePostEvent(
               postId: _postDetailScreenHandler!.postData!.id,
+              source: LMFeedWidgetSource.postDetailScreen,
               actionType: _postDetailScreenHandler!.postData!.isLiked
                   ? LMFeedPostActionType.unlike
                   : LMFeedPostActionType.like));
@@ -800,13 +803,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
-          if (!response.success) {
-            postBloc.add(LMFeedUpdatePostEvent(
-                postId: _postDetailScreenHandler!.postData!.id,
-                actionType: _postDetailScreenHandler!.postData!.isLiked
-                    ? LMFeedPostActionType.unlike
-                    : LMFeedPostActionType.like));
-          }
+          // if (!response.success) {
+          //   postBloc.add(LMFeedUpdatePostEvent(
+          //       postId: _postDetailScreenHandler!.postData!.id,
+          //       source: LMFeedWidgetSource.postDetailScreen,
+          //       actionType: _postDetailScreenHandler!.postData!.isLiked
+          //           ? LMFeedPostActionType.unlike
+          //           : LMFeedPostActionType.like));
+          // }
         },
       );
 
@@ -829,6 +833,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         onTap: () async {
           postBloc.add(LMFeedUpdatePostEvent(
             postId: _postDetailScreenHandler!.postData!.id,
+            source: LMFeedWidgetSource.postDetailScreen,
             actionType: _postDetailScreenHandler!.postData!.isSaved
                 ? LMFeedPostActionType.unsaved
                 : LMFeedPostActionType.saved,
@@ -844,6 +849,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           if (!response.success) {
             postBloc.add(LMFeedUpdatePostEvent(
               postId: _postDetailScreenHandler!.postData!.id,
+              source: LMFeedWidgetSource.postDetailScreen,
               actionType: _postDetailScreenHandler!.postData!.isSaved
                   ? LMFeedPostActionType.unsaved
                   : LMFeedPostActionType.saved,
@@ -1528,6 +1534,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
     postBloc.add(LMFeedUpdatePostEvent(
       postId: _postDetailScreenHandler!.postData!.id,
+      source: LMFeedWidgetSource.postDetailScreen,
       actionType: _postDetailScreenHandler!.postData!.isPinned
           ? LMFeedPostActionType.unpinned
           : LMFeedPostActionType.pinned,
@@ -1539,6 +1546,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     if (!response.success) {
       postBloc.add(LMFeedUpdatePostEvent(
         postId: _postDetailScreenHandler!.postData!.id,
+        source: LMFeedWidgetSource.postDetailScreen,
         actionType: _postDetailScreenHandler!.postData!.isPinned
             ? LMFeedPostActionType.unpinned
             : LMFeedPostActionType.pinned,

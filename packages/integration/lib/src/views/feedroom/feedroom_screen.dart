@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart';
 import 'package:video_compress/video_compress.dart';
 
@@ -405,7 +404,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }
                   if (curr is LMFeedEditPostUploadedState) {
-                    LMPostViewData? item = curr.postData;
+                    LMPostViewData? item = curr.postData.copyWith();
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     int index = feedRoomItemList
@@ -435,7 +434,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                         -1;
                     if (index != -1) {
                       feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
-                          feedRoomItemList[index], curr.actionType);
+                          postViewData: feedRoomItemList[index],
+                          actionType: curr.actionType);
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }

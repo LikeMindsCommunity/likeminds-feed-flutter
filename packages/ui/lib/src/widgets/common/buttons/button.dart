@@ -79,6 +79,7 @@ class _LMButtonState extends State<LMFeedButton> {
         });
         widget.onTap();
       },
+      behavior: HitTestBehavior.translucent,
       child: Container(
         height: inStyle.height,
         width: inStyle.width,
