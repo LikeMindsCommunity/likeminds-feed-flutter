@@ -79,3 +79,13 @@ class LMFeedDeleteLocalReplyState extends LMFeedCommentRepliesState {
   @override
   List<Object?> get props => [replyId];
 }
+
+class LMFeedEditLocalReplyState extends LMFeedCommentRepliesState {
+  final String text;
+  final String replyId;
+
+  const LMFeedEditLocalReplyState({required this.text, required this.replyId});
+
+  @override
+  List<Object?> get props => [text];
+}

@@ -43,6 +43,7 @@ class LMLikesScreenHandler {
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
       eventName: LMFeedAnalyticsKeys.likeListOpen,
       deprecatedEventName: LMFeedAnalyticsKeysDep.likeListOpen,
+      widgetSource: LMFeedWidgetSource.likesScreen,
       eventProperties: {
         "post_id": postId,
         "total_likes": totalLikes,

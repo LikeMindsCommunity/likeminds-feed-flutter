@@ -74,7 +74,6 @@ class LMFeedCore {
   LMFeedCore._();
 
   Future<void> initialize({
-    String? apiKey,
     LMFeedClient? lmFeedClient,
     String? domain,
     LMFeedConfig? config,
@@ -82,9 +81,7 @@ class LMFeedCore {
     GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
     LMFeedThemeData? theme,
   }) async {
-    assert(apiKey != null || lmFeedClient != null);
-    this.lmFeedClient =
-        lmFeedClient ?? (LMFeedClientBuilder()..apiKey(apiKey!)).build();
+    this.lmFeedClient = lmFeedClient ?? LMFeedClientBuilder().build();
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
@@ -100,8 +97,31 @@ class LMFeedCore {
     await LMFeedAnalyticsBloc.instance.close();
   }
 
-  Future<InitiateUserResponse> initiateUser(InitiateUserRequest request) async {
-    InitiateUserResponse response = await lmFeedClient.initiateUser(request);
+  Future<LMResponse> initialiseFeed(ValidateUserRequest request) async {
+    ValidateUserResponse validateUserResponse = await validateUser(request);
+    if (validateUserResponse.success) {
+      MemberStateResponse memberStateResponse = await getMemberState();
+      GetCommunityConfigurationsResponse communityConfigurationsResponse =
+          await getCommunityConfigurations();
+
+      if (!memberStateResponse.success) {
+        return LMResponse(
+            success: false, errorMessage: memberStateResponse.errorMessage);
+      } else if (!communityConfigurationsResponse.success) {
+        return LMResponse(
+            success: false,
+            errorMessage: communityConfigurationsResponse.errorMessage);
+      }
+    } else {
+      return LMResponse(
+          success: false, errorMessage: validateUserResponse.errorMessage);
+    }
+
+    return LMResponse(success: true, data: validateUserResponse);
+  }
+
+  Future<ValidateUserResponse> validateUser(ValidateUserRequest request) async {
+    ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
     await LMFeedLocalPreference.instance.clearUserData();
     if (response.success) {
@@ -121,6 +141,28 @@ class LMFeedCore {
 
     if (response.success) {
       await LMFeedLocalPreference.instance.storeMemberState(response);
+    }
+
+    return response;
+  }
+
+  Future<GetCommunityConfigurationsResponse>
+      getCommunityConfigurations() async {
+    GetCommunityConfigurationsResponse response =
+        await lmFeedClient.getCommunityConfigurations();
+    await LMFeedLocalPreference.instance.clearCommunityConfiguration();
+
+    if (response.success) {
+      for (CommunityConfigurations conf in response.communityConfigurations!) {
+        if (conf.type == 'feed_metadata') {
+          String postVar = conf.value?['post'] ?? 'Post';
+          String commentVar = conf.value?['comment'] ?? 'Comment';
+
+          LMFeedLocalPreference.instance.storePostVariable(postVar);
+          LMFeedLocalPreference.instance.storeCommentVariable(commentVar);
+        }
+        await LMFeedLocalPreference.instance.storeCommunityConfiguration(conf);
+      }
     }
 
     return response;

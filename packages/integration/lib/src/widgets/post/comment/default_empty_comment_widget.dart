@@ -7,13 +7,19 @@ class LMFeedEmptyCommentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedCore.theme;
+
+    String commentTitleSmallCapPlural = LMFeedPostUtils.getCommentTitle(
+        LMFeedPluralizeWordAction.allSmallPlural);
+    String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+        LMFeedPluralizeWordAction.allSmallSingular);
+
     return Column(
       children: <Widget>[
         SizedBox(
           height: 60,
         ),
         Text(
-          'No comments found!',
+          'No $commentTitleSmallCapPlural found!',
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: feedTheme.onContainer,
@@ -21,7 +27,7 @@ class LMFeedEmptyCommentWidget extends StatelessWidget {
           ),
         ),
         Text(
-          'Be the first one to comment',
+          'Be the first one to $commentTitleSmallCapSingular',
           style: TextStyle(
             fontWeight: FontWeight.w500,
             color: feedTheme.onContainer,

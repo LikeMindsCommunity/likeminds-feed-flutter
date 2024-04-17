@@ -9,6 +9,7 @@ class LMFeedPostHeader extends StatelessWidget {
     required this.user,
     this.titleText,
     this.subText,
+    this.subTextBuilder,
     this.subTextSeparator,
     this.menuBuilder,
     this.editedText,
@@ -25,6 +26,8 @@ class LMFeedPostHeader extends StatelessWidget {
   final LMFeedText? titleText;
   final LMFeedText? customTitle;
   final LMFeedText? subText;
+  final Widget? Function(BuildContext context, LMFeedText subtext)?
+      subTextBuilder;
   final Widget? subTextSeparator;
   final LMFeedText? editedText;
 
@@ -96,6 +99,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                       onProfileTap!();
                                     }
                                   },
+                                  behavior: HitTestBehavior.translucent,
                                   child: titleText ??
                                       LMFeedText(
                                         text: user.name,
@@ -179,11 +183,20 @@ class LMFeedPostHeader extends StatelessWidget {
                           LikeMindsTheme.kVerticalPaddingSmall,
                           Row(
                             children: [
-                              Flexible(child: subText ?? const SizedBox()),
+                              Flexible(
+                                  child: subTextBuilder?.call(
+                                          context,
+                                          subText ??
+                                              const LMFeedText(
+                                                text: '',
+                                              )) ??
+                                      subText ??
+                                      const SizedBox()),
                               subText != null
                                   ? LikeMindsTheme.kHorizontalPaddingXSmall
                                   : const SizedBox(),
-                              if (createdAt != null)
+                              if (createdAt != null &&
+                                  headerStyle.showTimeStamp)
                                 subTextSeparator ??
                                     LMFeedText(
                                       text: subText != null ? '·' : '',
@@ -194,13 +207,16 @@ class LMFeedPostHeader extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                              if (createdAt != null && subText != null)
+                              if (createdAt != null &&
+                                  subText != null &&
+                                  headerStyle.showTimeStamp)
                                 LikeMindsTheme.kHorizontalPaddingXSmall,
-                              createdAt ??
-                                  LMFeedText(
-                                    text: LMFeedTimeAgo.instance
-                                        .format(postViewData.createdAt),
-                                  ),
+                              if (headerStyle.showTimeStamp)
+                                createdAt ??
+                                    LMFeedText(
+                                      text: LMFeedTimeAgo.instance
+                                          .format(postViewData.createdAt),
+                                    ),
                               LikeMindsTheme.kHorizontalPaddingSmall,
                               if (postViewData.isEdited)
                                 subTextSeparator ??
@@ -264,6 +280,7 @@ class LMFeedPostHeader extends StatelessWidget {
     LMUserViewData? user,
     LMFeedText? titleText,
     LMFeedText? subText,
+    Widget? Function(BuildContext context, LMFeedText subtext)? subTextBuilder,
     Widget? subTextSeparator,
     LMFeedText? editedText,
     Widget Function(LMFeedMenu)? menuBuilder,
@@ -280,6 +297,7 @@ class LMFeedPostHeader extends StatelessWidget {
       user: user ?? this.user,
       titleText: titleText ?? this.titleText,
       subText: subText ?? this.subText,
+      subTextBuilder: subTextBuilder ?? this.subTextBuilder,
       subTextSeparator: subTextSeparator ?? this.subTextSeparator,
       editedText: editedText ?? this.editedText,
       menuBuilder: menuBuilder ?? this.menuBuilder,
@@ -316,6 +334,7 @@ class LMFeedPostHeaderStyle {
   final LMFeedTextStyle? subTextStyle;
   final LMFeedTextStyle? customTitleTextStyle;
   final LMFeedMenuStyle? menuStyle;
+  final bool showTimeStamp;
 
   final bool showPinnedIcon;
 
@@ -332,6 +351,7 @@ class LMFeedPostHeaderStyle {
     this.subTextStyle,
     this.customTitleTextStyle,
     this.menuStyle,
+    this.showTimeStamp = true,
   });
 
   LMFeedPostHeaderStyle copyWith({
@@ -347,6 +367,7 @@ class LMFeedPostHeaderStyle {
     LMFeedTextStyle? subTextStyle,
     LMFeedTextStyle? customTitleTextStyle,
     LMFeedMenuStyle? menuStyle,
+    bool? showTimeStamp,
   }) {
     return LMFeedPostHeaderStyle(
       padding: padding ?? this.padding,
@@ -361,6 +382,7 @@ class LMFeedPostHeaderStyle {
       subTextStyle: subTextStyle ?? this.subTextStyle,
       customTitleTextStyle: customTitleTextStyle ?? this.customTitleTextStyle,
       menuStyle: menuStyle ?? this.menuStyle,
+      showTimeStamp: showTimeStamp ?? this.showTimeStamp,
     );
   }
 

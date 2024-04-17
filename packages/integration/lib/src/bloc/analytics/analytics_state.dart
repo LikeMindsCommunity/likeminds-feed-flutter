@@ -31,10 +31,14 @@ class LMFeedAnalyticsEventFired extends LMFeedAnalyticsState {
   final String deprecatedEventName;
   final Map<String, dynamic> eventProperties;
 
+  /// {@macro lm_feed_widget_source}
+  final LMFeedWidgetSource? widgetSource;
+
   const LMFeedAnalyticsEventFired({
     required this.eventName,
     required this.deprecatedEventName,
     required this.eventProperties,
+    this.widgetSource,
   });
 
   @override

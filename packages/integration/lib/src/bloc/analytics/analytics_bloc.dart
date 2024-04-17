@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 part 'analytics_event.dart';
 part 'analytics_state.dart';

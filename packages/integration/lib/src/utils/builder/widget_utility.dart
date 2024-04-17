@@ -45,9 +45,11 @@ class LMFeedWidgetUtility {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: LMFeedCore.config.globalSystemOverlayStyle ??
           SystemUiOverlayStyle.dark,
-      child: PopScope(
-        canPop: canPop,
-        onPopInvoked: onPopInvoked,
+      child: WillPopScope(
+        onWillPop: () async {
+          onPopInvoked?.call(canPop);
+          return Future.value(canPop);
+        },
         child: Scaffold(
           key: key,
           extendBody: extendBody,
@@ -153,7 +155,7 @@ class LMFeedWidgetUtility {
   }
 
   Widget noItemsFoundIndicatorBuilderFeed(BuildContext context,
-      {LMFeedButton? createPostButton}) {
+      {LMFeedButton? createPostButton, bool isSelfPost = true}) {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return Center(
       child: Column(
@@ -169,7 +171,8 @@ class LMFeedWidgetUtility {
           ),
           const SizedBox(height: 12),
           LMFeedText(
-            text: 'No posts to show',
+            text:
+                'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 fontSize: 24,
@@ -178,19 +181,21 @@ class LMFeedWidgetUtility {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          LMFeedText(
-            text: "Be the first one to post here",
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w300,
-                color: feedThemeData.onContainer,
+          if (isSelfPost) const SizedBox(height: 12),
+          if (isSelfPost)
+            LMFeedText(
+              text:
+                  "Be the first one to create a ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)} here",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,
+                  color: feedThemeData.onContainer,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 28),
-          if (createPostButton != null) createPostButton,
+          if (isSelfPost) const SizedBox(height: 28),
+          if (createPostButton != null && isSelfPost) createPostButton,
         ],
       ),
     );
@@ -202,8 +207,9 @@ class LMFeedWidgetUtility {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const LMFeedText(
-            text: "Looks like there are no posts for this topic yet.",
+          LMFeedText(
+            text:
+                "Looks like there are no ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} for this topic yet.",
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 fontSize: 15,
@@ -262,5 +268,15 @@ class LMFeedWidgetUtility {
   Widget composeScreenTopicSelectorBuilder(BuildContext context,
       Widget topicSelector, List<LMTopicViewData> selectedTopics) {
     return topicSelector;
+  }
+
+  Widget composeScreenHeadingTextfieldBuilder(
+      BuildContext context, TextField headingTextField) {
+    return headingTextField;
+  }
+
+  Widget composeScreenContentTextfieldBuilder(
+      BuildContext context, LMTaggingAheadTextField contentTextField) {
+    return contentTextField;
   }
 }

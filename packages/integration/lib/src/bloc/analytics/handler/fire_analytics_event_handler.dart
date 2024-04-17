@@ -14,5 +14,6 @@ fireAnalyticsEventHandler(
     eventName: event.eventName,
     deprecatedEventName: event.deprecatedEventName,
     eventProperties: event.eventProperties,
+    widgetSource: event.widgetSource,
   ));
 }

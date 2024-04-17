@@ -36,6 +36,8 @@ build/
 /.fvm/
 /.fvmrc
 /.vscode/
+.flutter-plugins-dependencies
+.flutter-plugins
 
 # FVM Version Cache
 .fvm/

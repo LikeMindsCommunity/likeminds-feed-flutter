@@ -34,6 +34,11 @@ class LMFeedSearchScreen extends StatefulWidget {
 }
 
 class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
   LMFeedThemeData theme = LMFeedCore.theme;
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   ValueNotifier<bool> showCancelIcon = ValueNotifier<bool>(false);
@@ -233,7 +238,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             rebuildPostWidget.value = !rebuildPostWidget.value;
           }
           if (state is LMFeedEditPostUploadedState) {
-            LMPostViewData? item = state.postData;
+            LMPostViewData? item = state.postData.copyWith();
             List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
             int index = feedRoomItemList
                     ?.indexWhere((element) => element.id == item.id) ??
@@ -481,10 +486,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               showDialog(
                 context: context,
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                  title: 'Delete Post',
+                  title: 'Delete $postTitleFirstCap',
                   uuid: postViewData.uuid,
                   content:
-                      'Are you sure you want to delete this post. This action can not be reversed.',
+                      'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
@@ -492,6 +497,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                       LMFeedFireAnalyticsEvent(
                         eventName: LMFeedAnalyticsKeys.postDeleted,
                         deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
+                        widgetSource: LMFeedWidgetSource.searchScreen,
                         eventProperties: {
                           "post_id": postViewData.id,
                         },
@@ -573,6 +579,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+              widgetSource: LMFeedWidgetSource.searchScreen,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -681,6 +688,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
                 eventName: LMFeedAnalyticsKeys.postCreationStarted,
                 deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
+                widgetSource: LMFeedWidgetSource.searchScreen,
                 eventProperties: {}));
 
             LMFeedVideoProvider.instance.forcePauseAllControllers();
@@ -704,7 +712,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             LMFeedCore.showSnackBar(
               LMFeedSnackBar(
                 content: LMFeedText(
-                  text: 'A post is already uploading.',
+                  text: 'A $postTitleSmallCap is already uploading.',
                 ),
               ),
             );
@@ -737,8 +745,9 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            const LMFeedText(
-              text: 'No posts to show',
+            LMFeedText(
+              text:
+                  'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 24,
@@ -747,8 +756,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            const LMFeedText(
-              text: "Be the first one to post here",
+            LMFeedText(
+              text: "Be the first one to create a $postTitleSmallCap here",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 16,
@@ -775,8 +784,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 placement: LMFeedIconButtonPlacement.end,
               ),
-              text: const LMFeedText(
-                text: "Create Post",
+              text: LMFeedText(
+                text: "Create $postTitleFirstCap",
                 style: LMFeedTextStyle(
                   textStyle: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -792,6 +801,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                                     LMFeedAnalyticsKeys.postCreationStarted,
                                 deprecatedEventName:
                                     LMFeedAnalyticsKeysDep.postCreationStarted,
+                                widgetSource: LMFeedWidgetSource.searchScreen,
                                 eventProperties: {}));
 
                         LMFeedVideoProvider.instance.pauseCurrentVideo();
@@ -807,7 +817,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                         LMFeedCore.showSnackBar(
                           LMFeedSnackBar(
                             content: LMFeedText(
-                              text: 'A post is already uploading.',
+                              text:
+                                  'A $postTitleSmallCap is already uploading.',
                             ),
                           ),
                         );
@@ -816,7 +827,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                   : () => LMFeedCore.showSnackBar(
                         LMFeedSnackBar(
                           content: LMFeedText(
-                            text: "You do not have permission to create a post",
+                            text:
+                                "You do not have permission to create a $postTitleSmallCap",
                           ),
                         ),
                       ),
@@ -857,6 +869,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.searchScreen,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,
