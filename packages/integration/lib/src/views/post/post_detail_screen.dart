@@ -569,7 +569,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         );
       },
       onPostTap: (context, post) {
-        debugPrint("Post in detail screen tapped");
         widget.onPostTap?.call();
       },
       isFeed: false,
@@ -653,7 +652,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       },
       menu: LMFeedMenu(
         menuItems: _postDetailScreenHandler!.postData?.menuItems ?? [],
-        removeItemIds: {postReportId, postEditId},
+        removeItemIds: {},
         action: LMFeedMenuAction(
           onPostReport: () => handlePostReportAction(),
           onPostPin: () => handlePostPinAction(),

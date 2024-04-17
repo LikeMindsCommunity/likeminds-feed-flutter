@@ -1,18 +1,19 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/poll/poll_attachement_widget.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
-class CreatePollScreen extends StatefulWidget {
-  const CreatePollScreen({super.key});
+class LMFeedCreatePollScreen extends StatefulWidget {
+  const LMFeedCreatePollScreen({super.key});
 
   @override
-  State<CreatePollScreen> createState() => _CreatePollScreenState();
+  State<LMFeedCreatePollScreen> createState() => _LMFeedCreatePollScreenState();
 }
 
-class _CreatePollScreenState extends State<CreatePollScreen> {
+class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
   LMFeedThemeData theme = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
@@ -20,6 +21,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
   final ValueNotifier<bool> _optionBuilder = ValueNotifier(false);
   String exactlyDialogKey = 'exactly';
   int exactlyValue = 1;
+  ValueNotifier<bool> _advancedBuilder = ValueNotifier(false);
 
   Future<DateTime?> showDateTimePicker({
     required BuildContext context,
@@ -105,7 +107,7 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
           trailing: [
             LMFeedButton(
               onTap: () {
-                for(String option in options){
+                for (String option in options) {
                   debugPrint(option);
                 }
               },
@@ -294,184 +296,203 @@ class _CreatePollScreenState extends State<CreatePollScreen> {
               ),
             ),
             SizedBox(height: 16),
-            Container(
-              color: theme.container,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SwitchListTile(
-                    value: false,
-                    onChanged: (value) {},
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 18,
-                    ),
-                    title: LMFeedText(
-                      text: 'Allow voters to add options',
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: theme.onContainer,
-                        ),
+            // Advanced settings
+            ValueListenableBuilder(
+                valueListenable: _advancedBuilder,
+                builder: (context, value, child) {
+                  return Column(
+                    children: [
+                      AnimatedSwitcher(
+                        duration: Duration(milliseconds: 300),
+                        child: value
+                            ? Container(
+                                color: theme.container,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SwitchListTile(
+                                      value: false,
+                                      onChanged: (value) {},
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                      ),
+                                      title: LMFeedText(
+                                        text: 'Allow voters to add options',
+                                        style: LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: theme.onContainer,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Divider(
+                                      color: theme.inActiveColor,
+                                      height: 0,
+                                    ),
+                                    SwitchListTile(
+                                      value: false,
+                                      onChanged: (value) {},
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                      ),
+                                      title: LMFeedText(
+                                        text: 'Anonymous poll',
+                                        style: LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: theme.onContainer,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Divider(
+                                      color: theme.inActiveColor,
+                                      height: 0,
+                                    ),
+                                    SwitchListTile(
+                                      value: false,
+                                      onChanged: (value) {},
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                      ),
+                                      title: LMFeedText(
+                                        text: 'Don\'t show live results',
+                                        style: LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: theme.onContainer,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Divider(
+                                      color: theme.inActiveColor,
+                                      height: 0,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                        vertical: 12,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          LMFeedText(
+                                            text: 'User can vote for',
+                                            style: LMFeedTextStyle(
+                                              textStyle: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400,
+                                                color: theme.inActiveColor,
+                                              ),
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              DropdownButton<String>(
+                                                value: exactlyDialogKey,
+                                                onChanged: (value) =>
+                                                    exactlyDialogKey = value!,
+                                                items: [
+                                                  DropdownMenuItem(
+                                                    child: LMFeedText(
+                                                      text: 'Exactly',
+                                                    ),
+                                                    value: 'exactly',
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: LMFeedText(
+                                                      text: 'At most',
+                                                    ),
+                                                    value: 'atMost',
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: LMFeedText(
+                                                      text: 'At least',
+                                                    ),
+                                                    value: 'atLeast',
+                                                  ),
+                                                ],
+                                              ),
+                                              LMFeedText(
+                                                text: '=',
+                                                style: LMFeedTextStyle(
+                                                  textStyle: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: theme.inActiveColor,
+                                                  ),
+                                                ),
+                                              ),
+                                              DropdownButton<int>(
+                                                value: exactlyValue,
+                                                items: [
+                                                  DropdownMenuItem(
+                                                    child: LMFeedText(
+                                                        text: '1 option'),
+                                                    value: 1,
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: LMFeedText(
+                                                        text: '2 options'),
+                                                    value: 2,
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: LMFeedText(
+                                                        text: '3 options'),
+                                                    value: 3,
+                                                  ),
+                                                  DropdownMenuItem(
+                                                    child: LMFeedText(
+                                                        text: '4 options'),
+                                                    value: 4,
+                                                  ),
+                                                ],
+                                                onChanged: (value) {
+                                                  exactlyValue = value!;
+                                                },
+                                              )
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            : SizedBox.shrink(),
                       ),
-                    ),
-                  ),
-                  Divider(
-                    color: theme.inActiveColor,
-                    height: 0,
-                  ),
-                  SwitchListTile(
-                    value: false,
-                    onChanged: (value) {},
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 18,
-                    ),
-                    title: LMFeedText(
-                      text: 'Anonymous poll',
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: theme.onContainer,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Divider(
-                    color: theme.inActiveColor,
-                    height: 0,
-                  ),
-                  SwitchListTile(
-                    value: false,
-                    onChanged: (value) {},
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 18,
-                    ),
-                    title: LMFeedText(
-                      text: 'Don\'t show live results',
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: theme.onContainer,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Divider(
-                    color: theme.inActiveColor,
-                    height: 0,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 12,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        LMFeedText(
-                          text: 'User can vote for',
-                          style: LMFeedTextStyle(
-                            textStyle: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: theme.inActiveColor,
-                            ),
+                      SizedBox(height: 24),
+                      LMFeedButton(
+                        onTap: () {
+                          _advancedBuilder.value = !_advancedBuilder.value;
+                        },
+                        text: LMFeedText(text: 'ADVANCED'),
+                        isActive: value,
+                        style: LMFeedButtonStyle(
+                          placement: LMFeedIconButtonPlacement.end,
+                          activeIcon: LMFeedIcon(
+                            type: LMFeedIconType.icon,
+                            icon: Icons.expand_less,
+                          ),
+                          icon: LMFeedIcon(
+                            type: LMFeedIconType.icon,
+                            icon: Icons.expand_more,
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            DropdownButton<String>(
-                              value: exactlyDialogKey,
-                              onChanged: (value) => exactlyDialogKey = value!,
-                              items: [
-                                DropdownMenuItem(
-                                  child: LMFeedText(
-                                    text: 'Exactly',
-                                  ),
-                                  value: 'exactly',
-                                ),
-                                DropdownMenuItem(
-                                  child: LMFeedText(
-                                    text: 'At most',
-                                  ),
-                                  value: 'atMost',
-                                ),
-                                DropdownMenuItem(
-                                  child: LMFeedText(
-                                    text: 'At least',
-                                  ),
-                                  value: 'atLeast',
-                                ),
-                              ],
-                            ),
-                            LMFeedText(
-                              text: '=',
-                              style: LMFeedTextStyle(
-                                textStyle: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w400,
-                                  color: theme.inActiveColor,
-                                ),
-                              ),
-                            ),
-                            DropdownButton<int>(
-                              value: exactlyValue,
-                              items: [
-                                DropdownMenuItem(
-                                  child: LMFeedText(text: '1 option'),
-                                  value: 1,
-                                ),
-                                DropdownMenuItem(
-                                  child: LMFeedText(text: '2 options'),
-                                  value: 2,
-                                ),
-                                DropdownMenuItem(
-                                  child: LMFeedText(text: '3 options'),
-                                  value: 3,
-                                ),
-                                DropdownMenuItem(
-                                  child: LMFeedText(text: '4 options'),
-                                  value: 4,
-                                ),
-                              ],
-                              onChanged: (value) {
-                                exactlyValue = value!;
-                              },
-                            )
-                          ],
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 24),
-            LMFeedButton(
-              onTap: () {
-                debugPrint('ADVANCED');
-              },
-              text: LMFeedText(text: 'ADVANCED'),
-              style: LMFeedButtonStyle(
-                placement: LMFeedIconButtonPlacement.end,
-                icon: LMFeedIcon(
-                  type: LMFeedIconType.icon,
-                  icon: Icons.expand_more,
-                ),
-              ),
-            ),
-            Container(
-              color: theme.container,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 40),
-                child: PollAttachment(),
-              ),
-            ),
+                      ),
+                    ],
+                  );
+                }),
             SizedBox(
               height: 50,
             ),

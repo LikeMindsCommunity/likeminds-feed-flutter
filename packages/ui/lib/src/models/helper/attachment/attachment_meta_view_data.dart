@@ -12,6 +12,14 @@ class LMAttachmentMetaViewData {
   final double? aspectRatio;
   final LMPostViewData? repost;
   final Map<String, dynamic>? meta;
+  final String? pollQuestion;
+  final int? expiryTime;
+  final List<String>? pollOptions;
+  final PollMultiSelectState? multiSelectState;
+  final PollType? pollType;
+  final int? multiSelectNo;
+  final bool? isAnonymous;
+  final bool? allowAddOption;
 
   LMAttachmentMetaViewData._({
     this.url,
@@ -25,6 +33,14 @@ class LMAttachmentMetaViewData {
     this.height,
     this.repost,
     this.meta,
+    this.pollQuestion,
+    this.expiryTime,
+    this.pollOptions,
+    this.multiSelectState,
+    this.pollType,
+    this.multiSelectNo,
+    this.isAnonymous,
+    this.allowAddOption,
   });
 }
 
@@ -40,6 +56,14 @@ class LMAttachmentMetaViewDataBuilder {
   double? _aspectRatio;
   Map<String, dynamic>? _meta;
   LMPostViewData? _repost;
+  String? _pollQuestion;
+  int? _expiryTime;
+  List<String>? _pollOptions;
+  PollMultiSelectState? _multiSelectState;
+  PollType? _pollType;
+  int? _multiSelectNo;
+  bool? _isAnonymous;
+  bool? _allowAddOption;
 
   void url(String url) {
     _url = url;
@@ -85,6 +109,38 @@ class LMAttachmentMetaViewDataBuilder {
     _repost = repost;
   }
 
+  void pollQuestion(String? pollQuestion) {
+    _pollQuestion = pollQuestion;
+  }
+
+  void expiryTime(int? expiryTime) {
+    _expiryTime = expiryTime;
+  }
+
+  void pollOptions(List<String>? pollOptions) {
+    _pollOptions = pollOptions;
+  }
+
+  void multiSelectState(PollMultiSelectState? multiSelectState) {
+    _multiSelectState = multiSelectState;
+  }
+
+  void pollType(PollType? pollType) {
+    _pollType = pollType;
+  }
+
+  void multiSelectNo(int? multiSelectNo) {
+    _multiSelectNo = multiSelectNo;
+  }
+
+  void isAnonymous(bool? isAnonymous) {
+    _isAnonymous = isAnonymous;
+  }
+
+  void allowAddOption(bool? allowAddOption) {
+    _allowAddOption = allowAddOption;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -98,6 +154,66 @@ class LMAttachmentMetaViewDataBuilder {
       aspectRatio: _aspectRatio,
       meta: _meta,
       repost: _repost,
+      pollQuestion: _pollQuestion,
+      expiryTime: _expiryTime,
+      pollOptions: _pollOptions,
+      multiSelectState: _multiSelectState,
+      pollType: _pollType,
+      multiSelectNo: _multiSelectNo,
+      isAnonymous: _isAnonymous,
+      allowAddOption: _allowAddOption,
     );
+  }
+}
+
+enum PollMultiSelectState { exactly, atLeast, atMost }
+
+extension PollMultiSelectStateExtension on PollMultiSelectState {
+  String get value {
+    switch (this) {
+      case PollMultiSelectState.exactly:
+        return 'exactly';
+      case PollMultiSelectState.atLeast:
+        return 'at_least';
+      case PollMultiSelectState.atMost:
+        return 'at_most';
+    }
+  }
+}
+
+PollMultiSelectState pollMultiSelectStateFromString(String value) {
+  switch (value) {
+    case 'exactly':
+      return PollMultiSelectState.exactly;
+    case 'at_least':
+      return PollMultiSelectState.atLeast;
+    case 'at_most':
+      return PollMultiSelectState.atMost;
+    default:
+      return PollMultiSelectState.exactly;
+  }
+}
+
+enum PollType { instant, deferred }
+
+extension PollTypeExtension on PollType {
+  String get value {
+    switch (this) {
+      case PollType.instant:
+        return 'instant';
+      case PollType.deferred:
+        return 'deferred';
+    }
+  }
+}
+
+PollType pollTypeFromString(String value) {
+  switch (value) {
+    case 'instant':
+      return PollType.instant;
+    case 'deferred':
+      return PollType.deferred;
+    default:
+      return PollType.instant;
   }
 }

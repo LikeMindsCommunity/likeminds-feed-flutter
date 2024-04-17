@@ -45,7 +45,20 @@ class LMAttachmentMetaViewDataConvertor {
     if (repost != null) {
       attachmentMetaViewDataBuilder.repost(repost);
     }
-
+    attachmentMetaViewDataBuilder.pollQuestion(attachmentMeta.pollQuestion);
+    attachmentMetaViewDataBuilder.expiryTime(attachmentMeta.expiryTime);
+    attachmentMetaViewDataBuilder.pollOptions(attachmentMeta.pollOptions);
+    if (attachmentMeta.multiSelectState != null) {
+      attachmentMetaViewDataBuilder.multiSelectState(
+          pollMultiSelectStateFromString(attachmentMeta.multiSelectState!));
+    }
+    if (attachmentMeta.pollType != null) {
+      attachmentMetaViewDataBuilder
+          .pollType(pollTypeFromString(attachmentMeta.pollType!));
+    }
+    attachmentMetaViewDataBuilder.multiSelectNo(attachmentMeta.multiSelectNo);
+    attachmentMetaViewDataBuilder.isAnonymous(attachmentMeta.isAnonymous);
+    attachmentMetaViewDataBuilder.allowAddOption(attachmentMeta.allowAddOption);
     return attachmentMetaViewDataBuilder.build();
   }
 
@@ -65,6 +78,14 @@ class LMAttachmentMetaViewDataConvertor {
       width: attachmentMetaViewData.width,
       height: attachmentMetaViewData.height,
       meta: attachmentMetaViewData.meta,
+      pollQuestion: attachmentMetaViewData.pollQuestion,
+      expiryTime: attachmentMetaViewData.expiryTime,
+      pollOptions: attachmentMetaViewData.pollOptions,
+      multiSelectState: attachmentMetaViewData.multiSelectState?.value,
+      pollType: attachmentMetaViewData.pollType?.value,
+      multiSelectNo: attachmentMetaViewData.multiSelectNo,
+      isAnonymous: attachmentMetaViewData.isAnonymous,
+      allowAddOption: attachmentMetaViewData.allowAddOption,
     );
   }
 }
