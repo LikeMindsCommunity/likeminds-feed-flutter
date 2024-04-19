@@ -33,3 +33,7 @@ Adding multiple media support
 Adding API Security
 Adding Post and Comment as variable
 Fixing minor bugs
+
+## 1.2.1
+
+Removing open_filex package
