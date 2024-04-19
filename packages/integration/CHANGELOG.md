@@ -34,3 +34,7 @@ Improvements, and bug fixes
 Adding API Security
 Adding Post and Comment as variable
 Fixing minor bugs
+
+## 1.2.1
+
+Updating LikeMinds Feed Flutter UI to 1.2.1
