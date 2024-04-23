@@ -270,7 +270,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                         padding: style!.showRepliesButtonStyle?.padding ??
                             const EdgeInsets.symmetric(horizontal: 8.0),
                         child: widget.comment.repliesCount > 0
-                            ? widget.replyButtonBuilder
+                            ? widget.showRepliesButtonBuilder
                                     ?.call(_defShowRepliesButton()) ??
                                 _defShowRepliesButton()
                             : const SizedBox.shrink())
