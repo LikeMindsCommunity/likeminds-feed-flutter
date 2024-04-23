@@ -73,4 +73,43 @@ class LMFeedSnackBarStyle {
     this.showCloseIcon,
     this.width,
   });
+
+  LMFeedSnackBarStyle copyWith({
+    SnackBarAction? action,
+    Color? backgroundColor,
+    SnackBarBehavior? behavior,
+    double? elevation,
+    EdgeInsetsGeometry? margin,
+    EdgeInsetsGeometry? padding,
+    ShapeBorder? shape,
+    Duration? duration,
+    Animation<double>? animation,
+    VoidCallback? onVisible,
+    double? actionOverflowThreshold,
+    Clip? clipBehavior,
+    Color? closeIconColor,
+    DismissDirection? dismissDirection,
+    bool? showCloseIcon,
+    double? width,
+  }) {
+    return LMFeedSnackBarStyle(
+      action: action ?? this.action,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      behavior: behavior ?? this.behavior,
+      elevation: elevation ?? this.elevation,
+      margin: margin ?? this.margin,
+      padding: padding ?? this.padding,
+      shape: shape ?? this.shape,
+      duration: duration ?? this.duration,
+      animation: animation ?? this.animation,
+      onVisible: onVisible ?? this.onVisible,
+      actionOverflowThreshold:
+          actionOverflowThreshold ?? this.actionOverflowThreshold,
+      clipBehavior: clipBehavior ?? this.clipBehavior,
+      closeIconColor: closeIconColor ?? this.closeIconColor,
+      dismissDirection: dismissDirection ?? this.dismissDirection,
+      showCloseIcon: showCloseIcon ?? this.showCloseIcon,
+      width: width ?? this.width,
+    );
+  }
 }

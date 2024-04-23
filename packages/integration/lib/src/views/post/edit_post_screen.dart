@@ -73,6 +73,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.editPostScreen;
 
   /// Controllers and other helper classes' objects
   FocusNode? _headingFocusNode;
@@ -219,11 +220,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   _composeBlocListener(BuildContext context, LMFeedComposeState state) {
     if (state is LMFeedComposeMediaErrorState) {
       LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: 'Error while selecting media, please try again',
-          ),
-        ),
+        context,
+        state.error ?? 'Error while selecting media, please try again',
+        widgetSource,
       );
     }
   }
@@ -294,11 +293,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         composeBloc.selectedTopics.isEmpty &&
         config!.enableTopics) {
       LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: "Can't create a $postTitleSmallCap without topic",
-          ),
-        ),
+        context,
+        "Can't create a $postTitleSmallCap without topic",
+        widgetSource,
       );
       return false;
     }
@@ -322,10 +319,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
             if (curr is LMFeedGetPostSuccessState) {
               onBoardPostDetails(curr.post);
             } else if (curr is LMFeedPostErrorState) {
-              LMFeedCore.showSnackBar(LMFeedSnackBar(
-                  content: LMFeedText(
-                text: curr.errorMessage,
-              )));
+              LMFeedCore.showSnackBar(context, curr.errorMessage, widgetSource);
             }
           },
           bloc: LMFeedPostBloc.instance,
@@ -344,7 +338,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     bloc: composeBloc,
                     listener: _composeBlocListener,
                     child: widgetUtility.scaffold(
-                      source: LMFeedWidgetSource.editPostScreen,
+                      source: widgetSource,
                       backgroundColor: feedTheme.container,
                       appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
                           _defAppBar(),
@@ -777,23 +771,18 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     config!.headingRequiredToCreatePost &&
                     (heading == null || heading.isEmpty)) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text:
-                            "Can't create a $postTitleSmallCap without heading",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without heading",
+                    widgetSource,
                   );
                   return;
                 }
 
                 if (config!.textRequiredToCreatePost && postText.isEmpty) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: "Can't create a $postTitleSmallCap without text",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without text",
+                    widgetSource,
                   );
                   return;
                 }
@@ -846,12 +835,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 Navigator.pop(context);
               } else {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "Can't create a $postTitleSmallCap without text or attachments",
-                    ),
-                  ),
+                  context,
+                  "Can't create a $postTitleSmallCap without text or attachments",
+                  widgetSource,
                 );
               }
             },

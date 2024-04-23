@@ -178,9 +178,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         !_postDetailScreenHandler!.rebuildPostWidget.value;
                   } else if (state is LMFeedPostDeletionErrorState) {
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(text: (state).message),
-                      ),
+                      context,
+                      state.message,
+                      _widgetSource,
                     );
                   }
                 },
@@ -255,7 +255,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     .commentHandlerBloc,
                                 listener: (context, state) {
                                   _postDetailScreenHandler!
-                                      .handleBlocChanges(state);
+                                      .handleBlocChanges(context, state);
                                 },
                                 child: PagedSliverList.separated(
                                   pagingController: _postDetailScreenHandler!
@@ -450,6 +450,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
               title: 'Delete $commentTitleFirstCapSingular',
+              widgetSource: _widgetSource,
               uuid: commentCreatorUUID,
               content:
                   'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
@@ -686,6 +687,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
+                widgetSource: _widgetSource,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
@@ -842,12 +844,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             ));
           } else {
             LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: _postDetailScreenHandler!.postData!.isSaved
-                        ? "$postTitleFirstCap Saved"
-                        : "$postTitleFirstCap Unsaved"),
-              ),
+              context,
+              _postDetailScreenHandler!.postData!.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              _widgetSource,
             );
           }
         },
@@ -907,22 +908,17 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A $postTitleSmallCap is already uploading.',
-                      ),
-                    ),
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          'You do not have permission to create a $postTitleSmallCap',
-                    ),
-                  ),
+                  context,
+                  'You do not have permission to create a $postTitleSmallCap',
+                  _widgetSource,
                 );
               },
         style: feedTheme.footerStyle.repostButtonStyle?.copyWith(
@@ -1174,21 +1170,21 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   Widget defBottomTextField() {
-    return SafeArea(
-      child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
-        bloc: _postDetailScreenHandler!.commentHandlerBloc,
-        builder: (context, state) => Container(
-          decoration: BoxDecoration(
-            color: feedTheme.container,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: feedTheme.container,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
           ),
-          child: Column(
+        ],
+      ),
+      child: SafeArea(
+        child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
+          bloc: _postDetailScreenHandler!.commentHandlerBloc,
+          builder: (context, state) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               LikeMindsTheme.kVerticalPaddingMedium,
@@ -1331,12 +1327,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                 commentText = commentText.trim();
                                 if (commentText.isEmpty) {
                                   LMFeedCore.showSnackBar(
-                                    LMFeedSnackBar(
-                                      content: LMFeedText(
-                                        text:
-                                            "Please write something to create a $commentTitleSmallCapSingular",
-                                      ),
-                                    ),
+                                    context,
+                                    "Please write something to create a $commentTitleSmallCapSingular",
+                                    _widgetSource,
                                   );
 
                                   return;
@@ -1485,7 +1478,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   ],
                 ),
               ),
-              LikeMindsTheme.kVerticalPaddingLarge,
             ],
           ),
         ),

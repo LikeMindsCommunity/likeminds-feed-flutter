@@ -46,6 +46,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.savedPostScreen;
   LMFeedThemeData _theme = LMFeedCore.theme;
   Size? screenSize;
   PagingController<int, LMPostViewData> _pagingController =
@@ -112,8 +113,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       listener: (context, state) {
         if (state is LMFeedNewPostErrorState) {
           postUploading.value = false;
-          LMFeedCore.showSnackBar(
-              LMFeedSnackBar(content: LMFeedText(text: state.errorMessage)));
+          LMFeedCore.showSnackBar(context, state.errorMessage, widgetSource);
         }
         if (state is LMFeedNewPostUploadedState) {
           LMPostViewData? item = state.postData;
@@ -225,7 +225,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                                 ?.call(context, postWidget, item) ??
                             LMFeedCore.widgetUtility.postWidgetBuilder.call(
                                 context, postWidget, item,
-                                source: LMFeedWidgetSource.activityScreen);
+                                source: widgetSource);
                       },
                     ),
                   ),
@@ -371,6 +371,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $postTitleFirstCap',
                 uuid: postViewData.uuid,
+                widgetSource: widgetSource,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
@@ -383,7 +384,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                     LMFeedFireAnalyticsEvent(
                       eventName: LMFeedAnalyticsKeys.postDeleted,
                       deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                      widgetSource: LMFeedWidgetSource.savedPostScreen,
+                      widgetSource: widgetSource,
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
@@ -467,7 +468,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              widgetSource: LMFeedWidgetSource.savedPostScreen,
+              widgetSource: widgetSource,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -546,12 +547,11 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                     : LMFeedPostActionType.unsaved));
           } else {
             LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: postViewData.isSaved
-                        ? "$postTitleFirstCap Saved"
-                        : "$postTitleFirstCap Unsaved"),
-              ),
+              context,
+              postViewData.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              widgetSource,
             );
           }
         },
@@ -582,13 +582,12 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          widgetSource: LMFeedWidgetSource.savedPostScreen,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
+                  LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+                      eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                      widgetSource: widgetSource,
+                      deprecatedEventName:
+                          LMFeedAnalyticsKeysDep.postCreationStarted,
+                      eventProperties: {}));
 
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
@@ -608,15 +607,18 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                     ),
                   );
                 } else {
-                  LMFeedCore.showSnackBar(LMFeedSnackBar(
-                      content: LMFeedText(
-                          text: "A $postTitleSmallCap is already uploading.")));
+                  LMFeedCore.showSnackBar(
+                    context,
+                    "A $postTitleSmallCap is already uploading.",
+                    widgetSource,
+                  );
                 }
               }
-            : () => LMFeedCore.showSnackBar(LMFeedSnackBar(
-                content: LMFeedText(
-                    text:
-                        "You do not have permission to create a $postTitleSmallCap."))),
+            : () => LMFeedCore.showSnackBar(
+                  context,
+                  "You do not have permission to create a $postTitleSmallCap.",
+                  widgetSource,
+                ),
         style: _theme.footerStyle.repostButtonStyle?.copyWith(
             icon: _theme.footerStyle.repostButtonStyle?.icon?.copyWith(
               style: _theme.footerStyle.repostButtonStyle?.icon?.style
@@ -701,11 +703,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                   ? () async {
                       if (!postUploading.value) {
                         LMFeedAnalyticsBloc.instance.add(
-                            const LMFeedFireAnalyticsEvent(
+                            LMFeedFireAnalyticsEvent(
                                 eventName:
                                     LMFeedAnalyticsKeys.postCreationStarted,
-                                widgetSource:
-                                    LMFeedWidgetSource.savedPostScreen,
+                                widgetSource: widgetSource,
                                 deprecatedEventName:
                                     LMFeedAnalyticsKeysDep.postCreationStarted,
                                 eventProperties: {}));
@@ -719,16 +720,17 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                           ),
                         );
                       } else {
-                        LMFeedCore.showSnackBar(LMFeedSnackBar(
-                            content: LMFeedText(
-                                text:
-                                    "A $postTitleSmallCap is already uploading.")));
+                        LMFeedCore.showSnackBar(
+                            context,
+                            "A $postTitleSmallCap is already uploading.",
+                            widgetSource);
                       }
                     }
-                  : () => LMFeedCore.showSnackBar(LMFeedSnackBar(
-                      content: LMFeedText(
-                          text:
-                              "You do not have permission to create a $postTitleSmallCap."))),
+                  : () => LMFeedCore.showSnackBar(
+                        context,
+                        "You do not have permission to create a $postTitleSmallCap.",
+                        widgetSource,
+                      ),
             ),
           ],
         ),
@@ -825,7 +827,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: LMFeedWidgetSource.savedPostScreen,
+          widgetSource: widgetSource,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

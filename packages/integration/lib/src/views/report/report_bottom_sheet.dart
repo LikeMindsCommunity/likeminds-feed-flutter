@@ -68,6 +68,7 @@ class LMFeedReportBottomSheet extends StatefulWidget {
 class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
   LMFeedModerationBloc reportBloc = LMFeedModerationBloc();
   LMFeedThemeData? feedTheme;
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.reportScreen;
 
   @override
   void initState() {
@@ -97,17 +98,17 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
           bloc: reportBloc,
           listener: (context, state) {
             if (state is LMFeedReportSubmitFailedState) {
-              LMFeedCore.showSnackBar(LMFeedSnackBar(
-                  content: LMFeedText(
-                text: state.error,
-              )));
+              LMFeedCore.showSnackBar(
+                context,
+                state.error,
+                widgetSource,
+              );
             } else if (state is LMFeedReportSubmittedState) {
               Navigator.of(context).pop();
-              LMFeedCore.showSnackBar(LMFeedSnackBar(
-                  content: LMFeedText(
-                text: widget.successMessage ??
-                    'Reported! Thanks for making our community a safe place',
-              )));
+              LMFeedCore.showSnackBar(
+                  context,
+                  'Reported! Thanks for making our community a safe place',
+                  widgetSource);
             }
           },
           builder: (context, state) {

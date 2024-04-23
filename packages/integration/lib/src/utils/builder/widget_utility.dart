@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
+/// {@template feed_widget_utility}
+/// A utility class that provides a set of methods to build widgets for the feed.
+/// {@endtemplate}
 class LMFeedWidgetUtility {
+  /// {@macro feed_widget_utility}
   LMFeedWidgetUtility();
 
   static LMFeedWidgetUtility? _instance;
@@ -260,6 +264,11 @@ class LMFeedWidgetUtility {
     return const SizedBox();
   }
 
+  PreferredSizeWidget composeScreenAppBar(
+      BuildContext context, LMFeedAppBar appBar) {
+    return appBar;
+  }
+
   Widget composeScreenUserHeaderBuilder(
       BuildContext context, LMUserViewData user) {
     return const SizedBox.shrink();
@@ -278,5 +287,17 @@ class LMFeedWidgetUtility {
   Widget composeScreenContentTextfieldBuilder(
       BuildContext context, LMTaggingAheadTextField contentTextField) {
     return contentTextField;
+  }
+
+  /// {@template snackbar_builder}
+  /// Builds a [SnackBar] widget based on the provided [snackBar].
+  /// {@endtemplate}
+  SnackBar snackBarBuilder(
+      BuildContext context, String snackBarMessage, LMFeedWidgetSource source,
+      {LMFeedSnackBarStyle? style}) {
+    return LMFeedSnackBar(
+      content: LMFeedText(text: snackBarMessage),
+      style: style ?? LMFeedCore.theme.snackBarTheme,
+    );
   }
 }

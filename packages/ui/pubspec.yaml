@@ -1,6 +1,6 @@
 name: likeminds_feed_flutter_ui
 description: A Flutter package for Likeminds Feed UI widgets. Used alongside the Likeminds Feed SDK package (likeminds_feed) to build custom interfaces.
-version: 1.2.1
+version: 1.2.2
 homepage: "https://www.likeminds.community/"
 
 environment:

@@ -317,12 +317,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                 }
                               : () {
                                   LMFeedCore.showSnackBar(
-                                    LMFeedSnackBar(
-                                      content: LMFeedText(
-                                        text:
-                                            "You do not have permission to create a $postTitleSmallCap",
-                                      ),
-                                    ),
+                                    context,
+                                    "You do not have permission to create a $postTitleSmallCap",
+                                    _widgetSource,
+                                    style: LMFeedCore.theme.snackBarTheme,
                                   );
                                 })
                       : widget.customWidgetBuilder!(context)
@@ -364,12 +362,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     // show a snackbar when post is deleted
                     // will only be shown if a messenger key is provided
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(
-                          text: '$postTitleFirstCap Deleted',
-                        ),
-                      ),
+                      context,
+                      '$postTitleFirstCap Deleted',
+                      _widgetSource,
                     );
+
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     feedRoomItemList
@@ -415,9 +412,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     postUploading.value = false;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
 
-                    LMFeedCore.showSnackBar(LMFeedSnackBar(
-                        content:
-                            LMFeedText(text: "$postTitleFirstCap Created")));
+                    LMFeedCore.showSnackBar(
+                      context,
+                      '$postTitleFirstCap Created',
+                      _widgetSource,
+                    );
                   }
                   if (curr is LMFeedEditPostUploadedState) {
                     LMPostViewData? item = curr.postData.copyWith();
@@ -434,18 +433,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     postUploading.value = false;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
 
-                    LMFeedCore.showSnackBar(LMFeedSnackBar(
-                        content:
-                            LMFeedText(text: "$postTitleFirstCap Edited")));
+                    LMFeedCore.showSnackBar(
+                        context, '$postTitleFirstCap Edited', _widgetSource);
                   }
                   if (curr is LMFeedNewPostErrorState) {
                     postUploading.value = false;
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(
-                          text: curr.errorMessage,
-                        ),
-                      ),
+                      context,
+                      curr.errorMessage,
+                      _widgetSource,
                     );
                   }
                   if (curr is LMFeedPostUpdateState) {
@@ -464,9 +460,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   }
                   if (curr is LMFeedPostDeletionErrorState) {
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(text: (curr).message),
-                      ),
+                      context,
+                      curr.message,
+                      _widgetSource,
                     );
                   }
                 },
@@ -959,6 +955,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
+                widgetSource: _widgetSource,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
@@ -1141,12 +1138,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     : LMFeedPostActionType.unsaved));
           } else {
             LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: postViewData.isSaved
-                        ? "$postTitleFirstCap Saved"
-                        : "$postTitleFirstCap Unsaved"),
-              ),
+              context,
+              postViewData.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              _widgetSource,
             );
           }
         },
@@ -1208,22 +1204,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A $postTitleSmallCap is already uploading.',
-                      ),
-                    ),
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "You do not have permission to create a $postTitleSmallCap",
-                    ),
-                  ),
+                  context,
+                  'You do not have permission to create a $postTitleSmallCap',
+                  _widgetSource,
                 );
               },
         style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
@@ -1314,22 +1305,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 );
               } else {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: 'A $postTitleSmallCap is already uploading.',
-                    ),
-                  ),
-                );
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource);
               }
             }
           : () {
               LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text:
-                        "You do not have permission to create a $postTitleSmallCap",
-                  ),
-                ),
+                context,
+                "You do not have permission to create a $postTitleSmallCap",
+                _widgetSource,
               );
             },
     );
@@ -1387,22 +1372,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A $postTitleSmallCap is already uploading.',
-                      ),
-                    ),
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "You do not have permission to create a $postTitleSmallCap",
-                    ),
-                  ),
+                  context,
+                  "You do not have permission to create a $postTitleSmallCap",
+                  _widgetSource,
                 );
               },
       );
