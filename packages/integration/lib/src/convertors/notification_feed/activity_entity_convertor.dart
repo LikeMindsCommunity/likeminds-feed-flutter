@@ -10,8 +10,10 @@ class LMActivityEntityViewDataConvertor {
 
     if (activityEntityData.attachments != null) {
       activityEntityViewDataBuilder.attachments(activityEntityData.attachments!
-          .map((e) =>
-              LMAttachmentViewDataConvertor.fromAttachment(attachment: e))
+          .map((e) => LMAttachmentViewDataConvertor.fromAttachment(
+              attachment: e,
+              users: users.map(
+                  (k, v) => MapEntry(k, LMUserViewDataConvertor.fromUser(v)))))
           .toList());
     }
 

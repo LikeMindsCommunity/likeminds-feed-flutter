@@ -45,7 +45,6 @@ class _PollResultScreenState extends State<PollResultScreen> {
               children: [
                 TabBar(
                   dividerColor: theme.primaryColor,
-                  dividerHeight: 4,
                   indicatorColor: theme.primaryColor,
                   indicatorWeight: 4,
                   labelColor: theme.primaryColor,

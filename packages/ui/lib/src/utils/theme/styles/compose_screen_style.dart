@@ -8,6 +8,7 @@ class LMFeedComposeScreenStyle {
   final LMFeedIcon? addImageIcon;
   final LMFeedIcon? addVideoIcon;
   final LMFeedIcon? addDocumentIcon;
+  final LMFeedIcon? addPollIcon;
 
   const LMFeedComposeScreenStyle({
     this.mediaPadding,
@@ -15,6 +16,7 @@ class LMFeedComposeScreenStyle {
     this.addImageIcon,
     this.addVideoIcon,
     this.addDocumentIcon,
+    this.addPollIcon,
   });
 
   LMFeedComposeScreenStyle copyWith({
@@ -23,6 +25,7 @@ class LMFeedComposeScreenStyle {
     LMFeedIcon? addImageIcon,
     LMFeedIcon? addVideoIcon,
     LMFeedIcon? addDocumentIcon,
+    LMFeedIcon? addPollIcon,
   }) {
     return LMFeedComposeScreenStyle(
       mediaPadding: mediaPadding ?? this.mediaPadding,
@@ -30,6 +33,7 @@ class LMFeedComposeScreenStyle {
       addImageIcon: addImageIcon ?? addImageIcon,
       addVideoIcon: addVideoIcon ?? addVideoIcon,
       addDocumentIcon: addDocumentIcon ?? addDocumentIcon,
+      addPollIcon: addPollIcon ?? addPollIcon,
     );
   }
 
@@ -60,6 +64,16 @@ class LMFeedComposeScreenStyle {
         addDocumentIcon: LMFeedIcon(
           type: LMFeedIconType.icon,
           icon: Icons.file_open_outlined,
+          style: LMFeedIconStyle(
+            color: primaryColor ?? LikeMindsTheme.primaryColor,
+            size: 32,
+            boxPadding: 0,
+            fit: BoxFit.contain,
+          ),
+        ),
+        addPollIcon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.poll_outlined,
           style: LMFeedIconStyle(
             color: primaryColor ?? LikeMindsTheme.primaryColor,
             size: 32,

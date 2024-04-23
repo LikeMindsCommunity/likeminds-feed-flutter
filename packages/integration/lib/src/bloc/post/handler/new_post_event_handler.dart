@@ -24,6 +24,17 @@ void newPostEventHandler(
         ),
       );
       for (final media in postMedia) {
+        if (media.mediaType == LMMediaType.poll) {
+          attachments.add(
+            Attachment(
+              attachmentType: 6,
+              attachmentMeta:
+                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
+                      media.attachmentMetaViewData!),
+            ),
+          );
+          continue;
+        }
         if (media.mediaType == LMMediaType.repost) {
           attachments.add(
             Attachment(

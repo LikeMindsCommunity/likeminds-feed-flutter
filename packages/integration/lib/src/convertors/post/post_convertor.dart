@@ -42,11 +42,18 @@ class LMPostViewDataConvertor {
             repostedPosts != null &&
             repostedPosts[e.attachmentMeta.entityId] != null) {
           repost = repostedPosts[e.attachmentMeta.entityId]!;
+        } else if (e.attachmentType == 6) {
+          String? key = e.attachmentMeta.entityId;
+          if (key != null && widgets?[key] != null) {
+            postWidget[key] = widgets![key]!;
+          }
         }
 
         return LMAttachmentViewDataConvertor.fromAttachment(
           attachment: e,
           repost: repost,
+          widget: postWidget[e.attachmentMeta.entityId],
+          users: users,
         );
       }).toList());
     }

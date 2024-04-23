@@ -24,4 +24,6 @@ export 'topic/topic_feed_grid.dart';
 export 'topic/topic_tile.dart';
 export 'topic/feed_topic_bar.dart';
 
+export 'poll/poll.dart';
+
 export 'common/shimmer/user_tile_shimmer.dart';

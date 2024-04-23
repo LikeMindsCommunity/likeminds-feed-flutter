@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMAttachmentMetaViewData {
@@ -20,6 +21,7 @@ class LMAttachmentMetaViewData {
   final int? multiSelectNo;
   final bool? isAnonymous;
   final bool? allowAddOption;
+  final List<LMPostOptionViewData>? options;
 
   LMAttachmentMetaViewData._({
     this.url,
@@ -41,7 +43,14 @@ class LMAttachmentMetaViewData {
     this.multiSelectNo,
     this.isAnonymous,
     this.allowAddOption,
+    this.options,
   });
+
+  @override
+  String toString() {
+    // ignore: lines_longer_than_80_chars
+    return 'LMAttachmentMetaViewData(url: $url, format: $format, size: $size, duration: $duration, pageCount: $pageCount, ogTags: $ogTags, height: $height, width: $width, aspectRatio: $aspectRatio, meta: $meta, repost: $repost, pollQuestion: $pollQuestion, expiryTime: $expiryTime, pollOptions: $pollOptions, multiSelectState: $multiSelectState, pollType: $pollType, multiSelectNo: $multiSelectNo, isAnonymous: $isAnonymous, allowAddOption: $allowAddOption, options: $options)';
+  }
 }
 
 class LMAttachmentMetaViewDataBuilder {
@@ -64,6 +73,7 @@ class LMAttachmentMetaViewDataBuilder {
   int? _multiSelectNo;
   bool? _isAnonymous;
   bool? _allowAddOption;
+  List<LMPostOptionViewData>? _options;
 
   void url(String url) {
     _url = url;
@@ -141,6 +151,10 @@ class LMAttachmentMetaViewDataBuilder {
     _allowAddOption = allowAddOption;
   }
 
+  void options(List<LMPostOptionViewData>? options) {
+    _options = options;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -162,11 +176,12 @@ class LMAttachmentMetaViewDataBuilder {
       multiSelectNo: _multiSelectNo,
       isAnonymous: _isAnonymous,
       allowAddOption: _allowAddOption,
+      options: _options,
     );
   }
 }
 
-enum PollMultiSelectState { exactly, atLeast, atMost }
+enum PollMultiSelectState { exactly, atLeast, atMax }
 
 extension PollMultiSelectStateExtension on PollMultiSelectState {
   String get value {
@@ -175,8 +190,19 @@ extension PollMultiSelectStateExtension on PollMultiSelectState {
         return 'exactly';
       case PollMultiSelectState.atLeast:
         return 'at_least';
-      case PollMultiSelectState.atMost:
-        return 'at_most';
+      case PollMultiSelectState.atMax:
+        return 'at_max';
+    }
+  }
+
+  String get name {
+    switch (this) {
+      case PollMultiSelectState.exactly:
+        return 'exactly';
+      case PollMultiSelectState.atLeast:
+        return 'at least';
+      case PollMultiSelectState.atMax:
+        return 'at most';
     }
   }
 }
@@ -187,8 +213,8 @@ PollMultiSelectState pollMultiSelectStateFromString(String value) {
       return PollMultiSelectState.exactly;
     case 'at_least':
       return PollMultiSelectState.atLeast;
-    case 'at_most':
-      return PollMultiSelectState.atMost;
+    case 'at_max':
+      return PollMultiSelectState.atMax;
     default:
       return PollMultiSelectState.exactly;
   }

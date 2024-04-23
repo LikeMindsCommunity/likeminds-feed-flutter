@@ -267,6 +267,7 @@ class LMFeedPostUtils {
               ..attachments(activity.activityEntityData.attachments
                       ?.map((e) => LMAttachmentViewDataConvertor.fromAttachment(
                             attachment: e,
+                            users: users,
                           ))
                       .toList() ??
                   [])

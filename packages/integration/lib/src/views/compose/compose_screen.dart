@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/create_poll_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
@@ -306,8 +307,26 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         if (state is LMFeedComposeMediaLoadingState) {
           return const LMFeedLoader();
         }
-
         if (composeBloc.postMedia.isNotEmpty) {
+          if (composeBloc.isPollAdded) {
+            return LMFeedPoll(
+              attachmentMeta:
+                  composeBloc.postMedia.first.attachmentMetaViewData!,
+              onCancel: () {
+                composeBloc.add(LMFeedComposeCloseEvent());
+              },
+              onEdit: (attachmentMeta) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LMFeedCreatePollScreen(
+                      attachmentMeta: attachmentMeta,
+                    ),
+                  ),
+                );
+              },
+            );
+          }
           if (composeBloc.postMedia.first.mediaType == LMMediaType.repost) {
             return Padding(
               padding: const EdgeInsets.only(right: 16.0),
@@ -384,7 +403,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               physics: LMFeedComposeBloc.instance.documentCount > 0
                   ? const NeverScrollableScrollPhysics()
                   : null,
-              shrinkWrap: true,
+              // shrinkWrap: true,
               itemCount: composeBloc.postMedia.length,
               itemBuilder: (context, index) {
                 Widget mediaWidget;
@@ -486,7 +505,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   padding: EdgeInsets.zero,
                   child: Stack(
                     children: <Widget>[
-                      mediaWidget,
+                      SizedBox(
+                        width: screenSize?.width,
+                        child: mediaWidget),
                       if (composeBloc.postMedia[index].mediaType !=
                           LMMediaType.document)
                         Positioned(
@@ -847,11 +868,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       listener: (context, state) {
         if (state is LMFeedComposeAddedDocumentState ||
             state is LMFeedComposeAddedImageState ||
-            state is LMFeedComposeAddedVideoState) {
+            state is LMFeedComposeAddedVideoState ||
+            state is LMFeedComposeAddedPollState ||
+            state is LMFeedComposeRemovedAttachmentState ||
+            state is LMFeedComposeInitialState) {
           rebuildTopicFloatingButton.value = !rebuildTopicFloatingButton.value;
         }
       },
       builder: (context, state) {
+        if (composeBloc.isPollAdded) {
+          return const SizedBox();
+        }
         if (composeBloc.postMedia.length == 10) {
           return const SizedBox();
         }
@@ -945,6 +972,36 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     composeBloc.add(LMFeedComposeAddDocumentEvent());
                   },
                 ),
+              if (config!.enablePolls &&
+                  composeBloc.videoCount == 0 &&
+                  composeBloc.imageCount == 0 &&
+                  composeBloc.documentCount == 0)
+                LMFeedButton(
+                  isActive: false,
+                  style: LMFeedButtonStyle(
+                    placement: LMFeedIconButtonPlacement.end,
+                    showText: false,
+                    icon: style?.addPollIcon ??
+                        LMFeedIcon(
+                          type: LMFeedIconType.icon,
+                          icon: Icons.poll_outlined,
+                          style: LMFeedIconStyle(
+                            color: theme.primaryColor,
+                            size: 32,
+                            boxPadding: 0,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                  ),
+                  onTap: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LMFeedCreatePollScreen(),
+                      ),
+                    );
+                  },
+                ),
               Spacer(),
               composeBloc.postMedia.length > 0 && config!.showMediaCount
                   ? Padding(
@@ -971,8 +1028,12 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         valueListenable: rebuildTopicFloatingButton,
         builder: (context, _, __) {
           return Container(
+            height: 40,
             margin: EdgeInsets.only(
-              bottom: composeBloc.postMedia.length == 10 ? 0 : 25,
+              bottom:
+                  composeBloc.postMedia.length == 10 || composeBloc.isPollAdded
+                      ? 0
+                      : 25,
             ),
             child: Row(children: [
               Align(

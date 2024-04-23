@@ -98,6 +98,15 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
     if (attachments == null || attachments!.isEmpty) {
       return const SizedBox();
     }
+
+    /// if attachment is a poll
+    if (attachments!.first.attachmentType == 6) {
+      return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: LMFeedPoll(
+            attachmentMeta: attachments!.first.attachmentMeta,
+          ));
+    }
     if (attachments!.first.attachmentType == 3) {
       /// If the attachment is a document,
       /// we need to call the method 'getDocumentList'

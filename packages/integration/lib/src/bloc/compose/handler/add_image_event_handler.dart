@@ -39,6 +39,9 @@ addImageEventHandler(
             },
           ),
         );
+        LMFeedComposeBloc.instance.postMedia
+            .removeWhere((element) => element.mediaType == LMMediaType.link);
+        emitter(LMFeedComposeAddedImageState());
 
         emitter(LMFeedComposeAddedImageState());
       } else {

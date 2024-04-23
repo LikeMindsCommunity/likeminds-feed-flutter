@@ -15,7 +15,7 @@ Future<(String?, String?)> initiateUser(String uuid, String userName) async {
       }),
       data: {
         'uuid': uuid,
-        'userName': userName,
+        'user_name': userName,
       });
 
   if (response.data['success']) {

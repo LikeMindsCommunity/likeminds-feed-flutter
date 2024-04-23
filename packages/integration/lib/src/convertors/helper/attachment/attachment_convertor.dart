@@ -6,7 +6,9 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 class LMAttachmentViewDataConvertor {
   static LMAttachmentViewData fromAttachment({
     required Attachment attachment,
+    LMWidgetViewData? widget,
     LMPostViewData? repost,
+    required Map<String, LMUserViewData>? users,
   }) {
     LMAttachmentViewDataBuilder attachmentViewDataBuilder =
         LMAttachmentViewDataBuilder();
@@ -16,6 +18,8 @@ class LMAttachmentViewDataConvertor {
         .attachmentMeta(LMAttachmentMetaViewDataConvertor.attachmentMeta(
       attachmentMeta: attachment.attachmentMeta,
       repost: repost,
+      widget: widget,
+      users: users,
     ));
 
     return attachmentViewDataBuilder.build();

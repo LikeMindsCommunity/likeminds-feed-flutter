@@ -17,6 +17,17 @@ class LMFeedComposeEvent extends Equatable {
 /// {@endtemplate}
 class LMFeedComposeFetchTopicsEvent extends LMFeedComposeEvent {}
 
+///{@template lm_feed_compose_add_poll_event}
+/// [LMFeedComposeAddPollEvent] adds a poll to the post
+/// {@endtemplate}
+class LMFeedComposeAddPollEvent extends LMFeedComposeEvent {
+  final LMAttachmentMetaViewData attachmentMetaViewData;
+  const LMFeedComposeAddPollEvent({required this.attachmentMetaViewData});
+
+  @override
+  List<Object?> get props => [attachmentMetaViewData];
+}
+
 /// {@template lm_feed_compose_add_image_event}
 /// [LMFeedComposeAddImageEvent] opens the image picker and handles the flow
 /// to add the selected images to the post

@@ -61,7 +61,7 @@ class LMFeedCore {
   static LMFeedWidgetUtility get widgetUtility => instance._widgetUtility;
 
   static void showSnackBar(LMFeedSnackBar snackBar) {
-    snackBar = snackBar.copyWith(style: theme.snackBarTheme);
+    snackBar = snackBar.copyWith(style: snackBar.style ?? theme.snackBarTheme);
     instance._scaffoldMessengerKey?.currentState?.showSnackBar(snackBar);
   }
 

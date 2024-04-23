@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/poll_attachement_widget.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedCreatePollScreen extends StatefulWidget {
-  const LMFeedCreatePollScreen({super.key});
+  const LMFeedCreatePollScreen({
+    super.key,
+    this.attachmentMeta,
+  });
+  final LMAttachmentMetaViewData? attachmentMeta;
 
   @override
   State<LMFeedCreatePollScreen> createState() => _LMFeedCreatePollScreenState();
@@ -22,6 +21,15 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
   String exactlyDialogKey = 'exactly';
   int exactlyValue = 1;
   ValueNotifier<bool> _advancedBuilder = ValueNotifier(false);
+  final TextEditingController _questionController = TextEditingController();
+  ValueNotifier<DateTime?> _expiryDateBuilder = ValueNotifier(null);
+  ValueNotifier<PollMultiSelectState> _multiSelectStateBuilder =
+      ValueNotifier(PollMultiSelectState.exactly);
+  ValueNotifier<bool> _rebuildMultiSelectStateBuilder = ValueNotifier(false);
+  ValueNotifier<int> _multiSelectNoBuilder = ValueNotifier(1);
+  ValueNotifier<bool> _pollTypeBuilder = ValueNotifier(false);
+  ValueNotifier<bool> _isAnonymousBuilder = ValueNotifier(false);
+  ValueNotifier<bool> _allowAddOptionBuilder = ValueNotifier(false);
 
   Future<DateTime?> showDateTimePicker({
     required BuildContext context,
@@ -30,7 +38,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
     DateTime? lastDate,
   }) async {
     initialDate ??= DateTime.now();
-    firstDate ??= initialDate.subtract(const Duration(days: 365 * 100));
+    firstDate ??= DateTime.now();
     lastDate ??= firstDate.add(const Duration(days: 365 * 200));
 
     final DateTime? selectedDate = await showDatePicker(
@@ -56,7 +64,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
 
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(selectedDate),
+      initialTime: TimeOfDay.fromDateTime(initialDate),
       builder: (context, child) {
         return Theme(
             data: Theme.of(context).copyWith(
@@ -68,16 +76,120 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
             child: child!);
       },
     );
+    if (selectedTime == null) return null;
+    DateTime selectedDateTime = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
 
-    return selectedTime == null
-        ? selectedDate
-        : DateTime(
-            selectedDate.year,
-            selectedDate.month,
-            selectedDate.day,
-            selectedTime.hour,
-            selectedTime.minute,
-          );
+    if (selectedDateTime.isBefore(DateTime.now())) {
+      showSnackBar('Expiry date cannot be in the past');
+      return null;
+    }
+
+    return selectedDateTime;
+  }
+
+  String getFormattedDate(DateTime date) {
+    String day = date.day < 10 ? '0${date.day}' : '${date.day}';
+    String month = date.month < 10 ? '0${date.month}' : '${date.month}';
+    String hour = date.hour < 10 ? '0${date.hour}' : '${date.hour}';
+    String minute = date.minute < 10 ? '0${date.minute}' : '${date.minute}';
+
+    return '$day-$month-${date.year} $hour:$minute';
+  }
+
+  void showSnackBar(String message) {
+    LMFeedCore.showSnackBar(
+      LMFeedSnackBar(
+        style: LMFeedSnackBarStyle(
+          behavior: SnackBarBehavior.fixed,
+        ),
+        content: LMFeedText(
+          text: message,
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  bool checkForUniqueOptions() {
+    Set<String> uniqueOptions = options.toSet();
+    if (uniqueOptions.length != options.length) {
+      showSnackBar('Options should be unique');
+      return false;
+    }
+    return true;
+  }
+
+  bool validatePoll() {
+    // check if question is empty
+    if (_questionController.text.trim().isEmpty) {
+      showSnackBar('Question cannot be empty');
+      return false;
+    }
+
+    // trim options and check if options are empty
+    for (int i = 0; i < options.length; i++) {
+      options[i] = options[i].trim();
+      if (options[i].isEmpty) {
+        showSnackBar('Option ${i + 1} cannot be empty');
+        return false;
+      }
+    }
+
+    // check if options are unique
+    if (!checkForUniqueOptions()) {
+      return false;
+    }
+
+    // check if expiry date is empty and in future
+    if (_expiryDateBuilder.value == null) {
+      showSnackBar('Expiry date cannot be empty');
+      return false;
+    } else if (_expiryDateBuilder.value!.isBefore(DateTime.now())) {
+      showSnackBar('Expiry date cannot be in the past');
+      return false;
+    }
+
+    return true;
+  }
+
+  void loadInitialData() {
+    if (widget.attachmentMeta != null) {
+      LMAttachmentMetaViewData attachmentMeta = widget.attachmentMeta!;
+      _questionController.text = attachmentMeta.pollQuestion ?? '';
+      options = attachmentMeta.pollOptions ?? [];
+      _expiryDateBuilder.value = attachmentMeta.expiryTime != null
+          ? DateTime.fromMillisecondsSinceEpoch(attachmentMeta.expiryTime!)
+          : null;
+      _multiSelectStateBuilder.value =
+          attachmentMeta.multiSelectState ?? PollMultiSelectState.exactly;
+      _multiSelectNoBuilder.value = attachmentMeta.multiSelectNo ?? 1;
+      _pollTypeBuilder.value = attachmentMeta.pollType == PollType.deferred;
+      _isAnonymousBuilder.value = attachmentMeta.isAnonymous ?? false;
+      _allowAddOptionBuilder.value = attachmentMeta.allowAddOption ?? false;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadInitialData();
+  }
+
+  @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    loadInitialData();
   }
 
   @override
@@ -106,11 +218,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
           ),
           trailing: [
             LMFeedButton(
-              onTap: () {
-                for (String option in options) {
-                  debugPrint(option);
-                }
-              },
+              onTap: onPollSubmit,
               text: LMFeedText(
                 text: 'POST',
                 style: LMFeedTextStyle(
@@ -156,7 +264,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                     ),
                   ),
                   LMFeedText(
-                    text: 'Polls question',
+                    text: 'Poll question',
                     style: LMFeedTextStyle(
                       textStyle: TextStyle(
                           fontSize: 16,
@@ -165,6 +273,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                     ),
                   ),
                   TextField(
+                    controller: _questionController,
                     maxLines: 3,
                     decoration: InputDecoration(
                       hintText: 'Ask a question',
@@ -207,12 +316,19 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                             itemBuilder: (context, index) {
                               return OptionTile(
                                 index: index,
+                                isRemovable: options.length > 2,
                                 option: options[index],
                                 onDelete: () {
                                   if (options.length > 2) {
                                     options.removeAt(index);
                                     _optionBuilder.value =
                                         !_optionBuilder.value;
+                                    _rebuildMultiSelectStateBuilder.value =
+                                        !_rebuildMultiSelectStateBuilder.value;
+                                    if (_multiSelectNoBuilder.value >
+                                        options.length) {
+                                      _multiSelectNoBuilder.value = 1;
+                                    }
                                   }
                                 },
                                 onChanged: (value) {
@@ -223,9 +339,15 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                       }),
                   LMFeedTile(
                     onTap: () {
-                      options.add('');
-                      _optionBuilder.value = !_optionBuilder.value;
-                      debugPrint('Add option');
+                      if (options.length < 10) {
+                        options.add('');
+                        _optionBuilder.value = !_optionBuilder.value;
+                        _rebuildMultiSelectStateBuilder.value =
+                            !_rebuildMultiSelectStateBuilder.value;
+                        debugPrint('Add option');
+                      } else {
+                        showSnackBar('You can add at max 10 options');
+                      }
                     },
                     style: LMFeedTileStyle(
                         padding: EdgeInsets.symmetric(
@@ -274,22 +396,32 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: GestureDetector(
                       onTap: () async {
-                        DateTime? dateTime =
-                            await showDateTimePicker(context: context);
-                        debugPrint(dateTime.toString());
+                        DateTime? selectedDate = await showDateTimePicker(
+                          context: context,
+                          initialDate: _expiryDateBuilder.value,
+                        );
+                        if (selectedDate != null) {
+                          _expiryDateBuilder.value = selectedDate;
+                        }
                       },
                       child: SizedBox(
                           width: double.infinity,
-                          child: LMFeedText(
-                            text: 'DD-MM-YYYY hh:mm',
-                            style: LMFeedTextStyle(
-                              textStyle: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: theme.inActiveColor,
-                              ),
-                            ),
-                          )),
+                          child: ValueListenableBuilder(
+                              valueListenable: _expiryDateBuilder,
+                              builder: (context, value, child) {
+                                return LMFeedText(
+                                  text: value == null
+                                      ? 'DD-MM-YYYY hh:mm'
+                                      : getFormattedDate(value),
+                                  style: LMFeedTextStyle(
+                                    textStyle: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: theme.inActiveColor,
+                                    ),
+                                  ),
+                                );
+                              })),
                     ),
                   )
                 ],
@@ -312,65 +444,88 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    SwitchListTile(
-                                      value: false,
-                                      onChanged: (value) {},
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 18,
-                                      ),
-                                      title: LMFeedText(
-                                        text: 'Allow voters to add options',
-                                        style: LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: theme.onContainer,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    ValueListenableBuilder(
+                                        valueListenable: _allowAddOptionBuilder,
+                                        builder: (context, value, child) {
+                                          return SwitchListTile(
+                                            value: value,
+                                            onChanged: (value) {
+                                              _allowAddOptionBuilder.value =
+                                                  value;
+                                            },
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                              horizontal: 18,
+                                            ),
+                                            title: LMFeedText(
+                                              text:
+                                                  'Allow voters to add options',
+                                              style: LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: theme.onContainer,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
                                     Divider(
                                       color: theme.inActiveColor,
                                       height: 0,
                                     ),
-                                    SwitchListTile(
-                                      value: false,
-                                      onChanged: (value) {},
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 18,
-                                      ),
-                                      title: LMFeedText(
-                                        text: 'Anonymous poll',
-                                        style: LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: theme.onContainer,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    ValueListenableBuilder(
+                                        valueListenable: _isAnonymousBuilder,
+                                        builder: (context, value, child) {
+                                          return SwitchListTile(
+                                            value: value,
+                                            onChanged: (value) {
+                                              _isAnonymousBuilder.value = value;
+                                            },
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                              horizontal: 18,
+                                            ),
+                                            title: LMFeedText(
+                                              text: 'Anonymous poll',
+                                              style: LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: theme.onContainer,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
                                     Divider(
                                       color: theme.inActiveColor,
                                       height: 0,
                                     ),
-                                    SwitchListTile(
-                                      value: false,
-                                      onChanged: (value) {},
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 18,
-                                      ),
-                                      title: LMFeedText(
-                                        text: 'Don\'t show live results',
-                                        style: LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w400,
-                                            color: theme.onContainer,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    ValueListenableBuilder(
+                                        valueListenable: _pollTypeBuilder,
+                                        builder: (context, value, child) {
+                                          return SwitchListTile(
+                                            value: value,
+                                            onChanged: (value) {
+                                              _pollTypeBuilder.value = value;
+                                            },
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                              horizontal: 18,
+                                            ),
+                                            title: LMFeedText(
+                                              text: 'Don\'t show live results',
+                                              style: LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: theme.onContainer,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
                                     Divider(
                                       color: theme.inActiveColor,
                                       height: 0,
@@ -398,31 +553,47 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              DropdownButton<String>(
-                                                value: exactlyDialogKey,
-                                                onChanged: (value) =>
-                                                    exactlyDialogKey = value!,
-                                                items: [
-                                                  DropdownMenuItem(
-                                                    child: LMFeedText(
-                                                      text: 'Exactly',
-                                                    ),
-                                                    value: 'exactly',
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: LMFeedText(
-                                                      text: 'At most',
-                                                    ),
-                                                    value: 'atMost',
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: LMFeedText(
-                                                      text: 'At least',
-                                                    ),
-                                                    value: 'atLeast',
-                                                  ),
-                                                ],
-                                              ),
+                                              ValueListenableBuilder(
+                                                  valueListenable:
+                                                      _multiSelectStateBuilder,
+                                                  builder:
+                                                      (context, value, child) {
+                                                    return DropdownButton<
+                                                        PollMultiSelectState>(
+                                                      value: value,
+                                                      onChanged: (value) {
+                                                        if (value != null)
+                                                          _multiSelectStateBuilder
+                                                              .value = value;
+                                                      },
+                                                      items: [
+                                                        DropdownMenuItem(
+                                                          child: LMFeedText(
+                                                            text: "Exactly",
+                                                          ),
+                                                          value:
+                                                              PollMultiSelectState
+                                                                  .exactly,
+                                                        ),
+                                                        DropdownMenuItem(
+                                                          child: LMFeedText(
+                                                            text: "At least",
+                                                          ),
+                                                          value:
+                                                              PollMultiSelectState
+                                                                  .atLeast,
+                                                        ),
+                                                        DropdownMenuItem(
+                                                          child: LMFeedText(
+                                                            text: "At max",
+                                                          ),
+                                                          value:
+                                                              PollMultiSelectState
+                                                                  .atMax,
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }),
                                               LMFeedText(
                                                 text: '=',
                                                 style: LMFeedTextStyle(
@@ -433,34 +604,43 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                                                   ),
                                                 ),
                                               ),
-                                              DropdownButton<int>(
-                                                value: exactlyValue,
-                                                items: [
-                                                  DropdownMenuItem(
-                                                    child: LMFeedText(
-                                                        text: '1 option'),
-                                                    value: 1,
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: LMFeedText(
-                                                        text: '2 options'),
-                                                    value: 2,
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: LMFeedText(
-                                                        text: '3 options'),
-                                                    value: 3,
-                                                  ),
-                                                  DropdownMenuItem(
-                                                    child: LMFeedText(
-                                                        text: '4 options'),
-                                                    value: 4,
-                                                  ),
-                                                ],
-                                                onChanged: (value) {
-                                                  exactlyValue = value!;
-                                                },
-                                              )
+                                              ValueListenableBuilder(
+                                                  valueListenable:
+                                                      _rebuildMultiSelectStateBuilder,
+                                                  builder: (context, _, __) {
+                                                    return ValueListenableBuilder(
+                                                        valueListenable:
+                                                            _multiSelectNoBuilder,
+                                                        builder: (context,
+                                                            value, child) {
+                                                          return DropdownButton<
+                                                              int>(
+                                                            value: value,
+                                                            items: [
+                                                              // create dropdown items based on current options length min 1 and max options.length
+                                                              for (int i = 1;
+                                                                  i <=
+                                                                      options
+                                                                          .length;
+                                                                  i++)
+                                                                DropdownMenuItem(
+                                                                  child:
+                                                                      LMFeedText(
+                                                                    text:
+                                                                        '$i ${i == 1 ? 'option' : 'options'}',
+                                                                  ),
+                                                                  value: i,
+                                                                ),
+                                                            ],
+                                                            onChanged: (value) {
+                                                              if (value != null)
+                                                                _multiSelectNoBuilder
+                                                                        .value =
+                                                                    value;
+                                                            },
+                                                          );
+                                                        });
+                                                  })
                                             ],
                                           )
                                         ],
@@ -501,6 +681,28 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
       ),
     );
   }
+
+  onPollSubmit() {
+    if (validatePoll()) {
+      LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
+          LMAttachmentMetaViewDataBuilder()
+            ..pollQuestion(_questionController.text)
+            ..expiryTime(_expiryDateBuilder.value?.millisecondsSinceEpoch)
+            ..pollOptions(options)
+            ..multiSelectState(_multiSelectStateBuilder.value)
+            ..pollType(
+                _pollTypeBuilder.value ? PollType.deferred : PollType.instant)
+            ..multiSelectNo(_multiSelectNoBuilder.value)
+            ..isAnonymous(_isAnonymousBuilder.value)
+            ..allowAddOption(_allowAddOptionBuilder.value);
+
+      debugPrint(attachmentMetaViewDataBuilder.build().toString());
+      LMFeedComposeBloc.instance.add(LMFeedComposeAddPollEvent(
+        attachmentMetaViewData: attachmentMetaViewDataBuilder.build(),
+      ));
+      Navigator.pop(context);
+    }
+  }
 }
 
 class OptionTile extends StatefulWidget {
@@ -510,11 +712,13 @@ class OptionTile extends StatefulWidget {
     this.option,
     this.onDelete,
     this.onChanged,
+    this.isRemovable = true,
   });
   final int index;
   final String? option;
   final VoidCallback? onDelete;
   final Function(String)? onChanged;
+  final bool isRemovable;
 
   @override
   State<OptionTile> createState() => _OptionTileState();
@@ -553,11 +757,13 @@ class _OptionTileState extends State<OptionTile> {
               errorBorder: InputBorder.none,
               disabledBorder: InputBorder.none,
               suffixIconColor: theme.inActiveColor,
-              suffixIcon: IconButton(
-                isSelected: false,
-                icon: Icon(Icons.close),
-                onPressed: widget.onDelete,
-              ),
+              suffixIcon: widget.isRemovable
+                  ? IconButton(
+                      isSelected: true,
+                      icon: Icon(Icons.close),
+                      onPressed: widget.onDelete,
+                    )
+                  : null,
             ),
           ),
         ),
