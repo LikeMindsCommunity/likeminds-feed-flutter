@@ -38,3 +38,7 @@ Fixing minor bugs
 ## 1.2.1
 
 Updating LikeMinds Feed Flutter UI to 1.2.1
+
+## 1.2.2
+
+Adding SnackBar build in Widget Utility
