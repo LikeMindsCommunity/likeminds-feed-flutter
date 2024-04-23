@@ -1170,21 +1170,21 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   Widget defBottomTextField() {
-    return SafeArea(
-      child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
-        bloc: _postDetailScreenHandler!.commentHandlerBloc,
-        builder: (context, state) => Container(
-          decoration: BoxDecoration(
-            color: feedTheme.container,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: feedTheme.container,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
           ),
-          child: Column(
+        ],
+      ),
+      child: SafeArea(
+        child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
+          bloc: _postDetailScreenHandler!.commentHandlerBloc,
+          builder: (context, state) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               LikeMindsTheme.kVerticalPaddingMedium,
@@ -1478,7 +1478,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   ],
                 ),
               ),
-              LikeMindsTheme.kVerticalPaddingLarge,
             ],
           ),
         ),
