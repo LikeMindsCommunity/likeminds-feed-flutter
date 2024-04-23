@@ -174,8 +174,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             source: LMFeedWidgetSource.createPostScreen,
             backgroundColor: feedTheme.container,
             bottomSheet: _defMediaPicker(),
-            appBar:
-                widget.composeAppBarBuilder?.call(_defAppBar()) ?? _defAppBar(),
+            appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
+                widgetUtility.composeScreenAppBar(context, _defAppBar()),
             canPop: false,
             onPopInvoked: (canPop) {
               widget.composeDiscardDialogBuilder?.call(context) ??
@@ -244,6 +244,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         style: const TextStyle(),
         child: AlertDialog(
           backgroundColor: feedTheme.container,
+          surfaceTintColor: Colors.transparent,
           title: Text('Discard $postTitleFirstCap'),
           content: Text(
               'Are you sure you want to discard the current $postTitleSmallCap?'),

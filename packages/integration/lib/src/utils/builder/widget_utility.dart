@@ -264,6 +264,11 @@ class LMFeedWidgetUtility {
     return const SizedBox();
   }
 
+  PreferredSizeWidget composeScreenAppBar(
+      BuildContext context, LMFeedAppBar appBar) {
+    return appBar;
+  }
+
   Widget composeScreenUserHeaderBuilder(
       BuildContext context, LMUserViewData user) {
     return const SizedBox.shrink();
