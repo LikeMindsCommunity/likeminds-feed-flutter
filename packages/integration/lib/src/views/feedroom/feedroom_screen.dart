@@ -80,6 +80,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.feedroom;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
   bool right = true;
@@ -307,12 +308,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                                 }
                               : () {
                                   LMFeedCore.showSnackBar(
-                                    LMFeedSnackBar(
-                                      content: LMFeedText(
-                                        text:
-                                            "You do not have permission to create a post",
-                                      ),
-                                    ),
+                                    context,
+                                    "You do not have permission to create a post",
+                                    _widgetSource,
                                   );
                                 })
                       : widget.customWidgetBuilder!(context)
@@ -354,11 +352,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     // show a snackbar when post is deleted
                     // will only be shown if a messenger key is provided
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(
-                          text: 'Post Deleted',
-                        ),
-                      ),
+                      context,
+                      'Post Deleted',
+                      _widgetSource,
                     );
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
@@ -419,11 +415,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   if (curr is LMFeedNewPostErrorState) {
                     postUploading.value = false;
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(
-                          text: curr.errorMessage,
-                        ),
-                      ),
+                      context,
+                      curr.errorMessage,
+                      _widgetSource,
                     );
                   }
                   if (curr is LMFeedPostUpdateState) {
@@ -441,9 +435,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   }
                   if (curr is LMFeedPostDeletionErrorState) {
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(text: (curr).message),
-                      ),
+                      context,
+                      curr.message,
+                      _widgetSource,
                     );
                   }
                 },
@@ -899,6 +893,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete Post',
                 uuid: postCreatorUUID,
+                widgetSource: _widgetSource,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',
                 action: (String reason) async {
@@ -1144,21 +1139,17 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A post is already uploading.',
-                      ),
-                    ),
+                    context,
+                    'A post is already uploading.',
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: "You do not have permission to create a post",
-                    ),
-                  ),
+                  context,
+                  "You do not have permission to create a post",
+                  _widgetSource,
                 );
               },
         style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
@@ -1251,21 +1242,17 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 );
               } else {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: 'A post is already uploading.',
-                    ),
-                  ),
+                  context,
+                  "A post is already uploading.",
+                  _widgetSource,
                 );
               }
             }
           : () {
               LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text: "You do not have permission to create a post",
-                  ),
-                ),
+                context,
+                "You do not have permission to create a post",
+                _widgetSource,
               );
             },
     );
@@ -1323,21 +1310,17 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A post is already uploading.',
-                      ),
-                    ),
+                    context,
+                    "A post is already uploading.",
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: "You do not have permission to create a post",
-                    ),
-                  ),
+                  context,
+                  "You do not have permission to create a post",
+                  _widgetSource,
                 );
               },
       );

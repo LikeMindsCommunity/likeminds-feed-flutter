@@ -62,18 +62,7 @@ void newPostEventHandler(
           File mediaFile = media.mediaFile!;
           if (media.mediaType == LMMediaType.video) {
             int originalSize = media.size!;
-            debugPrint(
-                "Started compression of video of ${originalSize.toStringAsFixed(2)}MB");
-            if (bool.fromEnvironment('DEBUG')) {
-              LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text:
-                        "Started compression of video of ${originalSize.toStringAsFixed(2)}MBs",
-                  ),
-                ),
-              );
-            }
+
             var tempFile = await VideoCompress.compressVideo(
               mediaFile.path,
               deleteOrigin: false,
@@ -81,16 +70,7 @@ void newPostEventHandler(
             );
             double reducedSize = getFileSizeInDouble(tempFile!.filesize!);
             double compression = (reducedSize / originalSize) * 100;
-            if (bool.fromEnvironment('DEBUG')) {
-              LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text:
-                        'Finished compression (${compression.toStringAsFixed(2)}) reduced to ${reducedSize}MBs',
-                  ),
-                ),
-              );
-            }
+
             mediaFile = tempFile.file!;
             debugPrint(
               'Finished compression (${compression.toStringAsFixed(2)}) reduced to ${reducedSize}MBs',

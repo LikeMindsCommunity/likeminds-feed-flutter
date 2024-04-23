@@ -397,6 +397,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
                   title: 'Delete $postTitleFirstCap',
                   uuid: postCreatorUUID,
+                  widgetSource: widgetSource,
                   content:
                       'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                   action: (String reason) async {
@@ -557,12 +558,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             postViewData.isSaved = !postViewData.isSaved;
           } else {
             LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: postViewData.isSaved
-                        ? "$postTitleFirstCap Saved"
-                        : "$postTitleFirstCap Unsaved"),
-              ),
+              context,
+              postViewData.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              LMFeedWidgetSource.activityScreen,
             );
           }
         },
@@ -761,6 +761,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
               title: 'Delete $commentTitleFirstCapSingular',
               uuid: commentCreatorUUID,
+              widgetSource: widgetSource,
               content:
                   'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
               action: (String reason) async {

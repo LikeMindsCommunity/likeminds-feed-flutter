@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_sample/main.dart';
 
 Future<(String?, String?)> initiateUser(String uuid, String userName) async {
   String apiKey = dotenv.get('API_KEY');
@@ -24,7 +25,7 @@ Future<(String?, String?)> initiateUser(String uuid, String userName) async {
       response.data['data']['refresh_token'] as String
     );
   } else {
-    LMFeedCore.showSnackBar(LMFeedSnackBar(
+    rootScaffoldMessengerKey.currentState?.showSnackBar(LMFeedSnackBar(
         content: LMFeedText(
       text: response.data["error_message"],
     )));

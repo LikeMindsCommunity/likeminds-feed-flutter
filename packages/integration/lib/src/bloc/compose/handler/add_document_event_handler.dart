@@ -20,37 +20,49 @@ addDocumentEventHandler(
     widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'file'},
   ));
-  final result = await LMFeedMediaHandler.handlePermissions(3);
-  if (result) {
+  final LMResponse<bool> result = await LMFeedMediaHandler.handlePermissions(3);
+  if (result.success) {
     try {
-      final documents = await LMFeedMediaHandler.pickDocuments(mediaCount);
-      if (documents != null && documents.isNotEmpty) {
-        int countOfPickedDocument = documents.length;
+      final LMResponse<List<LMMediaModel>> documents =
+          await LMFeedMediaHandler.pickDocuments(mediaCount);
+      if (documents.success) {
+        if (documents.data != null && documents.data!.isNotEmpty) {
+          int countOfPickedDocument = documents.data!.length;
 
-        LMFeedComposeBloc.instance.documentCount += countOfPickedDocument;
-        LMFeedComposeBloc.instance.postMedia.addAll(documents);
-        LMFeedComposeBloc.instance.postMedia
-            .removeWhere((element) => element.mediaType == LMMediaType.link);
+          LMFeedComposeBloc.instance.documentCount += countOfPickedDocument;
+          LMFeedComposeBloc.instance.postMedia.addAll(documents.data!);
+          LMFeedComposeBloc.instance.postMedia
+              .removeWhere((element) => element.mediaType == LMMediaType.link);
 
-        LMFeedAnalyticsBloc.instance.add(
-          LMFeedFireAnalyticsEvent(
-            eventName: LMFeedAnalyticsKeys.documentAttachedInPost,
-            deprecatedEventName: LMFeedAnalyticsKeysDep.documentAttachedInPost,
-            widgetSource: LMFeedWidgetSource.createPostScreen,
-            eventProperties: {
-              'imageCount': countOfPickedDocument,
-            },
-          ),
-        );
+          LMFeedAnalyticsBloc.instance.add(
+            LMFeedFireAnalyticsEvent(
+              eventName: LMFeedAnalyticsKeys.documentAttachedInPost,
+              deprecatedEventName:
+                  LMFeedAnalyticsKeysDep.documentAttachedInPost,
+              widgetSource: LMFeedWidgetSource.createPostScreen,
+              eventProperties: {
+                'imageCount': countOfPickedDocument,
+              },
+            ),
+          );
 
-        emitter(LMFeedComposeAddedDocumentState());
+          emitter(LMFeedComposeAddedDocumentState());
+        } else {
+          if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
+            emitter(LMFeedComposeInitialState());
+          } else {
+            emitter(LMFeedComposeAddedDocumentState());
+          }
+        }
       } else {
-        emitter(LMFeedComposeInitialState());
+        emitter(LMFeedComposeMediaErrorState(error: documents.errorMessage));
       }
     } on Exception catch (err, stacktrace) {
       LMFeedLogger.instance.handleException(err, stacktrace);
 
-      emitter(LMFeedComposeMediaErrorState(err));
+      emitter(LMFeedComposeMediaErrorState());
     }
+  } else {
+    emitter(LMFeedComposeMediaErrorState(error: result.errorMessage));
   }
 }

@@ -64,6 +64,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.createPostScreen;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
@@ -151,11 +152,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   _composeBlocListener(BuildContext context, LMFeedComposeState state) {
     if (state is LMFeedComposeMediaErrorState) {
       LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: 'Error while selecting media, please try again',
-          ),
-        ),
+        context,
+        state.error ?? 'Error while selecting media, please try again',
+        widgetSource,
       );
     }
   }
@@ -618,23 +617,18 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     config!.headingRequiredToCreatePost &&
                     (heading == null || heading.isEmpty)) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text:
-                            "Can't create a $postTitleSmallCap without heading",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without heading",
+                    widgetSource,
                   );
                   return;
                 }
 
                 if (config!.textRequiredToCreatePost && postText.isEmpty) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: "Can't create a $postTitleSmallCap without text",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without text",
+                    widgetSource,
                   );
                   return;
                 }
@@ -643,11 +637,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     selectedTopics.isEmpty &&
                     config!.enableTopics) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: "Can't create a $postTitleSmallCap without topic",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without topic",
+                    widgetSource,
                   );
                   return;
                 }
@@ -683,12 +675,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 Navigator.pop(context);
               } else {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "Can't create a $postTitleSmallCap without text or attachments",
-                    ),
-                  ),
+                  context,
+                  "Can't create a $postTitleSmallCap without text or attachments",
+                  widgetSource,
                 );
               }
             },

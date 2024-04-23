@@ -3,6 +3,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedPostDetailScreenHandler {
   final Map<String, LMUserViewData> users = {};
+  final LMFeedWidgetSource widgetSource = LMFeedWidgetSource.postDetailScreen;
   late final PagingController<int, LMCommentViewData>
       commentListPagingController;
   late final String postId;
@@ -103,13 +104,8 @@ class LMFeedPostDetailScreenHandler {
 
       return postViewData;
     } else {
-      LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: response.errorMessage ?? "An error occurred",
-          ),
-        ),
-      );
+      commentListPagingController.error = response.errorMessage;
+
       return null;
     }
   }
@@ -130,7 +126,8 @@ class LMFeedPostDetailScreenHandler {
     });
   }
 
-  void handleBlocChanges(LMFeedCommentHandlerState state) {
+  void handleBlocChanges(
+      BuildContext context, LMFeedCommentHandlerState state) {
     switch (state.runtimeType) {
       case LMFeedCommentCanceledState:
         {
@@ -209,11 +206,9 @@ class LMFeedPostDetailScreenHandler {
               LMFeedPluralizeWordAction.firstLetterCapitalSingular);
           // Show the toast message for comment deleted
           LMFeedCore.showSnackBar(
-            LMFeedSnackBar(
-              content: LMFeedText(
-                text: '$commentTitle Deleted',
-              ),
-            ),
+            context,
+            '$commentTitle Deleted',
+            widgetSource,
           );
 
           final LMFeedCommentSuccessState commentSuccessState =
@@ -293,11 +288,10 @@ class LMFeedPostDetailScreenHandler {
       case const (LMFeedCommentErrorState<DeleteCommentResponse>):
         {
           LMFeedCore.showSnackBar(
-            LMFeedSnackBar(
-              content: LMFeedText(
-                  text: (state as DeleteCommentResponse).errorMessage ??
-                      "An error occurred"),
-            ),
+            context,
+            (state as DeleteCommentResponse).errorMessage ??
+                "An error occurred",
+            widgetSource,
           );
         }
       case const (LMFeedCommentErrorState<AddCommentRequest>,):
@@ -306,10 +300,12 @@ class LMFeedPostDetailScreenHandler {
               state as LMFeedCommentErrorState<AddCommentResponse>;
           removeTempCommentFromController(
               commentErrorState.commentMetaData.commentId!);
-          LMFeedCore.showSnackBar(LMFeedSnackBar(
-              content: Text(
-                  commentErrorState.commentActionResponse.errorMessage ??
-                      'An error occurred')));
+          LMFeedCore.showSnackBar(
+            context,
+            commentErrorState.commentActionResponse.errorMessage ??
+                'An error occurred',
+            widgetSource,
+          );
           break;
         }
     }

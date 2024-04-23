@@ -37,6 +37,7 @@ enum LMFeedWidgetSource {
   searchScreen,
   savedPostScreen,
   userCreatedCommentScreen,
+  other,
 }
 
 /// {@macro lm_feed_post_action_type}
