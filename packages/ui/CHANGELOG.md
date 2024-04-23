@@ -37,3 +37,7 @@ Fixing minor bugs
 ## 1.2.1
 
 Removing open_filex package
+
+## 1.2.2
+
+Adding SnackBar builder in Widget Utility
