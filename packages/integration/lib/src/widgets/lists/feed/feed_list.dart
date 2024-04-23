@@ -31,6 +31,7 @@ class _LMFeedListState extends State<LMFeedList> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   LMFeedThemeData feedThemeData = LMFeedTheme.instance.theme;
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.universalFeed;
   LMFeedBloc _feedBloc = LMFeedBloc.instance;
   final ValueNotifier postUploading = ValueNotifier(false);
 
@@ -286,6 +287,7 @@ class _LMFeedListState extends State<LMFeedList> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
+                widgetSource: widgetSource,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
@@ -298,7 +300,7 @@ class _LMFeedListState extends State<LMFeedList> {
                     LMFeedFireAnalyticsEvent(
                       eventName: LMFeedAnalyticsKeys.postDeleted,
                       deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                      widgetSource: LMFeedWidgetSource.universalFeed,
+                      widgetSource: widgetSource,
                       eventProperties: {
                         "post_id": postViewData.id,
                         "post_type": postType,
@@ -390,7 +392,7 @@ class _LMFeedListState extends State<LMFeedList> {
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.postLiked,
               deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              widgetSource: LMFeedWidgetSource.universalFeed,
+              widgetSource: widgetSource,
               eventProperties: {'post_id': postViewData.id},
             ),
           );
@@ -502,13 +504,12 @@ class _LMFeedListState extends State<LMFeedList> {
         onTap: right
             ? () async {
                 if (!postUploading.value) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          widgetSource: LMFeedWidgetSource.universalFeed,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
+                  LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+                      eventName: LMFeedAnalyticsKeys.postCreationStarted,
+                      widgetSource: widgetSource,
+                      deprecatedEventName:
+                          LMFeedAnalyticsKeysDep.postCreationStarted,
+                      eventProperties: {}));
 
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
@@ -529,22 +530,16 @@ class _LMFeedListState extends State<LMFeedList> {
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A $postTitleSmallCap is already uploading.',
-                      ),
-                    ),
-                  );
+                      context,
+                      'A $postTitleSmallCap is already uploading.',
+                      widgetSource);
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "You do not have permission to create a $postTitleSmallCap",
-                    ),
-                  ),
+                  context,
+                  "You do not have permission to create a $postTitleSmallCap",
+                  widgetSource,
                 );
               },
         style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
@@ -637,7 +632,7 @@ class _LMFeedListState extends State<LMFeedList> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: LMFeedWidgetSource.universalFeed,
+          widgetSource: widgetSource,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

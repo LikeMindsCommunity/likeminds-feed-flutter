@@ -126,7 +126,7 @@ Future<String?> setupMessaging() async {
     debugPrint("Token - $token");
     return token.toString();
   } else {
-    LMFeedCore.showSnackBar(
+    rootScaffoldMessengerKey.currentState?.showSnackBar(
       LMFeedSnackBar(
         content: const Text(
           'User declined or has not accepted notification permissions',

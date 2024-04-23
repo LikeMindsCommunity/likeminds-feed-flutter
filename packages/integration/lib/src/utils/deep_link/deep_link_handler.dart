@@ -26,11 +26,7 @@ class LMFeedDeepLinkHandler {
   void sharePost(String postId) {
     String postUrl = createLink(postId);
     if (postUrl.isEmpty) {
-      LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(text: "The post sharing feature is unavailable"),
-        ),
-      );
+      return;
     } else {
       Share.share(postUrl);
     }
