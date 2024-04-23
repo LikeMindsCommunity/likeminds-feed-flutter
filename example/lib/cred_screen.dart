@@ -260,8 +260,6 @@ class _CredScreenState extends State<CredScreen> {
                         ),
                       ),
                     );
-
-                    //toast("Username cannot be empty");
                     return;
                   }
 
