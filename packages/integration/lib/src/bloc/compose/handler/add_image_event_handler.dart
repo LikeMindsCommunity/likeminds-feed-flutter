@@ -27,6 +27,8 @@ addImageEventHandler(
           await LMFeedMediaHandler.pickImages(mediaCount);
       if (images.success) {
         if (images.data != null && images.data!.isNotEmpty) {
+          LMFeedComposeBloc.instance.postMedia
+              .removeWhere((element) => element.mediaType == LMMediaType.link);
           int countOfPickedImages = images.data!.length;
           LMFeedComposeBloc.instance.imageCount += countOfPickedImages;
           LMFeedComposeBloc.instance.postMedia.addAll(images.data!);
@@ -47,8 +49,6 @@ addImageEventHandler(
           if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
             emitter(LMFeedComposeInitialState());
           } else {
-            LMFeedComposeBloc.instance.postMedia.removeWhere(
-                (element) => element.mediaType == LMMediaType.link);
             emitter(LMFeedComposeAddedImageState());
           }
         }
