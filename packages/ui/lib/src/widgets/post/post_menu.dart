@@ -11,6 +11,7 @@ class LMFeedMenu extends StatelessWidget {
     this.removeItemIds = const {4, 7},
     this.action,
     this.style,
+    this.onMenuTap,
   });
 
   final Map<int, Widget>? children;
@@ -18,6 +19,7 @@ class LMFeedMenu extends StatelessWidget {
   final Set<int> removeItemIds;
   final LMFeedMenuAction? action;
   final LMFeedMenuStyle? style;
+  final VoidCallback? onMenuTap;
 
   void removeReportIntegration() {
     menuItems.removeWhere((element) {
@@ -32,130 +34,142 @@ class LMFeedMenu extends StatelessWidget {
     LMFeedMenuStyle? style = this.style ?? theme.headerStyle.menuStyle;
     return menuItems.isEmpty
         ? Container()
-        : (theme.headerStyle.menuStyle?.menuType ?? LMFeedPostMenuType.popUp) ==
-                LMFeedPostMenuType.popUp
-            ? SizedBox(
-                child: PopupMenuButton<int>(
-                  onSelected: _handleMenuTap,
-                  itemBuilder: (context) => menuItems
-                      .map(
-                        (element) => PopupMenuItem(
-                          padding: style?.padding ??
-                              const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
-                          textStyle: style?.menuTitleStyle?.textStyle,
-                          value: element.id,
-                          child: children?[element.id] ??
-                              LMFeedText(
-                                text: element.title,
-                                style: style?.menuTitleStyle ??
-                                    LMFeedTextStyle(
-                                      textStyle: TextStyle(
-                                        color: theme.onContainer,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+        : GestureDetector(
+            onTap: () {
+              onMenuTap?.call();
+            },
+            child: AbsorbPointer(
+              absorbing: onMenuTap != null,
+              child: (theme.headerStyle.menuStyle?.menuType ??
+                          LMFeedPostMenuType.popUp) ==
+                      LMFeedPostMenuType.popUp
+                  ? SizedBox(
+                      child: PopupMenuButton<int>(
+                        onSelected: _handleMenuTap,
+                        itemBuilder: (context) => menuItems
+                            .map(
+                              (element) => PopupMenuItem(
+                                padding: style?.padding ??
+                                    const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 10,
+                                    ),
+                                textStyle: style?.menuTitleStyle?.textStyle,
+                                value: element.id,
+                                child: children?[element.id] ??
+                                    LMFeedText(
+                                      text: element.title,
+                                      style: style?.menuTitleStyle ??
+                                          LMFeedTextStyle(
+                                            textStyle: TextStyle(
+                                              color: theme.onContainer,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
                                     ),
                               ),
-                        ),
-                      )
-                      .toList(),
-                  color: theme.container,
-                  surfaceTintColor: Colors.transparent,
-                  child: style?.menuIcon ??
-                      const SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: Icon(
-                          Icons.more_horiz,
-                          color: Colors.grey,
-                          size: 24,
-                        ),
-                      ),
-                ),
-              )
-            : GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                      context: context,
-                      backgroundColor:
-                          style?.backgroundColor ?? theme.container,
-                      enableDrag: true,
-                      useRootNavigator: true,
-                      useSafeArea: true,
-                      clipBehavior: Clip.hardEdge,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            style?.borderRadius ?? BorderRadius.circular(0.0),
-                      ),
-                      builder: (context) {
-                        return LMFeedBottomSheet(
-                            style: LMFeedBottomSheetStyle(
-                              dragBarColor: theme.disabledColor,
-                              backgroundColor:
-                                  style?.backgroundColor ?? theme.container,
-                              borderRadius: style?.borderRadius,
-                              boxShadow: style?.boxShadow,
-                              margin: style?.margin,
-                              padding: style?.padding ??
-                                  const EdgeInsets.symmetric(horizontal: 20.0),
+                            )
+                            .toList(),
+                        color: theme.container,
+                        surfaceTintColor: Colors.transparent,
+                        child: style?.menuIcon ??
+                            const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: Icon(
+                                Icons.more_horiz,
+                                color: Colors.grey,
+                                size: 24,
+                              ),
                             ),
-                            title: (style?.showBottomSheetTitle ?? true)
-                                ? LMFeedText(
-                                    text: "Options",
-                                    style: style?.headingStyle ??
-                                        LMFeedTextStyle(
-                                          textAlign: TextAlign.left,
-                                          textStyle: TextStyle(
-                                            color: theme.onContainer,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                  )
-                                : null,
-                            children: menuItems
-                                .map(
-                                  (e) =>
-                                      children?[e.id] ??
-                                      ListTile(
-                                        contentPadding: EdgeInsets.zero,
-                                        title: LMFeedText(
-                                          text: e.title,
-                                          style: style?.menuTitleStyle ??
+                      ),
+                    )
+                  : GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                            context: context,
+                            backgroundColor:
+                                style?.backgroundColor ?? theme.container,
+                            enableDrag: true,
+                            useRootNavigator: true,
+                            useSafeArea: true,
+                            clipBehavior: Clip.hardEdge,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: style?.borderRadius ??
+                                  BorderRadius.circular(0.0),
+                            ),
+                            builder: (context) {
+                              return LMFeedBottomSheet(
+                                  style: LMFeedBottomSheetStyle(
+                                    dragBarColor: theme.disabledColor,
+                                    backgroundColor: style?.backgroundColor ??
+                                        theme.container,
+                                    borderRadius: style?.borderRadius,
+                                    boxShadow: style?.boxShadow,
+                                    margin: style?.margin,
+                                    padding: style?.padding ??
+                                        const EdgeInsets.symmetric(
+                                            horizontal: 20.0),
+                                  ),
+                                  title: (style?.showBottomSheetTitle ?? true)
+                                      ? LMFeedText(
+                                          text: "Options",
+                                          style: style?.headingStyle ??
                                               LMFeedTextStyle(
+                                                textAlign: TextAlign.left,
                                                 textStyle: TextStyle(
                                                   color: theme.onContainer,
-                                                  fontSize: 14,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
-                                          onTap: () {
-                                            Navigator.pop(context);
-                                            _handleMenuTap(e.id);
-                                          },
-                                        ),
-                                      ),
-                                )
-                                .toList());
-                      });
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: style?.menuIcon ??
-                      const SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: Icon(
-                          Icons.more_horiz,
-                          color: Colors.grey,
-                          size: 24,
-                        ),
+                                        )
+                                      : null,
+                                  children: menuItems
+                                      .map(
+                                        (e) =>
+                                            children?[e.id] ??
+                                            ListTile(
+                                              contentPadding: EdgeInsets.zero,
+                                              title: LMFeedText(
+                                                text: e.title,
+                                                style: style?.menuTitleStyle ??
+                                                    LMFeedTextStyle(
+                                                      textStyle: TextStyle(
+                                                        color:
+                                                            theme.onContainer,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                onTap: () {
+                                                  Navigator.pop(context);
+                                                  _handleMenuTap(e.id);
+                                                },
+                                              ),
+                                            ),
+                                      )
+                                      .toList());
+                            });
+                      },
+                      child: Container(
+                        color: Colors.transparent,
+                        child: style?.menuIcon ??
+                            const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: Icon(
+                                Icons.more_horiz,
+                                color: Colors.grey,
+                                size: 24,
+                              ),
+                            ),
                       ),
-                ),
-              );
+                    ),
+            ),
+          );
   }
 
   void _handleMenuTap(int itemId) {
@@ -196,6 +210,7 @@ class LMFeedMenu extends StatelessWidget {
     Set<int>? removeItemIds,
     LMFeedMenuAction? action,
     LMFeedMenuStyle? style,
+    VoidCallback? onMenuTap,
   }) {
     return LMFeedMenu(
       children: children ?? this.children,
@@ -203,6 +218,7 @@ class LMFeedMenu extends StatelessWidget {
       removeItemIds: removeItemIds ?? this.removeItemIds,
       action: action ?? this.action,
       style: style ?? this.style,
+      onMenuTap: onMenuTap ?? this.onMenuTap,
     );
   }
 }
