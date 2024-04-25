@@ -22,6 +22,7 @@ class LMAttachmentMetaViewData {
   final bool? isAnonymous;
   final bool? allowAddOption;
   final List<LMPostOptionViewData>? options;
+  final bool? toShowResult;
 
   LMAttachmentMetaViewData._({
     this.url,
@@ -44,12 +45,13 @@ class LMAttachmentMetaViewData {
     this.isAnonymous,
     this.allowAddOption,
     this.options,
+    this.toShowResult,
   });
 
   @override
   String toString() {
     // ignore: lines_longer_than_80_chars
-    return 'LMAttachmentMetaViewData(url: $url, format: $format, size: $size, duration: $duration, pageCount: $pageCount, ogTags: $ogTags, height: $height, width: $width, aspectRatio: $aspectRatio, meta: $meta, repost: $repost, pollQuestion: $pollQuestion, expiryTime: $expiryTime, pollOptions: $pollOptions, multiSelectState: $multiSelectState, pollType: $pollType, multiSelectNo: $multiSelectNo, isAnonymous: $isAnonymous, allowAddOption: $allowAddOption, options: $options)';
+    return 'LMAttachmentMetaViewData(url: $url, format: $format, size: $size, duration: $duration, pageCount: $pageCount, ogTags: $ogTags, height: $height, width: $width, aspectRatio: $aspectRatio, meta: $meta, repost: $repost, pollQuestion: $pollQuestion, expiryTime: $expiryTime, pollOptions: $pollOptions, multiSelectState: $multiSelectState, pollType: $pollType, multiSelectNo: $multiSelectNo, isAnonymous: $isAnonymous, allowAddOption: $allowAddOption, options: $options, toShowResult: $toShowResult)';
   }
 }
 
@@ -74,6 +76,7 @@ class LMAttachmentMetaViewDataBuilder {
   bool? _isAnonymous;
   bool? _allowAddOption;
   List<LMPostOptionViewData>? _options;
+  bool? _toShowResult;
 
   void url(String url) {
     _url = url;
@@ -155,6 +158,10 @@ class LMAttachmentMetaViewDataBuilder {
     _options = options;
   }
 
+  void toShowResult(bool? toShowResult) {
+    _toShowResult = toShowResult;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -177,6 +184,7 @@ class LMAttachmentMetaViewDataBuilder {
       isAnonymous: _isAnonymous,
       allowAddOption: _allowAddOption,
       options: _options,
+      toShowResult: _toShowResult,
     );
   }
 }

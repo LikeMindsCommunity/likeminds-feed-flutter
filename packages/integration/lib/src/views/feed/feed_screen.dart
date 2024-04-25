@@ -1007,11 +1007,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       postId: post.id,
-      style: feedThemeData.mediaStyle,
+      style: feedThemeData.mediaStyle
+          .copyWith(pollStyle: LMFeedPollStyle.inFeed()),
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
+      pollBuilder: _defPollWidget,
       onMediaTap: () async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
@@ -1028,6 +1030,28 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
     );
+  }
+
+  Widget _defPollWidget(LMFeedPoll pollWidget) {
+    final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
+    return ValueListenableBuilder(
+        valueListenable: rebuildPollWidget,
+        builder: (context, _, __) {
+          debugPrint(
+              '-------------${pollWidget.attachmentMeta.pollQuestion} rebuilds -------------');
+          return LMFeedPoll(
+            attachmentMeta: pollWidget.attachmentMeta,
+            style: pollWidget.style,
+            onOptionSelect: (optionData) {
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            showSubmitButton: showSubmitButton(pollWidget.attachmentMeta),
+            showAddOptionButton: showAddOptionButton(pollWidget.attachmentMeta),
+            showTick: (option) {
+              return showTick(pollWidget.attachmentMeta, option);
+            },
+          );
+        });
   }
 
   LMFeedButton defLikeButton(
@@ -1521,4 +1545,114 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       );
     }
   }
+
+  bool showTick(
+      LMAttachmentMetaViewData attachmentMeta, LMPostOptionViewData option) {
+    if ((isMultiChoicePoll(attachmentMeta.multiSelectNo!,
+                    attachmentMeta.multiSelectState!) ==
+                true ||
+            isInstantPoll(attachmentMeta.pollType!) == false) &&
+        option.isSelected == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool showAddOptionButton(LMAttachmentMetaViewData attachmentMeta) {
+    bool isAddOptionAllowedForInstantPoll =
+        isInstantPoll(attachmentMeta.pollType!) &&
+            !isPollSubmitted(attachmentMeta.options!);
+    bool isAddOptionAllowedForDeferredPoll =
+        !isInstantPoll(attachmentMeta.pollType!);
+
+    if (attachmentMeta.allowAddOption! &&
+        !hasPollEnded(attachmentMeta.expiryTime!) &&
+        (isAddOptionAllowedForInstantPoll ||
+            isAddOptionAllowedForDeferredPoll)) {
+      return true;
+    }
+    return false;
+  }
+
+  bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
+    if ((isInstantPoll(attachmentMeta.pollType!) &&
+            isPollSubmitted(attachmentMeta.options!)) ||
+        hasPollEnded(attachmentMeta.expiryTime!)) {
+      return false;
+    } else if (isMultiChoicePoll(
+        attachmentMeta.multiSelectNo!, attachmentMeta.multiSelectState!)) {
+      return false;
+    } else
+      return true;
+  }
+}
+
+bool isPollSubmitted(List<LMPostOptionViewData> options) {
+  return options.any((element) => element.isSelected);
+}
+
+bool hasPollEnded(int expiryTime) {
+  return DateTime.now().millisecondsSinceEpoch > expiryTime;
+}
+
+String getTimeLeftInPoll(int expiryTime) {
+  int timeLeft = expiryTime - DateTime.now().millisecondsSinceEpoch;
+  if (timeLeft < 0) {
+    return 'Poll Ended';
+  }
+  int dayInMilliSecond = 24 * 60 * 60 * 1000;
+  int hourInMilliSecond = 60 * 60 * 1000;
+  int minutesInMilliSecond = 60 * 1000;
+
+  int days = (expiryTime ~/ dayInMilliSecond);
+  int hours = ((expiryTime - (days * dayInMilliSecond)) ~/ hourInMilliSecond);
+  int minutes =
+      ((expiryTime - (days * dayInMilliSecond) - (hours * hourInMilliSecond)) ~/
+          minutesInMilliSecond);
+
+  if (days == 0 && hours == 0 && minutes > 0) {
+    return "$minutes min";
+  } else if (days == 0 && hours == 1) {
+    return "${hours}h";
+  } else if (days == 0 && hours > 1) {
+    return "${hours}h";
+  } else if (days == 1 && hours == 0) {
+    return "${days}d";
+  } else if (days >= 1) {
+    return "${days}d";
+  } else {
+    return "Just Now";
+  }
+}
+
+String? getPollSelectionText(
+    PollMultiSelectState pollMultiSelectState, int pollMultiSelectNo) {
+  switch (pollMultiSelectState) {
+    case PollMultiSelectState.exactly:
+      if (pollMultiSelectNo == 1) {
+        return null;
+      } else {
+        return "*Select exactly $pollMultiSelectNo options";
+      }
+    case PollMultiSelectState.atMax:
+      return "*Select at most $pollMultiSelectNo options";
+    case PollMultiSelectState.atLeast:
+      return "*Select at least $pollMultiSelectNo options";
+    default:
+      return null;
+  }
+}
+
+bool isInstantPoll(PollType pollType) {
+  return pollType == PollType.instant;
+}
+
+bool isMultiChoicePoll(
+    int pollMultiSelectNo, PollMultiSelectState pollMultiSelectState) {
+  if (pollMultiSelectState == PollMultiSelectState.exactly &&
+      pollMultiSelectNo == 1) {
+    return false;
+  }
+  return true;
 }

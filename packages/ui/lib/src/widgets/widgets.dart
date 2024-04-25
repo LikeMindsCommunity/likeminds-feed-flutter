@@ -25,5 +25,6 @@ export 'topic/topic_tile.dart';
 export 'topic/feed_topic_bar.dart';
 
 export 'poll/poll.dart';
+export 'poll/poll_style.dart';
 
 export 'common/shimmer/user_tile_shimmer.dart';

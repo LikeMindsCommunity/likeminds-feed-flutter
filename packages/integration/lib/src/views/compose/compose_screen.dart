@@ -310,6 +310,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         if (composeBloc.postMedia.isNotEmpty) {
           if (composeBloc.isPollAdded) {
             return LMFeedPoll(
+              style: LMFeedPollStyle.composable(),
               attachmentMeta:
                   composeBloc.postMedia.first.attachmentMetaViewData!,
               onCancel: () {
@@ -505,9 +506,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   padding: EdgeInsets.zero,
                   child: Stack(
                     children: <Widget>[
-                      SizedBox(
-                        width: screenSize?.width,
-                        child: mediaWidget),
+                      SizedBox(width: screenSize?.width, child: mediaWidget),
                       if (composeBloc.postMedia[index].mediaType !=
                           LMMediaType.document)
                         Positioned(

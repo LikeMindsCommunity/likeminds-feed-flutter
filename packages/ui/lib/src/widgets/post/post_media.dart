@@ -18,6 +18,7 @@ class LMFeedPostMedia extends StatefulWidget {
     this.carouselIndicatorBuilder,
     this.videoBuilder,
     this.imageBuilder,
+    this.pollBuilder,
   });
 
   final List<LMAttachmentViewData> attachments;
@@ -35,6 +36,7 @@ class LMFeedPostMedia extends StatefulWidget {
 
   final LMFeedVideoBuilder? videoBuilder;
   final LMFeedImageBuilder? imageBuilder;
+  final LMFeedPollBuilder? pollBuilder;
 
   @override
   State<LMFeedPostMedia> createState() => _LMPostMediaState();
@@ -51,6 +53,7 @@ class LMFeedPostMedia extends StatefulWidget {
     VoidCallback? onMediaTap,
     LMFeedVideoBuilder? videoBuilder,
     LMFeedImageBuilder? imageBuilder,
+    LMFeedPollBuilder? pollBuilder,
   }) {
     return LMFeedPostMedia(
       attachments: attachments ?? this.attachments,
@@ -64,6 +67,7 @@ class LMFeedPostMedia extends StatefulWidget {
       onMediaTap: onMediaTap ?? this.onMediaTap,
       imageBuilder: imageBuilder ?? this.imageBuilder,
       videoBuilder: videoBuilder ?? this.videoBuilder,
+      pollBuilder: pollBuilder ?? this.pollBuilder,
     );
   }
 }
@@ -101,11 +105,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
 
     /// if attachment is a poll
     if (attachments!.first.attachmentType == 6) {
-      return Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: LMFeedPoll(
-            attachmentMeta: attachments!.first.attachmentMeta,
-          ));
+      Widget poll = widget.pollBuilder?.call(_defPoll()) ?? _defPoll();
+      return poll;
     }
     if (attachments!.first.attachmentType == 3) {
       /// If the attachment is a document,
@@ -182,6 +183,13 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
     }
   }
 
+  LMFeedPoll _defPoll() {
+    return LMFeedPoll(
+      attachmentMeta: attachments!.first.attachmentMeta,
+      style: widget.style?.pollStyle ?? const LMFeedPollStyle(),
+    );
+  }
+
   Widget getPostDocuments() {
     List<Widget> documents;
     bool isCollapsed = true;
@@ -243,6 +251,7 @@ class LMFeedPostMediaStyle {
   final LMFeedPostDocumentStyle documentStyle;
   final LMFeedPostLinkPreviewStyle linkStyle;
   final LMFeedPostCarouselStyle carouselStyle;
+  final LMFeedPollStyle pollStyle;
 
   const LMFeedPostMediaStyle({
     required this.videoStyle,
@@ -250,6 +259,7 @@ class LMFeedPostMediaStyle {
     required this.documentStyle,
     required this.linkStyle,
     required this.carouselStyle,
+    required this.pollStyle,
   });
 
   LMFeedPostMediaStyle copyWith({
@@ -258,6 +268,7 @@ class LMFeedPostMediaStyle {
     LMFeedPostDocumentStyle? documentStyle,
     LMFeedPostLinkPreviewStyle? linkStyle,
     LMFeedPostCarouselStyle? carouselStyle,
+    LMFeedPollStyle? pollStyle,
   }) {
     return LMFeedPostMediaStyle(
       videoStyle: videoStyle ?? this.videoStyle,
@@ -265,6 +276,7 @@ class LMFeedPostMediaStyle {
       documentStyle: documentStyle ?? this.documentStyle,
       linkStyle: linkStyle ?? this.linkStyle,
       carouselStyle: carouselStyle ?? this.carouselStyle,
+      pollStyle: pollStyle ?? this.pollStyle,
     );
   }
 
@@ -274,5 +286,6 @@ class LMFeedPostMediaStyle {
         imageStyle: const LMFeedPostImageStyle(),
         linkStyle: LMFeedPostLinkPreviewStyle.basic(),
         videoStyle: const LMFeedPostVideoStyle(),
+        pollStyle: const LMFeedPollStyle(),
       );
 }
