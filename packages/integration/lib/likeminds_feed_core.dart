@@ -83,14 +83,27 @@ class LMFeedCore {
     LMFeedWidgetUtility? widgets,
     GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
     LMFeedThemeData? theme,
+    Function(LMFeedAnalyticsEventFired)? analyticsListener,
+    Function(LMFeedProfileState)? profileListener,
   }) async {
     this.lmFeedClient = lmFeedClient ?? LMFeedClientBuilder().build();
+
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
     _scaffoldMessengerKey = scaffoldMessengerKey;
     LMFeedTheme.instance.initialise(theme: theme ?? LMFeedThemeData.light());
     MediaKit.ensureInitialized();
+    if (analyticsListener != null)
+      LMFeedAnalyticsBloc.instance.stream.listen((LMFeedAnalyticsState event) {
+        if (event is LMFeedAnalyticsEventFired) {
+          analyticsListener.call(event);
+        }
+      });
+    if (profileListener != null)
+      LMFeedProfileBloc.instance.stream.listen((event) {
+        profileListener.call(event);
+      });
   }
 
   Future<void> closeBlocs() async {
@@ -98,6 +111,13 @@ class LMFeedCore {
     await LMFeedRoutingBloc.instance.close();
     await LMFeedProfileBloc.instance.close();
     await LMFeedAnalyticsBloc.instance.close();
+  }
+
+  Future<LMResponse> logout() async {
+    LogoutResponse response =
+        await lmFeedClient.logout(LogoutRequestBuilder().build());
+    return LMResponse(
+        success: response.success, errorMessage: response.errorMessage);
   }
 
   Future<LMResponse> initialiseFeed(ValidateUserRequest request) async {
