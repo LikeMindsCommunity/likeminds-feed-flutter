@@ -808,9 +808,6 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     LMFeedTaggingHelper.encodeString(_controller.text, userTags)
                         .trim();
 
-                sendPostCreationCompletedEvent(
-                    [...composeBloc.postMedia], userTags, selectedTopics);
-
                 if (postViewData?.attachments != null &&
                     postViewData!.attachments!.isNotEmpty &&
                     postViewData!.attachments!.first.attachmentType == 5) {

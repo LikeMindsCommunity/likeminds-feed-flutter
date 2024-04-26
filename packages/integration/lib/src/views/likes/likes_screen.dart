@@ -11,12 +11,14 @@ class LMFeedLikesScreen extends StatefulWidget {
   final String postId;
   final bool isCommentLikes;
   final String? commentId;
+  final LMFeedWidgetSource? widgetSource;
 
   const LMFeedLikesScreen({
     super.key,
     this.isCommentLikes = false,
     required this.postId,
     this.commentId,
+    this.widgetSource,
   });
 
   @override
@@ -38,9 +40,10 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.likeListOpen,
         deprecatedEventName: LMFeedAnalyticsKeysDep.likeListOpen,
-        widgetSource: LMFeedWidgetSource.likesScreen,
+        widgetSource: widget.widgetSource,
         eventProperties: {
-          'postId': widget.postId,
+          'post_id': widget.postId,
+          'comment_id': widget.commentId,
         },
       ),
     );

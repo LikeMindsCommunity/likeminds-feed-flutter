@@ -11,10 +11,14 @@ void editPostEventHandler(
     LMFeedEditPostEvent event, Emitter<LMFeedPostState> emit) async {
   try {
     emit(LMFeedEditPostUploadingState());
+
+    List<LMAttachmentViewData> attachmentViewData = LMFeedComposeBloc
+        .instance.postMedia
+        .map((e) => e.toAttachmentViewData())
+        .toList();
     // Mapping [LMAttachmentViewData] to [Attachment]
-    List<Attachment>? attachments = LMFeedComposeBloc.instance.postMedia
-        .map((e) => LMAttachmentViewDataConvertor.toAttachment(
-            e.toAttachmentViewData()))
+    List<Attachment>? attachments = attachmentViewData
+        .map((e) => LMAttachmentViewDataConvertor.toAttachment(e))
         .toList();
     // Text associated with the post
     // can be null [either heading or attachments should be present though]
@@ -80,21 +84,36 @@ void editPostEventHandler(
                   ))) ??
               {};
 
+      LMPostViewData post = LMPostViewDataConvertor.fromPost(
+        post: response.post!,
+        widgets: widgets,
+        repostedPosts: respostedPost,
+        users: users,
+        topics: topics,
+        userTopics: response.userTopics,
+      );
+
       emit(
         LMFeedEditPostUploadedState(
-          postData: LMPostViewDataConvertor.fromPost(
-            post: response.post!,
-            widgets: widgets,
-            repostedPosts: respostedPost,
-            users: users,
-            topics: topics,
-            userTopics: response.userTopics,
-          ),
+          postData: post,
           userData: users,
           topics: topics,
           widgets: widgets,
         ),
       );
+
+      String postType = LMFeedPostUtils.getPostType(attachmentViewData);
+
+      LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+          eventName: LMFeedAnalyticsKeys.postEdited,
+          deprecatedEventName: LMFeedAnalyticsKeysDep.postEdited,
+          widgetSource: LMFeedWidgetSource.editPostScreen,
+          eventProperties: {
+            'create_by_id': post.user.sdkClientInfo.uuid,
+            'post_id': post.id,
+            'post_type': postType,
+            'topics': post.topics.map((e) => e.name).toList(),
+          }));
     } else {
       // If the response is not successful
       // Emit [LMFeedNewPostErrorState] with the error message

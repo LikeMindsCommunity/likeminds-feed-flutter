@@ -696,25 +696,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   String postType = LMFeedPostUtils.getPostType(
                       _postDetailScreenHandler!.postData!.attachments);
 
-                  LMFeedAnalyticsBloc.instance.add(
-                    LMFeedFireAnalyticsEvent(
-                      eventName: LMFeedAnalyticsKeys.postDeleted,
-                      widgetSource: LMFeedWidgetSource.postDetailScreen,
-                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                      eventProperties: {
-                        "post_id": _postDetailScreenHandler!.postData!.id,
-                        "post_type": postType,
-                        "user_id": _postDetailScreenHandler!.postData!.uuid,
-                        "user_state": isCm ? "CM" : "member",
-                      },
-                    ),
-                  );
-
                   postBloc.add(
                     LMFeedDeletePostEvent(
                       postId: _postDetailScreenHandler!.postData!.id,
                       reason: reason,
                       isRepost: _postDetailScreenHandler!.postData!.isRepost,
+                      postType: postType,
+                      userId: postCreatorUUID,
+                      userState: isCm ? "CM" : "member",
                     ),
                   );
                   Navigator.of(context).pop();
@@ -772,6 +761,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: _postDetailScreenHandler!.postData!.id,
+                widgetSource: _widgetSource,
               ),
             ),
           );
@@ -791,14 +781,23 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
-          // if (!response.success) {
-          //   postBloc.add(LMFeedUpdatePostEvent(
-          //       postId: _postDetailScreenHandler!.postData!.id,
-          //       source: LMFeedWidgetSource.postDetailScreen,
-          //       actionType: _postDetailScreenHandler!.postData!.isLiked
-          //           ? LMFeedPostActionType.unlike
-          //           : LMFeedPostActionType.like));
-          // }
+          if (response.success && _postDetailScreenHandler!.postData!.isLiked) {
+            LMFeedAnalyticsBloc.instance.add(
+              LMFeedFireAnalyticsEvent(
+                eventName: LMFeedAnalyticsKeys.postLiked,
+                deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                widgetSource: LMFeedWidgetSource.postDetailScreen,
+                eventProperties: {
+                  'post_id': _postDetailScreenHandler!.postData!.id,
+                  'created_by_id': _postDetailScreenHandler!
+                      .postData!.user.sdkClientInfo.uuid,
+                  'topics': _postDetailScreenHandler!.postData!.topics
+                      .map((e) => e.name)
+                      .toList(),
+                },
+              ),
+            );
+          }
         },
       );
 
@@ -881,14 +880,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         onTap: right
             ? () async {
                 if (postBloc.state is! LMFeedEditPostUploadingState) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          widgetSource: LMFeedWidgetSource.postDetailScreen,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
@@ -903,6 +894,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
+                        widgetSource: LMFeedWidgetSource.postDetailScreen,
                       ),
                     ),
                   );
@@ -1043,6 +1035,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             builder: (context) => LMFeedLikesScreen(
               postId: _postDetailScreenHandler!.postData!.id,
               commentId: commentViewData.id,
+              widgetSource: _widgetSource,
             ),
           ),
         );

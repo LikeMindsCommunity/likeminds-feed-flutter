@@ -49,6 +49,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   LMFeedSearchBloc searchBloc = LMFeedSearchBloc();
   ValueNotifier<bool> postUploading = ValueNotifier<bool>(false);
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier<bool>(false);
+  // check whether current logged in user is CM or not
+  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
   final PagingController<int, LMPostViewData> _pagingController =
       PagingController(firstPageKey: 1);
   bool userPostingRights = true;
@@ -491,22 +493,17 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        widgetSource: widgetSource,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                        },
-                      ),
-                    );
+                    String postType =
+                        LMFeedPostUtils.getPostType(postViewData.attachments);
 
                     LMFeedPostBloc.instance.add(
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
                         isRepost: postViewData.isRepost,
+                        postType: postType,
+                        userState: isCm ? "CM" : "member",
+                        userId: postViewData.user.sdkClientInfo.uuid,
                       ),
                     );
                   },
@@ -556,6 +553,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: widgetSource,
               ),
             ),
           );
@@ -573,15 +571,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.postLiked,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              widgetSource: widgetSource,
-              eventProperties: {'post_id': postViewData.id},
-            ),
-          );
-
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
@@ -591,6 +580,20 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: widgetSource,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );
@@ -683,12 +686,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         ),
         onTap: () async {
           if (!postUploading.value) {
-            LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-                eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
-                widgetSource: widgetSource,
-                eventProperties: {}));
-
             LMFeedVideoProvider.instance.forcePauseAllControllers();
             // ignore: use_build_context_synchronously
             LMAttachmentViewData attachmentViewData =
@@ -703,6 +700,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               MaterialPageRoute(
                 builder: (context) => LMFeedComposeScreen(
                   attachments: [attachmentViewData],
+                  widgetSource: LMFeedWidgetSource.searchScreen,
                 ),
               ),
             );
@@ -791,21 +789,14 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               onTap: userPostingRights
                   ? () async {
                       if (!postUploading.value) {
-                        LMFeedAnalyticsBloc.instance.add(
-                            LMFeedFireAnalyticsEvent(
-                                eventName:
-                                    LMFeedAnalyticsKeys.postCreationStarted,
-                                deprecatedEventName:
-                                    LMFeedAnalyticsKeysDep.postCreationStarted,
-                                widgetSource: widgetSource,
-                                eventProperties: {}));
-
                         LMFeedVideoProvider.instance.pauseCurrentVideo();
                         // ignore: use_build_context_synchronously
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const LMFeedComposeScreen(),
+                            builder: (context) => const LMFeedComposeScreen(
+                              widgetSource: LMFeedWidgetSource.searchScreen,
+                            ),
                           ),
                         );
                         LMFeedVideoProvider.instance.playCurrentVideo();
