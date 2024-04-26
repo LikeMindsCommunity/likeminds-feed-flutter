@@ -100,7 +100,9 @@ class LMFeedDeepLinkHandler {
     if (response.success) {
       navigatorKey.currentState!.push(
         MaterialPageRoute(
-          builder: (context) => const LMFeedComposeScreen(),
+          builder: (context) => const LMFeedComposeScreen(
+            widgetSource: LMFeedWidgetSource.other,
+          ),
         ),
       );
       return LMFeedDeepLinkResponse(

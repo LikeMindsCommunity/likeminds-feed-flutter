@@ -36,7 +36,24 @@ final class LMFeedReportReasonSelectedState extends LMFeedModerationState {
   List<Object> get props => [reason];
 }
 
-final class LMFeedReportSubmittedState extends LMFeedModerationState {}
+final class LMFeedReportSubmittedState extends LMFeedModerationState {
+  final String entityCreatorId;
+  final String entityId;
+  final int entityType;
+  final String reason;
+  final int tagId;
+
+  const LMFeedReportSubmittedState({
+    required this.entityCreatorId,
+    required this.entityId,
+    required this.entityType,
+    required this.reason,
+    required this.tagId,
+  });
+
+  @override
+  List<Object> get props => [entityCreatorId, entityId, entityType, reason, tagId];
+}
 
 final class LMFeedReportSubmitFailedState extends LMFeedModerationState {
   final String error;

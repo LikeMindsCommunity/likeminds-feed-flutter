@@ -406,25 +406,14 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                     String postType =
                         LMFeedPostUtils.getPostType(postViewData.attachments);
 
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        widgetSource: LMFeedWidgetSource.activityScreen,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                          "post_type": postType,
-                          "user_id": currentUser?.sdkClientInfo.uuid,
-                          "user_state": isCm ? "CM" : "member",
-                        },
-                      ),
-                    );
-
                     LMFeedPostBloc.instance.add(
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
                         isRepost: postViewData.isRepost,
+                        postType: postType,
+                        userId: postCreatorUUID,
+                        userState: isCm ? "CM" : "member",
                       ),
                     );
                   },
@@ -491,6 +480,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: widgetSource,
               ),
             ),
           );
@@ -516,6 +506,20 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             // rebuildPostWidget.value = !rebuildPostWidget.value;
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: LMFeedWidgetSource.universalFeed,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );

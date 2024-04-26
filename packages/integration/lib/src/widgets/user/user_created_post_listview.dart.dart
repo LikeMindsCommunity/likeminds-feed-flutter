@@ -480,25 +480,14 @@ class _LMFeedUserCreatedPostListViewState
                   String postType =
                       LMFeedPostUtils.getPostType(postViewData.attachments);
 
-                  LMFeedAnalyticsBloc.instance.add(
-                    LMFeedFireAnalyticsEvent(
-                      eventName: LMFeedAnalyticsKeys.postDeleted,
-                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                      widgetSource: _widgetSource,
-                      eventProperties: {
-                        "post_id": postViewData.id,
-                        "post_type": postType,
-                        "user_id": currentUser?.sdkClientInfo.uuid,
-                        "user_state": isCm ? "CM" : "member",
-                      },
-                    ),
-                  );
-
                   LMFeedPostBloc.instance.add(
                     LMFeedDeletePostEvent(
                       postId: postViewData.id,
                       reason: reason,
                       isRepost: postViewData.isRepost,
+                      postType: postType,
+                      userId: postCreatorUUID,
+                      userState: isCm ? "CM" : "member",
                     ),
                   );
                 },
@@ -549,6 +538,7 @@ class _LMFeedUserCreatedPostListViewState
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: _widgetSource,
               ),
             ),
           );
@@ -564,15 +554,6 @@ class _LMFeedUserCreatedPostListViewState
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.postLiked,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              widgetSource: _widgetSource,
-              eventProperties: {'post_id': postViewData.id},
-            ),
-          );
-
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
@@ -582,6 +563,20 @@ class _LMFeedUserCreatedPostListViewState
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: _widgetSource,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );
@@ -684,12 +679,6 @@ class _LMFeedUserCreatedPostListViewState
         ),
         onTap: () async {
           if (!postUploading.value) {
-            LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-                eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
-                widgetSource: _widgetSource,
-                eventProperties: {}));
-
             LMFeedVideoProvider.instance.forcePauseAllControllers();
             // ignore: use_build_context_synchronously
             LMAttachmentViewData attachmentViewData =
@@ -704,6 +693,7 @@ class _LMFeedUserCreatedPostListViewState
               MaterialPageRoute(
                 builder: (context) => LMFeedComposeScreen(
                   attachments: [attachmentViewData],
+                  widgetSource: LMFeedWidgetSource.userFeed,
                 ),
               ),
             );
@@ -762,19 +752,14 @@ class _LMFeedUserCreatedPostListViewState
       onTap: userPostingRights
           ? () async {
               if (!postUploading.value) {
-                LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-                    eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                    deprecatedEventName:
-                        LMFeedAnalyticsKeysDep.postCreationStarted,
-                    widgetSource: _widgetSource,
-                    eventProperties: {}));
-
                 LMFeedVideoProvider.instance.pauseCurrentVideo();
                 // ignore: use_build_context_synchronously
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LMFeedComposeScreen(),
+                    builder: (context) => const LMFeedComposeScreen(
+                      widgetSource: LMFeedWidgetSource.userFeed,
+                    ),
                   ),
                 );
                 LMFeedVideoProvider.instance.playCurrentVideo();

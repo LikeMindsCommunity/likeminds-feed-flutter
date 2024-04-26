@@ -564,6 +564,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
               builder: (context) => LMFeedLikesScreen(
                 postId: widget.postId,
                 commentId: commentViewData.id,
+                widgetSource: widgetSource,
               ),
             ),
           );

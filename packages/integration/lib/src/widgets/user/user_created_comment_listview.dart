@@ -47,6 +47,8 @@ class _LMFeedUserCreatedCommentListViewState
   String commentTitleSmallPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
+  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   static const int pageSize = 10;
   final PagingController<int, LMCommentViewData> _pagingController =
@@ -376,22 +378,17 @@ class _LMFeedUserCreatedCommentListViewState
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        widgetSource: widgetSource,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                        },
-                      ),
-                    );
+                    String postType =
+                        LMFeedPostUtils.getPostType(postViewData.attachments);
 
                     lmFeedPostBloc.add(
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
                         isRepost: postViewData.isRepost,
+                        userId: postViewData.user.sdkClientInfo.uuid,
+                        postType: postType,
+                        userState: isCm ? "CM" : "member",
                       ),
                     );
                   },
@@ -416,6 +413,7 @@ class _LMFeedUserCreatedCommentListViewState
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: widgetSource,
               ),
             ),
           );
@@ -431,15 +429,6 @@ class _LMFeedUserCreatedCommentListViewState
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.postLiked,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              widgetSource: widgetSource,
-              eventProperties: {'post_id': postViewData.id},
-            ),
-          );
-
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
@@ -450,6 +439,20 @@ class _LMFeedUserCreatedCommentListViewState
                   : LMFeedPostActionType.like,
               postId: postViewData.id,
             ));
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: widgetSource,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );
@@ -552,12 +555,6 @@ class _LMFeedUserCreatedCommentListViewState
         ),
         onTap: () async {
           if (!postUploading.value) {
-            LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-                eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
-                widgetSource: widgetSource,
-                eventProperties: {}));
-
             LMFeedVideoProvider.instance.forcePauseAllControllers();
             // ignore: use_build_context_synchronously
             LMAttachmentViewData attachmentViewData =
@@ -572,6 +569,7 @@ class _LMFeedUserCreatedCommentListViewState
               MaterialPageRoute(
                 builder: (context) => LMFeedComposeScreen(
                   attachments: [attachmentViewData],
+                  widgetSource: LMFeedWidgetSource.userCreatedCommentScreen,
                 ),
               ),
             );
