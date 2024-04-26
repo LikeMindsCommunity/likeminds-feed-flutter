@@ -42,7 +42,7 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
   final LMUserViewData user;
   final List<LMTopicViewData> selectedTopics;
   final int? feedroomId;
-  final  List<LMUserTagViewData>? userTagged,
+  final List<LMUserTagViewData>? userTagged;
 
   ///{@macro lm_feed_create_new_post_event}
   LMFeedCreateNewPostEvent({
@@ -52,7 +52,7 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
     required this.selectedTopics,
     this.heading,
     this.feedroomId,
-     this.userTagged,
+    this.userTagged,
   }) : assert(postMedia != null || postText != null || heading != null);
 }
 
