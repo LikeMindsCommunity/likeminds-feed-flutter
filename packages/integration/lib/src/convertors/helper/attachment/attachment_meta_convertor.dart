@@ -78,13 +78,16 @@ class LMAttachmentMetaViewDataConvertor {
           .allowAddOption(widget.metadata['allow_add_option']);
 
       List<LMPostOptionViewData> options = [];
-      for (Map<String, dynamic> option in widget.lmMeta!['options']) {
+      for (Map<String, dynamic> option in widget.lmMeta?['options']) {
         final optionViewData = LMPollOptionViewDataConvertor.fromPollOption(
             option: option, users: users);
         options.add(optionViewData);
       }
       attachmentMetaViewDataBuilder.options(options);
-      attachmentMetaViewDataBuilder.toShowResult(widget.lmMeta!['to_show_results']);
+      attachmentMetaViewDataBuilder
+          .toShowResult(widget.lmMeta?['to_show_results']);
+      attachmentMetaViewDataBuilder
+          .pollAnswerText(widget.lmMeta?['poll_answer_text']);
     }
 
     return attachmentMetaViewDataBuilder.build();

@@ -1037,8 +1037,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return ValueListenableBuilder(
         valueListenable: rebuildPollWidget,
         builder: (context, _, __) {
-          debugPrint(
-              '-------------${pollWidget.attachmentMeta.pollQuestion} rebuilds -------------');
           return LMFeedPoll(
             attachmentMeta: pollWidget.attachmentMeta,
             style: pollWidget.style,

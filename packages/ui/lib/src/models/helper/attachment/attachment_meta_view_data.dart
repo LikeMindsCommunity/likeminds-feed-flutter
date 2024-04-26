@@ -23,6 +23,7 @@ class LMAttachmentMetaViewData {
   final bool? allowAddOption;
   final List<LMPostOptionViewData>? options;
   final bool? toShowResult;
+  final String? pollAnswerText;
 
   LMAttachmentMetaViewData._({
     this.url,
@@ -46,6 +47,7 @@ class LMAttachmentMetaViewData {
     this.allowAddOption,
     this.options,
     this.toShowResult,
+    this.pollAnswerText,
   });
 
   @override
@@ -77,6 +79,7 @@ class LMAttachmentMetaViewDataBuilder {
   bool? _allowAddOption;
   List<LMPostOptionViewData>? _options;
   bool? _toShowResult;
+  String? _pollAnswerText;
 
   void url(String url) {
     _url = url;
@@ -162,6 +165,10 @@ class LMAttachmentMetaViewDataBuilder {
     _toShowResult = toShowResult;
   }
 
+  void pollAnswerText(String? pollAnswerText) {
+    _pollAnswerText = pollAnswerText;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -185,6 +192,7 @@ class LMAttachmentMetaViewDataBuilder {
       allowAddOption: _allowAddOption,
       options: _options,
       toShowResult: _toShowResult,
+      pollAnswerText: _pollAnswerText,
     );
   }
 }

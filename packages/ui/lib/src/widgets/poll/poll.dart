@@ -304,9 +304,9 @@ class _LMFeedPollState extends State<LMFeedPoll> {
               ),
             ),
           ),
-          const LMFeedText(
-              text: '15 votes',
-              style: LMFeedTextStyle(
+          LMFeedText(
+              text: widget.attachmentMeta.pollAnswerText ?? '',
+              style: const LMFeedTextStyle(
                 textStyle: TextStyle(
                   height: 1.33,
                   fontSize: 14,
@@ -368,11 +368,11 @@ class _LMFeedPollState extends State<LMFeedPoll> {
         ),
         if (widget.attachmentMeta.toShowResult != null &&
             widget.attachmentMeta.toShowResult!)
-          const Padding(
-            padding: EdgeInsets.only(left: 8.0),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
             child: LMFeedText(
-              text: "4 votes",
-              style: LMFeedTextStyle(
+              text: voteText(widget.attachmentMeta.options![index].voteCount),
+              style: const LMFeedTextStyle(
                 textStyle: TextStyle(
                   height: 1.33,
                   fontSize: 14,
@@ -385,5 +385,13 @@ class _LMFeedPollState extends State<LMFeedPoll> {
         LikeMindsTheme.kVerticalPaddingMedium,
       ],
     );
+  }
+}
+
+String voteText(int voteCount) {
+  if (voteCount == 1) {
+    return '1 vote';
+  } else {
+    return '$voteCount votes';
   }
 }
