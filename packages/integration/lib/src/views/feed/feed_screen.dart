@@ -296,24 +296,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       ? LMFeedPostSomething(
                           onTap: userPostingRights
                               ? () async {
-                                  LMFeedAnalyticsBloc.instance
-                                      .add(const LMFeedFireAnalyticsEvent(
-                                    eventName:
-                                        LMFeedAnalyticsKeys.postCreationStarted,
-                                    widgetSource:
-                                        LMFeedWidgetSource.universalFeed,
-                                    deprecatedEventName: LMFeedAnalyticsKeysDep
-                                        .postCreationStarted,
-                                    eventProperties: {},
-                                  ));
-
                                   LMFeedVideoProvider.instance
                                       .forcePauseAllControllers();
                                   // ignore: use_build_context_synchronously
                                   await Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const LMFeedComposeScreen()));
+                                              const LMFeedComposeScreen(
+                                                widgetSource: LMFeedWidgetSource
+                                                    .universalFeed,
+                                              )));
                                 }
                               : () {
                                   LMFeedCore.showSnackBar(
@@ -964,25 +956,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   String postType =
                       LMFeedPostUtils.getPostType(postViewData.attachments);
 
-                  LMFeedAnalyticsBloc.instance.add(
-                    LMFeedFireAnalyticsEvent(
-                      eventName: LMFeedAnalyticsKeys.postDeleted,
-                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                      widgetSource: LMFeedWidgetSource.universalFeed,
-                      eventProperties: {
-                        "post_id": postViewData.id,
-                        "post_type": postType,
-                        "user_id": currentUser?.sdkClientInfo.uuid,
-                        "user_state": isCm ? "CM" : "member",
-                      },
-                    ),
-                  );
-
                   LMFeedPostBloc.instance.add(
                     LMFeedDeletePostEvent(
                       postId: postViewData.id,
                       reason: reason,
                       isRepost: postViewData.isRepost,
+                      postType: postType,
+                      userId: postCreatorUUID,
+                      userState: isCm ? "CM" : "member",
                     ),
                   );
                 },
@@ -1040,6 +1021,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: _widgetSource,
               ),
             ),
           )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
@@ -1055,15 +1037,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.postLiked,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              widgetSource: LMFeedWidgetSource.universalFeed,
-              eventProperties: {'post_id': postViewData.id},
-            ),
-          );
-
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
@@ -1074,6 +1047,20 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   : LMFeedPostActionType.like,
               postId: postViewData.id,
             ));
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: _widgetSource,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );
@@ -1177,14 +1164,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          widgetSource: LMFeedWidgetSource.universalFeed,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
@@ -1199,6 +1178,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
+                        widgetSource: LMFeedWidgetSource.universalFeed,
                       ),
                     ),
                   );
@@ -1288,19 +1268,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       onTap: userPostingRights
           ? () async {
               if (!postUploading.value) {
-                LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
-                    eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                    widgetSource: LMFeedWidgetSource.universalFeed,
-                    deprecatedEventName:
-                        LMFeedAnalyticsKeysDep.postCreationStarted,
-                    eventProperties: {}));
-
                 LMFeedVideoProvider.instance.forcePauseAllControllers();
                 // ignore: use_build_context_synchronously
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LMFeedComposeScreen(),
+                    builder: (context) => const LMFeedComposeScreen(
+                      widgetSource: LMFeedWidgetSource.universalFeed,
+                    ),
                   ),
                 );
               } else {
@@ -1354,20 +1329,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          widgetSource: LMFeedWidgetSource.universalFeed,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(),
+                      builder: (context) => LMFeedComposeScreen(
+                        widgetSource: LMFeedWidgetSource.universalFeed,
+                      ),
                     ),
                   );
                 } else {

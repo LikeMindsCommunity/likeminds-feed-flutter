@@ -27,9 +27,12 @@ class LMFeedComposeScreen extends StatefulWidget {
     this.displayName,
     this.displayUrl,
     this.feedroomId,
+    this.widgetSource,
   });
 
   final LMFeedComposeScreenConfig? config;
+
+  final LMFeedWidgetSource? widgetSource;
 
   final LMFeedComposeScreenStyle? style;
 
@@ -92,6 +95,13 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   void initState() {
     super.initState();
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+          widgetSource: widget.widgetSource,
+          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+          deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
+          eventProperties: {}),
+    );
     style = widget.style ?? feedTheme.composeScreenStyle;
     _checkForRepost();
     config = widget.config ?? LMFeedCore.config.composeConfig;
@@ -651,8 +661,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     LMFeedTaggingHelper.encodeString(_controller.text, userTags)
                         .trim();
 
-                sendPostCreationCompletedEvent(
-                    [...composeBloc.postMedia], userTags, selectedTopics);
                 if (widget.attachments != null &&
                     widget.attachments!.isNotEmpty &&
                     widget.attachments!.first.attachmentType == 5) {
@@ -671,6 +679,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   postMedia: [...composeBloc.postMedia],
                   heading: _headingController?.text,
                   feedroomId: widget.feedroomId,
+                  userTagged: userTags,
                 ));
 
                 Navigator.pop(context);
@@ -1045,82 +1054,4 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           );
         });
   }
-}
-
-void sendPostCreationCompletedEvent(
-  List<LMMediaModel> postMedia,
-  List<LMUserTagViewData> usersTagged,
-  List<LMTopicViewData> topics,
-) {
-  Map<String, String> propertiesMap = {};
-
-  if (postMedia.isNotEmpty) {
-    if (postMedia.first.mediaType == LMMediaType.link) {
-      propertiesMap['link_attached'] = 'yes';
-      propertiesMap['link'] =
-          postMedia.first.ogTags?.url ?? postMedia.first.link!;
-    } else {
-      propertiesMap['link_attached'] = 'no';
-      int imageCount = 0;
-      int videoCount = 0;
-      int documentCount = 0;
-      for (LMMediaModel media in postMedia) {
-        if (media.mediaType == LMMediaType.image) {
-          imageCount++;
-        } else if (media.mediaType == LMMediaType.video) {
-          videoCount++;
-        } else if (media.mediaType == LMMediaType.document) {
-          documentCount++;
-        }
-      }
-      if (imageCount > 0) {
-        propertiesMap['image_attached'] = 'yes';
-        propertiesMap['image_count'] = imageCount.toString();
-      } else {
-        propertiesMap['image_attached'] = 'no';
-      }
-      if (videoCount > 0) {
-        propertiesMap['video_attached'] = 'yes';
-        propertiesMap['video_count'] = videoCount.toString();
-      } else {
-        propertiesMap['video_attached'] = 'no';
-      }
-
-      if (documentCount > 0) {
-        propertiesMap['document_attached'] = 'yes';
-        propertiesMap['document_count'] = documentCount.toString();
-      } else {
-        propertiesMap['document_attached'] = 'no';
-      }
-    }
-  }
-
-  if (usersTagged.isNotEmpty) {
-    int taggedUserCount = 0;
-    List<String> taggedUserId = [];
-
-    taggedUserCount = usersTagged.length;
-    taggedUserId =
-        usersTagged.map((e) => e.sdkClientInfo?.uuid ?? e.uuid!).toList();
-
-    propertiesMap['user_tagged'] = taggedUserCount == 0 ? 'no' : 'yes';
-    if (taggedUserCount > 0) {
-      propertiesMap['tagged_users_count'] = taggedUserCount.toString();
-      propertiesMap['tagged_users_id'] = taggedUserId.join(',');
-    }
-  }
-
-  if (topics.isNotEmpty) {
-    propertiesMap['topics_added'] = 'yes';
-    propertiesMap['topics'] = topics.map((e) => e.id).toList().join(',');
-  } else {
-    propertiesMap['topics_added'] = 'no';
-  }
-
-  LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-    eventName: LMFeedAnalyticsKeys.postCreationCompleted,
-    widgetSource: LMFeedWidgetSource.createPostScreen,
-    deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationCompleted,
-    eventProperties: propertiesMap,
-  ));
 }

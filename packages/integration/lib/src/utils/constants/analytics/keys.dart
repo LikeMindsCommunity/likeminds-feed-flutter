@@ -16,6 +16,7 @@ class LMFeedAnalyticsKeys {
   static const String postCreationCompleted = 'post_creation_completed';
   static const String postPinned = 'post_pinned';
   static const String postLiked = 'post_liked';
+  static const String postUnliked = 'post_unliked';
   static const String postUnpinned = 'post_unpinned';
   static const String postShared = 'post_shared';
   static const String postEdited = 'post_edited';
