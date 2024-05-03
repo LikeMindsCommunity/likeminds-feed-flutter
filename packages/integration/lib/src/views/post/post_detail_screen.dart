@@ -803,7 +803,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
         style: feedTheme.footerStyle.commentButtonStyle,
         onTap: () {
-          LMFeedPostUtils.handlerPostShareTapEvent(
+          LMFeedPostUtils.handlePostCommentButtonTap(
               _postDetailScreenHandler!.postData!, _widgetSource);
           _postDetailScreenHandler!.openOnScreenKeyboard();
         },

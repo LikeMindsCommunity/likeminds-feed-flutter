@@ -1071,7 +1071,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         ),
         style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
-          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, _widgetSource);
+          LMFeedPostUtils.handlePostCommentButtonTap(
+              postViewData, _widgetSource);
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(

@@ -573,7 +573,7 @@ class _LMFeedUserCreatedPostListViewState
         style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
           // Handle analytics event for comment button tap
-          LMFeedPostUtils.handlerPostShareTapEvent(post, _widgetSource);
+          LMFeedPostUtils.handlePostCommentButtonTap(post, _widgetSource);
 
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously

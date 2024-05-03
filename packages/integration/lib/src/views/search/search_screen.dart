@@ -621,7 +621,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         style: theme.footerStyle.commentButtonStyle,
         onTap: () async {
           // Handle analytics event for comment button tap
-          LMFeedPostUtils.handlerPostShareTapEvent(post, widgetSource);
+          LMFeedPostUtils.handlePostCommentButtonTap(post, widgetSource);
 
           // Pause any video controller if playing
           LMFeedVideoProvider.instance.pauseCurrentVideo();

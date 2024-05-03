@@ -531,7 +531,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         ),
         style: feedTheme?.footerStyle.commentButtonStyle,
         onTap: () {
-          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, widgetSource);
+          LMFeedPostUtils.handlePostCommentButtonTap(
+              postViewData, widgetSource);
           navigateToLMFeedPostDetailsScreen(postViewData.id);
         },
       );
