@@ -1,14 +1,14 @@
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMPollOptionViewDataConvertor {
-  static LMPostOptionViewData fromPollOption({
-    required Map<String,dynamic> option,
+  static LMPollOptionViewData fromPollOption({
+    required Map<String, dynamic> option,
     required Map<String, LMUserViewData> users,
   }) {
-    String? id = option['id'] as String?;
+    String? id = option['_id'] as String?;
     String? text = option['text'] as String?;
     int? voteCount = option['vote_count'] as int?;
-    int? percentage = option['percentage'] as int?;
+    num? percentage = option['percentage'] as num?;
     bool? isSelected = option['is_selected'] as bool?;
     String? userId = option['uuid'] as String?;
 
@@ -24,7 +24,7 @@ class LMPollOptionViewDataConvertor {
       pollOptionViewDataBuilder.votes(voteCount);
     }
     if (percentage != null) {
-      pollOptionViewDataBuilder.percentage(double.parse(percentage.toString()));
+      pollOptionViewDataBuilder.percentage(percentage.toDouble());
     }
     if (isSelected != null) {
       pollOptionViewDataBuilder.isSelected(isSelected);

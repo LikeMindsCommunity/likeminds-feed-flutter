@@ -1013,7 +1013,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
-      pollBuilder: _defPollWidget,
+      pollBuilder: (pollWidget) => _defPollWidget(pollWidget, post),
       onMediaTap: () async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
@@ -1032,21 +1032,67 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
-  Widget _defPollWidget(LMFeedPoll pollWidget) {
+  Widget _defPollWidget(LMFeedPoll pollWidget, LMPostViewData postViewData) {
+    List<String> selectedOptions = [];
     final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
     return ValueListenableBuilder(
         valueListenable: rebuildPollWidget,
         builder: (context, _, __) {
           return LMFeedPoll(
+            selectedOption: selectedOptions,
             attachmentMeta: pollWidget.attachmentMeta,
             style: pollWidget.style,
-            onOptionSelect: (optionData) {
+            onOptionSelect: (optionData) async {
+              if (isPollSubmitted(pollWidget.attachmentMeta.options ?? []))
+                return;
+              if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
+                  pollWidget.attachmentMeta.multiSelectState!)) {
+                submitVote(pollWidget.attachmentMeta, [optionData.id]);
+              } else if (selectedOptions.contains(optionData.id)) {
+                selectedOptions.remove(optionData.id);
+              } else {
+                selectedOptions.add(optionData.id);
+              }
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },
             showSubmitButton: showSubmitButton(pollWidget.attachmentMeta),
             showAddOptionButton: showAddOptionButton(pollWidget.attachmentMeta),
             showTick: (option) {
               return showTick(pollWidget.attachmentMeta, option);
+            },
+            timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime!),
+            onAddOptionSubmit: (option) async {
+              await addOption(pollWidget, pollWidget.attachmentMeta, option,
+                  postViewData.id);
+              selectedOptions.clear();
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            onSubtextTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LMFeedPollResultScreen(
+                          pollId: pollWidget.attachmentMeta.id ?? '',
+                          pollOptions: pollWidget.attachmentMeta.options ?? [],
+                        )),
+              );
+            },
+            onVoteClick: (option) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LMFeedPollResultScreen(
+                    pollId: pollWidget.attachmentMeta.id ?? '',
+                    pollOptions: pollWidget.attachmentMeta.options ?? [],
+                    selectedOptionId: option.id,
+                  ),
+                ),
+              );
+            },
+            onSubmit: (options) {
+              submitVote(pollWidget.attachmentMeta, options);
+              selectedOptions.clear();
+              rebuildPollWidget.value = !rebuildPollWidget.value;
             },
           );
         });
@@ -1545,7 +1591,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   }
 
   bool showTick(
-      LMAttachmentMetaViewData attachmentMeta, LMPostOptionViewData option) {
+      LMAttachmentMetaViewData attachmentMeta, LMPollOptionViewData option) {
+    if (isPollSubmitted(attachmentMeta.options!)) {
+      return false;
+    }
     if ((isMultiChoicePoll(attachmentMeta.multiSelectNo!,
                     attachmentMeta.multiSelectState!) ==
                 true ||
@@ -1573,20 +1622,129 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return false;
   }
 
+  Future<void> submitVote(
+      LMAttachmentMetaViewData attachmentMeta, List<String> options) async {
+    try {
+      if (hasPollEnded(attachmentMeta.expiryTime!)) {
+        LMFeedCore.showSnackBar(
+          LMFeedSnackBar(
+              content: LMFeedText(
+                  text: "Poll ended. Vote can not be submitted now.")),
+        );
+        return;
+      }
+      if (isPollSubmitted(attachmentMeta.options!) &&
+          isInstantPoll(attachmentMeta.pollType!)) {
+        // TODO: remove this snackbar and do nothing
+        LMFeedCore.showSnackBar(
+          LMFeedSnackBar(
+              content:
+                  LMFeedText(text: "You have already submitted your vote.")),
+        );
+        return;
+      } else {
+        int totalVotes = attachmentMeta.options?.fold(
+                0,
+                (previousValue, element) =>
+                    previousValue! + element.voteCount) ??
+            0;
+        totalVotes += options.length;
+        for (int i = 0; i < options.length; i++) {
+          int index = attachmentMeta.options!
+              .indexWhere((element) => element.id == options[i]);
+          if (index != -1) {
+            attachmentMeta.options![index].isSelected = true;
+            attachmentMeta.options![index].voteCount++;
+            attachmentMeta.options![index].percentage =
+                (attachmentMeta.options![index].voteCount / totalVotes) * 100;
+          }
+        }
+        if (isMultiChoicePoll(
+            attachmentMeta.multiSelectNo!, attachmentMeta.multiSelectState!)) {
+          SubmitPollVoteRequest request = (SubmitPollVoteRequestBuilder()
+                ..pollId(attachmentMeta.id ?? '')
+                ..votes([...options]))
+              .build();
+          final response = await LMFeedCore.client.submitPollVote(request);
+          if (!response.success) {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(text: response.errorMessage ?? ""),
+              ),
+            );
+          }
+        } else {
+          SubmitPollVoteRequest request = (SubmitPollVoteRequestBuilder()
+                ..pollId(attachmentMeta.id ?? '')
+                ..votes([...options]))
+              .build();
+          final response = await LMFeedCore.client.submitPollVote(request);
+          if (!response.success) {
+            LMFeedCore.showSnackBar(
+              LMFeedSnackBar(
+                content: LMFeedText(text: response.errorMessage ?? ""),
+              ),
+            );
+          }
+        }
+      }
+    } on Exception catch (e) {
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(text: e.toString()),
+        ),
+      );
+    }
+  }
+
   bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
     if ((isInstantPoll(attachmentMeta.pollType!) &&
             isPollSubmitted(attachmentMeta.options!)) ||
         hasPollEnded(attachmentMeta.expiryTime!)) {
       return false;
-    } else if (isMultiChoicePoll(
+    } else if (!isMultiChoicePoll(
         attachmentMeta.multiSelectNo!, attachmentMeta.multiSelectState!)) {
       return false;
     } else
       return true;
   }
+
+  Future<void> addOption(
+      LMFeedPoll pollwidget,
+      LMAttachmentMetaViewData attachmentMeta,
+      String option,
+      String postId) async {
+    AddPollOptionRequest request = (AddPollOptionRequestBuilder()
+          ..pollId(attachmentMeta.id ?? '')
+          ..text(option))
+        .build();
+
+    final response = await LMFeedCore.client.addPollOption(request);
+    if (response.success) {
+      final poll = LMAttachmentMetaViewDataConvertor.fromWidgetModel(
+          widget: response.data!.widget!,
+          users: {
+            currentUser!.uuid: currentUser!,
+          });
+      attachmentMeta.options?.clear();
+      attachmentMeta.options?.addAll(poll.options ?? []);
+      // newPostBloc.add(LMFeedUpdatePostEvent(
+      //   actionType: LMFeedPostActionType.addPollOption,
+      //   postId: postId,
+      //   pollOption: poll.options!.last,
+      // ));
+      // rebuildPostWidget.value = !rebuildPostWidget.value;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
+      LMFeedCore.showSnackBar(
+        LMFeedSnackBar(
+          content: LMFeedText(text: "Option added successfully"),
+        ),
+      );
+    }
+  }
 }
 
-bool isPollSubmitted(List<LMPostOptionViewData> options) {
+bool isPollSubmitted(List<LMPollOptionViewData> options) {
   return options.any((element) => element.isSelected);
 }
 
@@ -1595,30 +1753,19 @@ bool hasPollEnded(int expiryTime) {
 }
 
 String getTimeLeftInPoll(int expiryTime) {
-  int timeLeft = expiryTime - DateTime.now().millisecondsSinceEpoch;
-  if (timeLeft < 0) {
-    return 'Poll Ended';
+  DateTime expiryTimeInDateTime =
+      DateTime.fromMillisecondsSinceEpoch(expiryTime);
+  DateTime now = DateTime.now();
+  Duration difference = expiryTimeInDateTime.difference(now);
+  if (difference.isNegative) {
+    return "Poll Ended";
   }
-  int dayInMilliSecond = 24 * 60 * 60 * 1000;
-  int hourInMilliSecond = 60 * 60 * 1000;
-  int minutesInMilliSecond = 60 * 1000;
-
-  int days = (expiryTime ~/ dayInMilliSecond);
-  int hours = ((expiryTime - (days * dayInMilliSecond)) ~/ hourInMilliSecond);
-  int minutes =
-      ((expiryTime - (days * dayInMilliSecond) - (hours * hourInMilliSecond)) ~/
-          minutesInMilliSecond);
-
-  if (days == 0 && hours == 0 && minutes > 0) {
-    return "$minutes min";
-  } else if (days == 0 && hours == 1) {
-    return "${hours}h";
-  } else if (days == 0 && hours > 1) {
-    return "${hours}h";
-  } else if (days == 1 && hours == 0) {
-    return "${days}d";
-  } else if (days >= 1) {
-    return "${days}d";
+  if (difference.inDays > 0) {
+    return "${difference.inDays}d left";
+  } else if (difference.inHours > 0) {
+    return "${difference.inHours}h left";
+  } else if (difference.inMinutes > 0) {
+    return "${difference.inMinutes}m left";
   } else {
     return "Just Now";
   }

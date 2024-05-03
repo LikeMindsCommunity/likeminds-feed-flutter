@@ -1,14 +1,14 @@
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
-class LMPostOptionViewData {
+class LMPollOptionViewData {
   final String id;
-  final String text;
-  final int voteCount;
-  final double percentage;
-  final bool isSelected;
-  final LMUserViewData userViewData;
+  String text;
+  int voteCount;
+  double percentage;
+  bool isSelected;
+  LMUserViewData? userViewData;
 
-  LMPostOptionViewData._({
+  LMPollOptionViewData._({
     required this.id,
     required this.text,
     required this.voteCount,
@@ -56,14 +56,14 @@ class LMPostOptionViewDataBuilder {
     _userViewData = userViewData;
   }
 
-  LMPostOptionViewData build() {
-    return LMPostOptionViewData._(
-      id: _id??"",
+  LMPollOptionViewData build() {
+    return LMPollOptionViewData._(
+      id: _id ?? "",
       text: _text!,
       voteCount: _votes!,
       percentage: _percentage!,
       isSelected: _isSelected!,
-      userViewData: _userViewData!,
+      userViewData: _userViewData,
     );
   }
 }

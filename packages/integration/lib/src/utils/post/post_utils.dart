@@ -18,10 +18,12 @@ class LMFeedPostUtils {
     return LMFeedPluralize.instance.pluralizeOrCapitalize(commentTitle, action);
   }
 
-  static LMPostViewData updatePostData(
-      {required LMPostViewData postViewData,
-      required LMFeedPostActionType actionType,
-      String? commentId}) {
+  static LMPostViewData updatePostData({
+    required LMPostViewData postViewData,
+    required LMFeedPostActionType actionType,
+    String? commentId,
+    List<LMPollOptionViewData>? pollOptions,
+  }) {
     switch (actionType) {
       case (LMFeedPostActionType.like || LMFeedPostActionType.unlike):
         {
@@ -53,6 +55,31 @@ class LMFeedPostUtils {
       case (LMFeedPostActionType.saved || LMFeedPostActionType.unsaved):
         postViewData.isSaved = !postViewData.isSaved;
         break;
+      case (LMFeedPostActionType.pollSubmit ||
+            LMFeedPostActionType.pollSubmitError):
+        {
+          if (pollOptions != null) {
+            pollOptions.map((e) {
+              int index = postViewData
+                  .attachments!.first.attachmentMeta.options!
+                  .indexWhere((element) => element.id == e.id);
+
+              if (index != -1) {
+               // TODO: udate poll data
+              }
+            });
+          }
+          break;
+        }
+      case (LMFeedPostActionType.addPollOption ||
+            LMFeedPostActionType.addPollOptionError):
+        {
+          if (pollOptions != null) {
+            postViewData.attachments!.first.attachmentMeta.options
+                ?.addAll(pollOptions);
+          }
+          break;
+        }
       default:
         break;
     }

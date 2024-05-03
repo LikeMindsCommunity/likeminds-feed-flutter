@@ -63,6 +63,7 @@ class LMAttachmentMetaViewDataConvertor {
     attachmentMetaViewDataBuilder.isAnonymous(attachmentMeta.isAnonymous);
     attachmentMetaViewDataBuilder.allowAddOption(attachmentMeta.allowAddOption);
     if (users != null && widget != null && widget.lmMeta != null) {
+      attachmentMetaViewDataBuilder.id(widget.id);
       attachmentMetaViewDataBuilder.pollQuestion(widget.metadata['title']);
       attachmentMetaViewDataBuilder.expiryTime(widget.metadata['expiry_time']);
       attachmentMetaViewDataBuilder.multiSelectState(
@@ -77,7 +78,7 @@ class LMAttachmentMetaViewDataConvertor {
       attachmentMetaViewDataBuilder
           .allowAddOption(widget.metadata['allow_add_option']);
 
-      List<LMPostOptionViewData> options = [];
+      List<LMPollOptionViewData> options = [];
       for (Map<String, dynamic> option in widget.lmMeta?['options']) {
         final optionViewData = LMPollOptionViewDataConvertor.fromPollOption(
             option: option, users: users);
@@ -118,5 +119,39 @@ class LMAttachmentMetaViewDataConvertor {
       isAnonymous: attachmentMetaViewData.isAnonymous,
       allowAddOption: attachmentMetaViewData.allowAddOption,
     );
+  }
+
+  static LMAttachmentMetaViewData fromWidgetModel({
+    required WidgetModel widget,
+    required Map<String, LMUserViewData> users,
+  }) {
+    final LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
+        LMAttachmentMetaViewDataBuilder();
+    attachmentMetaViewDataBuilder.id(widget.id);
+    attachmentMetaViewDataBuilder.pollQuestion(widget.metadata['title']);
+    attachmentMetaViewDataBuilder.expiryTime(widget.metadata['expiry_time']);
+    attachmentMetaViewDataBuilder.multiSelectState(
+        pollMultiSelectStateFromString(
+            widget.metadata['multiple_select_state']));
+    attachmentMetaViewDataBuilder
+        .pollType(pollTypeFromString(widget.metadata['poll_type']));
+    attachmentMetaViewDataBuilder
+        .multiSelectNo(widget.metadata['multiple_select_number']);
+    attachmentMetaViewDataBuilder.isAnonymous(widget.metadata['is_anonymous']);
+    attachmentMetaViewDataBuilder
+        .allowAddOption(widget.metadata['allow_add_option']);
+
+    List<LMPollOptionViewData> options = [];
+    for (Map<String, dynamic> option in widget.lmMeta?['options']) {
+      final optionViewData = LMPollOptionViewDataConvertor.fromPollOption(
+          option: option, users: users);
+      options.add(optionViewData);
+    }
+    attachmentMetaViewDataBuilder.options(options);
+    attachmentMetaViewDataBuilder
+        .toShowResult(widget.lmMeta?['to_show_results']);
+    attachmentMetaViewDataBuilder
+        .pollAnswerText(widget.lmMeta?['poll_answer_text']);
+    return attachmentMetaViewDataBuilder.build();
   }
 }

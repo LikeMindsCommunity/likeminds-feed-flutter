@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/poll/poll_style.dart';
 
+// ignore: must_be_immutable
 class LMFeedPoll extends StatefulWidget {
-  const LMFeedPoll({
+  LMFeedPoll({
     super.key,
     required this.attachmentMeta,
     this.onCancel,
@@ -15,15 +13,28 @@ class LMFeedPoll extends StatefulWidget {
     this.showSubmitButton = false,
     this.showAddOptionButton = false,
     this.showTick,
+    this.timeLeft,
+    this.onAddOptionSubmit,
+    this.onVoteClick,
+    this.selectedOption = const [],
+    this.onSubmit,
+    this.onSubtextTap,
   });
   final LMAttachmentMetaViewData attachmentMeta;
   final VoidCallback? onCancel;
   final Function(LMAttachmentMetaViewData)? onEdit;
   final LMFeedPollStyle style;
-  final void Function(LMPostOptionViewData)? onOptionSelect;
+  final void Function(LMPollOptionViewData)? onOptionSelect;
   final bool showSubmitButton;
   final bool showAddOptionButton;
-  final bool Function(LMPostOptionViewData optionViewData)? showTick;
+  final bool Function(LMPollOptionViewData optionViewData)? showTick;
+  final String? timeLeft;
+  final void Function(String option)? onAddOptionSubmit;
+  final Function(LMPollOptionViewData)? onVoteClick;
+  List<String> selectedOption;
+  final Function(List<String> selectedOption)? onSubmit;
+  final VoidCallback? onSubtextTap;
+
   @override
   State<LMFeedPoll> createState() => _LMFeedPollState();
 }
@@ -36,6 +47,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
   PollMultiSelectState multiSelectState = PollMultiSelectState.exactly;
   late LMFeedPollStyle _lmFeedPollStyle;
   final theme = LMFeedTheme.instance.theme;
+  final TextEditingController _addOptionController = TextEditingController();
 
   void _setPollData() {
     pollQuestion = widget.attachmentMeta.pollQuestion ?? '';
@@ -124,7 +136,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                 ),
             ],
           ),
-          const SizedBox(height: 8),
+          LikeMindsTheme.kVerticalPaddingMedium,
           LMFeedText(
             text:
                 "*Select ${multiSelectState.name} $multiSelectNo ${multiSelectNo == 1 ? "option" : "options"}.",
@@ -145,175 +157,211 @@ class _LMFeedPollState extends State<LMFeedPoll> {
               itemBuilder: (context, index) {
                 return _defPollOption(index);
               }),
-          const SizedBox(height: 8),
           //add and option button
           if (widget.showAddOptionButton)
-            LMFeedButton(
-              onTap: () {
-                //add option bottom sheet
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) => Padding(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        // crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 48,
-                            height: 8,
-                            decoration: ShapeDecoration(
-                              color: theme.disabledColor..withAlpha(200),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(99),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: LMFeedText(
-                              text: 'Add new poll option',
-                              style: LMFeedTextStyle(
-                                textStyle: TextStyle(
-                                  height: 1.33,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: LMFeedButton(
+                onTap: () {
+                  //add option bottom sheet
+                  showModalBottomSheet(
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (context) => Padding(
+                      padding: EdgeInsets.only(
+                          bottom: MediaQuery.of(context).viewInsets.bottom),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          // crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 8,
+                              decoration: ShapeDecoration(
+                                color: theme.disabledColor..withAlpha(200),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(99),
                                 ),
                               ),
                             ),
-                          ),
-                          LikeMindsTheme.kVerticalPaddingSmall,
-                          const LMFeedText(
-                            text:
-                                'Enter an option that you think is missing in this poll. This can not be undone.',
-                            style: LMFeedTextStyle(
-                                overflow: TextOverflow.visible,
-                                textStyle: TextStyle(
-                                  height: 1.33,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.grey,
-                                )),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: TextField(
-                              onChanged: (value) {
-                                pollOptions.add(value);
+                            const SizedBox(height: 24),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: LMFeedText(
+                                text: 'Add new poll option',
+                                style: LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    height: 1.33,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            LikeMindsTheme.kVerticalPaddingSmall,
+                            const LMFeedText(
+                              text:
+                                  'Enter an option that you think is missing in this poll. This can not be undone.',
+                              style: LMFeedTextStyle(
+                                  overflow: TextOverflow.visible,
+                                  textStyle: TextStyle(
+                                    height: 1.33,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey,
+                                  )),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              child: TextField(
+                                controller: _addOptionController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Type new option',
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8)),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8)),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            LMFeedButton(
+                              onTap: () {
+                                setState(() {
+                                  final LMPollOptionViewData newOption =
+                                      (LMPostOptionViewDataBuilder()
+                                            ..text(_addOptionController.text)
+                                            ..percentage(0)
+                                            ..votes(0)
+                                            ..isSelected(false))
+                                          .build();
+                                  widget.attachmentMeta.options?.add(newOption);
+                                  _setPollData();
+                                });
+                                widget.onAddOptionSubmit
+                                    ?.call(_addOptionController.text);
+                                Navigator.of(context).pop();
+                                _addOptionController.clear();
                               },
-                              decoration: const InputDecoration(
-                                hintText: 'Type new option',
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
+                              text: const LMFeedText(
+                                text: 'SUBMIT',
+                                style: LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    height: 1.33,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                          LMFeedButton(
-                            onTap: () {},
-                            text: const LMFeedText(
-                              text: 'SUBMIT',
-                              style: LMFeedTextStyle(
-                                textStyle: TextStyle(
-                                  height: 1.33,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white,
-                                ),
+                              style: LMFeedButtonStyle(
+                                backgroundColor: theme.primaryColor,
+                                borderRadius: 100,
+                                width: 150,
+                                height: 44,
                               ),
                             ),
-                            style: LMFeedButtonStyle(
-                              backgroundColor: theme.primaryColor,
-                              borderRadius: 100,
-                              width: 150,
-                              height: 44,
-                            ),
-                          ),
-                          LikeMindsTheme.kVerticalPaddingMedium,
-                        ],
+                            LikeMindsTheme.kVerticalPaddingMedium,
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-              text: const LMFeedText(
-                text: '+ Add an option',
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    height: 1.33,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              style: LMFeedButtonStyle(
-                width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                borderRadius: 8,
-                border: Border.all(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-
-          LikeMindsTheme.kVerticalPaddingMedium,
-          if (widget.showSubmitButton)
-            LMFeedButton(
-                onTap: () {},
+                  );
+                },
                 text: const LMFeedText(
-                  text: 'Submit Vote',
+                  text: '+ Add an option',
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
                       height: 1.33,
                       fontSize: 16,
                       fontWeight: FontWeight.w400,
-                      color: Colors.white,
                     ),
                   ),
                 ),
                 style: LMFeedButtonStyle(
-                  backgroundColor: theme.primaryColor,
-                  borderRadius: 8,
+                  width: double.infinity,
                   padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                )),
-
-          LMFeedText(
-            text: 'Expires on $expiryTime',
-            style: const LMFeedTextStyle(
-              textStyle: TextStyle(
-                height: 1.33,
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: Colors.grey,
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  borderRadius: 8,
+                  border: Border.all(
+                    color: Colors.grey,
+                  ),
+                ),
               ),
             ),
-          ),
-          LMFeedText(
-              text: widget.attachmentMeta.pollAnswerText ?? '',
-              style: const LMFeedTextStyle(
-                textStyle: TextStyle(
-                  height: 1.33,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey,
+
+          if (widget.showSubmitButton)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: LMFeedButton(
+                  onTap: () {
+                    widget.onSubmit?.call(widget.selectedOption);
+                  },
+                  text: const LMFeedText(
+                    text: 'Submit Vote',
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        height: 1.33,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  style: LMFeedButtonStyle(
+                    backgroundColor: theme.primaryColor,
+                    borderRadius: 8,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  )),
+            ),
+
+          Row(
+            children: [
+              LMFeedText(
+                  text: widget.attachmentMeta.pollAnswerText ?? '',
+                  onTap: widget.onSubtextTap,
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      height: 1.33,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: theme.primaryColor,
+                    ),
+                  )),
+              LikeMindsTheme.kHorizontalPaddingSmall,
+              const LMFeedText(
+                text: '●',
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    fontSize: LikeMindsTheme.kFontSmall,
+                    color: Color.fromRGBO(217, 217, 217, 1),
+                  ),
                 ),
-              )),
+              ),
+              LikeMindsTheme.kHorizontalPaddingSmall,
+              LMFeedText(
+                text: widget.timeLeft ?? '',
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    height: 1.33,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                    color: theme.inActiveColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -325,45 +373,112 @@ class _LMFeedPollState extends State<LMFeedPoll> {
       children: [
         InkWell(
           onTap: () {
-            //TODO: handle null check on options
             widget.onOptionSelect?.call(widget.attachmentMeta.options![index]);
           },
-          child: Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Colors.grey,
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: LMFeedText(
-                      text: pollOptions[index],
-                      style: const LMFeedTextStyle(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textStyle: TextStyle(
-                          height: 1.25,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      )),
-                ),
-                if (widget.showTick != null &&
-                    widget.showTick!(widget.attachmentMeta.options![index]))
-                  LMFeedIcon(
-                    type: LMFeedIconType.icon,
-                    icon: Icons.check_circle,
-                    style: LMFeedIconStyle(color: theme.primaryColor),
+          child: Stack(
+            children: [
+              if (widget.attachmentMeta.toShowResult != null &&
+                  widget.attachmentMeta.toShowResult!)
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: LinearProgressIndicator(
+                      //Here you pass the percentage
+                      value: widget.attachmentMeta.options![index].percentage /
+                          100,
+                      color: widget.attachmentMeta.options![index].isSelected
+                          ? const Color.fromRGBO(80, 70, 229, 0.2)
+                          : const Color.fromRGBO(230, 235, 245, 1),
+                      backgroundColor: theme.container,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-              ],
-            ),
+                ),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: (widget.attachmentMeta.toShowResult != null &&
+                                widget.attachmentMeta.toShowResult! &&
+                                widget.attachmentMeta.options![index]
+                                    .isSelected) ||
+                            _isSelectedByUser(
+                                widget.attachmentMeta.options?[index])
+                        ? theme.primaryColor
+                        : Colors.grey,
+                  ),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LMFeedText(
+                            text: pollOptions[index],
+                            style: LMFeedTextStyle(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textStyle: TextStyle(
+                                color: _isSelectedByUser(widget
+                                            .attachmentMeta.options?[index]) ||
+                                        (widget.showTick != null &&
+                                            widget.showTick!(widget
+                                                .attachmentMeta
+                                                .options![index]))
+                                    ? theme.primaryColor
+                                    : Colors.black,
+                                height: 1.25,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            )),
+                        if (widget.attachmentMeta.allowAddOption ?? false)
+                          LMFeedText(
+                              text: _defAddedByMember(widget
+                                  .attachmentMeta.options?[index].userViewData),
+                              style: const LMFeedTextStyle(
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textStyle: TextStyle(
+                                  height: 1.25,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey,
+                                ),
+                              )),
+                      ],
+                    ),
+                    if (_isSelectedByUser(
+                            widget.attachmentMeta.options?[index]) ||
+                        (widget.showTick != null &&
+                            widget.showTick!(
+                                widget.attachmentMeta.options![index])))
+                      Padding(
+                        padding: widget.attachmentMeta.allowAddOption ?? false
+                            ? const EdgeInsets.only(
+                                top: 5,
+                              )
+                            : EdgeInsets.zero,
+                        child: const Align(
+                          alignment: Alignment.bottomRight,
+                          child: LMFeedIcon(
+                            type: LMFeedIconType.svg,
+                            assetPath: lmTickSvg,
+                            style: LMFeedIconStyle(
+                              boxSize: 20,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
         if (widget.attachmentMeta.toShowResult != null &&
@@ -372,6 +487,9 @@ class _LMFeedPollState extends State<LMFeedPoll> {
             padding: const EdgeInsets.only(left: 8.0),
             child: LMFeedText(
               text: voteText(widget.attachmentMeta.options![index].voteCount),
+              onTap: () {
+                widget.onVoteClick?.call(widget.attachmentMeta.options![index]);
+              },
               style: const LMFeedTextStyle(
                 textStyle: TextStyle(
                   height: 1.33,
@@ -382,9 +500,22 @@ class _LMFeedPollState extends State<LMFeedPoll> {
               ),
             ),
           ),
-        LikeMindsTheme.kVerticalPaddingMedium,
+        LikeMindsTheme.kVerticalPaddingSmall,
       ],
     );
+  }
+
+  bool _isSelectedByUser(LMPollOptionViewData? optionViewData) {
+    if (optionViewData == null) {
+      return false;
+    }
+    return widget.selectedOption.contains(optionViewData.id);
+  }
+
+  String _defAddedByMember(
+    LMUserViewData? userViewData,
+  ) {
+    return "Added by ${userViewData?.name ?? ""}";
   }
 }
 

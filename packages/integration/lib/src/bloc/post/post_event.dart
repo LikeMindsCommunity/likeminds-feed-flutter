@@ -106,6 +106,7 @@ class LMFeedUpdatePostEvent extends LMFeedPostEvents {
   // This variable stores the id of comment
   // that is deleted
   final String? commentId;
+  final LMPollOptionViewData? pollOption;
 
   LMFeedUpdatePostEvent({
     this.post,
@@ -113,6 +114,7 @@ class LMFeedUpdatePostEvent extends LMFeedPostEvents {
     required this.postId,
     this.commentId,
     this.source,
+    this.pollOption,
   });
 
   @override

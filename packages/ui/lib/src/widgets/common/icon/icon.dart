@@ -64,6 +64,8 @@ class LMFeedIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final inStyle = style ?? LMFeedIconStyle.basic();
     return Container(
+      height: inStyle.boxSize,
+      width: inStyle.boxSize,
       padding: EdgeInsets.all(
         inStyle.boxPadding?.abs() ?? 0,
       ),

@@ -25,3 +25,5 @@ const String lmNoResponsePng =
     "packages/likeminds_feed_flutter_ui/assets/icons/no-response.png";
 const String lmPollSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/poll.svg";
+const String lmTickSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/tick.svg";

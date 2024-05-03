@@ -1,5 +1,6 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/attachment_meta_convertor.dart';
+import 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/poll_option_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/helper/og_tag_convertor.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
@@ -42,6 +43,21 @@ class LMAttachmentViewDataConvertor {
         width: attachmentViewData.attachmentMeta.width,
         height: attachmentViewData.attachmentMeta.height,
         meta: attachmentViewData.attachmentMeta.meta,
+        // send the id of the reposted post in case of repost else send the id of the attachment
+        entityId: attachmentViewData.attachmentType == 8
+            ? attachmentViewData.attachmentMeta.repost?.id
+            : attachmentViewData.attachmentMeta.id,
+        pollQuestion: attachmentViewData.attachmentMeta.pollQuestion,
+        expiryTime: attachmentViewData.attachmentMeta.expiryTime,
+        pollType: attachmentViewData.attachmentMeta.pollType?.value,
+        multiSelectState:
+            attachmentViewData.attachmentMeta.multiSelectState?.value,
+        multiSelectNo: attachmentViewData.attachmentMeta.multiSelectNo,
+        pollOptions: attachmentViewData.attachmentMeta.options
+            ?.map((e) => e.text)
+            .toList(),
+        isAnonymous: attachmentViewData.attachmentMeta.isAnonymous,
+        allowAddOption: attachmentViewData.attachmentMeta.allowAddOption,
       ),
     );
   }

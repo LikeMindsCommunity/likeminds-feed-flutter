@@ -272,9 +272,9 @@ class LMFeedPostFooterStyle {
     LMFeedButtonStyle? repostButtonStyle,
   }) {
     return LMFeedPostFooterStyle(
-      showSaveButton: showSaveButton ?? showSaveButton,
-      showLikeButton: showLikeButton ?? showLikeButton,
-      showCommentButton: showCommentButton ?? showCommentButton,
+      showSaveButton: showSaveButton ?? this.showSaveButton,
+      showLikeButton: showLikeButton ?? this.showLikeButton,
+      showCommentButton: showCommentButton ?? this.showCommentButton,
       showShareButton: showShareButton ?? this.showShareButton,
       showRepostButton: showRepostButton ?? this.showRepostButton,
       alignment: alignment ?? this.alignment,

@@ -13,6 +13,7 @@ class LMAttachmentMetaViewData {
   final double? aspectRatio;
   final LMPostViewData? repost;
   final Map<String, dynamic>? meta;
+  final String? id;
   final String? pollQuestion;
   final int? expiryTime;
   final List<String>? pollOptions;
@@ -21,7 +22,7 @@ class LMAttachmentMetaViewData {
   final int? multiSelectNo;
   final bool? isAnonymous;
   final bool? allowAddOption;
-  final List<LMPostOptionViewData>? options;
+  final List<LMPollOptionViewData>? options;
   final bool? toShowResult;
   final String? pollAnswerText;
 
@@ -37,6 +38,7 @@ class LMAttachmentMetaViewData {
     this.height,
     this.repost,
     this.meta,
+    this.id,
     this.pollQuestion,
     this.expiryTime,
     this.pollOptions,
@@ -69,6 +71,7 @@ class LMAttachmentMetaViewDataBuilder {
   double? _aspectRatio;
   Map<String, dynamic>? _meta;
   LMPostViewData? _repost;
+  String? _id;
   String? _pollQuestion;
   int? _expiryTime;
   List<String>? _pollOptions;
@@ -77,7 +80,7 @@ class LMAttachmentMetaViewDataBuilder {
   int? _multiSelectNo;
   bool? _isAnonymous;
   bool? _allowAddOption;
-  List<LMPostOptionViewData>? _options;
+  List<LMPollOptionViewData>? _options;
   bool? _toShowResult;
   String? _pollAnswerText;
 
@@ -125,6 +128,10 @@ class LMAttachmentMetaViewDataBuilder {
     _repost = repost;
   }
 
+  void id(String id) {
+    _id = id;
+  }
+
   void pollQuestion(String? pollQuestion) {
     _pollQuestion = pollQuestion;
   }
@@ -157,7 +164,7 @@ class LMAttachmentMetaViewDataBuilder {
     _allowAddOption = allowAddOption;
   }
 
-  void options(List<LMPostOptionViewData>? options) {
+  void options(List<LMPollOptionViewData>? options) {
     _options = options;
   }
 
@@ -182,6 +189,7 @@ class LMAttachmentMetaViewDataBuilder {
       aspectRatio: _aspectRatio,
       meta: _meta,
       repost: _repost,
+      id: _id,
       pollQuestion: _pollQuestion,
       expiryTime: _expiryTime,
       pollOptions: _pollOptions,

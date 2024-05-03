@@ -131,6 +131,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         composeBloc.documentCount++;
       } else if (media.mediaType == LMMediaType.image) {
         composeBloc.imageCount++;
+      } else if (media.mediaType == LMMediaType.poll) {
+        composeBloc.isPollAdded = true;
       }
     }
 
@@ -485,6 +487,13 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         }
 
         if (composeBloc.postMedia.isNotEmpty) {
+          if (composeBloc.isPollAdded) {
+            return LMFeedPoll(
+              style: LMFeedPollStyle.composable(),
+              attachmentMeta:
+                  composeBloc.postMedia.first.attachmentMetaViewData!,
+            );
+          }
           if (composeBloc.postMedia.first.mediaType == LMMediaType.repost) {
             return Padding(
               padding: const EdgeInsets.only(right: 16.0),
