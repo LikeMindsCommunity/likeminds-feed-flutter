@@ -920,8 +920,6 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                           LMFeedFireAnalyticsEvent(
                             eventName: LMFeedAnalyticsKeys.userTaggedInPost,
                             widgetSource: LMFeedWidgetSource.editPostScreen,
-                            deprecatedEventName:
-                                LMFeedAnalyticsKeysDep.userTaggedInPost,
                             eventProperties: {
                               'tagged_user_id':
                                   tag.sdkClientInfo?.uuid ?? tag.uuid,

@@ -12,6 +12,7 @@ class LMFeedMenu extends StatelessWidget {
     this.action,
     this.style,
     this.onMenuTap,
+    this.onMenuOpen,
   });
 
   final Map<int, Widget>? children;
@@ -20,6 +21,7 @@ class LMFeedMenu extends StatelessWidget {
   final LMFeedMenuAction? action;
   final LMFeedMenuStyle? style;
   final VoidCallback? onMenuTap;
+  final VoidCallback? onMenuOpen;
 
   void removeReportIntegration() {
     menuItems.removeWhere((element) {
@@ -36,7 +38,10 @@ class LMFeedMenu extends StatelessWidget {
         ? Container()
         : GestureDetector(
             onTap: () {
-              onMenuTap?.call();
+              if (onMenuTap != null) {
+                onMenuTap?.call();
+                onMenuOpen?.call();
+              }
             },
             child: AbsorbPointer(
               absorbing: onMenuTap != null,
@@ -83,6 +88,9 @@ class LMFeedMenu extends StatelessWidget {
                                 size: 24,
                               ),
                             ),
+                        onOpened: () {
+                          onMenuOpen?.call();
+                        },
                       ),
                     )
                   : GestureDetector(
@@ -153,6 +161,8 @@ class LMFeedMenu extends StatelessWidget {
                                       )
                                       .toList());
                             });
+                        // Called when the post menu is opened
+                        onMenuOpen?.call();
                       },
                       child: Container(
                         color: Colors.transparent,
@@ -211,6 +221,7 @@ class LMFeedMenu extends StatelessWidget {
     LMFeedMenuAction? action,
     LMFeedMenuStyle? style,
     VoidCallback? onMenuTap,
+    VoidCallback? onMenuOpen,
   }) {
     return LMFeedMenu(
       children: children ?? this.children,
@@ -219,6 +230,7 @@ class LMFeedMenu extends StatelessWidget {
       action: action ?? this.action,
       style: style ?? this.style,
       onMenuTap: onMenuTap ?? this.onMenuTap,
+      onMenuOpen: onMenuOpen ?? this.onMenuOpen,
     );
   }
 }

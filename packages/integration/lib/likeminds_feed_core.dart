@@ -32,8 +32,8 @@ export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
-  bool initiateUserCalled = false;
   LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
+  @deprecated
   GlobalKey<ScaffoldMessengerState>? _scaffoldMessengerKey;
 
   /// This is stream is used to listen to
@@ -65,7 +65,7 @@ class LMFeedCore {
       {LMFeedSnackBarStyle? style}) {
     SnackBar snackBarWidget = LMFeedCore.widgetUtility
         .snackBarBuilder(context, snackBarMessage, widgetSource, style: style);
-    instance._scaffoldMessengerKey?.currentState?.showSnackBar(snackBarWidget);
+    ScaffoldMessenger.of(context).showSnackBar(snackBarWidget);
   }
 
   static GlobalKey<ScaffoldMessengerState>? get scaffoldMessengerKey =>
@@ -148,7 +148,6 @@ class LMFeedCore {
 
     await LMFeedLocalPreference.instance.clearUserData();
     if (response.success) {
-      initiateUserCalled = true;
       await LMFeedLocalPreference.instance.storeUserData(response.user!);
       LMNotificationHandler.instance.registerDevice(
         response.user!.sdkClientInfo.uuid,
