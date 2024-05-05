@@ -9,6 +9,7 @@ class LMFeedList extends StatefulWidget {
   final List<String> selectedTopicIds;
   final PagingController<int, LMPostViewData> pagingController;
   final int pageSize;
+  final LMFeedWidgetSource widgetSource;
 
   final LMFeedPostWidgetBuilder? postBuilder;
 
@@ -18,6 +19,7 @@ class LMFeedList extends StatefulWidget {
     required this.pagingController,
     this.pageSize = 20,
     this.postBuilder,
+    this.widgetSource = LMFeedWidgetSource.universalFeed,
   });
 
   @override
@@ -31,7 +33,6 @@ class _LMFeedListState extends State<LMFeedList> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   LMFeedThemeData feedThemeData = LMFeedTheme.instance.theme;
-  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.universalFeed;
   LMFeedBloc _feedBloc = LMFeedBloc.instance;
   final ValueNotifier postUploading = ValueNotifier(false);
 
@@ -213,7 +214,7 @@ class _LMFeedListState extends State<LMFeedList> {
       style: feedThemeData.topicStyle,
       onTopicTap: (context, topicViewData) =>
           LMFeedPostUtils.handlePostTopicTap(
-              context, postViewData, topicViewData, widgetSource),
+              context, postViewData, topicViewData, widget.widgetSource),
     );
   }
 
@@ -252,10 +253,16 @@ class _LMFeedListState extends State<LMFeedList> {
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData.headerStyle,
-      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
-          postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
-      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
-          postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
+      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(
+          context,
+          postViewData,
+          LMFeedAnalyticsKeys.postProfilePicture,
+          widget.widgetSource),
+      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(
+          context,
+          postViewData,
+          LMFeedAnalyticsKeys.postProfilePicture,
+          widget.widgetSource),
       menu: LMFeedMenu(
         menuItems: postViewData.menuItems,
         removeItemIds: {postReportId, postEditId},
@@ -296,7 +303,7 @@ class _LMFeedListState extends State<LMFeedList> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
-                widgetSource: widgetSource,
+                widgetSource: widget.widgetSource,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
@@ -369,7 +376,7 @@ class _LMFeedListState extends State<LMFeedList> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
-                widgetSource: widgetSource,
+                widgetSource: widget.widgetSource,
               ),
             ),
           )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
@@ -398,7 +405,7 @@ class _LMFeedListState extends State<LMFeedList> {
             rebuildPostWidget.value = !rebuildPostWidget.value;
           } else {
             LMFeedPostUtils.handlePostLikeTapEvent(
-                postViewData, widgetSource, postViewData.isLiked);
+                postViewData, widget.widgetSource, postViewData.isLiked);
           }
         },
       );
@@ -411,7 +418,7 @@ class _LMFeedListState extends State<LMFeedList> {
         style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
           // Handle analytics event for comment button tap
-          LMFeedPostUtils.handlePostCommentButtonTap(post, widgetSource);
+          LMFeedPostUtils.handlePostCommentButtonTap(post, widget.widgetSource);
 
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
@@ -469,13 +476,13 @@ class _LMFeedListState extends State<LMFeedList> {
                     : LMFeedPostActionType.unsaved));
           } else {
             LMFeedPostUtils.handlePostSaveTapEvent(
-                postViewData, postViewData.isSaved, widgetSource);
+                postViewData, postViewData.isSaved, widget.widgetSource);
             LMFeedCore.showSnackBar(
               context,
               postViewData.isSaved
                   ? "$postTitleFirstCap Saved"
                   : "$postTitleFirstCap Unsaved",
-              widgetSource,
+              widget.widgetSource,
             );
           }
         },
@@ -486,7 +493,8 @@ class _LMFeedListState extends State<LMFeedList> {
         text: const LMFeedText(text: "Share"),
         onTap: () {
           // Fire analytics event for share button tap
-          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, widgetSource);
+          LMFeedPostUtils.handlerPostShareTapEvent(
+              postViewData, widget.widgetSource);
 
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
@@ -527,7 +535,7 @@ class _LMFeedListState extends State<LMFeedList> {
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
-                        widgetSource: LMFeedWidgetSource.universalFeed,
+                        widgetSource: widget.widgetSource,
                       ),
                     ),
                   );
@@ -535,14 +543,14 @@ class _LMFeedListState extends State<LMFeedList> {
                   LMFeedCore.showSnackBar(
                       context,
                       'A $postTitleSmallCap is already uploading.',
-                      widgetSource);
+                      widget.widgetSource);
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
                   context,
                   "You do not have permission to create a $postTitleSmallCap",
-                  widgetSource,
+                  widget.widgetSource,
                 );
               },
         style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
@@ -635,7 +643,7 @@ class _LMFeedListState extends State<LMFeedList> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: widgetSource,
+          widgetSource: widget.widgetSource,
           eventProperties: {
             'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,
