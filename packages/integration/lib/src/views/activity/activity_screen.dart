@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/poll_result_screen.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -397,6 +399,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
                   title: 'Delete $postTitleFirstCap',
                   uuid: postCreatorUUID,
+                  widgetSource: widgetSource,
                   content:
                       'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                   action: (String reason) async {
@@ -405,25 +408,14 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                     String postType =
                         LMFeedPostUtils.getPostType(postViewData.attachments);
 
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        widgetSource: LMFeedWidgetSource.activityScreen,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                          "post_type": postType,
-                          "user_id": currentUser?.sdkClientInfo.uuid,
-                          "user_state": isCm ? "CM" : "member",
-                        },
-                      ),
-                    );
-
                     LMFeedPostBloc.instance.add(
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
                         isRepost: postViewData.isRepost,
+                        postType: postType,
+                        userId: postCreatorUUID,
+                        userState: isCm ? "CM" : "member",
                       ),
                     );
                   },
@@ -458,6 +450,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       attachments: post.attachments!,
       style: feedTheme?.mediaStyle,
       postId: post.id,
+      pollBuilder: (pollWidget) {
+        return _defPollWidget(pollWidget, post);
+      },
       onMediaTap: () async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
@@ -477,6 +472,72 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     );
   }
 
+  Widget _defPollWidget(LMFeedPoll pollWidget, LMPostViewData postViewData) {
+    List<String> selectedOptions = [];
+    final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
+    return ValueListenableBuilder(
+        valueListenable: rebuildPollWidget,
+        builder: (context, _, __) {
+          return LMFeedPoll(
+            selectedOption: selectedOptions,
+            attachmentMeta: pollWidget.attachmentMeta,
+            style: pollWidget.style,
+            onOptionSelect: (optionData) async {
+              if (isPollSubmitted(pollWidget.attachmentMeta.options ?? []))
+                return;
+              if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
+                  pollWidget.attachmentMeta.multiSelectState!)) {
+                submitVote(context, pollWidget.attachmentMeta, [optionData.id], postViewData.id);
+              } else if (selectedOptions.contains(optionData.id)) {
+                selectedOptions.remove(optionData.id);
+              } else {
+                selectedOptions.add(optionData.id);
+              }
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            showSubmitButton: showSubmitButton(pollWidget.attachmentMeta),
+            showAddOptionButton: showAddOptionButton(pollWidget.attachmentMeta),
+            showTick: (option) {
+              return showTick(pollWidget.attachmentMeta, option);
+            },
+            timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime),
+            onAddOptionSubmit: (option) async {
+              await addOption(context, pollWidget, pollWidget.attachmentMeta,
+                  option, postViewData.id, currentUser, rebuildPollWidget);
+              selectedOptions.clear();
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            onSubtextTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LMFeedPollResultScreen(
+                          pollId: pollWidget.attachmentMeta.id ?? '',
+                          pollOptions: pollWidget.attachmentMeta.options ?? [],
+                        )),
+              );
+            },
+            onVoteClick: (option) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LMFeedPollResultScreen(
+                    pollId: pollWidget.attachmentMeta.id ?? '',
+                    pollOptions: pollWidget.attachmentMeta.options ?? [],
+                    selectedOptionId: option.id,
+                  ),
+                ),
+              );
+            },
+            onSubmit: (options) {
+              submitVote(context, pollWidget.attachmentMeta, options, postViewData.id);
+              selectedOptions.clear();
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+          );
+        });
+  }
+
   LMFeedButton defLikeButton(
           LMFeedThemeData? feedTheme, LMPostViewData postViewData) =>
       LMFeedButton(
@@ -490,6 +551,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: widgetSource,
               ),
             ),
           );
@@ -515,6 +577,20 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             // rebuildPostWidget.value = !rebuildPostWidget.value;
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: LMFeedWidgetSource.universalFeed,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );
@@ -557,12 +633,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             postViewData.isSaved = !postViewData.isSaved;
           } else {
             LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: postViewData.isSaved
-                        ? "$postTitleFirstCap Saved"
-                        : "$postTitleFirstCap Unsaved"),
-              ),
+              context,
+              postViewData.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              LMFeedWidgetSource.activityScreen,
             );
           }
         },
@@ -761,6 +836,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
               title: 'Delete $commentTitleFirstCapSingular',
               uuid: commentCreatorUUID,
+              widgetSource: widgetSource,
               content:
                   'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
               action: (String reason) async {

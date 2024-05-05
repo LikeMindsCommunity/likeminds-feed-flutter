@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// {@template lm_feed_edit_post_screen}
@@ -73,6 +74,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.editPostScreen;
 
   /// Controllers and other helper classes' objects
   FocusNode? _headingFocusNode;
@@ -221,11 +223,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   _composeBlocListener(BuildContext context, LMFeedComposeState state) {
     if (state is LMFeedComposeMediaErrorState) {
       LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: 'Error while selecting media, please try again',
-          ),
-        ),
+        context,
+        state.error ?? 'Error while selecting media, please try again',
+        widgetSource,
       );
     }
   }
@@ -296,11 +296,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         composeBloc.selectedTopics.isEmpty &&
         config!.enableTopics) {
       LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: "Can't create a $postTitleSmallCap without topic",
-          ),
-        ),
+        context,
+        "Can't create a $postTitleSmallCap without topic",
+        widgetSource,
       );
       return false;
     }
@@ -324,10 +322,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
             if (curr is LMFeedGetPostSuccessState) {
               onBoardPostDetails(curr.post);
             } else if (curr is LMFeedPostErrorState) {
-              LMFeedCore.showSnackBar(LMFeedSnackBar(
-                  content: LMFeedText(
-                text: curr.errorMessage,
-              )));
+              LMFeedCore.showSnackBar(context, curr.errorMessage, widgetSource);
             }
           },
           bloc: LMFeedPostBloc.instance,
@@ -346,7 +341,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     bloc: composeBloc,
                     listener: _composeBlocListener,
                     child: widgetUtility.scaffold(
-                      source: LMFeedWidgetSource.editPostScreen,
+                      source: widgetSource,
                       backgroundColor: feedTheme.container,
                       appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
                           _defAppBar(),
@@ -492,6 +487,19 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               style: LMFeedPollStyle.composable(),
               attachmentMeta:
                   composeBloc.postMedia.first.attachmentMetaViewData!,
+              subTextBuilder: (context) {
+                return LMFeedText(
+                  text: getFormattedDateTime(composeBloc
+                      .postMedia.first.attachmentMetaViewData!.expiryTime!),
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      color: feedTheme.onContainer.withOpacity(0.5),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                );
+              },
             );
           }
           if (composeBloc.postMedia.first.mediaType == LMMediaType.repost) {
@@ -786,23 +794,18 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     config!.headingRequiredToCreatePost &&
                     (heading == null || heading.isEmpty)) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text:
-                            "Can't create a $postTitleSmallCap without heading",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without heading",
+                    widgetSource,
                   );
                   return;
                 }
 
                 if (config!.textRequiredToCreatePost && postText.isEmpty) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: "Can't create a $postTitleSmallCap without text",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without text",
+                    widgetSource,
                   );
                   return;
                 }
@@ -828,9 +831,6 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     LMFeedTaggingHelper.encodeString(_controller.text, userTags)
                         .trim();
 
-                sendPostCreationCompletedEvent(
-                    [...composeBloc.postMedia], userTags, selectedTopics);
-
                 if (postViewData?.attachments != null &&
                     postViewData!.attachments!.isNotEmpty &&
                     postViewData!.attachments!.first.attachmentType == 5) {
@@ -855,12 +855,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 Navigator.pop(context);
               } else {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "Can't create a $postTitleSmallCap without text or attachments",
-                    ),
-                  ),
+                  context,
+                  "Can't create a $postTitleSmallCap without text or attachments",
+                  widgetSource,
                 );
               }
             },

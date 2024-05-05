@@ -57,6 +57,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   Map<String, LMUserViewData> users = {};
   LMFeedThemeData? feedTheme;
   LMFeedCommentStyle? replyStyle;
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.postDetailScreen;
 
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
@@ -470,6 +471,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $commentTitleFirstCapSingular',
+                widgetSource: widgetSource,
                 uuid: commentCreatorUUID,
                 content:
                     'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
@@ -562,6 +564,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
               builder: (context) => LMFeedLikesScreen(
                 postId: widget.postId,
                 commentId: commentViewData.id,
+                widgetSource: widgetSource,
               ),
             ),
           );

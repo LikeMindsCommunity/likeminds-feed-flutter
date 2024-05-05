@@ -20,37 +20,48 @@ addVideoEventHandler(
     widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'video'},
   ));
-  final result = await LMFeedMediaHandler.handlePermissions(2);
-  if (result) {
+  final LMResponse<bool> result = await LMFeedMediaHandler.handlePermissions(2);
+  if (result.success) {
     try {
-      final videos = await LMFeedMediaHandler.pickVideos(mediaCount);
-      if (videos != null && videos.isNotEmpty) {
-        int countOfPickedVideos = videos.length;
+      final LMResponse<List<LMMediaModel>> videos =
+          await LMFeedMediaHandler.pickVideos(mediaCount);
+      if (videos.success) {
+        if (videos.data != null && videos.data!.isNotEmpty) {
+          int countOfPickedVideos = videos.data!.length;
 
-        LMFeedComposeBloc.instance.videoCount += videos.length;
-        LMFeedComposeBloc.instance.postMedia.addAll(videos);
-        LMFeedComposeBloc.instance.postMedia
-            .removeWhere((element) => element.mediaType == LMMediaType.link);
+          LMFeedComposeBloc.instance.videoCount += countOfPickedVideos;
+          LMFeedComposeBloc.instance.postMedia.addAll(videos.data!);
+          LMFeedComposeBloc.instance.postMedia
+              .removeWhere((element) => element.mediaType == LMMediaType.link);
 
-        LMFeedAnalyticsBloc.instance.add(
-          LMFeedFireAnalyticsEvent(
-            eventName: LMFeedAnalyticsKeys.videoAttachedToPost,
-            deprecatedEventName: LMFeedAnalyticsKeysDep.videoAttachedToPost,
-            widgetSource: LMFeedWidgetSource.createPostScreen,
-            eventProperties: {
-              'video_count': countOfPickedVideos,
-            },
-          ),
-        );
+          LMFeedAnalyticsBloc.instance.add(
+            LMFeedFireAnalyticsEvent(
+              eventName: LMFeedAnalyticsKeys.videoAttachedToPost,
+              deprecatedEventName: LMFeedAnalyticsKeysDep.videoAttachedToPost,
+              widgetSource: LMFeedWidgetSource.createPostScreen,
+              eventProperties: {
+                'video_count': countOfPickedVideos,
+              },
+            ),
+          );
 
-        emitter(LMFeedComposeAddedVideoState());
+          emitter(LMFeedComposeAddedVideoState());
+        } else {
+          if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
+            emitter(LMFeedComposeInitialState());
+          } else {
+            emitter(LMFeedComposeAddedVideoState());
+          }
+        }
       } else {
-        emitter(LMFeedComposeInitialState());
+        emitter(LMFeedComposeMediaErrorState(error: videos.errorMessage));
       }
     } on Exception catch (err, stacktrace) {
       LMFeedLogger.instance.handleException(err, stacktrace);
 
-      emitter(LMFeedComposeMediaErrorState(err));
+      emitter(LMFeedComposeMediaErrorState());
     }
+  } else {
+    emitter(LMFeedComposeMediaErrorState(error: result.errorMessage));
   }
 }

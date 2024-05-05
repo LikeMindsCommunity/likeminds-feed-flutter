@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/poll/create_poll_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/views/poll/poll_result_screen.dart';
 import 'package:video_compress/video_compress.dart';
 // import 'package:media_kit_video/media_kit_video.dart';
@@ -298,33 +299,23 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       ? LMFeedPostSomething(
                           onTap: userPostingRights
                               ? () async {
-                                  LMFeedAnalyticsBloc.instance
-                                      .add(const LMFeedFireAnalyticsEvent(
-                                    eventName:
-                                        LMFeedAnalyticsKeys.postCreationStarted,
-                                    widgetSource:
-                                        LMFeedWidgetSource.universalFeed,
-                                    deprecatedEventName: LMFeedAnalyticsKeysDep
-                                        .postCreationStarted,
-                                    eventProperties: {},
-                                  ));
-
                                   LMFeedVideoProvider.instance
                                       .forcePauseAllControllers();
                                   // ignore: use_build_context_synchronously
                                   await Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              const LMFeedComposeScreen()));
+                                              const LMFeedComposeScreen(
+                                                widgetSource: LMFeedWidgetSource
+                                                    .universalFeed,
+                                              )));
                                 }
                               : () {
                                   LMFeedCore.showSnackBar(
-                                    LMFeedSnackBar(
-                                      content: LMFeedText(
-                                        text:
-                                            "You do not have permission to create a $postTitleSmallCap",
-                                      ),
-                                    ),
+                                    context,
+                                    "You do not have permission to create a $postTitleSmallCap",
+                                    _widgetSource,
+                                    style: LMFeedCore.theme.snackBarTheme,
                                   );
                                 })
                       : widget.customWidgetBuilder!(context)
@@ -366,12 +357,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     // show a snackbar when post is deleted
                     // will only be shown if a messenger key is provided
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(
-                          text: '$postTitleFirstCap Deleted',
-                        ),
-                      ),
+                      context,
+                      '$postTitleFirstCap Deleted',
+                      _widgetSource,
                     );
+
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     feedRoomItemList
@@ -417,9 +407,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     postUploading.value = false;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
 
-                    LMFeedCore.showSnackBar(LMFeedSnackBar(
-                        content:
-                            LMFeedText(text: "$postTitleFirstCap Created")));
+                    LMFeedCore.showSnackBar(
+                      context,
+                      '$postTitleFirstCap Created',
+                      _widgetSource,
+                    );
                   }
                   if (curr is LMFeedEditPostUploadedState) {
                     LMPostViewData? item = curr.postData.copyWith();
@@ -436,18 +428,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     postUploading.value = false;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
 
-                    LMFeedCore.showSnackBar(LMFeedSnackBar(
-                        content:
-                            LMFeedText(text: "$postTitleFirstCap Edited")));
+                    LMFeedCore.showSnackBar(
+                        context, '$postTitleFirstCap Edited', _widgetSource);
                   }
                   if (curr is LMFeedNewPostErrorState) {
                     postUploading.value = false;
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(
-                          text: curr.errorMessage,
-                        ),
-                      ),
+                      context,
+                      curr.errorMessage,
+                      _widgetSource,
                     );
                   }
                   if (curr is LMFeedPostUpdateState) {
@@ -458,17 +447,19 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         -1;
                     if (index != -1) {
                       feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
-                          postViewData: feedRoomItemList[index],
-                          actionType: curr.actionType,
-                          commentId: curr.commentId);
+                        postViewData: feedRoomItemList[index],
+                        actionType: curr.actionType,
+                        commentId: curr.commentId,
+                        pollOptions: curr.pollOptions,
+                      );
                     }
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }
                   if (curr is LMFeedPostDeletionErrorState) {
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(text: (curr).message),
-                      ),
+                      context,
+                      curr.message,
+                      _widgetSource,
                     );
                   }
                 },
@@ -961,6 +952,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
+                widgetSource: _widgetSource,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
@@ -969,25 +961,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   String postType =
                       LMFeedPostUtils.getPostType(postViewData.attachments);
 
-                  LMFeedAnalyticsBloc.instance.add(
-                    LMFeedFireAnalyticsEvent(
-                      eventName: LMFeedAnalyticsKeys.postDeleted,
-                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                      widgetSource: LMFeedWidgetSource.universalFeed,
-                      eventProperties: {
-                        "post_id": postViewData.id,
-                        "post_type": postType,
-                        "user_id": currentUser?.sdkClientInfo.uuid,
-                        "user_state": isCm ? "CM" : "member",
-                      },
-                    ),
-                  );
-
                   LMFeedPostBloc.instance.add(
                     LMFeedDeletePostEvent(
                       postId: postViewData.id,
                       reason: reason,
                       isRepost: postViewData.isRepost,
+                      postType: postType,
+                      userId: postCreatorUUID,
+                      userState: isCm ? "CM" : "member",
                     ),
                   );
                 },
@@ -1047,7 +1028,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 return;
               if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
                   pollWidget.attachmentMeta.multiSelectState!)) {
-                submitVote(pollWidget.attachmentMeta, [optionData.id]);
+                submitVote(context, pollWidget.attachmentMeta, [optionData.id], postViewData.id);
               } else if (selectedOptions.contains(optionData.id)) {
                 selectedOptions.remove(optionData.id);
               } else {
@@ -1062,8 +1043,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             },
             timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime!),
             onAddOptionSubmit: (option) async {
-              await addOption(pollWidget, pollWidget.attachmentMeta, option,
-                  postViewData.id);
+              await addOption(context, pollWidget, pollWidget.attachmentMeta,
+                  option, postViewData.id, currentUser, rebuildPollWidget);
               selectedOptions.clear();
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },
@@ -1090,7 +1071,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               );
             },
             onSubmit: (options) {
-              submitVote(pollWidget.attachmentMeta, options);
+              submitVote(context, pollWidget.attachmentMeta, options, postViewData.id);
               selectedOptions.clear();
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },
@@ -1113,6 +1094,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: _widgetSource,
               ),
             ),
           )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
@@ -1128,15 +1110,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.postLiked,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              widgetSource: LMFeedWidgetSource.universalFeed,
-              eventProperties: {'post_id': postViewData.id},
-            ),
-          );
-
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
@@ -1147,6 +1120,20 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   : LMFeedPostActionType.like,
               postId: postViewData.id,
             ));
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: _widgetSource,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );
@@ -1211,12 +1198,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     : LMFeedPostActionType.unsaved));
           } else {
             LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: postViewData.isSaved
-                        ? "$postTitleFirstCap Saved"
-                        : "$postTitleFirstCap Unsaved"),
-              ),
+              context,
+              postViewData.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              _widgetSource,
             );
           }
         },
@@ -1251,14 +1237,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          widgetSource: LMFeedWidgetSource.universalFeed,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
@@ -1273,27 +1251,23 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
+                        widgetSource: LMFeedWidgetSource.universalFeed,
                       ),
                     ),
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A $postTitleSmallCap is already uploading.',
-                      ),
-                    ),
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "You do not have permission to create a $postTitleSmallCap",
-                    ),
-                  ),
+                  context,
+                  'You do not have permission to create a $postTitleSmallCap',
+                  _widgetSource,
                 );
               },
         style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
@@ -1367,39 +1341,28 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       onTap: userPostingRights
           ? () async {
               if (!postUploading.value) {
-                LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
-                    eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                    widgetSource: LMFeedWidgetSource.universalFeed,
-                    deprecatedEventName:
-                        LMFeedAnalyticsKeysDep.postCreationStarted,
-                    eventProperties: {}));
-
                 LMFeedVideoProvider.instance.forcePauseAllControllers();
                 // ignore: use_build_context_synchronously
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LMFeedComposeScreen(),
+                    builder: (context) => const LMFeedComposeScreen(
+                      widgetSource: LMFeedWidgetSource.universalFeed,
+                    ),
                   ),
                 );
               } else {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: 'A $postTitleSmallCap is already uploading.',
-                    ),
-                  ),
-                );
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource);
               }
             }
           : () {
               LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text:
-                        "You do not have permission to create a $postTitleSmallCap",
-                  ),
-                ),
+                context,
+                "You do not have permission to create a $postTitleSmallCap",
+                _widgetSource,
               );
             },
     );
@@ -1439,40 +1402,29 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         onTap: userPostingRights
             ? () async {
                 if (!postUploading.value) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          widgetSource: LMFeedWidgetSource.universalFeed,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(),
+                      builder: (context) => LMFeedComposeScreen(
+                        widgetSource: LMFeedWidgetSource.universalFeed,
+                      ),
                     ),
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A $postTitleSmallCap is already uploading.',
-                      ),
-                    ),
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "You do not have permission to create a $postTitleSmallCap",
-                    ),
-                  ),
+                  context,
+                  "You do not have permission to create a $postTitleSmallCap",
+                  _widgetSource,
                 );
               },
       );
@@ -1589,215 +1541,4 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       );
     }
   }
-
-  bool showTick(
-      LMAttachmentMetaViewData attachmentMeta, LMPollOptionViewData option) {
-    if (isPollSubmitted(attachmentMeta.options!)) {
-      return false;
-    }
-    if ((isMultiChoicePoll(attachmentMeta.multiSelectNo!,
-                    attachmentMeta.multiSelectState!) ==
-                true ||
-            isInstantPoll(attachmentMeta.pollType!) == false) &&
-        option.isSelected == true) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  bool showAddOptionButton(LMAttachmentMetaViewData attachmentMeta) {
-    bool isAddOptionAllowedForInstantPoll =
-        isInstantPoll(attachmentMeta.pollType!) &&
-            !isPollSubmitted(attachmentMeta.options!);
-    bool isAddOptionAllowedForDeferredPoll =
-        !isInstantPoll(attachmentMeta.pollType!);
-
-    if (attachmentMeta.allowAddOption! &&
-        !hasPollEnded(attachmentMeta.expiryTime!) &&
-        (isAddOptionAllowedForInstantPoll ||
-            isAddOptionAllowedForDeferredPoll)) {
-      return true;
-    }
-    return false;
-  }
-
-  Future<void> submitVote(
-      LMAttachmentMetaViewData attachmentMeta, List<String> options) async {
-    try {
-      if (hasPollEnded(attachmentMeta.expiryTime!)) {
-        LMFeedCore.showSnackBar(
-          LMFeedSnackBar(
-              content: LMFeedText(
-                  text: "Poll ended. Vote can not be submitted now.")),
-        );
-        return;
-      }
-      if (isPollSubmitted(attachmentMeta.options!) &&
-          isInstantPoll(attachmentMeta.pollType!)) {
-        // TODO: remove this snackbar and do nothing
-        LMFeedCore.showSnackBar(
-          LMFeedSnackBar(
-              content:
-                  LMFeedText(text: "You have already submitted your vote.")),
-        );
-        return;
-      } else {
-        int totalVotes = attachmentMeta.options?.fold(
-                0,
-                (previousValue, element) =>
-                    previousValue! + element.voteCount) ??
-            0;
-        totalVotes += options.length;
-        for (int i = 0; i < options.length; i++) {
-          int index = attachmentMeta.options!
-              .indexWhere((element) => element.id == options[i]);
-          if (index != -1) {
-            attachmentMeta.options![index].isSelected = true;
-            attachmentMeta.options![index].voteCount++;
-            attachmentMeta.options![index].percentage =
-                (attachmentMeta.options![index].voteCount / totalVotes) * 100;
-          }
-        }
-        if (isMultiChoicePoll(
-            attachmentMeta.multiSelectNo!, attachmentMeta.multiSelectState!)) {
-          SubmitPollVoteRequest request = (SubmitPollVoteRequestBuilder()
-                ..pollId(attachmentMeta.id ?? '')
-                ..votes([...options]))
-              .build();
-          final response = await LMFeedCore.client.submitPollVote(request);
-          if (!response.success) {
-            LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(text: response.errorMessage ?? ""),
-              ),
-            );
-          }
-        } else {
-          SubmitPollVoteRequest request = (SubmitPollVoteRequestBuilder()
-                ..pollId(attachmentMeta.id ?? '')
-                ..votes([...options]))
-              .build();
-          final response = await LMFeedCore.client.submitPollVote(request);
-          if (!response.success) {
-            LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(text: response.errorMessage ?? ""),
-              ),
-            );
-          }
-        }
-      }
-    } on Exception catch (e) {
-      LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(text: e.toString()),
-        ),
-      );
-    }
-  }
-
-  bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
-    if ((isInstantPoll(attachmentMeta.pollType!) &&
-            isPollSubmitted(attachmentMeta.options!)) ||
-        hasPollEnded(attachmentMeta.expiryTime!)) {
-      return false;
-    } else if (!isMultiChoicePoll(
-        attachmentMeta.multiSelectNo!, attachmentMeta.multiSelectState!)) {
-      return false;
-    } else
-      return true;
-  }
-
-  Future<void> addOption(
-      LMFeedPoll pollwidget,
-      LMAttachmentMetaViewData attachmentMeta,
-      String option,
-      String postId) async {
-    AddPollOptionRequest request = (AddPollOptionRequestBuilder()
-          ..pollId(attachmentMeta.id ?? '')
-          ..text(option))
-        .build();
-
-    final response = await LMFeedCore.client.addPollOption(request);
-    if (response.success) {
-      final poll = LMAttachmentMetaViewDataConvertor.fromWidgetModel(
-          widget: response.data!.widget!,
-          users: {
-            currentUser!.uuid: currentUser!,
-          });
-      attachmentMeta.options?.clear();
-      attachmentMeta.options?.addAll(poll.options ?? []);
-      // newPostBloc.add(LMFeedUpdatePostEvent(
-      //   actionType: LMFeedPostActionType.addPollOption,
-      //   postId: postId,
-      //   pollOption: poll.options!.last,
-      // ));
-      // rebuildPostWidget.value = !rebuildPostWidget.value;
-      rebuildPostWidget.value = !rebuildPostWidget.value;
-      LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(text: "Option added successfully"),
-        ),
-      );
-    }
-  }
-}
-
-bool isPollSubmitted(List<LMPollOptionViewData> options) {
-  return options.any((element) => element.isSelected);
-}
-
-bool hasPollEnded(int expiryTime) {
-  return DateTime.now().millisecondsSinceEpoch > expiryTime;
-}
-
-String getTimeLeftInPoll(int expiryTime) {
-  DateTime expiryTimeInDateTime =
-      DateTime.fromMillisecondsSinceEpoch(expiryTime);
-  DateTime now = DateTime.now();
-  Duration difference = expiryTimeInDateTime.difference(now);
-  if (difference.isNegative) {
-    return "Poll Ended";
-  }
-  if (difference.inDays > 0) {
-    return "${difference.inDays}d left";
-  } else if (difference.inHours > 0) {
-    return "${difference.inHours}h left";
-  } else if (difference.inMinutes > 0) {
-    return "${difference.inMinutes}m left";
-  } else {
-    return "Just Now";
-  }
-}
-
-String? getPollSelectionText(
-    PollMultiSelectState pollMultiSelectState, int pollMultiSelectNo) {
-  switch (pollMultiSelectState) {
-    case PollMultiSelectState.exactly:
-      if (pollMultiSelectNo == 1) {
-        return null;
-      } else {
-        return "*Select exactly $pollMultiSelectNo options";
-      }
-    case PollMultiSelectState.atMax:
-      return "*Select at most $pollMultiSelectNo options";
-    case PollMultiSelectState.atLeast:
-      return "*Select at least $pollMultiSelectNo options";
-    default:
-      return null;
-  }
-}
-
-bool isInstantPoll(PollType pollType) {
-  return pollType == PollType.instant;
-}
-
-bool isMultiChoicePoll(
-    int pollMultiSelectNo, PollMultiSelectState pollMultiSelectState) {
-  if (pollMultiSelectState == PollMultiSelectState.exactly &&
-      pollMultiSelectNo == 1) {
-    return false;
-  }
-  return true;
 }

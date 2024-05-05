@@ -34,3 +34,15 @@ Improvements, and bug fixes
 Adding API Security
 Adding Post and Comment as variable
 Fixing minor bugs
+
+## 1.2.1
+
+Updating LikeMinds Feed Flutter UI to 1.2.1
+
+## 1.2.2
+
+Adding SnackBar build in Widget Utility
+
+## 1.2.3
+
+Fixed analytics events and added function for logout

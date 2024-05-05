@@ -33,3 +33,15 @@ Adding multiple media support
 Adding API Security
 Adding Post and Comment as variable
 Fixing minor bugs
+
+## 1.2.1
+
+Removing open_filex package
+
+## 1.2.2
+
+Adding SnackBar builder in Widget Utility
+
+## 1.2.3
+
+Fixed analytics events and added function for logout

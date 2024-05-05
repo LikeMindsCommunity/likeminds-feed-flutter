@@ -9,6 +9,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
   final String uuid;
   final Function(String) action;
   final String actionText;
+  final LMFeedWidgetSource widgetSource;
 
   const LMFeedDeleteConfirmationDialog({
     super.key,
@@ -17,6 +18,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
     required this.uuid,
     required this.action,
     required this.actionText,
+    required this.widgetSource,
   });
 
   @override
@@ -216,12 +218,10 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                             });
                                           } else {
                                             LMFeedCore.showSnackBar(
-                                              LMFeedSnackBar(
-                                                content: LMFeedText(
-                                                  text: value.errorMessage ??
-                                                      "An error occurred",
-                                                ),
-                                              ),
+                                              context,
+                                              value.errorMessage ??
+                                                  "An error occurred",
+                                              widgetSource,
                                             );
                                           }
                                           boolVarLoading = false;
@@ -291,11 +291,9 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                         isCm &&
                         reasonForDeletion == null) {
                       LMFeedCore.showSnackBar(
-                        LMFeedSnackBar(
-                          content: LMFeedText(
-                            text: 'Please select a reason for deletion',
-                          ),
-                        ),
+                        context,
+                        'Please select a reason for deletion',
+                        widgetSource,
                       );
                       return;
                     }

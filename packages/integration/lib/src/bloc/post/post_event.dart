@@ -42,6 +42,7 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
   final LMUserViewData user;
   final List<LMTopicViewData> selectedTopics;
   final int? feedroomId;
+  final List<LMUserTagViewData>? userTagged;
 
   ///{@macro lm_feed_create_new_post_event}
   LMFeedCreateNewPostEvent({
@@ -51,6 +52,7 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
     required this.selectedTopics,
     this.heading,
     this.feedroomId,
+    this.userTagged,
   }) : assert(postMedia != null || postText != null || heading != null);
 }
 
@@ -86,12 +88,19 @@ class LMFeedDeletePostEvent extends LMFeedPostEvents {
   final String reason;
   final int? feedRoomId;
   final bool isRepost;
+  // The below keys are required for analytics
+  final String? userState; // state of user who deletes the post
+  final String? userId; // user who created the post
+  final String? postType; // type of post i.e video, photo, text
 
   LMFeedDeletePostEvent({
     required this.postId,
     required this.reason,
     this.feedRoomId,
     this.isRepost = false,
+    this.userState,
+    this.userId,
+    this.postType,
   });
 
   @override
@@ -106,7 +115,7 @@ class LMFeedUpdatePostEvent extends LMFeedPostEvents {
   // This variable stores the id of comment
   // that is deleted
   final String? commentId;
-  final LMPollOptionViewData? pollOption;
+  final List<LMPollOptionViewData>? pollOption;
 
   LMFeedUpdatePostEvent({
     this.post,

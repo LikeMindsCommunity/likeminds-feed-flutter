@@ -47,6 +47,8 @@ class _LMFeedUserCreatedCommentListViewState
   String commentTitleSmallPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
+  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   static const int pageSize = 10;
   final PagingController<int, LMCommentViewData> _pagingController =
@@ -59,6 +61,7 @@ class _LMFeedUserCreatedCommentListViewState
       LMFeedUserCreatedCommentBloc();
   final Map<String, LMPostViewData> _posts = {};
   LMFeedPostBloc lmFeedPostBloc = LMFeedPostBloc.instance;
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.userCreatedCommentScreen;
 
   @override
   void initState() {
@@ -154,8 +157,7 @@ class _LMFeedUserCreatedCommentListViewState
                                   context, postWidget, _posts[item.postId]!) ??
                               LMFeedCore.widgetUtility.postWidgetBuilder.call(
                                   context, postWidget, _posts[item.postId]!,
-                                  source: LMFeedWidgetSource
-                                      .userCreatedCommentScreen),
+                                  source: widgetSource),
                           const Divider(),
                         ],
                       );
@@ -370,28 +372,23 @@ class _LMFeedUserCreatedCommentListViewState
                 builder: (childContext) => LMFeedDeleteConfirmationDialog(
                   title: 'Delete $postTitleFirstCap',
                   uuid: postViewData.uuid,
+                  widgetSource: widgetSource,
                   content:
                       'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                   action: (String reason) async {
                     Navigator.of(childContext).pop();
 
-                    LMFeedAnalyticsBloc.instance.add(
-                      LMFeedFireAnalyticsEvent(
-                        eventName: LMFeedAnalyticsKeys.postDeleted,
-                        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                        widgetSource:
-                            LMFeedWidgetSource.userCreatedCommentScreen,
-                        eventProperties: {
-                          "post_id": postViewData.id,
-                        },
-                      ),
-                    );
+                    String postType =
+                        LMFeedPostUtils.getPostType(postViewData.attachments);
 
                     lmFeedPostBloc.add(
                       LMFeedDeletePostEvent(
                         postId: postViewData.id,
                         reason: reason,
                         isRepost: postViewData.isRepost,
+                        userId: postViewData.user.sdkClientInfo.uuid,
+                        postType: postType,
+                        userState: isCm ? "CM" : "member",
                       ),
                     );
                   },
@@ -416,6 +413,7 @@ class _LMFeedUserCreatedCommentListViewState
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: widgetSource,
               ),
             ),
           );
@@ -431,15 +429,6 @@ class _LMFeedUserCreatedCommentListViewState
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.postLiked,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              widgetSource: LMFeedWidgetSource.userCreatedCommentScreen,
-              eventProperties: {'post_id': postViewData.id},
-            ),
-          );
-
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
@@ -450,6 +439,20 @@ class _LMFeedUserCreatedCommentListViewState
                   : LMFeedPostActionType.like,
               postId: postViewData.id,
             ));
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: widgetSource,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );
@@ -516,12 +519,11 @@ class _LMFeedUserCreatedCommentListViewState
             ));
           } else {
             LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: postViewData.isSaved
-                        ? "$postTitleFirstCap Saved"
-                        : "$postTitleFirstCap Unsaved"),
-              ),
+              context,
+              postViewData.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              widgetSource,
             );
           }
         },
@@ -553,12 +555,6 @@ class _LMFeedUserCreatedCommentListViewState
         ),
         onTap: () async {
           if (!postUploading.value) {
-            LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
-                eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
-                widgetSource: LMFeedWidgetSource.userCreatedCommentScreen,
-                eventProperties: {}));
-
             LMFeedVideoProvider.instance.forcePauseAllControllers();
             // ignore: use_build_context_synchronously
             LMAttachmentViewData attachmentViewData =
@@ -573,17 +569,13 @@ class _LMFeedUserCreatedCommentListViewState
               MaterialPageRoute(
                 builder: (context) => LMFeedComposeScreen(
                   attachments: [attachmentViewData],
+                  widgetSource: LMFeedWidgetSource.userCreatedCommentScreen,
                 ),
               ),
             );
           } else {
-            LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                  text: 'A $postTitleSmallCap is already uploading.',
-                ),
-              ),
-            );
+            LMFeedCore.showSnackBar(context,
+                'A $postTitleSmallCap is already uploading.', widgetSource);
           }
         },
         style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
@@ -661,7 +653,7 @@ class _LMFeedUserCreatedCommentListViewState
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: LMFeedWidgetSource.userCreatedCommentScreen,
+          widgetSource: widgetSource,
           deprecatedEventName: postViewData.isPinned
               ? LMFeedAnalyticsKeysDep.postPinned
               : LMFeedAnalyticsKeysDep.postUnpinned,

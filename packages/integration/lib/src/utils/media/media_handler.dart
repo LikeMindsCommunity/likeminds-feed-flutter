@@ -2,12 +2,11 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LMFeedMediaHandler {
-  static Future<bool> handlePermissions(int mediaType) async {
+  static Future<LMResponse<bool>> handlePermissions(int mediaType) async {
     if (Platform.isAndroid) {
       PermissionStatus permissionStatus;
 
@@ -17,43 +16,33 @@ class LMFeedMediaHandler {
         if (mediaType == 1) {
           permissionStatus = await Permission.photos.status;
           if (permissionStatus == PermissionStatus.granted) {
-            return true;
+            return LMResponse(success: true);
           } else if (permissionStatus == PermissionStatus.denied) {
             permissionStatus = await Permission.photos.request();
             if (permissionStatus == PermissionStatus.permanentlyDenied) {
-              LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text: 'Permissions denied, change app settings',
-                  ),
-                ),
-              );
-              return false;
+              return LMResponse(
+                  success: false,
+                  errorMessage: 'Permissions denied, change app settings');
             } else if (permissionStatus == PermissionStatus.granted) {
-              return true;
+              return LMResponse(success: true);
             } else {
-              return false;
+              return LMResponse(success: false);
             }
           }
         } else if (mediaType == 2) {
           permissionStatus = await Permission.videos.status;
           if (permissionStatus == PermissionStatus.granted) {
-            return true;
+            return LMResponse(success: true);
           } else if (permissionStatus == PermissionStatus.denied) {
             permissionStatus = await Permission.videos.request();
             if (permissionStatus == PermissionStatus.permanentlyDenied) {
-              LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text: 'Permissions denied, change app settings',
-                  ),
-                ),
-              );
-              return false;
+              return LMResponse(
+                  success: false,
+                  errorMessage: 'Permissions denied, change app settings');
             } else if (permissionStatus == PermissionStatus.granted) {
-              return true;
+              return LMResponse(success: true);
             } else {
-              return false;
+              return LMResponse(success: false);
             }
           }
         } else if (mediaType == 3) {
@@ -75,7 +64,7 @@ class LMFeedMediaHandler {
           //   }
           // }
           // on android 33, storage permission always returns PermissionStatus.denied, since it is deprecated in android 30 and fully removed in android 33
-          return true;
+          return LMResponse(success: true);
         }
       } else {
         // permissionStatus = await Permission.storage.status;
@@ -96,13 +85,14 @@ class LMFeedMediaHandler {
         //   }
         // }
         // on android 33, storage permission always returns PermissionStatus.denied, since it is deprecated in android 30 and fully removed in android 33
-        return true;
+        return LMResponse(success: true);
       }
     }
-    return true;
+    return LMResponse(success: true);
   }
 
-  static Future<List<LMMediaModel>?> pickVideos(int currentMediaLength) async {
+  static Future<LMResponse<List<LMMediaModel>>> pickVideos(
+      int currentMediaLength) async {
     try {
       // final XFile? pickedFile =
       List<LMMediaModel> videoFiles = [];
@@ -112,7 +102,7 @@ class LMFeedMediaHandler {
       );
 
       if (pickedFiles == null || pickedFiles.files.isEmpty) {
-        return null;
+        return LMResponse(success: true);
       }
 
       CommunityConfigurations? config = LMFeedLocalPreference.instance
@@ -134,60 +124,39 @@ class LMFeedMediaHandler {
         sizeLimit = 100;
       }
 
-      if (pickedFiles.files.isNotEmpty) {
-        if (currentMediaLength >= 10) {
-          LMFeedCore.showSnackBar(
-            LMFeedSnackBar(
-              content: LMFeedText(
-                text: 'A total of 10 attachments can be added to a post',
-              ),
-            ),
-          );
-          return null;
-        } else {
-          for (PlatformFile pFile in pickedFiles.files) {
-            File file = File(pFile.path!);
-            int fileBytes = await file.length();
-            double fileSize = getFileSizeInDouble(fileBytes);
-            if (fileSize > sizeLimit) {
-              LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text:
-                        'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-                  ),
-                ),
-              );
-            } else {
-              LMMediaModel videoFile = LMMediaModel(
-                mediaType: LMMediaType.video,
-                mediaFile: file,
-                size: fileSize.toInt(),
-                duration: 0,
-              );
-              videoFiles.add(videoFile);
-            }
-          }
-          return videoFiles;
-        }
+      if (currentMediaLength >= 10) {
+        return LMResponse(
+            success: false,
+            errorMessage: 'A total of 10 attachments can be added to a post');
       } else {
-        return null;
+        for (PlatformFile pFile in pickedFiles.files) {
+          File file = File(pFile.path!);
+          int fileBytes = await file.length();
+          double fileSize = getFileSizeInDouble(fileBytes);
+          if (fileSize > sizeLimit) {
+            return LMResponse(
+                success: false,
+                errorMessage:
+                    'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB');
+          } else {
+            LMMediaModel videoFile = LMMediaModel(
+              mediaType: LMMediaType.video,
+              mediaFile: file,
+              size: fileSize.toInt(),
+              duration: 0,
+            );
+            videoFiles.add(videoFile);
+          }
+        }
+        return LMResponse(success: true, data: videoFiles);
       }
     } on Exception catch (err, stacktrace) {
       LMFeedLogger.instance.handleException(err, stacktrace);
-      LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: 'An error occurred',
-          ),
-        ),
-      );
-      debugPrint(err.toString());
-      return null;
+      return LMResponse(success: false, errorMessage: 'An error occurred');
     }
   }
 
-  static Future<List<LMMediaModel>?> pickDocuments(
+  static Future<LMResponse<List<LMMediaModel>>> pickDocuments(
       int currentMediaLength) async {
     try {
       final pickedFiles = await FilePicker.platform.pickFiles(
@@ -200,25 +169,16 @@ class LMFeedMediaHandler {
       );
       if (pickedFiles != null) {
         if (currentMediaLength + pickedFiles.files.length > 3) {
-          LMFeedCore.showSnackBar(
-            LMFeedSnackBar(
-              content: LMFeedText(
-                text: 'A total of 3 documents can be added to a post',
-              ),
-            ),
-          );
-          return null;
+          return LMResponse(
+              success: false,
+              errorMessage: 'A total of 3 documents can be added to a post');
         }
         List<LMMediaModel> attachedFiles = [];
         for (var pickedFile in pickedFiles.files) {
           if (getFileSizeInDouble(pickedFile.size) > 100) {
-            LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                  text: 'File size should be smaller than 100MB',
-                ),
-              ),
-            );
+            return LMResponse(
+                success: false,
+                errorMessage: 'File size should be smaller than 100MB');
           } else {
             LMMediaModel documentFile = LMMediaModel(
               mediaType: LMMediaType.document,
@@ -230,24 +190,19 @@ class LMFeedMediaHandler {
           }
         }
 
-        return attachedFiles;
+        return LMResponse(success: true, data: attachedFiles);
       } else {
-        return null;
+        return LMResponse(success: true);
       }
     } on Exception catch (err, stacktrace) {
       LMFeedLogger.instance.handleException(err, stacktrace);
-      LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: 'An error occurred',
-          ),
-        ),
-      );
-      return null;
+
+      return LMResponse(success: false, errorMessage: 'An error occurred');
     }
   }
 
-  static Future<List<LMMediaModel>?> pickImages(int mediaCount) async {
+  static Future<LMResponse<List<LMMediaModel>>> pickImages(
+      int mediaCount) async {
     // onUploading();
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: true,
@@ -274,28 +229,18 @@ class LMFeedMediaHandler {
 
     if (list != null && list.files.isNotEmpty) {
       if (mediaCount + list.files.length > 10) {
-        LMFeedCore.showSnackBar(
-          LMFeedSnackBar(
-            content: LMFeedText(
-              text: 'A total of 10 attachments can be added to a post',
-            ),
-          ),
-        );
-        return [];
+        return LMResponse(
+            success: false,
+            errorMessage: 'A total of 10 attachments can be added to a post');
       }
       for (PlatformFile image in list.files) {
         int fileBytes = image.size;
         double fileSize = getFileSizeInDouble(fileBytes);
         if (fileSize > sizeLimit) {
-          LMFeedCore.showSnackBar(
-            LMFeedSnackBar(
-              content: LMFeedText(
-                text:
-                    'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-              ),
-            ),
-          );
-          return [];
+          return LMResponse(
+              success: false,
+              errorMessage:
+                  'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB');
         }
       }
       List<File> pickedFiles = list.files.map((e) => File(e.path!)).toList();
@@ -308,13 +253,13 @@ class LMFeedMediaHandler {
           )
           .toList();
 
-      return mediaFiles;
+      return LMResponse(success: true, data: mediaFiles);
     } else {
-      return [];
+      return LMResponse(success: true);
     }
   }
 
-  static Future<LMMediaModel?> pickSingleImage() async {
+  static Future<LMResponse<LMMediaModel>> pickSingleImage() async {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
@@ -344,15 +289,11 @@ class LMFeedMediaHandler {
         int fileBytes = image.size;
         double fileSize = getFileSizeInDouble(fileBytes);
         if (fileSize > sizeLimit) {
-          LMFeedCore.showSnackBar(
-            LMFeedSnackBar(
-              content: LMFeedText(
-                text:
-                    'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
-              ),
-            ),
+          return LMResponse(
+            success: false,
+            errorMessage:
+                'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB',
           );
-          return null;
         }
       }
       List<File> pickedFiles = list.files.map((e) => File(e.path!)).toList();
@@ -361,9 +302,9 @@ class LMFeedMediaHandler {
         mediaType: LMMediaType.image,
       );
 
-      return mediaFile;
+      return LMResponse(success: true, data: mediaFile);
     } else {
-      return null;
+      return LMResponse(success: true);
     }
   }
 }

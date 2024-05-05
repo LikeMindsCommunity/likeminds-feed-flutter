@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/poll/create_poll_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
@@ -28,9 +29,12 @@ class LMFeedComposeScreen extends StatefulWidget {
     this.displayName,
     this.displayUrl,
     this.feedroomId,
+    this.widgetSource,
   });
 
   final LMFeedComposeScreenConfig? config;
+
+  final LMFeedWidgetSource? widgetSource;
 
   final LMFeedComposeScreenStyle? style;
 
@@ -65,6 +69,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.createPostScreen;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
@@ -92,6 +97,13 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   void initState() {
     super.initState();
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+          widgetSource: widget.widgetSource,
+          eventName: LMFeedAnalyticsKeys.postCreationStarted,
+          deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
+          eventProperties: {}),
+    );
     style = widget.style ?? feedTheme.composeScreenStyle;
     _checkForRepost();
     config = widget.config ?? LMFeedCore.config.composeConfig;
@@ -152,11 +164,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   _composeBlocListener(BuildContext context, LMFeedComposeState state) {
     if (state is LMFeedComposeMediaErrorState) {
       LMFeedCore.showSnackBar(
-        LMFeedSnackBar(
-          content: LMFeedText(
-            text: 'Error while selecting media, please try again',
-          ),
-        ),
+        context,
+        state.error ?? 'Error while selecting media, please try again',
+        widgetSource,
       );
     }
   }
@@ -176,8 +186,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             source: LMFeedWidgetSource.createPostScreen,
             backgroundColor: feedTheme.container,
             bottomSheet: _defMediaPicker(),
-            appBar:
-                widget.composeAppBarBuilder?.call(_defAppBar()) ?? _defAppBar(),
+            appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
+                widgetUtility.composeScreenAppBar(context, _defAppBar()),
             canPop: false,
             onPopInvoked: (canPop) {
               widget.composeDiscardDialogBuilder?.call(context) ??
@@ -246,6 +256,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         style: const TextStyle(),
         child: AlertDialog(
           backgroundColor: feedTheme.container,
+          surfaceTintColor: Colors.transparent,
           title: Text('Discard $postTitleFirstCap'),
           content: Text(
               'Are you sure you want to discard the current $postTitleSmallCap?'),
@@ -313,6 +324,19 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               style: LMFeedPollStyle.composable(),
               attachmentMeta:
                   composeBloc.postMedia.first.attachmentMetaViewData!,
+              subTextBuilder: (context) {
+                return LMFeedText(
+                  text: getFormattedDateTime(composeBloc
+                      .postMedia.first.attachmentMetaViewData!.expiryTime!),
+                      style: LMFeedTextStyle(
+                        textStyle: TextStyle(
+                          color: feedTheme.onContainer.withOpacity(0.5),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                );
+              },
               onCancel: () {
                 composeBloc.add(LMFeedComposeCloseEvent());
               },
@@ -638,23 +662,18 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     config!.headingRequiredToCreatePost &&
                     (heading == null || heading.isEmpty)) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text:
-                            "Can't create a $postTitleSmallCap without heading",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without heading",
+                    widgetSource,
                   );
                   return;
                 }
 
                 if (config!.textRequiredToCreatePost && postText.isEmpty) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: "Can't create a $postTitleSmallCap without text",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without text",
+                    widgetSource,
                   );
                   return;
                 }
@@ -663,11 +682,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     selectedTopics.isEmpty &&
                     config!.enableTopics) {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: "Can't create a $postTitleSmallCap without topic",
-                      ),
-                    ),
+                    context,
+                    "Can't create a $postTitleSmallCap without topic",
+                    widgetSource,
                   );
                   return;
                 }
@@ -678,8 +695,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     LMFeedTaggingHelper.encodeString(_controller.text, userTags)
                         .trim();
 
-                sendPostCreationCompletedEvent(
-                    [...composeBloc.postMedia], userTags, selectedTopics);
                 if (widget.attachments != null &&
                     widget.attachments!.isNotEmpty &&
                     widget.attachments!.first.attachmentType == 5) {
@@ -698,17 +713,15 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   postMedia: [...composeBloc.postMedia],
                   heading: _headingController?.text,
                   feedroomId: widget.feedroomId,
+                  userTagged: userTags,
                 ));
 
                 Navigator.pop(context);
               } else {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          "Can't create a $postTitleSmallCap without text or attachments",
-                    ),
-                  ),
+                  context,
+                  "Can't create a $postTitleSmallCap without text or attachments",
+                  widgetSource,
                 );
               }
             },
@@ -1115,82 +1128,4 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           );
         });
   }
-}
-
-void sendPostCreationCompletedEvent(
-  List<LMMediaModel> postMedia,
-  List<LMUserTagViewData> usersTagged,
-  List<LMTopicViewData> topics,
-) {
-  Map<String, String> propertiesMap = {};
-
-  if (postMedia.isNotEmpty) {
-    if (postMedia.first.mediaType == LMMediaType.link) {
-      propertiesMap['link_attached'] = 'yes';
-      propertiesMap['link'] =
-          postMedia.first.ogTags?.url ?? postMedia.first.link!;
-    } else {
-      propertiesMap['link_attached'] = 'no';
-      int imageCount = 0;
-      int videoCount = 0;
-      int documentCount = 0;
-      for (LMMediaModel media in postMedia) {
-        if (media.mediaType == LMMediaType.image) {
-          imageCount++;
-        } else if (media.mediaType == LMMediaType.video) {
-          videoCount++;
-        } else if (media.mediaType == LMMediaType.document) {
-          documentCount++;
-        }
-      }
-      if (imageCount > 0) {
-        propertiesMap['image_attached'] = 'yes';
-        propertiesMap['image_count'] = imageCount.toString();
-      } else {
-        propertiesMap['image_attached'] = 'no';
-      }
-      if (videoCount > 0) {
-        propertiesMap['video_attached'] = 'yes';
-        propertiesMap['video_count'] = videoCount.toString();
-      } else {
-        propertiesMap['video_attached'] = 'no';
-      }
-
-      if (documentCount > 0) {
-        propertiesMap['document_attached'] = 'yes';
-        propertiesMap['document_count'] = documentCount.toString();
-      } else {
-        propertiesMap['document_attached'] = 'no';
-      }
-    }
-  }
-
-  if (usersTagged.isNotEmpty) {
-    int taggedUserCount = 0;
-    List<String> taggedUserId = [];
-
-    taggedUserCount = usersTagged.length;
-    taggedUserId =
-        usersTagged.map((e) => e.sdkClientInfo?.uuid ?? e.uuid!).toList();
-
-    propertiesMap['user_tagged'] = taggedUserCount == 0 ? 'no' : 'yes';
-    if (taggedUserCount > 0) {
-      propertiesMap['tagged_users_count'] = taggedUserCount.toString();
-      propertiesMap['tagged_users_id'] = taggedUserId.join(',');
-    }
-  }
-
-  if (topics.isNotEmpty) {
-    propertiesMap['topics_added'] = 'yes';
-    propertiesMap['topics'] = topics.map((e) => e.id).toList().join(',');
-  } else {
-    propertiesMap['topics_added'] = 'no';
-  }
-
-  LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-    eventName: LMFeedAnalyticsKeys.postCreationCompleted,
-    widgetSource: LMFeedWidgetSource.createPostScreen,
-    deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationCompleted,
-    eventProperties: propertiesMap,
-  ));
 }

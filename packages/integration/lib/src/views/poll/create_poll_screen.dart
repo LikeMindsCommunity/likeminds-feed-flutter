@@ -5,8 +5,34 @@ class LMFeedCreatePollScreen extends StatefulWidget {
   const LMFeedCreatePollScreen({
     super.key,
     this.attachmentMeta,
+    this.appBarBuilder,
+    this.pollQuestionStyle,
+    this.optionStyle,
+    this.advancedButtonBuilder,
+    this.postButtonBuilder,
+    this.addOptionButtonBuilder,
   });
+
+  /// [LMAttachmentMetaViewData] to prefill the poll data
   final LMAttachmentMetaViewData? attachmentMeta;
+
+  /// [LMFeedPostAppBarBuilder] Builder for app bar
+  final LMFeedPostAppBarBuilder? appBarBuilder;
+
+  /// [LMFeedTextFieldStyle] for poll question
+  final LMFeedTextFieldStyle? pollQuestionStyle;
+
+  /// [LMFeedTextFieldStyle] for poll options
+  final LMFeedTextFieldStyle? optionStyle;
+
+  /// [LMFeedButtonBuilder] Builder for advanced settings button
+  final LMFeedButtonBuilder? advancedButtonBuilder;
+
+  /// [LMFeedButtonBuilder] Builder for post button
+  final LMFeedButtonBuilder? postButtonBuilder;
+
+  /// [LMFeedButtonBuilder] Builder for add option button
+  final LMFeedButtonBuilder? addOptionButtonBuilder;
 
   @override
   State<LMFeedCreatePollScreen> createState() => _LMFeedCreatePollScreenState();
@@ -104,20 +130,9 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
 
   void showSnackBar(String message) {
     LMFeedCore.showSnackBar(
-      LMFeedSnackBar(
-        style: LMFeedSnackBarStyle(
-          behavior: SnackBarBehavior.fixed,
-        ),
-        content: LMFeedText(
-          text: message,
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ),
+      context,
+      message,
+      LMFeedWidgetSource.createPostScreen,
     );
   }
 
@@ -196,41 +211,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
   Widget build(BuildContext context) {
     return _widgetsBuilder.scaffold(
       backgroundColor: theme.backgroundColor,
-      appBar: LMFeedAppBar(
-          style: LMFeedAppBarStyle(
-            height: 60,
-            padding: EdgeInsets.only(
-              right: 16,
-            ),
-            border: Border.all(
-              color: Colors.transparent,
-            ),
-          ),
-          leading: BackButton(),
-          title: LMFeedText(
-            text: 'New Poll',
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-          trailing: [
-            LMFeedButton(
-              onTap: onPollSubmit,
-              text: LMFeedText(
-                text: 'POST',
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: theme.primaryColor,
-                  ),
-                ),
-              ),
-            )
-          ]),
+      appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -275,14 +256,15 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                   TextField(
                     controller: _questionController,
                     maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: 'Ask a question',
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                    ),
+                    decoration: widget.pollQuestionStyle?.decoration ??
+                        InputDecoration(
+                          hintText: 'Ask a question',
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                        ),
                   ),
                 ],
               ),
@@ -453,6 +435,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                                               _allowAddOptionBuilder.value =
                                                   value;
                                             },
+                                            activeColor: theme.primaryColor,
                                             contentPadding:
                                                 EdgeInsets.symmetric(
                                               horizontal: 18,
@@ -482,6 +465,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                                             onChanged: (value) {
                                               _isAnonymousBuilder.value = value;
                                             },
+                                            activeColor: theme.primaryColor,
                                             contentPadding:
                                                 EdgeInsets.symmetric(
                                               horizontal: 18,
@@ -510,6 +494,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                                             onChanged: (value) {
                                               _pollTypeBuilder.value = value;
                                             },
+                                            activeColor: theme.primaryColor,
                                             contentPadding:
                                                 EdgeInsets.symmetric(
                                               horizontal: 18,
@@ -652,24 +637,9 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                             : SizedBox.shrink(),
                       ),
                       SizedBox(height: 24),
-                      LMFeedButton(
-                        onTap: () {
-                          _advancedBuilder.value = !_advancedBuilder.value;
-                        },
-                        text: LMFeedText(text: 'ADVANCED'),
-                        isActive: value,
-                        style: LMFeedButtonStyle(
-                          placement: LMFeedIconButtonPlacement.end,
-                          activeIcon: LMFeedIcon(
-                            type: LMFeedIconType.icon,
-                            icon: Icons.expand_less,
-                          ),
-                          icon: LMFeedIcon(
-                            type: LMFeedIconType.icon,
-                            icon: Icons.expand_more,
-                          ),
-                        ),
-                      ),
+                      widget.addOptionButtonBuilder
+                              ?.call(_defAdvancedButton(value)) ??
+                          _defAdvancedButton(value),
                     ],
                   );
                 }),
@@ -677,6 +647,69 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
               height: 50,
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  LMFeedButton _defAdvancedButton(bool value) {
+    return LMFeedButton(
+      onTap: () {
+        _advancedBuilder.value = !_advancedBuilder.value;
+      },
+      text: LMFeedText(text: 'ADVANCED'),
+      isActive: value,
+      style: LMFeedButtonStyle(
+        placement: LMFeedIconButtonPlacement.end,
+        activeIcon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.expand_less,
+        ),
+        icon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.expand_more,
+        ),
+      ),
+    );
+  }
+
+  LMFeedAppBar _defAppBar() {
+    return LMFeedAppBar(
+        style: LMFeedAppBarStyle(
+          height: 60,
+          padding: EdgeInsets.only(
+            right: 16,
+          ),
+          border: Border.all(
+            color: Colors.transparent,
+          ),
+        ),
+        leading: BackButton(),
+        title: LMFeedText(
+          text: 'New Poll',
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        trailing: [
+          widget.postButtonBuilder?.call(_defPostButton()) ?? _defPostButton(),
+        ]);
+  }
+
+  LMFeedButton _defPostButton() {
+    return LMFeedButton(
+      onTap: onPollSubmit,
+      text: LMFeedText(
+        text: 'POST',
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: theme.primaryColor,
+          ),
         ),
       ),
     );
@@ -713,12 +746,14 @@ class OptionTile extends StatefulWidget {
     this.onDelete,
     this.onChanged,
     this.isRemovable = true,
+    this.optionStyle,
   });
   final int index;
   final String? option;
   final VoidCallback? onDelete;
   final Function(String)? onChanged;
   final bool isRemovable;
+  final LMFeedTextFieldStyle? optionStyle;
 
   @override
   State<OptionTile> createState() => _OptionTileState();
@@ -749,22 +784,23 @@ class _OptionTileState extends State<OptionTile> {
           child: TextField(
             controller: _controller,
             onChanged: widget.onChanged,
-            decoration: InputDecoration(
-              hintText: 'Option',
-              border: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              suffixIconColor: theme.inActiveColor,
-              suffixIcon: widget.isRemovable
-                  ? IconButton(
-                      isSelected: true,
-                      icon: Icon(Icons.close),
-                      onPressed: widget.onDelete,
-                    )
-                  : null,
-            ),
+            decoration: widget.optionStyle?.decoration ??
+                InputDecoration(
+                  hintText: 'Option',
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  suffixIconColor: theme.inActiveColor,
+                  suffixIcon: widget.isRemovable
+                      ? IconButton(
+                          isSelected: true,
+                          icon: Icon(Icons.close),
+                          onPressed: widget.onDelete,
+                        )
+                      : null,
+                ),
           ),
         ),
         Divider(

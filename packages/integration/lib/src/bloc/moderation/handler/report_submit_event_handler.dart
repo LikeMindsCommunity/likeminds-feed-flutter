@@ -13,7 +13,12 @@ void reportSubmitEventHandler(
   PostReportResponse response =
       await LMFeedCore.client.postReport(postReportRequest);
   if (response.success) {
-    emit(LMFeedReportSubmittedState());
+    emit(LMFeedReportSubmittedState(
+        entityCreatorId: event.entityCreatorId,
+        entityId: event.entityId,
+        entityType: event.entityType,
+        reason: event.reason,
+        tagId: event.tagId));
   } else {
     emit(LMFeedReportSubmitFailedState(
         error: response.errorMessage ?? 'An error occurred'));

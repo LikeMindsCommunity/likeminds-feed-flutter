@@ -80,6 +80,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.feedroom;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
   bool right = true;
@@ -285,15 +286,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                       ? LMFeedPostSomething(
                           onTap: userPostingRights
                               ? () async {
-                                  LMFeedAnalyticsBloc.instance
-                                      .add(const LMFeedFireAnalyticsEvent(
-                                    eventName:
-                                        LMFeedAnalyticsKeys.postCreationStarted,
-                                    deprecatedEventName: LMFeedAnalyticsKeysDep
-                                        .postCreationStarted,
-                                    eventProperties: {},
-                                  ));
-
                                   LMFeedVideoProvider.instance
                                       .forcePauseAllControllers();
                                   // ignore: use_build_context_synchronously
@@ -302,17 +294,16 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                                         builder: (context) =>
                                             LMFeedComposeScreen(
                                               feedroomId: widget.feedroomId,
+                                              widgetSource: LMFeedWidgetSource
+                                                  .universalFeed,
                                             )),
                                   );
                                 }
                               : () {
                                   LMFeedCore.showSnackBar(
-                                    LMFeedSnackBar(
-                                      content: LMFeedText(
-                                        text:
-                                            "You do not have permission to create a post",
-                                      ),
-                                    ),
+                                    context,
+                                    "You do not have permission to create a post",
+                                    _widgetSource,
                                   );
                                 })
                       : widget.customWidgetBuilder!(context)
@@ -354,11 +345,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     // show a snackbar when post is deleted
                     // will only be shown if a messenger key is provided
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(
-                          text: 'Post Deleted',
-                        ),
-                      ),
+                      context,
+                      'Post Deleted',
+                      _widgetSource,
                     );
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
@@ -419,11 +408,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   if (curr is LMFeedNewPostErrorState) {
                     postUploading.value = false;
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(
-                          text: curr.errorMessage,
-                        ),
-                      ),
+                      context,
+                      curr.errorMessage,
+                      _widgetSource,
                     );
                   }
                   if (curr is LMFeedPostUpdateState) {
@@ -441,9 +428,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   }
                   if (curr is LMFeedPostDeletionErrorState) {
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(text: (curr).message),
-                      ),
+                      context,
+                      curr.message,
+                      _widgetSource,
                     );
                   }
                 },
@@ -899,6 +886,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete Post',
                 uuid: postCreatorUUID,
+                widgetSource: _widgetSource,
                 content:
                     'Are you sure you want to delete this post. This action can not be reversed.',
                 action: (String reason) async {
@@ -907,24 +895,14 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   String postType =
                       LMFeedPostUtils.getPostType(postViewData.attachments);
 
-                  LMFeedAnalyticsBloc.instance.add(
-                    LMFeedFireAnalyticsEvent(
-                      eventName: LMFeedAnalyticsKeys.postDeleted,
-                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                      eventProperties: {
-                        "post_id": postViewData.id,
-                        "post_type": postType,
-                        "user_id": currentUser?.sdkClientInfo.uuid,
-                        "user_state": isCm ? "CM" : "member",
-                      },
-                    ),
-                  );
-
                   LMFeedPostBloc.instance.add(
                     LMFeedDeletePostEvent(
                       postId: postViewData.id,
                       reason: reason,
                       isRepost: postViewData.isRepost,
+                      userState: isCm ? "CM" : "member",
+                      postType: postType,
+                      userId: postCreatorUUID,
                     ),
                   );
                 },
@@ -984,6 +962,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
+                widgetSource: _widgetSource,
               ),
             ),
           );
@@ -1001,14 +980,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           final likePostRequest =
               (LikePostRequestBuilder()..postId(postViewData.id)).build();
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.postLiked,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-              eventProperties: {'post_id': postViewData.id},
-            ),
-          );
-
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
@@ -1018,6 +989,20 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 ? postViewData.likeCount + 1
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
+          } else {
+            if (postViewData.isLiked)
+              LMFeedAnalyticsBloc.instance.add(
+                LMFeedFireAnalyticsEvent(
+                  eventName: LMFeedAnalyticsKeys.postLiked,
+                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                  widgetSource: _widgetSource,
+                  eventProperties: {
+                    'post_id': postViewData.id,
+                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
+                    'topics': postViewData.topics.map((e) => e.name).toList(),
+                  },
+                ),
+              );
           }
         },
       );
@@ -1117,13 +1102,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         onTap: right
             ? () async {
                 if (!postUploading.value && feedroom != null) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
@@ -1139,26 +1117,23 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
                         feedroomId: widget.feedroomId,
+                        widgetSource: LMFeedWidgetSource.feedroom,
                       ),
                     ),
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A post is already uploading.',
-                      ),
-                    ),
+                    context,
+                    'A post is already uploading.',
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: "You do not have permission to create a post",
-                    ),
-                  ),
+                  context,
+                  "You do not have permission to create a post",
+                  _widgetSource,
                 );
               },
         style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
@@ -1233,12 +1208,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           ? () async {
               if (!postUploading.value &&
                   LMFeedPostBloc.instance.state != LMFeedUploadingState()) {
-                LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
-                    eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                    deprecatedEventName:
-                        LMFeedAnalyticsKeysDep.postCreationStarted,
-                    eventProperties: {}));
-
                 LMFeedVideoProvider.instance.forcePauseAllControllers();
                 // ignore: use_build_context_synchronously
                 await Navigator.push(
@@ -1246,26 +1215,23 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   MaterialPageRoute(
                     builder: (context) => LMFeedComposeScreen(
                       feedroomId: widget.feedroomId,
+                      widgetSource: LMFeedWidgetSource.feedroom,
                     ),
                   ),
                 );
               } else {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: 'A post is already uploading.',
-                    ),
-                  ),
+                  context,
+                  "A post is already uploading.",
+                  _widgetSource,
                 );
               }
             }
           : () {
               LMFeedCore.showSnackBar(
-                LMFeedSnackBar(
-                  content: LMFeedText(
-                    text: "You do not have permission to create a post",
-                  ),
-                ),
+                context,
+                "You do not have permission to create a post",
+                _widgetSource,
               );
             },
     );
@@ -1304,13 +1270,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         onTap: right
             ? () async {
                 if (!postUploading.value) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   await Navigator.push(
@@ -1318,26 +1277,23 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         feedroomId: widget.feedroomId,
+                        widgetSource: LMFeedWidgetSource.feedroom,
                       ),
                     ),
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A post is already uploading.',
-                      ),
-                    ),
+                    context,
+                    "A post is already uploading.",
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text: "You do not have permission to create a post",
-                    ),
-                  ),
+                  context,
+                  "You do not have permission to create a post",
+                  _widgetSource,
                 );
               },
       );

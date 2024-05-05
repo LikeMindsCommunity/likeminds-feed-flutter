@@ -60,9 +60,12 @@ class LMFeedCore {
 
   static LMFeedWidgetUtility get widgetUtility => instance._widgetUtility;
 
-  static void showSnackBar(LMFeedSnackBar snackBar) {
-    snackBar = snackBar.copyWith(style: snackBar.style ?? theme.snackBarTheme);
-    instance._scaffoldMessengerKey?.currentState?.showSnackBar(snackBar);
+  static void showSnackBar(BuildContext context, String snackBarMessage,
+      LMFeedWidgetSource widgetSource,
+      {LMFeedSnackBarStyle? style}) {
+    SnackBar snackBarWidget = LMFeedCore.widgetUtility
+        .snackBarBuilder(context, snackBarMessage, widgetSource, style: style);
+    instance._scaffoldMessengerKey?.currentState?.showSnackBar(snackBarWidget);
   }
 
   static GlobalKey<ScaffoldMessengerState>? get scaffoldMessengerKey =>
@@ -80,14 +83,27 @@ class LMFeedCore {
     LMFeedWidgetUtility? widgets,
     GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
     LMFeedThemeData? theme,
+    Function(LMFeedAnalyticsEventFired)? analyticsListener,
+    Function(LMFeedProfileState)? profileListener,
   }) async {
     this.lmFeedClient = lmFeedClient ?? LMFeedClientBuilder().build();
+
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
     _scaffoldMessengerKey = scaffoldMessengerKey;
     LMFeedTheme.instance.initialise(theme: theme ?? LMFeedThemeData.light());
     MediaKit.ensureInitialized();
+    if (analyticsListener != null)
+      LMFeedAnalyticsBloc.instance.stream.listen((LMFeedAnalyticsState event) {
+        if (event is LMFeedAnalyticsEventFired) {
+          analyticsListener.call(event);
+        }
+      });
+    if (profileListener != null)
+      LMFeedProfileBloc.instance.stream.listen((event) {
+        profileListener.call(event);
+      });
   }
 
   Future<void> closeBlocs() async {
@@ -95,6 +111,13 @@ class LMFeedCore {
     await LMFeedRoutingBloc.instance.close();
     await LMFeedProfileBloc.instance.close();
     await LMFeedAnalyticsBloc.instance.close();
+  }
+
+  Future<LMResponse> logout() async {
+    LogoutResponse response =
+        await lmFeedClient.logout(LogoutRequestBuilder().build());
+    return LMResponse(
+        success: response.success, errorMessage: response.errorMessage);
   }
 
   Future<LMResponse> initialiseFeed(ValidateUserRequest request) async {

@@ -8,4 +8,5 @@ void updatePostEventHandler(
       actionType: event.actionType,
       postId: event.postId,
       source: event.source,
+      pollOptions: event.pollOption,
     ));

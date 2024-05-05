@@ -33,9 +33,9 @@ class LMFeedComposeFetchedTopicsState extends LMFeedComposeState {
 }
 
 class LMFeedComposeMediaErrorState extends LMFeedComposeState {
-  final Exception error;
+  final String? error;
 
-  LMFeedComposeMediaErrorState(this.error);
+  LMFeedComposeMediaErrorState({this.error});
 
   @override
   List<Object> get props => [];

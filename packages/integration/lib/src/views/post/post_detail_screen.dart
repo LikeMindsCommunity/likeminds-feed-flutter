@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/poll_result_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
@@ -166,6 +168,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         postViewData: _postDetailScreenHandler!.postData!,
                         actionType: state.actionType,
                         commentId: state.commentId,
+                        pollOptions: state.pollOptions,
                       );
                       _postDetailScreenHandler!.rebuildPostWidget.value =
                           !_postDetailScreenHandler!.rebuildPostWidget.value;
@@ -178,9 +181,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         !_postDetailScreenHandler!.rebuildPostWidget.value;
                   } else if (state is LMFeedPostDeletionErrorState) {
                     LMFeedCore.showSnackBar(
-                      LMFeedSnackBar(
-                        content: LMFeedText(text: (state).message),
-                      ),
+                      context,
+                      state.message,
+                      _widgetSource,
                     );
                   }
                 },
@@ -255,7 +258,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     .commentHandlerBloc,
                                 listener: (context, state) {
                                   _postDetailScreenHandler!
-                                      .handleBlocChanges(state);
+                                      .handleBlocChanges(context, state);
                                 },
                                 child: PagedSliverList.separated(
                                   pagingController: _postDetailScreenHandler!
@@ -450,6 +453,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             context: context,
             builder: (childContext) => LMFeedDeleteConfirmationDialog(
               title: 'Delete $commentTitleFirstCapSingular',
+              widgetSource: _widgetSource,
               uuid: commentCreatorUUID,
               content:
                   'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
@@ -686,6 +690,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
+                widgetSource: _widgetSource,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
@@ -694,25 +699,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   String postType = LMFeedPostUtils.getPostType(
                       _postDetailScreenHandler!.postData!.attachments);
 
-                  LMFeedAnalyticsBloc.instance.add(
-                    LMFeedFireAnalyticsEvent(
-                      eventName: LMFeedAnalyticsKeys.postDeleted,
-                      widgetSource: LMFeedWidgetSource.postDetailScreen,
-                      deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
-                      eventProperties: {
-                        "post_id": _postDetailScreenHandler!.postData!.id,
-                        "post_type": postType,
-                        "user_id": _postDetailScreenHandler!.postData!.uuid,
-                        "user_state": isCm ? "CM" : "member",
-                      },
-                    ),
-                  );
-
                   postBloc.add(
                     LMFeedDeletePostEvent(
                       postId: _postDetailScreenHandler!.postData!.id,
                       reason: reason,
                       isRepost: _postDetailScreenHandler!.postData!.isRepost,
+                      postType: postType,
+                      userId: postCreatorUUID,
+                      userState: isCm ? "CM" : "member",
                     ),
                   );
                   Navigator.of(context).pop();
@@ -737,6 +731,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           _widgetBuilder.postMediaCarouselIndicatorBuilder,
       imageBuilder: _widgetBuilder.imageBuilder,
       videoBuilder: _widgetBuilder.videoBuilder,
+      pollBuilder: (pollWidget) =>
+          _defPollWidget(pollWidget, _postDetailScreenHandler!.postData!),
       onMediaTap: () {
         Navigator.push(
           context,
@@ -752,6 +748,74 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         );
       },
     );
+  }
+
+  Widget _defPollWidget(LMFeedPoll pollWidget, LMPostViewData postViewData) {
+    List<String> selectedOptions = [];
+    final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
+    return ValueListenableBuilder(
+        valueListenable: rebuildPollWidget,
+        builder: (context, _, __) {
+          return LMFeedPoll(
+            selectedOption: selectedOptions,
+            attachmentMeta: pollWidget.attachmentMeta,
+            style: pollWidget.style,
+            onOptionSelect: (optionData) async {
+              if (isPollSubmitted(pollWidget.attachmentMeta.options ?? []))
+                return;
+              if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
+                  pollWidget.attachmentMeta.multiSelectState!)) {
+                submitVote(context, pollWidget.attachmentMeta, [optionData.id],
+                    postViewData.id);
+              } else if (selectedOptions.contains(optionData.id)) {
+                selectedOptions.remove(optionData.id);
+              } else {
+                selectedOptions.add(optionData.id);
+              }
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            showSubmitButton: showSubmitButton(pollWidget.attachmentMeta),
+            showAddOptionButton: showAddOptionButton(pollWidget.attachmentMeta),
+            showTick: (option) {
+              return showTick(pollWidget.attachmentMeta, option);
+            },
+            timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime!),
+            onAddOptionSubmit: (option) async {
+              await addOption(context, pollWidget, pollWidget.attachmentMeta,
+                  option, postViewData.id, currentUser, rebuildPollWidget);
+              selectedOptions.clear();
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            onSubtextTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LMFeedPollResultScreen(
+                          pollId: pollWidget.attachmentMeta.id ?? '',
+                          pollOptions: pollWidget.attachmentMeta.options ?? [],
+                        )),
+              );
+            },
+            onVoteClick: (option) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LMFeedPollResultScreen(
+                    pollId: pollWidget.attachmentMeta.id ?? '',
+                    pollOptions: pollWidget.attachmentMeta.options ?? [],
+                    selectedOptionId: option.id,
+                  ),
+                ),
+              );
+            },
+            onSubmit: (options) {
+              submitVote(
+                  context, pollWidget.attachmentMeta, options, postViewData.id);
+              selectedOptions.clear();
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+          );
+        });
   }
 
   LMFeedButton defLikeButton() => LMFeedButton(
@@ -772,6 +836,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: _postDetailScreenHandler!.postData!.id,
+                widgetSource: _widgetSource,
               ),
             ),
           );
@@ -791,14 +856,23 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           final LikePostResponse response =
               await LMFeedCore.client.likePost(likePostRequest);
 
-          // if (!response.success) {
-          //   postBloc.add(LMFeedUpdatePostEvent(
-          //       postId: _postDetailScreenHandler!.postData!.id,
-          //       source: LMFeedWidgetSource.postDetailScreen,
-          //       actionType: _postDetailScreenHandler!.postData!.isLiked
-          //           ? LMFeedPostActionType.unlike
-          //           : LMFeedPostActionType.like));
-          // }
+          if (response.success && _postDetailScreenHandler!.postData!.isLiked) {
+            LMFeedAnalyticsBloc.instance.add(
+              LMFeedFireAnalyticsEvent(
+                eventName: LMFeedAnalyticsKeys.postLiked,
+                deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
+                widgetSource: LMFeedWidgetSource.postDetailScreen,
+                eventProperties: {
+                  'post_id': _postDetailScreenHandler!.postData!.id,
+                  'created_by_id': _postDetailScreenHandler!
+                      .postData!.user.sdkClientInfo.uuid,
+                  'topics': _postDetailScreenHandler!.postData!.topics
+                      .map((e) => e.name)
+                      .toList(),
+                },
+              ),
+            );
+          }
         },
       );
 
@@ -844,12 +918,11 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             ));
           } else {
             LMFeedCore.showSnackBar(
-              LMFeedSnackBar(
-                content: LMFeedText(
-                    text: _postDetailScreenHandler!.postData!.isSaved
-                        ? "$postTitleFirstCap Saved"
-                        : "$postTitleFirstCap Unsaved"),
-              ),
+              context,
+              _postDetailScreenHandler!.postData!.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              _widgetSource,
             );
           }
         },
@@ -882,14 +955,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         onTap: right
             ? () async {
                 if (postBloc.state is! LMFeedEditPostUploadingState) {
-                  LMFeedAnalyticsBloc.instance.add(
-                      const LMFeedFireAnalyticsEvent(
-                          eventName: LMFeedAnalyticsKeys.postCreationStarted,
-                          widgetSource: LMFeedWidgetSource.postDetailScreen,
-                          deprecatedEventName:
-                              LMFeedAnalyticsKeysDep.postCreationStarted,
-                          eventProperties: {}));
-
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
@@ -904,27 +969,23 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
+                        widgetSource: LMFeedWidgetSource.postDetailScreen,
                       ),
                     ),
                   );
                 } else {
                   LMFeedCore.showSnackBar(
-                    LMFeedSnackBar(
-                      content: LMFeedText(
-                        text: 'A $postTitleSmallCap is already uploading.',
-                      ),
-                    ),
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource,
                   );
                 }
               }
             : () {
                 LMFeedCore.showSnackBar(
-                  LMFeedSnackBar(
-                    content: LMFeedText(
-                      text:
-                          'You do not have permission to create a $postTitleSmallCap',
-                    ),
-                  ),
+                  context,
+                  'You do not have permission to create a $postTitleSmallCap',
+                  _widgetSource,
                 );
               },
         style: feedTheme.footerStyle.repostButtonStyle?.copyWith(
@@ -1049,6 +1110,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             builder: (context) => LMFeedLikesScreen(
               postId: _postDetailScreenHandler!.postData!.id,
               commentId: commentViewData.id,
+              widgetSource: _widgetSource,
             ),
           ),
         );
@@ -1176,21 +1238,21 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   Widget defBottomTextField() {
-    return SafeArea(
-      child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
-        bloc: _postDetailScreenHandler!.commentHandlerBloc,
-        builder: (context, state) => Container(
-          decoration: BoxDecoration(
-            color: feedTheme.container,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        color: feedTheme.container,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
           ),
-          child: Column(
+        ],
+      ),
+      child: SafeArea(
+        child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
+          bloc: _postDetailScreenHandler!.commentHandlerBloc,
+          builder: (context, state) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               LikeMindsTheme.kVerticalPaddingMedium,
@@ -1333,12 +1395,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                 commentText = commentText.trim();
                                 if (commentText.isEmpty) {
                                   LMFeedCore.showSnackBar(
-                                    LMFeedSnackBar(
-                                      content: LMFeedText(
-                                        text:
-                                            "Please write something to create a $commentTitleSmallCapSingular",
-                                      ),
-                                    ),
+                                    context,
+                                    "Please write something to create a $commentTitleSmallCapSingular",
+                                    _widgetSource,
                                   );
 
                                   return;
@@ -1487,7 +1546,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   ],
                 ),
               ),
-              LikeMindsTheme.kVerticalPaddingLarge,
             ],
           ),
         ),
