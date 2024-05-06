@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
 
 class LMFeedCommentReplyWidget extends StatefulWidget {
   final String postId;
@@ -401,6 +402,13 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     return LMFeedCommentWidget(
       style: replyStyle,
       comment: commentViewData,
+      menu: (menu) => menu.copyWith(
+        removeItemIds: {},
+        onMenuOpen: () {
+          LMFeedCommentUtils.handleCommentMenuOpenTap(widget.post,
+              commentViewData, widgetSource, LMFeedAnalyticsKeys.replyMenu);
+        },
+      ),
       onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
@@ -419,18 +427,19 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
           backgroundColor: feedTheme!.primaryColor,
         ),
         fallbackText: commentViewData.user.name,
-        onTap: () {
-          LMFeedProfileBloc.instance.add(
-            LMFeedRouteToUserProfileEvent(
-              uuid: commentViewData.user.sdkClientInfo.uuid,
-              context: context,
-            ),
-          );
-
-          LMFeedCore.instance.lmFeedClient
-              .routeToProfile(commentViewData.user.sdkClientInfo.uuid);
-        },
+        onTap: () => LMFeedCommentUtils.handleCommentProfileTap(
+            context,
+            widget.post,
+            commentViewData,
+            LMFeedAnalyticsKeys.replyProfilePicture,
+            widgetSource),
       ),
+      onProfileNameTap: () => LMFeedCommentUtils.handleCommentProfileTap(
+          context,
+          widget.post,
+          commentViewData,
+          LMFeedAnalyticsKeys.replyProfileName,
+          widgetSource),
       lmFeedMenuAction: defLMFeedMenuAction(
         commentViewData,
       ),
@@ -438,11 +447,6 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         commentViewData,
         setReplyState,
       ),
-      menu: (menu) {
-        return menu.copyWith(
-          removeItemIds: {},
-        );
-      },
     );
   }
 

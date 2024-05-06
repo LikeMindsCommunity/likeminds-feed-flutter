@@ -42,7 +42,6 @@ addLinkPreviewEventHandler(
 
       LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.linkAttachedInPost,
-        deprecatedEventName: LMFeedAnalyticsKeysDep.linkAttachedInPost,
         widgetSource: LMFeedWidgetSource.createPostScreen,
         eventProperties: {
           'link': event.url,

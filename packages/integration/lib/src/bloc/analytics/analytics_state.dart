@@ -26,9 +26,6 @@ class LMFeedAnalyticsEventFired extends LMFeedAnalyticsState {
   final String eventName;
   // Properties of the event fired
   // i.e. likes count, post id, etc.
-  @Deprecated(
-      "Previous version of event name have been deprecated, consider migrating to new event name.")
-  final String deprecatedEventName;
   final Map<String, dynamic> eventProperties;
 
   /// {@macro lm_feed_widget_source}
@@ -36,7 +33,6 @@ class LMFeedAnalyticsEventFired extends LMFeedAnalyticsState {
 
   const LMFeedAnalyticsEventFired({
     required this.eventName,
-    required this.deprecatedEventName,
     required this.eventProperties,
     this.widgetSource,
   });

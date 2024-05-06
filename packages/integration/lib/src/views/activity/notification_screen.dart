@@ -42,10 +42,19 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   LMFeedThemeData _theme = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.notificationScreen;
+  LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
 
   @override
   void initState() {
     super.initState();
+
+    // Fire analytics event when the user opens the activity feed
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.activityFeedOpened,
+        eventProperties: {
+          LMFeedAnalyticsKeys.userIdKey: currentUser.sdkClientInfo.uuid
+        }));
+
     _notificationsBloc = LMFeedNotificationsBloc();
     addPageRequestListener();
 
@@ -213,6 +222,15 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       ),
       onTap: () {
+        // Fire analytics events when a user taps on a activity item
+        LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.activityItemClicked,
+            eventProperties: {
+              LMFeedAnalyticsKeys.activityItemClicked: item.id,
+              LMFeedAnalyticsKeys.entityTypeKey: item.entityType,
+            }));
+
+        // If the notification is not marked as read, mark it as read
         if (!item.isRead) {
           _notificationsBloc?.add(
             LMFeedMarkNotificationAsReadEvent(
@@ -220,7 +238,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
             ),
           );
         }
-        debugPrint(item.cta ?? 'no cta');
+        // Route the notification to the appropriate screen
         routeNotification(item.cta ?? '');
       },
     );

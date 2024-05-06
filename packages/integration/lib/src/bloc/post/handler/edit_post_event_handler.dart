@@ -106,7 +106,6 @@ void editPostEventHandler(
 
       LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
           eventName: LMFeedAnalyticsKeys.postEdited,
-          deprecatedEventName: LMFeedAnalyticsKeysDep.postEdited,
           widgetSource: LMFeedWidgetSource.editPostScreen,
           eventProperties: {
             'create_by_id': post.user.sdkClientInfo.uuid,
