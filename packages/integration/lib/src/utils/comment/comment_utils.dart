@@ -70,14 +70,17 @@ class LMFeedCommentUtils {
           LMFeedPostUtils.getPostType(postViewData.attachments),
 
       // If the entity is a comment then add comment id
-      if (commentViewData.level == 0)
-        LMFeedAnalyticsKeys.commentIdKey: commentViewData.id
-      // If the entity is a reply then add reply id and comment id
-      else
-        LMFeedAnalyticsKeys.commentIdKey: commentViewData.parentComment?.id,
-      if (commentViewData.level > 0)
-        LMFeedAnalyticsKeys.replyIdKey: commentViewData.id,
     };
+
+    if (commentViewData.level == 0) {
+      eventProperties[LMFeedAnalyticsKeys.commentIdKey] = commentViewData.id;
+    }
+    // If the entity is a reply then add reply id and comment id
+    else {
+      eventProperties[LMFeedAnalyticsKeys.commentIdKey] =
+          commentViewData.parentComment?.id;
+      eventProperties[LMFeedAnalyticsKeys.replyIdKey] = commentViewData.id;
+    }
 
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
         eventName: eventName,
