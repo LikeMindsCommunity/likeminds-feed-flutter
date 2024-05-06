@@ -280,6 +280,8 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                                   const EdgeInsets.symmetric(horizontal: 8),
                             ),
                             child: Video(
+                              fit: style?.boxFit ?? BoxFit.contain,
+                              aspectRatio: style?.aspectRatio,
                               onEnterFullscreen: () async {
                                 LMFeedVideoProvider.instance.playCurrentVideo();
                               },
