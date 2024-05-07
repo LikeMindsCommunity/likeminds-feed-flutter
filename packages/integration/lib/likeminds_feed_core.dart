@@ -32,13 +32,7 @@ export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
-  bool initiateUserCalled = false;
   LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
-  GlobalKey<ScaffoldMessengerState>? _scaffoldMessengerKey;
-
-  /// This is stream is used to listen to
-  /// deep links while the app is in active state
-  StreamSubscription? deepLinkStreamListener;
 
   /// This is the domain of the client. This is used to show
   /// generate link for sharing post
@@ -65,14 +59,8 @@ class LMFeedCore {
       {LMFeedSnackBarStyle? style}) {
     SnackBar snackBarWidget = LMFeedCore.widgetUtility
         .snackBarBuilder(context, snackBarMessage, widgetSource, style: style);
-    instance._scaffoldMessengerKey?.currentState?.showSnackBar(snackBarWidget);
+    ScaffoldMessenger.of(context).showSnackBar(snackBarWidget);
   }
-
-  static GlobalKey<ScaffoldMessengerState>? get scaffoldMessengerKey =>
-      instance._scaffoldMessengerKey;
-
-  static set deepLinkStream(StreamSubscription deepLinkStream) =>
-      instance.deepLinkStreamListener = deepLinkStream;
 
   LMFeedCore._();
 
@@ -81,7 +69,6 @@ class LMFeedCore {
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
-    GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
     LMFeedThemeData? theme,
     Function(LMFeedAnalyticsEventFired)? analyticsListener,
     Function(LMFeedProfileState)? profileListener,
@@ -91,7 +78,6 @@ class LMFeedCore {
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
-    _scaffoldMessengerKey = scaffoldMessengerKey;
     LMFeedTheme.instance.initialise(theme: theme ?? LMFeedThemeData.light());
     MediaKit.ensureInitialized();
     if (analyticsListener != null)
@@ -148,7 +134,6 @@ class LMFeedCore {
 
     await LMFeedLocalPreference.instance.clearUserData();
     if (response.success) {
-      initiateUserCalled = true;
       await LMFeedLocalPreference.instance.storeUserData(response.user!);
       LMNotificationHandler.instance.registerDevice(
         response.user!.sdkClientInfo.uuid,

@@ -19,4 +19,4 @@ class LMFeedUserMetaBloc
     on<LMFeedUserMetaGetEvent>(getUserMetaEventHandler);
     on<LMFeedUserMetaUpdateEvent>(updateUserMetaEventHandler);
   }
-  }
+}

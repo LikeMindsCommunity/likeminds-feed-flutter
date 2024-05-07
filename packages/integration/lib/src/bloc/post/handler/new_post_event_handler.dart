@@ -275,7 +275,6 @@ void sendPostCreationCompletedEvent(
   LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.postCreationCompleted,
     widgetSource: LMFeedWidgetSource.createPostScreen,
-    deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationCompleted,
     eventProperties: propertiesMap,
   ));
 }

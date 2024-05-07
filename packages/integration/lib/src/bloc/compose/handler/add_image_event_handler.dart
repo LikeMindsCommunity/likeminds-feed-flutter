@@ -16,7 +16,6 @@ addImageEventHandler(
   debugPrint("Starting picking images");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
-    deprecatedEventName: LMFeedAnalyticsKeysDep.clickedOnAttachment,
     widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'image'},
   ));
@@ -36,7 +35,6 @@ addImageEventHandler(
           LMFeedAnalyticsBloc.instance.add(
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.imageAttachedToPost,
-              deprecatedEventName: LMFeedAnalyticsKeysDep.imageAttachedToPost,
               widgetSource: LMFeedWidgetSource.createPostScreen,
               eventProperties: {
                 'imageCount': countOfPickedImages,

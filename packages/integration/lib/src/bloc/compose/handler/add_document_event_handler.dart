@@ -16,7 +16,6 @@ addDocumentEventHandler(
   debugPrint("Starting picking documents");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
-    deprecatedEventName: LMFeedAnalyticsKeysDep.clickedOnAttachment,
     widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'file'},
   ));
@@ -37,8 +36,6 @@ addDocumentEventHandler(
           LMFeedAnalyticsBloc.instance.add(
             LMFeedFireAnalyticsEvent(
               eventName: LMFeedAnalyticsKeys.documentAttachedInPost,
-              deprecatedEventName:
-                  LMFeedAnalyticsKeysDep.documentAttachedInPost,
               widgetSource: LMFeedWidgetSource.createPostScreen,
               eventProperties: {
                 'imageCount': countOfPickedDocument,

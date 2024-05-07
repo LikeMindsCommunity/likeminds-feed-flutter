@@ -396,11 +396,14 @@ class _LMFeedUserCreatedPostListViewState
     );
   }
 
-  LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
+  LMFeedPostTopic _defTopicWidget(LMPostViewData postViewData) {
     return LMFeedPostTopic(
-      topics: post.topics,
-      post: post,
+      topics: postViewData.topics,
+      post: postViewData,
       style: feedThemeData.topicStyle,
+      onTopicTap: (context, topicViewData) =>
+          LMFeedPostUtils.handlePostTopicTap(
+              context, postViewData, topicViewData, _widgetSource),
     );
   }
 
@@ -429,17 +432,10 @@ class _LMFeedUserCreatedPostListViewState
     return LMFeedPostHeader(
       user: users[postViewData.uuid]!,
       isFeed: true,
-      onProfileTap: () {
-        LMFeedCore.instance.lmFeedClient.routeToProfile(
-          postViewData.user.sdkClientInfo.uuid,
-        );
-        LMFeedProfileBloc.instance.add(
-          LMFeedRouteToUserProfileEvent(
-            uuid: postViewData.user.sdkClientInfo.uuid,
-            context: context,
-          ),
-        );
-      },
+      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, _widgetSource),
+      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, _widgetSource),
       postViewData: postViewData,
       postHeaderStyle: feedThemeData.headerStyle,
       menu: LMFeedMenu(
@@ -564,19 +560,8 @@ class _LMFeedUserCreatedPostListViewState
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
           } else {
-            if (postViewData.isLiked)
-              LMFeedAnalyticsBloc.instance.add(
-                LMFeedFireAnalyticsEvent(
-                  eventName: LMFeedAnalyticsKeys.postLiked,
-                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-                  widgetSource: _widgetSource,
-                  eventProperties: {
-                    'post_id': postViewData.id,
-                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
-                    'topics': postViewData.topics.map((e) => e.name).toList(),
-                  },
-                ),
-              );
+            LMFeedPostUtils.handlePostLikeTapEvent(
+                postViewData, _widgetSource, postViewData.isLiked);
           }
         },
       );
@@ -587,6 +572,9 @@ class _LMFeedUserCreatedPostListViewState
         ),
         style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
+          // Handle analytics event for comment button tap
+          LMFeedPostUtils.handlePostCommentButtonTap(post, _widgetSource);
+
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
@@ -642,6 +630,8 @@ class _LMFeedUserCreatedPostListViewState
               ),
             );
           } else {
+            LMFeedPostUtils.handlePostSaveTapEvent(
+                postViewData, postViewData.isSaved, _widgetSource);
             LMFeedCore.showSnackBar(
               context,
               postViewData.isSaved
@@ -657,6 +647,9 @@ class _LMFeedUserCreatedPostListViewState
   LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
         text: const LMFeedText(text: "Share"),
         onTap: () {
+          // Fire analytics event for share button tap
+          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, _widgetSource);
+
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
         style: feedThemeData.footerStyle.shareButtonStyle,
@@ -837,9 +830,6 @@ class _LMFeedUserCreatedPostListViewState
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
           widgetSource: _widgetSource,
-          deprecatedEventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeysDep.postPinned
-              : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
             'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,

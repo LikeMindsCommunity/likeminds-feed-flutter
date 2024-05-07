@@ -11,5 +11,4 @@ class LMFeedSearchBloc extends Bloc<LMFeedSearchEvent, LMFeedSearchState> {
     on<LMFeedGetSearchEvent>(getSearchEventHandler);
     on<LMFeedClearSearchEvent>(clearSearchEventHandler);
   }
-
- }
+}
