@@ -23,4 +23,6 @@ export 'builder/widget_utility.dart';
 
 export 'user/user_utils.dart';
 
+export 'comment/comment_utils.dart';
+
 export '../../packages/pluralize/pluralize.dart';

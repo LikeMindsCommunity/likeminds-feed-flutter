@@ -728,6 +728,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               ? commentViewData.likesCount - 1
               : commentViewData.likesCount + 1;
           commentViewData.isLiked = !commentViewData.isLiked;
+        } else {
+          LMFeedCommentUtils.handleCommentLikeTapEvent(postViewData,
+              widgetSource, commentViewData, commentViewData.isLiked);
         }
       },
       isActive: commentViewData.isLiked,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
