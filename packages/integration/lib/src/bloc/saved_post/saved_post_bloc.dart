@@ -10,8 +10,9 @@ part 'handler/get_saved_post_event_handler.dart';
 
 class LMFeedSavedPostBloc
     extends Bloc<LMFeedSavedPostEvent, LMFeedSavedPostState> {
-static LMFeedSavedPostBloc? _instance;
-static LMFeedSavedPostBloc get instance => _instance ??= LMFeedSavedPostBloc._();
+  static LMFeedSavedPostBloc? _instance;
+  static LMFeedSavedPostBloc get instance =>
+      _instance ??= LMFeedSavedPostBloc._();
   LMFeedSavedPostBloc._() : super(LMFeedSavedPostInitialState()) {
     on<LMFeedGetSavedPostEvent>(getSavedPostEventHandler);
   }
