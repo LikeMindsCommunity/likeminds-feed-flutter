@@ -391,6 +391,7 @@ class _LMFeedUserCreatedCommentListViewState
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -425,6 +426,7 @@ class _LMFeedUserCreatedCommentListViewState
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -451,6 +453,7 @@ class _LMFeedUserCreatedCommentListViewState
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -486,6 +489,7 @@ class _LMFeedUserCreatedCommentListViewState
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:

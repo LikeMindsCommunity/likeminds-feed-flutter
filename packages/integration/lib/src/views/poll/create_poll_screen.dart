@@ -120,10 +120,10 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
   }
 
   String getFormattedDate(DateTime date) {
-    String day = date.day < 10 ? '0${date.day}' : '${date.day}';
-    String month = date.month < 10 ? '0${date.month}' : '${date.month}';
-    String hour = date.hour < 10 ? '0${date.hour}' : '${date.hour}';
-    String minute = date.minute < 10 ? '0${date.minute}' : '${date.minute}';
+    String day = date.day.toString().padLeft(2, '0');
+    String month = date.month.toString().padLeft(2, '0');
+    String hour = date.hour.toString().padLeft(2, '0');
+    String minute = date.minute.toString().padLeft(2, '0');
 
     return '$day-$month-${date.year} $hour:$minute';
   }

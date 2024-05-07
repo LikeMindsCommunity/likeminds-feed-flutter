@@ -623,6 +623,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -657,6 +658,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -683,6 +685,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -718,6 +721,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:

@@ -608,6 +608,7 @@ class _LMFeedUserCreatedPostListViewState
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -642,6 +643,7 @@ class _LMFeedUserCreatedPostListViewState
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -668,6 +670,7 @@ class _LMFeedUserCreatedPostListViewState
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -703,6 +706,7 @@ class _LMFeedUserCreatedPostListViewState
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:

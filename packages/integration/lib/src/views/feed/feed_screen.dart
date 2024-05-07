@@ -1089,6 +1089,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -1123,6 +1124,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -1149,6 +1151,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
@@ -1184,6 +1187,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 showDialog(
                   context: context,
                   builder: (context) => SimpleDialog(
+                    surfaceTintColor: Colors.transparent,
                     children: [
                       LMFeedText(
                         text:
