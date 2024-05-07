@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:async/async.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/poll_result_screen.dart';
 
 class LMFeedSearchScreen extends StatefulWidget {
   const LMFeedSearchScreen({

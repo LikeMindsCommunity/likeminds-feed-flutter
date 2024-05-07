@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/user_created_comment/user_created_comment_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/poll_result_screen.dart';
 
 class LMFeedUserCreatedCommentListView extends StatefulWidget {
   const LMFeedUserCreatedCommentListView({
