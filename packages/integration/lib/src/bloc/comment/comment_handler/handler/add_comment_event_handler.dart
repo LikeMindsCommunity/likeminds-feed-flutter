@@ -54,7 +54,6 @@ Future<void> _handleAddCommentAction(LMFeedCommentActionEvent event,
     // and send the [postId] and [commentId] as the parameters
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
       eventName: LMFeedAnalyticsKeys.commentPosted,
-      deprecatedEventName: LMFeedAnalyticsKeysDep.commentPosted,
       widgetSource: LMFeedWidgetSource.postDetailScreen,
       eventProperties: {
         "post_id": addCommentRequest.postId,
@@ -112,7 +111,6 @@ Future<void> _handleAddReplyAction(LMFeedCommentActionEvent event,
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.replyPosted,
-        deprecatedEventName: LMFeedAnalyticsKeysDep.replyPosted,
         widgetSource: LMFeedWidgetSource.postDetailScreen,
         eventProperties: {
           "post_id": addCommentReplyRequest.postId,

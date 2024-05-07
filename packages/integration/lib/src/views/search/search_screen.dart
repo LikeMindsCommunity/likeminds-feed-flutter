@@ -53,12 +53,12 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier<bool>(false);
   // check whether current logged in user is CM or not
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+  LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
   final PagingController<int, LMPostViewData> _pagingController =
       PagingController(firstPageKey: 1);
   bool userPostingRights = true;
   int page = 1;
   int pageSize = 10;
-  LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
   @override
   void initState() {
@@ -68,6 +68,13 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
     searchController.addListener(() {
       _onTextChanged(searchController.text);
     });
+
+    // Fire analytics for search screen opened event
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.searchScreenOpened,
+        eventProperties: {
+          LMFeedAnalyticsKeys.userIdKey: currentUser.sdkClientInfo.uuid
+        }));
   }
 
   @override
@@ -429,11 +436,14 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
     );
   }
 
-  LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
+  LMFeedPostTopic _defTopicWidget(LMPostViewData postViewData) {
     return LMFeedPostTopic(
-      topics: post.topics,
-      post: post,
+      topics: postViewData.topics,
+      post: postViewData,
       style: theme.topicStyle,
+      onTopicTap: (context, topicViewData) =>
+          LMFeedPostUtils.handlePostTopicTap(
+              context, postViewData, topicViewData, widgetSource),
     );
   }
 
@@ -464,9 +474,25 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: theme.headerStyle,
+      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
+      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
       menuBuilder: (menu) {
         return menu.copyWith(
           removeItemIds: {postReportId, postEditId},
+          onMenuOpen: () {
+            LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+              eventName: LMFeedAnalyticsKeys.postMenu,
+              eventProperties: {
+                'uuid': postViewData.user.sdkClientInfo.uuid,
+                'post_id': postViewData.id,
+                'topics': postViewData.topics.map((e) => e.name).toList(),
+                'post_type':
+                    LMFeedPostUtils.getPostType(postViewData.attachments),
+              },
+            ));
+          },
           action: LMFeedMenuAction(
             onPostUnpin: () => handlePostPinAction(postViewData),
             onPostPin: () => handlePostPinAction(postViewData),
@@ -697,19 +723,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
           } else {
-            if (postViewData.isLiked)
-              LMFeedAnalyticsBloc.instance.add(
-                LMFeedFireAnalyticsEvent(
-                  eventName: LMFeedAnalyticsKeys.postLiked,
-                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-                  widgetSource: widgetSource,
-                  eventProperties: {
-                    'post_id': postViewData.id,
-                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
-                    'topics': postViewData.topics.map((e) => e.name).toList(),
-                  },
-                ),
-              );
+            LMFeedPostUtils.handlePostLikeTapEvent(
+                postViewData, widgetSource, postViewData.isLiked);
           }
         },
       );
@@ -720,6 +735,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         ),
         style: theme.footerStyle.commentButtonStyle,
         onTap: () async {
+          // Handle analytics event for comment button tap
+          LMFeedPostUtils.handlePostCommentButtonTap(post, widgetSource);
+
+          // Pause any video controller if playing
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
@@ -774,6 +793,16 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               actionType: LMFeedPostActionType.saved,
               postId: postViewData.id,
             ));
+          } else {
+            LMFeedPostUtils.handlePostSaveTapEvent(
+                postViewData, postViewData.isSaved, widgetSource);
+            LMFeedCore.showSnackBar(
+              context,
+              postViewData.isSaved
+                  ? "$postTitleFirstCap Saved"
+                  : "$postTitleFirstCap Unsaved",
+              widgetSource,
+            );
           }
         },
         style: theme.footerStyle.saveButtonStyle,
@@ -782,6 +811,9 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
         text: const LMFeedText(text: "Share"),
         onTap: () {
+          // Fire analytics event for share button tap
+          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, widgetSource);
+
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
         style: theme.footerStyle.shareButtonStyle,
@@ -967,9 +999,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
           widgetSource: widgetSource,
-          deprecatedEventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeysDep.postPinned
-              : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
             'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,

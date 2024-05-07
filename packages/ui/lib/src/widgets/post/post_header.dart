@@ -14,7 +14,8 @@ class LMFeedPostHeader extends StatelessWidget {
     this.menuBuilder,
     this.editedText,
     this.createdAt,
-    this.onProfileTap,
+    this.onProfileNameTap,
+    this.onProfilePictureTap,
     required this.isFeed,
     this.customTitle,
     this.profilePicture,
@@ -34,7 +35,8 @@ class LMFeedPostHeader extends StatelessWidget {
   final Widget Function(LMFeedMenu)? menuBuilder;
   final LMFeedMenu? menu;
   final LMFeedText? createdAt;
-  final Function()? onProfileTap;
+  final Function()? onProfileNameTap;
+  final Function()? onProfilePictureTap;
 
   final Widget? profilePicture;
 
@@ -60,61 +62,49 @@ class LMFeedPostHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GestureDetector(
-            onTap: () {
-              if (onProfileTap != null) {
-                onProfileTap!();
-              }
-            },
-            child: Container(
-              color: Colors.transparent,
-              child: Row(
-                children: [
-                  profilePicture ??
-                      LMFeedProfilePicture(
-                        style: LMFeedProfilePictureStyle(
-                          fallbackTextStyle: headerStyle.fallbackTextStyle,
-                          size: headerStyle.imageSize ?? 42,
-                        ),
-                        fallbackText: user.name,
-                        imageUrl: user.imageUrl,
-                        onTap: onProfileTap,
+          Container(
+            color: Colors.transparent,
+            child: Row(
+              children: [
+                profilePicture ??
+                    LMFeedProfilePicture(
+                      style: LMFeedProfilePictureStyle(
+                        fallbackTextStyle: headerStyle.fallbackTextStyle,
+                        size: headerStyle.imageSize ?? 42,
                       ),
-                  LikeMindsTheme.kHorizontalPaddingMedium,
-                  Container(
-                    constraints: BoxConstraints(
-                      maxWidth: screenSize.width * 0.66,
+                      fallbackText: user.name,
+                      imageUrl: user.imageUrl,
+                      onTap: onProfilePictureTap,
                     ),
-                    child: IntrinsicWidth(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
+                LikeMindsTheme.kHorizontalPaddingMedium,
+                Container(
+                  constraints: BoxConstraints(
+                    maxWidth: screenSize.width * 0.66,
+                  ),
+                  child: IntrinsicWidth(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: onProfileNameTap,
+                          behavior: HitTestBehavior.translucent,
+                          child: Row(
                             children: [
                               Flexible(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    if (onProfileTap != null) {
-                                      onProfileTap!();
-                                    }
-                                  },
-                                  behavior: HitTestBehavior.translucent,
-                                  child: titleText ??
-                                      LMFeedText(
-                                        text: user.name,
-                                        style: postHeaderStyle
-                                                ?.titleTextStyle ??
-                                            LMFeedTextStyle(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    LikeMindsTheme.kFontMedium,
-                                                color: feedTheme.onContainer,
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                child: titleText ??
+                                    LMFeedText(
+                                      text: user.name,
+                                      style: postHeaderStyle?.titleTextStyle ??
+                                          LMFeedTextStyle(
+                                            textStyle: TextStyle(
+                                              fontSize:
+                                                  LikeMindsTheme.kFontMedium,
+                                              color: feedTheme.onContainer,
+                                              fontWeight: FontWeight.w500,
                                             ),
-                                      ),
-                                ),
+                                          ),
+                                    ),
                               ),
                               LikeMindsTheme.kHorizontalPaddingMedium,
                               !headerStyle.showCustomTitle
@@ -180,80 +170,78 @@ class LMFeedPostHeader extends StatelessWidget {
                                         ),
                             ],
                           ),
-                          LikeMindsTheme.kVerticalPaddingSmall,
-                          Row(
-                            children: [
-                              Flexible(
-                                  child: subTextBuilder?.call(
-                                          context,
-                                          subText ??
-                                              const LMFeedText(
-                                                text: '',
-                                              )) ??
-                                      subText ??
-                                      const SizedBox()),
-                              subText != null
-                                  ? LikeMindsTheme.kHorizontalPaddingXSmall
-                                  : const SizedBox(),
-                              if (createdAt != null &&
-                                  headerStyle.showTimeStamp)
-                                subTextSeparator ??
-                                    LMFeedText(
-                                      text: subText != null ? '·' : '',
-                                      style: LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: LikeMindsTheme.kFontSmall,
-                                          color: Colors.grey[700],
-                                        ),
+                        ),
+                        LikeMindsTheme.kVerticalPaddingSmall,
+                        Row(
+                          children: [
+                            Flexible(
+                                child: subTextBuilder?.call(
+                                        context,
+                                        subText ??
+                                            const LMFeedText(
+                                              text: '',
+                                            )) ??
+                                    subText ??
+                                    const SizedBox()),
+                            subText != null
+                                ? LikeMindsTheme.kHorizontalPaddingXSmall
+                                : const SizedBox(),
+                            if (createdAt != null && headerStyle.showTimeStamp)
+                              subTextSeparator ??
+                                  LMFeedText(
+                                    text: subText != null ? '·' : '',
+                                    style: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: LikeMindsTheme.kFontSmall,
+                                        color: Colors.grey[700],
                                       ),
                                     ),
-                              if (createdAt != null &&
-                                  subText != null &&
-                                  headerStyle.showTimeStamp)
-                                LikeMindsTheme.kHorizontalPaddingXSmall,
-                              if (headerStyle.showTimeStamp)
-                                createdAt ??
-                                    LMFeedText(
-                                      text: LMFeedTimeAgo.instance
-                                          .format(postViewData.createdAt),
-                                    ),
-                              LikeMindsTheme.kHorizontalPaddingSmall,
-                              if (postViewData.isEdited)
-                                subTextSeparator ??
-                                    LMFeedText(
-                                      text: postViewData.isEdited ? '·' : '',
-                                      style: LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: LikeMindsTheme.kFontSmall,
-                                          color: Colors.grey[700],
-                                        ),
+                                  ),
+                            if (createdAt != null &&
+                                subText != null &&
+                                headerStyle.showTimeStamp)
+                              LikeMindsTheme.kHorizontalPaddingXSmall,
+                            if (headerStyle.showTimeStamp)
+                              createdAt ??
+                                  LMFeedText(
+                                    text: LMFeedTimeAgo.instance
+                                        .format(postViewData.createdAt),
+                                  ),
+                            LikeMindsTheme.kHorizontalPaddingSmall,
+                            if (postViewData.isEdited)
+                              subTextSeparator ??
+                                  LMFeedText(
+                                    text: postViewData.isEdited ? '·' : '',
+                                    style: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: LikeMindsTheme.kFontSmall,
+                                        color: Colors.grey[700],
                                       ),
                                     ),
-                              LikeMindsTheme.kHorizontalPaddingSmall,
-                              postViewData.isEdited
-                                  ? editedText ??
-                                      LMFeedText(
-                                        text: postViewData.isEdited
-                                            ? 'Edited'
-                                            : '',
-                                        style: postHeaderStyle?.subTextStyle ??
-                                            LMFeedTextStyle(
-                                              textStyle: TextStyle(
-                                                fontSize:
-                                                    LikeMindsTheme.kFontSmall,
-                                                color: Colors.grey[700],
-                                              ),
+                                  ),
+                            LikeMindsTheme.kHorizontalPaddingSmall,
+                            postViewData.isEdited
+                                ? editedText ??
+                                    LMFeedText(
+                                      text:
+                                          postViewData.isEdited ? 'Edited' : '',
+                                      style: postHeaderStyle?.subTextStyle ??
+                                          LMFeedTextStyle(
+                                            textStyle: TextStyle(
+                                              fontSize:
+                                                  LikeMindsTheme.kFontSmall,
+                                              color: Colors.grey[700],
                                             ),
-                                      )
-                                  : const SizedBox(),
-                            ],
-                          )
-                        ],
-                      ),
+                                          ),
+                                    )
+                                : const SizedBox(),
+                          ],
+                        )
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           const Spacer(),
@@ -285,7 +273,8 @@ class LMFeedPostHeader extends StatelessWidget {
     LMFeedText? editedText,
     Widget Function(LMFeedMenu)? menuBuilder,
     LMFeedText? createdAt,
-    Function()? onProfileTap,
+    Function()? onProfileNameTap,
+    Function()? onProfilePictureTap,
     bool? isFeed,
     LMFeedText? customTitle,
     Widget? profilePicture,
@@ -302,7 +291,8 @@ class LMFeedPostHeader extends StatelessWidget {
       editedText: editedText ?? this.editedText,
       menuBuilder: menuBuilder ?? this.menuBuilder,
       createdAt: createdAt ?? this.createdAt,
-      onProfileTap: onProfileTap ?? this.onProfileTap,
+      onProfileNameTap: onProfileNameTap ?? this.onProfileNameTap,
+      onProfilePictureTap: onProfilePictureTap ?? this.onProfilePictureTap,
       isFeed: isFeed ?? this.isFeed,
       customTitle: customTitle ?? this.customTitle,
       profilePicture: profilePicture ?? this.profilePicture,

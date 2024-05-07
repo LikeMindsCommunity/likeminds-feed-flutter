@@ -369,4 +369,147 @@ class LMFeedPostUtils {
 
     return commentViewData;
   }
+
+  // The functions below are used for handling analytics events
+  // related to post actions
+
+  // Fire an analytics event when a user taps on the post comment button
+  static void handlePostCommentButtonTap(
+      LMPostViewData postViewData, LMFeedWidgetSource widgetSource) {
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.postCommentClick,
+        widgetSource: widgetSource,
+        eventProperties: {
+          LMFeedAnalyticsKeys.postIdKey: postViewData.id,
+          LMFeedAnalyticsKeys.postTypeKey:
+              getPostType(postViewData.attachments),
+          LMFeedAnalyticsKeys.topicsKey:
+              postViewData.topics.map((e) => e.name).toList(),
+          LMFeedAnalyticsKeys.createdByIdKey:
+              postViewData.user.sdkClientInfo.uuid,
+        },
+      ),
+    );
+  }
+
+  // Fire an analytics event when the user taps on the post share button
+  static void handlerPostShareTapEvent(
+      LMPostViewData postViewData, LMFeedWidgetSource widgetSource) {
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.postShared,
+        widgetSource: widgetSource,
+        eventProperties: {
+          LMFeedAnalyticsKeys.postIdKey: postViewData.id,
+          LMFeedAnalyticsKeys.postTypeKey:
+              getPostType(postViewData.attachments),
+          LMFeedAnalyticsKeys.topicsKey:
+              postViewData.topics.map((e) => e.name).toList(),
+          LMFeedAnalyticsKeys.createdByIdKey:
+              postViewData.user.sdkClientInfo.uuid,
+        },
+      ),
+    );
+  }
+
+  //  Fire an analytics event when a user taps on the post like button
+  static void handlePostLikeTapEvent(LMPostViewData postViewData,
+      LMFeedWidgetSource widgetSource, bool isLiked) {
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: isLiked
+            ? LMFeedAnalyticsKeys.postLiked
+            : LMFeedAnalyticsKeys.postUnliked,
+        widgetSource: widgetSource,
+        eventProperties: {
+          LMFeedAnalyticsKeys.postIdKey: postViewData.id,
+          LMFeedAnalyticsKeys.postTypeKey:
+              getPostType(postViewData.attachments),
+          LMFeedAnalyticsKeys.topicsKey:
+              postViewData.topics.map((e) => e.name).toList(),
+          LMFeedAnalyticsKeys.createdByIdKey:
+              postViewData.user.sdkClientInfo.uuid,
+        },
+      ),
+    );
+  }
+
+  // Fire an analytics event when a user taps on a post
+  // Send [isSaved] true to fire post saved event, false to fire post unsaved event
+  static void handlePostSaveTapEvent(LMPostViewData postViewData, bool isSaved,
+      LMFeedWidgetSource widgetSource) {
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: isSaved
+            ? LMFeedAnalyticsKeys.postSaved
+            : LMFeedAnalyticsKeys.postUnsaved,
+        widgetSource: widgetSource,
+        eventProperties: {
+          LMFeedAnalyticsKeys.postIdKey: postViewData.id,
+          LMFeedAnalyticsKeys.postTypeKey:
+              getPostType(postViewData.attachments),
+          LMFeedAnalyticsKeys.topicsKey:
+              postViewData.topics.map((e) => e.name).toList(),
+          LMFeedAnalyticsKeys.createdByIdKey:
+              postViewData.user.sdkClientInfo.uuid,
+        },
+      ),
+    );
+  }
+
+  // Fire an analytics event when a user taps on a topic
+  static void handlePostTopicTap(
+      BuildContext context,
+      LMPostViewData postViewData,
+      LMTopicViewData topicViewData,
+      LMFeedWidgetSource widgetSource) {
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.postTopicClick,
+        widgetSource: widgetSource,
+        eventProperties: {
+          LMFeedAnalyticsKeys.createdByIdKey:
+              postViewData.user.sdkClientInfo.uuid,
+          LMFeedAnalyticsKeys.topicIdKey: topicViewData.id,
+          LMFeedAnalyticsKeys.topicClickedKey: topicViewData.name,
+          LMFeedAnalyticsKeys.postIdKey: postViewData.id,
+          LMFeedAnalyticsKeys.postTypeKey:
+              getPostType(postViewData.attachments),
+          LMFeedAnalyticsKeys.topicsKey:
+              postViewData.topics.map((e) => e.name).toList(),
+        },
+      ),
+    );
+  }
+
+  // Fire an analytics event when a user taps on a user profile
+  // Also call the profile callback using [LMFeedProfileBloc]
+  static void handlePostProfileTap(
+      BuildContext context,
+      LMPostViewData postViewData,
+      String eventName,
+      LMFeedWidgetSource widgetSource) {
+    LMFeedCore.instance.lmFeedClient
+        .routeToProfile(postViewData.user.sdkClientInfo.uuid);
+    // Raise an event for user callback
+    LMFeedProfileBloc.instance.add(
+      LMFeedRouteToUserProfileEvent(
+        uuid: postViewData.user.sdkClientInfo.uuid,
+        context: context,
+      ),
+    );
+    // Raise an event for analytics
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+        eventName: eventName,
+        widgetSource: widgetSource,
+        eventProperties: {
+          LMFeedAnalyticsKeys.postIdKey: postViewData.id,
+          LMFeedAnalyticsKeys.userIdKey: postViewData.user.sdkClientInfo.uuid,
+          LMFeedAnalyticsKeys.topicsKey:
+              postViewData.topics.map((e) => e.name).toList(),
+          LMFeedAnalyticsKeys.postTypeKey:
+              getPostType(postViewData.attachments),
+        }));
+  }
 }

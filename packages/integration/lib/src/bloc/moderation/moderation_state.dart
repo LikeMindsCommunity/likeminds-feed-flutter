@@ -52,7 +52,8 @@ final class LMFeedReportSubmittedState extends LMFeedModerationState {
   });
 
   @override
-  List<Object> get props => [entityCreatorId, entityId, entityType, reason, tagId];
+  List<Object> get props =>
+      [entityCreatorId, entityId, entityType, reason, tagId];
 }
 
 final class LMFeedReportSubmitFailedState extends LMFeedModerationState {

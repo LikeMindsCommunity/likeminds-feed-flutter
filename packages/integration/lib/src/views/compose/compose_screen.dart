@@ -101,7 +101,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       LMFeedFireAnalyticsEvent(
           widgetSource: widget.widgetSource,
           eventName: LMFeedAnalyticsKeys.postCreationStarted,
-          deprecatedEventName: LMFeedAnalyticsKeysDep.postCreationStarted,
           eventProperties: {}),
     );
     style = widget.style ?? feedTheme.composeScreenStyle;
@@ -809,7 +808,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         LMFeedAnalyticsBloc.instance.add(
           LMFeedFireAnalyticsEvent(
             eventName: LMFeedAnalyticsKeys.userTaggedInPost,
-            deprecatedEventName: LMFeedAnalyticsKeysDep.userTaggedInPost,
             widgetSource: LMFeedWidgetSource.createPostScreen,
             eventProperties: {
               'tagged_user_id': tag.sdkClientInfo?.uuid ?? tag.uuid,

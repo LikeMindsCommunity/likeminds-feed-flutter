@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_ui/packages/expandable_text/expandable_text.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
@@ -28,6 +27,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.subTextSeparator,
     this.subTextStyle,
     this.customTitle,
+    this.onProfileNameTap,
   });
 
   final LMUserViewData user;
@@ -42,6 +42,7 @@ class LMFeedCommentWidget extends StatefulWidget {
 
   /// {@macro feed_on_tag_tap}
   final LMFeedOnTagTap onTagTap;
+  final Function()? onProfileNameTap;
 
   final Widget Function(LMFeedMenu)? menu;
   final LMFeedMenuAction lmFeedMenuAction;
@@ -83,6 +84,7 @@ class LMFeedCommentWidget extends StatefulWidget {
     Widget? subTextSeparator,
     LMFeedTextStyle? subTextStyle,
     LMFeedText? customTitle,
+    Function()? onProfileNameTap,
   }) {
     return LMFeedCommentWidget(
       user: user ?? this.user,
@@ -106,6 +108,7 @@ class LMFeedCommentWidget extends StatefulWidget {
       style: style ?? this.style,
       subTextStyle: subTextStyle ?? this.subTextStyle,
       customTitle: customTitle ?? this.customTitle,
+      onProfileNameTap: onProfileNameTap ?? this.onProfileNameTap,
     );
   }
 }
@@ -144,8 +147,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                   Row(
                     children: [
                       GestureDetector(
-                        onTap: () =>
-                            widget.onTagTap(widget.user.sdkClientInfo.uuid),
+                        onTap: () => widget.onProfileNameTap?.call(),
                         behavior: HitTestBehavior.translucent,
                         child: Container(
                           padding: style?.titlePadding,
@@ -210,7 +212,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                 ],
               ),
               const Spacer(),
-              widget.menu?.call(_defPostMenu()) ?? _defPostMenu()
+              widget.menu?.call(_defCommentMenu()) ?? _defCommentMenu()
             ],
           ),
           LikeMindsTheme.kVerticalPaddingMedium,
@@ -296,7 +298,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
     );
   }
 
-  LMFeedMenu _defPostMenu() {
+  LMFeedMenu _defCommentMenu() {
     return LMFeedMenu(
       menuItems: widget.comment.menuItems,
       action: widget.lmFeedMenuAction,

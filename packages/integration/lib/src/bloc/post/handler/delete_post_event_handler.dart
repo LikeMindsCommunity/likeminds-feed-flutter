@@ -15,7 +15,6 @@ void deletePostEventHandler(
 
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.postDeleted,
-        deprecatedEventName: LMFeedAnalyticsKeysDep.postDeleted,
         eventProperties: {
           "post_id": event.postId,
           "post_type": event.postType,

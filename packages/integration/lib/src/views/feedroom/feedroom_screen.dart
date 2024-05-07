@@ -133,7 +133,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.feedOpened,
-        deprecatedEventName: LMFeedAnalyticsKeysDep.feedOpened,
         eventProperties: {
           'feed_type': 'feedroom',
         },
@@ -806,11 +805,14 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
     );
   }
 
-  LMFeedPostTopic _defTopicWidget(LMPostViewData post) {
+  LMFeedPostTopic _defTopicWidget(LMPostViewData postViewData) {
     return LMFeedPostTopic(
-      topics: post.topics,
-      post: post,
+      topics: postViewData.topics,
+      post: postViewData,
       style: feedThemeData.topicStyle,
+      onTopicTap: (context, topicViewData) =>
+          LMFeedPostUtils.handlePostTopicTap(
+              context, postViewData, topicViewData, _widgetSource),
     );
   }
 
@@ -849,19 +851,25 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData.headerStyle,
-      onProfileTap: () {
-        LMFeedCore.instance.lmFeedClient
-            .routeToProfile(postViewData.user.sdkClientInfo.uuid);
-        LMFeedProfileBloc.instance.add(
-          LMFeedRouteToUserProfileEvent(
-            uuid: postViewData.user.sdkClientInfo.uuid,
-            context: context,
-          ),
-        );
-      },
+      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, _widgetSource),
+      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, _widgetSource),
       menu: LMFeedMenu(
         menuItems: postViewData.menuItems,
         removeItemIds: {postReportId, postEditId},
+        onMenuOpen: () {
+          LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.postMenu,
+            eventProperties: {
+              'uuid': postViewData.user.sdkClientInfo.uuid,
+              'post_id': postViewData.id,
+              'topics': postViewData.topics.map((e) => e.name).toList(),
+              'post_type':
+                  LMFeedPostUtils.getPostType(postViewData.attachments),
+            },
+          ));
+        },
         action: LMFeedMenuAction(
           onPostEdit: () {
             // Mute all video controllers
@@ -990,19 +998,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 : postViewData.likeCount - 1;
             rebuildPostWidget.value = !rebuildPostWidget.value;
           } else {
-            if (postViewData.isLiked)
-              LMFeedAnalyticsBloc.instance.add(
-                LMFeedFireAnalyticsEvent(
-                  eventName: LMFeedAnalyticsKeys.postLiked,
-                  deprecatedEventName: LMFeedAnalyticsKeysDep.postLiked,
-                  widgetSource: _widgetSource,
-                  eventProperties: {
-                    'post_id': postViewData.id,
-                    'created_by_id': postViewData.user.sdkClientInfo.uuid,
-                    'topics': postViewData.topics.map((e) => e.name).toList(),
-                  },
-                ),
-              );
+            LMFeedPostUtils.handlePostLikeTapEvent(
+                postViewData, _widgetSource, postViewData.isLiked);
           }
         },
       );
@@ -1014,6 +1011,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         ),
         style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
+          LMFeedPostUtils.handlePostCommentButtonTap(post, _widgetSource);
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
@@ -1069,6 +1067,14 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 actionType: postViewData.isSaved
                     ? LMFeedPostActionType.saved
                     : LMFeedPostActionType.unsaved));
+          } else {
+            LMFeedPostUtils.handlePostSaveTapEvent(
+                postViewData, postViewData.isSaved, _widgetSource);
+            LMFeedCore.showSnackBar(
+              context,
+              postViewData.isSaved ? "Post Saved" : "Post Unsaved",
+              _widgetSource,
+            );
           }
         },
         style: feedThemeData.footerStyle.saveButtonStyle,
@@ -1077,6 +1083,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
         text: const LMFeedText(text: "Share"),
         onTap: () {
+          // Fire analytics event for share button tap
+          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, _widgetSource);
+
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
         style: feedThemeData.footerStyle.shareButtonStyle,
@@ -1397,9 +1406,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           eventName: postViewData.isPinned
               ? LMFeedAnalyticsKeys.postPinned
               : LMFeedAnalyticsKeys.postUnpinned,
-          deprecatedEventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeysDep.postPinned
-              : LMFeedAnalyticsKeysDep.postUnpinned,
           eventProperties: {
             'created_by_id': postViewData.uuid,
             'post_id': postViewData.id,
