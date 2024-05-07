@@ -33,12 +33,6 @@ export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
   LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
-  @deprecated
-  GlobalKey<ScaffoldMessengerState>? _scaffoldMessengerKey;
-
-  /// This is stream is used to listen to
-  /// deep links while the app is in active state
-  StreamSubscription? deepLinkStreamListener;
 
   /// This is the domain of the client. This is used to show
   /// generate link for sharing post
@@ -68,12 +62,6 @@ class LMFeedCore {
     ScaffoldMessenger.of(context).showSnackBar(snackBarWidget);
   }
 
-  static GlobalKey<ScaffoldMessengerState>? get scaffoldMessengerKey =>
-      instance._scaffoldMessengerKey;
-
-  static set deepLinkStream(StreamSubscription deepLinkStream) =>
-      instance.deepLinkStreamListener = deepLinkStream;
-
   LMFeedCore._();
 
   Future<void> initialize({
@@ -81,7 +69,6 @@ class LMFeedCore {
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
-    GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
     LMFeedThemeData? theme,
     Function(LMFeedAnalyticsEventFired)? analyticsListener,
     Function(LMFeedProfileState)? profileListener,
@@ -91,7 +78,6 @@ class LMFeedCore {
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();
     if (widgets != null) _widgetUtility = widgets;
-    _scaffoldMessengerKey = scaffoldMessengerKey;
     LMFeedTheme.instance.initialise(theme: theme ?? LMFeedThemeData.light());
     MediaKit.ensureInitialized();
     if (analyticsListener != null)

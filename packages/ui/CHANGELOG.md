@@ -45,3 +45,8 @@ Adding SnackBar builder in Widget Utility
 ## 1.2.3
 
 Fixed analytics events and added function for logout
+
+## 1.2.4
+
+Extended the scope of analytics events
+Fixing minor UI issues
