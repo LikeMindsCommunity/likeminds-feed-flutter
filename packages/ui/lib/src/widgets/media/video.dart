@@ -193,12 +193,13 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
               future: initialiseVideo,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return LMPostMediaShimmer(
-                    style: LMPostMediaShimmerStyle(
-                      width: widget.style?.width ?? screenSize.width,
-                      height: widget.style?.height,
-                    ),
-                  );
+                  return style?.shimmerWidget ??
+                      LMPostMediaShimmer(
+                        style: LMPostMediaShimmerStyle(
+                          width: widget.style?.width ?? screenSize.width,
+                          height: widget.style?.height,
+                        ),
+                      );
                 } else if (snapshot.connectionState == ConnectionState.done) {
                   if (!initialiseOverlay) {
                     _timer =
@@ -361,13 +362,20 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                         ),
                       ),
                     ),
-                    child: Icon(
-                      controller != null && controller!.player.state.playing
-                          ? Icons.pause
-                          : Icons.play_arrow,
-                      size: 28,
-                      color: Colors.white,
-                    ),
+                    child:
+                        controller != null && controller!.player.state.playing
+                            ? style?.pauseButton ??
+                                const Icon(
+                                  Icons.pause,
+                                  size: 28,
+                                  color: Colors.white,
+                                )
+                            : style?.playButton ??
+                                const Icon(
+                                  Icons.play_arrow,
+                                  size: 28,
+                                  color: Colors.white,
+                                ),
                     onPressed: () {
                       _timer?.cancel();
                       if (controller == null) {
@@ -393,27 +401,6 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
             },
           ),
         ),
-        // Positioned(
-        //   bottom: 0,
-        //   right: 0,
-        //   child: ValueListenableBuilder(
-        //     valueListenable: isMuted!,
-        //     builder: (context, state, _) {
-        //       return IconButton(
-        //         onPressed: () {
-        //           toggleFullscreen(context);
-        //         },
-        //         icon: const LMFeedIcon(
-        //           type: LMFeedIconType.icon,
-        //           style: LMFeedIconStyle(
-        //             color: Colors.white,
-        //           ),
-        //           icon: Icons.fullscreen,
-        //         ),
-        //       );
-        //     },
-        //   ),
-        // )
       ],
     );
   }

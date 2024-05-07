@@ -604,6 +604,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 commentFromList.isLiked = !commentFromList.isLiked;
               },
             );
+          } else {
+            LMFeedCommentUtils.handleCommentLikeTapEvent(widget.post,
+                widgetSource, commentViewData, commentViewData.isLiked);
           }
         },
         isActive: commentViewData.isLiked,

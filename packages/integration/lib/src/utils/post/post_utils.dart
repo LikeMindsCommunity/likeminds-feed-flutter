@@ -482,7 +482,7 @@ class LMFeedPostUtils {
           LMFeedAnalyticsKeys.postIdKey: postViewData.id,
           LMFeedAnalyticsKeys.userIdKey: postViewData.user.sdkClientInfo.uuid,
           LMFeedAnalyticsKeys.topicsKey:
-              postViewData.topics.map((e) => e.id).toList(),
+              postViewData.topics.map((e) => e.name).toList(),
           LMFeedAnalyticsKeys.postTypeKey:
               getPostType(postViewData.attachments),
         }));

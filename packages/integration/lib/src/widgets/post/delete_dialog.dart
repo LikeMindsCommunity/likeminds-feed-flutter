@@ -35,6 +35,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
 
     return Dialog(
       backgroundColor: feedTheme.container,
+      surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(6.0),
       ),

@@ -37,6 +37,8 @@ class LMFeedAnalyticsKeys {
   static const String commentProfilePicture = 'comment_profile_pic';
   static const String commentProfileName = 'comment_profile_name';
   static const String commentMenu = 'comment_menu';
+  static const String commentLiked = 'comment_liked';
+  static const String commentUnliked = 'comment_unliked';
   // Events related to Replies
   static const String replyPosted = 'reply_posted';
   static const String replyDeleted = 'reply_deleted';
@@ -44,6 +46,8 @@ class LMFeedAnalyticsKeys {
   static const String replyProfilePicture = 'reply_profile_pic';
   static const String replyProfileName = 'reply_profile_name';
   static const String replyMenu = 'reply_menu';
+  static const String replyLiked = 'reply_liked';
+  static const String replyUnliked = 'reply_unliked';
   // Events related to Search
   static const String searchScreenOpened = 'search_screen_opened';
   // Events related to Hashtags

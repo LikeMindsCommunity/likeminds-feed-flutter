@@ -28,9 +28,10 @@ class LMFeedCommentUtils {
     // Raise an event for analytics
     Map<String, dynamic> eventProperties = {
       LMFeedAnalyticsKeys.postIdKey: postViewData.id,
-      LMFeedAnalyticsKeys.userIdKey: commentViewData.user.sdkClientInfo.uuid,
+      LMFeedAnalyticsKeys.createdByIdKey:
+          commentViewData.user.sdkClientInfo.uuid,
       LMFeedAnalyticsKeys.topicsKey:
-          postViewData.topics.map((e) => e.id).toList(),
+          postViewData.topics.map((e) => e.name).toList(),
       LMFeedAnalyticsKeys.postTypeKey:
           LMFeedPostUtils.getPostType(postViewData.attachments),
     };
@@ -65,7 +66,7 @@ class LMFeedCommentUtils {
       LMFeedAnalyticsKeys.createdByIdKey:
           commentViewData.user.sdkClientInfo.uuid,
       LMFeedAnalyticsKeys.topicsKey:
-          postViewData.topics.map((e) => e.id).toList(),
+          postViewData.topics.map((e) => e.name).toList(),
       LMFeedAnalyticsKeys.postTypeKey:
           LMFeedPostUtils.getPostType(postViewData.attachments),
 
@@ -86,5 +87,44 @@ class LMFeedCommentUtils {
         eventName: eventName,
         widgetSource: widgetSource,
         eventProperties: eventProperties));
+  }
+
+  //  Fire an analytics event when a user taps on the comment like button
+  static void handleCommentLikeTapEvent(
+      LMPostViewData postViewData,
+      LMFeedWidgetSource widgetSource,
+      LMCommentViewData commentViewData,
+      bool isLiked) {
+    Map<String, dynamic> eventProperties = {
+      LMFeedAnalyticsKeys.postIdKey: postViewData.id,
+      LMFeedAnalyticsKeys.postTypeKey:
+          LMFeedPostUtils.getPostType(postViewData.attachments),
+      LMFeedAnalyticsKeys.topicsKey:
+          postViewData.topics.map((e) => e.name).toList(),
+      LMFeedAnalyticsKeys.createdByIdKey:
+          commentViewData.user.sdkClientInfo.uuid,
+    };
+
+    if (commentViewData.level == 0) {
+      eventProperties[LMFeedAnalyticsKeys.commentIdKey] = commentViewData.id;
+    } else {
+      eventProperties[LMFeedAnalyticsKeys.commentIdKey] =
+          commentViewData.parentComment?.id;
+      eventProperties[LMFeedAnalyticsKeys.replyIdKey] = commentViewData.id;
+    }
+
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: commentViewData.level == 0
+            ? isLiked
+                ? LMFeedAnalyticsKeys.commentLiked
+                : LMFeedAnalyticsKeys.commentUnliked
+            : isLiked
+                ? LMFeedAnalyticsKeys.replyLiked
+                : LMFeedAnalyticsKeys.replyUnliked,
+        widgetSource: widgetSource,
+        eventProperties: eventProperties,
+      ),
+    );
   }
 }

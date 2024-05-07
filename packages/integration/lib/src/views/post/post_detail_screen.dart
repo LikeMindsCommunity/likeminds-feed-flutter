@@ -940,8 +940,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedCommentWidget(
       user: userViewData,
       comment: commentViewData,
-      menu: (menu) => menu.copyWith(
+      menu: (menu) => LMFeedMenu(
+        menuItems: commentViewData.menuItems,
         removeItemIds: {},
+        action: defLMFeedMenuAction(commentViewData),
         onMenuOpen: () {
           LMFeedCommentUtils.handleCommentMenuOpenTap(
               _postDetailScreenHandler!.postData!,
@@ -1047,6 +1049,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         );
       },
       onTap: () async {
+        LMPostViewData postViewData = _postDetailScreenHandler!.postData!;
+
         commentViewData.likesCount = commentViewData.isLiked
             ? commentViewData.likesCount - 1
             : commentViewData.likesCount + 1;
@@ -1072,6 +1076,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
           _postDetailScreenHandler!.rebuildPostWidget.value =
               !_postDetailScreenHandler!.rebuildPostWidget.value;
+        } else {
+          LMFeedCommentUtils.handleCommentLikeTapEvent(postViewData,
+              _widgetSource, commentViewData, commentViewData.isLiked);
         }
       },
       isActive: commentViewData.isLiked,
