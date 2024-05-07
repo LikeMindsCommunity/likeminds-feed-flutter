@@ -206,16 +206,19 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
                 return MapEntry(key, LMTopicViewDataConvertor.fromTopic(value));
               }) ??
               {};
-          List<LMUserViewData> users =
-              voteResponse.data?.users.entries.map((element) {
-                    return LMUserViewDataConvertor.fromUser(
-                      element.value,
-                      topics: topics,
-                      widgets: widgets,
-                      userTopics: voteResponse.data!.userTopics,
-                    );
-                  }).toList() ??
-                  [];
+
+          List<LMUserViewData> users = [];
+          voteResponse.data?.votes.first.users.forEach((e) {
+            final LMUserViewData user = LMUserViewDataConvertor.fromUser(
+              voteResponse.data!.users[e]!,
+              topics: topics,
+              widgets: widgets,
+              userTopics: voteResponse.data!.userTopics,
+            );
+            debugPrint('User: ${user.name}');
+            users.add(user);
+          });
+
           return ListView.builder(
               itemCount: users.length,
               itemBuilder: (context, index) {

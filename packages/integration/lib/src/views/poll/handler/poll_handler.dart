@@ -122,20 +122,29 @@ Future<void> submitVote(
             .build();
         final postResponse =
             await LMFeedCore.client.getPostDetails(postDetailRequest);
-        final Map<String, LMUserViewData> users = postResponse.users?.map(
-                (key, value) =>
-                    MapEntry(key, LMUserViewDataConvertor.fromUser(value))) ??
-            {};
 
         final Map<String, LMWidgetViewData> widgets = postResponse.widgets?.map(
                 (key, value) => MapEntry(
                     key, LMWidgetViewDataConvertor.fromWidgetModel(value))) ??
             {};
 
-        final Map<String, LMTopicViewData> topics = postResponse.topics?.map(
-                (key, value) =>
-                    MapEntry(key, LMTopicViewDataConvertor.fromTopic(value))) ??
-            {};
+        final Map<String, LMTopicViewData> topics =
+            postResponse.topics?.map((key, value) => MapEntry(
+                    key,
+                    LMTopicViewDataConvertor.fromTopic(
+                      value,
+                      widgets: widgets,
+                    ))) ??
+                {};
+
+        final Map<String, LMUserViewData> users =
+            postResponse.users?.map((key, value) => MapEntry(
+                    key,
+                    LMUserViewDataConvertor.fromUser(
+                      value,
+                      widgets: widgets,
+                    ))) ??
+                {};
 
         final Map<String, LMPostViewData> repostedPosts =
             postResponse.repostedPosts?.map((key, value) => MapEntry(
@@ -261,7 +270,7 @@ Future<void> addOption(
   if ((pollWidget.attachmentMeta.options?.length ?? 0) > 10) {
     LMFeedCore.showSnackBar(
       context,
-      "You can add maximum 10 options",
+      "You can add up to 10 options",
       source,
     );
     return;

@@ -108,6 +108,12 @@ class LMFeedPostUtils {
       case 4: // Link
         postTypeString = "link";
         break;
+      case 6: // Poll
+        postTypeString = "poll";
+        break;
+      case 8: // Repost
+        postTypeString = "repost";
+        break;
       default:
         postTypeString = "text";
     }
