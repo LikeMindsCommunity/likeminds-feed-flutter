@@ -19,6 +19,7 @@ class LMFeedPostMedia extends StatefulWidget {
     this.videoBuilder,
     this.imageBuilder,
     this.pollBuilder,
+    this.poll,
   });
 
   final List<LMAttachmentViewData> attachments;
@@ -37,6 +38,8 @@ class LMFeedPostMedia extends StatefulWidget {
   final LMFeedVideoBuilder? videoBuilder;
   final LMFeedImageBuilder? imageBuilder;
   final LMFeedPollBuilder? pollBuilder;
+
+  final LMFeedPoll? poll;
 
   @override
   State<LMFeedPostMedia> createState() => _LMPostMediaState();
@@ -105,7 +108,10 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
 
     /// if attachment is a poll
     if (attachments!.first.attachmentType == 6) {
-      Widget poll = widget.pollBuilder?.call(_defPoll(),) ?? _defPoll();
+      Widget poll = widget.pollBuilder?.call(
+            _defPoll(),
+          ) ??
+          _defPoll();
       return poll;
     }
     if (attachments!.first.attachmentType == 3) {
@@ -184,10 +190,11 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
   }
 
   LMFeedPoll _defPoll() {
-    return LMFeedPoll(
-      attachmentMeta: attachments!.first.attachmentMeta,
-      style: widget.style?.pollStyle ?? const LMFeedPollStyle(),
-    );
+    return widget.poll ??
+        LMFeedPoll(
+          attachmentMeta: attachments!.first.attachmentMeta,
+          style: widget.style?.pollStyle ?? const LMFeedPollStyle(),
+        );
   }
 
   Widget getPostDocuments() {

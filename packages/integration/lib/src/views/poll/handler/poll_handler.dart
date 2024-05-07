@@ -373,3 +373,51 @@ String getFormattedDateTime(int expiryTime) {
       DateFormat('d MMM y hh:mm a').format(expiryTimeInDateTime);
   return "Expires on $formattedDateTime";
 }
+
+void onVoteTextTap(BuildContext context,
+    LMAttachmentMetaViewData attachmentMeta, LMFeedWidgetSource source,
+    {LMPollOptionViewData? option}) {
+  if (attachmentMeta.isAnonymous ?? false) {
+    showDialog(
+      context: context,
+      builder: (context) => SimpleDialog(
+        surfaceTintColor: Colors.transparent,
+        children: [
+          LMFeedText(
+            text:
+                'This being an anonymous poll, the names of the voters can not be disclosed.',
+            style: LMFeedTextStyle(
+              maxLines: 3,
+              textAlign: TextAlign.center,
+              textStyle: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          )
+        ],
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 30,
+          horizontal: 8,
+        ),
+      ),
+    );
+  } else if (attachmentMeta.toShowResult! ||
+      hasPollEnded(attachmentMeta.expiryTime!)) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LMFeedPollResultScreen(
+          pollId: attachmentMeta.id ?? '',
+          pollOptions: attachmentMeta.options ?? [],
+          selectedOptionId: option?.id,
+        ),
+      ),
+    );
+  } else {
+    LMFeedCore.showSnackBar(
+      context,
+      "The results will be visible after the poll has ended.",
+      source,
+    );
+  }
+}

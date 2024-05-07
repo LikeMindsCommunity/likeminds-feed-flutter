@@ -554,12 +554,18 @@ class _LMFeedUserCreatedPostListViewState
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },
             onOptionSelect: (optionData) async {
-              if (hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) return;
+              if (hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) {
+                LMFeedCore.showSnackBar(
+                  context,
+                  "Poll ended. Vote can not be submitted now.",
+                  LMFeedWidgetSource.universalFeed,
+                );
+                return;
+              }
               if ((isPollSubmitted(pollWidget.attachmentMeta.options ?? [])) &&
                   !isVoteEditing["value"]!) return;
               if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
                   pollWidget.attachmentMeta.multiSelectState!)) {
-                debugPrint("ye wala");
                 submitVote(
                   context,
                   pollWidget.attachmentMeta,
@@ -604,129 +610,19 @@ class _LMFeedUserCreatedPostListViewState
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },
             onSubtextTap: () {
-              if (pollWidget.attachmentMeta.isAnonymous ?? false) {
-                showDialog(
-                  context: context,
-                  builder: (context) => SimpleDialog(
-                    surfaceTintColor: Colors.transparent,
-                    children: [
-                      LMFeedText(
-                        text:
-                            'This being an anonymous poll, the names of the voters can not be disclosed.',
-                        style: LMFeedTextStyle(
-                          maxLines: 3,
-                          textAlign: TextAlign.center,
-                          textStyle: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      )
-                    ],
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 30,
-                      horizontal: 8,
-                    ),
-                  ),
-                );
-              } else if (pollWidget.attachmentMeta.toShowResult! ||
-                  hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LMFeedPollResultScreen(
-                      pollId: pollWidget.attachmentMeta.id ?? '',
-                      pollOptions: pollWidget.attachmentMeta.options ?? [],
-                    ),
-                  ),
-                );
-              } else {
-                showDialog(
-                  context: context,
-                  builder: (context) => SimpleDialog(
-                    surfaceTintColor: Colors.transparent,
-                    children: [
-                      LMFeedText(
-                        text:
-                            'The results will be visible after the poll has ended.',
-                        style: LMFeedTextStyle(
-                          maxLines: 3,
-                          textAlign: TextAlign.center,
-                          textStyle: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      )
-                    ],
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 30,
-                      horizontal: 8,
-                    ),
-                  ),
-                );
-              }
+              onVoteTextTap(
+                context,
+                pollWidget.attachmentMeta,
+                LMFeedWidgetSource.userFeed,
+              );
             },
             onVoteClick: (option) {
-              if (pollWidget.attachmentMeta.isAnonymous ?? false) {
-                showDialog(
-                  context: context,
-                  builder: (context) => SimpleDialog(
-                    surfaceTintColor: Colors.transparent,
-                    children: [
-                      LMFeedText(
-                        text:
-                            'This being an anonymous poll, the names of the voters can not be disclosed.',
-                        style: LMFeedTextStyle(
-                          maxLines: 3,
-                          textAlign: TextAlign.center,
-                          textStyle: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      )
-                    ],
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 30,
-                      horizontal: 8,
-                    ),
-                  ),
-                );
-              } else if (pollWidget.attachmentMeta.toShowResult! ||
-                  hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LMFeedPollResultScreen(
-                      pollId: pollWidget.attachmentMeta.id ?? '',
-                      pollOptions: pollWidget.attachmentMeta.options ?? [],
-                      selectedOptionId: option.id,
-                    ),
-                  ),
-                );
-              } else {
-                showDialog(
-                  context: context,
-                  builder: (context) => SimpleDialog(
-                    surfaceTintColor: Colors.transparent,
-                    children: [
-                      LMFeedText(
-                        text:
-                            'The results will be visible after the poll has ended.',
-                        style: LMFeedTextStyle(
-                          maxLines: 3,
-                          textAlign: TextAlign.center,
-                          textStyle: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      )
-                    ],
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 30,
-                      horizontal: 8,
-                    ),
-                  ),
-                );
-              }
+              onVoteTextTap(
+                context,
+                pollWidget.attachmentMeta,
+                LMFeedWidgetSource.userFeed,
+                option: option,
+              );
             },
             onSubmit: (options) {
               submitVote(
