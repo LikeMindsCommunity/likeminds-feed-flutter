@@ -473,21 +473,44 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   }
 
   Widget _defPollWidget(LMFeedPoll pollWidget, LMPostViewData postViewData) {
+    Map<String, bool> isVoteEditing = {"value": false};
+    LMAttachmentMetaViewData previousValue =
+        pollWidget.attachmentMeta.copyWith();
     List<String> selectedOptions = [];
     final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
     return ValueListenableBuilder(
         valueListenable: rebuildPollWidget,
         builder: (context, _, __) {
           return LMFeedPoll(
+            isVoteEditing: isVoteEditing["value"]!,
             selectedOption: selectedOptions,
             attachmentMeta: pollWidget.attachmentMeta,
             style: pollWidget.style,
+            onEditVote: (pollData) {
+              isVoteEditing["value"] = true;
+              selectedOptions.clear();
+              selectedOptions.addAll(pollData.options!
+                  .where((element) => element.isSelected)
+                  .map((e) => e.id)
+                  .toList());
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
             onOptionSelect: (optionData) async {
-              if (isPollSubmitted(pollWidget.attachmentMeta.options ?? []))
-                return;
+              if (hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) return;
+              if ((isPollSubmitted(pollWidget.attachmentMeta.options ?? [])) &&
+                  !isVoteEditing["value"]!) return;
               if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
                   pollWidget.attachmentMeta.multiSelectState!)) {
-                submitVote(context, pollWidget.attachmentMeta, [optionData.id], postViewData.id);
+                submitVote(
+                  context,
+                  pollWidget.attachmentMeta,
+                  [optionData.id],
+                  postViewData.id,
+                  isVoteEditing,
+                  previousValue,
+                  rebuildPollWidget,
+                  LMFeedWidgetSource.activityScreen,
+                );
               } else if (selectedOptions.contains(optionData.id)) {
                 selectedOptions.remove(optionData.id);
               } else {
@@ -495,42 +518,164 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               }
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },
-            showSubmitButton: showSubmitButton(pollWidget.attachmentMeta),
+            showSubmitButton: isVoteEditing["value"]! ||
+                showSubmitButton(pollWidget.attachmentMeta),
+            showEditVoteButton: !isVoteEditing["value"]! &&
+                !isInstantPoll(pollWidget.attachmentMeta.pollType) &&
+                !hasPollEnded(pollWidget.attachmentMeta.expiryTime!) &&
+                isPollSubmitted(pollWidget.attachmentMeta.options ?? []),
             showAddOptionButton: showAddOptionButton(pollWidget.attachmentMeta),
             showTick: (option) {
-              return showTick(pollWidget.attachmentMeta, option);
+              return showTick(pollWidget.attachmentMeta, option,
+                  selectedOptions, isVoteEditing["value"]!);
             },
-            timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime),
+            timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime!),
             onAddOptionSubmit: (option) async {
-              await addOption(context, pollWidget, pollWidget.attachmentMeta,
-                  option, postViewData.id, currentUser, rebuildPollWidget);
+              await addOption(
+                context,
+                pollWidget,
+                pollWidget.attachmentMeta,
+                option,
+                postViewData.id,
+                currentUser,
+                rebuildPollWidget,
+                LMFeedWidgetSource.activityScreen,
+              );
               selectedOptions.clear();
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },
             onSubtextTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
+              if (pollWidget.attachmentMeta.isAnonymous ?? false) {
+                showDialog(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                    children: [
+                      LMFeedText(
+                        text:
+                            'This being an anonymous poll, the names of the voters can not be disclosed.',
+                        style: LMFeedTextStyle(
+                          maxLines: 3,
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      )
+                    ],
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 30,
+                      horizontal: 8,
+                    ),
+                  ),
+                );
+              } else if (pollWidget.attachmentMeta.toShowResult! ||
+                  hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
                     builder: (context) => LMFeedPollResultScreen(
-                          pollId: pollWidget.attachmentMeta.id ?? '',
-                          pollOptions: pollWidget.attachmentMeta.options ?? [],
-                        )),
-              );
+                      pollId: pollWidget.attachmentMeta.id ?? '',
+                      pollOptions: pollWidget.attachmentMeta.options ?? [],
+                    ),
+                  ),
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                    children: [
+                      LMFeedText(
+                        text:
+                            'The results will be visible after the poll has ended.',
+                        style: LMFeedTextStyle(
+                          maxLines: 3,
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      )
+                    ],
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 30,
+                      horizontal: 8,
+                    ),
+                  ),
+                );
+              }
             },
             onVoteClick: (option) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LMFeedPollResultScreen(
-                    pollId: pollWidget.attachmentMeta.id ?? '',
-                    pollOptions: pollWidget.attachmentMeta.options ?? [],
-                    selectedOptionId: option.id,
+              if (pollWidget.attachmentMeta.isAnonymous ?? false) {
+                showDialog(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                    children: [
+                      LMFeedText(
+                        text:
+                            'This being an anonymous poll, the names of the voters can not be disclosed.',
+                        style: LMFeedTextStyle(
+                          maxLines: 3,
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      )
+                    ],
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 30,
+                      horizontal: 8,
+                    ),
                   ),
-                ),
-              );
+                );
+              } else if (pollWidget.attachmentMeta.toShowResult! ||
+                  hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LMFeedPollResultScreen(
+                      pollId: pollWidget.attachmentMeta.id ?? '',
+                      pollOptions: pollWidget.attachmentMeta.options ?? [],
+                      selectedOptionId: option.id,
+                    ),
+                  ),
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                    children: [
+                      LMFeedText(
+                        text:
+                            'The results will be visible after the poll has ended.',
+                        style: LMFeedTextStyle(
+                          maxLines: 3,
+                          textAlign: TextAlign.center,
+                          textStyle: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      )
+                    ],
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 30,
+                      horizontal: 8,
+                    ),
+                  ),
+                );
+              }
             },
             onSubmit: (options) {
-              submitVote(context, pollWidget.attachmentMeta, options, postViewData.id);
+              submitVote(
+                context,
+                pollWidget.attachmentMeta,
+                options,
+                postViewData.id,
+                isVoteEditing,
+                previousValue,
+                rebuildPollWidget,
+                LMFeedWidgetSource.activityScreen,
+              );
               selectedOptions.clear();
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },

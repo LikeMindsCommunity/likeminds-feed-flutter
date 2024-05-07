@@ -703,7 +703,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
     return LMFeedButton(
       onTap: onPollSubmit,
       text: LMFeedText(
-        text: 'POST',
+        text: 'DONE',
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 16,

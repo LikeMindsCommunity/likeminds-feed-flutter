@@ -3,21 +3,29 @@ import 'package:intl/intl.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 Future<void> submitVote(
-    BuildContext context,
-    LMAttachmentMetaViewData attachmentMeta,
-    List<String> options,
-    String postId) async {
+  BuildContext context,
+  LMAttachmentMetaViewData attachmentMeta,
+  List<String> options,
+  String postId,
+  Map<String, bool> isVoteEditing,
+  LMAttachmentMetaViewData previousValue,
+  ValueNotifier<bool> rebuildPollWidget,
+  LMFeedWidgetSource source,
+) async {
+  isVoteEditing["value"] = false;
   try {
     if (hasPollEnded(attachmentMeta.expiryTime!)) {
       LMFeedCore.showSnackBar(
         context,
         "Poll ended. Vote can not be submitted now.",
-        LMFeedWidgetSource.universalFeed,
+        source,
       );
+      resetOptions(attachmentMeta, previousValue);
       return;
     }
     if (isPollSubmitted(attachmentMeta.options!) &&
         isInstantPoll(attachmentMeta.pollType!)) {
+      resetOptions(attachmentMeta, previousValue);
       return;
     } else {
       if (isMultiChoicePoll(
@@ -27,8 +35,11 @@ Future<void> submitVote(
           LMFeedCore.showSnackBar(
             context,
             "Please select exactly ${attachmentMeta.multiSelectNo} options",
-            LMFeedWidgetSource.universalFeed,
+            source,
           );
+
+          attachmentMeta = previousValue;
+          resetOptions(attachmentMeta, previousValue);
           return;
         } else if (attachmentMeta.multiSelectState! ==
                 PollMultiSelectState.atLeast &&
@@ -36,8 +47,10 @@ Future<void> submitVote(
           LMFeedCore.showSnackBar(
             context,
             "Please select at least ${attachmentMeta.multiSelectNo} options",
-            LMFeedWidgetSource.universalFeed,
+            source,
           );
+
+          resetOptions(attachmentMeta, previousValue);
           return;
         } else if (attachmentMeta.multiSelectState! ==
                 PollMultiSelectState.atMax &&
@@ -45,25 +58,33 @@ Future<void> submitVote(
           LMFeedCore.showSnackBar(
             context,
             "Please select at most ${attachmentMeta.multiSelectNo} options",
-            LMFeedWidgetSource.universalFeed,
+            source,
           );
+
+          attachmentMeta = previousValue;
+          resetOptions(attachmentMeta, previousValue);
           return;
         }
       }
       int totalVotes = attachmentMeta.options?.fold(0,
               (previousValue, element) => previousValue! + element.voteCount) ??
           0;
-      totalVotes += options.length;
-      for (int i = 0; i < options.length; i++) {
-        int index = attachmentMeta.options!
-            .indexWhere((element) => element.id == options[i]);
-        if (index != -1) {
-          attachmentMeta.options![index].isSelected = true;
-          attachmentMeta.options![index].voteCount++;
-          attachmentMeta.options![index].percentage =
-              (attachmentMeta.options![index].voteCount / totalVotes) * 100;
+      for (int i = 0; i < attachmentMeta.options!.length; i++) {
+        if (options.contains(attachmentMeta.options![i].id)) {
+          attachmentMeta.options![i].isSelected = true;
+          attachmentMeta.options![i].voteCount++;
+          totalVotes++;
+          attachmentMeta.options![i].percentage =
+              (attachmentMeta.options![i].voteCount / totalVotes) * 100;
+        } else if (previousValue.options![i].isSelected) {
+          attachmentMeta.options![i].isSelected = false;
+          attachmentMeta.options![i].voteCount--;
+          totalVotes--;
+          attachmentMeta.options![i].percentage =
+              (attachmentMeta.options![i].voteCount / totalVotes) * 100;
         }
       }
+      rebuildPollWidget.value = !rebuildPollWidget.value;
       SubmitPollVoteRequest request = (SubmitPollVoteRequestBuilder()
             ..pollId(attachmentMeta.id ?? '')
             ..votes([...options]))
@@ -80,12 +101,20 @@ Future<void> submitVote(
                 (attachmentMeta.options![index].voteCount / totalVotes) * 100;
           }
         }
+
+        attachmentMeta = previousValue;
+        resetOptions(attachmentMeta, previousValue);
         LMFeedCore.showSnackBar(
           context,
           response.errorMessage ?? "",
-          LMFeedWidgetSource.universalFeed,
+          source,
         );
       } else {
+        LMFeedCore.showSnackBar(
+          context,
+          "Vote submitted successfully",
+          source,
+        );
         PostDetailRequest postDetailRequest = (PostDetailRequestBuilder()
               ..postId(postId)
               ..pageSize(10)
@@ -150,18 +179,32 @@ Future<void> submitVote(
             (attachmentMeta.options![index].voteCount / totalVotes) * 100;
       }
     }
+
+    attachmentMeta = previousValue;
+    resetOptions(attachmentMeta, previousValue);
     LMFeedCore.showSnackBar(
       context,
       e.toString(),
-      LMFeedWidgetSource.universalFeed,
+      source,
     );
   }
 }
 
+void resetOptions(LMAttachmentMetaViewData attachmentMeta,
+    LMAttachmentMetaViewData previousValue) {
+  attachmentMeta = previousValue;
+}
+
 bool showTick(
-    LMAttachmentMetaViewData attachmentMeta, LMPollOptionViewData option) {
-  if (isPollSubmitted(attachmentMeta.options!)) {
-    return false;
+    LMAttachmentMetaViewData attachmentMeta,
+    LMPollOptionViewData option,
+    List<String> selectedOption,
+    bool isVoteEditing) {
+  // if (isPollSubmitted(attachmentMeta.options!)) {
+  //   return false;
+  // }
+  if (isVoteEditing) {
+    return selectedOption.contains(option.id);
   }
   if ((isMultiChoicePoll(attachmentMeta.multiSelectNo!,
                   attachmentMeta.multiSelectState!) ==
@@ -185,12 +228,15 @@ bool showAddOptionButton(LMAttachmentMetaViewData attachmentMeta) {
       attachmentMeta.allowAddOption! &&
       !hasPollEnded(attachmentMeta.expiryTime) &&
       (isAddOptionAllowedForInstantPoll || isAddOptionAllowedForDeferredPoll)) {
-    return true;
+    if (attachmentMeta.options!.length < 10) return true;
   }
   return false;
 }
 
 bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
+  if (isPollSubmitted(attachmentMeta.options!)) {
+    return false;
+  }
   if ((attachmentMeta.pollType != null &&
           isInstantPoll(attachmentMeta.pollType!) &&
           isPollSubmitted(attachmentMeta.options!)) ||
@@ -205,12 +251,21 @@ bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
 
 Future<void> addOption(
     BuildContext context,
-    LMFeedPoll pollwidget,
+    LMFeedPoll pollWidget,
     LMAttachmentMetaViewData attachmentMeta,
     String option,
     String postId,
     LMUserViewData? currentUser,
-    ValueNotifier<bool> rebuildPostWidget) async {
+    ValueNotifier<bool> rebuildPostWidget,
+    LMFeedWidgetSource source) async {
+  if ((pollWidget.attachmentMeta.options?.length ?? 0) > 10) {
+    LMFeedCore.showSnackBar(
+      context,
+      "You can add maximum 10 options",
+      source,
+    );
+    return;
+  }
   AddPollOptionRequest request = (AddPollOptionRequestBuilder()
         ..pollId(attachmentMeta.id ?? '')
         ..text(option))
@@ -223,17 +278,16 @@ Future<void> addOption(
         users: {
           currentUser!.uuid: currentUser,
         });
+    attachmentMeta.options!.removeLast();
+    attachmentMeta.options!.add(poll.options!.last);
     LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
         actionType: LMFeedPostActionType.addPollOption,
         postId: postId,
-        pollOption: poll.options));
-    // attachmentMeta.options?.clear();
-    // attachmentMeta.options?.addAll(poll.options ?? []);
-    // rebuildPostWidget.value = !rebuildPostWidget.value;
+        pollOption: attachmentMeta.options));
     LMFeedCore.showSnackBar(
       context,
       "Option added successfully",
-      LMFeedWidgetSource.universalFeed,
+      source,
     );
   }
 }

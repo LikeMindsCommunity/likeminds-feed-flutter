@@ -23,7 +23,7 @@ class LMAttachmentMetaViewData {
   final bool? isAnonymous;
   final bool? allowAddOption;
   final List<LMPollOptionViewData>? options;
-  final bool? toShowResult;
+  bool? toShowResult;
   final String? pollAnswerText;
 
   LMAttachmentMetaViewData._({
@@ -51,6 +51,59 @@ class LMAttachmentMetaViewData {
     this.toShowResult,
     this.pollAnswerText,
   });
+
+  /// copyWith method
+  LMAttachmentMetaViewData copyWith({
+    String? url,
+    String? format,
+    int? size,
+    int? duration,
+    int? pageCount,
+    LMOgTagsViewData? ogTags,
+    double? height,
+    double? width,
+    double? aspectRatio,
+    LMPostViewData? repost,
+    Map<String, dynamic>? meta,
+    String? id,
+    String? pollQuestion,
+    int? expiryTime,
+    List<String>? pollOptions,
+    PollMultiSelectState? multiSelectState,
+    PollType? pollType,
+    int? multiSelectNo,
+    bool? isAnonymous,
+    bool? allowAddOption,
+    List<LMPollOptionViewData>? options,
+    bool? toShowResult,
+    String? pollAnswerText,
+  }) {
+    return LMAttachmentMetaViewData._(
+      url: url ?? this.url,
+      format: format ?? this.format,
+      size: size ?? this.size,
+      duration: duration ?? this.duration,
+      pageCount: pageCount ?? this.pageCount,
+      ogTags: ogTags ?? this.ogTags,
+      height: height ?? this.height,
+      width: width ?? this.width,
+      aspectRatio: aspectRatio ?? this.aspectRatio,
+      meta: meta ?? this.meta,
+      repost: repost ?? this.repost,
+      id: id ?? this.id,
+      pollQuestion: pollQuestion ?? this.pollQuestion,
+      expiryTime: expiryTime ?? this.expiryTime,
+      pollOptions: pollOptions ?? this.pollOptions,
+      multiSelectState: multiSelectState ?? this.multiSelectState,
+      pollType: pollType ?? this.pollType,
+      multiSelectNo: multiSelectNo ?? this.multiSelectNo,
+      isAnonymous: isAnonymous ?? this.isAnonymous,
+      allowAddOption: allowAddOption ?? this.allowAddOption,
+      options: options ?? this.options,
+      toShowResult: toShowResult ?? this.toShowResult,
+      pollAnswerText: pollAnswerText ?? this.pollAnswerText,
+    );
+  }
 
   @override
   String toString() {

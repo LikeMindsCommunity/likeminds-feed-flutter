@@ -63,10 +63,11 @@ class LMFeedPostUtils {
       case (LMFeedPostActionType.addPollOption ||
             LMFeedPostActionType.addPollOptionError):
         {
-          if (pollOptions != null) {
+          if (pollOptions != null) { 
+            final options = [...pollOptions];
             postViewData.attachments!.first.attachmentMeta.options?.clear();
             postViewData.attachments!.first.attachmentMeta.options
-                ?.addAll(pollOptions);
+                ?.addAll(options);
           }
           break;
         }

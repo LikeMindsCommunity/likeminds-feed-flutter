@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:media_kit/media_kit.dart';
 
 class LMFeedPollResultScreen extends StatefulWidget {
   const LMFeedPollResultScreen({
@@ -103,7 +101,6 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
                     curve: Curves.easeInOut);
               },
               controller: _tabController,
-              isScrollable: true,
               dividerColor: theme.primaryColor,
               indicatorColor: theme.primaryColor,
               indicatorWeight: 4,
@@ -144,35 +141,6 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
                 itemBuilder: (context, index) {
                   return _defListView(widget.pollOptions[index]);
                 },
-                // children: [
-                //   for (var option in widget.pollOptions)
-                //     option.voteCount < 0
-                //         ? Center(
-                //             child: Column(
-                //             mainAxisAlignment: MainAxisAlignment.center,
-                //             children: [
-                //               LMFeedIcon(
-                //                 style: LMFeedIconStyle(size: 100),
-                //                 type: LMFeedIconType.png,
-                //                 assetPath: lmNoResponsePng,
-                //               ),
-                //               SizedBox(height: 8),
-                //               LMFeedText(
-                //                 text: 'No Responses',
-                //                 style: LMFeedTextStyle(
-                //                   textStyle: TextStyle(
-                //                     fontSize: 14,
-                //                     fontWeight: FontWeight.w500,
-                //                   ),
-                //                 ),
-                //               )
-                //             ],
-                //           ))
-                //         : _defListView(
-                //             option,
-                // ),
-
-                // ],
               ),
             )
           ],

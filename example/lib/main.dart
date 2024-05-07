@@ -39,9 +39,10 @@ void main() async {
     domain: "feedsx://www.feedsx.com/",
     scaffoldMessengerKey: rootScaffoldMessengerKey,
     config: LMFeedConfig(
-        composeConfig: const LMFeedComposeScreenConfig(
-      enablePolls: true,
-    )),
+      composeConfig: const LMFeedComposeScreenConfig(
+        enablePolls: true,
+      ),
+    ),
   );
 
   SystemChrome.setPreferredOrientations([

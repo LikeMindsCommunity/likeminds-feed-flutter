@@ -18,3 +18,7 @@ export 'post/edit_post_screen.dart';
 
 export 'feedroom/feedroom_list_screen.dart';
 export 'feedroom/feedroom_screen.dart' hide LMFeedTopicSelectionWidgetType;
+
+export 'poll/create_poll_screen.dart';
+export 'poll/poll_result_screen.dart';
+export 'poll/handler/poll_handler.dart';

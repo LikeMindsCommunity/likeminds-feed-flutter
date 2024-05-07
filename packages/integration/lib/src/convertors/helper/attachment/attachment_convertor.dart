@@ -1,6 +1,5 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/attachment_meta_convertor.dart';
-import 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/poll_option_convertor.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/helper/og_tag_convertor.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
