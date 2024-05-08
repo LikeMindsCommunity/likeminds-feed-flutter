@@ -37,11 +37,6 @@ void main() async {
   await LMFeedCore.instance.initialize(
     lmFeedClient: lmFeedClient,
     domain: "feedsx://www.feedsx.com/",
-    config: LMFeedConfig(
-      composeConfig: const LMFeedComposeScreenConfig(
-        enablePolls: true,
-      ),
-    ),
   );
 
   SystemChrome.setPreferredOrientations([
