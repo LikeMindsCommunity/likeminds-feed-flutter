@@ -1084,6 +1084,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   selectedOptions, isVoteEditing["value"]!);
             },
             timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime!),
+            onSameOptionAdded: () {
+              LMFeedCore.showSnackBar(
+                context,
+                "Option already exists",
+                LMFeedWidgetSource.universalFeed,
+              );
+            },
             onAddOptionSubmit: (option) async {
               await addOption(
                 context,

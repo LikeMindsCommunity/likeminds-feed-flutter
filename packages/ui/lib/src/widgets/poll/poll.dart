@@ -29,6 +29,7 @@ class LMFeedPoll extends StatefulWidget {
     this.submitButtonBuilder,
     this.subTextBuilder,
     this.pollActionBuilder,
+    this.onSameOptionAdded,
   });
 
   /// [LMattachmentMetaViewData] to be displayed in the poll
@@ -102,6 +103,9 @@ class LMFeedPoll extends StatefulWidget {
 
   /// [Widget Function(BuildContext)] Builder for the subtext
   final Widget Function(BuildContext)? subTextBuilder;
+
+  /// [VoidCallback] error callback to be called when same option is added
+  final VoidCallback? onSameOptionAdded;
 
   @override
   State<LMFeedPoll> createState() => _LMFeedPollState();
@@ -356,7 +360,6 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                       }
                       String text = _addOptionController.text.trim();
                       if (text.isEmpty) {
-                        Navigator.of(context).pop();
                         _addOptionController.clear();
                         return;
                       }
@@ -364,6 +367,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                         if (option.text == text) {
                           Navigator.of(context).pop();
                           _addOptionController.clear();
+                          widget.onSameOptionAdded?.call();
                           return;
                         }
                       }

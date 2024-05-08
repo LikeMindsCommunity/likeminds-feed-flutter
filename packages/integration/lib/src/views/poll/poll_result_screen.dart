@@ -243,6 +243,7 @@ class UserTile extends StatelessWidget {
           ? const DeletedLikesTile()
           : LMFeedUserTile(
               user: user!,
+              subtitle: SizedBox.shrink(),
               style: const LMFeedTileStyle(
                 padding: EdgeInsets.only(
                   left: 16.0,

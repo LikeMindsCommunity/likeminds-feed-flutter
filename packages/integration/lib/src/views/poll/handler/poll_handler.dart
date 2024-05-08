@@ -12,7 +12,6 @@ Future<void> submitVote(
   ValueNotifier<bool> rebuildPollWidget,
   LMFeedWidgetSource source,
 ) async {
-  isVoteEditing["value"] = false;
   try {
     if (hasPollEnded(attachmentMeta.expiryTime!)) {
       LMFeedCore.showSnackBar(
@@ -37,9 +36,8 @@ Future<void> submitVote(
             "Please select exactly ${attachmentMeta.multiSelectNo} options",
             source,
           );
-
-          attachmentMeta = previousValue;
-          resetOptions(attachmentMeta, previousValue);
+          rebuildPollWidget.value = !rebuildPollWidget.value;
+          // resetOptions(attachmentMeta, previousValue);
           return;
         } else if (attachmentMeta.multiSelectState! ==
                 PollMultiSelectState.atLeast &&
@@ -49,8 +47,6 @@ Future<void> submitVote(
             "Please select at least ${attachmentMeta.multiSelectNo} options",
             source,
           );
-
-          resetOptions(attachmentMeta, previousValue);
           return;
         } else if (attachmentMeta.multiSelectState! ==
                 PollMultiSelectState.atMax &&
@@ -60,12 +56,10 @@ Future<void> submitVote(
             "Please select at most ${attachmentMeta.multiSelectNo} options",
             source,
           );
-
-          attachmentMeta = previousValue;
-          resetOptions(attachmentMeta, previousValue);
           return;
         }
       }
+      isVoteEditing["value"] = false;
       int totalVotes = attachmentMeta.options?.fold(0,
               (previousValue, element) => previousValue! + element.voteCount) ??
           0;
