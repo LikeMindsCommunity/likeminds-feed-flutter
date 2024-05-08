@@ -18,10 +18,12 @@ class LMFeedPostUtils {
     return LMFeedPluralize.instance.pluralizeOrCapitalize(commentTitle, action);
   }
 
-  static LMPostViewData updatePostData(
-      {required LMPostViewData postViewData,
-      required LMFeedPostActionType actionType,
-      String? commentId}) {
+  static LMPostViewData updatePostData({
+    required LMPostViewData postViewData,
+    required LMFeedPostActionType actionType,
+    String? commentId,
+    List<LMPollOptionViewData>? pollOptions,
+  }) {
     switch (actionType) {
       case (LMFeedPostActionType.like || LMFeedPostActionType.unlike):
         {
@@ -53,6 +55,22 @@ class LMFeedPostUtils {
       case (LMFeedPostActionType.saved || LMFeedPostActionType.unsaved):
         postViewData.isSaved = !postViewData.isSaved;
         break;
+      case (LMFeedPostActionType.pollSubmit ||
+            LMFeedPostActionType.pollSubmitError):
+        {
+          return postViewData;
+        }
+      case (LMFeedPostActionType.addPollOption ||
+            LMFeedPostActionType.addPollOptionError):
+        {
+          if (pollOptions != null) { 
+            final options = [...pollOptions];
+            postViewData.attachments!.first.attachmentMeta.options?.clear();
+            postViewData.attachments!.first.attachmentMeta.options
+                ?.addAll(options);
+          }
+          break;
+        }
       default:
         break;
     }
@@ -89,6 +107,12 @@ class LMFeedPostUtils {
         break;
       case 4: // Link
         postTypeString = "link";
+        break;
+      case 6: // Poll
+        postTypeString = "poll";
+        break;
+      case 8: // Repost
+        postTypeString = "repost";
         break;
       default:
         postTypeString = "text";
@@ -267,6 +291,7 @@ class LMFeedPostUtils {
               ..attachments(activity.activityEntityData.attachments
                       ?.map((e) => LMAttachmentViewDataConvertor.fromAttachment(
                             attachment: e,
+                            users: users,
                           ))
                       .toList() ??
                   [])

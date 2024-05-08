@@ -58,4 +58,8 @@ enum LMFeedPostActionType {
   pinned,
   unpinned,
   edited,
+  pollSubmit,
+  pollSubmitError,
+  addPollOption,
+  addPollOptionError,
 }

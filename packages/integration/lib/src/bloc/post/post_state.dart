@@ -112,6 +112,7 @@ class LMFeedPostUpdateState extends LMFeedPostState {
   final String postId;
   final String? commentId;
   final LMFeedWidgetSource? source;
+  final List<LMPollOptionViewData>? pollOptions;
 
   const LMFeedPostUpdateState({
     this.post,
@@ -119,6 +120,7 @@ class LMFeedPostUpdateState extends LMFeedPostState {
     required this.actionType,
     this.commentId,
     this.source,
+    this.pollOptions,
   });
 
   @override

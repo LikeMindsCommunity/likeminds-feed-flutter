@@ -551,6 +551,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       attachments: post.attachments!,
       postId: post.id,
       style: theme.mediaStyle,
+      pollBuilder: (pollWidget) => _defPollWidget(pollWidget, post),
       onMediaTap: () async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
@@ -567,6 +568,118 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
     );
+  }
+
+  Widget _defPollWidget(LMFeedPoll pollWidget, LMPostViewData postViewData) {
+    Map<String, bool> isVoteEditing = {"value": false};
+    LMAttachmentMetaViewData previousValue =
+        pollWidget.attachmentMeta.copyWith();
+    List<String> selectedOptions = [];
+    final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
+    return ValueListenableBuilder(
+        valueListenable: rebuildPollWidget,
+        builder: (context, _, __) {
+          return LMFeedPoll(
+            isVoteEditing: isVoteEditing["value"]!,
+            selectedOption: selectedOptions,
+            attachmentMeta: pollWidget.attachmentMeta,
+            style: pollWidget.style,
+            onEditVote: (pollData) {
+              isVoteEditing["value"] = true;
+              selectedOptions.clear();
+              selectedOptions.addAll(pollData.options!
+                  .where((element) => element.isSelected)
+                  .map((e) => e.id)
+                  .toList());
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            onOptionSelect: (optionData) async {
+              if (hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) {
+                LMFeedCore.showSnackBar(
+                  context,
+                  "Poll ended. Vote can not be submitted now.",
+                  LMFeedWidgetSource.universalFeed,
+                );
+                return;
+              }
+              if ((isPollSubmitted(pollWidget.attachmentMeta.options ?? [])) &&
+                  !isVoteEditing["value"]!) return;
+              if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
+                  pollWidget.attachmentMeta.multiSelectState!)) {
+                submitVote(
+                  context,
+                  pollWidget.attachmentMeta,
+                  [optionData.id],
+                  postViewData.id,
+                  isVoteEditing,
+                  previousValue,
+                  rebuildPollWidget,
+                  LMFeedWidgetSource.searchScreen,
+                );
+              } else if (selectedOptions.contains(optionData.id)) {
+                selectedOptions.remove(optionData.id);
+              } else {
+                selectedOptions.add(optionData.id);
+              }
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            showSubmitButton: isVoteEditing["value"]! ||
+                showSubmitButton(pollWidget.attachmentMeta),
+            showEditVoteButton: !isVoteEditing["value"]! &&
+                !isInstantPoll(pollWidget.attachmentMeta.pollType) &&
+                !hasPollEnded(pollWidget.attachmentMeta.expiryTime!) &&
+                isPollSubmitted(pollWidget.attachmentMeta.options ?? []),
+            showAddOptionButton: showAddOptionButton(pollWidget.attachmentMeta),
+            showTick: (option) {
+              return showTick(pollWidget.attachmentMeta, option,
+                  selectedOptions, isVoteEditing["value"]!);
+            },
+            timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime!),
+            onAddOptionSubmit: (option) async {
+              await addOption(
+                context,
+                pollWidget,
+                pollWidget.attachmentMeta,
+                option,
+                postViewData.id,
+                currentUser,
+                rebuildPollWidget,
+                LMFeedWidgetSource.searchScreen,
+              );
+              selectedOptions.clear();
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+            onSubtextTap: () {
+              onVoteTextTap(
+                context,
+                pollWidget.attachmentMeta,
+                LMFeedWidgetSource.searchScreen,
+              );
+            },
+            onVoteClick: (option) {
+              onVoteTextTap(
+                context,
+                pollWidget.attachmentMeta,
+                LMFeedWidgetSource.searchScreen,
+                option: option,
+              );
+            },
+            onSubmit: (options) {
+              submitVote(
+                context,
+                pollWidget.attachmentMeta,
+                options,
+                postViewData.id,
+                isVoteEditing,
+                previousValue,
+                rebuildPollWidget,
+                LMFeedWidgetSource.searchScreen,
+              );
+              selectedOptions.clear();
+              rebuildPollWidget.value = !rebuildPollWidget.value;
+            },
+          );
+        });
   }
 
   LMFeedButton defLikeButton(LMPostViewData postViewData) => LMFeedButton(

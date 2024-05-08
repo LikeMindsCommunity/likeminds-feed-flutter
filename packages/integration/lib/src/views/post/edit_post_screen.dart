@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// {@template lm_feed_edit_post_screen}
@@ -132,6 +133,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         composeBloc.documentCount++;
       } else if (media.mediaType == LMMediaType.image) {
         composeBloc.imageCount++;
+      } else if (media.mediaType == LMMediaType.poll) {
+        composeBloc.isPollAdded = true;
       }
     }
 
@@ -416,7 +419,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         style: const TextStyle(),
         child: AlertDialog(
           backgroundColor: feedTheme.container,
-          title: Text('Discard $postTitleFirstCap'),
+          title: Text('Discard Changes'),
           content: Text(
               'Are you sure you want to discard the current $postTitleSmallCap?'),
           actionsAlignment: MainAxisAlignment.center,
@@ -479,6 +482,26 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         }
 
         if (composeBloc.postMedia.isNotEmpty) {
+          if (composeBloc.isPollAdded) {
+            return LMFeedPoll(
+              style: LMFeedPollStyle.composable(),
+              attachmentMeta:
+                  composeBloc.postMedia.first.attachmentMetaViewData!,
+              subTextBuilder: (context) {
+                return LMFeedText(
+                  text: getFormattedDateTime(composeBloc
+                      .postMedia.first.attachmentMetaViewData!.expiryTime!),
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      color: feedTheme.onContainer.withOpacity(0.5),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                );
+              },
+            );
+          }
           if (composeBloc.postMedia.first.mediaType == LMMediaType.repost) {
             return Padding(
               padding: const EdgeInsets.only(right: 16.0),

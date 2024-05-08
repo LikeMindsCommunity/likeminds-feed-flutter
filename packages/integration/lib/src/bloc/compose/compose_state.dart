@@ -69,3 +69,8 @@ class LMFeedComposeRemovedAttachmentState extends LMFeedComposeState {
   @override
   List<Object> get props => [identityHashCode(this)];
 }
+
+class LMFeedComposeAddedPollState extends LMFeedComposeState {
+  @override
+  List<Object> get props => [identityHashCode(this)];
+}

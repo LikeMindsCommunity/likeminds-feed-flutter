@@ -67,6 +67,12 @@ typedef LMFeedImageBuilder = Widget Function(LMFeedImage);
 /// {@endtemplate}
 typedef LMFeedVideoBuilder = Widget Function(LMFeedVideo);
 
+/// {@template feed_poll_builder}
+/// Builder function to build the poll widget.
+/// must return a widget, takes in [LMFeedPoll] as params
+/// {@endtemplate}
+typedef LMFeedPollBuilder = Widget Function(LMFeedPoll);
+
 /// {@template feed_carousel_indicator_builder}
 /// Builder function to build the carousel indicator widget.
 /// must return a widget, takes in [int] as params
