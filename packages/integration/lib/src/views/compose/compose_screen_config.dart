@@ -32,6 +32,7 @@ class LMFeedComposeScreenConfig {
     this.enableTagging = true,
     this.enableTopics = true,
     this.enableVideos = true,
+    this.enablePolls = true,
     this.enableHeading = false,
     this.topicRequiredToCreatePost = false,
     this.headingRequiredToCreatePost = false,
@@ -94,6 +95,9 @@ class LMFeedComposeScreenConfig {
   /// [bool] to make multiple topics selectable
   final bool multipleTopicsSelectable;
 
+  /// [bool] to enable/disable polls
+  final bool enablePolls;
+
   LMFeedComposeScreenConfig copyWith({
     SystemUiOverlayStyle? composeSystemOverlayStyle,
     String? composeHint,
@@ -103,6 +107,7 @@ class LMFeedComposeScreenConfig {
     bool? enableTagging,
     bool? enableTopics,
     bool? enableVideos,
+    bool? enablePolls,
     bool? topicRequiredToCreatePost,
     LMFeedComposeUserDisplayType? userDisplayType,
     bool? enableHeading,
@@ -121,6 +126,7 @@ class LMFeedComposeScreenConfig {
       enableTagging: enableTagging ?? this.enableTagging,
       enableTopics: enableTopics ?? this.enableTopics,
       enableVideos: enableVideos ?? this.enableVideos,
+      enablePolls: enablePolls ?? this.enablePolls,
       topicRequiredToCreatePost:
           topicRequiredToCreatePost ?? this.topicRequiredToCreatePost,
       enableHeading: enableHeading ?? this.enableHeading,

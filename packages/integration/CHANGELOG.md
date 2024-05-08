@@ -51,3 +51,7 @@ Fixed analytics events and added function for logout
 
 Extended the scope of analytics events
 Fixing minor UI issues
+
+## 1.3.0
+
+Added support for Polls

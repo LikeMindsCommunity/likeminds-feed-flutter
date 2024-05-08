@@ -14,6 +14,7 @@ export 'helper/attachment/attachment_meta_view_data.dart';
 export 'helper/attachment/attachment_view_data.dart';
 export 'helper/tagging/group_tag_view_data.dart';
 export 'helper/tagging/user_tag_view_data.dart';
+export 'helper/attachment/poll_option_view_data.dart';
 
 export 'notification_feed/activity_entity_view_data.dart';
 export 'notification_feed/notification_feed_item_view_data.dart';

@@ -9,6 +9,7 @@ closeComposeEventHandler(
   LMFeedComposeBloc.instance.videoCount = 0;
   LMFeedComposeBloc.instance.userTags = [];
   LMFeedComposeBloc.instance.selectedTopics = [];
+  LMFeedComposeBloc.instance.isPollAdded = false;
   emitter(
     LMFeedComposeInitialState(),
   );

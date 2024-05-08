@@ -4,6 +4,7 @@ export 'package:likeminds_feed_flutter_core/src/convertors/common/popup_menu_con
 export 'package:likeminds_feed_flutter_core/src/convertors/feed/feed_convertor.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/attachment_convertor.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/attachment_meta_convertor.dart';
+export 'package:likeminds_feed_flutter_core/src/convertors/helper/attachment/poll_option_convertor.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/helper/tagging/group_tag_convertor.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/helper/tagging/user_tag_convertor.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/helper/og_tag_convertor.dart';

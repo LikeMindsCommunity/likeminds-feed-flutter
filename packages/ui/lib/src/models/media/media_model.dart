@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 
-enum LMMediaType { none, video, image, document, link, widget, repost }
+enum LMMediaType { none, video, image, document, link, widget, repost, poll }
 
 class LMMediaModel {
   // defines the type of media
@@ -17,6 +17,8 @@ class LMMediaModel {
   Map<String, dynamic>? widgetsMeta; //required for widgets (attachment type 5)
   String? postId; // required for repost (attachment type 8)
   LMPostViewData? post; // required for repost (attachment type 8)
+  LMAttachmentMetaViewData?
+      attachmentMetaViewData; // required for poll (attachment type 6)
 
   LMMediaModel({
     required this.mediaType,
@@ -29,6 +31,7 @@ class LMMediaModel {
     this.widgetsMeta,
     this.postId,
     this.post,
+    this.attachmentMetaViewData,
   });
 
   // convert
@@ -46,6 +49,9 @@ class LMMediaModel {
     }
     if (mediaType == LMMediaType.repost) {
       return 8;
+    }
+    if (mediaType == LMMediaType.poll) {
+      return 6;
     } else {
       throw 'no valid media type provided';
     }
@@ -89,7 +95,11 @@ class LMMediaModel {
       attachmentMetaViewDataBuilder.meta(widgetsMeta!);
     }
 
-    attachmentViewData.attachmentMeta(attachmentMetaViewDataBuilder.build());
+    if (mediaType == LMMediaType.poll && attachmentMetaViewData != null) {
+      attachmentViewData.attachmentMeta(attachmentMetaViewData!);
+    } else {
+      attachmentViewData.attachmentMeta(attachmentMetaViewDataBuilder.build());
+    }
 
     return attachmentViewData.build();
   }
@@ -127,6 +137,9 @@ class LMMediaModel {
     if (attachmentMeta.repost != null) {
       mediaModel.post = attachmentMeta.repost;
     }
+    if (mapIntToMediaType(attachment.attachmentType) == LMMediaType.poll) {
+      mediaModel.attachmentMetaViewData = attachmentMeta;
+    }
 
     return mediaModel;
   }
@@ -145,6 +158,8 @@ LMMediaType mapIntToMediaType(int attachmentType) {
     return LMMediaType.widget;
   } else if (attachmentType == 8) {
     return LMMediaType.repost;
+  } else if (attachmentType == 6) {
+    return LMMediaType.poll;
   } else {
     return LMMediaType.none;
   }
