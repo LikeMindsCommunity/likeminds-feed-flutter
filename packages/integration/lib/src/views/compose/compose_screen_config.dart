@@ -32,7 +32,7 @@ class LMFeedComposeScreenConfig {
     this.enableTagging = true,
     this.enableTopics = true,
     this.enableVideos = true,
-    this.enablePolls = false,
+    this.enablePolls = true,
     this.enableHeading = false,
     this.topicRequiredToCreatePost = false,
     this.headingRequiredToCreatePost = false,
