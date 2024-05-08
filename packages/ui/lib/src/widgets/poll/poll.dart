@@ -642,7 +642,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
               ),
             ),
           ),
-        LikeMindsTheme.kVerticalPaddingSmall,
+        LikeMindsTheme.kVerticalPaddingMedium,
       ],
     );
   }

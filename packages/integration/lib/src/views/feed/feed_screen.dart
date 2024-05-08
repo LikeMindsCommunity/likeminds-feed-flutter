@@ -408,6 +408,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       '$postTitleFirstCap Created',
                       _widgetSource,
                     );
+                    _scrollToTop();
                   }
                   if (curr is LMFeedEditPostUploadedState) {
                     LMPostViewData? item = curr.postData.copyWith();

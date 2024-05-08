@@ -193,7 +193,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   _showDefaultDiscardDialog(context);
             },
             floatingActionButton: Padding(
-              padding: const EdgeInsets.only(bottom: 42.0, left: 16.0),
+              padding: const EdgeInsets.only(bottom: 30.0, left: 16.0),
               child: BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
                 bloc: composeBloc,
                 buildWhen: (previous, current) {
@@ -221,7 +221,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             body: SafeArea(
               child: Container(
                 margin: EdgeInsets.only(
-                  bottom: 150,
+                  bottom: 100,
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -327,13 +327,13 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 return LMFeedText(
                   text: getFormattedDateTime(composeBloc
                       .postMedia.first.attachmentMetaViewData!.expiryTime!),
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          color: feedTheme.onContainer.withOpacity(0.5),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      color: feedTheme.onContainer.withOpacity(0.5),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                 );
               },
               onCancel: () {

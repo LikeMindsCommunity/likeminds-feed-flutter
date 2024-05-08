@@ -419,7 +419,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         style: const TextStyle(),
         child: AlertDialog(
           backgroundColor: feedTheme.container,
-          title: Text('Discard $postTitleFirstCap'),
+          title: Text('Discard Changes'),
           content: Text(
               'Are you sure you want to discard the current $postTitleSmallCap?'),
           actionsAlignment: MainAxisAlignment.center,
