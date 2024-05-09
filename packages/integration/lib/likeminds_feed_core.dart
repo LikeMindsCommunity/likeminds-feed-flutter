@@ -137,6 +137,27 @@ class LMFeedCore {
     return LMResponse(success: true, data: validateUserResponse);
   }
 
+  Future<LMResponse<InitiateUserResponse>> initiateUser(
+      {required InitiateUserRequest initiateUserRequest}) async {
+    if (initiateUserRequest.apiKey == null &&
+        initiateUserRequest.uuid == null &&
+        initiateUserRequest.userName == null) {
+      return LMResponse(
+          success: false,
+          errorMessage: "ApiKey, UUID and Username are required");
+    } else {
+      InitiateUserResponse initiateUserResponse =
+          await lmFeedClient.initiateUser(initiateUserRequest);
+
+      if (!initiateUserResponse.success) {
+        return LMResponse(
+            success: false, errorMessage: initiateUserResponse.errorMessage);
+      }
+
+      return LMResponse(success: true, data: initiateUserResponse);
+    }
+  }
+
   Future<ValidateUserResponse> validateUser(ValidateUserRequest request) async {
     ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
