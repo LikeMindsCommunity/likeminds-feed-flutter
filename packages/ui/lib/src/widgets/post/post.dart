@@ -272,11 +272,6 @@ class LMFeedPostStyle {
     BorderRadiusGeometry? borderRadius,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
-    LMFeedPostContentStyle? contentStyle,
-    LMFeedPostHeaderStyle? headerStyle,
-    LMFeedPostFooterStyle? footerStyle,
-    LMFeedPostTopicStyle? topicStyle,
-    LMFeedPostMediaStyle? mediaStyle,
     BoxBorder? border,
     Color? backgroundColor,
     LMFeedPostLikesListViewType? likesListType,
@@ -289,6 +284,7 @@ class LMFeedPostStyle {
       margin: margin ?? this.margin,
       border: border ?? this.border,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      
     );
   }
 

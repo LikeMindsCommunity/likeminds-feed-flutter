@@ -13,7 +13,7 @@ addLinkPreviewEventHandler(
     if (composeBloc.imageCount +
             composeBloc.videoCount +
             composeBloc.documentCount >
-        0) {
+        0 || composeBloc.isPollAdded) {
       return;
     }
 
@@ -21,6 +21,7 @@ addLinkPreviewEventHandler(
 
     if (url.isEmpty) {
       emitter(LMFeedComposeInitialState());
+      return;
     }
 
     DecodeUrlRequest request = (DecodeUrlRequestBuilder()..url(url)).build();

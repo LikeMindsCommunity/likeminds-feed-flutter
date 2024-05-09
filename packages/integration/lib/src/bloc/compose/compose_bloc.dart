@@ -10,6 +10,7 @@ import 'package:equatable/equatable.dart';
 
 import 'handler/compose_topic_event_handler.dart';
 import 'handler/add_image_event_handler.dart';
+part 'handler/add_poll_event_handler.dart';
 
 part 'compose_event.dart';
 part 'compose_state.dart';
@@ -32,6 +33,8 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
   int imageCount = 0;
   int videoCount = 0;
   int documentCount = 0;
+  // is poll added to the post
+  bool isPollAdded = false;
   // List of media attached to the post
   List<LMMediaModel> postMedia = [];
   // List of user tags added to the post
@@ -46,6 +49,8 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
         emitter,
       ),
     );
+
+    on<LMFeedComposeAddPollEvent>(addPollEventHandler);
     on<LMFeedComposeAddImageEvent>(
       (event, emitter) => addImageEventHandler(
         event,
