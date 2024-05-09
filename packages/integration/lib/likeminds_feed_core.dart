@@ -8,6 +8,7 @@ import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/callbacks/lm_feed_callback.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
@@ -65,15 +66,22 @@ class LMFeedCore {
   LMFeedCore._();
 
   Future<void> initialize({
-    LMFeedClient? lmFeedClient,
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
     LMFeedThemeData? theme,
     Function(LMFeedAnalyticsEventFired)? analyticsListener,
     Function(LMFeedProfileState)? profileListener,
+    LMFeedCoreCallback? lmFeedCallback,
   }) async {
-    this.lmFeedClient = lmFeedClient ?? LMFeedClientBuilder().build();
+    LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
+
+    if (lmFeedCallback != null) {
+      clientBuilder
+          .sdkCallback(LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback));
+    }
+
+    this.lmFeedClient = clientBuilder.build();
 
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();

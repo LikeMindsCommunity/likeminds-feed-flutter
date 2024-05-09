@@ -35,7 +35,7 @@ void main() async {
   // Loading .env file
   await dotenv.load(fileName: ".env");
   await LMFeedCore.instance.initialize(
-    lmFeedClient: lmFeedClient,
+    // lmFeedClient: lmFeedClient,
     domain: "feedsx://www.feedsx.com/",
   );
 
