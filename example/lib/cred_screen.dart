@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:likeminds_feed_sample/app.dart';
 import 'package:likeminds_feed_sample/main.dart';
 import 'package:likeminds_feed_sample/tab_screen.dart';
@@ -263,25 +264,24 @@ class _CredScreenState extends State<CredScreen> {
                     return;
                   }
 
-                  // Call initiateUser
-                  String? accessToken, refreshToken;
+                  String apiKey = dotenv.get('API_KEY');
 
-                  (accessToken, refreshToken) =
-                      await initiateUser(uuid, userName);
+                  LMResponse response = await LMFeedCore.instance
+                      .showFeedWithApiKey(apiKey, uuid, userName);
 
-                  if (accessToken == null || refreshToken == null) {
+                  if (!response.success) {
+                    LMFeedCore.showSnackBar(
+                        context,
+                        response.errorMessage ?? "An error occurred",
+                        LMFeedWidgetSource.other);
+
                     return;
                   }
-
-                  lmFeed = LMSampleApp(
-                    refreshToken: refreshToken,
-                    accessToken: accessToken,
-                  );
 
                   MaterialPageRoute route = MaterialPageRoute(
                     // INIT - Get the LMFeed instance and pass the credentials (if any)
                     builder: (context) => ExampleTabScreen(
-                      feedWidget: lmFeed!,
+                      feedWidget: const LMFeedScreen(),
                       uuid: uuid,
                     ),
                   );
@@ -295,6 +295,21 @@ class _CredScreenState extends State<CredScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Center(child: Text("Submit")),
+                ),
+              ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () async {
+                  LMFeedLocalPreference.instance.clearCache();
+                },
+                child: Container(
+                  width: 200,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(child: Text("Clear Data")),
                 ),
               ),
               const SizedBox(height: 72),

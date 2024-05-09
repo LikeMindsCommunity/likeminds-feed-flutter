@@ -1,5 +1,7 @@
 library likeminds_feed_flutter_core;
 
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/analytics/analytics_bloc.dart';
@@ -114,7 +116,8 @@ class LMFeedCore {
         success: response.success, errorMessage: response.errorMessage);
   }
 
-  Future<LMResponse> showFeed(String? accessToken, String? refreshToken) async {
+  Future<LMResponse> showFeedWithoutApiKey(
+      String? accessToken, String? refreshToken) async {
     String? newAccessToken;
     String? newRefreshToken;
     if (accessToken == null || refreshToken == null) {
@@ -151,7 +154,9 @@ class LMFeedCore {
           ..refreshToken(newRefreshToken!))
         .build();
 
-    ValidateUserResponse validateUserResponse = await newValidateUser(request);
+    ValidateUserResponse validateUserResponse =
+        (await validateUser(request)).data!;
+
     //review left
     if (validateUserResponse.success) {
       await LMFeedLocalPreference.instance
@@ -160,17 +165,13 @@ class LMFeedCore {
         validateUserResponse.user!.sdkClientInfo.uuid,
       );
 
-      MemberStateResponse memberStateResponse = await getMemberState();
-      GetCommunityConfigurationsResponse communityConfigurationsResponse =
-          await getCommunityConfigurations();
+      // Call member state and community configurations
+      // and store them in local preference
+      LMResponse initialiseFeedResponse = await _initialiseFeed();
 
-      if (!memberStateResponse.success) {
+      if (!initialiseFeedResponse.success) {
         return LMResponse(
-            success: false, errorMessage: memberStateResponse.errorMessage);
-      } else if (!communityConfigurationsResponse.success) {
-        return LMResponse(
-            success: false,
-            errorMessage: communityConfigurationsResponse.errorMessage);
+            success: false, errorMessage: initialiseFeedResponse.errorMessage);
       }
     } else {
       return LMResponse(
@@ -180,35 +181,114 @@ class LMFeedCore {
     return LMResponse(success: true, data: validateUserResponse);
   }
 
-  Future<ValidateUserResponse> newValidateUser(
+  Future<LMResponse<ValidateUserResponse>> validateUser(
       ValidateUserRequest request) async {
-    return await lmFeedClient.validateUser(request);
-  }
+    ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
-  Future<LMResponse> initialiseFeed(ValidateUserRequest request) async {
-    ValidateUserResponse validateUserResponse = await validateUser(request);
-    if (validateUserResponse.success) {
-      MemberStateResponse memberStateResponse = await getMemberState();
-      GetCommunityConfigurationsResponse communityConfigurationsResponse =
-          await getCommunityConfigurations();
+    if (response.success) {
+      LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+            ..key(LMFeedStringConstants.instance.accessToken)
+            ..value(request.accessToken))
+          .build());
 
-      if (!memberStateResponse.success) {
-        return LMResponse(
-            success: false, errorMessage: memberStateResponse.errorMessage);
-      } else if (!communityConfigurationsResponse.success) {
-        return LMResponse(
-            success: false,
-            errorMessage: communityConfigurationsResponse.errorMessage);
-      }
+      LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+            ..key(LMFeedStringConstants.instance.refreshToken)
+            ..value(request.refreshToken))
+          .build());
+
+      await LMFeedLocalPreference.instance.storeUserData(response.user!);
+      return LMResponse(success: true, data: response);
     } else {
       return LMResponse(
-          success: false, errorMessage: validateUserResponse.errorMessage);
+          success: false, data: response, errorMessage: response.errorMessage);
     }
-
-    return LMResponse(success: true, data: validateUserResponse);
   }
 
-  Future<LMResponse<InitiateUserResponse>> initiateUser(
+  Future<LMResponse> _initialiseFeed() async {
+    MemberStateResponse memberStateResponse = await _getMemberState();
+    GetCommunityConfigurationsResponse communityConfigurationsResponse =
+        await _getCommunityConfigurations();
+
+    if (!memberStateResponse.success) {
+      return LMResponse(
+          success: false, errorMessage: memberStateResponse.errorMessage);
+    } else if (!communityConfigurationsResponse.success) {
+      return LMResponse(
+          success: false,
+          errorMessage: communityConfigurationsResponse.errorMessage);
+    }
+
+    return LMResponse(success: true);
+  }
+
+  Future<LMResponse> showFeedWithApiKey(
+      String apiKey, String uuid, String userName,
+      {String? imageUrl, String? isGuest}) async {
+    String? newAccessToken;
+    String? newRefreshToken;
+
+    newAccessToken = LMFeedLocalPreference.instance
+        .fetchCache(LMFeedStringConstants.instance.accessToken)
+        ?.value;
+
+    newRefreshToken = LMFeedLocalPreference.instance
+        .fetchCache(LMFeedStringConstants.instance.refreshToken)
+        ?.value;
+
+    if (newAccessToken == null || newRefreshToken == null) {
+      InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
+            ..apiKey(apiKey)
+            ..userName(userName)
+            ..uuid(uuid))
+          .build();
+
+      LMResponse<InitiateUserResponse> initiateUserResponse =
+          await _initiateUser(initiateUserRequest: initiateUserRequest);
+
+      if (initiateUserResponse.success) {
+        LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+              ..key(LMFeedStringConstants.instance.apiKey)
+              ..value(apiKey))
+            .build());
+
+        // Call member state and community configurations
+        // and store them in local preference
+        LMResponse initialiseFeedResponse = await _initialiseFeed();
+
+        if (!initialiseFeedResponse.success) {
+          return LMResponse(
+              success: false,
+              errorMessage: initialiseFeedResponse.errorMessage);
+        }
+      }
+
+      return initiateUserResponse;
+    } else {
+      ValidateUserRequest request = (ValidateUserRequestBuilder()
+            ..accessToken(newAccessToken)
+            ..refreshToken(newRefreshToken))
+          .build();
+
+      LMResponse<ValidateUserResponse> validateUserResponse =
+          await validateUser(request);
+
+      if (validateUserResponse.success) {
+        // Call member state and community configurations
+        // and store them in local preference
+        LMResponse initialiseFeedResponse = await _initialiseFeed();
+
+        if (!initialiseFeedResponse.success) {
+          return LMResponse(
+              success: false,
+              errorMessage: initialiseFeedResponse.errorMessage);
+        }
+      }
+
+      return validateUserResponse;
+    }
+  }
+
+  Future<LMResponse<InitiateUserResponse>> _initiateUser(
       {required InitiateUserRequest initiateUserRequest}) async {
     if (initiateUserRequest.apiKey == null &&
         initiateUserRequest.uuid == null &&
@@ -240,26 +320,16 @@ class LMFeedCore {
               ..key(LMFeedStringConstants.instance.refreshToken)
               ..value(refreshToken))
             .build());
+
+        await LMFeedLocalPreference.instance
+            .storeUserData(initiateUserResponse.user!);
+
         return LMResponse(success: true, data: initiateUserResponse);
       }
     }
   }
 
-  Future<ValidateUserResponse> validateUser(ValidateUserRequest request) async {
-    ValidateUserResponse response = await lmFeedClient.validateUser(request);
-
-    await LMFeedLocalPreference.instance.clearUserData();
-    if (response.success) {
-      await LMFeedLocalPreference.instance.storeUserData(response.user!);
-      LMNotificationHandler.instance.registerDevice(
-        response.user!.sdkClientInfo.uuid,
-      );
-    }
-
-    return response;
-  }
-
-  Future<MemberStateResponse> getMemberState() async {
+  Future<MemberStateResponse> _getMemberState() async {
     MemberStateResponse response = await lmFeedClient.getMemberState();
     await LMFeedLocalPreference.instance.clearMemberState();
 
@@ -271,7 +341,7 @@ class LMFeedCore {
   }
 
   Future<GetCommunityConfigurationsResponse>
-      getCommunityConfigurations() async {
+      _getCommunityConfigurations() async {
     GetCommunityConfigurationsResponse response =
         await lmFeedClient.getCommunityConfigurations();
     await LMFeedLocalPreference.instance.clearCommunityConfiguration();
@@ -292,31 +362,6 @@ class LMFeedCore {
 
     return response;
   }
-
-  // Future<LMResponse<UpdateTokenRequest>> getNewTokens() async {
-  //   LMResponse response = LMFeedPersistence.instance
-  //       .getCache(LMFeedStringConstants.instance.apiKey);
-  //   if (response.success && response.data != null) {
-
-  //   } else {
-  //     if (sdkCallback == null || sdkCallback?.onRefreshTokenExpired == null) {
-  //       LMResponse(
-  //           success: false,
-  //           errorMessage:
-  //               "onRefreshTokenExpired is not implemented in LMFeedCallback");
-  //     }
-  //     UpdateTokenRequest? request =
-  //         await this.sdkCallback?.onRefreshTokenExpired.call();
-  //     if (request == null) {
-  //       return LMResponse(
-  //           success: false,
-  //           errorMessage:
-  //               "onRefreshTokenExpired is not implemented in LMFeedCallback");
-  //     }
-
-  //     return LMResponse(success: true, data: request)
-  //   }
-  // }
 }
 
 class LMFeedConfig {

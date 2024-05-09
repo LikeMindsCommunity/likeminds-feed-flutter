@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
@@ -41,6 +42,9 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
         .fetchCache(LMFeedStringConstants.instance.apiKey)
         ?.value as String?;
 
+    debugPrint(
+        "This is print ////// \n\n\n\n\n ////////// this is new ///////\n/////\n////\n/////");
+
     if (apiKey != null) {
       LMUserViewData? userViewData =
           LMFeedLocalPreference.instance.fetchUserData();
@@ -49,21 +53,15 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
         throw Exception("User data not found");
       }
 
-      InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
-            ..apiKey(apiKey)
-            ..isGuest(false)
-            ..userName(userViewData.name)
-            ..uuid(userViewData.sdkClientInfo.uuid))
-          .build();
-
-      LMResponse<InitiateUserResponse> initiateUserRes = await LMFeedCore
-          .instance
-          .initiateUser(initiateUserRequest: initiateUserRequest);
+      LMResponse initiateUserRes = await LMFeedCore.instance.showFeedWithApiKey(
+          apiKey, userViewData.sdkClientInfo.uuid, userViewData.name);
 
       if (initiateUserRes.success) {
+        InitiateUserResponse initiateUserResponse =
+            initiateUserRes.data as InitiateUserResponse;
         return (UpdateTokenRequestBuilder()
-              ..accessToken(initiateUserRes.data!.accessToken!)
-              ..refreshToken(initiateUserRes.data!.refreshToken!))
+              ..accessToken(initiateUserResponse.accessToken!)
+              ..refreshToken(initiateUserResponse.refreshToken!))
             .build();
       } else {
         throw Exception(initiateUserRes.errorMessage);
