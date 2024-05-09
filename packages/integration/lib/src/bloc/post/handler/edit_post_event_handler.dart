@@ -124,7 +124,7 @@ void editPostEventHandler(
     }
   } on Exception catch (err, stacktrace) {
     // If an exception occurs, log the exception and stacktrace
-    LMFeedLogger.instance.handleException(err, stacktrace);
+    LMFeedPersistence.instance.handleException(err, stacktrace);
     // Emit [LMFeedNewPostErrorState] with the error message
     emit(
       const LMFeedNewPostErrorState(

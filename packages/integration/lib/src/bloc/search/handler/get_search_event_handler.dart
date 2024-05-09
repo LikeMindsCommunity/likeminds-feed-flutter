@@ -68,7 +68,7 @@ Future<void> getSearchEventHandler(
           message: searchResponse.errorMessage ?? 'An error occurred.'));
     }
   } on Exception catch (e, stackTrace) {
-    LMFeedLogger.instance.handleException(e, stackTrace);
+    LMFeedPersistence.instance.handleException(e, stackTrace);
     emit(LMFeedSearchErrorState(message: e.toString()));
   }
 }

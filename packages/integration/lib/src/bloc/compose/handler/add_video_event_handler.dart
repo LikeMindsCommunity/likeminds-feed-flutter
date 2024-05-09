@@ -55,7 +55,7 @@ addVideoEventHandler(
         emitter(LMFeedComposeMediaErrorState(error: videos.errorMessage));
       }
     } on Exception catch (err, stacktrace) {
-      LMFeedLogger.instance.handleException(err, stacktrace);
+      LMFeedPersistence.instance.handleException(err, stacktrace);
 
       emitter(LMFeedComposeMediaErrorState());
     }
