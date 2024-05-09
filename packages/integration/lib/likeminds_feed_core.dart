@@ -7,10 +7,8 @@ import 'package:likeminds_feed_flutter_core/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/callbacks/lm_feed_callback.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
+
+import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
@@ -33,6 +31,7 @@ export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
+  LMSDKCallbackImplementation? sdkCallback;
   LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
 
   /// This is the domain of the client. This is used to show
@@ -77,8 +76,9 @@ class LMFeedCore {
     LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
 
     if (lmFeedCallback != null) {
-      clientBuilder
-          .sdkCallback(LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback));
+      this.sdkCallback =
+          LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
+      clientBuilder.sdkCallback(this.sdkCallback);
     }
 
     this.lmFeedClient = clientBuilder.build();
@@ -112,6 +112,77 @@ class LMFeedCore {
         await lmFeedClient.logout(LogoutRequestBuilder().build());
     return LMResponse(
         success: response.success, errorMessage: response.errorMessage);
+  }
+
+  Future<LMResponse> showFeed(String? accessToken, String? refreshToken) async {
+    String? newAccessToken;
+    String? newRefreshToken;
+    if (accessToken == null || refreshToken == null) {
+      newAccessToken = LMFeedLocalPreference.instance
+          .fetchCache(LMFeedStringConstants.instance.accessToken)
+          ?.value;
+
+      newRefreshToken = LMFeedLocalPreference.instance
+          .fetchCache(LMFeedStringConstants.instance.refreshToken)
+          ?.value;
+    } else {
+      newAccessToken = accessToken;
+      newRefreshToken = refreshToken;
+
+      LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+            ..key(LMFeedStringConstants.instance.accessToken)
+            ..value(newAccessToken))
+          .build());
+
+      LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+            ..key(LMFeedStringConstants.instance.refreshToken)
+            ..value(newRefreshToken))
+          .build());
+    }
+
+    if (accessToken == null || refreshToken == null) {
+      return LMResponse(
+          success: false,
+          errorMessage: "Access token and Refresh token are required");
+    }
+
+    ValidateUserRequest request = (ValidateUserRequestBuilder()
+          ..accessToken(newAccessToken!)
+          ..refreshToken(newRefreshToken!))
+        .build();
+
+    ValidateUserResponse validateUserResponse = await newValidateUser(request);
+    //review left
+    if (validateUserResponse.success) {
+      await LMFeedLocalPreference.instance
+          .storeUserData(validateUserResponse.user!);
+      LMNotificationHandler.instance.registerDevice(
+        validateUserResponse.user!.sdkClientInfo.uuid,
+      );
+
+      MemberStateResponse memberStateResponse = await getMemberState();
+      GetCommunityConfigurationsResponse communityConfigurationsResponse =
+          await getCommunityConfigurations();
+
+      if (!memberStateResponse.success) {
+        return LMResponse(
+            success: false, errorMessage: memberStateResponse.errorMessage);
+      } else if (!communityConfigurationsResponse.success) {
+        return LMResponse(
+            success: false,
+            errorMessage: communityConfigurationsResponse.errorMessage);
+      }
+    } else {
+      return LMResponse(
+          success: false, errorMessage: validateUserResponse.errorMessage);
+    }
+
+    return LMResponse(success: true, data: validateUserResponse);
+  }
+
+  Future<ValidateUserResponse> newValidateUser(
+      ValidateUserRequest request) async {
+    return await lmFeedClient.validateUser(request);
   }
 
   Future<LMResponse> initialiseFeed(ValidateUserRequest request) async {
@@ -152,9 +223,25 @@ class LMFeedCore {
       if (!initiateUserResponse.success) {
         return LMResponse(
             success: false, errorMessage: initiateUserResponse.errorMessage);
-      }
+      } else {
+        String accessToken = initiateUserResponse.accessToken!;
+        String refreshToken = initiateUserResponse.refreshToken!;
+        LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+              ..key(LMFeedStringConstants.instance.apiKey)
+              ..value(initiateUserRequest.apiKey))
+            .build());
 
-      return LMResponse(success: true, data: initiateUserResponse);
+        LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+              ..key(LMFeedStringConstants.instance.accessToken)
+              ..value(accessToken))
+            .build());
+
+        LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+              ..key(LMFeedStringConstants.instance.refreshToken)
+              ..value(refreshToken))
+            .build());
+        return LMResponse(success: true, data: initiateUserResponse);
+      }
     }
   }
 
@@ -198,12 +285,38 @@ class LMFeedCore {
           LMFeedLocalPreference.instance.storePostVariable(postVar);
           LMFeedLocalPreference.instance.storeCommentVariable(commentVar);
         }
+        LMFeedLocalPreference.instance.storeCommunityConfiguration(conf);
         await LMFeedLocalPreference.instance.storeCommunityConfiguration(conf);
       }
     }
 
     return response;
   }
+
+  // Future<LMResponse<UpdateTokenRequest>> getNewTokens() async {
+  //   LMResponse response = LMFeedPersistence.instance
+  //       .getCache(LMFeedStringConstants.instance.apiKey);
+  //   if (response.success && response.data != null) {
+
+  //   } else {
+  //     if (sdkCallback == null || sdkCallback?.onRefreshTokenExpired == null) {
+  //       LMResponse(
+  //           success: false,
+  //           errorMessage:
+  //               "onRefreshTokenExpired is not implemented in LMFeedCallback");
+  //     }
+  //     UpdateTokenRequest? request =
+  //         await this.sdkCallback?.onRefreshTokenExpired.call();
+  //     if (request == null) {
+  //       return LMResponse(
+  //           success: false,
+  //           errorMessage:
+  //               "onRefreshTokenExpired is not implemented in LMFeedCallback");
+  //     }
+
+  //     return LMResponse(success: true, data: request)
+  //   }
+  // }
 }
 
 class LMFeedConfig {

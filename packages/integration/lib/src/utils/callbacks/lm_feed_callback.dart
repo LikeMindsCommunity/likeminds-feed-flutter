@@ -1,3 +1,4 @@
+import 'package:http/http.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedCoreCallback {
@@ -10,48 +11,76 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
   LMSDKCallbackImplementation({LMFeedCoreCallback? lmFeedCallback})
       : _lmFeedCallback = lmFeedCallback;
   @override
-  void eventFiredCallback(String eventKey, Map<String, dynamic> propertiesMap) {
-    // TODO: implement eventFiredCallback
-  }
+  void eventFiredCallback(
+      String eventKey, Map<String, dynamic> propertiesMap) {}
 
   @override
-  void loginRequiredCallback() {
-    // TODO: implement loginRequiredCallback
-  }
+  void loginRequiredCallback() {}
 
   @override
-  void logoutCallback() {
-    // TODO: implement logoutCallback
-  }
+  void logoutCallback() {}
 
   @override
   void onAccessTokenExpired(String accessToken, String refreshToken) {
-    //TODO: update local preference with new tokens
+    //Redirecting from core to example app
+    LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+          ..key(LMFeedStringConstants.instance.accessToken)
+          ..value(accessToken))
+        .build());
+
+    LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+          ..key(LMFeedStringConstants.instance.refreshToken)
+          ..value(refreshToken))
+        .build());
     _lmFeedCallback?.onAccessTokenExpired?.call(accessToken, refreshToken);
   }
 
   @override
   Future<UpdateTokenRequest> onRefreshTokenExpired() async {
-    //TODO: update local preference with new tokens
-    if("apiKey" == null){
-      if(_lmFeedCallback?.onRefreshTokenExpired == null){
-        throw Exception("onRefreshTokenExpired is not implemented in LMFeedCallback");
+    String? apiKey = LMFeedLocalPreference.instance
+        .fetchCache(LMFeedStringConstants.instance.apiKey)
+        ?.value as String?;
+
+    if (apiKey != null) {
+      LMUserViewData? userViewData =
+          LMFeedLocalPreference.instance.fetchUserData();
+
+      if (userViewData == null) {
+        throw Exception("User data not found");
       }
-      return _lmFeedCallback!.onRefreshTokenExpired!.call();
-    }else{
-      // return UpdateTokenRequestBuilder().apiKey(apiKey!).build();
+
+      InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
+            ..apiKey(apiKey)
+            ..isGuest(false)
+            ..userName(userViewData.name)
+            ..uuid(userViewData.sdkClientInfo.uuid))
+          .build();
+
+      LMResponse<InitiateUserResponse> initiateUserRes = await LMFeedCore
+          .instance
+          .initiateUser(initiateUserRequest: initiateUserRequest);
+
+      if (initiateUserRes.success) {
+        return (UpdateTokenRequestBuilder()
+              ..accessToken(initiateUserRes.data!.accessToken!)
+              ..refreshToken(initiateUserRes.data!.refreshToken!))
+            .build();
+      } else {
+        throw Exception(initiateUserRes.errorMessage);
+      }
+    } else {
+      final onRefreshTokenExpired = _lmFeedCallback?.onRefreshTokenExpired;
+      if (onRefreshTokenExpired == null) {
+        throw Exception("onRefreshTokenExpired callback is not implemented");
+      }
+
+      return onRefreshTokenExpired.call();
     }
-
-    return _lmFeedCallback!.onRefreshTokenExpired!.call();
   }
 
   @override
-  void profileRouteCallback({required String uuid}) {
-    // TODO: implement profileRouteCallback
-  }
+  void profileRouteCallback({required String uuid}) {}
 
   @override
-  void routeToCompanyCallback({required String companyId}) {
-    // TODO: implement routeToCompanyCallback
-  }
+  void routeToCompanyCallback({required String companyId}) {}
 }
