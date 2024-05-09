@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:likeminds_feed_sample/app.dart';
 import 'package:likeminds_feed_sample/main.dart';
-import 'package:likeminds_feed_sample/tab_screen.dart';
-import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
+import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
+import 'package:likeminds_feed_sample/themes/social/screens/tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/utils/utils.dart';
 import 'package:uni_links/uni_links.dart';
@@ -184,10 +185,10 @@ class _CredScreenState extends State<CredScreen> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedCore.theme;
+    // LMFeedThemeData feedTheme = LMFeedCore.theme;
 
     return Scaffold(
-      backgroundColor: feedTheme.primaryColor,
+      backgroundColor: kBackgroundColor,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18.0),
@@ -198,7 +199,6 @@ class _CredScreenState extends State<CredScreen> {
                 "LikeMinds Feed\nSample App",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -207,41 +207,41 @@ class _CredScreenState extends State<CredScreen> {
               const Text(
                 "Enter your credentials",
                 style: TextStyle(
-                  color: Colors.white,
+
                   fontSize: 12,
                 ),
               ),
               const SizedBox(height: 18),
               TextField(
-                cursorColor: Colors.white,
+                // cursorColor: Colors.white,
                 style: const TextStyle(color: Colors.white),
                 controller: _usernameController,
                 decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  focusColor: Colors.white,
+                  // fillColor: Colors.white,
+                  // focusColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
                   labelText: 'Username',
                   labelStyle: const TextStyle(
-                    color: Colors.white,
+                    // color: Colors.white,
                   ),
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
-                cursorColor: Colors.white,
+                // cursorColor: Colors.white,
                 controller: _uuidController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
+                    // fillColor: Colors.white,
+                    // focusColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                     labelText: 'User ID',
                     labelStyle: const TextStyle(
-                      color: Colors.white,
+                      // color: Colors.white,
                     )),
               ),
               const SizedBox(height: 36),
@@ -272,16 +272,19 @@ class _CredScreenState extends State<CredScreen> {
                   if (accessToken == null || refreshToken == null) {
                     return;
                   }
-
-                  lmFeed = LMSampleApp(
-                    refreshToken: refreshToken,
-                    accessToken: accessToken,
+                  await LMFeedQnA.setupFeed(
+                    domain: "qna://www.likeminds-qna.com/",
+                    lmFeedThemeData: qNaTheme,
+                    scaffoldMessengerKey: rootScaffoldMessengerKey,
                   );
 
                   MaterialPageRoute route = MaterialPageRoute(
                     // INIT - Get the LMFeed instance and pass the credentials (if any)
                     builder: (context) => ExampleTabScreen(
-                      feedWidget: lmFeed!,
+                      feedWidget: LMFeedQnA(
+                        accessToken: accessToken,
+                        refreshToken: refreshToken,
+                      ),
                       uuid: uuid,
                     ),
                   );
@@ -291,10 +294,10 @@ class _CredScreenState extends State<CredScreen> {
                   width: 200,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(child: Text("Submit")),
+                  child: const Center(child: Text("Submit", style: TextStyle(color: Colors.white),)),
                 ),
               ),
               const SizedBox(height: 72),
@@ -302,7 +305,7 @@ class _CredScreenState extends State<CredScreen> {
                 "If no credentials are provided, the app will run with the default credentials of Bot user in your community",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
+                  // color: Colors.white,
                   fontSize: 12,
                 ),
               ),
