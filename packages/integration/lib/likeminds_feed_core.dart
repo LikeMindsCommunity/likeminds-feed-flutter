@@ -1,7 +1,5 @@
 library likeminds_feed_flutter_core;
 
-import 'dart:isolate';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/analytics/analytics_bloc.dart';
@@ -76,12 +74,9 @@ class LMFeedCore {
     LMFeedCoreCallback? lmFeedCallback,
   }) async {
     LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
-
-    if (lmFeedCallback != null) {
-      this.sdkCallback =
-          LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
-      clientBuilder.sdkCallback(this.sdkCallback);
-    }
+    this.sdkCallback =
+        LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
+    clientBuilder.sdkCallback(this.sdkCallback);
 
     this.lmFeedClient = clientBuilder.build();
 
@@ -157,7 +152,6 @@ class LMFeedCore {
     ValidateUserResponse validateUserResponse =
         (await validateUser(request)).data!;
 
-    //review left
     if (validateUserResponse.success) {
       await LMFeedLocalPreference.instance
           .storeUserData(validateUserResponse.user!);
@@ -167,7 +161,7 @@ class LMFeedCore {
 
       // Call member state and community configurations
       // and store them in local preference
-      LMResponse initialiseFeedResponse = await _initialiseFeed();
+      LMResponse initialiseFeedResponse = await initialiseFeed();
 
       if (!initialiseFeedResponse.success) {
         return LMResponse(
@@ -204,7 +198,8 @@ class LMFeedCore {
     }
   }
 
-  Future<LMResponse> _initialiseFeed() async {
+  Future<LMResponse> initialiseFeed() async {
+    debugPrint("Initialising feed");
     MemberStateResponse memberStateResponse = await _getMemberState();
     GetCommunityConfigurationsResponse communityConfigurationsResponse =
         await _getCommunityConfigurations();
@@ -239,12 +234,15 @@ class LMFeedCore {
       InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
             ..apiKey(apiKey)
             ..userName(userName)
-            ..uuid(uuid))
+            ..uuid(uuid)
+            ..ltmExpireTime(1)
+            ..rtmExpireTime(2)
+            )
           .build();
 
       LMResponse<InitiateUserResponse> initiateUserResponse =
-          await _initiateUser(initiateUserRequest: initiateUserRequest);
-
+          await initiateUser(initiateUserRequest: initiateUserRequest);
+      debugPrint("Initiate user response: $initiateUserResponse");
       if (initiateUserResponse.success) {
         LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
               ..key(LMFeedStringConstants.instance.apiKey)
@@ -253,7 +251,7 @@ class LMFeedCore {
 
         // Call member state and community configurations
         // and store them in local preference
-        LMResponse initialiseFeedResponse = await _initialiseFeed();
+        LMResponse initialiseFeedResponse = await initialiseFeed();
 
         if (!initialiseFeedResponse.success) {
           return LMResponse(
@@ -275,7 +273,7 @@ class LMFeedCore {
       if (validateUserResponse.success) {
         // Call member state and community configurations
         // and store them in local preference
-        LMResponse initialiseFeedResponse = await _initialiseFeed();
+        LMResponse initialiseFeedResponse = await initialiseFeed();
 
         if (!initialiseFeedResponse.success) {
           return LMResponse(
@@ -288,7 +286,7 @@ class LMFeedCore {
     }
   }
 
-  Future<LMResponse<InitiateUserResponse>> _initiateUser(
+  Future<LMResponse<InitiateUserResponse>> initiateUser(
       {required InitiateUserRequest initiateUserRequest}) async {
     if (initiateUserRequest.apiKey == null &&
         initiateUserRequest.uuid == null &&

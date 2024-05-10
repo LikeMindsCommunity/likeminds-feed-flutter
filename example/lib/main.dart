@@ -8,6 +8,8 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'utils/utils.dart';
+
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
 /// Call [LMNotificationHandler.instance.handleNotification] in this function
@@ -34,6 +36,15 @@ void main() async {
   await dotenv.load(fileName: ".env");
   await LMFeedCore.instance.initialize(
     domain: "feedsx://www.feedsx.com/",
+    lmFeedCallback: LMFeedCoreCallback(
+      onRefreshTokenExpired: () async {
+        final (accessToken, refreshToken) = await initiateUser("abc", "abc");
+        return (UpdateTokenRequestBuilder()
+              ..accessToken(accessToken!)
+              ..refreshToken(refreshToken!))
+            .build();
+      },
+    ),
   );
 
   SystemChrome.setPreferredOrientations([

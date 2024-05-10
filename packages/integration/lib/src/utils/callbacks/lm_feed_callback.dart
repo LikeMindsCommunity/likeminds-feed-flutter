@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedCoreCallback {
   Function(String accessToken, String refreshToken)? onAccessTokenExpired;
   Future<UpdateTokenRequest> Function()? onRefreshTokenExpired;
+
+  LMFeedCoreCallback({
+    this.onAccessTokenExpired,
+    this.onRefreshTokenExpired,
+  });
 }
 
 class LMSDKCallbackImplementation implements LMSDKCallback {
@@ -42,30 +46,57 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
         .fetchCache(LMFeedStringConstants.instance.apiKey)
         ?.value as String?;
 
-    debugPrint(
-        "This is print ////// \n\n\n\n\n ////////// this is new ///////\n/////\n////\n/////");
-
     if (apiKey != null) {
       LMUserViewData? userViewData =
           LMFeedLocalPreference.instance.fetchUserData();
-
       if (userViewData == null) {
         throw Exception("User data not found");
       }
 
-      LMResponse initiateUserRes = await LMFeedCore.instance.showFeedWithApiKey(
-          apiKey, userViewData.sdkClientInfo.uuid, userViewData.name);
+      // LMResponse initiateUserRes = await LMFeedCore.instance.showFeedWithApiKey(
+      //     apiKey, userViewData.sdkClientInfo.uuid, userViewData.name);
+      InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
+            ..apiKey(apiKey)
+            ..userName(userViewData.name)
+            ..uuid(userViewData.sdkClientInfo.uuid)
+            ..ltmExpireTime(1)
+            ..rtmExpireTime(2))
+          .build();
 
-      if (initiateUserRes.success) {
-        InitiateUserResponse initiateUserResponse =
-            initiateUserRes.data as InitiateUserResponse;
+      LMResponse<InitiateUserResponse> initiateUserResponse = await LMFeedCore
+          .instance
+          .initiateUser(initiateUserRequest: initiateUserRequest);
+
+      if (initiateUserResponse.success) {
+        LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
+              ..key(LMFeedStringConstants.instance.apiKey)
+              ..value(apiKey))
+            .build());
+
         return (UpdateTokenRequestBuilder()
-              ..accessToken(initiateUserResponse.accessToken!)
-              ..refreshToken(initiateUserResponse.refreshToken!))
+              ..accessToken(initiateUserResponse.data!.accessToken!)
+              ..refreshToken(initiateUserResponse.data!.refreshToken!))
             .build();
+
+        // Call member state and community configurations
+        // and store them in local preference
+        LMResponse initialiseFeedResponse =
+            await LMFeedCore.instance.initialiseFeed();
+
+        // if (!initialiseFeedResponse.success) {}
       } else {
-        throw Exception(initiateUserRes.errorMessage);
+        throw Exception(initiateUserResponse.errorMessage);
       }
+
+      // if (initiateUserRes.success) {
+      //   InitiateUserResponse initiateUserResponse = initiateUserRes.data;
+      //   return (UpdateTokenRequestBuilder()
+      //         ..accessToken(initiateUserResponse.accessToken!)
+      //         ..refreshToken(initiateUserResponse.refreshToken!))
+      //       .build();
+      // } else {
+      //   throw Exception(initiateUserRes.errorMessage);
+      // }
     } else {
       final onRefreshTokenExpired = _lmFeedCallback?.onRefreshTokenExpired;
       if (onRefreshTokenExpired == null) {

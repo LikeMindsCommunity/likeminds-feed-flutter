@@ -266,8 +266,12 @@ class _CredScreenState extends State<CredScreen> {
 
                   String apiKey = dotenv.get('API_KEY');
 
+                  final (accessToken,refreshToken) = await initiateUser(uuid, userName);
+
                   LMResponse response = await LMFeedCore.instance
-                      .showFeedWithApiKey(apiKey, uuid, userName);
+                      .showFeedWithoutApiKey(accessToken, refreshToken,);
+                  // LMResponse response = await LMFeedCore.instance
+                  //     .showFeedWithApiKey(apiKey, uuid, userName);
 
                   if (!response.success) {
                     LMFeedCore.showSnackBar(
