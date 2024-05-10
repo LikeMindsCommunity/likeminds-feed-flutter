@@ -36,15 +36,6 @@ void main() async {
   await dotenv.load(fileName: ".env");
   await LMFeedCore.instance.initialize(
     domain: "feedsx://www.feedsx.com/",
-    lmFeedCallback: LMFeedCoreCallback(
-      onRefreshTokenExpired: () async {
-        final (accessToken, refreshToken) = await initiateUser("abc", "abc");
-        return (UpdateTokenRequestBuilder()
-              ..accessToken(accessToken!)
-              ..refreshToken(refreshToken!))
-            .build();
-      },
-    ),
   );
 
   SystemChrome.setPreferredOrientations([
