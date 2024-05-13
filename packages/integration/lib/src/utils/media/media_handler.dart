@@ -151,7 +151,7 @@ class LMFeedMediaHandler {
         return LMResponse(success: true, data: videoFiles);
       }
     } on Exception catch (err, stacktrace) {
-      LMFeedLogger.instance.handleException(err, stacktrace);
+      LMFeedPersistence.instance.handleException(err, stacktrace);
       return LMResponse(success: false, errorMessage: 'An error occurred');
     }
   }
@@ -195,7 +195,7 @@ class LMFeedMediaHandler {
         return LMResponse(success: true);
       }
     } on Exception catch (err, stacktrace) {
-      LMFeedLogger.instance.handleException(err, stacktrace);
+      LMFeedPersistence.instance.handleException(err, stacktrace);
 
       return LMResponse(success: false, errorMessage: 'An error occurred');
     }
