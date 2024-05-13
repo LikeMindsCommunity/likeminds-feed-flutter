@@ -17,8 +17,10 @@ class _LMSampleAppState extends State<LMSampleApp> {
   @override
   void initState() {
     super.initState();
-    initialiseFeed = LMFeedCore.instance
-        .showFeedWithoutApiKey(widget.accessToken, widget.refreshToken);
+    initialiseFeed = LMFeedCore.instance.showFeedWithoutApiKey(
+      accessToken: widget.accessToken,
+      refreshToken: widget.refreshToken,
+    );
   }
 
   @override
@@ -48,7 +50,8 @@ class _LMSampleAppState extends State<LMSampleApp> {
                 GestureDetector(
                   onTap: () {
                     initialiseFeed = LMFeedCore.instance.showFeedWithoutApiKey(
-                        widget.accessToken, widget.refreshToken);
+                        accessToken: widget.accessToken,
+                        refreshToken: widget.refreshToken);
                     setState(() {});
                   },
                   child: Container(

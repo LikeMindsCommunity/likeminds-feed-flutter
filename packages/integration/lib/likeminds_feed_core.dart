@@ -118,8 +118,10 @@ class LMFeedCore {
   /// It must be executed before displaying the feed screen or accessing any other [LMFeedCore] widgets or screens.
   /// The [accessToken] and [refreshToken] parameters are required to show the feed screen.
   /// If the [accessToken] and [refreshToken] parameters are not provided, the function will fetch them from the local preference.
-  Future<LMResponse> showFeedWithoutApiKey(
-      String? accessToken, String? refreshToken) async {
+  Future<LMResponse> showFeedWithoutApiKey({
+    String? accessToken,
+    String? refreshToken,
+  }) async {
     String? newAccessToken;
     String? newRefreshToken;
     if (accessToken == null || refreshToken == null) {
@@ -134,26 +136,18 @@ class LMFeedCore {
       newAccessToken = accessToken;
       newRefreshToken = refreshToken;
 
-      LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-            ..key(LMFeedStringConstants.instance.accessToken)
-            ..value(newAccessToken))
-          .build());
-
-      LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-            ..key(LMFeedStringConstants.instance.refreshToken)
-            ..value(newRefreshToken))
-          .build());
+      //TODO remove storing of cache and move it to data layer when validateUser() is success - done
     }
 
-    if (accessToken == null || refreshToken == null) {
+    if (newAccessToken == null || newRefreshToken == null) {
       return LMResponse(
           success: false,
           errorMessage: "Access token and Refresh token are required");
     }
 
     ValidateUserRequest request = (ValidateUserRequestBuilder()
-          ..accessToken(newAccessToken!)
-          ..refreshToken(newRefreshToken!))
+          ..accessToken(newAccessToken)
+          ..refreshToken(newRefreshToken))
         .build();
 
     ValidateUserResponse validateUserResponse =
@@ -169,7 +163,7 @@ class LMFeedCore {
 
       if (!initialiseFeedResponse.success) {
         return LMResponse(
-            success: false, errorMessage: initialiseFeedResponse.errorMessage);
+            success: false, errorMessage: initialiseFeedResponse.errorMessage,);
       }
     } else {
       return LMResponse(
@@ -185,17 +179,7 @@ class LMFeedCore {
     ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
     if (response.success) {
-      await LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-            ..key(LMFeedStringConstants.instance.accessToken)
-            ..value(request.accessToken))
-          .build());
-
-      await LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-            ..key(LMFeedStringConstants.instance.refreshToken)
-            ..value(request.refreshToken))
-          .build());
-      await LMFeedLocalPreference.instance.clearUserData();
-      await LMFeedLocalPreference.instance.storeUserData(response.user!);
+      //TODO can be removed when storing of cache is moved to data layer - done
       return LMResponse(success: true, data: response);
     } else {
       return LMResponse(
@@ -223,10 +207,13 @@ class LMFeedCore {
 
   /// This function is the starting point of the feed.
   /// It must be executed before displaying the feed screen or accessing any other [LMFeedCore] widgets or screens.
-  /// The [apiKey], [uuid], and [userName] parameters are required to show the feed screen.
-  Future<LMResponse> showFeedWithApiKey(
-      String apiKey, String uuid, String userName,
-      {String? imageUrl, String? isGuest}) async {
+  Future<LMResponse> showFeedWithApiKey({
+    required String apiKey,
+    required String uuid,
+    required String userName,
+    String? imageUrl,
+    String? isGuest,
+  }) async {
     String? newAccessToken;
     String? newRefreshToken;
 
@@ -259,34 +246,19 @@ class LMFeedCore {
 
       return initiateUserResponse;
     } else {
-      ValidateUserRequest request = (ValidateUserRequestBuilder()
-            ..accessToken(newAccessToken)
-            ..refreshToken(newRefreshToken))
-          .build();
-
-      LMResponse<ValidateUserResponse> validateUserResponse =
-          await validateUser(request);
-
-      if (validateUserResponse.success) {
-        // Call member state and community configurations and store them in local preference
-        LMResponse initialiseFeedResponse = await initialiseFeed();
-
-        if (!initialiseFeedResponse.success) {
-          return LMResponse(
-              success: false,
-              errorMessage: initialiseFeedResponse.errorMessage);
-        }
-      }
-
-      return validateUserResponse;
+      //TODO call showFeedWithoutAPIKey - done
+      return showFeedWithoutApiKey(
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      );
     }
   }
 
   /// This function is used to initiate a new user session.
   Future<LMResponse<InitiateUserResponse>> initiateUser(
       {required InitiateUserRequest initiateUserRequest}) async {
-    if (initiateUserRequest.apiKey == null &&
-        initiateUserRequest.uuid == null &&
+    if (initiateUserRequest.apiKey == null ||
+        initiateUserRequest.uuid == null ||
         initiateUserRequest.userName == null) {
       return LMResponse(
           success: false,
@@ -299,28 +271,7 @@ class LMFeedCore {
         return LMResponse(
             success: false, errorMessage: initiateUserResponse.errorMessage);
       } else {
-        String accessToken = initiateUserResponse.accessToken!;
-        String refreshToken = initiateUserResponse.refreshToken!;
-        await LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-              ..key(LMFeedStringConstants.instance.apiKey)
-              ..value(initiateUserRequest.apiKey))
-            .build());
-
-        await LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-              ..key(LMFeedStringConstants.instance.accessToken)
-              ..value(accessToken))
-            .build());
-
-        await LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-              ..key(LMFeedStringConstants.instance.refreshToken)
-              ..value(refreshToken))
-            .build());
-
-        await LMFeedLocalPreference.instance.clearUserData();
-
-        await LMFeedLocalPreference.instance
-            .storeUserData(initiateUserResponse.user!);
-
+        //TODO remove storing of cache and move it to data layer when initiateUser() is success - done
         return LMResponse(success: true, data: initiateUserResponse);
       }
     }

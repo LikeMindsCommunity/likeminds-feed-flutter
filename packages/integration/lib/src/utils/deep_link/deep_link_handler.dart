@@ -64,8 +64,10 @@ class LMFeedDeepLinkHandler {
         errorMessage: 'Invalid request, post id should not be null',
       );
     } else {
-      LMResponse response = await LMFeedCore.instance
-          .showFeedWithoutApiKey(request.accessToken, request.refreshToken);
+      LMResponse response = await LMFeedCore.instance.showFeedWithoutApiKey(
+        accessToken: request.accessToken,
+        refreshToken: request.refreshToken,
+      );
       if (response.success) {
         navigatorKey.currentState!.push(
           MaterialPageRoute(
@@ -89,8 +91,10 @@ class LMFeedDeepLinkHandler {
     LMFeedDeepLinkRequest request,
     GlobalKey<NavigatorState> navigatorKey,
   ) async {
-    LMResponse response = await LMFeedCore.instance
-        .showFeedWithoutApiKey(request.accessToken, request.refreshToken);
+    LMResponse response = await LMFeedCore.instance.showFeedWithoutApiKey(
+      accessToken: request.accessToken,
+      refreshToken: request.refreshToken,
+    );
     if (response.success) {
       navigatorKey.currentState!.push(
         MaterialPageRoute(
@@ -124,8 +128,10 @@ class LMFeedDeepLinkHandler {
             'Invalid request, post id and comment id should not be null',
       );
     } else {
-      LMResponse response = await LMFeedCore.instance
-          .showFeedWithoutApiKey(request.accessToken, request.refreshToken);
+      LMResponse response = await LMFeedCore.instance.showFeedWithoutApiKey(
+        accessToken: request.accessToken,
+        refreshToken: request.refreshToken,
+      );
       if (response.success) {
         navigatorKey.currentState!.push(
           MaterialPageRoute(

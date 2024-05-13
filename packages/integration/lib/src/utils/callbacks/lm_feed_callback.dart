@@ -3,7 +3,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 class LMFeedCoreCallback {
   Function(String accessToken, String refreshToken)?
       onAccessTokenExpiredAndRefreshed;
-  Future<UpdateTokenRequest> Function()? onRefreshTokenExpired;
+  Future<LMAuthToken> Function()? onRefreshTokenExpired;
 
   LMFeedCoreCallback({
     this.onAccessTokenExpiredAndRefreshed,
@@ -28,22 +28,22 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
   @override
   void onAccessTokenExpiredAndRefreshed(
       String accessToken, String refreshToken) {
-    //Redirecting from core to example app
+    //TODO can be removed
     LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
           ..key(LMFeedStringConstants.instance.accessToken)
           ..value(accessToken))
         .build());
-
     LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
           ..key(LMFeedStringConstants.instance.refreshToken)
           ..value(refreshToken))
         .build());
+    //Redirecting from core to example app
     _lmFeedCallback?.onAccessTokenExpiredAndRefreshed
         ?.call(accessToken, refreshToken);
   }
 
   @override
-  Future<UpdateTokenRequest> onRefreshTokenExpired() async {
+  Future<LMAuthToken> onRefreshTokenExpired() async {
     String? apiKey = LMFeedLocalPreference.instance
         .fetchCache(LMFeedStringConstants.instance.apiKey)
         ?.value as String?;
@@ -66,7 +66,7 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
           .initiateUser(initiateUserRequest: initiateUserRequest);
 
       if (initiateUserResponse.success) {
-        return (UpdateTokenRequestBuilder()
+        return (LMAuthTokenBuilder()
               ..accessToken(initiateUserResponse.data!.accessToken!)
               ..refreshToken(initiateUserResponse.data!.refreshToken!))
             .build();
