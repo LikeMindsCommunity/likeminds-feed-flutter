@@ -258,7 +258,7 @@ class LMFeedPostMediaStyle {
   final LMFeedPostDocumentStyle documentStyle;
   final LMFeedPostLinkPreviewStyle linkStyle;
   final LMFeedPostCarouselStyle carouselStyle;
-  final LMFeedPollStyle pollStyle;
+  final LMFeedPollStyle? pollStyle;
 
   const LMFeedPostMediaStyle({
     required this.videoStyle,
@@ -266,7 +266,7 @@ class LMFeedPostMediaStyle {
     required this.documentStyle,
     required this.linkStyle,
     required this.carouselStyle,
-    required this.pollStyle,
+    this.pollStyle,
   });
 
   LMFeedPostMediaStyle copyWith({
