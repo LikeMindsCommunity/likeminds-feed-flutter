@@ -55,3 +55,7 @@ Fixing minor UI issues
 ## 1.3.0
 
 Added support for Polls
+
+## 1.4.0
+
+Added api key security
