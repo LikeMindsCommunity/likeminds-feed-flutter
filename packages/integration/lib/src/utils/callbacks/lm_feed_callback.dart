@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedCoreCallback {
-  Function(String accessToken, String refreshToken)? onAccessTokenExpired;
+  Function(String accessToken, String refreshToken)?
+      onAccessTokenExpiredAndRefreshed;
   Future<UpdateTokenRequest> Function()? onRefreshTokenExpired;
 
   LMFeedCoreCallback({
-    this.onAccessTokenExpired,
+    this.onAccessTokenExpiredAndRefreshed,
     this.onRefreshTokenExpired,
   });
 }
@@ -26,7 +26,8 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
   void logoutCallback() {}
 
   @override
-  void onAccessTokenExpired(String accessToken, String refreshToken) {
+  void onAccessTokenExpiredAndRefreshed(
+      String accessToken, String refreshToken) {
     //Redirecting from core to example app
     LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
           ..key(LMFeedStringConstants.instance.accessToken)
@@ -37,7 +38,8 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
           ..key(LMFeedStringConstants.instance.refreshToken)
           ..value(refreshToken))
         .build());
-    _lmFeedCallback?.onAccessTokenExpired?.call(accessToken, refreshToken);
+    _lmFeedCallback?.onAccessTokenExpiredAndRefreshed
+        ?.call(accessToken, refreshToken);
   }
 
   @override
@@ -53,14 +55,10 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
         throw Exception("User data not found");
       }
 
-      // LMResponse initiateUserRes = await LMFeedCore.instance.showFeedWithApiKey(
-      //     apiKey, userViewData.sdkClientInfo.uuid, userViewData.name);
       InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
             ..apiKey(apiKey)
             ..userName(userViewData.name)
-            ..uuid(userViewData.sdkClientInfo.uuid)
-            ..ltmExpireTime(1)
-            ..rtmExpireTime(2))
+            ..uuid(userViewData.sdkClientInfo.uuid))
           .build();
 
       LMResponse<InitiateUserResponse> initiateUserResponse = await LMFeedCore
@@ -68,42 +66,20 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
           .initiateUser(initiateUserRequest: initiateUserRequest);
 
       if (initiateUserResponse.success) {
-        LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-              ..key(LMFeedStringConstants.instance.apiKey)
-              ..value(apiKey))
-            .build());
-
         return (UpdateTokenRequestBuilder()
               ..accessToken(initiateUserResponse.data!.accessToken!)
               ..refreshToken(initiateUserResponse.data!.refreshToken!))
             .build();
-
-        // Call member state and community configurations
-        // and store them in local preference
-        LMResponse initialiseFeedResponse =
-            await LMFeedCore.instance.initialiseFeed();
-
-        // if (!initialiseFeedResponse.success) {}
       } else {
         throw Exception(initiateUserResponse.errorMessage);
       }
-
-      // if (initiateUserRes.success) {
-      //   InitiateUserResponse initiateUserResponse = initiateUserRes.data;
-      //   return (UpdateTokenRequestBuilder()
-      //         ..accessToken(initiateUserResponse.accessToken!)
-      //         ..refreshToken(initiateUserResponse.refreshToken!))
-      //       .build();
-      // } else {
-      //   throw Exception(initiateUserRes.errorMessage);
-      // }
     } else {
       final onRefreshTokenExpired = _lmFeedCallback?.onRefreshTokenExpired;
       if (onRefreshTokenExpired == null) {
         throw Exception("onRefreshTokenExpired callback is not implemented");
       }
 
-      return onRefreshTokenExpired.call();
+      return onRefreshTokenExpired();
     }
   }
 
