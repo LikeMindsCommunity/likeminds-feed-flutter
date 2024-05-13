@@ -7,9 +7,8 @@ import 'package:likeminds_feed_flutter_core/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/builder/widget_utility.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/notification_handler.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/persistence/user_local_preference.dart';
+
+import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
@@ -32,6 +31,7 @@ export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
+  LMSDKCallbackImplementation? sdkCallback;
   LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
 
   /// This is the domain of the client. This is used to show
@@ -65,15 +65,20 @@ class LMFeedCore {
   LMFeedCore._();
 
   Future<void> initialize({
-    LMFeedClient? lmFeedClient,
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
     LMFeedThemeData? theme,
     Function(LMFeedAnalyticsEventFired)? analyticsListener,
     Function(LMFeedProfileState)? profileListener,
+    LMFeedCoreCallback? lmFeedCallback,
   }) async {
-    this.lmFeedClient = lmFeedClient ?? LMFeedClientBuilder().build();
+    LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
+    this.sdkCallback =
+        LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
+    clientBuilder.sdkCallback(this.sdkCallback);
+
+    this.lmFeedClient = clientBuilder.build();
 
     clientDomain = domain;
     feedConfig = config ?? LMFeedConfig();
@@ -99,6 +104,9 @@ class LMFeedCore {
     await LMFeedAnalyticsBloc.instance.close();
   }
 
+  /// This function is used to logout the user session.
+  /// It will clear the user data from the local preference.
+  /// It will also clear the member state and community configurations from the local preference.
   Future<LMResponse> logout() async {
     LogoutResponse response =
         await lmFeedClient.logout(LogoutRequestBuilder().build());
@@ -106,20 +114,56 @@ class LMFeedCore {
         success: response.success, errorMessage: response.errorMessage);
   }
 
-  Future<LMResponse> initialiseFeed(ValidateUserRequest request) async {
-    ValidateUserResponse validateUserResponse = await validateUser(request);
-    if (validateUserResponse.success) {
-      MemberStateResponse memberStateResponse = await getMemberState();
-      GetCommunityConfigurationsResponse communityConfigurationsResponse =
-          await getCommunityConfigurations();
+  /// This function is the starting point of the feed.
+  /// It must be executed before displaying the feed screen or accessing any other [LMFeedCore] widgets or screens.
+  /// The [accessToken] and [refreshToken] parameters are required to show the feed screen.
+  /// If the [accessToken] and [refreshToken] parameters are not provided, the function will fetch them from the local preference.
+  Future<LMResponse> showFeedWithoutApiKey({
+    String? accessToken,
+    String? refreshToken,
+  }) async {
+    String? newAccessToken;
+    String? newRefreshToken;
+    if (accessToken == null || refreshToken == null) {
+      newAccessToken = LMFeedLocalPreference.instance
+          .fetchCache(LMFeedStringConstants.instance.accessToken)
+          ?.value;
 
-      if (!memberStateResponse.success) {
+      newRefreshToken = LMFeedLocalPreference.instance
+          .fetchCache(LMFeedStringConstants.instance.refreshToken)
+          ?.value;
+    } else {
+      newAccessToken = accessToken;
+      newRefreshToken = refreshToken;
+
+      //TODO remove storing of cache and move it to data layer when validateUser() is success - done
+    }
+
+    if (newAccessToken == null || newRefreshToken == null) {
+      return LMResponse(
+          success: false,
+          errorMessage: "Access token and Refresh token are required");
+    }
+
+    ValidateUserRequest request = (ValidateUserRequestBuilder()
+          ..accessToken(newAccessToken)
+          ..refreshToken(newRefreshToken))
+        .build();
+
+    ValidateUserResponse validateUserResponse =
+        (await validateUser(request)).data!;
+
+    if (validateUserResponse.success) {
+      LMNotificationHandler.instance.registerDevice(
+        validateUserResponse.user!.sdkClientInfo.uuid,
+      );
+
+      // Call member state and community configurations and store them in local preference
+      LMResponse initialiseFeedResponse = await initialiseFeed();
+
+      if (!initialiseFeedResponse.success) {
         return LMResponse(
-            success: false, errorMessage: memberStateResponse.errorMessage);
-      } else if (!communityConfigurationsResponse.success) {
-        return LMResponse(
-            success: false,
-            errorMessage: communityConfigurationsResponse.errorMessage);
+            success: false, errorMessage: initialiseFeedResponse.errorMessage,);
       }
     } else {
       return LMResponse(
@@ -129,25 +173,115 @@ class LMFeedCore {
     return LMResponse(success: true, data: validateUserResponse);
   }
 
-  Future<ValidateUserResponse> validateUser(ValidateUserRequest request) async {
+  /// This function is used to validate the user session. using the [accessToken] and [refreshToken] parameters.
+  Future<LMResponse<ValidateUserResponse>> validateUser(
+      ValidateUserRequest request) async {
     ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
-    await LMFeedLocalPreference.instance.clearUserData();
     if (response.success) {
-      await LMFeedLocalPreference.instance.storeUserData(response.user!);
-      LMNotificationHandler.instance.registerDevice(
-        response.user!.sdkClientInfo.uuid,
-      );
+      //TODO can be removed when storing of cache is moved to data layer - done
+      return LMResponse(success: true, data: response);
+    } else {
+      return LMResponse(
+          success: false, data: response, errorMessage: response.errorMessage);
     }
-
-    return response;
   }
 
-  Future<MemberStateResponse> getMemberState() async {
+  /// This function is used to fetch the member state and community configurations.
+  Future<LMResponse> initialiseFeed() async {
+    MemberStateResponse memberStateResponse = await _getMemberState();
+    GetCommunityConfigurationsResponse communityConfigurationsResponse =
+        await _getCommunityConfigurations();
+
+    if (!memberStateResponse.success) {
+      return LMResponse(
+          success: false, errorMessage: memberStateResponse.errorMessage);
+    } else if (!communityConfigurationsResponse.success) {
+      return LMResponse(
+          success: false,
+          errorMessage: communityConfigurationsResponse.errorMessage);
+    }
+
+    return LMResponse(success: true);
+  }
+
+  /// This function is the starting point of the feed.
+  /// It must be executed before displaying the feed screen or accessing any other [LMFeedCore] widgets or screens.
+  Future<LMResponse> showFeedWithApiKey({
+    required String apiKey,
+    required String uuid,
+    required String userName,
+    String? imageUrl,
+    String? isGuest,
+  }) async {
+    String? newAccessToken;
+    String? newRefreshToken;
+
+    newAccessToken = LMFeedLocalPreference.instance
+        .fetchCache(LMFeedStringConstants.instance.accessToken)
+        ?.value;
+
+    newRefreshToken = LMFeedLocalPreference.instance
+        .fetchCache(LMFeedStringConstants.instance.refreshToken)
+        ?.value;
+
+    if (newAccessToken == null || newRefreshToken == null) {
+      InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
+            ..apiKey(apiKey)
+            ..userName(userName)
+            ..uuid(uuid))
+          .build();
+
+      LMResponse<InitiateUserResponse> initiateUserResponse =
+          await initiateUser(initiateUserRequest: initiateUserRequest);
+      if (initiateUserResponse.success) {
+        // Call member state and community configurations and store them in local preference
+        LMResponse initialiseFeedResponse = await initialiseFeed();
+        if (!initialiseFeedResponse.success) {
+          return LMResponse(
+              success: false,
+              errorMessage: initialiseFeedResponse.errorMessage);
+        }
+      }
+
+      return initiateUserResponse;
+    } else {
+      //TODO call showFeedWithoutAPIKey - done
+      return showFeedWithoutApiKey(
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      );
+    }
+  }
+
+  /// This function is used to initiate a new user session.
+  Future<LMResponse<InitiateUserResponse>> initiateUser(
+      {required InitiateUserRequest initiateUserRequest}) async {
+    if (initiateUserRequest.apiKey == null ||
+        initiateUserRequest.uuid == null ||
+        initiateUserRequest.userName == null) {
+      return LMResponse(
+          success: false,
+          errorMessage: "ApiKey, UUID and Username are required");
+    } else {
+      InitiateUserResponse initiateUserResponse =
+          await lmFeedClient.initiateUser(initiateUserRequest);
+
+      if (!initiateUserResponse.success) {
+        return LMResponse(
+            success: false, errorMessage: initiateUserResponse.errorMessage);
+      } else {
+        //TODO remove storing of cache and move it to data layer when initiateUser() is success - done
+        return LMResponse(success: true, data: initiateUserResponse);
+      }
+    }
+  }
+
+  Future<MemberStateResponse> _getMemberState() async {
     MemberStateResponse response = await lmFeedClient.getMemberState();
-    await LMFeedLocalPreference.instance.clearMemberState();
 
     if (response.success) {
+      await LMFeedLocalPreference.instance.clearMemberState();
       await LMFeedLocalPreference.instance.storeMemberState(response);
     }
 
@@ -155,12 +289,12 @@ class LMFeedCore {
   }
 
   Future<GetCommunityConfigurationsResponse>
-      getCommunityConfigurations() async {
+      _getCommunityConfigurations() async {
     GetCommunityConfigurationsResponse response =
         await lmFeedClient.getCommunityConfigurations();
-    await LMFeedLocalPreference.instance.clearCommunityConfiguration();
 
     if (response.success) {
+      await LMFeedLocalPreference.instance.clearCommunityConfiguration();
       for (CommunityConfigurations conf in response.communityConfigurations!) {
         if (conf.type == 'feed_metadata') {
           String postVar = conf.value?['post'] ?? 'Post';

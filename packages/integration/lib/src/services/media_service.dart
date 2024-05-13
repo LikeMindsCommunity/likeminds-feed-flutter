@@ -50,7 +50,7 @@ class LMFeedMediaService {
     } on SimpleS3Errors catch (e, stacktrace) {
       Exception exception = Exception(e.toString());
 
-      LMFeedLogger.instance.handleException(exception, stacktrace);
+      LMFeedPersistence.instance.handleException(exception, stacktrace);
       debugPrint(e.name);
       debugPrint(e.index.toString());
       return null;
