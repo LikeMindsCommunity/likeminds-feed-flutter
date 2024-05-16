@@ -26,3 +26,5 @@ export 'user/user_utils.dart';
 export 'comment/comment_utils.dart';
 
 export '../../packages/pluralize/pluralize.dart';
+
+export './callbacks/lm_feed_callback.dart';

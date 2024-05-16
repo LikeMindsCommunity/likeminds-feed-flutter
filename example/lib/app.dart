@@ -17,21 +17,10 @@ class _LMSampleAppState extends State<LMSampleApp> {
   @override
   void initState() {
     super.initState();
-    callValidateUser();
-  }
-
-  void callValidateUser() {
-    ValidateUserRequestBuilder request = ValidateUserRequestBuilder();
-
-    if (widget.accessToken != null && widget.accessToken!.isNotEmpty) {
-      request.accessToken(widget.accessToken!);
-    }
-
-    if (widget.refreshToken != null && widget.refreshToken!.isNotEmpty) {
-      request.refreshToken(widget.refreshToken!);
-    }
-
-    initialiseFeed = LMFeedCore.instance.initialiseFeed(request.build());
+    initialiseFeed = LMFeedCore.instance.showFeedWithoutApiKey(
+      accessToken: widget.accessToken,
+      refreshToken: widget.refreshToken,
+    );
   }
 
   @override
@@ -60,7 +49,9 @@ class _LMSampleAppState extends State<LMSampleApp> {
                 LikeMindsTheme.kVerticalPaddingLarge,
                 GestureDetector(
                   onTap: () {
-                    callValidateUser();
+                    initialiseFeed = LMFeedCore.instance.showFeedWithoutApiKey(
+                        accessToken: widget.accessToken,
+                        refreshToken: widget.refreshToken);
                     setState(() {});
                   },
                   child: Container(

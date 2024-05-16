@@ -17,6 +17,8 @@ Future<(String?, String?)> initiateUser(String uuid, String userName) async {
       data: {
         'uuid': uuid,
         'user_name': userName,
+        "token_expiry_beta": 1, // minutes
+        "rtm_token_expiry_beta": 2 // minutes
       });
 
   if (response.data['success']) {

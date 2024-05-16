@@ -30,7 +30,7 @@ getUserMetaEventHandler(
       commentsCount: response.commentsCount,
     ));
   } on Exception catch (e, stackTrace) {
-    LMFeedLogger.instance.handleException(e, stackTrace);
+    LMFeedPersistence.instance.handleException(e, stackTrace);
     emit(LMFeedUserMetaErrorState(
       message: e.toString(),
     ));
