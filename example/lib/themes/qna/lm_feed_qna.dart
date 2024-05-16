@@ -6,6 +6,7 @@ import 'package:likeminds_feed_sample/themes/qna/builder/compose/fab_button.dart
 import 'package:likeminds_feed_sample/themes/qna/builder/feed/lm_qna_feed.dart';
 import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
 import 'package:likeminds_feed_sample/themes/qna/screens/onboarding_screen.dart';
+import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/qna_custom_time_stamps.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/utils.dart';
 export 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart'
@@ -28,15 +29,11 @@ class LMFeedQnA extends StatefulWidget {
 
   static Future<void> setupFeed({
     String? domain,
-    LMFeedClient? lmFeedClient,
-    LMFeedWidgetUtility? lmFeedWidgets,
-    LMFeedThemeData? lmFeedThemeData,
-    GlobalKey<ScaffoldMessengerState>? scaffoldMessengerKey,
   }) async {
     await LMFeedCore.instance.initialize(
-      theme: lmFeedThemeData,
+      theme: qNaTheme,
       domain: domain,
-      lmFeedClient: lmFeedClient,
+      // lmFeedClient: lmFeedClient,
       config: LMFeedConfig(
         composeConfig: const LMFeedComposeScreenConfig(
           topicRequiredToCreatePost: true,
@@ -64,22 +61,23 @@ class _LMFeedQnAState extends State<LMFeedQnA> {
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   ValidateUserResponse? validateUserResponse;
   GetUserFeedMetaResponse? userFeedMetaResponse;
-  Future<LMResponse>? initFeed;
+  Future<void>? initFeed;
 
   @override
   void initState() {
     super.initState();
-    initFeed = initialiseFeed();
+    initFeed = initializeFeed();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<LMResponse>(
+      body: FutureBuilder(
         future: initFeed,
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.success) {
-            User user = validateUserResponse!.user!;
+        builder: (context,snapshot) {
+          if(snapshot.connectionState == ConnectionState.done)
+          {User? user = LMFeedPersistence.instance.getUserDB().data;
+          if (user != null) {
             List selectedTopics =
                 userFeedMetaResponse!.userTopics?[user.uuid] ?? [];
             // If the user has not selected any topics, show onboarding screen
@@ -98,13 +96,7 @@ class _LMFeedQnAState extends State<LMFeedQnA> {
                   FloatingActionButtonLocation.centerFloat,
               floatingActionButtonBuilder: qnAFeedCreatePostFABBuilder,
             );
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LMFeedLoader();
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.data?.errorMessage ?? "An error occurred"),
-            );
-          }
+          }}
           return const SizedBox();
         },
       ),
@@ -113,29 +105,29 @@ class _LMFeedQnAState extends State<LMFeedQnA> {
 
   // This functions call the onboarding api and fetch the
   // user topics for fetching the feed
-  Future<LMResponse> initialiseFeed() async {
+  Future<void> initializeFeed() async {
     // create ValidateUserRequest using accessToken and refreshToken passed in the widget
-    ValidateUserRequestBuilder requestBuilder = ValidateUserRequestBuilder();
-    if (widget.accessToken != null) {
-      requestBuilder.accessToken(widget.accessToken!);
-    }
-    if (widget.refreshToken != null) {
-      requestBuilder.refreshToken(widget.refreshToken!);
-    }
+    // ValidateUserRequestBuilder requestBuilder = ValidateUserRequestBuilder();
+    // if (widget.accessToken != null) {
+    //   requestBuilder.accessToken(widget.accessToken!);
+    // }
+    // if (widget.refreshToken != null) {
+    //   requestBuilder.refreshToken(widget.refreshToken!);
+    // }
 
     // call initialise feed to onboard the user
-    LMResponse initialiseFeedResponse =
-        await LMFeedCore.instance.initialiseFeed(requestBuilder.build());
+    // LMResponse initialiseFeedResponse =
+    //     await LMFeedCore.instance.initialiseFeed();
 
     // return the error message in case the api fails
-    if (!initialiseFeedResponse.success) {
-      return LMResponse(
-          success: false,
-          errorMessage:
-              initialiseFeedResponse.errorMessage ?? "An error occured");
-    }
+    // if (!initialiseFeedResponse.success) {
+    //   return LMResponse(
+    //       success: false,
+    //       errorMessage:
+    //           initialiseFeedResponse.errorMessage ?? "An error occured");
+    // }
 
-    validateUserResponse = initialiseFeedResponse.data as ValidateUserResponse?;
+    // validateUserResponse = initialiseFeedResponse.data as ValidateUserResponse?;
 
     // call GetUserMeta api to get user topics
     GetUserFeedMetaResponse getUserFeedMeta =
@@ -143,13 +135,10 @@ class _LMFeedQnAState extends State<LMFeedQnA> {
 
     // return the error message in case the api fails
     if (!getUserFeedMeta.success) {
-      return LMResponse(
-          success: false,
-          errorMessage: getUserFeedMeta.errorMessage ?? "An error occured");
+     
     }
 
     userFeedMetaResponse = getUserFeedMeta;
 
-    return initialiseFeedResponse;
   }
 }

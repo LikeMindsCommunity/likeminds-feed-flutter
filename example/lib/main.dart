@@ -26,25 +26,16 @@ final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  // Loading .env file
-  await dotenv.load(fileName: ".env");
-
   WidgetsFlutterBinding.ensureInitialized();
-
   // Loading .env file
   await dotenv.load(fileName: ".env");
-  await LMFeedCore.instance.initialize(
-      domain: "feedsx://www.feedsx.com/",
-      );
-
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-
-  setupNotifications();
+  // setupNotifications();
   runApp(const MyApp());
 }
 

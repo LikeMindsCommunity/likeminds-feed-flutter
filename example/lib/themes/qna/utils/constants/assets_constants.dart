@@ -1,40 +1,40 @@
 const String qNaAssetAddPollIcon =
-    'packages/likeminds_feed_flutter_qna/assets/icons/add_poll.svg';
+    'assets/qna/icons/add_poll.svg';
 const String qNaAssetAddImageIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/add_image.svg";
+    "assets/qna/icons/add_image.svg";
 const String qNaAssetAddVideoIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/add_video.svg";
+    "assets/qna/icons/add_video.svg";
 const String qNaAssetLikeIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/like.svg";
+    "assets/qna/icons/like.svg";
 const String qNaAssetLikeFilledIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/like_filled.svg";
+    "assets/qna/icons/like_filled.svg";
 const String qNaAssetCommentIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/comment.svg";
+    "assets/qna/icons/comment.svg";
 const String qNaAssetShareIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/share.svg";
+    "assets/qna/icons/share.svg";
 const String qNaAssetSaveIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/save.svg";
+    "assets/qna/icons/save.svg";
 const String qNaAssetSaveFilledIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/save_filled.svg";
+    "assets/qna/icons/save_filled.svg";
 const String qNaAssetTickCircleIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/no_post.svg";
+    "assets/qna/icons/no_post.svg";
 const String qNaAssetCreatePostIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/create_post.svg";
+    "assets/qna/icons/create_post.svg";
 const String qNaAssetSearchIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/search.svg";
+    "assets/qna/icons/search.svg";
 const String qNaAssetMenuIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/menu.svg";
+    "assets/qna/icons/menu.svg";
 const String qNaAssetReportIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/report.svg";
+    "assets/qna/icons/report.svg";
 const String qnAEditProfileIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/edit_profile.svg";
+    "assets/qna/icons/edit_profile.svg";
 const String qnAPenIcon =
-    "packages/likeminds_feed_flutter_qna/assets/icons/pen_icon.svg";
+    "assets/qna/icons/pen_icon.svg";
 const String qnALink =
-    "packages/likeminds_feed_flutter_qna/assets/icons/link.svg";
+    "assets/qna/icons/link.svg";
 const String qnAUnlock =
-    "packages/likeminds_feed_flutter_qna/assets/icons/unlock.svg";
+    "assets/qna/icons/unlock.svg";
 const String qnAMoney =
-    "packages/likeminds_feed_flutter_qna/assets/icons/money.svg";
+    "assets/qna/icons/money.svg";
 const String qnAGift =
-    "packages/likeminds_feed_flutter_qna/assets/icons/gift.svg";
+    "assets/qna/icons/gift.svg";

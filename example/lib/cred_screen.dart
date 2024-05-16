@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:likeminds_feed_sample/app.dart';
 import 'package:likeminds_feed_sample/main.dart';
+import 'package:likeminds_feed_sample/themes/qna/builder/feed/lm_qna_feed.dart';
 import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
 import 'package:likeminds_feed_sample/themes/social/screens/tab_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_sample/utils/utils.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/likeminds_feed_nova_fl.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
@@ -25,32 +25,6 @@ class MyApp extends StatelessWidget {
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       theme: ThemeData(
         useMaterial3: false,
-        primaryColor: Colors.deepPurple,
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          outlineBorder: const BorderSide(
-            color: Colors.deepPurple,
-            width: 2,
-          ),
-          activeIndicatorBorder: const BorderSide(
-            color: Colors.deepPurple,
-            width: 2,
-          ),
-          focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-          ),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-          ),
-        ),
       ),
       home: LMFeedBlocListener(
         analyticsListener: (BuildContext context, LMFeedAnalyticsState state) {
@@ -78,9 +52,11 @@ class CredScreen extends StatefulWidget {
 class _CredScreenState extends State<CredScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _uuidController = TextEditingController();
+  final TextEditingController _apiKeyController = TextEditingController();
   StreamSubscription? _streamSubscription;
   LMSampleApp? lmFeed;
   String? uuid;
+  int selectedTheme = 0;
 
   @override
   void initState() {
@@ -94,6 +70,7 @@ class _CredScreenState extends State<CredScreen> {
   void dispose() {
     _usernameController.dispose();
     _uuidController.dispose();
+    _apiKeyController.dispose();
     _streamSubscription?.cancel();
     super.dispose();
   }
@@ -186,10 +163,8 @@ class _CredScreenState extends State<CredScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // LMFeedThemeData feedTheme = LMFeedCore.theme;
-
     return Scaffold(
-      backgroundColor: kBackgroundColor,
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18.0),
@@ -208,104 +183,113 @@ class _CredScreenState extends State<CredScreen> {
               const Text(
                 "Enter your credentials",
                 style: TextStyle(
-
                   fontSize: 12,
                 ),
               ),
               const SizedBox(height: 18),
               TextField(
-                // cursorColor: Colors.white,
-                style: const TextStyle(color: Colors.white),
-                controller: _usernameController,
+                controller: _apiKeyController,
                 decoration: InputDecoration(
-                  // fillColor: Colors.white,
-                  // focusColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  labelText: 'Username',
-                  labelStyle: const TextStyle(
-                    // color: Colors.white,
-                  ),
+                  labelText: 'API Key',
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
-                // cursorColor: Colors.white,
-                controller: _uuidController,
-                style: const TextStyle(color: Colors.white),
+                controller: _usernameController,
                 decoration: InputDecoration(
-                    // fillColor: Colors.white,
-                    // focusColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    labelText: 'User ID',
-                    labelStyle: const TextStyle(
-                      // color: Colors.white,
-                    )),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'Username',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _uuidController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'User ID',
+                ),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                value: selectedTheme,
+                items: const [
+                  DropdownMenuItem(
+                    value: 0,
+                    child: Text("Social Theme"),
+                  ),
+                  DropdownMenuItem(
+                    value: 1,
+                    child: Text("Social FeedRoom Theme"),
+                  ),
+                  DropdownMenuItem(
+                    value: 2,
+                    child: Text("QnA Feed Theme"),
+                  ),
+                  DropdownMenuItem(
+                    value: 3,
+                    child: Text("Social Dark Theme"),
+                  ),
+                ],
+                onChanged: (value) {
+                  selectedTheme = value ?? selectedTheme;
+                },
               ),
               const SizedBox(height: 36),
               GestureDetector(
                 onTap: () async {
                   String uuid = _uuidController.text;
                   String userName = _usernameController.text;
-
-                  if (userName.isEmpty && uuid.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: LMFeedText(
-                          text: "Username cannot be empty",
-                          style: LMFeedTextStyle(
-                              textStyle: TextStyle(color: Colors.black)),
-                        ),
-                      ),
-                    );
+                  String apiKey = "f24b9522-a612-4f1e-8551-ffce88a52c76";
+                  if (apiKey.isEmpty) {
+                    _showSnackBar("API Key cannot be empty");
                     return;
                   }
+                  if ((userName.isEmpty && uuid.isEmpty)) {
+                    _showSnackBar("Username and User ID both cannot be empty");
+                    return;
+                  }
+                  // show the loader dialog
+                  _showLoader(context);
 
-                  // final (accessToken, refreshToken) =
-                  //     await initiateUser(uuid, userName);
-
-                  // LMResponse response =
-                  //     await LMFeedCore.instance.showFeedWithoutApiKey(
-                  //   accessToken,
-                  //   refreshToken,
-                  // );
-                  String apiKey = dotenv.get('API_KEY');
+                  // initialize the LMFeedCore instance
+                  // await LMFeedCore.instance.initialize();
+                  await _setUpFeed(selectedTheme);
+                  // initiate the user
                   LMResponse response =
                       await LMFeedCore.instance.showFeedWithApiKey(
                     apiKey: apiKey,
                     uuid: uuid,
                     userName: userName,
                   );
-
                   if (!response.success) {
-                    LMFeedCore.showSnackBar(
-                        context,
-                        response.errorMessage ?? "An error occurred",
-                        LMFeedWidgetSource.other);
-
+                    _showSnackBar(response.errorMessage ?? "An error occurred");
                     return;
                   }
-                  await LMFeedQnA.setupFeed(
-                    domain: "qna://www.likeminds-qna.com/",
-                    lmFeedThemeData: qNaTheme,
-                    scaffoldMessengerKey: rootScaffoldMessengerKey,
+                  // define the route
+                  MaterialPageRoute route = MaterialPageRoute(
+                    builder: (context) => _getNavigationWidget(selectedTheme),
                   );
 
-                  MaterialPageRoute route = MaterialPageRoute(
-                    // INIT - Get the LMFeed instance and pass the credentials (if any)
-                    builder: (context) => ExampleTabScreen(
-                      feedWidget: const LMFeedScreen(),
-                      feedWidget: LMFeedQnA(
-                        accessToken: accessToken,
-                        refreshToken: refreshToken,
-                      ),
-                      uuid: uuid,
-                    ),
-                  );
-                  Navigator.of(context).push(route);
+                  // dismiss the loader dialog
+                  Navigator.of(context).pop();
+
+                  // navigate to the feed screen
+                  Navigator.of(context).pushReplacement(route);
                 },
                 child: Container(
                   width: 200,
@@ -314,7 +298,11 @@ class _CredScreenState extends State<CredScreen> {
                     color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(child: Text("Submit", style: TextStyle(color: Colors.white),)),
+                  child: const Center(
+                      child: Text(
+                    "Submit",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 ),
               ),
               const SizedBox(height: 20),
@@ -326,25 +314,14 @@ class _CredScreenState extends State<CredScreen> {
                   width: 200,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(child: Text("Submit")),
-                ),
-              ),
-              const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  LMFeedLocalPreference.instance.clearCache();
-                },
-                child: Container(
-                  width: 200,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Center(child: Text("Clear Data")),
+                  child: const Center(
+                      child: Text(
+                    "Clear Data",
+                    style: TextStyle(color: Colors.white),
+                  )),
                 ),
               ),
               const SizedBox(height: 72),
@@ -359,6 +336,92 @@ class _CredScreenState extends State<CredScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _getNavigationWidget(int selectedTheme) {
+    switch (selectedTheme) {
+      case 0:
+        {
+          return const ExampleTabScreen(
+            uuid: "",
+            feedWidget: LMFeedScreen(),
+          );
+        }
+      case 1:
+        {
+          return const ExampleTabScreen(
+            uuid: "",
+            feedWidget: LMFeedScreen(),
+          );
+        }
+      case 2:
+        {
+          const LMFeedQnA();
+        }
+      case 3:
+        {
+          const LMFeedNova();
+        }
+      default:
+        {
+          return const LMFeedScreen();
+        }
+    }
+    return const LMFeedScreen();
+  }
+
+  Future<void> _setUpFeed(int selectedTheme) async {
+    switch (selectedTheme) {
+      case 0:
+        {
+          LMFeedCore.instance.initialize();
+          break;
+        }
+
+      case 1:
+        {
+          LMFeedCore.instance.initialize();
+          break;
+        }
+      case 2:
+        {
+          await LMFeedQnA.setupFeed();
+        }
+        break;
+      case 3:
+        {
+          await LMFeedCore.instance.initialize(
+            theme: novaTheme1,
+          );
+          break;
+        }
+      default:
+        {
+          LMFeedCore.instance.initialize();
+        }
+    }
+  }
+
+  Future<dynamic> _showLoader(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => const AlertDialog(
+          content: SizedBox(
+        width: 100,
+        height: 100,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      )),
+    );
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
       ),
     );
   }
