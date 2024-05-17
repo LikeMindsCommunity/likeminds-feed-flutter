@@ -2,12 +2,12 @@ library likeminds_feed_ss_fl;
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/builder/post/post_builder.dart';
-export 'src/builder/post/post_builder.dart';
-export 'src/model/company_view_data.dart';
-export 'src/utils/analytics/analytics.dart';
-export 'src/utils/constants/ui_constants.dart';
-export 'src/widget/company_feed.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/builder/post/post_builder.dart';
+export 'builder/post/post_builder.dart';
+export 'model/company_view_data.dart';
+export 'builder/utils/analytics/analytics.dart';
+export 'builder/utils/constants/ui_constants.dart';
+export 'widget/company_feed.dart';
 
 class LMFeedNova extends StatefulWidget {
   const LMFeedNova({

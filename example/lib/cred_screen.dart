@@ -1,46 +1,17 @@
 import 'dart:async';
 
-import 'package:likeminds_feed_sample/app.dart';
-import 'package:likeminds_feed_sample/main.dart';
-import 'package:likeminds_feed_sample/themes/qna/builder/feed/lm_qna_feed.dart';
+import 'package:likeminds_feed_sample/globals.dart';
+import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
 import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
 import 'package:likeminds_feed_sample/themes/social/screens/tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/themes/social_dark/likeminds_feed_nova_fl.dart';
+import 'package:likeminds_feed_sample/themes/social_feedroom/koshiqa_theme.dart';
+import 'package:likeminds_feed_sample/themes/social_feedroom/likeminds_feed_flutter_koshiqa.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
-const _isProd = !bool.fromEnvironment('DEBUG');
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Integration App for UI + SDK package',
-      debugShowCheckedModeBanner: _isProd,
-      navigatorKey: rootNavigatorKey,
-      scaffoldMessengerKey: rootScaffoldMessengerKey,
-      theme: ThemeData(
-        useMaterial3: false,
-      ),
-      home: LMFeedBlocListener(
-        analyticsListener: (BuildContext context, LMFeedAnalyticsState state) {
-          if (state is LMFeedAnalyticsEventFired) {
-            debugPrint("Bloc Listened for event, - ${state.eventName}");
-            debugPrint("////////////////");
-            debugPrint("With properties - ${state.eventProperties}");
-          }
-        },
-        profileListener: (BuildContext context, LMFeedProfileState state) {},
-        routingListener: (BuildContext context, LMFeedRoutingState state) {},
-        child: const CredScreen(),
-      ),
-    );
-  }
-}
 
 class CredScreen extends StatefulWidget {
   const CredScreen({super.key});
@@ -53,10 +24,11 @@ class _CredScreenState extends State<CredScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _uuidController = TextEditingController();
   final TextEditingController _apiKeyController = TextEditingController();
+  final TextEditingController _feedRoomController = TextEditingController();
+  final ValueNotifier<bool> _isFeedRoomTheme = ValueNotifier(false);
   StreamSubscription? _streamSubscription;
-  LMSampleApp? lmFeed;
   String? uuid;
-  int selectedTheme = 0;
+  LMFeedFlavor selectedTheme = LMFeedFlavor.social;
 
   @override
   void initState() {
@@ -71,6 +43,7 @@ class _CredScreenState extends State<CredScreen> {
     _usernameController.dispose();
     _uuidController.dispose();
     _apiKeyController.dispose();
+    _feedRoomController.dispose();
     _streamSubscription?.cancel();
     super.dispose();
   }
@@ -217,7 +190,28 @@ class _CredScreenState extends State<CredScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<int>(
+              ValueListenableBuilder(
+                  valueListenable: _isFeedRoomTheme,
+                  builder: (context, value, child) {
+                    return value
+                        ? Column(
+                            children: [
+                              TextField(
+                                controller: _feedRoomController,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  labelText: 'Chat Room ID',
+                                ),
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink();
+                  }),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<LMFeedFlavor>(
+                isExpanded: true,
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -229,108 +223,60 @@ class _CredScreenState extends State<CredScreen> {
                 value: selectedTheme,
                 items: const [
                   DropdownMenuItem(
-                    value: 0,
+                    value: LMFeedFlavor.social,
                     child: Text("Social Theme"),
                   ),
                   DropdownMenuItem(
-                    value: 1,
+                    value: LMFeedFlavor.socialFeedRoom,
                     child: Text("Social FeedRoom Theme"),
                   ),
                   DropdownMenuItem(
-                    value: 2,
+                    value: LMFeedFlavor.qna,
                     child: Text("QnA Feed Theme"),
                   ),
                   DropdownMenuItem(
-                    value: 3,
+                    value: LMFeedFlavor.socialDark,
                     child: Text("Social Dark Theme"),
                   ),
                 ],
                 onChanged: (value) {
                   selectedTheme = value ?? selectedTheme;
+                  if (value == LMFeedFlavor.socialFeedRoom) {
+                    _isFeedRoomTheme.value = true;
+                  } else {
+                    _isFeedRoomTheme.value = false;
+                  }
                 },
               ),
               const SizedBox(height: 36),
-              GestureDetector(
-                onTap: () async {
-                  String uuid = _uuidController.text;
-                  String userName = _usernameController.text;
-                  String apiKey = "f24b9522-a612-4f1e-8551-ffce88a52c76";
-                  if (apiKey.isEmpty) {
-                    _showSnackBar("API Key cannot be empty");
-                    return;
-                  }
-                  if ((userName.isEmpty && uuid.isEmpty)) {
-                    _showSnackBar("Username and User ID both cannot be empty");
-                    return;
-                  }
-                  // show the loader dialog
-                  _showLoader(context);
-
-                  // initialize the LMFeedCore instance
-                  // await LMFeedCore.instance.initialize();
-                  await _setUpFeed(selectedTheme);
-                  // initiate the user
-                  LMResponse response =
-                      await LMFeedCore.instance.showFeedWithApiKey(
-                    apiKey: apiKey,
-                    uuid: uuid,
-                    userName: userName,
-                  );
-                  if (!response.success) {
-                    _showSnackBar(response.errorMessage ?? "An error occurred");
-                    return;
-                  }
-                  // define the route
-                  MaterialPageRoute route = MaterialPageRoute(
-                    builder: (context) => _getNavigationWidget(selectedTheme),
-                  );
-
-                  // dismiss the loader dialog
-                  Navigator.of(context).pop();
-
-                  // navigate to the feed screen
-                  Navigator.of(context).pushReplacement(route);
-                },
-                child: Container(
-                  width: 200,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
+              ElevatedButton(
+                onPressed: _onSubmit,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(
-                      child: Text(
-                    "Submit",
-                    style: TextStyle(color: Colors.white),
-                  )),
+                  fixedSize: const Size(200, 45),
                 ),
+                child: const Text('Submit'),
               ),
               const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  LMFeedLocalPreference.instance.clearCache();
-                },
-                child: Container(
-                  width: 200,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: BorderRadius.circular(12),
+              ElevatedButton(
+                  onPressed: () {
+                    LMFeedLocalPreference.instance.clearCache();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    fixedSize: const Size(200, 45),
                   ),
-                  child: const Center(
-                      child: Text(
-                    "Clear Data",
-                    style: TextStyle(color: Colors.white),
-                  )),
-                ),
-              ),
+                  child: const Text("Clear Data")),
               const SizedBox(height: 72),
               const Text(
-                "If no credentials are provided, the app will run with the default credentials of Bot user in your community",
+                "Please consider using clear data to log in with your new credentials.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  // color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                 ),
               ),
             ],
@@ -340,66 +286,116 @@ class _CredScreenState extends State<CredScreen> {
     );
   }
 
-  Widget _getNavigationWidget(int selectedTheme) {
+  void _onSubmit() async {
+    String uuid = _uuidController.text;
+    String userName = _usernameController.text;
+    String apiKey = _apiKeyController.text;
+    globalApiKey = apiKey;
+    if (apiKey.isEmpty) {
+      _showSnackBar("API Key cannot be empty");
+      return;
+    }
+    if ((userName.isEmpty && uuid.isEmpty)) {
+      _showSnackBar("Username and User ID both cannot be empty");
+      return;
+    }
+    // show the loader dialog
+    _showLoader(context);
+
+    // initialize the LMFeedCore instance
+    // await LMFeedCore.instance.initialize();
+    await _setUpFeed(selectedTheme);
+
+    // initiate the user
+    LMResponse response = await LMFeedCore.instance.showFeedWithApiKey(
+      apiKey: apiKey,
+      uuid: uuid,
+      userName: userName,
+    );
+    if (!response.success) {
+      _showSnackBar(response.errorMessage ?? "An error occurred");
+      return;
+    }
+    // define the route
+    MaterialPageRoute route = MaterialPageRoute(
+      builder: (context) => _getNavigationWidget(selectedTheme),
+    );
+
+    // dismiss the loader dialog
+    Navigator.of(context).pop();
+
+    // navigate to the feed screen
+    Navigator.of(context).push(route);
+  }
+
+  Widget _getNavigationWidget(LMFeedFlavor selectedTheme) {
     switch (selectedTheme) {
-      case 0:
+      case LMFeedFlavor.social:
         {
           return const ExampleTabScreen(
             uuid: "",
             feedWidget: LMFeedScreen(),
           );
         }
-      case 1:
+      case LMFeedFlavor.socialFeedRoom:
         {
-          return const ExampleTabScreen(
-            uuid: "",
-            feedWidget: LMFeedScreen(),
+          return LMFeedKoshiqa(
+            feedRoomId: int.parse(_feedRoomController.text),
           );
         }
-      case 2:
+      case LMFeedFlavor.qna:
         {
           const LMFeedQnA();
         }
-      case 3:
+      case LMFeedFlavor.socialDark:
         {
           const LMFeedNova();
-        }
-      default:
-        {
-          return const LMFeedScreen();
         }
     }
     return const LMFeedScreen();
   }
 
-  Future<void> _setUpFeed(int selectedTheme) async {
+  Future<void> _setUpFeed(LMFeedFlavor selectedTheme) async {
     switch (selectedTheme) {
-      case 0:
+      case LMFeedFlavor.social:
         {
-          LMFeedCore.instance.initialize();
+          LMFeedTheme.instance.initialise(theme: LMFeedThemeData.light());
           break;
         }
 
-      case 1:
+      case LMFeedFlavor.socialFeedRoom:
         {
-          LMFeedCore.instance.initialize();
+          LMFeedTheme.instance.initialise(theme: koshiqaTheme);
           break;
         }
-      case 2:
+      case LMFeedFlavor.qna:
         {
-          await LMFeedQnA.setupFeed();
+          LMFeedTheme.instance.initialise(theme: qNaTheme);
+          LMFeedCore.instance.feedConfig = LMFeedConfig(
+            composeConfig: const LMFeedComposeScreenConfig(
+              topicRequiredToCreatePost: true,
+              showMediaCount: false,
+              enableTagging: false,
+              enableDocuments: false,
+              enableHeading: true,
+              headingRequiredToCreatePost: true,
+              userDisplayType: LMFeedComposeUserDisplayType.tile,
+              composeHint: "Mention details here to make the post rich",
+            ),
+            feedScreenConfig: const LMFeedScreenConfig(
+              enableTopicFiltering: false,
+            ),
+            postDetailConfig: const LMPostDetailScreenConfig(
+                commentTextFieldHint: "Write your response"),
+          );
+          LMFeedCore.widgetUtility = LMFeedQnAWidgets.instance;
+          LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
         }
         break;
-      case 3:
+      case LMFeedFlavor.socialDark:
         {
-          await LMFeedCore.instance.initialize(
-            theme: novaTheme1,
-          );
+          LMFeedTheme.instance.initialise(theme: novaTheme1);
           break;
-        }
-      default:
-        {
-          LMFeedCore.instance.initialize();
         }
     }
   }
@@ -425,4 +421,11 @@ class _CredScreenState extends State<CredScreen> {
       ),
     );
   }
+}
+
+enum LMFeedFlavor {
+  social,
+  socialFeedRoom,
+  qna,
+  socialDark,
 }

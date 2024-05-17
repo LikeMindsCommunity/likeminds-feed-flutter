@@ -5,8 +5,8 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/model/company_view_data.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/model/company_view_data.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/builder/utils/constants/assets_constants.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:overlay_support/overlay_support.dart';
 

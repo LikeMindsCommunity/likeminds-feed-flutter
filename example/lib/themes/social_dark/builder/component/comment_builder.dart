@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/utils/constants/assets_constants.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/builder/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/builder/utils/constants/ui_constants.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 Widget novaCommentBuilder(BuildContext context,

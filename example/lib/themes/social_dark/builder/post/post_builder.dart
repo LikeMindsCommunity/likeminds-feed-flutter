@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/builder/component/comment_builder.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/model/company_view_data.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/utils/constants/ui_constants.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/builder/component/comment_builder.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/model/company_view_data.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/builder/utils/constants/ui_constants.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 LMCompanyViewData? getCompanyDetails(

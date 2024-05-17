@@ -3,11 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:likeminds_feed_sample/cred_screen.dart';
+import 'package:likeminds_feed_sample/app.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:likeminds_feed_sample/utils/utils.dart';
+import 'package:likeminds_feed_sample/globals.dart';
 
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
@@ -20,11 +20,6 @@ Future<void> _handleNotification(RemoteMessage message) async {
       .handleNotification(message, false, rootNavigatorKey);
 }
 
-final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
-    GlobalKey<ScaffoldMessengerState>();
-
-final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Loading .env file
@@ -35,8 +30,9 @@ void main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
+   await LMFeedCore.instance.initialize();
   // setupNotifications();
-  runApp(const MyApp());
+  runApp(const LMSampleApp());
 }
 
 /// Setup notifications

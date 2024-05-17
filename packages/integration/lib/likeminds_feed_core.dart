@@ -54,6 +54,10 @@ class LMFeedCore {
 
   static LMFeedWidgetUtility get widgetUtility => instance._widgetUtility;
 
+  static set widgetUtility(LMFeedWidgetUtility value) {
+    instance._widgetUtility = value;
+  }
+
   static void showSnackBar(BuildContext context, String snackBarMessage,
       LMFeedWidgetSource widgetSource,
       {LMFeedSnackBarStyle? style}) {
@@ -135,8 +139,6 @@ class LMFeedCore {
     } else {
       newAccessToken = accessToken;
       newRefreshToken = refreshToken;
-
-      //TODO remove storing of cache and move it to data layer when validateUser() is success - done
     }
 
     if (newAccessToken == null || newRefreshToken == null) {
@@ -179,7 +181,6 @@ class LMFeedCore {
     ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
     if (response.success) {
-      //TODO can be removed when storing of cache is moved to data layer - done
       return LMResponse(success: true, data: response);
     } else {
       return LMResponse(
@@ -271,7 +272,6 @@ class LMFeedCore {
         return LMResponse(
             success: false, errorMessage: initiateUserResponse.errorMessage);
       } else {
-        //TODO remove storing of cache and move it to data layer when initiateUser() is success - done
         return LMResponse(success: true, data: initiateUserResponse);
       }
     }

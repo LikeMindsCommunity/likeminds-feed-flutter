@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_sample/themes/social_dark/src/utils/constants/assets_constants.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/builder/utils/constants/assets_constants.dart';
 
 class ColorTheme {
   static const backgroundColor = Color.fromRGBO(24, 23, 25, 1);
