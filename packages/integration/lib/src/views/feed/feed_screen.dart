@@ -826,10 +826,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
-        // ignore: use_build_context_synchronously
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -837,7 +836,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: _feedBloc.users[post.uuid]!,
-              // position: ,
+              position: index,
             ),
           ),
         )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
@@ -1002,7 +1001,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
       pollBuilder: (pollWidget) => _defPollWidget(pollWidget, post),
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -1012,6 +1011,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: _feedBloc.users[post.uuid]!,
+              position: index,
             ),
           ),
         );

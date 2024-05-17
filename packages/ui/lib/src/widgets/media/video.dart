@@ -42,21 +42,21 @@ class LMFeedVideo extends StatefulWidget {
 
   final bool autoPlay;
 
-  final VoidCallback? onMediaTap;
+  final Function(int)? onMediaTap;
 
   @override
   State<LMFeedVideo> createState() => _LMFeedVideoState();
 
-  LMFeedVideo copyWith({
-    String? postId,
-    String? videoUrl,
-    File? videoFile,
-    LMFeedButton? playButton,
-    LMFeedButton? pauseButton,
-    LMFeedButton? muteButton,
-    LMFeedPostVideoStyle? style,
-    VoidCallback? onMediaTap,
-  }) {
+  LMFeedVideo copyWith(
+      {String? postId,
+      String? videoUrl,
+      File? videoFile,
+      LMFeedButton? playButton,
+      LMFeedButton? pauseButton,
+      LMFeedButton? muteButton,
+      LMFeedPostVideoStyle? style,
+      Function(int)? onMediaTap,
+      int? position}) {
     return LMFeedVideo(
       postId: postId ?? this.postId,
       videoUrl: videoUrl ?? this.videoUrl,
@@ -66,6 +66,7 @@ class LMFeedVideo extends StatefulWidget {
       muteButton: muteButton ?? this.muteButton,
       style: style ?? this.style,
       onMediaTap: onMediaTap ?? this.onMediaTap,
+      position: position ?? this.position,
     );
   }
 }
@@ -167,7 +168,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     return GestureDetector(
       onTap: () {
         if (_onTouch) {
-          widget.onMediaTap?.call();
+          widget.onMediaTap?.call(widget.position ?? 0);
         }
         _timer?.cancel();
         if (controller == null) {

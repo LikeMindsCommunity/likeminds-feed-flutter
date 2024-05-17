@@ -65,7 +65,7 @@ class LMFeedPostWidget extends StatefulWidget {
   final LMFeedOnPostTap? onPostTap;
   final Function(String)? onTagTap;
   final double? childrenSpacing;
-  final VoidCallback? onMediaTap;
+  final Function(int)? onMediaTap;
 
   final VoidCallback? disposeVideoPlayerOnInActive;
 
@@ -97,7 +97,7 @@ class LMFeedPostWidget extends StatefulWidget {
     LMFeedMenu? menu,
     LMFeedPostTopic? topicWidget,
     LMFeedPostStyle? style,
-    VoidCallback? onMediaTap,
+    Function(int)? onMediaTap,
     Widget? activityHeader,
   }) {
     return LMFeedPostWidget(
@@ -284,7 +284,6 @@ class LMFeedPostStyle {
       margin: margin ?? this.margin,
       border: border ?? this.border,
       backgroundColor: backgroundColor ?? this.backgroundColor,
-      
     );
   }
 

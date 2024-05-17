@@ -30,7 +30,7 @@ class LMFeedPostMedia extends StatefulWidget {
 
   final Function(String, StackTrace)? onError;
 
-  final VoidCallback? onMediaTap;
+  final Function(int)? onMediaTap;
 
   final LMFeedPostMediaStyle? style;
   final LMFeedCarouselIndicatorBuilder? carouselIndicatorBuilder;
@@ -53,7 +53,7 @@ class LMFeedPostMedia extends StatefulWidget {
     Function(String, StackTrace)? onError,
     LMFeedPostMediaStyle? style,
     Widget Function(BuildContext, int, int, Widget)? carouselIndicatorBuilder,
-    VoidCallback? onMediaTap,
+    Function(int)? onMediaTap,
     LMFeedVideoBuilder? videoBuilder,
     LMFeedImageBuilder? imageBuilder,
     LMFeedPollBuilder? pollBuilder,

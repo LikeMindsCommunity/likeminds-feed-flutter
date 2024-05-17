@@ -239,7 +239,7 @@ class _LMFeedUserCreatedCommentListViewState
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -249,6 +249,7 @@ class _LMFeedUserCreatedCommentListViewState
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );
@@ -294,7 +295,7 @@ class _LMFeedUserCreatedCommentListViewState
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       pollBuilder: (pollWidget) => _defPollWidget(pollWidget, post),
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -304,6 +305,7 @@ class _LMFeedUserCreatedCommentListViewState
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );
@@ -392,7 +394,7 @@ class _LMFeedUserCreatedCommentListViewState
               selectedOptions.clear();
               rebuildPollWidget.value = !rebuildPollWidget.value;
             },
-           onSubtextTap: () {
+            onSubtextTap: () {
               onVoteTextTap(
                 context,
                 pollWidget.attachmentMeta,
