@@ -72,12 +72,15 @@ class LMFeedPollStyle {
 
   static LMFeedPollStyle inFeed() {
     return const LMFeedPollStyle(
-        margin: EdgeInsets.symmetric(
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-        ));
+      margin: EdgeInsets.symmetric(
+        vertical: 8,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+      ),
+      pollOptionSelectedColor: Color.fromRGBO(80, 70, 229, 0.2),
+      pollOptionOtherColor: Color.fromRGBO(230, 235, 245, 1),
+    );
   }
 
   LMFeedPollStyle copyWith({
