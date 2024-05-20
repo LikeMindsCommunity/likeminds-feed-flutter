@@ -43,4 +43,5 @@ flutter:
     - assets/
     - assets/icons/
     - assets/qna/icons/
+    - assets/social_dark/icons/
     - .env

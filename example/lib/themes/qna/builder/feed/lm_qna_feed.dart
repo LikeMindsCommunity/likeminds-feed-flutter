@@ -234,6 +234,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
+          debugPrint("floating action button builder called");
           return widget.floatingActionButtonBuilder
                   ?.call(context, defFloatingActionButton(context)) ??
               defFloatingActionButton(context);

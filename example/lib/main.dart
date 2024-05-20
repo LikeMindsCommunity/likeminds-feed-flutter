@@ -31,7 +31,7 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
    await LMFeedCore.instance.initialize();
-  // setupNotifications();
+  setupNotifications();
   runApp(const LMSampleApp());
 }
 

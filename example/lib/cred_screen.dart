@@ -202,7 +202,7 @@ class _CredScreenState extends State<CredScreen> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  labelText: 'Chat Room ID',
+                                  labelText: 'Feed Room ID',
                                 ),
                               ),
                             ],
@@ -317,8 +317,13 @@ class _CredScreenState extends State<CredScreen> {
       return;
     }
     // define the route
+    Widget? navigationWidget = _getNavigationWidget(selectedTheme);
+    if (navigationWidget == null) {
+      Navigator.pop(context);
+      return;
+    }
     MaterialPageRoute route = MaterialPageRoute(
-      builder: (context) => _getNavigationWidget(selectedTheme),
+      builder: (context) => navigationWidget,
     );
 
     // dismiss the loader dialog
@@ -328,7 +333,7 @@ class _CredScreenState extends State<CredScreen> {
     Navigator.of(context).push(route);
   }
 
-  Widget _getNavigationWidget(LMFeedFlavor selectedTheme) {
+  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme) {
     switch (selectedTheme) {
       case LMFeedFlavor.social:
         {
@@ -339,20 +344,29 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.socialFeedRoom:
         {
+          if (!LMFeedUserUtils.checkIfCurrentUserIsCM() &&
+              _feedRoomController.text.isEmpty) {
+            _showSnackBar(
+                "You need to provide an LM FeedRoom ID if the user being logged in is not a community manager");
+            return null;
+          }
+          int? feedRoomId;
+          if(  _feedRoomController.text.isNotEmpty) {
+            feedRoomId = int.parse(_feedRoomController.text);
+          }
           return LMFeedKoshiqa(
-            feedRoomId: int.parse(_feedRoomController.text),
+            feedRoomId: feedRoomId,
           );
         }
       case LMFeedFlavor.qna:
         {
-          const LMFeedQnA();
+          return const LMFeedQnA();
         }
       case LMFeedFlavor.socialDark:
         {
-          const LMFeedNova();
+          return const LMFeedNova();
         }
     }
-    return const LMFeedScreen();
   }
 
   Future<void> _setUpFeed(LMFeedFlavor selectedTheme) async {
@@ -360,12 +374,16 @@ class _CredScreenState extends State<CredScreen> {
       case LMFeedFlavor.social:
         {
           LMFeedTheme.instance.initialise(theme: LMFeedThemeData.light());
+          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
+          LMFeedCore.instance.feedConfig = LMFeedConfig();
           break;
         }
 
       case LMFeedFlavor.socialFeedRoom:
         {
           LMFeedTheme.instance.initialise(theme: koshiqaTheme);
+          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
+          LMFeedCore.instance.feedConfig = LMFeedConfig();
           break;
         }
       case LMFeedFlavor.qna:
@@ -394,7 +412,9 @@ class _CredScreenState extends State<CredScreen> {
         break;
       case LMFeedFlavor.socialDark:
         {
-          LMFeedTheme.instance.initialise(theme: novaTheme1);
+          LMFeedTheme.instance.initialise(theme: darkTheme);
+          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
+          LMFeedCore.instance.feedConfig = LMFeedConfig();
           break;
         }
     }

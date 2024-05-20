@@ -125,8 +125,7 @@ class ColorTheme {
   );
 }
 
-// should not use this theme
-LMFeedThemeData novaTheme1 = LMFeedThemeData.light(
+LMFeedThemeData darkTheme = LMFeedThemeData.light(
   backgroundColor: ColorTheme.backgroundColor,
   primaryColor: ColorTheme.primaryColor,
   container: ColorTheme.backgroundColor,
