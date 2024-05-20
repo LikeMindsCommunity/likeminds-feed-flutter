@@ -351,7 +351,7 @@ class _CredScreenState extends State<CredScreen> {
             return null;
           }
           int? feedRoomId;
-          if(  _feedRoomController.text.isNotEmpty) {
+          if (_feedRoomController.text.isNotEmpty) {
             feedRoomId = int.parse(_feedRoomController.text);
           }
           return LMFeedKoshiqa(
@@ -373,23 +373,23 @@ class _CredScreenState extends State<CredScreen> {
     switch (selectedTheme) {
       case LMFeedFlavor.social:
         {
-          LMFeedTheme.instance.initialise(theme: LMFeedThemeData.light());
+          LMFeedCore.theme = LMFeedThemeData.light();
           LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
-          LMFeedCore.instance.feedConfig = LMFeedConfig();
+          LMFeedCore.config = LMFeedConfig();
           break;
         }
 
       case LMFeedFlavor.socialFeedRoom:
         {
-          LMFeedTheme.instance.initialise(theme: koshiqaTheme);
+          LMFeedCore.theme = koshiqaTheme;
           LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
-          LMFeedCore.instance.feedConfig = LMFeedConfig();
+          LMFeedCore.config = LMFeedConfig();
           break;
         }
       case LMFeedFlavor.qna:
         {
-          LMFeedTheme.instance.initialise(theme: qNaTheme);
-          LMFeedCore.instance.feedConfig = LMFeedConfig(
+          LMFeedCore.theme = qNaTheme;
+          LMFeedCore.config = LMFeedConfig(
             composeConfig: const LMFeedComposeScreenConfig(
               topicRequiredToCreatePost: true,
               showMediaCount: false,
@@ -412,9 +412,9 @@ class _CredScreenState extends State<CredScreen> {
         break;
       case LMFeedFlavor.socialDark:
         {
-          LMFeedTheme.instance.initialise(theme: darkTheme);
+          LMFeedCore.theme = darkTheme;
           LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
-          LMFeedCore.instance.feedConfig = LMFeedConfig();
+          LMFeedCore.config = LMFeedConfig();
           break;
         }
     }
