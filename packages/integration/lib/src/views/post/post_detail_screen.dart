@@ -747,9 +747,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedPostMedia(
       postId: _postDetailScreenHandler!.postData!.id,
       attachments: _postDetailScreenHandler!.postData!.attachments!,
-      style: feedTheme.mediaStyle.copyWith(
-        pollStyle: LMFeedPollStyle.inFeed(),
-      ),
+      style: feedTheme.mediaStyle,
       carouselIndicatorBuilder:
           _widgetBuilder.postMediaCarouselIndicatorBuilder,
       imageBuilder: _widgetBuilder.imageBuilder,

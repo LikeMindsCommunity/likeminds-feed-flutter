@@ -156,14 +156,17 @@ class _LMFeedPollState extends State<LMFeedPoll> {
             vertical: 8,
             horizontal: 16,
           ),
-      padding: const EdgeInsets.all(16),
+      padding: _lmFeedPollStyle.padding ?? const EdgeInsets.all(16),
       decoration: _lmFeedPollStyle.decoration ??
           BoxDecoration(
-            color: theme.container,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Colors.grey,
-            ),
+            color: _lmFeedPollStyle.backgroundColor ?? theme.container,
+            borderRadius:
+                _lmFeedPollStyle.isComposable ? BorderRadius.circular(8) : null,
+            border: _lmFeedPollStyle.isComposable
+                ? Border.all(
+                    color: theme.inActiveColor,
+                  )
+                : null,
           ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,21 +220,22 @@ class _LMFeedPollState extends State<LMFeedPoll> {
         LMFeedText(
             text: widget.attachmentMeta.pollAnswerText ?? '',
             onTap: widget.onSubtextTap,
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                height: 1.33,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: theme.primaryColor,
-              ),
-            )),
+            style: _lmFeedPollStyle.pollAnswerStyle ??
+                LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    height: 1.33,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: theme.primaryColor,
+                  ),
+                )),
         LikeMindsTheme.kHorizontalPaddingSmall,
-        const LMFeedText(
+        LMFeedText(
           text: '●',
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               fontSize: LikeMindsTheme.kFontSmall,
-              color: Color.fromRGBO(217, 217, 217, 1),
+              color: theme.inActiveColor,
             ),
           ),
         ),
@@ -251,30 +255,31 @@ class _LMFeedPollState extends State<LMFeedPoll> {
           Row(
             children: [
               LikeMindsTheme.kHorizontalPaddingSmall,
-              const LMFeedText(
+              LMFeedText(
                 text: '●',
                 style: LMFeedTextStyle(
                   textStyle: TextStyle(
                     fontSize: LikeMindsTheme.kFontSmall,
-                    color: Color.fromRGBO(217, 217, 217, 1),
+                    color: theme.inActiveColor,
                   ),
                 ),
               ),
               LikeMindsTheme.kHorizontalPaddingSmall,
               LMFeedText(
-                  text: 'Edit Vote',
-                  onTap: () {
-                    widget.onEditVote?.call(widget.attachmentMeta);
-                  },
-                  style: _lmFeedPollStyle.editPollOptionsStyles ??
-                      LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          height: 1.33,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: theme.primaryColor,
-                        ),
-                      )),
+                text: 'Edit Vote',
+                onTap: () {
+                  widget.onEditVote?.call(widget.attachmentMeta);
+                },
+                style: _lmFeedPollStyle.editPollOptionsStyles ??
+                    LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        height: 1.33,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: theme.primaryColor,
+                      ),
+                    ),
+              ),
             ],
           ),
       ],
@@ -321,7 +326,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                     ),
                   ),
                   LikeMindsTheme.kVerticalPaddingSmall,
-                  const LMFeedText(
+                  LMFeedText(
                     text:
                         'Enter an option that you think is missing in this poll. This can not be undone.',
                     style: LMFeedTextStyle(
@@ -330,7 +335,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                           height: 1.33,
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
-                          color: Colors.grey,
+                          color: theme.inActiveColor,
                         )),
                   ),
                   Padding(
@@ -387,23 +392,25 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                       Navigator.of(context).pop();
                       _addOptionController.clear();
                     },
-                    text: const LMFeedText(
+                    text: LMFeedText(
                       text: 'SUBMIT',
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          height: 1.33,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.white,
+                      style: _lmFeedPollStyle.submitPollTextStyle ??
+                          LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              height: 1.33,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: theme.container,
+                            ),
+                          ),
+                    ),
+                    style: _lmFeedPollStyle.submitPollButtonStyle ??
+                        LMFeedButtonStyle(
+                          backgroundColor: theme.primaryColor,
+                          borderRadius: 100,
+                          width: 150,
+                          height: 44,
                         ),
-                      ),
-                    ),
-                    style: LMFeedButtonStyle(
-                      backgroundColor: theme.primaryColor,
-                      borderRadius: 100,
-                      width: 150,
-                      height: 44,
-                    ),
                   ),
                   LikeMindsTheme.kVerticalPaddingMedium,
                 ],
@@ -428,7 +435,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         borderRadius: 8,
         border: Border.all(
-          color: Colors.grey,
+          color: theme.inActiveColor,
         ),
       ),
     );
@@ -518,8 +525,10 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                       value: widget.attachmentMeta.options![index].percentage /
                           100,
                       color: widget.attachmentMeta.options![index].isSelected
-                          ? _lmFeedPollStyle.pollOptionSelectedColor
-                          : _lmFeedPollStyle.pollOptionOtherColor,
+                          ? _lmFeedPollStyle
+                              .pollOptionStyle?.pollOptionSelectedColor
+                          : _lmFeedPollStyle
+                              .pollOptionStyle?.pollOptionOtherColor,
                       backgroundColor: theme.container,
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -528,25 +537,29 @@ class _LMFeedPollState extends State<LMFeedPoll> {
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: (!_lmFeedPollStyle.isComposable &&
-                                widget.attachmentMeta.toShowResult != null &&
-                                !widget.isVoteEditing &&
-                                widget.attachmentMeta.toShowResult! &&
-                                widget.attachmentMeta.options![index]
-                                    .isSelected) ||
-                            _isSelectedByUser(
-                                widget.attachmentMeta.options?[index]) ||
-                            (widget.showTick != null &&
-                                widget.showTick!(
-                                    widget.attachmentMeta.options![index]))
-                        ? _lmFeedPollStyle.pollOptionSelectedColor ??
-                            theme.primaryColor
-                        : theme.inActiveColor,
-                  ),
-                ),
+                decoration: _lmFeedPollStyle
+                        .pollOptionStyle?.pollOptionDecoration ??
+                    BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: (!_lmFeedPollStyle.isComposable &&
+                                    widget.attachmentMeta.toShowResult !=
+                                        null &&
+                                    !widget.isVoteEditing &&
+                                    widget.attachmentMeta.toShowResult! &&
+                                    widget.attachmentMeta.options![index]
+                                        .isSelected) ||
+                                _isSelectedByUser(
+                                    widget.attachmentMeta.options?[index]) ||
+                                (widget.showTick != null &&
+                                    widget.showTick!(
+                                        widget.attachmentMeta.options![index]))
+                            ? _lmFeedPollStyle.pollOptionStyle
+                                    ?.pollOptionSelectedBorderColor ??
+                                theme.primaryColor
+                            : theme.inActiveColor,
+                      ),
+                    ),
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 child: Stack(
@@ -556,7 +569,8 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                       children: [
                         LMFeedText(
                             text: pollOptions[index],
-                            style: _lmFeedPollStyle.pollOptionStyle ??
+                            style: _lmFeedPollStyle
+                                    .pollOptionStyle?.pollOptionTextStyle ??
                                 LMFeedTextStyle(
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -568,8 +582,10 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                                                 widget.showTick!(widget
                                                     .attachmentMeta
                                                     .options![index]))
-                                        ? theme.primaryColor
-                                        : Colors.black,
+                                        ? _lmFeedPollStyle.pollOptionStyle
+                                                ?.pollOptionSelectedTextColor ??
+                                            theme.primaryColor
+                                        : theme.onContainer,
                                     height: 1.25,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
@@ -592,8 +608,12 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                                               widget.showTick!(widget
                                                   .attachmentMeta
                                                   .options![index]))
-                                      ? theme.primaryColor
-                                      : Colors.grey,
+                                      ? _lmFeedPollStyle.pollOptionStyle
+                                              ?.pollOptionSelectedTextColor ??
+                                          theme.primaryColor
+                                      : _lmFeedPollStyle.pollOptionStyle
+                                              ?.pollOptionOtherTextColor ??
+                                          theme.inActiveColor,
                                 ),
                               )),
                       ],
@@ -609,14 +629,17 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                                 top: 5,
                               )
                             : EdgeInsets.zero,
-                        child: const Align(
+                        child: Align(
                           alignment: Alignment.bottomRight,
                           child: LMFeedIcon(
-                            type: LMFeedIconType.svg,
-                            assetPath: lmTickSvg,
+                            type: LMFeedIconType.icon,
+                            icon: Icons.check_circle,
                             style: LMFeedIconStyle(
                               boxSize: 20,
                               size: 20,
+                              color: _lmFeedPollStyle.pollOptionStyle
+                                      ?.pollOptionSelectedTickColor ??
+                                  theme.primaryColor,
                             ),
                           ),
                         ),
@@ -639,12 +662,12 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                 widget.onVoteClick?.call(widget.attachmentMeta.options![index]);
               },
               style: _lmFeedPollStyle.votesCountStyles ??
-                  const LMFeedTextStyle(
+                  LMFeedTextStyle(
                     textStyle: TextStyle(
                       height: 1.33,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      color: Colors.grey,
+                      color: theme.inActiveColor,
                     ),
                   ),
             ),
@@ -672,22 +695,24 @@ class _LMFeedPollState extends State<LMFeedPoll> {
         onTap: () {
           widget.onSubmit?.call(widget.selectedOption);
         },
-        text: const LMFeedText(
+        text: LMFeedText(
           text: 'Submit Vote',
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              height: 1.33,
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-              color: Colors.white,
-            ),
-          ),
+          style: _lmFeedPollStyle.submitPollTextStyle ??
+              LMFeedTextStyle(
+                textStyle: TextStyle(
+                  height: 1.33,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: theme.container,
+                ),
+              ),
         ),
-        style: LMFeedButtonStyle(
-          backgroundColor: theme.primaryColor,
-          borderRadius: 8,
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        ));
+        style: _lmFeedPollStyle.submitPollButtonStyle ??
+            LMFeedButtonStyle(
+              backgroundColor: theme.primaryColor,
+              borderRadius: 8,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            ));
   }
 }
 

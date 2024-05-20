@@ -192,9 +192,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
   LMFeedPoll _defPoll() {
     return widget.poll ??
         LMFeedPoll(
-          attachmentMeta: attachments!.first.attachmentMeta,
-          style: widget.style?.pollStyle ?? const LMFeedPollStyle(),
-        );
+            attachmentMeta: attachments!.first.attachmentMeta,
+            style: widget.style?.pollStyle ?? LMFeedPollStyle.basic());
   }
 
   Widget getPostDocuments() {
@@ -293,6 +292,6 @@ class LMFeedPostMediaStyle {
         imageStyle: const LMFeedPostImageStyle(),
         linkStyle: LMFeedPostLinkPreviewStyle.basic(),
         videoStyle: const LMFeedPostVideoStyle(),
-        pollStyle: const LMFeedPollStyle(),
+        pollStyle: LMFeedPollStyle.basic(),
       );
 }

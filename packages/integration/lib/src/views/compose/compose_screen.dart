@@ -320,7 +320,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         if (composeBloc.postMedia.isNotEmpty) {
           if (composeBloc.isPollAdded) {
             return LMFeedPoll(
-              style: LMFeedPollStyle.composable(),
+              style: feedTheme.composeScreenStyle.mediaStyle?.pollStyle
+                      ?.copyWith() ??
+                  LMFeedPollStyle.composable(),
               attachmentMeta:
                   composeBloc.postMedia.first.attachmentMetaViewData!,
               subTextBuilder: (context) {

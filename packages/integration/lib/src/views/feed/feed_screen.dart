@@ -995,8 +995,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       postId: post.id,
-      style: feedThemeData.mediaStyle
-          .copyWith(pollStyle: LMFeedPollStyle.inFeed()),
+      style: feedThemeData.mediaStyle,
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
