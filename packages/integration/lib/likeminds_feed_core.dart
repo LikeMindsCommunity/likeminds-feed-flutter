@@ -152,8 +152,12 @@ class LMFeedCore {
           ..refreshToken(newRefreshToken))
         .build();
 
-    ValidateUserResponse validateUserResponse =
-        (await validateUser(request)).data!;
+    ValidateUserResponse? validateUserResponse =
+        (await validateUser(request)).data;
+
+    if (validateUserResponse == null) {
+      return LMResponse(success: false, errorMessage: "User validation failed");
+    }
 
     if (validateUserResponse.success) {
       LMNotificationHandler.instance.registerDevice(
@@ -165,7 +169,9 @@ class LMFeedCore {
 
       if (!initialiseFeedResponse.success) {
         return LMResponse(
-            success: false, errorMessage: initialiseFeedResponse.errorMessage,);
+          success: false,
+          errorMessage: initialiseFeedResponse.errorMessage,
+        );
       }
     } else {
       return LMResponse(
@@ -247,8 +253,7 @@ class LMFeedCore {
 
       return initiateUserResponse;
     } else {
-      //TODO call showFeedWithoutAPIKey - done
-      return showFeedWithoutApiKey(
+      return await showFeedWithoutApiKey(
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
       );
