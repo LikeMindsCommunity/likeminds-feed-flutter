@@ -57,6 +57,7 @@ class LMFeedPostMedia extends StatefulWidget {
     LMFeedVideoBuilder? videoBuilder,
     LMFeedImageBuilder? imageBuilder,
     LMFeedPollBuilder? pollBuilder,
+    LMFeedPoll? poll,
   }) {
     return LMFeedPostMedia(
       attachments: attachments ?? this.attachments,
@@ -71,6 +72,7 @@ class LMFeedPostMedia extends StatefulWidget {
       imageBuilder: imageBuilder ?? this.imageBuilder,
       videoBuilder: videoBuilder ?? this.videoBuilder,
       pollBuilder: pollBuilder ?? this.pollBuilder,
+      poll: poll ?? this.poll,
     );
   }
 }

@@ -82,7 +82,7 @@ class LMFeedPollStyle {
       decoration: const BoxDecoration(
         color: Colors.white,
       ),
-      pollOptionStyle: LMFeedPollOptionStyle.basic(),
+      pollOptionStyle: LMFeedPollOptionStyle.basic(),      
     );
   }
 

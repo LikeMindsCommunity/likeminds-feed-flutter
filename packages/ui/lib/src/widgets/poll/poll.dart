@@ -6,6 +6,7 @@ class LMFeedPoll extends StatefulWidget {
   LMFeedPoll({
     super.key,
     required this.attachmentMeta,
+    this.rebuildPollWidget,
     this.onCancel,
     this.onEdit,
     this.onEditVote,
@@ -24,13 +25,18 @@ class LMFeedPoll extends StatefulWidget {
     this.onSubtextTap,
     this.pollQuestionBuilder,
     this.pollOptionBuilder,
-    this.pollSubtitleBuilder,
+    this.pollSelectionTextBuilder,
+    this.pollSelectionText,
     this.addOptionButtonBuilder,
     this.submitButtonBuilder,
     this.subTextBuilder,
     this.pollActionBuilder,
     this.onSameOptionAdded,
+    this.isMultiChoicePoll,
   });
+
+  /// [ValueNotifier] to rebuild the poll widget
+  final ValueNotifier<bool>? rebuildPollWidget;
 
   /// [LMattachmentMetaViewData] to be displayed in the poll
   final LMAttachmentMetaViewData attachmentMeta;
@@ -92,8 +98,11 @@ class LMFeedPoll extends StatefulWidget {
   /// [Widget Function(BuildContext)] Builder for the poll option
   final Widget Function(BuildContext)? pollOptionBuilder;
 
-  /// [Widget Function(BuildContext)] Builder for the poll subtitle
-  final Widget Function(BuildContext)? pollSubtitleBuilder;
+  /// [Widget Function(BuildContext)] Builder for the poll selection text
+  final Widget Function(BuildContext)? pollSelectionTextBuilder;
+
+  /// [String] poll selection text
+  final String? pollSelectionText;
 
   /// [Widget Function(BuildContext)] Builder for the add option button
   final LMFeedButtonBuilder? addOptionButtonBuilder;
@@ -106,6 +115,9 @@ class LMFeedPoll extends StatefulWidget {
 
   /// [VoidCallback] error callback to be called when same option is added
   final VoidCallback? onSameOptionAdded;
+
+  /// [bool] to show if the poll is multi choice
+  final bool? isMultiChoicePoll;
 
   @override
   State<LMFeedPoll> createState() => _LMFeedPollState();
@@ -120,6 +132,8 @@ class _LMFeedPollState extends State<LMFeedPoll> {
   late LMFeedPollStyle _lmFeedPollStyle;
   final theme = LMFeedTheme.instance.theme;
   final TextEditingController _addOptionController = TextEditingController();
+  late ValueNotifier<bool> _rebuildPollWidget;
+  bool _isVoteEditing = false;
 
   void _setPollData() {
     pollQuestion = widget.attachmentMeta.pollQuestion ?? '';
@@ -132,12 +146,14 @@ class _LMFeedPollState extends State<LMFeedPoll> {
     multiSelectNo = widget.attachmentMeta.multiSelectNo ?? 0;
     multiSelectState =
         widget.attachmentMeta.multiSelectState ?? PollMultiSelectState.exactly;
+    _isVoteEditing = widget.isVoteEditing;
   }
 
   @override
   void initState() {
     super.initState();
     _lmFeedPollStyle = widget.style;
+    _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
     _setPollData();
   }
 
@@ -145,73 +161,84 @@ class _LMFeedPollState extends State<LMFeedPoll> {
   void didUpdateWidget(covariant LMFeedPoll oldWidget) {
     super.didUpdateWidget(oldWidget);
     _lmFeedPollStyle = widget.style;
+    _rebuildPollWidget = widget.rebuildPollWidget ?? ValueNotifier(false);
     _setPollData();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: _lmFeedPollStyle.margin ??
-          const EdgeInsets.symmetric(
-            vertical: 8,
-            horizontal: 16,
-          ),
-      padding: _lmFeedPollStyle.padding ?? const EdgeInsets.all(16),
-      decoration: _lmFeedPollStyle.decoration ??
-          BoxDecoration(
-            color: _lmFeedPollStyle.backgroundColor ?? theme.container,
-            borderRadius:
-                _lmFeedPollStyle.isComposable ? BorderRadius.circular(8) : null,
-            border: _lmFeedPollStyle.isComposable
-                ? Border.all(
-                    color: theme.inActiveColor,
-                  )
-                : null,
-          ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              widget.pollQuestionBuilder?.call(context) ?? _defPollQuestion(),
-              if (_lmFeedPollStyle.isComposable)
-                widget.pollActionBuilder?.call(context) ?? _defPollAction(),
-            ],
-          ),
-          LikeMindsTheme.kVerticalPaddingMedium,
-          widget.pollSubtitleBuilder?.call(context) ?? _defPollSubtitle(),
-          const SizedBox(height: 8),
-          ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: pollOptions.length,
-              itemBuilder: (context, index) {
-                return widget.pollOptionBuilder?.call(
-                      context,
-                    ) ??
-                    _defPollOption(index);
-              }),
-          //add and option button
-          if (widget.showAddOptionButton)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: widget.addOptionButtonBuilder
-                      ?.call(_defAddOptionButton(context)) ??
-                  _defAddOptionButton(context),
-            ),
+    return ValueListenableBuilder(
+        valueListenable: _rebuildPollWidget,
+        builder: (context, value, __) {
+          debugPrint(_isVoteEditing.toString());
+          return Container(
+            margin: _lmFeedPollStyle.margin ??
+                const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 16,
+                ),
+            padding: _lmFeedPollStyle.padding ?? const EdgeInsets.all(16),
+            decoration: _lmFeedPollStyle.decoration ??
+                BoxDecoration(
+                  color: _lmFeedPollStyle.backgroundColor ?? theme.container,
+                  borderRadius: _lmFeedPollStyle.isComposable
+                      ? BorderRadius.circular(8)
+                      : null,
+                  border: _lmFeedPollStyle.isComposable
+                      ? Border.all(
+                          color: theme.inActiveColor,
+                        )
+                      : null,
+                ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    widget.pollQuestionBuilder?.call(context) ??
+                        _defPollQuestion(),
+                    if (_lmFeedPollStyle.isComposable)
+                      widget.pollActionBuilder?.call(context) ??
+                          _defPollAction(),
+                  ],
+                ),
+                LikeMindsTheme.kVerticalPaddingMedium,
+                widget.pollSelectionTextBuilder?.call(context) ??
+                    _defPollSubtitle(),
+                const SizedBox(height: 8),
+                ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: pollOptions.length,
+                    itemBuilder: (context, index) {
+                      return widget.pollOptionBuilder?.call(
+                            context,
+                          ) ??
+                          _defPollOption(index);
+                    }),
+                //add and option button
+                if (widget.showAddOptionButton)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: widget.addOptionButtonBuilder
+                            ?.call(_defAddOptionButton(context)) ??
+                        _defAddOptionButton(context),
+                  ),
 
-          if (widget.showSubmitButton)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: widget.submitButtonBuilder?.call(
-                    _defSubmitButton(),
-                  ) ??
-                  _defSubmitButton(),
+                if (widget.showSubmitButton ||
+                    (_isVoteEditing && (widget.isMultiChoicePoll ?? false)))
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: widget.submitButtonBuilder?.call(
+                          _defSubmitButton(),
+                        ) ??
+                        _defSubmitButton(),
+                  ),
+                widget.subTextBuilder?.call(context) ?? _defSubText(),
+              ],
             ),
-          widget.subTextBuilder?.call(context) ?? _defSubText(),
-        ],
-      ),
-    );
+          );
+        });
   }
 
   Row _defSubText() {
@@ -251,7 +278,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
             ),
           ),
         ),
-        if (widget.showEditVoteButton && !widget.isVoteEditing)
+        if (widget.showEditVoteButton && !_isVoteEditing)
           Row(
             children: [
               LikeMindsTheme.kHorizontalPaddingSmall,
@@ -269,6 +296,8 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                 text: 'Edit Vote',
                 onTap: () {
                   widget.onEditVote?.call(widget.attachmentMeta);
+                  _isVoteEditing = true;
+                  _rebuildPollWidget.value = !_rebuildPollWidget.value;
                 },
                 style: _lmFeedPollStyle.editPollOptionsStyles ??
                     LMFeedTextStyle(
@@ -441,20 +470,21 @@ class _LMFeedPollState extends State<LMFeedPoll> {
     );
   }
 
-  LMFeedText _defPollSubtitle() {
-    return LMFeedText(
-      text:
-          "*Select ${multiSelectState.name} $multiSelectNo ${multiSelectNo == 1 ? "option" : "options"}.",
-      style: _lmFeedPollStyle.pollInfoStyles ??
-          const LMFeedTextStyle(
-            textStyle: TextStyle(
-              height: 1.33,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Colors.grey,
-            ),
-          ),
-    );
+  Widget _defPollSubtitle() {
+    return widget.pollSelectionText == null
+        ? const SizedBox.shrink()
+        : LMFeedText(
+            text: widget.pollSelectionText!,
+            style: _lmFeedPollStyle.pollInfoStyles ??
+                const LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    height: 1.33,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey,
+                  ),
+                ),
+          );
   }
 
   Row _defPollAction() {
@@ -515,7 +545,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
             children: [
               if (widget.attachmentMeta.toShowResult != null &&
                   widget.attachmentMeta.toShowResult! &&
-                  !widget.isVoteEditing &&
+                  !_isVoteEditing &&
                   !_lmFeedPollStyle.isComposable)
                 Positioned.fill(
                   child: Padding(
@@ -545,7 +575,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                         color: (!_lmFeedPollStyle.isComposable &&
                                     widget.attachmentMeta.toShowResult !=
                                         null &&
-                                    !widget.isVoteEditing &&
+                                    !_isVoteEditing &&
                                     widget.attachmentMeta.toShowResult! &&
                                     widget.attachmentMeta.options![index]
                                         .isSelected) ||
@@ -652,7 +682,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
         ),
         if (!_lmFeedPollStyle.isComposable &&
             widget.attachmentMeta.toShowResult != null &&
-            !widget.isVoteEditing &&
+            !_isVoteEditing &&
             widget.attachmentMeta.toShowResult!)
           Padding(
             padding: const EdgeInsets.only(left: 8.0),

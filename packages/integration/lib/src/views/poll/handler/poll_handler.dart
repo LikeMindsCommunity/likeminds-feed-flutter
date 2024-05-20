@@ -37,7 +37,6 @@ Future<void> submitVote(
             source,
           );
           rebuildPollWidget.value = !rebuildPollWidget.value;
-          // resetOptions(attachmentMeta, previousValue);
           return;
         } else if (attachmentMeta.multiSelectState! ==
                 PollMultiSelectState.atLeast &&
@@ -254,14 +253,13 @@ bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
 
 Future<void> addOption(
     BuildContext context,
-    LMFeedPoll pollWidget,
     LMAttachmentMetaViewData attachmentMeta,
     String option,
     String postId,
     LMUserViewData? currentUser,
     ValueNotifier<bool> rebuildPostWidget,
     LMFeedWidgetSource source) async {
-  if ((pollWidget.attachmentMeta.options?.length ?? 0) > 10) {
+  if ((attachmentMeta.options?.length ?? 0) > 10) {
     LMFeedCore.showSnackBar(
       context,
       "You can add up to 10 options",
@@ -327,12 +325,17 @@ String getTimeLeftInPoll(int? expiryTime) {
 }
 
 String? getPollSelectionText(
-    PollMultiSelectState pollMultiSelectState, int pollMultiSelectNo) {
+    PollMultiSelectState? pollMultiSelectState, int? pollMultiSelectNo) {
+  if (pollMultiSelectNo == null || pollMultiSelectState == null) {
+    return null;
+  }
   switch (pollMultiSelectState) {
     case PollMultiSelectState.exactly:
       if (pollMultiSelectNo == 1) {
+        debugPrint("Select exactly 1 option");
         return null;
       } else {
+        debugPrint("Select exactly $pollMultiSelectNo options");
         return "*Select exactly $pollMultiSelectNo options";
       }
     case PollMultiSelectState.atMax:
