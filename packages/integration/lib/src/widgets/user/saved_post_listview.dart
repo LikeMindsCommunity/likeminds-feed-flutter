@@ -60,6 +60,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedScreenConfig? config;
   LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
+  LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
+  final LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
 
   @override
   void initState() {
@@ -223,7 +225,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                             defPostWidget(_theme, item);
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
-                            LMFeedCore.widgetUtility.postWidgetBuilder.call(
+                            _widgetUtility.postWidgetBuilder.call(
                                 context, postWidget, item,
                                 source: widgetSource);
                       },
@@ -277,8 +279,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           MaterialPageRoute(
             builder: (context) => LMFeedPostDetailScreen(
               postId: post.id,
-              postBuilder: widget.postBuilder ??
-                  LMFeedCore.widgetUtility.postWidgetBuilder,
+              postBuilder:
+                  widget.postBuilder ?? _widgetUtility.postWidgetBuilder,
             ),
           ),
         );
@@ -416,8 +418,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       attachments: post.attachments!,
       postId: post.id,
       style: _theme.mediaStyle,
+      pollBuilder: _widgetUtility.pollWidgetBuilder,
+      poll: _defPollWidget(post),
       carouselIndicatorBuilder:
-          LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
+          _widgetUtility.postMediaCarouselIndicatorBuilder,
       onMediaTap: () async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
@@ -432,6 +436,143 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           ),
         );
         LMFeedVideoProvider.instance.playCurrentVideo();
+      },
+    );
+  }
+
+  LMFeedPoll? _defPollWidget(LMPostViewData postViewData) {
+    Map<String, bool> isVoteEditing = {"value": false};
+    if (postViewData.attachments == null || postViewData.attachments!.isEmpty) {
+      return null;
+    }
+    bool isPoll = false;
+    postViewData.attachments?.forEach((element) {
+      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+        isPoll = true;
+      }
+    });
+
+    if (!isPoll) {
+      return null;
+    }
+
+    LMAttachmentMetaViewData pollValue =
+        postViewData.attachments!.first.attachmentMeta;
+    LMAttachmentMetaViewData previousValue = pollValue.copyWith();
+    List<String> selectedOptions = [];
+    final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
+    return LMFeedPoll(
+      rebuildPollWidget: rebuildPollWidget,
+      isVoteEditing: isVoteEditing["value"]!,
+      selectedOption: selectedOptions,
+      attachmentMeta: pollValue,
+      style: _theme.mediaStyle.pollStyle ??
+          LMFeedPollStyle.basic(
+              primaryColor: _theme.primaryColor,
+              containerColor: _theme.container),
+      onEditVote: (pollData) {
+        isVoteEditing["value"] = true;
+        selectedOptions.clear();
+        selectedOptions.addAll(pollData.options!
+            .where((element) => element.isSelected)
+            .map((e) => e.id)
+            .toList());
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      onOptionSelect: (optionData) async {
+        debugPrint("this is selected");
+        if (hasPollEnded(pollValue.expiryTime!)) {
+          LMFeedCore.showSnackBar(
+            context,
+            "Poll ended. Vote can not be submitted now.",
+            LMFeedWidgetSource.universalFeed,
+          );
+          return;
+        }
+        if ((isPollSubmitted(pollValue.options ?? [])) &&
+            !isVoteEditing["value"]!) return;
+        if (!isMultiChoicePoll(
+            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+          submitVote(
+            context,
+            pollValue,
+            [optionData.id],
+            postViewData.id,
+            isVoteEditing,
+            previousValue,
+            rebuildPostWidget,
+            LMFeedWidgetSource.universalFeed,
+          );
+        } else if (selectedOptions.contains(optionData.id)) {
+          selectedOptions.remove(optionData.id);
+        } else {
+          selectedOptions.add(optionData.id);
+        }
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
+      showEditVoteButton: !isVoteEditing["value"]! &&
+          !isInstantPoll(pollValue.pollType) &&
+          !hasPollEnded(pollValue.expiryTime!) &&
+          isPollSubmitted(pollValue.options ?? []),
+      showAddOptionButton: showAddOptionButton(pollValue),
+      showTick: (option) {
+        return showTick(
+            pollValue, option, selectedOptions, isVoteEditing["value"]!);
+      },
+      isMultiChoicePoll: isMultiChoicePoll(
+          pollValue.multiSelectNo!, pollValue.multiSelectState!),
+      pollSelectionText: getPollSelectionText(
+          pollValue.multiSelectState, pollValue.multiSelectNo),
+      timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
+      onSameOptionAdded: () {
+        LMFeedCore.showSnackBar(
+          context,
+          "Option already exists",
+          LMFeedWidgetSource.universalFeed,
+        );
+      },
+      onAddOptionSubmit: (option) async {
+        await addOption(
+          context,
+          pollValue,
+          option,
+          postViewData.id,
+          currentUser,
+          rebuildPollWidget,
+          LMFeedWidgetSource.universalFeed,
+        );
+        selectedOptions.clear();
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      onSubtextTap: () {
+        onVoteTextTap(
+          context,
+          pollValue,
+          LMFeedWidgetSource.universalFeed,
+        );
+      },
+      onVoteClick: (option) {
+        onVoteTextTap(
+          context,
+          pollValue,
+          LMFeedWidgetSource.universalFeed,
+          option: option,
+        );
+      },
+      onSubmit: (options) {
+        submitVote(
+          context,
+          pollValue,
+          options,
+          postViewData.id,
+          isVoteEditing,
+          previousValue,
+          rebuildPostWidget,
+          LMFeedWidgetSource.universalFeed,
+        );
+        selectedOptions.clear();
+        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }
@@ -496,8 +637,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               builder: (context) => LMFeedPostDetailScreen(
                 postId: post.id,
                 openKeyboard: true,
-                postBuilder: widget.postBuilder ??
-                    LMFeedCore.widgetUtility.postWidgetBuilder,
+                postBuilder:
+                    widget.postBuilder ?? _widgetUtility.postWidgetBuilder,
               ),
             ),
           );
@@ -511,8 +652,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               builder: (context) => LMFeedPostDetailScreen(
                 postId: post.id,
                 openKeyboard: true,
-                postBuilder: widget.postBuilder ??
-                    LMFeedCore.widgetUtility.postWidgetBuilder,
+                postBuilder:
+                    widget.postBuilder ?? _widgetUtility.postWidgetBuilder,
               ),
             ),
           );

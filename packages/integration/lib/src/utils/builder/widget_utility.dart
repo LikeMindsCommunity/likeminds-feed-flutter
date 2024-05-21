@@ -142,6 +142,10 @@ class LMFeedWidgetUtility {
     return video;
   }
 
+  Widget pollWidgetBuilder(BuildContext context, LMFeedPoll pollWidget) {
+    return pollWidget;
+  }
+
   Widget postMediaCarouselIndicatorBuilder(BuildContext context, int currIndex,
       int mediaLength, Widget carouselIndicator) {
     return carouselIndicator;

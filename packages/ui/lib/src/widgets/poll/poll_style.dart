@@ -20,14 +20,14 @@ class LMFeedPollStyle {
   ///[LMFeedTextStyle] for poll question text
   final LMFeedTextStyle? pollQuestionStyle;
 
-  ///[LMFeedTextStyle] for poll option text
-  final LMFeedTextStyle? pollOptionStyle;
-
   ///[LMFeedTextStyle] for poll info text
   final LMFeedTextStyle? pollInfoStyles;
 
-  ///[LMFeedTextStyle] for votes count text
-  final LMFeedTextStyle? votesCountStyles;
+  ///[LMFeedTextStyle] for poll answer text
+  final LMFeedTextStyle? pollAnswerStyle;
+
+  /// [LMFeedTextStyle] for time stamp text
+  final LMFeedTextStyle? timeStampStyle;
 
   ///[LMFeedTextStyle] for percentage text
   final LMFeedTextStyle? percentageStyle;
@@ -35,11 +35,14 @@ class LMFeedPollStyle {
   ///[LMFeedTextStyle] for edit poll options text
   final LMFeedTextStyle? editPollOptionsStyles;
 
-  ///[Color] for poll option selected color
-  final Color? pollOptionSelectedColor;
+  /// [LMFeedTextStyle] for submit poll text style
+  final LMFeedTextStyle? submitPollTextStyle;
 
-  ///[Color] for poll option other color
-  final Color? pollOptionOtherColor;
+  /// [LMFeedButtonStyle] for submit poll button style
+  final LMFeedButtonStyle? submitPollButtonStyle;
+
+  /// [LMPollOptionStyle] for poll option style
+  final LMFeedPollOptionStyle? pollOptionStyle;
 
   const LMFeedPollStyle({
     this.isComposable = false,
@@ -48,36 +51,41 @@ class LMFeedPollStyle {
     this.decoration,
     this.backgroundColor,
     this.pollQuestionStyle,
-    this.pollOptionStyle,
     this.pollInfoStyles,
-    this.votesCountStyles,
+    this.pollAnswerStyle,
+    this.timeStampStyle,
     this.percentageStyle,
     this.editPollOptionsStyles,
-    this.pollOptionSelectedColor,
-    this.pollOptionOtherColor,
+    this.submitPollTextStyle,
+    this.submitPollButtonStyle,
+    this.pollOptionStyle,
   });
 
-  static LMFeedPollStyle composable() {
-    return LMFeedPollStyle(
-      isComposable: true,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.grey,
-        ),
-      ),
-    );
-  }
 
-  static LMFeedPollStyle inFeed() {
-    return const LMFeedPollStyle(
-        margin: EdgeInsets.symmetric(
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-        ));
+
+  factory LMFeedPollStyle.basic({
+    Color? primaryColor,
+    Color? containerColor,
+    Color? inActiveColor,
+    bool isComposable = false,
+  }) {
+    return LMFeedPollStyle(
+      margin: const EdgeInsets.symmetric(
+        vertical: 8,
+      ),
+      backgroundColor: containerColor ?? Colors.white,
+      decoration: BoxDecoration(
+        color: containerColor ?? Colors.white,
+        borderRadius: isComposable ? BorderRadius.circular(8) : null,
+        border: isComposable
+            ? Border.all(
+                color: Colors.grey,
+              )
+            : null,
+      ),
+      pollOptionStyle: LMFeedPollOptionStyle.basic(
+          primaryColor: primaryColor, inActiveColor: inActiveColor),
+    );
   }
 
   LMFeedPollStyle copyWith({
@@ -87,13 +95,15 @@ class LMFeedPollStyle {
     BoxDecoration? decoration,
     Color? backgroundColor,
     LMFeedTextStyle? pollQuestionStyle,
-    LMFeedTextStyle? pollOptionStyle,
     LMFeedTextStyle? pollInfoStyles,
+    LMFeedTextStyle? pollAnswerStyle,
+    LMFeedTextStyle? timeStampStyle,
     LMFeedTextStyle? votesCountStyles,
     LMFeedTextStyle? percentageStyle,
     LMFeedTextStyle? editPollOptionsStyles,
-    Color? pollOptionSelectedColor,
-    Color? pollOptionOtherColor,
+    LMFeedTextStyle? submitPollTextStyle,
+    LMFeedButtonStyle? submitPollButtonStyle,
+    LMFeedPollOptionStyle? pollOptionStyle,
   }) {
     return LMFeedPollStyle(
       isComposable: isComposable ?? this.isComposable,
@@ -102,15 +112,97 @@ class LMFeedPollStyle {
       decoration: decoration ?? this.decoration,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       pollQuestionStyle: pollQuestionStyle ?? this.pollQuestionStyle,
-      pollOptionStyle: pollOptionStyle ?? this.pollOptionStyle,
       pollInfoStyles: pollInfoStyles ?? this.pollInfoStyles,
-      votesCountStyles: votesCountStyles ?? this.votesCountStyles,
+      pollAnswerStyle: pollAnswerStyle ?? this.pollAnswerStyle,
+      timeStampStyle: timeStampStyle ?? this.timeStampStyle,
       percentageStyle: percentageStyle ?? this.percentageStyle,
       editPollOptionsStyles:
           editPollOptionsStyles ?? this.editPollOptionsStyles,
+      submitPollTextStyle: submitPollTextStyle ?? this.submitPollTextStyle,
+      submitPollButtonStyle:
+          submitPollButtonStyle ?? this.submitPollButtonStyle,
+      pollOptionStyle: pollOptionStyle ?? this.pollOptionStyle,
+    );
+  }
+}
+
+class LMFeedPollOptionStyle {
+  ///[Color] for poll option selected color
+  final Color? pollOptionSelectedColor;
+
+  ///[Color] for poll option other color
+  final Color? pollOptionOtherColor;
+
+  ///[Color] for tick in poll option selected
+  final Color? pollOptionSelectedTickColor;
+
+  ///[Color] for border of selected poll option
+  final Color? pollOptionSelectedBorderColor;
+
+  /// [Color] for text color of selected poll option
+  final Color? pollOptionSelectedTextColor;
+
+  /// [Color] for text color of other poll option
+  final Color? pollOptionOtherTextColor;
+
+  ///[LMFeedTextStyle] for votes count text
+  final LMFeedTextStyle? votesCountStyles;
+
+  ///[LMFeedTextStyle] for poll option text style
+  final LMFeedTextStyle? pollOptionTextStyle;
+
+  /// [BoxDecoration] for poll option decoration
+  final BoxDecoration? pollOptionDecoration;
+
+  const LMFeedPollOptionStyle({
+    this.pollOptionSelectedColor,
+    this.pollOptionOtherColor,
+    this.pollOptionSelectedTickColor,
+    this.pollOptionSelectedBorderColor,
+    this.pollOptionSelectedTextColor,
+    this.votesCountStyles,
+    this.pollOptionOtherTextColor,
+    this.pollOptionTextStyle,
+    this.pollOptionDecoration,
+  });
+
+  /// copyWith method for [LMFeedPollOptionStyle]
+  LMFeedPollOptionStyle copyWith({
+    Color? pollOptionSelectedColor,
+    Color? pollOptionOtherColor,
+    Color? pollOptionSelectedTickColor,
+    Color? pollOptionSelectedBorderColor,
+    Color? pollOptionSelectedTextColor,
+    Color? pollOptionOtherTextColor,
+    LMFeedTextStyle? votesCountStyles,
+    LMFeedTextStyle? pollOptionTextStyle,
+    BoxDecoration? pollOptionDecoration,
+  }) {
+    return LMFeedPollOptionStyle(
       pollOptionSelectedColor:
           pollOptionSelectedColor ?? this.pollOptionSelectedColor,
       pollOptionOtherColor: pollOptionOtherColor ?? this.pollOptionOtherColor,
+      pollOptionSelectedTickColor:
+          pollOptionSelectedTickColor ?? this.pollOptionSelectedTickColor,
+      pollOptionSelectedBorderColor:
+          pollOptionSelectedBorderColor ?? this.pollOptionSelectedBorderColor,
+      pollOptionSelectedTextColor:
+          pollOptionSelectedTextColor ?? this.pollOptionSelectedTextColor,
+      pollOptionOtherTextColor:
+          pollOptionOtherTextColor ?? this.pollOptionOtherTextColor,
+      votesCountStyles: votesCountStyles ?? this.votesCountStyles,
+      pollOptionTextStyle: pollOptionTextStyle ?? this.pollOptionTextStyle,
+      pollOptionDecoration: pollOptionDecoration ?? this.pollOptionDecoration,
+    );
+  }
+
+  factory LMFeedPollOptionStyle.basic(
+      {Color? primaryColor, Color? inActiveColor}) {
+    return LMFeedPollOptionStyle(
+      pollOptionSelectedColor: primaryColor?.withOpacity(0.2) ??
+          LikeMindsTheme.primaryColor.withOpacity(0.2),
+      pollOptionOtherColor:
+          inActiveColor ?? const Color.fromRGBO(230, 235, 245, 1),
     );
   }
 }
