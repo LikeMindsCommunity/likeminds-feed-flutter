@@ -126,6 +126,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
               dividerColor: theme.primaryColor,
               indicatorColor: theme.primaryColor,
               indicatorWeight: 4,
+              isScrollable: true,
               labelColor: theme.primaryColor,
               indicatorSize: TabBarIndicatorSize.tab,
               labelStyle: TextStyle(
@@ -242,6 +243,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
     LMResponse<GetPollVotesResponse> response =
         await LMFeedCore.instance.lmFeedClient.getPollVotes(request);
     if (!response.success) {
+      _pagingController.error = response.errorMessage;
       return;
     }
 
@@ -258,6 +260,10 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
             {};
 
     List<LMUserViewData> users = [];
+    if (response.data?.votes.isEmpty ?? true) {
+      _pagingController.appendLastPage([]);
+      return;
+    }
     response.data?.votes.first.users.forEach((e) {
       final LMUserViewData user = LMUserViewDataConvertor.fromUser(
         response.data!.users[e]!,
