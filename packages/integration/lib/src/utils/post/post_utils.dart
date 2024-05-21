@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedPostUtils {
+  static bool doPostNeedsApproval = false;
+
   static String getPostTitle(LMFeedPluralizeWordAction action) {
     String postTitle = LMFeedLocalPreference.instance.getPostVariable();
 
@@ -63,7 +65,7 @@ class LMFeedPostUtils {
       case (LMFeedPostActionType.addPollOption ||
             LMFeedPostActionType.addPollOptionError):
         {
-          if (pollOptions != null) { 
+          if (pollOptions != null) {
             final options = [...pollOptions];
             postViewData.attachments!.first.attachmentMeta.options?.clear();
             postViewData.attachments!.first.attachmentMeta.options

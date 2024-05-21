@@ -74,6 +74,10 @@ class LMPostViewDataConvertor {
 
     postViewDataBuilder.isLiked(post.isLiked);
 
+    postViewDataBuilder.isPendingPost(post.isPendingPost);
+
+    postViewDataBuilder.postStatus(post.postStatus);
+
     postViewDataBuilder.menuItems(post.menuItems
         .map((e) => LMPopupMenuItemConvertor.fromPopUpMenuItemModel(item: e))
         .toList());
@@ -157,6 +161,9 @@ class LMPostViewDataConvertor {
       isDeleted: postViewData.isDeleted,
       heading: postViewData.heading,
       tempId: postViewData.tempId,
+      isPendingPost: postViewData.isPendingPost,
+      postStatus: postViewData.postStatus,
+      commentIds: postViewData.commentIds,
     );
   }
 }

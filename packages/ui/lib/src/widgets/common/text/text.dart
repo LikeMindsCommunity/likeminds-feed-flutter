@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 
+/// {@template lm_feed_text}
 /// A simple text widget to be used throughout the Feed experience
 /// Provides high level customisability through [LMFeedTextStyle]
 /// Also, can add onTap functionality
+/// {@endtemplate}
 class LMFeedText extends StatelessWidget {
-  /// text to be shown as [String]
+  // text to be shown as [String]
   final String text;
 
-  /// onTap functionality by providing a [Function]
+  // onTap functionality by providing a [Function]
   final Function()? onTap;
 
-  /// style class to provide appearance customisability
+  // style class to provide appearance customisability
+  /// {@macro lm_feed_text_style}
   final LMFeedTextStyle? style;
 
+  /// {@macro lm_feed_text}
   const LMFeedText({
     Key? key,
     required this.text,
@@ -55,7 +59,9 @@ class LMFeedText extends StatelessWidget {
   }
 }
 
+/// {@template lm_feed_text_style}
 /// class representing style for a [LMFeedText]
+/// {@endtemplate}
 class LMFeedTextStyle {
   /// [bool] to determine whether the text is selectable or not
   final bool selectable;

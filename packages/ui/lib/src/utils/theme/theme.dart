@@ -328,15 +328,55 @@ class LMFeedTextFieldStyle {
 }
 
 class LMFeedDialogStyle {
+  final Alignment? alignment;
   final Color? backgroundColor;
+  final Clip clipBehavior;
+  final double? elevation;
+  final Curve insetAnimationCurve;
+  final Duration insetAnimationDuration;
+  final EdgeInsets insetPadding;
+  final Color? shadowColor;
+  final ShapeBorder? shape;
+  final Color surfaceTintColor;
 
   const LMFeedDialogStyle({
+    this.alignment,
     this.backgroundColor,
+    this.clipBehavior = Clip.none,
+    this.elevation,
+    this.insetAnimationCurve = Curves.decelerate,
+    this.insetAnimationDuration = const Duration(milliseconds: 100),
+    this.insetPadding =
+        const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+    this.shadowColor,
+    this.shape,
+    this.surfaceTintColor = Colors.transparent,
   });
 
-  LMFeedDialogStyle copyWith({Color? backgroundColor}) {
+  LMFeedDialogStyle copyWith({
+    Alignment? alignment,
+    Color? backgroundColor,
+    Clip? clipBehavior,
+    double? elevation,
+    Curve? insetAnimationCurve,
+    Duration? insetAnimationDuration,
+    EdgeInsets? insetPadding,
+    Color? shadowColor,
+    ShapeBorder? shape,
+    Color? surfaceTintColor,
+  }) {
     return LMFeedDialogStyle(
+      alignment: alignment ?? this.alignment,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      clipBehavior: clipBehavior ?? this.clipBehavior,
+      elevation: elevation ?? this.elevation,
+      insetAnimationCurve: insetAnimationCurve ?? this.insetAnimationCurve,
+      insetAnimationDuration:
+          insetAnimationDuration ?? this.insetAnimationDuration,
+      insetPadding: insetPadding ?? this.insetPadding,
+      shadowColor: shadowColor ?? this.shadowColor,
+      shape: shape ?? this.shape,
+      surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
     );
   }
 }

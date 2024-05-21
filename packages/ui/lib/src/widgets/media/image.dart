@@ -22,6 +22,7 @@ class LMFeedImage extends StatefulWidget {
     this.onError,
     this.style,
     this.onMediaTap,
+    this.position = 0,
   }) : assert(imageUrl != null || imageFile != null);
 
   final String? imageUrl;
@@ -32,7 +33,9 @@ class LMFeedImage extends StatefulWidget {
 
   final LMFeedPostImageStyle? style;
 
-  final VoidCallback? onMediaTap;
+  final Function(int)? onMediaTap;
+
+  final int position;
 
   @override
   State<LMFeedImage> createState() => _LMImageState();
@@ -42,7 +45,7 @@ class LMFeedImage extends StatefulWidget {
     File? imageFile,
     LMFeedPostImageStyle? style,
     Function(String, StackTrace)? onError,
-    VoidCallback? onMediaTap,
+    Function(int)? onMediaTap,
   }) {
     return LMFeedImage(
       imageUrl: imageUrl ?? this.imageUrl,
@@ -61,7 +64,7 @@ class _LMImageState extends State<LMFeedImage> {
   Widget build(BuildContext context) {
     style = widget.style ?? LMFeedTheme.instance.theme.mediaStyle.imageStyle;
     return GestureDetector(
-      onTap: () => widget.onMediaTap?.call(),
+      onTap: () => widget.onMediaTap?.call(widget.position),
       child: widget.imageUrl != null
           ? Container(
               padding: style?.padding,

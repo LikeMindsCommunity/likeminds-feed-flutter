@@ -54,6 +54,8 @@ class LMPostViewData {
   bool isRepostedByUser;
   int repostCount;
   bool? isDeleted;
+  bool isPendingPost;
+  String postStatus;
 
   /// widget map to hold custom widget data
   Map<String, LMWidgetViewData>? widgets;
@@ -84,6 +86,8 @@ class LMPostViewData {
     required this.isRepost,
     required this.isRepostedByUser,
     required this.repostCount,
+    required this.isPendingPost,
+    required this.postStatus,
     this.isDeleted = false,
     this.widgets,
     this.commentIds,
@@ -120,6 +124,8 @@ class LMPostViewData {
       heading: heading,
       topComments: topComments,
       tempId: tempId,
+      isPendingPost: isPendingPost,
+      postStatus: postStatus,
     );
   }
 }
@@ -151,6 +157,8 @@ class LMPostViewDataBuilder {
   List<String>? _commentIds;
   List<LMCommentViewData>? _topComments;
   String? _tempId;
+  bool? _isPendingPost;
+  String? _postStatus;
 
   void id(String id) {
     _id = id;
@@ -256,6 +264,14 @@ class LMPostViewDataBuilder {
     _tempId = tempId;
   }
 
+  void isPendingPost(bool isPendingPost) {
+    _isPendingPost = isPendingPost;
+  }
+
+  void postStatus(String postStatus) {
+    _postStatus = postStatus;
+  }
+
   LMPostViewData build() {
     return LMPostViewData._(
       id: _id!,
@@ -284,6 +300,8 @@ class LMPostViewDataBuilder {
       commentIds: _commentIds,
       topComments: _topComments,
       tempId: _tempId,
+      isPendingPost: _isPendingPost!,
+      postStatus: _postStatus!,
     );
   }
 }

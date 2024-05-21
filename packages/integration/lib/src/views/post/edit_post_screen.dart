@@ -420,8 +420,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         child: AlertDialog(
           backgroundColor: feedTheme.container,
           title: Text('Discard Changes?'),
-          content: Text(
-              'Are you sure you want to discard the current changes?'),
+          content:
+              Text('Are you sure you want to discard the current changes?'),
           actionsAlignment: MainAxisAlignment.center,
           actionsPadding: const EdgeInsets.all(8),
           actions: <Widget>[
@@ -572,6 +572,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                       child: LMFeedImage(
                         imageUrl: mediaModel.link,
                         style: style?.mediaStyle?.imageStyle,
+                        position: index,
                       ),
                     );
                     break;

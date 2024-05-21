@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
+import 'package:likeminds_feed_flutter_ui/src/widgets/post/post_review_banner.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 import 'package:visibility_aware_state/visibility_aware_state.dart';
 
@@ -38,10 +39,13 @@ class LMFeedPostWidget extends StatefulWidget {
     this.onMediaTap,
     this.activityHeader,
     this.disposeVideoPlayerOnInActive,
+    this.reviewBanner,
+    this.reviewBannerBuilder,
   });
 
   final LMFeedPostStyle? style;
 
+  final LMFeedPostReviewBanner? reviewBannerBuilder;
   final LMFeedPostHeaderBuilder? headerBuilder;
   final LMFeedPostContentBuilder? contentBuilder;
   final LMFeedPostTopicBuilder? topicBuilder;
@@ -49,6 +53,7 @@ class LMFeedPostWidget extends StatefulWidget {
   final LMFeedPostMediaBuilder? mediaBuilder;
   final LMFeedPostFooterBuilder? footerBuilder;
 
+  final LMFeedPostReviewBanner? reviewBanner;
   final LMFeedPostHeader? header;
   final LMFeedPostFooter? footer;
   final LMFeedMenu? menu;
@@ -99,6 +104,9 @@ class LMFeedPostWidget extends StatefulWidget {
     LMFeedPostStyle? style,
     Function(int)? onMediaTap,
     Widget? activityHeader,
+    void Function()? disposeVideoPlayerOnInActive,
+    LMFeedPostReviewBanner? reviewBanner,
+    LMFeedPostReviewBanner? reviewBannerBuilder,
   }) {
     return LMFeedPostWidget(
       post: post ?? this.post,
@@ -123,6 +131,10 @@ class LMFeedPostWidget extends StatefulWidget {
       style: style ?? this.style,
       onMediaTap: onMediaTap ?? this.onMediaTap,
       activityHeader: activityHeader ?? this.activityHeader,
+      disposeVideoPlayerOnInActive:
+          disposeVideoPlayerOnInActive ?? this.disposeVideoPlayerOnInActive,
+      reviewBanner: reviewBanner ?? reviewBanner,
+      reviewBannerBuilder: reviewBannerBuilder ?? reviewBannerBuilder,
     );
   }
 }
@@ -206,6 +218,13 @@ class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
         ),
       ),
     );
+  }
+
+  LMFeedPostReviewBanner _defPostReviewBanner() {
+    return widget.reviewBanner ??
+        const LMFeedPostReviewBanner(
+          postReviewStatus: LMPostReviewStatus.pending,
+        );
   }
 
   LMFeedPostTopic _defTopicWidget() {

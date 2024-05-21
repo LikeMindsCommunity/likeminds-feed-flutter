@@ -163,7 +163,9 @@ class LMFeedCore {
 
       if (!initialiseFeedResponse.success) {
         return LMResponse(
-            success: false, errorMessage: initialiseFeedResponse.errorMessage,);
+          success: false,
+          errorMessage: initialiseFeedResponse.errorMessage,
+        );
       }
     } else {
       return LMResponse(
@@ -179,7 +181,11 @@ class LMFeedCore {
     ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
     if (response.success) {
-      //TODO can be removed when storing of cache is moved to data layer - done
+      response.community?.communitySettings?.forEach((element) {
+        if (element.settingType == "post_needs_approval") {
+          LMFeedPostUtils.doPostNeedsApproval = element.enabled;
+        }
+      });
       return LMResponse(success: true, data: response);
     } else {
       return LMResponse(
@@ -271,7 +277,12 @@ class LMFeedCore {
         return LMResponse(
             success: false, errorMessage: initiateUserResponse.errorMessage);
       } else {
-        //TODO remove storing of cache and move it to data layer when initiateUser() is success - done
+        initiateUserResponse.community?.communitySettings?.forEach((element) {
+          if (element.settingType == "post_needs_approval") {
+            LMFeedPostUtils.doPostNeedsApproval = element.enabled;
+          }
+        });
+
         return LMResponse(success: true, data: initiateUserResponse);
       }
     }
