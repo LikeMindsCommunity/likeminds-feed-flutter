@@ -144,7 +144,12 @@ class LMFeedThemeData {
           topicStyle ?? LMFeedPostTopicStyle.basic(primaryColor: primaryColor),
       contentStyle: contentStyle ??
           LMFeedPostContentStyle.basic(onContainer: onContainer),
-      mediaStyle: mediaStyle ?? LMFeedPostMediaStyle.basic(),
+      mediaStyle: mediaStyle ??
+          LMFeedPostMediaStyle.basic(
+            primaryColor: primaryColor,
+            containerColor: container ?? LikeMindsTheme.container,
+            inActiveColor: inActiveColor ?? LikeMindsTheme.unSelectedColor,
+          ),
       footerStyle: footerStyle ??
           LMFeedPostFooterStyle.basic(primaryColor: primaryColor),
       headerStyle: headerStyle ?? LMFeedPostHeaderStyle.basic(),
@@ -259,6 +264,7 @@ class LikeMindsTheme {
   static const Color hashTagColor = Color.fromRGBO(0, 122, 255, 1);
   static const Color linkColor = Color.fromRGBO(0, 122, 255, 1);
   static const Color headingColor = Color.fromRGBO(51, 51, 51, 1);
+  static const Color unSelectedColor = Color.fromRGBO(230, 235, 245, 1);
   static const Color container = whiteColor;
   static const Color onContainer = blackColor;
   static const Color onPrimary = whiteColor;

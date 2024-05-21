@@ -121,6 +121,68 @@ class LMFeedPoll extends StatefulWidget {
 
   @override
   State<LMFeedPoll> createState() => _LMFeedPollState();
+
+  LMFeedPoll copyWith({
+    ValueNotifier<bool>? rebuildPollWidget,
+    LMAttachmentMetaViewData? attachmentMeta,
+    VoidCallback? onCancel,
+    Function(LMAttachmentMetaViewData)? onEdit,
+    Function(LMAttachmentMetaViewData)? onEditVote,
+    LMFeedPollStyle? style,
+    void Function(LMPollOptionViewData)? onOptionSelect,
+    bool? showSubmitButton,
+    bool? showAddOptionButton,
+    bool? showEditVoteButton,
+    bool? isVoteEditing,
+    bool Function(LMPollOptionViewData)? showTick,
+    String? timeLeft,
+    void Function(String option)? onAddOptionSubmit,
+    Function(LMPollOptionViewData)? onVoteClick,
+    List<String>? selectedOption,
+    Function(List<String> selectedOption)? onSubmit,
+    VoidCallback? onSubtextTap,
+    Widget Function(BuildContext)? pollQuestionBuilder,
+    Widget Function(BuildContext)? pollOptionBuilder,
+    Widget Function(BuildContext)? pollSelectionTextBuilder,
+    String? pollSelectionText,
+    LMFeedButtonBuilder? addOptionButtonBuilder,
+    LMFeedButtonBuilder? submitButtonBuilder,
+    Widget Function(BuildContext)? subTextBuilder,
+    VoidCallback? onSameOptionAdded,
+    bool? isMultiChoicePoll,
+  }) {
+    return LMFeedPoll(
+      rebuildPollWidget: rebuildPollWidget ?? this.rebuildPollWidget,
+      attachmentMeta: attachmentMeta ?? this.attachmentMeta,
+      onCancel: onCancel ?? this.onCancel,
+      onEdit: onEdit ?? this.onEdit,
+      onEditVote: onEditVote ?? this.onEditVote,
+      style: style ?? this.style,
+      onOptionSelect: onOptionSelect ?? this.onOptionSelect,
+      showSubmitButton: showSubmitButton ?? this.showSubmitButton,
+      showAddOptionButton: showAddOptionButton ?? this.showAddOptionButton,
+      showEditVoteButton: showEditVoteButton ?? this.showEditVoteButton,
+      isVoteEditing: isVoteEditing ?? this.isVoteEditing,
+      showTick: showTick ?? this.showTick,
+      timeLeft: timeLeft ?? this.timeLeft,
+      onAddOptionSubmit: onAddOptionSubmit ?? this.onAddOptionSubmit,
+      onVoteClick: onVoteClick ?? this.onVoteClick,
+      selectedOption: selectedOption ?? this.selectedOption,
+      onSubmit: onSubmit ?? this.onSubmit,
+      onSubtextTap: onSubtextTap ?? this.onSubtextTap,
+      pollQuestionBuilder: pollQuestionBuilder ?? this.pollQuestionBuilder,
+      pollOptionBuilder: pollOptionBuilder ?? this.pollOptionBuilder,
+      pollSelectionTextBuilder:
+          pollSelectionTextBuilder ?? this.pollSelectionTextBuilder,
+      pollSelectionText: pollSelectionText ?? this.pollSelectionText,
+      addOptionButtonBuilder:
+          addOptionButtonBuilder ?? this.addOptionButtonBuilder,
+      submitButtonBuilder: submitButtonBuilder ?? this.submitButtonBuilder,
+      subTextBuilder: subTextBuilder ?? this.subTextBuilder,
+      onSameOptionAdded: onSameOptionAdded ?? this.onSameOptionAdded,
+      isMultiChoicePoll: isMultiChoicePoll ?? this.isMultiChoicePoll,
+    );
+  }
 }
 
 class _LMFeedPollState extends State<LMFeedPoll> {
@@ -178,8 +240,8 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                 ),
             padding: _lmFeedPollStyle.padding ?? const EdgeInsets.all(16),
             decoration: _lmFeedPollStyle.decoration?.copyWith(
-              color: _lmFeedPollStyle.backgroundColor ?? theme.container,
-            ) ??
+                  color: _lmFeedPollStyle.backgroundColor ?? theme.container,
+                ) ??
                 BoxDecoration(
                   color: _lmFeedPollStyle.backgroundColor ?? theme.container,
                   borderRadius: _lmFeedPollStyle.isComposable

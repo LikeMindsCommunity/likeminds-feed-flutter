@@ -74,15 +74,18 @@ class LMFeedPollStyle {
     );
   }
 
-  static LMFeedPollStyle basic() {
+  factory LMFeedPollStyle.basic(
+      {Color? primaryColor, Color? containerColor, Color? inActiveColor}) {
     return LMFeedPollStyle(
       margin: const EdgeInsets.symmetric(
         vertical: 8,
       ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      backgroundColor: containerColor ?? Colors.white,
+      decoration: BoxDecoration(
+        color: containerColor ?? Colors.white,
       ),
-      pollOptionStyle: LMFeedPollOptionStyle.basic(),      
+      pollOptionStyle: LMFeedPollOptionStyle.basic(
+          primaryColor: primaryColor, inActiveColor: inActiveColor),
     );
   }
 
@@ -193,10 +196,13 @@ class LMFeedPollOptionStyle {
     );
   }
 
-  static LMFeedPollOptionStyle basic() {
-    return const LMFeedPollOptionStyle(
-      pollOptionSelectedColor: Color.fromRGBO(80, 70, 229, 0.2),
-      pollOptionOtherColor: Color.fromRGBO(230, 235, 245, 1),
+  factory LMFeedPollOptionStyle.basic(
+      {Color? primaryColor, Color? inActiveColor}) {
+    return LMFeedPollOptionStyle(
+      pollOptionSelectedColor: primaryColor?.withOpacity(0.2) ??
+          LikeMindsTheme.primaryColor.withOpacity(0.2),
+      pollOptionOtherColor:
+          inActiveColor ?? const Color.fromRGBO(230, 235, 245, 1),
     );
   }
 }

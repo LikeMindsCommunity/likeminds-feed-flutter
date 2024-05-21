@@ -288,12 +288,17 @@ class LMFeedPostMediaStyle {
     );
   }
 
-  factory LMFeedPostMediaStyle.basic() => LMFeedPostMediaStyle(
+  factory LMFeedPostMediaStyle.basic(
+          {Color? primaryColor, Color? containerColor, Color? inActiveColor}) =>
+      LMFeedPostMediaStyle(
         carouselStyle: const LMFeedPostCarouselStyle(),
         documentStyle: const LMFeedPostDocumentStyle(),
         imageStyle: const LMFeedPostImageStyle(),
         linkStyle: LMFeedPostLinkPreviewStyle.basic(),
         videoStyle: const LMFeedPostVideoStyle(),
-        pollStyle: LMFeedPollStyle.basic(),
+        pollStyle: LMFeedPollStyle.basic(
+            primaryColor: primaryColor,
+            containerColor: containerColor,
+            inActiveColor: inActiveColor),
       );
 }
