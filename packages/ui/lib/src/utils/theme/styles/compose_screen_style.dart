@@ -89,12 +89,14 @@ class LMFeedComposeMediaStyle {
   final LMFeedPostVideoStyle? videoStyle;
   final LMFeedPostLinkPreviewStyle? linkStyle;
   final LMFeedPostDocumentStyle? documentStyle;
+  final LMFeedPollStyle? pollStyle;
 
   LMFeedComposeMediaStyle({
     this.imageStyle,
     this.videoStyle,
     this.linkStyle,
     this.documentStyle,
+    this.pollStyle,
   });
 
   LMFeedComposeMediaStyle copyWith({
@@ -102,12 +104,14 @@ class LMFeedComposeMediaStyle {
     LMFeedPostVideoStyle? videoStyle,
     LMFeedPostLinkPreviewStyle? linkStyle,
     LMFeedPostDocumentStyle? documentStyle,
+    LMFeedPollStyle? pollStyle,
   }) {
     return LMFeedComposeMediaStyle(
       imageStyle: imageStyle ?? this.imageStyle,
       videoStyle: videoStyle ?? this.videoStyle,
       linkStyle: linkStyle ?? this.linkStyle,
       documentStyle: documentStyle ?? this.documentStyle,
+      pollStyle: pollStyle ?? this.pollStyle,
     );
   }
 
@@ -116,5 +120,6 @@ class LMFeedComposeMediaStyle {
         videoStyle: LMFeedPostVideoStyle.basic(),
         linkStyle: LMFeedPostLinkPreviewStyle.basic(),
         documentStyle: LMFeedPostDocumentStyle.basic(),
+        pollStyle: LMFeedPollStyle.basic(isComposable: true),
       );
 }

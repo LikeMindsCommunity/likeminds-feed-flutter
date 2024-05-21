@@ -62,3 +62,6 @@ Added api key security
 
 # 1.4.1
  Updated Data layer to v1.10.1
+
+# 1.4.2
+ Added customisibility to poll
