@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:video_compress/video_compress.dart';
 // import 'package:media_kit_video/media_kit_video.dart';
@@ -692,6 +691,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             icon: LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.search,
+              style: LMFeedIconStyle.basic().copyWith(
+                color: feedThemeData.onContainer,
+                size: 24,
+              ),
             ),
           ),
         ),

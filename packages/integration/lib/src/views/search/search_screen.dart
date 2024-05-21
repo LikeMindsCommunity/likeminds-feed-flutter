@@ -167,14 +167,17 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         title: TextField(
           controller: searchController,
           onChanged: _onTextChanged,
+          cursorColor: theme.primaryColor,
           decoration: InputDecoration(
             hintText: 'Search...',
+            hintStyle: TextStyle(color: theme.onContainer.withOpacity(0.5)),
             border: InputBorder.none,
             focusedBorder: InputBorder.none,
             enabledBorder: InputBorder.none,
             errorBorder: InputBorder.none,
             disabledBorder: InputBorder.none,
           ),
+          style: TextStyle(color: theme.onContainer),
         ),
         actions: [
           ValueListenableBuilder(
