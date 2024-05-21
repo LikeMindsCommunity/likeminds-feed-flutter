@@ -105,7 +105,7 @@ class LMFeedPoll extends StatefulWidget {
   final String? pollSelectionText;
 
   /// [Widget Function(BuildContext, LMFeedButton,  Function(String))] Builder for the add option button
-  final Widget Function(BuildContext, LMFeedButton,  Function(String))?
+  final Widget Function(BuildContext, LMFeedButton, Function(String))?
       addOptionButtonBuilder;
 
   /// [Widget Function(BuildContext)] Builder for the submit button
@@ -452,7 +452,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                     ),
                   ),
                   LMFeedButton(
-                    onTap:(){
+                    onTap: () {
                       _onAddOptionSubmit(_addOptionController.text);
                     },
                     text: LMFeedText(
@@ -586,18 +586,17 @@ class _LMFeedPollState extends State<LMFeedPoll> {
     );
   }
 
-  LMFeedText _defPollQuestion() {
-    return LMFeedText(
-      text: pollQuestion,
+  LMFeedExpandableText _defPollQuestion() {
+    return LMFeedExpandableText(
+      pollQuestion,
+      expandText: _lmFeedPollStyle.pollQuestionExpandedText ?? "See more",
+      maxLines: 3,
+      onTagTap: (value) {},
       style: _lmFeedPollStyle.pollQuestionStyle ??
-          LMFeedTextStyle(
-            overflow: TextOverflow.ellipsis,
-            maxLines: 3,
-            textStyle: TextStyle(
-              color: theme.onContainer,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
+          TextStyle(
+            color: theme.onContainer,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
     );
   }

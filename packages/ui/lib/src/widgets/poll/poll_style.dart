@@ -17,8 +17,11 @@ class LMFeedPollStyle {
   ///[Color] for background color of the poll
   final Color? backgroundColor;
 
-  ///[LMFeedTextStyle] for poll question text
-  final LMFeedTextStyle? pollQuestionStyle;
+  ///[TextStyle] for poll question text
+  final TextStyle? pollQuestionStyle;
+
+  /// [String] for poll question expanded text
+  final String? pollQuestionExpandedText;
 
   ///[LMFeedTextStyle] for poll info text
   final LMFeedTextStyle? pollInfoStyles;
@@ -51,6 +54,7 @@ class LMFeedPollStyle {
     this.decoration,
     this.backgroundColor,
     this.pollQuestionStyle,
+    this.pollQuestionExpandedText,
     this.pollInfoStyles,
     this.pollAnswerStyle,
     this.timeStampStyle,
@@ -94,7 +98,8 @@ class LMFeedPollStyle {
     EdgeInsets? padding,
     BoxDecoration? decoration,
     Color? backgroundColor,
-    LMFeedTextStyle? pollQuestionStyle,
+    TextStyle? pollQuestionStyle,
+    String? pollQuestionExpandedText,
     LMFeedTextStyle? pollInfoStyles,
     LMFeedTextStyle? pollAnswerStyle,
     LMFeedTextStyle? timeStampStyle,
@@ -112,6 +117,8 @@ class LMFeedPollStyle {
       decoration: decoration ?? this.decoration,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       pollQuestionStyle: pollQuestionStyle ?? this.pollQuestionStyle,
+      pollQuestionExpandedText:
+          pollQuestionExpandedText ?? this.pollQuestionExpandedText,
       pollInfoStyles: pollInfoStyles ?? this.pollInfoStyles,
       pollAnswerStyle: pollAnswerStyle ?? this.pollAnswerStyle,
       timeStampStyle: timeStampStyle ?? this.timeStampStyle,
