@@ -170,9 +170,10 @@ class LMFeedThemeData {
           LMFeedComposeScreenStyle.basic(
             primaryColor: primaryColor,
           ),
-      loaderStyle: LMFeedLoaderStyle(
-        color: primaryColor ?? LikeMindsTheme.primaryColor,
-      ),
+      loaderStyle: loaderStyle ??
+          LMFeedLoaderStyle(
+            color: primaryColor ?? LikeMindsTheme.primaryColor,
+          ),
       bottomSheetStyle: bottomSheetStyle ?? const LMFeedBottomSheetStyle(),
       snackBarTheme: snackBarTheme ??
           LMFeedSnackBarStyle(

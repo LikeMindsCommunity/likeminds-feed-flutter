@@ -13,6 +13,7 @@ class LMFeedPollResultScreen extends StatefulWidget {
     this.noMoreItemsIndicatorBuilder,
     this.newPageErrorIndicatorBuilder,
     this.firstPageErrorIndicatorBuilder,
+    this.tabWidth,
   });
 
   final String pollId;
@@ -30,6 +31,8 @@ class LMFeedPollResultScreen extends StatefulWidget {
   final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
   // Builder for error view while loading the first page
   final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
+  // width for the poll options tab
+  final double? tabWidth;
 
   @override
   State<LMFeedPollResultScreen> createState() => _LMFeedPollResultScreenState();
@@ -89,6 +92,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return _widgetsBuilder.scaffold(
         backgroundColor: theme.container,
         appBar: LMFeedAppBar(
@@ -141,29 +145,37 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
               tabs: [
                 for (var option in widget.pollOptions)
                   Tab(
-                    child: Column(
-                      children: [
-                        LMFeedText(
-                          text: option.voteCount.toString(),
-                        ),
-                        LMFeedText(
-                          text: option.text,
-                        ),
-                      ],
+                    child: SizedBox(
+                      width: widget.tabWidth ??
+                          (widget.pollOptions.length == 2
+                              ? width / 3
+                              : width / 4),
+                      child: Column(
+                        children: [
+                          LMFeedText(
+                            text: option.voteCount.toString(),
+                          ),
+                          LMFeedText(
+                            text: option.text,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
               ],
             ),
             Expanded(
-              child: PageView.builder(
-                onPageChanged: (index) {
-                  _tabController.animateTo(index);
-                },
-                controller: _pagingController,
-                itemCount: widget.pollOptions.length,
-                itemBuilder: (context, index) {
-                  return _defListView(widget.pollOptions[index]);
-                },
+              child: SafeArea(
+                child: PageView.builder(
+                  onPageChanged: (index) {
+                    _tabController.animateTo(index);
+                  },
+                  controller: _pagingController,
+                  itemCount: widget.pollOptions.length,
+                  itemBuilder: (context, index) {
+                    return _defListView(widget.pollOptions[index]);
+                  },
+                ),
               ),
             )
           ],

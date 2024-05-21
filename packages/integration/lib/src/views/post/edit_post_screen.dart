@@ -420,8 +420,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         child: AlertDialog(
           backgroundColor: feedTheme.container,
           title: Text('Discard Changes?'),
-          content: Text(
-              'Are you sure you want to discard the current changes?'),
+          content:
+              Text('Are you sure you want to discard the current changes?'),
           actionsAlignment: MainAxisAlignment.center,
           actionsPadding: const EdgeInsets.all(8),
           actions: <Widget>[
@@ -484,7 +484,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         if (composeBloc.postMedia.isNotEmpty) {
           if (composeBloc.isPollAdded) {
             return LMFeedPoll(
-              style: LMFeedPollStyle.composable(),
+              style: LMFeedPollStyle.basic(isComposable: true).copyWith(
+                backgroundColor: feedTheme.container,
+              ),
               attachmentMeta:
                   composeBloc.postMedia.first.attachmentMetaViewData!,
               subTextBuilder: (context) {

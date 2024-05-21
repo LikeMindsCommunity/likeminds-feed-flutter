@@ -104,8 +104,8 @@ class LMFeedPoll extends StatefulWidget {
   /// [String] poll selection text
   final String? pollSelectionText;
 
-  /// [Widget Function(BuildContext, LMFeedButton, VoidCallback)] Builder for the add option button
-  final Widget Function(BuildContext, LMFeedButton, VoidCallback)?
+  /// [Widget Function(BuildContext, LMFeedButton,  Function(String))] Builder for the add option button
+  final Widget Function(BuildContext, LMFeedButton,  Function(String))?
       addOptionButtonBuilder;
 
   /// [Widget Function(BuildContext)] Builder for the submit button
@@ -146,7 +146,7 @@ class LMFeedPoll extends StatefulWidget {
     Widget Function(BuildContext)? pollOptionBuilder,
     Widget Function(BuildContext)? pollSelectionTextBuilder,
     String? pollSelectionText,
-    Widget Function(BuildContext, LMFeedButton, VoidCallback)?
+    Widget Function(BuildContext, LMFeedButton, Function(String))?
         addOptionButtonBuilder,
     LMFeedButtonBuilder? submitButtonBuilder,
     Widget Function(BuildContext)? subTextBuilder,
@@ -452,7 +452,9 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                     ),
                   ),
                   LMFeedButton(
-                    onTap: _onAddOptionSubmit,
+                    onTap:(){
+                      _onAddOptionSubmit(_addOptionController.text);
+                    },
                     text: LMFeedText(
                       text: 'SUBMIT',
                       style: _lmFeedPollStyle.submitPollTextStyle ??
@@ -502,18 +504,18 @@ class _LMFeedPollState extends State<LMFeedPoll> {
     );
   }
 
-  void _onAddOptionSubmit() {
+  void _onAddOptionSubmit(String optionText) {
     if ((widget.attachmentMeta.options?.length ?? 0) > 10) {
-      widget.onAddOptionSubmit?.call(_addOptionController.text);
+      widget.onAddOptionSubmit?.call(optionText);
       Navigator.of(context).pop();
       return;
     }
-    String text = _addOptionController.text.trim();
+    String text = optionText.trim();
     if (text.isEmpty) {
       _addOptionController.clear();
       return;
     }
-    for (var option in widget.attachmentMeta.options ?? []) {
+    for (LMPollOptionViewData option in widget.attachmentMeta.options ?? []) {
       if (option.text == text) {
         Navigator.of(context).pop();
         _addOptionController.clear();
@@ -531,7 +533,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
       widget.attachmentMeta.options?.add(newOption);
       _setPollData();
     });
-    widget.onAddOptionSubmit?.call(_addOptionController.text);
+    widget.onAddOptionSubmit?.call(optionText);
     Navigator.of(context).pop();
     _addOptionController.clear();
   }

@@ -61,21 +61,14 @@ class LMFeedPollStyle {
     this.pollOptionStyle,
   });
 
-  static LMFeedPollStyle composable() {
-    return LMFeedPollStyle(
-      isComposable: true,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.grey,
-        ),
-      ),
-    );
-  }
 
-  factory LMFeedPollStyle.basic(
-      {Color? primaryColor, Color? containerColor, Color? inActiveColor}) {
+
+  factory LMFeedPollStyle.basic({
+    Color? primaryColor,
+    Color? containerColor,
+    Color? inActiveColor,
+    bool isComposable = false,
+  }) {
     return LMFeedPollStyle(
       margin: const EdgeInsets.symmetric(
         vertical: 8,
@@ -83,6 +76,12 @@ class LMFeedPollStyle {
       backgroundColor: containerColor ?? Colors.white,
       decoration: BoxDecoration(
         color: containerColor ?? Colors.white,
+        borderRadius: isComposable ? BorderRadius.circular(8) : null,
+        border: isComposable
+            ? Border.all(
+                color: Colors.grey,
+              )
+            : null,
       ),
       pollOptionStyle: LMFeedPollOptionStyle.basic(
           primaryColor: primaryColor, inActiveColor: inActiveColor),

@@ -236,7 +236,7 @@ bool showAddOptionButton(LMAttachmentMetaViewData attachmentMeta) {
 }
 
 bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
-  if (isPollSubmitted(attachmentMeta.options!)) {
+  if (isPollSubmitted(attachmentMeta.options??[])) {
     return false;
   }
   if ((attachmentMeta.pollType != null &&

@@ -322,7 +322,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             return LMFeedPoll(
               style: feedTheme.composeScreenStyle.mediaStyle?.pollStyle
                       ?.copyWith() ??
-                  LMFeedPollStyle.composable(),
+                  LMFeedPollStyle.basic(isComposable: true).copyWith(
+                    backgroundColor: feedTheme.container,
+                  ),
               attachmentMeta:
                   composeBloc.postMedia.first.attachmentMetaViewData!,
               subTextBuilder: (context) {

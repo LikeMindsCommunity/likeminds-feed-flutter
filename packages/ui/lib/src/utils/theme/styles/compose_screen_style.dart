@@ -120,6 +120,6 @@ class LMFeedComposeMediaStyle {
         videoStyle: LMFeedPostVideoStyle.basic(),
         linkStyle: LMFeedPostLinkPreviewStyle.basic(),
         documentStyle: LMFeedPostDocumentStyle.basic(),
-        pollStyle: LMFeedPollStyle.composable(),
+        pollStyle: LMFeedPollStyle.basic(isComposable: true),
       );
 }
