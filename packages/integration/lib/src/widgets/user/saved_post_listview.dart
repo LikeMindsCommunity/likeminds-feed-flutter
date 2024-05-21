@@ -440,8 +440,22 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
     );
   }
 
-  LMFeedPoll _defPollWidget(LMPostViewData postViewData) {
+  LMFeedPoll? _defPollWidget(LMPostViewData postViewData) {
     Map<String, bool> isVoteEditing = {"value": false};
+    if (postViewData.attachments == null || postViewData.attachments!.isEmpty) {
+      return null;
+    }
+    bool isPoll = false;
+    postViewData.attachments?.forEach((element) {
+      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+        isPoll = true;
+      }
+    });
+
+    if (!isPoll) {
+      return null;
+    }
+
     LMAttachmentMetaViewData pollValue =
         postViewData.attachments!.first.attachmentMeta;
     LMAttachmentMetaViewData previousValue = pollValue.copyWith();
@@ -452,7 +466,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       isVoteEditing: isVoteEditing["value"]!,
       selectedOption: selectedOptions,
       attachmentMeta: pollValue,
-      style: _theme.mediaStyle.pollStyle ?? LMFeedPollStyle.basic(),
+      style: _theme.mediaStyle.pollStyle ??
+          LMFeedPollStyle.basic(
+              primaryColor: _theme.primaryColor,
+              containerColor: _theme.container),
       onEditVote: (pollData) {
         isVoteEditing["value"] = true;
         selectedOptions.clear();

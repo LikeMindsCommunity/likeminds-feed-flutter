@@ -26,8 +26,8 @@ class LMFeedPollStyle {
   ///[LMFeedTextStyle] for poll answer text
   final LMFeedTextStyle? pollAnswerStyle;
 
-  ///[LMFeedTextStyle] for votes count text
-  final LMFeedTextStyle? votesCountStyles;
+  /// [LMFeedTextStyle] for time stamp text
+  final LMFeedTextStyle? timeStampStyle;
 
   ///[LMFeedTextStyle] for percentage text
   final LMFeedTextStyle? percentageStyle;
@@ -53,7 +53,7 @@ class LMFeedPollStyle {
     this.pollQuestionStyle,
     this.pollInfoStyles,
     this.pollAnswerStyle,
-    this.votesCountStyles,
+    this.timeStampStyle,
     this.percentageStyle,
     this.editPollOptionsStyles,
     this.submitPollTextStyle,
@@ -98,6 +98,7 @@ class LMFeedPollStyle {
     LMFeedTextStyle? pollQuestionStyle,
     LMFeedTextStyle? pollInfoStyles,
     LMFeedTextStyle? pollAnswerStyle,
+    LMFeedTextStyle? timeStampStyle,
     LMFeedTextStyle? votesCountStyles,
     LMFeedTextStyle? percentageStyle,
     LMFeedTextStyle? editPollOptionsStyles,
@@ -114,7 +115,7 @@ class LMFeedPollStyle {
       pollQuestionStyle: pollQuestionStyle ?? this.pollQuestionStyle,
       pollInfoStyles: pollInfoStyles ?? this.pollInfoStyles,
       pollAnswerStyle: pollAnswerStyle ?? this.pollAnswerStyle,
-      votesCountStyles: votesCountStyles ?? this.votesCountStyles,
+      timeStampStyle: timeStampStyle ?? this.timeStampStyle,
       percentageStyle: percentageStyle ?? this.percentageStyle,
       editPollOptionsStyles:
           editPollOptionsStyles ?? this.editPollOptionsStyles,

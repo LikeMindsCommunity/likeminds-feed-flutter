@@ -104,8 +104,9 @@ class LMFeedPoll extends StatefulWidget {
   /// [String] poll selection text
   final String? pollSelectionText;
 
-  /// [Widget Function(BuildContext)] Builder for the add option button
-  final LMFeedButtonBuilder? addOptionButtonBuilder;
+  /// [Widget Function(BuildContext, LMFeedButton, VoidCallback)] Builder for the add option button
+  final Widget Function(BuildContext, LMFeedButton, VoidCallback)?
+      addOptionButtonBuilder;
 
   /// [Widget Function(BuildContext)] Builder for the submit button
   final LMFeedButtonBuilder? submitButtonBuilder;
@@ -145,7 +146,8 @@ class LMFeedPoll extends StatefulWidget {
     Widget Function(BuildContext)? pollOptionBuilder,
     Widget Function(BuildContext)? pollSelectionTextBuilder,
     String? pollSelectionText,
-    LMFeedButtonBuilder? addOptionButtonBuilder,
+    Widget Function(BuildContext, LMFeedButton, VoidCallback)?
+        addOptionButtonBuilder,
     LMFeedButtonBuilder? submitButtonBuilder,
     Widget Function(BuildContext)? subTextBuilder,
     VoidCallback? onSameOptionAdded,
@@ -283,8 +285,8 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                 if (widget.showAddOptionButton)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: widget.addOptionButtonBuilder
-                            ?.call(_defAddOptionButton(context)) ??
+                    child: widget.addOptionButtonBuilder?.call(context,
+                            _defAddOptionButton(context), _onAddOptionSubmit) ??
                         _defAddOptionButton(context),
                   ),
 
@@ -332,14 +334,15 @@ class _LMFeedPollState extends State<LMFeedPoll> {
         LikeMindsTheme.kHorizontalPaddingSmall,
         LMFeedText(
           text: widget.timeLeft ?? '',
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              height: 1.33,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-              color: theme.inActiveColor,
-            ),
-          ),
+          style: _lmFeedPollStyle.timeStampStyle ??
+              LMFeedTextStyle(
+                textStyle: TextStyle(
+                  height: 1.33,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: theme.inActiveColor,
+                ),
+              ),
         ),
         if (widget.showEditVoteButton && !_isVoteEditing)
           Row(
@@ -449,41 +452,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                     ),
                   ),
                   LMFeedButton(
-                    onTap: () {
-                      if ((widget.attachmentMeta.options?.length ?? 0) > 10) {
-                        widget.onAddOptionSubmit
-                            ?.call(_addOptionController.text);
-                        Navigator.of(context).pop();
-                        return;
-                      }
-                      String text = _addOptionController.text.trim();
-                      if (text.isEmpty) {
-                        _addOptionController.clear();
-                        return;
-                      }
-                      for (var option in widget.attachmentMeta.options ?? []) {
-                        if (option.text == text) {
-                          Navigator.of(context).pop();
-                          _addOptionController.clear();
-                          widget.onSameOptionAdded?.call();
-                          return;
-                        }
-                      }
-                      setState(() {
-                        final LMPollOptionViewData newOption =
-                            (LMPostOptionViewDataBuilder()
-                                  ..text(text)
-                                  ..percentage(0)
-                                  ..votes(0)
-                                  ..isSelected(false))
-                                .build();
-                        widget.attachmentMeta.options?.add(newOption);
-                        _setPollData();
-                      });
-                      widget.onAddOptionSubmit?.call(_addOptionController.text);
-                      Navigator.of(context).pop();
-                      _addOptionController.clear();
-                    },
+                    onTap: _onAddOptionSubmit,
                     text: LMFeedText(
                       text: 'SUBMIT',
                       style: _lmFeedPollStyle.submitPollTextStyle ??
@@ -531,6 +500,40 @@ class _LMFeedPollState extends State<LMFeedPoll> {
         ),
       ),
     );
+  }
+
+  void _onAddOptionSubmit() {
+    if ((widget.attachmentMeta.options?.length ?? 0) > 10) {
+      widget.onAddOptionSubmit?.call(_addOptionController.text);
+      Navigator.of(context).pop();
+      return;
+    }
+    String text = _addOptionController.text.trim();
+    if (text.isEmpty) {
+      _addOptionController.clear();
+      return;
+    }
+    for (var option in widget.attachmentMeta.options ?? []) {
+      if (option.text == text) {
+        Navigator.of(context).pop();
+        _addOptionController.clear();
+        widget.onSameOptionAdded?.call();
+        return;
+      }
+    }
+    setState(() {
+      final LMPollOptionViewData newOption = (LMPostOptionViewDataBuilder()
+            ..text(text)
+            ..percentage(0)
+            ..votes(0)
+            ..isSelected(false))
+          .build();
+      widget.attachmentMeta.options?.add(newOption);
+      _setPollData();
+    });
+    widget.onAddOptionSubmit?.call(_addOptionController.text);
+    Navigator.of(context).pop();
+    _addOptionController.clear();
   }
 
   Widget _defPollSubtitle() {
@@ -585,10 +588,11 @@ class _LMFeedPollState extends State<LMFeedPoll> {
     return LMFeedText(
       text: pollQuestion,
       style: _lmFeedPollStyle.pollQuestionStyle ??
-          const LMFeedTextStyle(
+          LMFeedTextStyle(
             overflow: TextOverflow.ellipsis,
             maxLines: 3,
             textStyle: TextStyle(
+              color: theme.onContainer,
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -754,7 +758,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
               onTap: () {
                 widget.onVoteClick?.call(widget.attachmentMeta.options![index]);
               },
-              style: _lmFeedPollStyle.votesCountStyles ??
+              style: _lmFeedPollStyle.pollOptionStyle?.votesCountStyles ??
                   LMFeedTextStyle(
                     textStyle: TextStyle(
                       height: 1.33,

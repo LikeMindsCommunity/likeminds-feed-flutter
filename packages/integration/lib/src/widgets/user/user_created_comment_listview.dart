@@ -292,7 +292,8 @@ class _LMFeedUserCreatedCommentListViewState
       style: feedThemeData.mediaStyle,
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
-      pollBuilder: (pollWidget) => _defPollWidget(post),
+      poll: _defPollWidget(post),
+      pollBuilder: LMFeedCore.widgetUtility.pollWidgetBuilder,
       onMediaTap: () async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
@@ -311,8 +312,22 @@ class _LMFeedUserCreatedCommentListViewState
     );
   }
 
-  LMFeedPoll _defPollWidget(LMPostViewData postViewData) {
+  LMFeedPoll? _defPollWidget(LMPostViewData postViewData) {
     Map<String, bool> isVoteEditing = {"value": false};
+    if (postViewData.attachments == null || postViewData.attachments!.isEmpty) {
+      return null;
+    }
+    bool isPoll = false;
+    postViewData.attachments?.forEach((element) {
+      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+        isPoll = true;
+      }
+    });
+
+    if (!isPoll) {
+      return null;
+    }
+
     LMAttachmentMetaViewData pollValue =
         postViewData.attachments!.first.attachmentMeta;
     LMAttachmentMetaViewData previousValue = pollValue.copyWith();
@@ -323,7 +338,10 @@ class _LMFeedUserCreatedCommentListViewState
       isVoteEditing: isVoteEditing["value"]!,
       selectedOption: selectedOptions,
       attachmentMeta: pollValue,
-      style: feedThemeData.mediaStyle.pollStyle ?? LMFeedPollStyle.basic(),
+      style: feedThemeData.mediaStyle.pollStyle ??
+          LMFeedPollStyle.basic(
+              primaryColor: feedThemeData.primaryColor,
+              containerColor: feedThemeData.container),
       onEditVote: (pollData) {
         isVoteEditing["value"] = true;
         selectedOptions.clear();

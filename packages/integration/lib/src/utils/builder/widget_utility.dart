@@ -142,7 +142,7 @@ class LMFeedWidgetUtility {
     return video;
   }
 
-  Widget pollWidgetBuilder(LMFeedPoll pollWidget) {
+  Widget pollWidgetBuilder(BuildContext context, LMFeedPoll pollWidget) {
     return pollWidget;
   }
 

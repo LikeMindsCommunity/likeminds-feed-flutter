@@ -111,6 +111,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
     /// if attachment is a poll
     if (attachments!.first.attachmentType == 6) {
       Widget poll = widget.pollBuilder?.call(
+            context,
             _defPoll(),
           ) ??
           _defPoll();
