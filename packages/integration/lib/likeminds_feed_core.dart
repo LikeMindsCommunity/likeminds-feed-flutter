@@ -135,8 +135,6 @@ class LMFeedCore {
     } else {
       newAccessToken = accessToken;
       newRefreshToken = refreshToken;
-
-      //TODO remove storing of cache and move it to data layer when validateUser() is success - done
     }
 
     if (newAccessToken == null || newRefreshToken == null) {
@@ -150,8 +148,12 @@ class LMFeedCore {
           ..refreshToken(newRefreshToken))
         .build();
 
-    ValidateUserResponse validateUserResponse =
-        (await validateUser(request)).data!;
+    ValidateUserResponse? validateUserResponse =
+        (await validateUser(request)).data;
+
+    if (validateUserResponse == null) {
+      return LMResponse(success: false, errorMessage: "User validation failed");
+    }
 
     if (validateUserResponse.success) {
       LMNotificationHandler.instance.registerDevice(
@@ -252,8 +254,7 @@ class LMFeedCore {
 
       return initiateUserResponse;
     } else {
-      //TODO call showFeedWithoutAPIKey - done
-      return showFeedWithoutApiKey(
+      return await showFeedWithoutApiKey(
         accessToken: newAccessToken,
         refreshToken: newRefreshToken,
       );
@@ -282,7 +283,6 @@ class LMFeedCore {
             LMFeedPostUtils.doPostNeedsApproval = element.enabled;
           }
         });
-
         return LMResponse(success: true, data: initiateUserResponse);
       }
     }
