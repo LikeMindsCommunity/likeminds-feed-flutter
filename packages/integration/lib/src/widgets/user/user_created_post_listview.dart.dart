@@ -568,7 +568,7 @@ class _LMFeedUserCreatedPostListViewState
             postViewData.id,
             isVoteEditing,
             previousValue,
-            rebuildPollWidget,
+            rebuildPostWidget,
             LMFeedWidgetSource.universalFeed,
           );
         } else if (selectedOptions.contains(optionData.id)) {
@@ -636,7 +636,7 @@ class _LMFeedUserCreatedPostListViewState
           postViewData.id,
           isVoteEditing,
           previousValue,
-          rebuildPollWidget,
+          rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
         selectedOptions.clear();

@@ -170,7 +170,6 @@ class _LMFeedPollState extends State<LMFeedPoll> {
     return ValueListenableBuilder(
         valueListenable: _rebuildPollWidget,
         builder: (context, value, __) {
-          debugPrint(_isVoteEditing.toString());
           return Container(
             margin: _lmFeedPollStyle.margin ??
                 const EdgeInsets.symmetric(
@@ -178,7 +177,9 @@ class _LMFeedPollState extends State<LMFeedPoll> {
                   horizontal: 16,
                 ),
             padding: _lmFeedPollStyle.padding ?? const EdgeInsets.all(16),
-            decoration: _lmFeedPollStyle.decoration ??
+            decoration: _lmFeedPollStyle.decoration?.copyWith(
+              color: _lmFeedPollStyle.backgroundColor ?? theme.container,
+            ) ??
                 BoxDecoration(
                   color: _lmFeedPollStyle.backgroundColor ?? theme.container,
                   borderRadius: _lmFeedPollStyle.isComposable

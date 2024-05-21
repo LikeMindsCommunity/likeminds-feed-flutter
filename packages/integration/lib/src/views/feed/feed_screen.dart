@@ -1064,7 +1064,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             postViewData.id,
             isVoteEditing,
             previousValue,
-            rebuildPollWidget,
+            rebuildPostWidget,
             LMFeedWidgetSource.universalFeed,
           );
         } else if (selectedOptions.contains(optionData.id)) {
@@ -1132,7 +1132,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           postViewData.id,
           isVoteEditing,
           previousValue,
-          rebuildPollWidget,
+          rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
         selectedOptions.clear();

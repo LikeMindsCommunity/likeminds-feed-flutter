@@ -614,7 +614,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             postViewData.id,
             isVoteEditing,
             previousValue,
-            rebuildPollWidget,
+            rebuildPostWidget,
             LMFeedWidgetSource.universalFeed,
           );
         } else if (selectedOptions.contains(optionData.id)) {
@@ -682,7 +682,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           postViewData.id,
           isVoteEditing,
           previousValue,
-          rebuildPollWidget,
+          rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
         selectedOptions.clear();

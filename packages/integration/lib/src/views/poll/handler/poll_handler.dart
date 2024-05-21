@@ -9,7 +9,7 @@ Future<void> submitVote(
   String postId,
   Map<String, bool> isVoteEditing,
   LMAttachmentMetaViewData previousValue,
-  ValueNotifier<bool> rebuildPollWidget,
+  ValueNotifier<bool> rebuildPostWidget,
   LMFeedWidgetSource source,
 ) async {
   try {
@@ -36,7 +36,7 @@ Future<void> submitVote(
             "Please select exactly ${attachmentMeta.multiSelectNo} options",
             source,
           );
-          rebuildPollWidget.value = !rebuildPollWidget.value;
+          rebuildPostWidget.value = !rebuildPostWidget.value;
           return;
         } else if (attachmentMeta.multiSelectState! ==
                 PollMultiSelectState.atLeast &&
@@ -77,7 +77,7 @@ Future<void> submitVote(
               (attachmentMeta.options![i].voteCount / totalVotes) * 100;
         }
       }
-      rebuildPollWidget.value = !rebuildPollWidget.value;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
       SubmitPollVoteRequest request = (SubmitPollVoteRequestBuilder()
             ..pollId(attachmentMeta.id ?? '')
             ..votes([...options]))
@@ -332,10 +332,8 @@ String? getPollSelectionText(
   switch (pollMultiSelectState) {
     case PollMultiSelectState.exactly:
       if (pollMultiSelectNo == 1) {
-        debugPrint("Select exactly 1 option");
         return null;
       } else {
-        debugPrint("Select exactly $pollMultiSelectNo options");
         return "*Select exactly $pollMultiSelectNo options";
       }
     case PollMultiSelectState.atMax:
