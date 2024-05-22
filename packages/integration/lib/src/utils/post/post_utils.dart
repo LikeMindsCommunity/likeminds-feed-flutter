@@ -515,4 +515,28 @@ class LMFeedPostUtils {
               getPostType(postViewData.attachments),
         }));
   }
+
+  static LMPostReviewStatus postReviewStatusFromString(String key) {
+    switch (key) {
+      case LMFeedStringConstants.rejectedKey:
+        return LMPostReviewStatus.rejected;
+      case LMFeedStringConstants.underReviewKey:
+        return LMPostReviewStatus.pending;
+      default:
+        return LMPostReviewStatus.pending;
+    }
+  }
+}
+
+extension PostReviewToKey on LMPostReviewStatus {
+  String toKey() {
+    switch (this) {
+      case LMPostReviewStatus.rejected:
+        return LMFeedStringConstants.rejectedKey;
+      case LMPostReviewStatus.pending:
+        return LMFeedStringConstants.underReviewKey;
+      default:
+        return '';
+    }
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
@@ -76,7 +77,8 @@ class LMPostViewDataConvertor {
 
     postViewDataBuilder.isPendingPost(post.isPendingPost);
 
-    postViewDataBuilder.postStatus(post.postStatus);
+    postViewDataBuilder.postStatus(
+        LMFeedPostUtils.postReviewStatusFromString(post.postStatus));
 
     postViewDataBuilder.menuItems(post.menuItems
         .map((e) => LMPopupMenuItemConvertor.fromPopUpMenuItemModel(item: e))
@@ -162,7 +164,7 @@ class LMPostViewDataConvertor {
       heading: postViewData.heading,
       tempId: postViewData.tempId,
       isPendingPost: postViewData.isPendingPost,
-      postStatus: postViewData.postStatus,
+      postStatus: postViewData.postStatus.toString(),
       commentIds: postViewData.commentIds,
     );
   }
