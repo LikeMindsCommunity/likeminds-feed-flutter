@@ -294,6 +294,7 @@ class LMFeedPostUtils {
                       ?.map((e) => LMAttachmentViewDataConvertor.fromAttachment(
                             attachment: e,
                             users: users,
+                            widget: widgets?[e.attachmentMeta.entityId],
                           ))
                       .toList() ??
                   [])

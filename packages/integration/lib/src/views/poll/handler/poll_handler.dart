@@ -9,7 +9,7 @@ Future<void> submitVote(
   String postId,
   Map<String, bool> isVoteEditing,
   LMAttachmentMetaViewData previousValue,
-  ValueNotifier<bool> rebuildPollWidget,
+  ValueNotifier<bool> rebuildPostWidget,
   LMFeedWidgetSource source,
 ) async {
   try {
@@ -36,8 +36,7 @@ Future<void> submitVote(
             "Please select exactly ${attachmentMeta.multiSelectNo} options",
             source,
           );
-          rebuildPollWidget.value = !rebuildPollWidget.value;
-          // resetOptions(attachmentMeta, previousValue);
+          rebuildPostWidget.value = !rebuildPostWidget.value;
           return;
         } else if (attachmentMeta.multiSelectState! ==
                 PollMultiSelectState.atLeast &&
@@ -78,7 +77,7 @@ Future<void> submitVote(
               (attachmentMeta.options![i].voteCount / totalVotes) * 100;
         }
       }
-      rebuildPollWidget.value = !rebuildPollWidget.value;
+      rebuildPostWidget.value = !rebuildPostWidget.value;
       SubmitPollVoteRequest request = (SubmitPollVoteRequestBuilder()
             ..pollId(attachmentMeta.id ?? '')
             ..votes([...options]))
@@ -237,7 +236,7 @@ bool showAddOptionButton(LMAttachmentMetaViewData attachmentMeta) {
 }
 
 bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
-  if (isPollSubmitted(attachmentMeta.options!)) {
+  if (isPollSubmitted(attachmentMeta.options??[])) {
     return false;
   }
   if ((attachmentMeta.pollType != null &&
@@ -254,14 +253,13 @@ bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
 
 Future<void> addOption(
     BuildContext context,
-    LMFeedPoll pollWidget,
     LMAttachmentMetaViewData attachmentMeta,
     String option,
     String postId,
     LMUserViewData? currentUser,
     ValueNotifier<bool> rebuildPostWidget,
     LMFeedWidgetSource source) async {
-  if ((pollWidget.attachmentMeta.options?.length ?? 0) > 10) {
+  if ((attachmentMeta.options?.length ?? 0) > 10) {
     LMFeedCore.showSnackBar(
       context,
       "You can add up to 10 options",
@@ -327,7 +325,10 @@ String getTimeLeftInPoll(int? expiryTime) {
 }
 
 String? getPollSelectionText(
-    PollMultiSelectState pollMultiSelectState, int pollMultiSelectNo) {
+    PollMultiSelectState? pollMultiSelectState, int? pollMultiSelectNo) {
+  if (pollMultiSelectNo == null || pollMultiSelectState == null) {
+    return null;
+  }
   switch (pollMultiSelectState) {
     case PollMultiSelectState.exactly:
       if (pollMultiSelectNo == 1) {
