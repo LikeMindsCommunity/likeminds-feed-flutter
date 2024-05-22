@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/pending_posts_screen.dart';
 import 'package:video_compress/video_compress.dart';
 // import 'package:media_kit_video/media_kit_video.dart';
 
@@ -289,6 +290,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         child: CustomScrollView(
           controller: _controller,
           slivers: [
+            getPendingPostBanner(),
             SliverToBoxAdapter(
               child: config!.showCustomWidget
                   ? widget.customWidgetBuilder == null
@@ -1617,5 +1619,49 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         ),
       );
     }
+  }
+
+  Widget getPendingPostBanner() {
+    return SliverToBoxAdapter(
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => LMFeedPendingPostsScreen()));
+        },
+        splashFactory: InkRipple.splashFactory,
+        child: Container(
+          color: Colors.white,
+          child: Container(
+            decoration: BoxDecoration(
+              color: feedThemeData.primaryColor.withOpacity(0.1),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                LMFeedText(
+                  text: "2 $postTitleSmallCap created by you are under review",
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      color: feedThemeData.primaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                LMFeedIcon(
+                  type: LMFeedIconType.icon,
+                  icon: Icons.chevron_right,
+                  style: LMFeedIconStyle(
+                    color: feedThemeData.primaryColor,
+                    size: 24,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

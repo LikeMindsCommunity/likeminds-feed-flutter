@@ -17,6 +17,7 @@ class LMFeedTheme {
 
 class LMFeedThemeData {
   final LMFeedPostStyle postStyle;
+  final LMFeedPostReviewBannerStyle reviewBannerStyle;
   final LMFeedPostHeaderStyle headerStyle;
   final LMFeedPostTopicStyle topicStyle;
   final LMFeedPostContentStyle contentStyle;
@@ -50,6 +51,7 @@ class LMFeedThemeData {
 
   const LMFeedThemeData({
     required this.postStyle,
+    required this.reviewBannerStyle,
     required this.headerStyle,
     required this.topicStyle,
     required this.contentStyle,
@@ -108,6 +110,7 @@ class LMFeedThemeData {
     Color? hashTagColor,
     Color? linkColor,
     LMFeedPostStyle? postStyle,
+    LMFeedPostReviewBannerStyle? reviewBannerStyle,
     LMFeedPostHeaderStyle? headerStyle,
     LMFeedPostTopicStyle? topicStyle,
     LMFeedPostContentStyle? contentStyle,
@@ -150,6 +153,8 @@ class LMFeedThemeData {
             containerColor: container ?? LikeMindsTheme.container,
             inActiveColor: inActiveColor ?? LikeMindsTheme.unSelectedColor,
           ),
+      reviewBannerStyle:
+          reviewBannerStyle ?? LMFeedPostReviewBannerStyle.basic(),
       footerStyle: footerStyle ??
           LMFeedPostFooterStyle.basic(primaryColor: primaryColor),
       headerStyle: headerStyle ?? LMFeedPostHeaderStyle.basic(),
@@ -205,6 +210,7 @@ class LMFeedThemeData {
     LMFeedTextFieldStyle? textFieldStyle,
     LMFeedDialogStyle? dialogStyle,
     LMFeedPopUpMenuStyle? popUpMenuStyle,
+    LMFeedPostReviewBannerStyle? reviewBannerStyle,
     LMFeedPostHeaderStyle? headerStyle,
     LMFeedPostTopicStyle? topicStyle,
     LMFeedPostContentStyle? contentStyle,
@@ -246,6 +252,7 @@ class LMFeedThemeData {
       loaderStyle: loaderStyle ?? this.loaderStyle,
       bottomSheetStyle: bottomSheetStyle ?? this.bottomSheetStyle,
       snackBarTheme: snackBarTheme ?? this.snackBarTheme,
+      reviewBannerStyle: reviewBannerStyle ?? this.reviewBannerStyle,
     );
   }
 }

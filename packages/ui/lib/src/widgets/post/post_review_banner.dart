@@ -57,38 +57,46 @@ class LMFeedPostReviewBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        reviewStatusIcon ??
-            LMFeedIcon(
-              type: LMFeedIconType.svg,
-              assetPath: postReviewStatus == LMPostReviewStatus.pending
-                  ? lmWarningPendingPostSvg
-                  : lmRejectPendingPostSvg,
-              style: style?.reviewStatusIconStyle,
+    LMFeedThemeData theme = LMFeedTheme.instance.theme;
+    LMFeedPostReviewBannerStyle postReviewStatusStyle = theme.reviewBannerStyle;
+    return Container(
+      color: style?.backgroundColor ?? postReviewStatusStyle.backgroundColor,
+      padding: style?.padding ?? postReviewStatusStyle.padding,
+      margin: style?.margin ?? postReviewStatusStyle.margin,
+      child: Row(
+        children: [
+          reviewStatusIcon ??
+              LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: postReviewStatus == LMPostReviewStatus.pending
+                    ? lmWarningPendingPostSvg
+                    : lmRejectPendingPostSvg,
+                style: style?.reviewStatusIconStyle,
+              ),
+          const SizedBox(width: 8.0),
+          reviewStatusText ??
+              LMFeedText(
+                text: postReviewStatus == LMPostReviewStatus.pending
+                    ? "Under review"
+                    : "Post Rejected",
+                style: style?.reviewStatusTextStyle,
+              ),
+          const Spacer(),
+          LMFeedButton(
+            onTap: () => onInfoIconClicked?.call(),
+            style: LMFeedButtonStyle(
+              padding: EdgeInsets.zero,
+              margin: 0,
+              icon: infoIcon ??
+                  LMFeedIcon(
+                    type: LMFeedIconType.svg,
+                    assetPath: lmInfoPendingPostSvg,
+                    style: style?.infoIconStyle,
+                  ),
             ),
-        reviewStatusText ??
-            LMFeedText(
-              text: postReviewStatus == LMPostReviewStatus.pending
-                  ? "Under review"
-                  : "Post Rejected",
-              style: style?.reviewStatusTextStyle,
-            ),
-        const Spacer(),
-        LMFeedButton(
-          onTap: () => onInfoIconClicked?.call(),
-          style: LMFeedButtonStyle(
-            padding: EdgeInsets.zero,
-            margin: 0,
-            icon: infoIcon ??
-                LMFeedIcon(
-                  type: LMFeedIconType.svg,
-                  assetPath: lmInfoPendingPostSvg,
-                  style: style?.infoIconStyle,
-                ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -121,12 +129,18 @@ class LMFeedPostReviewBannerStyle {
   LMFeedTextStyle? reviewStatusTextStyle;
   LMFeedIconStyle? reviewStatusIconStyle;
   LMFeedIconStyle? infoIconStyle;
+  EdgeInsets? padding;
+  EdgeInsets? margin;
+  Color? backgroundColor;
 
   /// {@macro post_review_banner_style}
   LMFeedPostReviewBannerStyle({
     this.reviewStatusTextStyle,
     this.reviewStatusIconStyle,
     this.infoIconStyle,
+    this.padding,
+    this.margin,
+    this.backgroundColor,
   });
 
   /// {@template post_review_banner_style_basic}
@@ -135,6 +149,9 @@ class LMFeedPostReviewBannerStyle {
   /// {@endtemplate}
   factory LMFeedPostReviewBannerStyle.basic() {
     return LMFeedPostReviewBannerStyle(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      margin: EdgeInsets.zero,
+      backgroundColor: LikeMindsTheme.container,
       reviewStatusTextStyle: const LMFeedTextStyle(
         textStyle: TextStyle(
           fontWeight: FontWeight.w400,

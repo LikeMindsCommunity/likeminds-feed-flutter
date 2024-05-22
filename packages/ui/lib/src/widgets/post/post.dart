@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/post/post_review_banner.dart';
+
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 import 'package:visibility_aware_state/visibility_aware_state.dart';
 
 /// {@template post_widget}
-/// A widget that displays a post on the feed.
-/// Provide a header, footer, menu, media
-/// and content instance to customize the post.
-/// {@endtemplate}
+/// A widget that displays a feed post in the LM app.
 ///
-
+/// The `LMFeedPostWidget` class is responsible for rendering a single feed post
+/// in the LM app. It takes in a `FeedPost` object as input and displays the
+/// post's content, author information, and any associated media (e.g., images,
+/// videos).
+///
+/// Example usage:
+///
+/// ```dart
+/// LMFeedPostWidget(
+///   post: feedPost,
+/// )
+/// ```
+/// {@endtemplate}
 class LMFeedPostWidget extends StatefulWidget {
   ///{@macro post_widget}
   const LMFeedPostWidget({
@@ -43,14 +52,28 @@ class LMFeedPostWidget extends StatefulWidget {
     this.reviewBannerBuilder,
   });
 
+  /// {@macro post_style}
   final LMFeedPostStyle? style;
 
-  final LMFeedPostReviewBanner? reviewBannerBuilder;
+  /// {@macro post_review_banner_builder}
+  final LMFeedPostReviewBannerBuilder? reviewBannerBuilder;
+
+  /// {@macro post_header_builder}
   final LMFeedPostHeaderBuilder? headerBuilder;
+
+  /// {@macro post_content_builder}
   final LMFeedPostContentBuilder? contentBuilder;
+
+  /// {@macro post_topic_builder}
   final LMFeedPostTopicBuilder? topicBuilder;
+
+  /// {@macro post_menu_builder}
   final LMFeedPostMenuBuilder? menuBuilder;
+
+  /// {@macro post_media_builder}
   final LMFeedPostMediaBuilder? mediaBuilder;
+
+  /// {@macro post_footer_builder}
   final LMFeedPostFooterBuilder? footerBuilder;
 
   final LMFeedPostReviewBanner? reviewBanner;
@@ -77,6 +100,27 @@ class LMFeedPostWidget extends StatefulWidget {
   @override
   State<LMFeedPostWidget> createState() => _LMPostWidgetState();
 
+  /// {@template post_widget_copywith}
+  /// Creates a copy of this [LMFeedPostWidget] with the specified
+  /// properties overridden.
+  ///
+  /// The returned [LMFeedPostWidget] will have the same values
+  /// for all properties except for the ones specified in the method arguments.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// LMFeedPostWidget updatedWidget = originalWidget.copyWith(
+  ///   title: 'Updated Title',
+  ///   content: 'Updated Content',
+  /// );
+  /// ```
+  ///
+  /// Note: This method is commonly used in Flutter to create a
+  /// new instance of a widget with updated properties, while keeping the rest
+  /// of the properties unchanged.
+  /// Returns a new [LMFeedPostWidget] instance with the specified properties
+  /// overridden.
+  /// {@endtemplate}
   LMFeedPostWidget copyWith({
     LMFeedPostHeaderBuilder? headerBuilder,
     LMFeedPostFooterBuilder? footerBuilder,
@@ -84,6 +128,7 @@ class LMFeedPostWidget extends StatefulWidget {
     LMFeedPostMenuBuilder? menuBuilder,
     LMFeedPostMediaBuilder? mediaBuilder,
     LMFeedPostContentBuilder? contentBuilder,
+    LMFeedPostReviewBannerBuilder? reviewBannerBuilder,
     List<BoxShadow>? boxShadow,
     BorderRadiusGeometry? borderRadius,
     LMPostViewData? post,
@@ -106,7 +151,6 @@ class LMFeedPostWidget extends StatefulWidget {
     Widget? activityHeader,
     void Function()? disposeVideoPlayerOnInActive,
     LMFeedPostReviewBanner? reviewBanner,
-    LMFeedPostReviewBanner? reviewBannerBuilder,
   }) {
     return LMFeedPostWidget(
       post: post ?? this.post,
@@ -193,6 +237,10 @@ class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (widget.post.isPendingPost)
+              widget.reviewBannerBuilder
+                      ?.call(context, _defPostReviewBanner(), widget.post) ??
+                  _defPostReviewBanner(),
             if (widget.activityHeader != null) widget.activityHeader!,
             widget.headerBuilder
                     ?.call(context, _defPostHeader(), widget.post) ??
@@ -222,8 +270,8 @@ class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
 
   LMFeedPostReviewBanner _defPostReviewBanner() {
     return widget.reviewBanner ??
-        const LMFeedPostReviewBanner(
-          postReviewStatus: LMPostReviewStatus.pending,
+        LMFeedPostReviewBanner(
+          postReviewStatus: widget.post.postStatus,
         );
   }
 
@@ -268,6 +316,25 @@ class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
   }
 }
 
+/// {@template post_style}
+/// Represents the style of a feed post in the LM app.
+///
+/// The `LMFeedPostStyle` class defines the visual appearance and layout
+/// properties for a feed post in the LM app. It provides a set of style
+/// options that can be customized to achieve different visual effects.
+///
+/// Example usage:
+/// ```dart
+/// LMFeedPostStyle style = LMFeedPostStyle(
+///   backgroundColor: Colors.white,
+///   titleTextStyle: TextStyle(
+///     fontSize: 16,
+///     fontWeight: FontWeight.bold,
+///   ),
+///   // Add more style properties here...
+/// );
+/// ```
+/// {@endtemplate}
 class LMFeedPostStyle {
   // Styling variables
   final List<BoxShadow>? boxShadow;
@@ -277,6 +344,7 @@ class LMFeedPostStyle {
   final BoxBorder? border;
   final Color? backgroundColor;
 
+  /// {@macro post_style}
   LMFeedPostStyle({
     this.boxShadow,
     this.borderRadius,
@@ -286,6 +354,24 @@ class LMFeedPostStyle {
     this.backgroundColor,
   });
 
+  /// {@template post_style_copywith}
+  /// Creates a copy of this [LMFeedPostStyle] with the specified
+  /// properties overridden.
+  /// The returned [LMFeedPostStyle] object will have the same values
+  /// for all properties
+  /// as this object, except for the ones specified in the named parameters.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// LMFeedPostStyle newStyle = oldStyle.copyWith(
+  ///   backgroundColor: Colors.red,
+  ///   textColor: Colors.white,
+  /// );
+  /// ```
+  ///
+  /// Returns a new [LMFeedPostStyle] object with the specified
+  /// properties overridden.
+  /// {@endtemplate}
   LMFeedPostStyle copyWith({
     List<BoxShadow>? boxShadow,
     BorderRadiusGeometry? borderRadius,
@@ -306,6 +392,19 @@ class LMFeedPostStyle {
     );
   }
 
+  /// {@template post_style_basic}
+  /// Creates LikeMinds default [LMFeedPostStyle].
+  ///
+  /// The [LMFeedPostStyle.basic] factory constructor creates LikeMinds default
+  /// [LMFeedPostStyle] object
+  /// with default settings. This style is suitable for displaying a
+  /// post in the feed with LikeMinds Post design.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// LMFeedPostStyle style = LMFeedPostStyle.basic();
+  /// ```
+  /// {@endtemplate}
   factory LMFeedPostStyle.basic() => LMFeedPostStyle(
         boxShadow: [
           const BoxShadow(

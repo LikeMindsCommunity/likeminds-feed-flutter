@@ -1,4 +1,4 @@
-import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 /// {@template post_view_data}
 /// A data class to hold the post data.
@@ -55,7 +55,7 @@ class LMPostViewData {
   int repostCount;
   bool? isDeleted;
   bool isPendingPost;
-  String postStatus;
+  LMPostReviewStatus postStatus;
 
   /// widget map to hold custom widget data
   Map<String, LMWidgetViewData>? widgets;
@@ -158,7 +158,7 @@ class LMPostViewDataBuilder {
   List<LMCommentViewData>? _topComments;
   String? _tempId;
   bool? _isPendingPost;
-  String? _postStatus;
+  LMPostReviewStatus? _postStatus;
 
   void id(String id) {
     _id = id;
@@ -268,7 +268,7 @@ class LMPostViewDataBuilder {
     _isPendingPost = isPendingPost;
   }
 
-  void postStatus(String postStatus) {
+  void postStatus(LMPostReviewStatus postStatus) {
     _postStatus = postStatus;
   }
 

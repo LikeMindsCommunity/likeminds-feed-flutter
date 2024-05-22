@@ -95,7 +95,13 @@ class LMFeedWidgetUtility {
       footerBuilder: this.postFooterBuilder,
       menuBuilder: this.menuBuilder,
       topicBuilder: this.topicBuilder,
+      reviewBannerBuilder: this.postReviewBannerBuilder,
     );
+  }
+
+  Widget postReviewBannerBuilder(BuildContext context,
+      LMFeedPostReviewBanner postReviewBanner, LMPostViewData postViewData) {
+    return postReviewBanner;
   }
 
   Widget commentBuilder(BuildContext context, LMFeedCommentWidget commentWidget,

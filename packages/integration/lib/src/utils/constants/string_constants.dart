@@ -12,4 +12,7 @@ class LMFeedStringConstants {
   String authToken = "authToken";
   String accessToken = "accessToken";
   String refreshToken = 'refreshToken';
+
+  static const String underReviewKey = 'under_review';
+  static const String rejectedKey = 'rejected';
 }
