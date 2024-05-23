@@ -1,16 +1,13 @@
 part of 'pending_bloc.dart';
 
-abstract class LMFeedPendingState extends Equatable {}
-
-class LMFeedPendingInitialState extends LMFeedPendingState {
+abstract class LMFeedPendingState extends Equatable {
   @override
   List<Object> get props => [];
 }
 
-class LMFeedPendingPostsLoadingState extends LMFeedPendingState {
-  @override
-  List<Object> get props => [];
-}
+class LMFeedPendingInitialState extends LMFeedPendingState {}
+
+class LMFeedPendingPostsLoadingState extends LMFeedPendingState {}
 
 class LMFeedPendingPostsLoadedState extends LMFeedPendingState {
   final List<LMPostViewData> posts;
