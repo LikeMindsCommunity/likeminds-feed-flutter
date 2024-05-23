@@ -346,6 +346,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
           getUserFeedMeta = getUserFeedMetaFuture();
+          _rebuildAppBar.value = !_rebuildAppBar.value;
           refresh();
           clearPagingController();
         },
@@ -498,13 +499,28 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         curr.postData,
                         LMFeedPendingPostDialog(
                           pendingPostId: curr.postData.id,
+                          onCancelButtonClicked: () {
+                            Navigator.of(context).pop();
+                          },
+                          onEditButtonClicked: () {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => LMFeedEditPostScreen(
+                                  pendingPostId: curr.postData.id,
+                                ),
+                              ),
+                            );
+                          },
                           title: "$postTitleFirstCap submitted for approval",
                           description:
                               "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
                         ),
                       );
                       getUserFeedMeta = getUserFeedMetaFuture();
-
+                      pendingPostCount++;
+                      _rebuildAppBar.value = !_rebuildAppBar.value;
+                      postUploading.value = false;
                       return;
                     }
                     LMPostViewData? item = curr.postData;
@@ -818,6 +834,26 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             icon: LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.search,
+              style: LMFeedIconStyle.basic().copyWith(
+                color: feedThemeData.onContainer,
+                size: 24,
+              ),
+            ),
+          ),
+        ),
+        LMFeedButton(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LMFeedNotificationScreen(),
+              ),
+            );
+          },
+          style: LMFeedButtonStyle.basic().copyWith(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.notifications,
               style: LMFeedIconStyle.basic().copyWith(
                 color: feedThemeData.onContainer,
                 size: 24,

@@ -105,7 +105,7 @@ class LMFeedPendingPostBanner extends StatelessWidget {
                   children: [
                     LMFeedText(
                       text:
-                          "$pendingPostCount ${pendingPostCount == 1 ? postTitleSmallCap : postTitleSmallCapPlural} created by you are under review",
+                          "$pendingPostCount ${pendingPostCount == 1 ? postTitleSmallCap : postTitleSmallCapPlural} created by you ${pendingPostCount == 1 ? 'is' : 'are'} under review",
                       style: style?.textStyle ??
                           LMFeedTextStyle(
                             textStyle: TextStyle(

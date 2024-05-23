@@ -636,12 +636,15 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
       elevation: 4,
       shadowColor: feedThemeData.shadowColor,
       centerTitle: iSiOS,
-      leading: LMFeedIcon(
-        type: LMFeedIconType.icon,
-        icon: iSiOS ? Icons.chevron_left : Icons.arrow_back,
-        style: LMFeedIconStyle(
-          size: 24,
-          color: feedThemeData.onContainer,
+      leading: InkWell(
+        onTap: () => Navigator.of(context).pop(),
+        child: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: iSiOS ? Icons.chevron_left : Icons.arrow_back,
+          style: LMFeedIconStyle(
+            size: 24,
+            color: feedThemeData.onContainer,
+          ),
         ),
       ),
       title: ValueListenableBuilder(
