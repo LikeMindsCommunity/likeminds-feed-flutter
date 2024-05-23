@@ -27,7 +27,10 @@ class LMFeedDialog extends StatelessWidget {
       shadowColor: insetDialogStyle.shadowColor,
       shape: insetDialogStyle.shape,
       surfaceTintColor: insetDialogStyle.surfaceTintColor,
-      child: child,
+      child: Padding(
+        padding: insetDialogStyle.padding,
+        child: child,
+      ),
     );
   }
 }

@@ -177,8 +177,8 @@ class LMFeedPostWidget extends StatefulWidget {
       activityHeader: activityHeader ?? this.activityHeader,
       disposeVideoPlayerOnInActive:
           disposeVideoPlayerOnInActive ?? this.disposeVideoPlayerOnInActive,
-      reviewBanner: reviewBanner ?? reviewBanner,
-      reviewBannerBuilder: reviewBannerBuilder ?? reviewBannerBuilder,
+      reviewBanner: reviewBanner ?? this.reviewBanner,
+      reviewBannerBuilder: reviewBannerBuilder ?? this.reviewBannerBuilder,
     );
   }
 }

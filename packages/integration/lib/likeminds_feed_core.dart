@@ -7,11 +7,12 @@ import 'package:likeminds_feed_flutter_core/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.dart';
 
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
-import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/universal_feed/feed_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feedroom/feedroom_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
@@ -32,6 +33,7 @@ export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
   LMSDKCallbackImplementation? sdkCallback;
+  late LMFeedBuilderDelegate _feedBuilderDelegate;
   LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
 
   /// This is the domain of the client. This is used to show
@@ -54,6 +56,9 @@ class LMFeedCore {
 
   static LMFeedWidgetUtility get widgetUtility => instance._widgetUtility;
 
+  static LMFeedBuilderDelegate get feedBuilderDelegate =>
+      instance._feedBuilderDelegate;
+
   static void showSnackBar(BuildContext context, String snackBarMessage,
       LMFeedWidgetSource widgetSource,
       {LMFeedSnackBarStyle? style}) {
@@ -72,6 +77,7 @@ class LMFeedCore {
     Function(LMFeedAnalyticsEventFired)? analyticsListener,
     Function(LMFeedProfileState)? profileListener,
     LMFeedCoreCallback? lmFeedCallback,
+    LMFeedBuilderDelegate? builderDelegate,
   }) async {
     LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
     this.sdkCallback =
@@ -95,6 +101,8 @@ class LMFeedCore {
       LMFeedProfileBloc.instance.stream.listen((event) {
         profileListener.call(event);
       });
+
+    _feedBuilderDelegate = builderDelegate ?? LMFeedBuilderDelegate();
   }
 
   Future<void> closeBlocs() async {
@@ -184,7 +192,7 @@ class LMFeedCore {
 
     if (response.success) {
       response.community?.communitySettings?.forEach((element) {
-        if (element.settingType == "post_needs_approval") {
+        if (element.settingType == LMFeedStringConstants.postApprovalNeeded) {
           LMFeedPostUtils.doPostNeedsApproval = element.enabled;
         }
       });
@@ -279,7 +287,7 @@ class LMFeedCore {
             success: false, errorMessage: initiateUserResponse.errorMessage);
       } else {
         initiateUserResponse.community?.communitySettings?.forEach((element) {
-          if (element.settingType == "post_needs_approval") {
+          if (element.settingType == LMFeedStringConstants.postApprovalNeeded) {
             LMFeedPostUtils.doPostNeedsApproval = element.enabled;
           }
         });

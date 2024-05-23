@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/pending_posts_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/universal_feed/feed_screen_builder_delegate.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/feed/feed_pending_post_banner.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/post/post_approval_dialog.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/pending_post/pending_posts_screen.dart';
 import 'package:video_compress/video_compress.dart';
 // import 'package:media_kit_video/media_kit_video.dart';
 
@@ -35,6 +38,7 @@ class LMFeedScreen extends StatefulWidget {
     this.noMoreItemsIndicatorBuilder,
     this.firstPageErrorIndicatorBuilder,
     this.newPageErrorIndicatorBuilder,
+    this.pendingPostBannerBuilder,
   });
 
   // Builder for appbar
@@ -66,6 +70,10 @@ class LMFeedScreen extends StatefulWidget {
   // Builder for error view while loading the first page
   final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
+  // Builder for pending post banner on feed screen above post list
+  final Widget Function(BuildContext context, int noOfPendingPost)?
+      pendingPostBannerBuilder;
+
   final LMFeedTopicBarBuilder? topicBarBuilder;
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
@@ -77,25 +85,53 @@ class LMFeedScreen extends StatefulWidget {
 }
 
 class _LMFeedScreenState extends State<LMFeedScreen> {
+  // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  // Get the post title in all small singular form
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
+  // Get the post title in all small singular form
+  String postTitleSmallCapPlural =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
+
+  // Get the comment title in first letter capital plural form
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  // Get the comment title in all small plural form
   String commentTitleSmallCapPlural =
       LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  // Get the comment title in first letter capital singular form
   String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  // Get the comment title in all small singular form
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
+  // Create an instance of LMFeedScreenBuilderDelegate
+  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
+      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
+
+  LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
+      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+
+  // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
+
+  // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
+
+  // Create an instance of LMFeedWidgetUtility
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+
+  // Set the widget source to universal feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.universalFeed;
+
+  // Create a ValueNotifier to rebuild the post widget
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
+
+  // Create a ValueNotifier to track if a post is uploading
   final ValueNotifier postUploading = ValueNotifier(false);
 
   LMFeedScreenConfig? config;
@@ -122,6 +158,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   // future to get the unread notification count
   late Future<GetUnreadNotificationCountResponse> getUnreadNotificationCount;
 
+  late Future<GetUserFeedMetaResponse> getUserFeedMeta;
+
   // used to rebuild the appbar
   final ValueNotifier _rebuildAppBar = ValueNotifier(false);
 
@@ -131,21 +169,38 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   bool userPostingRights = true;
 
+  int pendingPostCount = 0;
+
   @override
   void initState() {
     super.initState();
+    // Adds pagination listener to the feed
     _addPaginationListener();
+
+    // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(
       (GetTopicsRequestBuilder()
             ..page(1)
             ..pageSize(20))
           .build(),
     );
+
+    getUserFeedMeta = getUserFeedMetaFuture();
+
+    // Sets the Bloc observer to LMFeedBlocObserver
     Bloc.observer = LMFeedBlocObserver();
+
+    // Initializes the feed Bloc instance
     _feedBloc = LMFeedBloc.instance;
+
+    // Checks the user's posting rights using LMFeedUserUtils
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
+
+    // Sets the value of postUploading based on the state of newPostBloc
     postUploading.value = newPostBloc.state is LMFeedNewPostUploadingState ||
         newPostBloc.state is LMFeedEditPostUploadingState;
+
+    // Adds a feed opened event to the LMFeedAnalyticsBloc
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.feedOpened,
@@ -157,6 +212,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
+  // This function updates the selected topics and fetches the universal
+  // feed based on the selected topics
   void updateSelectedTopics(List<LMTopicViewData> topics) {
     _feedBloc.selectedTopics = topics;
     rebuildTopicFeed.value = !rebuildTopicFeed.value;
@@ -263,6 +320,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
+  Future<GetUserFeedMetaResponse> getUserFeedMetaFuture() {
+    return LMFeedCore.client.getUserFeedMeta(
+      (GetUserFeedMetaRequestBuilder()..uuid(currentUser?.uuid ?? '')).build(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
@@ -282,6 +345,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
+          getUserFeedMeta = getUserFeedMetaFuture();
           refresh();
           clearPagingController();
         },
@@ -290,7 +354,45 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         child: CustomScrollView(
           controller: _controller,
           slivers: [
-            getPendingPostBanner(),
+            SliverToBoxAdapter(
+              child: ValueListenableBuilder(
+                  valueListenable: _rebuildAppBar,
+                  builder: (context, _, __) {
+                    return FutureBuilder(
+                        future: getUserFeedMeta,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasData && snapshot.data != null) {
+                              GetUserFeedMetaResponse response =
+                                  snapshot.data as GetUserFeedMetaResponse;
+
+                              if (response.success) {
+                                pendingPostCount =
+                                    response.pendingPostCount ?? 0;
+                              }
+                            }
+                          }
+
+                          return Container(
+                            child: widget.pendingPostBannerBuilder
+                                    ?.call(context, pendingPostCount) ??
+                                _screenBuilderDelegate.pendingPostBannerBuilder(
+                                  context,
+                                  pendingPostCount,
+                                  LMFeedPendingPostBanner(
+                                      pendingPostCount: pendingPostCount,
+                                      onPendingPostBannerPressed: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LMFeedPendingPostsScreen()));
+                                      }),
+                                ),
+                          );
+                        });
+                  }),
+            ),
             SliverToBoxAdapter(
               child: config!.showCustomWidget
                   ? widget.customWidgetBuilder == null
@@ -382,6 +484,21 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     postUploading.value = false;
                   }
                   if (curr is LMFeedNewPostUploadedState) {
+                    if (LMFeedPostUtils.doPostNeedsApproval) {
+                      _pendingPostScreenBuilderDelegate.showPostApprovalDialog(
+                        context,
+                        curr.postData,
+                        LMFeedPendingPostDialog(
+                          pendingPostId: curr.postData.id,
+                          title: "$postTitleFirstCap submitted for approval",
+                          description:
+                              "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
+                        ),
+                      );
+                      getUserFeedMeta = getUserFeedMetaFuture();
+
+                      return;
+                    }
                     LMPostViewData? item = curr.postData;
                     int length = _pagingController.itemList?.length ?? 0;
                     List<LMPostViewData> feedRoomItemList =
@@ -1619,49 +1736,5 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         ),
       );
     }
-  }
-
-  Widget getPendingPostBanner() {
-    return SliverToBoxAdapter(
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => LMFeedPendingPostsScreen()));
-        },
-        splashFactory: InkRipple.splashFactory,
-        child: Container(
-          color: Colors.white,
-          child: Container(
-            decoration: BoxDecoration(
-              color: feedThemeData.primaryColor.withOpacity(0.1),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                LMFeedText(
-                  text: "2 $postTitleSmallCap created by you are under review",
-                  style: LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      color: feedThemeData.primaryColor,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                LMFeedIcon(
-                  type: LMFeedIconType.icon,
-                  icon: Icons.chevron_right,
-                  style: LMFeedIconStyle(
-                    color: feedThemeData.primaryColor,
-                    size: 24,
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

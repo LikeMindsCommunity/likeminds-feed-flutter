@@ -1,6 +1,7 @@
 class LMFeedStringConstants {
   LMFeedStringConstants._();
   static final LMFeedStringConstants instance = LMFeedStringConstants._();
+
   String kStringLike = "Like";
   String kStringLikes = "Likes";
   String kStringAddComment = "Add Comment";
@@ -15,4 +16,5 @@ class LMFeedStringConstants {
 
   static const String underReviewKey = 'under_review';
   static const String rejectedKey = 'rejected';
+  static const String postApprovalNeeded = 'post_approval_needed';
 }

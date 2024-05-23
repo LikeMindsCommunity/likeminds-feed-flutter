@@ -169,7 +169,11 @@ class LMFeedThemeData {
           LMFeedTextFieldStyle.basic(
             backgroundColor: LikeMindsTheme.backgroundColor,
           ),
-      dialogStyle: dialogStyle ?? const LMFeedDialogStyle(),
+      dialogStyle: dialogStyle ??
+          LMFeedDialogStyle(
+            backgroundColor: container ?? LikeMindsTheme.container,
+            insetPadding: const EdgeInsets.all(24.0),
+          ),
       popUpMenuStyle: popUpMenuStyle ?? const LMFeedPopUpMenuStyle(),
       composeScreenStyle: composeScreenStyle ??
           LMFeedComposeScreenStyle.basic(
@@ -349,6 +353,7 @@ class LMFeedDialogStyle {
   final Curve insetAnimationCurve;
   final Duration insetAnimationDuration;
   final EdgeInsets insetPadding;
+  final EdgeInsets padding;
   final Color? shadowColor;
   final ShapeBorder? shape;
   final Color surfaceTintColor;
@@ -362,6 +367,7 @@ class LMFeedDialogStyle {
     this.insetAnimationDuration = const Duration(milliseconds: 100),
     this.insetPadding =
         const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+    this.padding = const EdgeInsets.all(24.0),
     this.shadowColor,
     this.shape,
     this.surfaceTintColor = Colors.transparent,

@@ -78,14 +78,18 @@ class LMFeedPostReviewBanner extends StatelessWidget {
               LMFeedText(
                 text: postReviewStatus == LMPostReviewStatus.pending
                     ? "Under review"
-                    : "Post Rejected",
+                    : "Post rejected",
                 style: style?.reviewStatusTextStyle,
               ),
           const Spacer(),
           LMFeedButton(
-            onTap: () => onInfoIconClicked?.call(),
+            onTap: () {
+              print("print");
+              onInfoIconClicked?.call();
+            },
             style: LMFeedButtonStyle(
               padding: EdgeInsets.zero,
+              backgroundColor: Colors.transparent,
               margin: 0,
               icon: infoIcon ??
                   LMFeedIcon(

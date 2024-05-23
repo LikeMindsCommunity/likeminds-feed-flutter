@@ -32,6 +32,7 @@ class LMFeedScreenConfig {
     this.topicSelectionWidgetType =
         LMFeedTopicSelectionWidgetType.showTopicSelectionScreen,
     this.showCustomWidget = false,
+    this.showPendingPostHeader = true,
   });
 
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]
@@ -53,6 +54,10 @@ class LMFeedScreenConfig {
   final LMFeedTopicSelectionWidgetType topicSelectionWidgetType;
 
   final bool showCustomWidget;
+
+  /// [bool] to enable/disable pending post header
+  /// on feed screen
+  final bool showPendingPostHeader;
 
   LMFeedScreenConfig copyWith({
     SystemUiOverlayStyle? composeSystemOverlayStyle,

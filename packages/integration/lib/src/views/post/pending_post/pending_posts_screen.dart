@@ -6,6 +6,8 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/pending_post/pending_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/post_approval_dialog.dart';
 
+part './pending_post_screen_builder_delegate.dart';
+
 class LMFeedPendingPostsScreen extends StatefulWidget {
   // Builder for appbar
   final LMFeedPostAppBarBuilder? appBar;
@@ -58,6 +60,9 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   String postTitleSmallCapPlural =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
 
+  LMFeedPendingPostScreenBuilderDeletegate _postScreenBuilderDeletegate =
+      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+
   LMFeedPendingBloc pendingBloc = LMFeedPendingBloc.instance;
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -92,6 +97,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
     firstPageKey: 1,
   );
 
+  int pendingPostCount = 0;
+
   @override
   void initState() {
     pendingBloc = LMFeedPendingBloc.instance;
@@ -116,64 +123,123 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
     super.dispose();
   }
 
+  void refreshPage() {
+    pagingController.itemList?.clear();
+    pagingController.refresh();
+  }
+
+  void updateAppBarTitle() {
+    _appBarTitle =
+        '${pendingPostCount == 1 ? postTitleFirstCap : postTitleFirstCapPlural} Under Review';
+    _appBarSubtitle =
+        '${pendingPostCount} ${pendingPostCount == 1 ? postTitleSmallCap : postTitleSmallCapPlural}';
+    _rebuildAppBar.value = !_rebuildAppBar.value;
+  }
+
   @override
   Widget build(BuildContext context) {
     return _widgetsBuilder.scaffold(
       appBar: defAppBar(),
       backgroundColor: feedThemeData.backgroundColor,
-      body: BlocListener(
-        bloc: pendingBloc,
-        listener: (context, state) {
-          if (state is LMFeedPendingPostsLoadedState) {
-            if (state.page == 1) {
-              int totalPostCount = state.totalCount;
-              _appBarTitle =
-                  '${totalPostCount == 1 ? postTitleFirstCap : postTitleFirstCapPlural} Under Review';
-              _appBarSubtitle =
-                  '${state.totalCount} ${totalPostCount == 1 ? postTitleSmallCap : postTitleSmallCapPlural}';
-              _rebuildAppBar.value = !_rebuildAppBar.value;
-            }
-            if (state.posts.isEmpty || state.posts.length < pageSize)
-              pagingController.appendLastPage(state.posts);
-            else {
-              pagingController.appendPage(
-                  state.posts, pagingController.nextPageKey);
-            }
-          } else if (state is LMFeedPendingPostsErrorState) {
-            pagingController.error = state.errorMessage;
-          }
-        },
-        child: PagedListView(
-          pagingController: pagingController,
-          padding: EdgeInsets.zero,
-          builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
-            itemBuilder: (context, item, index) {
-              LMFeedPostWidget postWidget = defPostWidget(context, item);
-              return widget.postBuilder?.call(context, postWidget, item) ??
-                  _widgetsBuilder.postWidgetBuilder
-                      .call(context, postWidget, item, source: _widgetSource);
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<LMFeedPostBloc, LMFeedPostState>(
+            bloc: newPostBloc,
+            listener: (context, state) {
+              if (state is LMFeedEditPostUploadedState) {
+                // Clear the post list and refresh the page
+                pagingController.itemList?.clear();
+                pagingController.refresh();
+              } else if (state is LMFeedPostDeletedState) {
+                // Fetch the post id of the deleted post
+                String postId = state.postId;
+
+                List<LMPostViewData> postList = pagingController.itemList ?? [];
+                // Remove the deleted post from the list
+                postList.removeWhere((element) => element.id == postId);
+                // Update pending post count
+                pendingPostCount--;
+                // Update app bar title according to the newly update
+                // pending post count
+                updateAppBarTitle();
+                // rebuild the post list to update the UI
+                rebuildPostWidget.value = !rebuildPostWidget.value;
+              }
             },
-            noItemsFoundIndicatorBuilder: (context) {
-              return _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(context);
-            },
-            noMoreItemsIndicatorBuilder: (context) {
-              return widget.noMoreItemsIndicatorBuilder?.call(context) ??
-                  _widgetsBuilder.noMoreItemsIndicatorBuilderFeed(context);
-            },
-            newPageProgressIndicatorBuilder: (context) {
-              return widget.newPageProgressIndicatorBuilder?.call(context) ??
-                  _widgetsBuilder.newPageProgressIndicatorBuilderFeed(context);
-            },
-            firstPageProgressIndicatorBuilder: (context) =>
-                widget.firstPageProgressIndicatorBuilder?.call(context) ??
-                _widgetsBuilder.firstPageProgressIndicatorBuilderFeed(context),
-            firstPageErrorIndicatorBuilder: (context) =>
-                widget.firstPageErrorIndicatorBuilder?.call(context) ??
-                _widgetsBuilder.firstPageErrorIndicatorBuilderFeed(context),
-            newPageErrorIndicatorBuilder: (context) =>
-                widget.newPageErrorIndicatorBuilder?.call(context) ??
-                _widgetsBuilder.newPageErrorIndicatorBuilderFeed(context),
           ),
+          BlocListener<LMFeedPendingBloc, LMFeedPendingState>(
+            bloc: pendingBloc,
+            listener: (context, state) {
+              if (state is LMFeedPendingPostsLoadedState) {
+                if (state.page == 1) {
+                  pendingPostCount = state.totalCount;
+                  updateAppBarTitle();
+                }
+                if (state.posts.isEmpty || state.posts.length < pageSize)
+                  pagingController.appendLastPage(state.posts);
+                else {
+                  pagingController.appendPage(
+                      state.posts, pagingController.nextPageKey);
+                }
+              } else if (state is LMFeedPendingPostsErrorState) {
+                pagingController.error = state.errorMessage;
+              }
+            },
+          ),
+        ],
+        child: RefreshIndicator.adaptive(
+          color: feedThemeData.primaryColor,
+          onRefresh: () async {
+            refreshPage();
+          },
+          child: ValueListenableBuilder(
+              valueListenable: rebuildPostWidget,
+              builder: (context, _, __) {
+                return PagedListView(
+                  pagingController: pagingController,
+                  padding: EdgeInsets.zero,
+                  builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
+                    itemBuilder: (context, item, index) {
+                      LMFeedPostWidget postWidget =
+                          defPostWidget(context, item);
+                      return widget.postBuilder
+                              ?.call(context, postWidget, item) ??
+                          _widgetsBuilder.postWidgetBuilder.call(
+                              context, postWidget, item,
+                              source: _widgetSource);
+                    },
+                    noItemsFoundIndicatorBuilder: (context) {
+                      return _widgetsBuilder
+                          .noItemsFoundIndicatorBuilderFeed(context);
+                    },
+                    noMoreItemsIndicatorBuilder: (context) {
+                      return widget.noMoreItemsIndicatorBuilder
+                              ?.call(context) ??
+                          _widgetsBuilder
+                              .noMoreItemsIndicatorBuilderFeed(context);
+                    },
+                    newPageProgressIndicatorBuilder: (context) {
+                      return widget.newPageProgressIndicatorBuilder
+                              ?.call(context) ??
+                          _widgetsBuilder
+                              .newPageProgressIndicatorBuilderFeed(context);
+                    },
+                    firstPageProgressIndicatorBuilder: (context) =>
+                        widget.firstPageProgressIndicatorBuilder
+                            ?.call(context) ??
+                        _widgetsBuilder
+                            .firstPageProgressIndicatorBuilderFeed(context),
+                    firstPageErrorIndicatorBuilder: (context) =>
+                        widget.firstPageErrorIndicatorBuilder?.call(context) ??
+                        _widgetsBuilder
+                            .firstPageErrorIndicatorBuilderFeed(context),
+                    newPageErrorIndicatorBuilder: (context) =>
+                        widget.newPageErrorIndicatorBuilder?.call(context) ??
+                        _widgetsBuilder
+                            .newPageErrorIndicatorBuilderFeed(context),
+                  ),
+                );
+              }),
         ),
       ),
     );
@@ -212,19 +278,6 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
           ),
         )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
         // await postVideoController.player.play();
-        LMFeedVideoProvider.instance.playCurrentVideo();
-      },
-      onPostTap: (context, post) async {
-        LMFeedVideoProvider.instance.pauseCurrentVideo();
-        // ignore: use_build_context_synchronously
-        await Navigator.of(context, rootNavigator: true).push(
-          MaterialPageRoute(
-            builder: (context) => LMFeedPostDetailScreen(
-              postId: post.id,
-              postBuilder: widget.postBuilder,
-            ),
-          ),
-        );
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
       footer: LMFeedPostFooter(hide: true),
@@ -293,7 +346,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
           ));
         },
         action: LMFeedMenuAction(
-          onPostEdit: () {
+          onPendingPostEdit: () {
             // Mute all video controllers
             // to prevent video from playing in background
             // while editing the post
@@ -302,12 +355,12 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => LMFeedEditPostScreen(
-                  postId: postViewData.id,
+                  pendingPostId: postViewData.id,
                 ),
               ),
             );
           },
-          onPostDelete: () {
+          onPendingPostDelete: () {
             String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
 
             showDialog(
@@ -326,7 +379,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
 
                   LMFeedPostBloc.instance.add(
                     LMFeedDeletePostEvent(
-                      postId: postViewData.id,
+                      pendingPostId: postViewData.id,
                       reason: reason,
                       isRepost: postViewData.isRepost,
                       postType: postType,
@@ -347,21 +400,63 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   LMFeedPostReviewBanner _defPostReviewBanner(LMPostViewData postViewData) {
     return LMFeedPostReviewBanner(
       postReviewStatus: postViewData.postStatus,
-      onInfoIconClicked: () => showPostReviewDialog(postViewData),
+      onInfoIconClicked: () {
+        print("object");
+        showPostReviewDialog(postViewData);
+      },
     );
   }
 
   void showPostReviewDialog(LMPostViewData postViewData) {
     if (postViewData.postStatus == LMPostReviewStatus.pending) {
-      showDialog(
-        context: context,
-        builder: (childContext) => LMFeedPostApprovalDialog(),
+      LMFeedPendingPostDialog postApprovalDialog = LMFeedPendingPostDialog(
+        onEditButtonClicked: () {
+          Navigator.of(context).pop();
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => LMFeedEditPostScreen(
+                pendingPostId: postViewData.id,
+              ),
+            ),
+          );
+        },
+        onCancelButtonClicked: () {
+          Navigator.of(context).pop();
+        },
+        pendingPostId: postViewData.id,
+        title: "$postTitleFirstCap submitted for approval",
+        description:
+            "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
+      );
+
+      _postScreenBuilderDeletegate.showPostApprovalDialog(
+        context,
+        postViewData,
+        postApprovalDialog,
       );
     } else if (postViewData.postStatus == LMPostReviewStatus.rejected) {
-      showDialog(
-        context: context,
-        builder: (childContext) => LMFeedPostApprovalDialog(),
+      LMFeedPendingPostDialog postRejectionDialog = LMFeedPendingPostDialog(
+        onEditButtonClicked: () {
+          Navigator.of(context).pop();
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => LMFeedEditPostScreen(
+                pendingPostId: postViewData.id,
+              ),
+            ),
+          );
+        },
+        onCancelButtonClicked: () {
+          Navigator.of(context).pop();
+        },
+        pendingPostId: postViewData.id,
+        title: "$postTitleFirstCap rejected",
+        description:
+            "This $postTitleSmallCap was rejected by the admin. Edit post to submit again.",
       );
+
+      _postScreenBuilderDeletegate.showPostRejectionDialog(
+          context, postViewData, postRejectionDialog);
     }
   }
 
@@ -538,6 +633,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   AppBar defAppBar() {
     return AppBar(
       backgroundColor: feedThemeData.container,
+      elevation: 4,
+      shadowColor: feedThemeData.shadowColor,
       centerTitle: iSiOS,
       leading: LMFeedIcon(
         type: LMFeedIconType.icon,

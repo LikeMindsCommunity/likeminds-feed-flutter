@@ -8,13 +8,16 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 /// {@endtemplate}
 class LMFeedWidgetUtility {
   /// {@macro feed_widget_utility}
+  /// Constructor for LMFeedWidgetUtility.
   LMFeedWidgetUtility();
 
   static LMFeedWidgetUtility? _instance;
 
+  /// Returns the singleton instance of LMFeedWidgetUtility.
   static LMFeedWidgetUtility get instance =>
       _instance ??= LMFeedWidgetUtility();
 
+  /// Builds a scaffold widget.
   Widget scaffold({
     Key? key,
     bool extendBody = false,
@@ -85,6 +88,7 @@ class LMFeedWidgetUtility {
     );
   }
 
+  /// Builds a post widget with customized builders.
   Widget postWidgetBuilder(
       BuildContext context, LMFeedPostWidget post, LMPostViewData postViewData,
       {LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed}) {
@@ -99,75 +103,90 @@ class LMFeedWidgetUtility {
     );
   }
 
+  /// Builds a post review banner widget.
   Widget postReviewBannerBuilder(BuildContext context,
       LMFeedPostReviewBanner postReviewBanner, LMPostViewData postViewData) {
     return postReviewBanner;
   }
 
+  /// Builds a comment widget.
   Widget commentBuilder(BuildContext context, LMFeedCommentWidget commentWidget,
       LMPostViewData postViewData) {
     return commentWidget;
   }
 
+  /// Builds a post header widget.
   Widget headerBuilder(BuildContext context, LMFeedPostHeader postHeader,
       LMPostViewData postViewData) {
     return postHeader;
   }
 
+  /// Builds a menu widget.
   Widget menuBuilder(
       BuildContext context, LMFeedMenu menu, LMPostViewData postViewData) {
     return menu;
   }
 
+  /// Builds a topic widget.
   Widget topicBuilder(BuildContext context, LMFeedPostTopic postTopic,
       LMPostViewData postViewData) {
     return postTopic;
   }
 
+  /// Builds a post content widget.
   Widget postContentBuilder(BuildContext context, LMFeedPostContent postContent,
       LMPostViewData postViewData) {
     return postContent;
   }
 
+  /// Builds a post media widget.
   Widget postMediaBuilder(BuildContext context, LMFeedPostMedia postMedia,
       LMPostViewData postViewData) {
     return postMedia.copyWith(
         carouselIndicatorBuilder: this.postMediaCarouselIndicatorBuilder);
   }
 
+  /// Builds a post footer widget.
   Widget postFooterBuilder(BuildContext context, LMFeedPostFooter postFooter,
       LMPostViewData postViewData) {
     return postFooter;
   }
 
+  /// Builds an image widget.
   Widget imageBuilder(LMFeedImage image) {
     return image;
   }
 
+  /// Builds a video widget.
   Widget videoBuilder(LMFeedVideo video) {
     return video;
   }
 
+  /// Builds a poll widget.
   Widget pollWidgetBuilder(BuildContext context, LMFeedPoll pollWidget) {
     return pollWidget;
   }
 
+  /// Builds a carousel indicator widget for post media.
   Widget postMediaCarouselIndicatorBuilder(BuildContext context, int currIndex,
       int mediaLength, Widget carouselIndicator) {
     return carouselIndicator;
   }
 
-  /// Feed Screen Builder Widgets
-  /// These widgets are used to build the feed screen
+  // Feed Screen Builder Widgets
+
+  /// Builds a custom widget for the feed screen.
   Widget customWidgetBuilder(BuildContext context) {
     return const SizedBox.shrink();
   }
 
+  /// Builds a floating action button for the feed screen.
   Widget floatingActionButtonBuilder(
       BuildContext context, LMFeedButton floatingActionButton) {
     return floatingActionButton;
   }
 
+  /// Builds an indicator when no items are found in the feed.
   Widget noItemsFoundIndicatorBuilderFeed(BuildContext context,
       {LMFeedButton? createPostButton, bool isSelfPost = true}) {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
@@ -215,6 +234,7 @@ class LMFeedWidgetUtility {
     );
   }
 
+  /// Builds an indicator when there are no posts under a topic in the feed.
   Widget noPostUnderTopicFeed(BuildContext context,
       {LMFeedButton? actionable}) {
     return Center(
@@ -244,6 +264,7 @@ class LMFeedWidgetUtility {
     );
   }
 
+  /// Builds a progress indicator for the first page of the feed.
   Widget firstPageProgressIndicatorBuilderFeed(BuildContext context) {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return LMFeedLoader(
@@ -251,6 +272,7 @@ class LMFeedWidgetUtility {
     );
   }
 
+  /// Builds a progress indicator for subsequent pages of the feed.
   Widget newPageProgressIndicatorBuilderFeed(BuildContext context) {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return LMFeedLoader(
@@ -258,42 +280,51 @@ class LMFeedWidgetUtility {
     );
   }
 
+  /// Builds an error indicator for the first page of the feed.
   Widget firstPageErrorIndicatorBuilderFeed(BuildContext context) {
     return const SizedBox();
   }
 
+  /// Builds an error indicator for subsequent pages of the feed.
   Widget newPageErrorIndicatorBuilderFeed(BuildContext context) {
     return const SizedBox();
   }
 
+  /// Builds an indicator when there are no more items to load in the feed.
   Widget noMoreItemsIndicatorBuilderFeed(BuildContext context) {
     return const SizedBox.shrink();
   }
 
+  /// Builds a topic bar widget.
   Widget topicBarBuilder(LMFeedTopicBar topicBar) {
     return const SizedBox();
   }
 
+  /// Builds the app bar for the compose screen.
   PreferredSizeWidget composeScreenAppBar(
       BuildContext context, LMFeedAppBar appBar) {
     return appBar;
   }
 
+  /// Builds the user header for the compose screen.
   Widget composeScreenUserHeaderBuilder(
       BuildContext context, LMUserViewData user) {
     return const SizedBox.shrink();
   }
 
+  /// Builds the topic selector for the compose screen.
   Widget composeScreenTopicSelectorBuilder(BuildContext context,
       Widget topicSelector, List<LMTopicViewData> selectedTopics) {
     return topicSelector;
   }
 
+  /// Builds the heading text field for the compose screen.
   Widget composeScreenHeadingTextfieldBuilder(
       BuildContext context, TextField headingTextField) {
     return headingTextField;
   }
 
+  /// Builds the content text field for the compose screen.
   Widget composeScreenContentTextfieldBuilder(
       BuildContext context, LMTaggingAheadTextField contentTextField) {
     return contentTextField;
