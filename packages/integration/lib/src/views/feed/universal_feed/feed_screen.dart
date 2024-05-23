@@ -462,6 +462,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       _widgetSource,
                     );
 
+                    if (curr.pendingPostId != null) {
+                      if (pendingPostCount > 0) {
+                        pendingPostCount--;
+                        rebuildPostWidget.value = !rebuildPostWidget.value;
+                      }
+                      return;
+                    }
+
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     feedRoomItemList

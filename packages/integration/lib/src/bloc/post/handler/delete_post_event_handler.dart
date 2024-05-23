@@ -54,7 +54,7 @@ Future<void> deletePendingPost(
   );
 
   if (response.success) {
-    emit(LMFeedPostDeletedState(postId: pendingPostId));
+    emit(LMFeedPostDeletedState(pendingPostId: pendingPostId));
 
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.postDeleted,

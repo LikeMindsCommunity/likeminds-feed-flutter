@@ -152,7 +152,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
                 pagingController.refresh();
               } else if (state is LMFeedPostDeletedState) {
                 // Fetch the post id of the deleted post
-                String postId = state.postId;
+                String postId = state.pendingPostId ?? state.postId ?? '';
 
                 List<LMPostViewData> postList = pagingController.itemList ?? [];
                 // Remove the deleted post from the list
