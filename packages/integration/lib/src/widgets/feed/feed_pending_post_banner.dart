@@ -81,8 +81,6 @@ class LMFeedPendingPostBanner extends StatelessWidget {
         : InkWell(
             onTap: () {
               onPendingPostBannerPressed?.call();
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => LMFeedPendingPostsScreen()));
             },
             splashFactory: InkRipple.splashFactory,
             child: Container(

@@ -36,6 +36,7 @@ import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 /// {@endtemplate}
 class LMFeedMenu extends StatelessWidget {
   /// Constructor for `LMFeedMenu`.
+  /// {@macro lm_feed_menu}
   const LMFeedMenu({
     Key? key,
     this.children,
