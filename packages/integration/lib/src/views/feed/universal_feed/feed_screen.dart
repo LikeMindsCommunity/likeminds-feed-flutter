@@ -841,26 +841,27 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             ),
           ),
         ),
-        LMFeedButton(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LMFeedNotificationScreen(),
-              ),
-            );
-          },
-          style: LMFeedButtonStyle.basic().copyWith(
-            icon: LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.notifications,
-              style: LMFeedIconStyle.basic().copyWith(
-                color: feedThemeData.onContainer,
-                size: 24,
+        if (config?.showNotificationFeedIcon ?? true)
+          LMFeedButton(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LMFeedNotificationScreen(),
+                ),
+              );
+            },
+            style: LMFeedButtonStyle.basic().copyWith(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmNotificationBellSvg,
+                style: LMFeedIconStyle.basic().copyWith(
+                  color: feedThemeData.onContainer,
+                  size: 24,
+                ),
               ),
             ),
           ),
-        ),
         LMFeedProfilePicture(
           fallbackText: currentUser!.name,
           imageUrl: currentUser!.imageUrl,

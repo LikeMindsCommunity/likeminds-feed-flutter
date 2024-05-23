@@ -82,13 +82,14 @@ class LMFeedMenu extends StatelessWidget {
     LMFeedMenuStyle? style = this.style ?? theme.headerStyle.menuStyle;
     return menuItems.isEmpty
         ? Container() // Return an empty container if there are no menu items
-        : GestureDetector(
+        : InkWell(
             onTap: () {
               if (onMenuTap != null) {
                 onMenuTap?.call();
                 onMenuOpen?.call();
               }
             },
+            splashFactory: InkRipple.splashFactory,
             child: AbsorbPointer(
               absorbing: onMenuTap != null,
               child: (theme.headerStyle.menuStyle?.menuType ??
@@ -139,7 +140,7 @@ class LMFeedMenu extends StatelessWidget {
                         },
                       ),
                     )
-                  : GestureDetector(
+                  : InkWell(
                       onTap: () {
                         showModalBottomSheet(
                             context: context,
@@ -210,6 +211,7 @@ class LMFeedMenu extends StatelessWidget {
                         // Called when the post menu is opened
                         onMenuOpen?.call();
                       },
+                      splashFactory: InkRipple.splashFactory,
                       child: Container(
                         color: Colors.transparent,
                         child: style?.menuIcon ??
