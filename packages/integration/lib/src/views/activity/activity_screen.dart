@@ -298,7 +298,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           ),
         );
       },
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         await Navigator.push(
@@ -308,6 +308,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -460,7 +461,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       postId: post.id,
       pollBuilder: _widgetUtility.pollWidgetBuilder,
       poll: _defPollWidget(post),
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         await Navigator.push(
@@ -470,6 +471,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: index,
             ),
           ),
         );

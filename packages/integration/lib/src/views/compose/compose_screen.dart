@@ -440,6 +440,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     mediaWidget = LMFeedImage(
                       imageFile: composeBloc.postMedia[index].mediaFile,
                       style: style?.mediaStyle?.imageStyle,
+                      position: index,
                     );
                     break;
                   case LMMediaType.video:

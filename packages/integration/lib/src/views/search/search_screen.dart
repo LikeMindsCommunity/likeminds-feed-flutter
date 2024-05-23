@@ -401,7 +401,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: theme.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -411,6 +411,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );
@@ -556,7 +557,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       style: theme.mediaStyle,
       pollBuilder: widgetUtility.pollWidgetBuilder,
       poll: _defPollWidget(post),
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -566,6 +567,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );

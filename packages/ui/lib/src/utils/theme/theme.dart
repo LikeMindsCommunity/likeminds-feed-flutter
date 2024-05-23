@@ -17,6 +17,7 @@ class LMFeedTheme {
 
 class LMFeedThemeData {
   final LMFeedPostStyle postStyle;
+  final LMFeedPostReviewBannerStyle reviewBannerStyle;
   final LMFeedPostHeaderStyle headerStyle;
   final LMFeedPostTopicStyle topicStyle;
   final LMFeedPostContentStyle contentStyle;
@@ -50,6 +51,7 @@ class LMFeedThemeData {
 
   const LMFeedThemeData({
     required this.postStyle,
+    required this.reviewBannerStyle,
     required this.headerStyle,
     required this.topicStyle,
     required this.contentStyle,
@@ -108,6 +110,7 @@ class LMFeedThemeData {
     Color? hashTagColor,
     Color? linkColor,
     LMFeedPostStyle? postStyle,
+    LMFeedPostReviewBannerStyle? reviewBannerStyle,
     LMFeedPostHeaderStyle? headerStyle,
     LMFeedPostTopicStyle? topicStyle,
     LMFeedPostContentStyle? contentStyle,
@@ -150,6 +153,8 @@ class LMFeedThemeData {
             containerColor: container ?? LikeMindsTheme.container,
             inActiveColor: inActiveColor ?? LikeMindsTheme.unSelectedColor,
           ),
+      reviewBannerStyle:
+          reviewBannerStyle ?? LMFeedPostReviewBannerStyle.basic(),
       footerStyle: footerStyle ??
           LMFeedPostFooterStyle.basic(primaryColor: primaryColor),
       headerStyle: headerStyle ?? LMFeedPostHeaderStyle.basic(),
@@ -164,7 +169,11 @@ class LMFeedThemeData {
           LMFeedTextFieldStyle.basic(
             backgroundColor: LikeMindsTheme.backgroundColor,
           ),
-      dialogStyle: dialogStyle ?? const LMFeedDialogStyle(),
+      dialogStyle: dialogStyle ??
+          LMFeedDialogStyle(
+            backgroundColor: container ?? LikeMindsTheme.container,
+            insetPadding: const EdgeInsets.all(24.0),
+          ),
       popUpMenuStyle: popUpMenuStyle ?? const LMFeedPopUpMenuStyle(),
       composeScreenStyle: composeScreenStyle ??
           LMFeedComposeScreenStyle.basic(
@@ -205,6 +214,7 @@ class LMFeedThemeData {
     LMFeedTextFieldStyle? textFieldStyle,
     LMFeedDialogStyle? dialogStyle,
     LMFeedPopUpMenuStyle? popUpMenuStyle,
+    LMFeedPostReviewBannerStyle? reviewBannerStyle,
     LMFeedPostHeaderStyle? headerStyle,
     LMFeedPostTopicStyle? topicStyle,
     LMFeedPostContentStyle? contentStyle,
@@ -246,6 +256,7 @@ class LMFeedThemeData {
       loaderStyle: loaderStyle ?? this.loaderStyle,
       bottomSheetStyle: bottomSheetStyle ?? this.bottomSheetStyle,
       snackBarTheme: snackBarTheme ?? this.snackBarTheme,
+      reviewBannerStyle: reviewBannerStyle ?? this.reviewBannerStyle,
     );
   }
 }
@@ -335,15 +346,57 @@ class LMFeedTextFieldStyle {
 }
 
 class LMFeedDialogStyle {
+  final Alignment? alignment;
   final Color? backgroundColor;
+  final Clip clipBehavior;
+  final double? elevation;
+  final Curve insetAnimationCurve;
+  final Duration insetAnimationDuration;
+  final EdgeInsets insetPadding;
+  final EdgeInsets padding;
+  final Color? shadowColor;
+  final ShapeBorder? shape;
+  final Color surfaceTintColor;
 
   const LMFeedDialogStyle({
+    this.alignment,
     this.backgroundColor,
+    this.clipBehavior = Clip.none,
+    this.elevation,
+    this.insetAnimationCurve = Curves.decelerate,
+    this.insetAnimationDuration = const Duration(milliseconds: 100),
+    this.insetPadding =
+        const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
+    this.padding = const EdgeInsets.all(24.0),
+    this.shadowColor,
+    this.shape,
+    this.surfaceTintColor = Colors.transparent,
   });
 
-  LMFeedDialogStyle copyWith({Color? backgroundColor}) {
+  LMFeedDialogStyle copyWith({
+    Alignment? alignment,
+    Color? backgroundColor,
+    Clip? clipBehavior,
+    double? elevation,
+    Curve? insetAnimationCurve,
+    Duration? insetAnimationDuration,
+    EdgeInsets? insetPadding,
+    Color? shadowColor,
+    ShapeBorder? shape,
+    Color? surfaceTintColor,
+  }) {
     return LMFeedDialogStyle(
+      alignment: alignment ?? this.alignment,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      clipBehavior: clipBehavior ?? this.clipBehavior,
+      elevation: elevation ?? this.elevation,
+      insetAnimationCurve: insetAnimationCurve ?? this.insetAnimationCurve,
+      insetAnimationDuration:
+          insetAnimationDuration ?? this.insetAnimationDuration,
+      insetPadding: insetPadding ?? this.insetPadding,
+      shadowColor: shadowColor ?? this.shadowColor,
+      shape: shape ?? this.shape,
+      surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
     );
   }
 }

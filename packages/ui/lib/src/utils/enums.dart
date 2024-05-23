@@ -39,6 +39,7 @@ enum LMFeedWidgetSource {
   userCreatedCommentScreen,
   userProfileScreen,
   topicDetailScreen,
+  pendingPostsScreen,
   other,
 }
 

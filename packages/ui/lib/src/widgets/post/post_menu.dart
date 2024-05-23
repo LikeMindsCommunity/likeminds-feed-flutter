@@ -3,9 +3,42 @@ import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
+/// {@template lm_feed_menu}
+/// `LMFeedMenu` is a stateless widget that represents a menu in the feed.
+/// It includes a list of menu items, a map of child widgets for each menu item,
+/// a set of menu item IDs to be removed, an action to be performed when a menu
+/// item is selected,
+/// a style for the menu, and callbacks for when the menu is tapped and opened.
+///   /// Example usage:
+/// ```dart
+/// LMFeedMenu(
+///   menuItems: [
+///     LMPopUpMenuItemViewData(
+///       id: 1,
+///       title: 'Menu Item 1',
+///       icon: Icons.menu,
+///     ),
+///     LMPopUpMenuItemViewData(
+///       id: 2,
+///       title: 'Menu Item 2',
+///       icon: Icons.menu,
+///     ),
+///   ],
+///   removeItemIds: {2},
+///   onMenuTap: () {
+///     print('Menu tapped');
+///   },
+///   onMenuOpen: () {
+///     print('Menu opened');
+///   },
+/// );
+/// ```
+/// {@endtemplate}
 class LMFeedMenu extends StatelessWidget {
+  /// Constructor for `LMFeedMenu`.
+  /// {@macro lm_feed_menu}
   const LMFeedMenu({
-    super.key,
+    Key? key,
     this.children,
     required this.menuItems,
     this.removeItemIds = const {4, 7},
@@ -13,14 +46,27 @@ class LMFeedMenu extends StatelessWidget {
     this.style,
     this.onMenuTap,
     this.onMenuOpen,
-  });
+  }) : super(key: key);
 
+  /// A map of child widgets for each menu item. The key is the menu item ID.
   final Map<int, Widget>? children;
+
+  /// A list of menu items.
   final List<LMPopUpMenuItemViewData> menuItems;
+
+  /// A set of menu item IDs to be removed from the menu.
   final Set<int> removeItemIds;
+
+  /// The action to be performed when a menu item is selected.
   final LMFeedMenuAction? action;
+
+  /// The style for the menu.
   final LMFeedMenuStyle? style;
+
+  /// A callback that is called when the menu is tapped.
   final VoidCallback? onMenuTap;
+
+  /// A callback that is called when the menu is opened.
   final VoidCallback? onMenuOpen;
 
   void removeReportIntegration() {
@@ -35,14 +81,15 @@ class LMFeedMenu extends StatelessWidget {
     LMFeedThemeData theme = LMFeedTheme.instance.theme;
     LMFeedMenuStyle? style = this.style ?? theme.headerStyle.menuStyle;
     return menuItems.isEmpty
-        ? Container()
-        : GestureDetector(
+        ? Container() // Return an empty container if there are no menu items
+        : InkWell(
             onTap: () {
               if (onMenuTap != null) {
                 onMenuTap?.call();
                 onMenuOpen?.call();
               }
             },
+            splashFactory: InkRipple.splashFactory,
             child: AbsorbPointer(
               absorbing: onMenuTap != null,
               child: (theme.headerStyle.menuStyle?.menuType ??
@@ -93,7 +140,7 @@ class LMFeedMenu extends StatelessWidget {
                         },
                       ),
                     )
-                  : GestureDetector(
+                  : InkWell(
                       onTap: () {
                         showModalBottomSheet(
                             context: context,
@@ -164,6 +211,7 @@ class LMFeedMenu extends StatelessWidget {
                         // Called when the post menu is opened
                         onMenuOpen?.call();
                       },
+                      splashFactory: InkRipple.splashFactory,
                       child: Container(
                         color: Colors.transparent,
                         child: style?.menuIcon ??
@@ -208,11 +256,34 @@ class LMFeedMenu extends StatelessWidget {
       case LMFeedMenuAction.commentEditId:
         action?.onCommentEdit?.call();
         break;
+      case LMFeedMenuAction.pendingPostDeleteId:
+        action?.onPendingPostDelete?.call();
+        break;
+      case LMFeedMenuAction.pendingPostEditId:
+        action?.onPendingPostEdit?.call();
+        break;
       default:
         break;
     }
   }
 
+  /// {@template lm_feed_menu_copywith}
+  /// Creates a copy of this `LMFeedMenu` but with the given fields replaced
+  /// with the new values.
+  /// If a field is not provided, the value from the current `LMFeedMenu`
+  /// instance will be used.
+  ///
+  /// - `children`: A map of child widgets for each menu item. The key is the
+  /// menu item ID.
+  /// - `menuIcon`: The icon for the menu.
+  /// - `menuItems`: A list of menu items.
+  /// - `removeItemIds`: A set of menu item IDs to be removed from the menu.
+  /// - `action`: The action to be performed when a menu item is selected.
+  /// - `style`: The style for the menu.
+  /// - `onMenuTap`: A callback that is called when the menu is tapped.
+  /// - `onMenuOpen`: A callback that is called when the menu is opened.
+  /// {@endtemplate}
+  ///
   LMFeedMenu copyWith({
     Map<int, Widget>? children,
     LMFeedIcon? menuIcon,
@@ -241,6 +312,8 @@ class LMFeedMenuAction {
   static const int postUnpinId = 3;
   static const int postReportId = 4;
   static const int postEditId = 5;
+  static const int pendingPostDeleteId = 10;
+  static const int pendingPostEditId = 9;
 
 // Comment & Reply Id
   static const int commentDeleteId = 6;
@@ -252,6 +325,8 @@ class LMFeedMenuAction {
   VoidCallback? onPostUnpin;
   VoidCallback? onPostReport;
   VoidCallback? onPostEdit;
+  VoidCallback? onPendingPostDelete;
+  VoidCallback? onPendingPostEdit;
 
   VoidCallback? onCommentDelete;
   VoidCallback? onCommentReport;
@@ -266,6 +341,8 @@ class LMFeedMenuAction {
     this.onCommentDelete,
     this.onCommentReport,
     this.onCommentEdit,
+    this.onPendingPostDelete,
+    this.onPendingPostEdit,
   });
 
   LMFeedMenuAction copyWith({
@@ -277,6 +354,8 @@ class LMFeedMenuAction {
     VoidCallback? onCommentDelete,
     VoidCallback? onCommentReport,
     VoidCallback? onCommentEdit,
+    VoidCallback? onPendingPostDelete,
+    VoidCallback? onPendingPostEdit,
   }) {
     return LMFeedMenuAction(
       onPostDelete: onPostDelete ?? this.onPostDelete,
@@ -287,6 +366,8 @@ class LMFeedMenuAction {
       onCommentDelete: onCommentDelete ?? this.onCommentDelete,
       onCommentReport: onCommentReport ?? this.onCommentReport,
       onCommentEdit: onCommentEdit ?? this.onCommentEdit,
+      onPendingPostDelete: onPendingPostDelete ?? this.onPendingPostDelete,
+      onPendingPostEdit: onPendingPostEdit ?? this.onPendingPostEdit,
     );
   }
 }

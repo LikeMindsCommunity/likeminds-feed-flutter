@@ -257,7 +257,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -267,6 +267,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );
@@ -422,7 +423,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       poll: _defPollWidget(post),
       carouselIndicatorBuilder:
           _widgetUtility.postMediaCarouselIndicatorBuilder,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -432,6 +433,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );

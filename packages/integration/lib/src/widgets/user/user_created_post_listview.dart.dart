@@ -360,7 +360,7 @@ class _LMFeedUserCreatedPostListViewState
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -370,6 +370,7 @@ class _LMFeedUserCreatedPostListViewState
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -507,7 +508,7 @@ class _LMFeedUserCreatedPostListViewState
           _widgetsBuilder.postMediaCarouselIndicatorBuilder,
       pollBuilder: _widgetsBuilder.pollWidgetBuilder,
       poll: _defPollWidget(post),
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -517,6 +518,7 @@ class _LMFeedUserCreatedPostListViewState
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: index,
             ),
           ),
         );

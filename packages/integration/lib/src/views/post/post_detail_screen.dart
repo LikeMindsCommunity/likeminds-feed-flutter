@@ -573,7 +573,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       user: _postDetailScreenHandler!
           .users[_postDetailScreenHandler!.postData!.uuid]!,
       topics: _postDetailScreenHandler!.postData!.topics,
-      onMediaTap: () {
+      onMediaTap: (int index) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -583,6 +583,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               post: _postDetailScreenHandler!.postData!,
               user: _postDetailScreenHandler!
                   .users[_postDetailScreenHandler!.postData!.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -754,7 +755,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       videoBuilder: _widgetBuilder.videoBuilder,
       pollBuilder: _widgetBuilder.pollWidgetBuilder,
       poll: _defPollWidget(_postDetailScreenHandler!.postData!),
-      onMediaTap: () {
+      onMediaTap: (int index) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -764,6 +765,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               post: _postDetailScreenHandler!.postData!,
               user: _postDetailScreenHandler!
                   .users[_postDetailScreenHandler!.postData!.uuid]!,
+              position: index,
             ),
           ),
         );
