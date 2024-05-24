@@ -5,7 +5,7 @@ class LMFeedPendingPostScreenBuilderDeletegate {
 
   Future<void> showPostApprovalDialog(BuildContext context,
       LMPostViewData postViewData, LMFeedPendingPostDialog dialog) async {
-    await showAdaptiveDialog(
+    await showDialog(
       context: context,
       builder: (childContext) => dialog,
       useRootNavigator: true,
@@ -14,7 +14,7 @@ class LMFeedPendingPostScreenBuilderDeletegate {
 
   Future<void> showPostRejectionDialog(BuildContext context,
       LMPostViewData postViewData, LMFeedPendingPostDialog dialog) async {
-    await showAdaptiveDialog(
+    await showDialog(
       context: context,
       builder: (childContext) => dialog,
       useRootNavigator: true,

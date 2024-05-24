@@ -124,7 +124,7 @@ class LMFeedPendingPostDialog extends StatelessWidget {
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 14,
-            color: theme.onContainer,
+            color: theme.inActiveColor,
             fontWeight: FontWeight.w500,
           ),
         ),

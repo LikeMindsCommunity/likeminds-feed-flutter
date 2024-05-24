@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/create_poll_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
@@ -422,7 +420,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           }
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
-            height: screenSize?.width,
             width: screenSize?.width,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
@@ -431,7 +428,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               physics: LMFeedComposeBloc.instance.documentCount > 0
                   ? const NeverScrollableScrollPhysics()
                   : null,
-              // shrinkWrap: true,
+              shrinkWrap: true,
               itemCount: composeBloc.postMedia.length,
               itemBuilder: (context, index) {
                 Widget mediaWidget;

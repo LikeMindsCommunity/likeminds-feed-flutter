@@ -496,6 +496,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             ));
           },
           action: LMFeedMenuAction(
+            onPostReport: () => handlePostReportAction(postViewData),
             onPostUnpin: () => handlePostPinAction(postViewData),
             onPostPin: () => handlePostPinAction(postViewData),
             onPostEdit: () {
@@ -994,6 +995,18 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           ],
         ),
       );
+
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
+        ),
+      ),
+    );
+  }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;
