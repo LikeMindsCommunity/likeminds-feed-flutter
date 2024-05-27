@@ -7,7 +7,6 @@ import 'package:likeminds_feed_sample/cred_screen.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:likeminds_feed_sample/utils/utils.dart';
 
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
@@ -34,8 +33,8 @@ void main() async {
   // Loading .env file
   await dotenv.load(fileName: ".env");
   await LMFeedCore.instance.initialize(
-      domain: "feedsx://www.feedsx.com/",
-      );
+    domain: "feedsx://www.feedsx.com/",
+  );
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
