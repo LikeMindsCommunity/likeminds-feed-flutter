@@ -51,11 +51,24 @@ class LMFeedCore {
 
   static LMFeedConfig get config => instance.feedConfig;
 
+  static set config(LMFeedConfig value) {
+    instance.feedConfig = value;
+  }
+
   static String? get domain => instance.clientDomain;
 
   static LMFeedThemeData get theme => LMFeedTheme.instance.theme;
 
+  static set theme(LMFeedThemeData value) {
+    LMFeedTheme.instance.initialise(theme: value);
+  }
+
   static LMFeedWidgetUtility get widgetUtility => instance._widgetUtility;
+
+  static set widgetUtility(LMFeedWidgetUtility value) {
+    instance._widgetUtility = value;
+  }
+
 
   static LMFeedBuilderDelegate get feedBuilderDelegate =>
       instance._feedBuilderDelegate;

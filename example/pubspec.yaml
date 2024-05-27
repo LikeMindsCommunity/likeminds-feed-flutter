@@ -23,6 +23,7 @@ dependencies:
   uni_links:
   envied: ^0.3.0+3
   flutter_dotenv:
+  timeago: ^3.6.1
   overlay_support: 
 
 dependency_overrides:
@@ -43,4 +44,6 @@ flutter:
   assets:
     - assets/
     - assets/icons/
+    - assets/qna/icons/
+    - assets/social_dark/icons/
     - .env

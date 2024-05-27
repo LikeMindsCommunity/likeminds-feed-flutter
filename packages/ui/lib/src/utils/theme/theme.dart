@@ -8,7 +8,7 @@ class LMFeedTheme {
 
   LMFeedTheme._();
 
-  late final LMFeedThemeData theme;
+  late LMFeedThemeData theme;
 
   void initialise({LMFeedThemeData? theme}) {
     this.theme = theme ?? LMFeedThemeData.light();
