@@ -1,71 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:likeminds_feed_sample/app.dart';
-import 'package:likeminds_feed_sample/main.dart';
-import 'package:likeminds_feed_sample/tab_screen.dart';
-import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_sample/globals.dart';
+import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
+import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
+import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
+import 'package:likeminds_feed_sample/themes/social/screens/tab_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_sample/utils/utils.dart';
+import 'package:likeminds_feed_sample/themes/social_dark/likeminds_feed_nova_fl.dart';
+import 'package:likeminds_feed_sample/themes/social_feedroom/koshiqa_theme.dart';
+import 'package:likeminds_feed_sample/themes/social_feedroom/likeminds_feed_flutter_koshiqa.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
-const _isProd = !bool.fromEnvironment('DEBUG');
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Integration App for UI + SDK package',
-      debugShowCheckedModeBanner: _isProd,
-      navigatorKey: rootNavigatorKey,
-      scaffoldMessengerKey: rootScaffoldMessengerKey,
-      theme: ThemeData(
-        useMaterial3: false,
-        primaryColor: Colors.deepPurple,
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          outlineBorder: const BorderSide(
-            color: Colors.deepPurple,
-            width: 2,
-          ),
-          activeIndicatorBorder: const BorderSide(
-            color: Colors.deepPurple,
-            width: 2,
-          ),
-          focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-          ),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-          ),
-        ),
-      ),
-      home: LMFeedBlocListener(
-        analyticsListener: (BuildContext context, LMFeedAnalyticsState state) {
-          if (state is LMFeedAnalyticsEventFired) {
-            debugPrint("Bloc Listened for event, - ${state.eventName}");
-            debugPrint("////////////////");
-            debugPrint("With properties - ${state.eventProperties}");
-          }
-        },
-        profileListener: (BuildContext context, LMFeedProfileState state) {},
-        routingListener: (BuildContext context, LMFeedRoutingState state) {},
-        child: const CredScreen(),
-      ),
-    );
-  }
-}
 
 class CredScreen extends StatefulWidget {
   const CredScreen({super.key});
@@ -77,9 +23,12 @@ class CredScreen extends StatefulWidget {
 class _CredScreenState extends State<CredScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _uuidController = TextEditingController();
+  final TextEditingController _apiKeyController = TextEditingController();
+  final TextEditingController _feedRoomController = TextEditingController();
+  final ValueNotifier<bool> _isFeedRoomTheme = ValueNotifier(false);
   StreamSubscription? _streamSubscription;
-  LMSampleApp? lmFeed;
   String? uuid;
+  LMFeedFlavor selectedTheme = LMFeedFlavor.social;
 
   @override
   void initState() {
@@ -93,6 +42,8 @@ class _CredScreenState extends State<CredScreen> {
   void dispose() {
     _usernameController.dispose();
     _uuidController.dispose();
+    _apiKeyController.dispose();
+    _feedRoomController.dispose();
     _streamSubscription?.cancel();
     super.dispose();
   }
@@ -185,10 +136,8 @@ class _CredScreenState extends State<CredScreen> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedCore.theme;
-
     return Scaffold(
-      backgroundColor: feedTheme.primaryColor,
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18.0),
@@ -199,7 +148,6 @@ class _CredScreenState extends State<CredScreen> {
                 "LikeMinds Feed\nSample App",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -208,128 +156,127 @@ class _CredScreenState extends State<CredScreen> {
               const Text(
                 "Enter your credentials",
                 style: TextStyle(
-                  color: Colors.white,
                   fontSize: 12,
                 ),
               ),
               const SizedBox(height: 18),
               TextField(
-                cursorColor: Colors.white,
-                style: const TextStyle(color: Colors.white),
-                controller: _usernameController,
+                controller: _apiKeyController,
                 decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  focusColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  labelText: 'Username',
-                  labelStyle: const TextStyle(
-                    color: Colors.white,
-                  ),
+                  labelText: 'API Key',
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
-                cursorColor: Colors.white,
-                controller: _uuidController,
-                style: const TextStyle(color: Colors.white),
+                controller: _usernameController,
                 decoration: InputDecoration(
-                    fillColor: Colors.white,
-                    focusColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    labelText: 'User ID',
-                    labelStyle: const TextStyle(
-                      color: Colors.white,
-                    )),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'Username',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _uuidController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'User ID',
+                ),
+              ),
+              const SizedBox(height: 12),
+              ValueListenableBuilder(
+                  valueListenable: _isFeedRoomTheme,
+                  builder: (context, value, child) {
+                    return value
+                        ? Column(
+                            children: [
+                              TextField(
+                                controller: _feedRoomController,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  labelText: 'Feed Room ID',
+                                ),
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink();
+                  }),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<LMFeedFlavor>(
+                isExpanded: true,
+                decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                value: selectedTheme,
+                items: const [
+                  DropdownMenuItem(
+                    value: LMFeedFlavor.social,
+                    child: Text("Social Theme"),
+                  ),
+                  DropdownMenuItem(
+                    value: LMFeedFlavor.socialFeedRoom,
+                    child: Text("Social FeedRoom Theme"),
+                  ),
+                  DropdownMenuItem(
+                    value: LMFeedFlavor.qna,
+                    child: Text("QnA Feed Theme"),
+                  ),
+                  DropdownMenuItem(
+                    value: LMFeedFlavor.socialDark,
+                    child: Text("Social Dark Theme"),
+                  ),
+                ],
+                onChanged: (value) {
+                  selectedTheme = value ?? selectedTheme;
+                  if (value == LMFeedFlavor.socialFeedRoom) {
+                    _isFeedRoomTheme.value = true;
+                  } else {
+                    _isFeedRoomTheme.value = false;
+                  }
+                },
               ),
               const SizedBox(height: 36),
-              GestureDetector(
-                onTap: () async {
-                  String uuid = _uuidController.text;
-                  String userName = _usernameController.text;
-
-                  if (userName.isEmpty && uuid.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: LMFeedText(
-                          text: "Username cannot be empty",
-                          style: LMFeedTextStyle(
-                              textStyle: TextStyle(color: Colors.black)),
-                        ),
-                      ),
-                    );
-                    return;
-                  }
-
-                  // final (accessToken, refreshToken) =
-                  //     await initiateUser(uuid, userName);
-
-                  // LMResponse response =
-                  //     await LMFeedCore.instance.showFeedWithoutApiKey(
-                  //   accessToken,
-                  //   refreshToken,
-                  // );
-                  String apiKey = dotenv.get('API_KEY');
-                  LMResponse response =
-                      await LMFeedCore.instance.showFeedWithApiKey(
-                    apiKey: apiKey,
-                    uuid: uuid,
-                    userName: userName,
-                  );
-
-                  if (!response.success) {
-                    LMFeedCore.showSnackBar(
-                        context,
-                        response.errorMessage ?? "An error occurred",
-                        LMFeedWidgetSource.other);
-
-                    return;
-                  }
-
-                  MaterialPageRoute route = MaterialPageRoute(
-                    // INIT - Get the LMFeed instance and pass the credentials (if any)
-                    builder: (context) => ExampleTabScreen(
-                      feedWidget: const LMFeedScreen(),
-                      uuid: uuid,
-                    ),
-                  );
-                  Navigator.of(context).push(route);
-                },
-                child: Container(
-                  width: 200,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+              ElevatedButton(
+                onPressed: _onSubmit,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Center(child: Text("Submit")),
+                  fixedSize: const Size(200, 45),
                 ),
+                child: const Text('Submit'),
               ),
               const SizedBox(height: 20),
-              GestureDetector(
-                onTap: () async {
-                  LMFeedLocalPreference.instance.clearCache();
-                },
-                child: Container(
-                  width: 200,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+              ElevatedButton(
+                  onPressed: () {
+                    LMFeedLocalPreference.instance.clearCache();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    fixedSize: const Size(200, 45),
                   ),
-                  child: const Center(child: Text("Clear Data")),
-                ),
-              ),
+                  child: const Text("Clear Data")),
               const SizedBox(height: 72),
               const Text(
-                "If no credentials are provided, the app will run with the default credentials of Bot user in your community",
+                "Please consider using clear data to log in with your new credentials.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 14,
                 ),
               ),
             ],
@@ -338,4 +285,167 @@ class _CredScreenState extends State<CredScreen> {
       ),
     );
   }
+
+  void _onSubmit() async {
+    String uuid = _uuidController.text;
+    String userName = _usernameController.text;
+    String apiKey = _apiKeyController.text;
+    globalApiKey = apiKey;
+    if (apiKey.isEmpty) {
+      _showSnackBar("API Key cannot be empty");
+      return;
+    }
+    if ((userName.isEmpty && uuid.isEmpty)) {
+      _showSnackBar("Username and User ID both cannot be empty");
+      return;
+    }
+    // show the loader dialog
+    _showLoader(context);
+
+    // initialize the LMFeedCore instance
+    // await LMFeedCore.instance.initialize();
+    await _setUpFeed(selectedTheme);
+
+    // initiate the user
+    LMResponse response = await LMFeedCore.instance.showFeedWithApiKey(
+      apiKey: apiKey,
+      uuid: uuid,
+      userName: userName,
+    );
+    if (!response.success) {
+      _showSnackBar(response.errorMessage ?? "An error occurred");
+      return;
+    }
+    // define the route
+    Widget? navigationWidget = _getNavigationWidget(selectedTheme);
+    if (navigationWidget == null) {
+      Navigator.pop(context);
+      return;
+    }
+    MaterialPageRoute route = MaterialPageRoute(
+      builder: (context) => navigationWidget,
+    );
+
+    // dismiss the loader dialog
+    Navigator.of(context).pop();
+
+    // navigate to the feed screen
+    Navigator.of(context).push(route);
+  }
+
+  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme) {
+    switch (selectedTheme) {
+      case LMFeedFlavor.social:
+        {
+          return const ExampleTabScreen(
+            uuid: "",
+            feedWidget: LMFeedScreen(),
+          );
+        }
+      case LMFeedFlavor.socialFeedRoom:
+        {
+          if (!LMFeedUserUtils.checkIfCurrentUserIsCM() &&
+              _feedRoomController.text.isEmpty) {
+            _showSnackBar(
+                "You need to provide an LM FeedRoom ID if the user being logged in is not a community manager");
+            return null;
+          }
+          int? feedRoomId;
+          if (_feedRoomController.text.isNotEmpty) {
+            feedRoomId = int.parse(_feedRoomController.text);
+          }
+          return LMFeedKoshiqa(
+            feedRoomId: feedRoomId,
+          );
+        }
+      case LMFeedFlavor.qna:
+        {
+          return const LMFeedQnA();
+        }
+      case LMFeedFlavor.socialDark:
+        {
+          return const LMFeedNova();
+        }
+    }
+  }
+
+  Future<void> _setUpFeed(LMFeedFlavor selectedTheme) async {
+    switch (selectedTheme) {
+      case LMFeedFlavor.social:
+        {
+          LMFeedCore.theme = LMFeedThemeData.light();
+          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
+          LMFeedCore.config = LMFeedConfig();
+          break;
+        }
+
+      case LMFeedFlavor.socialFeedRoom:
+        {
+          LMFeedCore.theme = koshiqaTheme;
+          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
+          LMFeedCore.config = LMFeedConfig();
+          break;
+        }
+      case LMFeedFlavor.qna:
+        {
+          LMFeedCore.theme = qNaTheme;
+          LMFeedCore.config = LMFeedConfig(
+            composeConfig: const LMFeedComposeScreenConfig(
+              topicRequiredToCreatePost: true,
+              showMediaCount: false,
+              enableTagging: false,
+              enableDocuments: false,
+              enableHeading: true,
+              headingRequiredToCreatePost: true,
+              userDisplayType: LMFeedComposeUserDisplayType.tile,
+              composeHint: "Mention details here to make the post rich",
+            ),
+            feedScreenConfig: const LMFeedScreenConfig(
+              enableTopicFiltering: false,
+            ),
+            postDetailConfig: const LMPostDetailScreenConfig(
+                commentTextFieldHint: "Write your response"),
+          );
+          LMFeedCore.widgetUtility = LMFeedQnAWidgets.instance;
+          LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
+        }
+        break;
+      case LMFeedFlavor.socialDark:
+        {
+          LMFeedCore.theme = darkTheme;
+          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
+          LMFeedCore.config = LMFeedConfig();
+          break;
+        }
+    }
+  }
+
+  Future<dynamic> _showLoader(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => const AlertDialog(
+          content: SizedBox(
+        width: 100,
+        height: 100,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      )),
+    );
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+}
+
+enum LMFeedFlavor {
+  social,
+  socialFeedRoom,
+  qna,
+  socialDark,
 }

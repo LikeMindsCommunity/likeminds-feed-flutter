@@ -372,7 +372,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       isFeed: true,
       postViewData: postViewData,
       onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
-          postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
+          postViewData, LMFeedAnalyticsKeys.postProfileName, widgetSource),
       onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
           postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
       subText: LMFeedText(
