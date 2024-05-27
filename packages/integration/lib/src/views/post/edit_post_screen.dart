@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// {@template lm_feed_edit_post_screen}
@@ -33,10 +32,11 @@ class LMFeedEditPostScreen extends StatefulWidget {
     // Style for the screen
     this.style,
     // Post data to be edited
-    required this.postId,
+    this.postId,
+    this.pendingPostId,
     this.displayName,
     this.displayUrl,
-  });
+  }) : assert(pendingPostId != null || postId != null);
 
   final LMFeedComposeScreenConfig? config;
 
@@ -52,7 +52,8 @@ class LMFeedEditPostScreen extends StatefulWidget {
   final Widget Function()? composeMediaPreviewBuilder;
   final Widget Function(BuildContext context, LMUserViewData user)?
       composeUserHeaderBuilder;
-  final String postId;
+  final String? postId;
+  final String? pendingPostId;
   final String? displayName;
   final String? displayUrl;
 
@@ -91,8 +92,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   // and don't generate link preview any further
   bool linkCancelled = false;
 
-  /// Value notifiers to rebuild small widgets throughout the screen
-  /// Rather than handling state management from complex classes
+  // Value notifiers to rebuild small widgets throughout the screen
+  // Rather than handling state management from complex classes
   ValueNotifier<bool> rebuildLinkPreview = ValueNotifier(false);
   ValueNotifier<bool> rebuildTopicFloatingButton = ValueNotifier(false);
 
@@ -153,8 +154,15 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     super.initState();
     // populate the post details
     // when the screen is initialized
-    LMFeedPostBloc.instance
-        .add(LMFeedGetPostEvent(postId: widget.postId, page: 1, pageSize: 10));
+
+    LMFeedPostBloc.instance.add(
+      LMFeedGetPostEvent(
+        postId: widget.postId,
+        pendingPostId: widget.pendingPostId,
+        page: 1,
+        pageSize: 10,
+      ),
+    );
   }
 
   @override
@@ -420,8 +428,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         child: AlertDialog(
           backgroundColor: feedTheme.container,
           title: Text('Discard Changes?'),
-          content: Text(
-              'Are you sure you want to discard the current changes?'),
+          content:
+              Text('Are you sure you want to discard the current changes?'),
           actionsAlignment: MainAxisAlignment.center,
           actionsPadding: const EdgeInsets.all(8),
           actions: <Widget>[
@@ -484,7 +492,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         if (composeBloc.postMedia.isNotEmpty) {
           if (composeBloc.isPollAdded) {
             return LMFeedPoll(
-              style: LMFeedPollStyle.composable(),
+              style: LMFeedPollStyle.basic(isComposable: true).copyWith(
+                backgroundColor: feedTheme.container,
+              ),
               attachmentMeta:
                   composeBloc.postMedia.first.attachmentMetaViewData!,
               subTextBuilder: (context) {
@@ -572,6 +582,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                       child: LMFeedImage(
                         imageUrl: mediaModel.link,
                         style: style?.mediaStyle?.imageStyle,
+                        position: index,
                       ),
                     );
                     break;
@@ -845,7 +856,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
                 LMFeedPostBloc.instance.add(
                   LMFeedEditPostEvent(
-                    postId: postViewData!.id,
+                    postId: widget.postId,
+                    pendingPostId: widget.pendingPostId,
                     postText: result!,
                     selectedTopics: selectedTopics,
                     heading: _headingController?.text,

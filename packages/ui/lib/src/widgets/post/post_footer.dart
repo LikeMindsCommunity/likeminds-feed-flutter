@@ -17,7 +17,10 @@ class LMFeedPostFooter extends StatelessWidget {
     this.shareButton,
     this.repostButton,
     this.showRepostButton = false,
+    this.hide = false,
   });
+
+  final bool hide;
 
   final LMFeedPostFooterStyle? postFooterStyle;
 
@@ -41,16 +44,19 @@ class LMFeedPostFooter extends StatelessWidget {
     LMFeedPostFooterStyle footerStyle =
         postFooterStyle ?? LMFeedTheme.instance.theme.footerStyle;
     _populateButtonList(footerStyle);
-    return Container(
-      width: footerStyle.width,
-      height: footerStyle.height,
-      padding: footerStyle.padding,
-      margin: footerStyle.margin,
-      child: Row(
-        mainAxisAlignment: footerStyle.alignment ?? MainAxisAlignment.start,
-        children: _footerChildren,
-      ),
-    );
+    return hide
+        ? const SizedBox()
+        : Container(
+            width: footerStyle.width,
+            height: footerStyle.height,
+            padding: footerStyle.padding,
+            margin: footerStyle.margin,
+            child: Row(
+              mainAxisAlignment:
+                  footerStyle.alignment ?? MainAxisAlignment.start,
+              children: _footerChildren,
+            ),
+          );
   }
 
   void _populateButtonList(LMFeedPostFooterStyle postFooterStyle) {
@@ -198,6 +204,7 @@ class LMFeedPostFooter extends StatelessWidget {
     LMFeedButton? shareButton,
     LMFeedButton? repostButton,
     bool? showRepostButton,
+    bool? hide,
   }) {
     return LMFeedPostFooter(
       postFooterStyle: postFooterStyle ?? this.postFooterStyle,
@@ -212,6 +219,7 @@ class LMFeedPostFooter extends StatelessWidget {
       shareButton: shareButton ?? this.shareButton,
       repostButton: repostButton ?? this.repostButton,
       showRepostButton: showRepostButton ?? this.showRepostButton,
+      hide: hide ?? this.hide,
     );
   }
 }

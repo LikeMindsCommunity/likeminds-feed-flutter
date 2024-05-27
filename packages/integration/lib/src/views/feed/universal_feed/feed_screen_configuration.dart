@@ -32,6 +32,8 @@ class LMFeedScreenConfig {
     this.topicSelectionWidgetType =
         LMFeedTopicSelectionWidgetType.showTopicSelectionScreen,
     this.showCustomWidget = false,
+    this.showPendingPostHeader = true,
+    this.showNotificationFeedIcon = true,
   });
 
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]
@@ -54,12 +56,22 @@ class LMFeedScreenConfig {
 
   final bool showCustomWidget;
 
+  /// [bool] to enable/disable pending post header
+  /// on feed screen
+  final bool showPendingPostHeader;
+
+  /// [bool] to enable/disable notification feed icon
+  /// on feed screen
+  final bool showNotificationFeedIcon;
+
   LMFeedScreenConfig copyWith({
     SystemUiOverlayStyle? composeSystemOverlayStyle,
     bool? enableTopicFiltering,
     bool? allowMultipleTopicsSelection,
     LMFeedTopicSelectionWidgetType? topicSelectionWidgetType,
     bool? showCustomWidget,
+    bool? showPendingPostHeader,
+    bool? showNotificationFeedIcon,
   }) {
     return LMFeedScreenConfig(
       feedSystemOverlayStyle:
@@ -68,6 +80,10 @@ class LMFeedScreenConfig {
       topicSelectionWidgetType:
           topicSelectionWidgetType ?? this.topicSelectionWidgetType,
       showCustomWidget: showCustomWidget ?? this.showCustomWidget,
+      showNotificationFeedIcon:
+          showNotificationFeedIcon ?? this.showNotificationFeedIcon,
+      showPendingPostHeader:
+          showPendingPostHeader ?? this.showPendingPostHeader,
     );
   }
 }

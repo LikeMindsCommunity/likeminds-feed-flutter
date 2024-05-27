@@ -30,7 +30,7 @@ class LMFeedPostMedia extends StatefulWidget {
 
   final Function(String, StackTrace)? onError;
 
-  final VoidCallback? onMediaTap;
+  final Function(int)? onMediaTap;
 
   final LMFeedPostMediaStyle? style;
   final LMFeedCarouselIndicatorBuilder? carouselIndicatorBuilder;
@@ -53,10 +53,11 @@ class LMFeedPostMedia extends StatefulWidget {
     Function(String, StackTrace)? onError,
     LMFeedPostMediaStyle? style,
     Widget Function(BuildContext, int, int, Widget)? carouselIndicatorBuilder,
-    VoidCallback? onMediaTap,
+    Function(int)? onMediaTap,
     LMFeedVideoBuilder? videoBuilder,
     LMFeedImageBuilder? imageBuilder,
     LMFeedPollBuilder? pollBuilder,
+    LMFeedPoll? poll,
   }) {
     return LMFeedPostMedia(
       attachments: attachments ?? this.attachments,
@@ -71,6 +72,7 @@ class LMFeedPostMedia extends StatefulWidget {
       imageBuilder: imageBuilder ?? this.imageBuilder,
       videoBuilder: videoBuilder ?? this.videoBuilder,
       pollBuilder: pollBuilder ?? this.pollBuilder,
+      poll: poll ?? this.poll,
     );
   }
 }
@@ -109,6 +111,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
     /// if attachment is a poll
     if (attachments!.first.attachmentType == 6) {
       Widget poll = widget.pollBuilder?.call(
+            context,
             _defPoll(),
           ) ??
           _defPoll();
@@ -192,9 +195,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
   LMFeedPoll _defPoll() {
     return widget.poll ??
         LMFeedPoll(
-          attachmentMeta: attachments!.first.attachmentMeta,
-          style: widget.style?.pollStyle ?? const LMFeedPollStyle(),
-        );
+            attachmentMeta: attachments!.first.attachmentMeta,
+            style: widget.style?.pollStyle ?? LMFeedPollStyle.basic());
   }
 
   Widget getPostDocuments() {
@@ -287,12 +289,17 @@ class LMFeedPostMediaStyle {
     );
   }
 
-  factory LMFeedPostMediaStyle.basic() => LMFeedPostMediaStyle(
+  factory LMFeedPostMediaStyle.basic(
+          {Color? primaryColor, Color? containerColor, Color? inActiveColor}) =>
+      LMFeedPostMediaStyle(
         carouselStyle: const LMFeedPostCarouselStyle(),
         documentStyle: const LMFeedPostDocumentStyle(),
         imageStyle: const LMFeedPostImageStyle(),
         linkStyle: LMFeedPostLinkPreviewStyle.basic(),
         videoStyle: const LMFeedPostVideoStyle(),
-        pollStyle: const LMFeedPollStyle(),
+        pollStyle: LMFeedPollStyle.basic(
+            primaryColor: primaryColor,
+            containerColor: containerColor,
+            inActiveColor: inActiveColor),
       );
 }

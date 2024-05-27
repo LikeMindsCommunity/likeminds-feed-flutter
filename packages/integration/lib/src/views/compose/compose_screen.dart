@@ -320,7 +320,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         if (composeBloc.postMedia.isNotEmpty) {
           if (composeBloc.isPollAdded) {
             return LMFeedPoll(
-              style: LMFeedPollStyle.composable(),
+              style: feedTheme.composeScreenStyle.mediaStyle?.pollStyle
+                      ?.copyWith() ??
+                  LMFeedPollStyle.basic(isComposable: true).copyWith(
+                    backgroundColor: feedTheme.container,
+                  ),
               attachmentMeta:
                   composeBloc.postMedia.first.attachmentMetaViewData!,
               subTextBuilder: (context) {
@@ -436,6 +440,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     mediaWidget = LMFeedImage(
                       imageFile: composeBloc.postMedia[index].mediaFile,
                       style: style?.mediaStyle?.imageStyle,
+                      position: index,
                     );
                     break;
                   case LMMediaType.video:

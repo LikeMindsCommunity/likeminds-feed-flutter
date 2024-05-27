@@ -56,7 +56,7 @@ class _LMFeedUserCreatedCommentListViewState
       PagingController(firstPageKey: 1);
   LMUserViewData? userViewData = LMFeedLocalPreference.instance.fetchUserData();
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
-  LMFeedThemeData? feedThemeData;
+  LMFeedThemeData feedThemeData = LMFeedCore.theme;
   final ValueNotifier postUploading = ValueNotifier(false);
   final LMFeedUserCreatedCommentBloc _userCreatedCommentBloc =
       LMFeedUserCreatedCommentBloc();
@@ -108,7 +108,6 @@ class _LMFeedUserCreatedCommentListViewState
 
   @override
   Widget build(BuildContext context) {
-    feedThemeData = LMFeedCore.theme;
     return BlocListener<LMFeedPostBloc, LMFeedPostState>(
         bloc: lmFeedPostBloc,
         listener: (context, state) {
@@ -239,7 +238,7 @@ class _LMFeedUserCreatedCommentListViewState
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -249,6 +248,7 @@ class _LMFeedUserCreatedCommentListViewState
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );
@@ -278,7 +278,7 @@ class _LMFeedUserCreatedCommentListViewState
   LMFeedPostContent _defContentWidget(LMPostViewData post) {
     return LMFeedPostContent(
       onTagTap: (String? uuid) {},
-      style: feedThemeData?.contentStyle,
+      style: feedThemeData.contentStyle,
       text: post.text,
       heading: post.heading,
     );
@@ -290,11 +290,12 @@ class _LMFeedUserCreatedCommentListViewState
     return LMFeedPostMedia(
       attachments: post.attachments!,
       postId: post.id,
-      style: feedThemeData?.mediaStyle,
+      style: feedThemeData.mediaStyle,
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
-      pollBuilder: (pollWidget) => _defPollWidget(pollWidget, post),
-      onMediaTap: () async {
+      poll: _defPollWidget(post),
+      pollBuilder: LMFeedCore.widgetUtility.pollWidgetBuilder,
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -304,6 +305,7 @@ class _LMFeedUserCreatedCommentListViewState
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );
@@ -312,124 +314,148 @@ class _LMFeedUserCreatedCommentListViewState
     );
   }
 
-  Widget _defPollWidget(LMFeedPoll pollWidget, LMPostViewData postViewData) {
+  LMFeedPoll? _defPollWidget(LMPostViewData postViewData) {
     Map<String, bool> isVoteEditing = {"value": false};
-    LMAttachmentMetaViewData previousValue =
-        pollWidget.attachmentMeta.copyWith();
+    if (postViewData.attachments == null || postViewData.attachments!.isEmpty) {
+      return null;
+    }
+    bool isPoll = false;
+    postViewData.attachments?.forEach((element) {
+      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+        isPoll = true;
+      }
+    });
+
+    if (!isPoll) {
+      return null;
+    }
+
+    LMAttachmentMetaViewData pollValue =
+        postViewData.attachments!.first.attachmentMeta;
+    LMAttachmentMetaViewData previousValue = pollValue.copyWith();
     List<String> selectedOptions = [];
     final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
-    return ValueListenableBuilder(
-        valueListenable: rebuildPollWidget,
-        builder: (context, _, __) {
-          return LMFeedPoll(
-            isVoteEditing: isVoteEditing["value"]!,
-            selectedOption: selectedOptions,
-            attachmentMeta: pollWidget.attachmentMeta,
-            style: pollWidget.style,
-            onEditVote: (pollData) {
-              isVoteEditing["value"] = true;
-              selectedOptions.clear();
-              selectedOptions.addAll(pollData.options!
-                  .where((element) => element.isSelected)
-                  .map((e) => e.id)
-                  .toList());
-              rebuildPollWidget.value = !rebuildPollWidget.value;
-            },
-            onOptionSelect: (optionData) async {
-              if (hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) {
-                LMFeedCore.showSnackBar(
-                  context,
-                  "Poll ended. Vote can not be submitted now.",
-                  LMFeedWidgetSource.universalFeed,
-                );
-                return;
-              }
-              if ((isPollSubmitted(pollWidget.attachmentMeta.options ?? [])) &&
-                  !isVoteEditing["value"]!) return;
-              if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
-                  pollWidget.attachmentMeta.multiSelectState!)) {
-                debugPrint("ye wala");
-                submitVote(
-                  context,
-                  pollWidget.attachmentMeta,
-                  [optionData.id],
-                  postViewData.id,
-                  isVoteEditing,
-                  previousValue,
-                  rebuildPollWidget,
-                  LMFeedWidgetSource.userCreatedCommentScreen,
-                );
-              } else if (selectedOptions.contains(optionData.id)) {
-                selectedOptions.remove(optionData.id);
-              } else {
-                selectedOptions.add(optionData.id);
-              }
-              rebuildPollWidget.value = !rebuildPollWidget.value;
-            },
-            showSubmitButton: isVoteEditing["value"]! ||
-                showSubmitButton(pollWidget.attachmentMeta),
-            showEditVoteButton: !isVoteEditing["value"]! &&
-                !isInstantPoll(pollWidget.attachmentMeta.pollType) &&
-                !hasPollEnded(pollWidget.attachmentMeta.expiryTime!) &&
-                isPollSubmitted(pollWidget.attachmentMeta.options ?? []),
-            showAddOptionButton: showAddOptionButton(pollWidget.attachmentMeta),
-            showTick: (option) {
-              return showTick(pollWidget.attachmentMeta, option,
-                  selectedOptions, isVoteEditing["value"]!);
-            },
-            timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime!),
-            onAddOptionSubmit: (option) async {
-              await addOption(
-                context,
-                pollWidget,
-                pollWidget.attachmentMeta,
-                option,
-                postViewData.id,
-                currentUser,
-                rebuildPollWidget,
-                LMFeedWidgetSource.userCreatedCommentScreen,
-              );
-              selectedOptions.clear();
-              rebuildPollWidget.value = !rebuildPollWidget.value;
-            },
-           onSubtextTap: () {
-              onVoteTextTap(
-                context,
-                pollWidget.attachmentMeta,
-                LMFeedWidgetSource.userCreatedCommentScreen,
-              );
-            },
-            onVoteClick: (option) {
-              onVoteTextTap(
-                context,
-                pollWidget.attachmentMeta,
-                LMFeedWidgetSource.userCreatedCommentScreen,
-                option: option,
-              );
-            },
-            onSubmit: (options) {
-              submitVote(
-                context,
-                pollWidget.attachmentMeta,
-                options,
-                postViewData.id,
-                isVoteEditing,
-                previousValue,
-                rebuildPollWidget,
-                LMFeedWidgetSource.userCreatedCommentScreen,
-              );
-              selectedOptions.clear();
-              rebuildPollWidget.value = !rebuildPollWidget.value;
-            },
+    return LMFeedPoll(
+      rebuildPollWidget: rebuildPollWidget,
+      isVoteEditing: isVoteEditing["value"]!,
+      selectedOption: selectedOptions,
+      attachmentMeta: pollValue,
+      style: feedThemeData.mediaStyle.pollStyle ??
+          LMFeedPollStyle.basic(
+              primaryColor: feedThemeData.primaryColor,
+              containerColor: feedThemeData.container),
+      onEditVote: (pollData) {
+        isVoteEditing["value"] = true;
+        selectedOptions.clear();
+        selectedOptions.addAll(pollData.options!
+            .where((element) => element.isSelected)
+            .map((e) => e.id)
+            .toList());
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      onOptionSelect: (optionData) async {
+        debugPrint("this is selected");
+        if (hasPollEnded(pollValue.expiryTime!)) {
+          LMFeedCore.showSnackBar(
+            context,
+            "Poll ended. Vote can not be submitted now.",
+            LMFeedWidgetSource.universalFeed,
           );
-        });
+          return;
+        }
+        if ((isPollSubmitted(pollValue.options ?? [])) &&
+            !isVoteEditing["value"]!) return;
+        if (!isMultiChoicePoll(
+            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+          submitVote(
+            context,
+            pollValue,
+            [optionData.id],
+            postViewData.id,
+            isVoteEditing,
+            previousValue,
+            rebuildPostWidget,
+            LMFeedWidgetSource.universalFeed,
+          );
+        } else if (selectedOptions.contains(optionData.id)) {
+          selectedOptions.remove(optionData.id);
+        } else {
+          selectedOptions.add(optionData.id);
+        }
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
+      showEditVoteButton: !isVoteEditing["value"]! &&
+          !isInstantPoll(pollValue.pollType) &&
+          !hasPollEnded(pollValue.expiryTime!) &&
+          isPollSubmitted(pollValue.options ?? []),
+      showAddOptionButton: showAddOptionButton(pollValue),
+      showTick: (option) {
+        return showTick(
+            pollValue, option, selectedOptions, isVoteEditing["value"]!);
+      },
+      isMultiChoicePoll: isMultiChoicePoll(
+          pollValue.multiSelectNo!, pollValue.multiSelectState!),
+      pollSelectionText: getPollSelectionText(
+          pollValue.multiSelectState, pollValue.multiSelectNo),
+      timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
+      onSameOptionAdded: () {
+        LMFeedCore.showSnackBar(
+          context,
+          "Option already exists",
+          LMFeedWidgetSource.universalFeed,
+        );
+      },
+      onAddOptionSubmit: (option) async {
+        await addOption(
+          context,
+          pollValue,
+          option,
+          postViewData.id,
+          currentUser,
+          rebuildPollWidget,
+          LMFeedWidgetSource.universalFeed,
+        );
+        selectedOptions.clear();
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      onSubtextTap: () {
+        onVoteTextTap(
+          context,
+          pollValue,
+          LMFeedWidgetSource.universalFeed,
+        );
+      },
+      onVoteClick: (option) {
+        onVoteTextTap(
+          context,
+          pollValue,
+          LMFeedWidgetSource.universalFeed,
+          option: option,
+        );
+      },
+      onSubmit: (options) {
+        submitVote(
+          context,
+          pollValue,
+          options,
+          postViewData.id,
+          isVoteEditing,
+          previousValue,
+          rebuildPostWidget,
+          LMFeedWidgetSource.universalFeed,
+        );
+        selectedOptions.clear();
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+    );
   }
 
   LMFeedPostTopic _defTopicWidget(LMPostViewData postViewData) {
     return LMFeedPostTopic(
       topics: postViewData.topics,
       post: postViewData,
-      style: feedThemeData?.topicStyle,
+      style: feedThemeData.topicStyle,
       onTopicTap: (context, topicViewData) =>
           LMFeedPostUtils.handlePostTopicTap(
               context, postViewData, topicViewData, widgetSource),
@@ -443,7 +469,7 @@ class _LMFeedUserCreatedCommentListViewState
       saveButton: defSaveButton(post),
       shareButton: defShareButton(post),
       repostButton: defRepostButton(post),
-      postFooterStyle: feedThemeData?.footerStyle,
+      postFooterStyle: feedThemeData.footerStyle,
       showRepostButton: !post.isRepost,
     );
   }
@@ -457,7 +483,7 @@ class _LMFeedUserCreatedCommentListViewState
           postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
       onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
           postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
-      postHeaderStyle: feedThemeData?.headerStyle,
+      postHeaderStyle: feedThemeData.headerStyle,
       menuBuilder: (menu) {
         return menu.copyWith(
           removeItemIds: {postReportId, postEditId},
@@ -531,7 +557,7 @@ class _LMFeedUserCreatedCommentListViewState
         text: LMFeedText(
             text: LMFeedPostUtils.getLikeCountTextWithCount(
                 postViewData.likeCount)),
-        style: feedThemeData?.footerStyle.likeButtonStyle,
+        style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -574,7 +600,7 @@ class _LMFeedUserCreatedCommentListViewState
         text: LMFeedText(
           text: LMFeedPostUtils.getCommentCountTextWithCount(post.commentCount),
         ),
-        style: feedThemeData?.footerStyle.commentButtonStyle,
+        style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
           // Handle analytics event for comment button tap
           LMFeedPostUtils.handlePostCommentButtonTap(post, widgetSource);
@@ -645,7 +671,7 @@ class _LMFeedUserCreatedCommentListViewState
             );
           }
         },
-        style: feedThemeData?.footerStyle.saveButtonStyle,
+        style: feedThemeData.footerStyle.saveButtonStyle,
       );
 
   LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
@@ -656,7 +682,7 @@ class _LMFeedUserCreatedCommentListViewState
 
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
-        style: feedThemeData?.footerStyle.shareButtonStyle,
+        style: feedThemeData.footerStyle.shareButtonStyle,
       );
 
   LMFeedButton defRepostButton(LMPostViewData postViewData) => LMFeedButton(
@@ -664,7 +690,7 @@ class _LMFeedUserCreatedCommentListViewState
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: postViewData.isRepostedByUser
-                  ? feedThemeData?.primaryColor
+                  ? feedThemeData.primaryColor
                   : null,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -699,20 +725,20 @@ class _LMFeedUserCreatedCommentListViewState
                 'A $postTitleSmallCap is already uploading.', widgetSource);
           }
         },
-        style: feedThemeData?.footerStyle.repostButtonStyle?.copyWith(
-            icon: feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+        style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
+            icon: feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color: postViewData.isRepostedByUser
-                          ? feedThemeData?.primaryColor
+                          ? feedThemeData.primaryColor
                           : null),
             ),
             activeIcon:
-                feedThemeData?.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedThemeData?.footerStyle.repostButtonStyle?.icon?.style
+                feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color: postViewData.isRepostedByUser
-                          ? feedThemeData?.primaryColor
+                          ? feedThemeData.primaryColor
                           : null),
             )),
       );

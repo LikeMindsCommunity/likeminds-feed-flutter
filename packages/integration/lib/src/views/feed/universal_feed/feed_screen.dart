@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/universal_feed/feed_screen_builder_delegate.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/feed/feed_pending_post_banner.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/post/post_approval_dialog.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/pending_post/pending_posts_screen.dart';
 import 'package:video_compress/video_compress.dart';
 // import 'package:media_kit_video/media_kit_video.dart';
 
@@ -34,6 +38,7 @@ class LMFeedScreen extends StatefulWidget {
     this.noMoreItemsIndicatorBuilder,
     this.firstPageErrorIndicatorBuilder,
     this.newPageErrorIndicatorBuilder,
+    this.pendingPostBannerBuilder,
   });
 
   // Builder for appbar
@@ -65,6 +70,10 @@ class LMFeedScreen extends StatefulWidget {
   // Builder for error view while loading the first page
   final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
+  // Builder for pending post banner on feed screen above post list
+  final Widget Function(BuildContext context, int noOfPendingPost)?
+      pendingPostBannerBuilder;
+
   final LMFeedTopicBarBuilder? topicBarBuilder;
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
@@ -76,25 +85,53 @@ class LMFeedScreen extends StatefulWidget {
 }
 
 class _LMFeedScreenState extends State<LMFeedScreen> {
+  // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  // Get the post title in all small singular form
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
+  // Get the post title in all small singular form
+  String postTitleSmallCapPlural =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
+
+  // Get the comment title in first letter capital plural form
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  // Get the comment title in all small plural form
   String commentTitleSmallCapPlural =
       LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  // Get the comment title in first letter capital singular form
   String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  // Get the comment title in all small singular form
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
+  // Create an instance of LMFeedScreenBuilderDelegate
+  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
+      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
+
+  LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
+      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+
+  // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
+
+  // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
+
+  // Create an instance of LMFeedWidgetUtility
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+
+  // Set the widget source to universal feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.universalFeed;
+
+  // Create a ValueNotifier to rebuild the post widget
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
+
+  // Create a ValueNotifier to track if a post is uploading
   final ValueNotifier postUploading = ValueNotifier(false);
 
   LMFeedScreenConfig? config;
@@ -121,6 +158,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   // future to get the unread notification count
   late Future<GetUnreadNotificationCountResponse> getUnreadNotificationCount;
 
+  late Future<GetUserFeedMetaResponse> getUserFeedMeta;
+
   // used to rebuild the appbar
   final ValueNotifier _rebuildAppBar = ValueNotifier(false);
 
@@ -130,21 +169,38 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   bool userPostingRights = true;
 
+  int pendingPostCount = 0;
+
   @override
   void initState() {
     super.initState();
+    // Adds pagination listener to the feed
     _addPaginationListener();
+
+    // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(
       (GetTopicsRequestBuilder()
             ..page(1)
             ..pageSize(20))
           .build(),
     );
+
+    getUserFeedMeta = getUserFeedMetaFuture();
+
+    // Sets the Bloc observer to LMFeedBlocObserver
     Bloc.observer = LMFeedBlocObserver();
+
+    // Initializes the feed Bloc instance
     _feedBloc = LMFeedBloc.instance;
+
+    // Checks the user's posting rights using LMFeedUserUtils
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
+
+    // Sets the value of postUploading based on the state of newPostBloc
     postUploading.value = newPostBloc.state is LMFeedNewPostUploadingState ||
         newPostBloc.state is LMFeedEditPostUploadingState;
+
+    // Adds a feed opened event to the LMFeedAnalyticsBloc
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.feedOpened,
@@ -156,6 +212,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
+  // This function updates the selected topics and fetches the universal
+  // feed based on the selected topics
   void updateSelectedTopics(List<LMTopicViewData> topics) {
     _feedBloc.selectedTopics = topics;
     rebuildTopicFeed.value = !rebuildTopicFeed.value;
@@ -262,6 +320,12 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
+  Future<GetUserFeedMetaResponse> getUserFeedMetaFuture() {
+    return LMFeedCore.client.getUserFeedMeta(
+      (GetUserFeedMetaRequestBuilder()..uuid(currentUser?.uuid ?? '')).build(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
@@ -281,6 +345,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
+          getUserFeedMeta = getUserFeedMetaFuture();
+          _rebuildAppBar.value = !_rebuildAppBar.value;
           refresh();
           clearPagingController();
         },
@@ -289,6 +355,45 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         child: CustomScrollView(
           controller: _controller,
           slivers: [
+            SliverToBoxAdapter(
+              child: ValueListenableBuilder(
+                  valueListenable: _rebuildAppBar,
+                  builder: (context, _, __) {
+                    return FutureBuilder(
+                        future: getUserFeedMeta,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasData && snapshot.data != null) {
+                              GetUserFeedMetaResponse response =
+                                  snapshot.data as GetUserFeedMetaResponse;
+
+                              if (response.success) {
+                                pendingPostCount =
+                                    response.pendingPostCount ?? 0;
+                              }
+                            }
+                          }
+
+                          return Container(
+                            child: widget.pendingPostBannerBuilder
+                                    ?.call(context, pendingPostCount) ??
+                                _screenBuilderDelegate.pendingPostBannerBuilder(
+                                  context,
+                                  pendingPostCount,
+                                  LMFeedPendingPostBanner(
+                                      pendingPostCount: pendingPostCount,
+                                      onPendingPostBannerPressed: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LMFeedPendingPostsScreen()));
+                                      }),
+                                ),
+                          );
+                        });
+                  }),
+            ),
             SliverToBoxAdapter(
               child: config!.showCustomWidget
                   ? widget.customWidgetBuilder == null
@@ -358,6 +463,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       _widgetSource,
                     );
 
+                    if (curr.pendingPostId != null) {
+                      if (pendingPostCount > 0) {
+                        pendingPostCount--;
+                        rebuildPostWidget.value = !rebuildPostWidget.value;
+                      }
+                      return;
+                    }
+
                     List<LMPostViewData>? feedRoomItemList =
                         _pagingController.itemList;
                     feedRoomItemList
@@ -380,6 +493,36 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     postUploading.value = false;
                   }
                   if (curr is LMFeedNewPostUploadedState) {
+                    if (LMFeedPostUtils.doPostNeedsApproval) {
+                      _pendingPostScreenBuilderDelegate.showPostApprovalDialog(
+                        context,
+                        curr.postData,
+                        LMFeedPendingPostDialog(
+                          pendingPostId: curr.postData.id,
+                          onCancelButtonClicked: () {
+                            Navigator.of(context).pop();
+                          },
+                          onEditButtonClicked: () {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => LMFeedEditPostScreen(
+                                  pendingPostId: curr.postData.id,
+                                ),
+                              ),
+                            );
+                          },
+                          title: "$postTitleFirstCap submitted for approval",
+                          description:
+                              "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
+                        ),
+                      );
+                      getUserFeedMeta = getUserFeedMetaFuture();
+                      pendingPostCount++;
+                      _rebuildAppBar.value = !_rebuildAppBar.value;
+                      postUploading.value = false;
+                      return;
+                    }
                     LMPostViewData? item = curr.postData;
                     int length = _pagingController.itemList?.length ?? 0;
                     List<LMPostViewData> feedRoomItemList =
@@ -691,9 +834,34 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             icon: LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.search,
+              style: LMFeedIconStyle.basic().copyWith(
+                color: feedThemeData.onContainer,
+                size: 24,
+              ),
             ),
           ),
         ),
+        if (config?.showNotificationFeedIcon ?? true)
+          LMFeedButton(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LMFeedNotificationScreen(),
+                ),
+              );
+            },
+            style: LMFeedButtonStyle.basic().copyWith(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmNotificationBellSvg,
+                style: LMFeedIconStyle.basic().copyWith(
+                  color: feedThemeData.onContainer,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
         LMFeedProfilePicture(
           fallbackText: currentUser!.name,
           imageUrl: currentUser!.imageUrl,
@@ -826,10 +994,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
-        // ignore: use_build_context_synchronously
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -837,7 +1004,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: _feedBloc.users[post.uuid]!,
-              // position: ,
+              position: index,
             ),
           ),
         )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
@@ -995,14 +1162,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       postId: post.id,
-      style: feedThemeData.mediaStyle
-          .copyWith(pollStyle: LMFeedPollStyle.inFeed()),
+      style: feedThemeData.mediaStyle,
       carouselIndicatorBuilder:
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
-      imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
-      videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
-      pollBuilder: (pollWidget) => _defPollWidget(pollWidget, post),
-      onMediaTap: () async {
+      imageBuilder: _widgetsBuilder.imageBuilder,
+      videoBuilder: _widgetsBuilder.videoBuilder,
+      pollBuilder: _widgetsBuilder.pollWidgetBuilder,
+      poll: _defPollWidget(post),
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -1012,6 +1179,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: _feedBloc.users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -1020,123 +1188,141 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
-  Widget _defPollWidget(LMFeedPoll pollWidget, LMPostViewData postViewData) {
+  LMFeedPoll? _defPollWidget(LMPostViewData postViewData) {
     Map<String, bool> isVoteEditing = {"value": false};
-    LMAttachmentMetaViewData previousValue =
-        pollWidget.attachmentMeta.copyWith();
+    if (postViewData.attachments == null || postViewData.attachments!.isEmpty) {
+      return null;
+    }
+    bool isPoll = false;
+    postViewData.attachments?.forEach((element) {
+      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+        isPoll = true;
+      }
+    });
+
+    if (!isPoll) {
+      return null;
+    }
+
+    LMAttachmentMetaViewData pollValue =
+        postViewData.attachments!.first.attachmentMeta;
+    LMAttachmentMetaViewData previousValue = pollValue.copyWith();
     List<String> selectedOptions = [];
     final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
-    return ValueListenableBuilder(
-        valueListenable: rebuildPollWidget,
-        builder: (context, _, __) {
-          return LMFeedPoll(
-            isVoteEditing: isVoteEditing["value"]!,
-            selectedOption: selectedOptions,
-            attachmentMeta: pollWidget.attachmentMeta,
-            style: pollWidget.style,
-            onEditVote: (pollData) {
-              isVoteEditing["value"] = true;
-              selectedOptions.clear();
-              selectedOptions.addAll(pollData.options!
-                  .where((element) => element.isSelected)
-                  .map((e) => e.id)
-                  .toList());
-              rebuildPollWidget.value = !rebuildPollWidget.value;
-            },
-            onOptionSelect: (optionData) async {
-              if (hasPollEnded(pollWidget.attachmentMeta.expiryTime!)) {
-                LMFeedCore.showSnackBar(
-                  context,
-                  "Poll ended. Vote can not be submitted now.",
-                  LMFeedWidgetSource.universalFeed,
-                );
-                return;
-              }
-              if ((isPollSubmitted(pollWidget.attachmentMeta.options ?? [])) &&
-                  !isVoteEditing["value"]!) return;
-              if (!isMultiChoicePoll(pollWidget.attachmentMeta.multiSelectNo!,
-                  pollWidget.attachmentMeta.multiSelectState!)) {
-                submitVote(
-                  context,
-                  pollWidget.attachmentMeta,
-                  [optionData.id],
-                  postViewData.id,
-                  isVoteEditing,
-                  previousValue,
-                  rebuildPollWidget,
-                  LMFeedWidgetSource.universalFeed,
-                );
-              } else if (selectedOptions.contains(optionData.id)) {
-                selectedOptions.remove(optionData.id);
-              } else {
-                selectedOptions.add(optionData.id);
-              }
-              rebuildPollWidget.value = !rebuildPollWidget.value;
-            },
-            showSubmitButton: isVoteEditing["value"]! ||
-                showSubmitButton(pollWidget.attachmentMeta),
-            showEditVoteButton: !isVoteEditing["value"]! &&
-                !isInstantPoll(pollWidget.attachmentMeta.pollType) &&
-                !hasPollEnded(pollWidget.attachmentMeta.expiryTime!) &&
-                isPollSubmitted(pollWidget.attachmentMeta.options ?? []),
-            showAddOptionButton: showAddOptionButton(pollWidget.attachmentMeta),
-            showTick: (option) {
-              return showTick(pollWidget.attachmentMeta, option,
-                  selectedOptions, isVoteEditing["value"]!);
-            },
-            timeLeft: getTimeLeftInPoll(pollWidget.attachmentMeta.expiryTime!),
-            onSameOptionAdded: () {
-              LMFeedCore.showSnackBar(
-                context,
-                "Option already exists",
-                LMFeedWidgetSource.universalFeed,
-              );
-            },
-            onAddOptionSubmit: (option) async {
-              await addOption(
-                context,
-                pollWidget,
-                pollWidget.attachmentMeta,
-                option,
-                postViewData.id,
-                currentUser,
-                rebuildPollWidget,
-                LMFeedWidgetSource.universalFeed,
-              );
-              selectedOptions.clear();
-              rebuildPollWidget.value = !rebuildPollWidget.value;
-            },
-            onSubtextTap: () {
-              onVoteTextTap(
-                context,
-                pollWidget.attachmentMeta,
-                LMFeedWidgetSource.universalFeed,
-              );
-            },
-            onVoteClick: (option) {
-              onVoteTextTap(
-                context,
-                pollWidget.attachmentMeta,
-                LMFeedWidgetSource.universalFeed,
-                option: option,
-              );
-            },
-            onSubmit: (options) {
-              submitVote(
-                context,
-                pollWidget.attachmentMeta,
-                options,
-                postViewData.id,
-                isVoteEditing,
-                previousValue,
-                rebuildPollWidget,
-                LMFeedWidgetSource.universalFeed,
-              );
-              selectedOptions.clear();
-              rebuildPollWidget.value = !rebuildPollWidget.value;
-            },
+    return LMFeedPoll(
+      rebuildPollWidget: rebuildPollWidget,
+      isVoteEditing: isVoteEditing["value"]!,
+      selectedOption: selectedOptions,
+      attachmentMeta: pollValue,
+      style: feedThemeData.mediaStyle.pollStyle ??
+          LMFeedPollStyle.basic(
+              primaryColor: feedThemeData.primaryColor,
+              containerColor: feedThemeData.container),
+      onEditVote: (pollData) {
+        isVoteEditing["value"] = true;
+        selectedOptions.clear();
+        selectedOptions.addAll(pollData.options!
+            .where((element) => element.isSelected)
+            .map((e) => e.id)
+            .toList());
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      onOptionSelect: (optionData) async {
+        debugPrint("this is selected");
+        if (hasPollEnded(pollValue.expiryTime!)) {
+          LMFeedCore.showSnackBar(
+            context,
+            "Poll ended. Vote can not be submitted now.",
+            LMFeedWidgetSource.universalFeed,
           );
-        });
+          return;
+        }
+        if ((isPollSubmitted(pollValue.options ?? [])) &&
+            !isVoteEditing["value"]!) return;
+        if (!isMultiChoicePoll(
+            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+          submitVote(
+            context,
+            pollValue,
+            [optionData.id],
+            postViewData.id,
+            isVoteEditing,
+            previousValue,
+            rebuildPostWidget,
+            LMFeedWidgetSource.universalFeed,
+          );
+        } else if (selectedOptions.contains(optionData.id)) {
+          selectedOptions.remove(optionData.id);
+        } else {
+          selectedOptions.add(optionData.id);
+        }
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
+      showEditVoteButton: !isVoteEditing["value"]! &&
+          !isInstantPoll(pollValue.pollType) &&
+          !hasPollEnded(pollValue.expiryTime!) &&
+          isPollSubmitted(pollValue.options ?? []),
+      showAddOptionButton: showAddOptionButton(pollValue),
+      showTick: (option) {
+        return showTick(
+            pollValue, option, selectedOptions, isVoteEditing["value"]!);
+      },
+      isMultiChoicePoll: isMultiChoicePoll(
+          pollValue.multiSelectNo!, pollValue.multiSelectState!),
+      pollSelectionText: getPollSelectionText(
+          pollValue.multiSelectState, pollValue.multiSelectNo),
+      timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
+      onSameOptionAdded: () {
+        LMFeedCore.showSnackBar(
+          context,
+          "Option already exists",
+          LMFeedWidgetSource.universalFeed,
+        );
+      },
+      onAddOptionSubmit: (option) async {
+        await addOption(
+          context,
+          pollValue,
+          option,
+          postViewData.id,
+          currentUser,
+          rebuildPollWidget,
+          LMFeedWidgetSource.universalFeed,
+        );
+        selectedOptions.clear();
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+      onSubtextTap: () {
+        onVoteTextTap(
+          context,
+          pollValue,
+          LMFeedWidgetSource.universalFeed,
+        );
+      },
+      onVoteClick: (option) {
+        onVoteTextTap(
+          context,
+          pollValue,
+          LMFeedWidgetSource.universalFeed,
+          option: option,
+        );
+      },
+      onSubmit: (options) {
+        submitVote(
+          context,
+          pollValue,
+          options,
+          postViewData.id,
+          isVoteEditing,
+          previousValue,
+          rebuildPostWidget,
+          LMFeedWidgetSource.universalFeed,
+        );
+        selectedOptions.clear();
+        rebuildPollWidget.value = !rebuildPollWidget.value;
+      },
+    );
   }
 
   LMFeedButton defLikeButton(

@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedPostUtils {
+  static bool doPostNeedsApproval = false;
+
   static String getPostTitle(LMFeedPluralizeWordAction action) {
     String postTitle = LMFeedLocalPreference.instance.getPostVariable();
 
@@ -63,7 +65,7 @@ class LMFeedPostUtils {
       case (LMFeedPostActionType.addPollOption ||
             LMFeedPostActionType.addPollOptionError):
         {
-          if (pollOptions != null) { 
+          if (pollOptions != null) {
             final options = [...pollOptions];
             postViewData.attachments!.first.attachmentMeta.options?.clear();
             postViewData.attachments!.first.attachmentMeta.options
@@ -292,6 +294,7 @@ class LMFeedPostUtils {
                       ?.map((e) => LMAttachmentViewDataConvertor.fromAttachment(
                             attachment: e,
                             users: users,
+                            widget: widgets?[e.attachmentMeta.entityId],
                           ))
                       .toList() ??
                   [])
@@ -511,5 +514,29 @@ class LMFeedPostUtils {
           LMFeedAnalyticsKeys.postTypeKey:
               getPostType(postViewData.attachments),
         }));
+  }
+
+  static LMPostReviewStatus postReviewStatusFromString(String key) {
+    switch (key) {
+      case LMFeedStringConstants.rejectedKey:
+        return LMPostReviewStatus.rejected;
+      case LMFeedStringConstants.underReviewKey:
+        return LMPostReviewStatus.pending;
+      default:
+        return LMPostReviewStatus.pending;
+    }
+  }
+}
+
+extension PostReviewToKey on LMPostReviewStatus {
+  String toKey() {
+    switch (this) {
+      case LMPostReviewStatus.rejected:
+        return LMFeedStringConstants.rejectedKey;
+      case LMPostReviewStatus.pending:
+        return LMFeedStringConstants.underReviewKey;
+      default:
+        return '';
+    }
   }
 }

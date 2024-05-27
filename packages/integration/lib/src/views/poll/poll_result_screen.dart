@@ -7,11 +7,32 @@ class LMFeedPollResultScreen extends StatefulWidget {
     required this.pollId,
     required this.pollOptions,
     this.selectedOptionId,
+    this.noItemsFoundIndicatorBuilder,
+    this.firstPageProgressIndicatorBuilder,
+    this.newPageProgressIndicatorBuilder,
+    this.noMoreItemsIndicatorBuilder,
+    this.newPageErrorIndicatorBuilder,
+    this.firstPageErrorIndicatorBuilder,
+    this.tabWidth,
   });
 
   final String pollId;
   final List<LMPollOptionViewData> pollOptions;
   final String? selectedOptionId;
+  // Builder for empty feed view
+  final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
+  // Builder for first page loader when no post are there
+  final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;
+  // Builder for pagination loader when more post are there
+  final LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder;
+  // Builder for widget when no more post are there
+  final LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder;
+  // Builder for error view while loading a new page
+  final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
+  // Builder for error view while loading the first page
+  final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
+  // width for the poll options tab
+  final double? tabWidth;
 
   @override
   State<LMFeedPollResultScreen> createState() => _LMFeedPollResultScreenState();
@@ -25,6 +46,8 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
   int initialIndex = 0;
   late TabController _tabController;
   late PageController _pagingController;
+  int pageSize = 10;
+  final _widgetUtility = LMFeedCore.widgetUtility;
 
   @override
   initState() {
@@ -69,6 +92,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return _widgetsBuilder.scaffold(
         backgroundColor: theme.container,
         appBar: LMFeedAppBar(
@@ -77,6 +101,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
             padding: EdgeInsets.only(
               right: 16,
             ),
+            backgroundColor: theme.container,
             border: Border.all(
               color: Colors.transparent,
             ),
@@ -86,6 +111,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
             text: 'Poll Results',
             style: LMFeedTextStyle(
               textStyle: TextStyle(
+                color: theme.onContainer,
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
               ),
@@ -104,6 +130,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
               dividerColor: theme.primaryColor,
               indicatorColor: theme.primaryColor,
               indicatorWeight: 4,
+              isScrollable: true,
               labelColor: theme.primaryColor,
               indicatorSize: TabBarIndicatorSize.tab,
               labelStyle: TextStyle(
@@ -118,29 +145,37 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
               tabs: [
                 for (var option in widget.pollOptions)
                   Tab(
-                    child: Column(
-                      children: [
-                        LMFeedText(
-                          text: option.voteCount.toString(),
-                        ),
-                        LMFeedText(
-                          text: option.text,
-                        ),
-                      ],
+                    child: SizedBox(
+                      width: widget.tabWidth ??
+                          (widget.pollOptions.length == 2
+                              ? width / 3
+                              : width / 4),
+                      child: Column(
+                        children: [
+                          LMFeedText(
+                            text: option.voteCount.toString(),
+                          ),
+                          LMFeedText(
+                            text: option.text,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
               ],
             ),
             Expanded(
-              child: PageView.builder(
-                onPageChanged: (index) {
-                  _tabController.animateTo(index);
-                },
-                controller: _pagingController,
-                itemCount: widget.pollOptions.length,
-                itemBuilder: (context, index) {
-                  return _defListView(widget.pollOptions[index]);
-                },
+              child: SafeArea(
+                child: PageView.builder(
+                  onPageChanged: (index) {
+                    _tabController.animateTo(index);
+                  },
+                  controller: _pagingController,
+                  itemCount: widget.pollOptions.length,
+                  itemBuilder: (context, index) {
+                    return _defListView(widget.pollOptions[index]);
+                  },
+                ),
               ),
             )
           ],
@@ -172,59 +207,95 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
         ),
       );
     }
-    return FutureBuilder(
-        future: LMFeedCore.instance.lmFeedClient
-            .getPollVotes((GetPollVotesRequestBuilder()
-                  ..pollId(widget.pollId)
-                  ..votes([option.id]))
-                .build()),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (snapshot.hasError) {
-            return const Center(
-              child: Text('Error fetching data'),
-            );
-          }
-          final voteResponse = snapshot.data;
-          if (voteResponse == null || voteResponse.data == null) {
-            return const Center(
-              child: Text('Error fetching data'),
-            );
-          }
-          Map<String, LMWidgetViewData> widgets =
-              voteResponse.data?.widgets.map((key, value) {
-                    return MapEntry(
-                        key, LMWidgetViewDataConvertor.fromWidgetModel(value));
-                  }) ??
-                  {};
-          Map<String, LMTopicViewData> topics = voteResponse.data?.topics
-                  .map((key, value) {
-                return MapEntry(key, LMTopicViewDataConvertor.fromTopic(value));
-              }) ??
-              {};
+    PagingController<int, LMUserViewData> pagingController =
+        PagingController(firstPageKey: 1);
+    _addPaginationListener(pagingController, [option.id]);
 
-          List<LMUserViewData> users = [];
-          voteResponse.data?.votes.first.users.forEach((e) {
-            final LMUserViewData user = LMUserViewDataConvertor.fromUser(
-              voteResponse.data!.users[e]!,
-              topics: topics,
-              widgets: widgets,
-              userTopics: voteResponse.data!.userTopics,
-            );
-            debugPrint('User: ${user.name}');
-            users.add(user);
-          });
+    return PagedListView<int, LMUserViewData>(
+      pagingController: pagingController,
+      builderDelegate: PagedChildBuilderDelegate(
+        itemBuilder: (context, item, index) {
+          return UserTile(user: item);
+        },
+        noItemsFoundIndicatorBuilder: widget.noItemsFoundIndicatorBuilder ??
+            _widgetUtility.noItemsFoundIndicatorBuilderFeed,
+        firstPageProgressIndicatorBuilder:
+            widget.firstPageProgressIndicatorBuilder ??
+                _widgetUtility.firstPageProgressIndicatorBuilderFeed,
+        newPageProgressIndicatorBuilder:
+            widget.newPageProgressIndicatorBuilder ??
+                _widgetUtility.newPageProgressIndicatorBuilderFeed,
+        noMoreItemsIndicatorBuilder: widget.noMoreItemsIndicatorBuilder ??
+            _widgetUtility.noMoreItemsIndicatorBuilderFeed,
+      ),
+    );
+  }
 
-          return ListView.builder(
-              itemCount: users.length,
-              itemBuilder: (context, index) {
-                return UserTile(user: users[index]);
-              });
-        });
+  void _addPaginationListener(
+      PagingController<int, LMUserViewData> _pagingController,
+      List<String> votes) {
+    _pagingController.addPageRequestListener(
+      (pageKey) async {
+        await _getUserList(_pagingController, pageKey, votes);
+      },
+    );
+  }
+
+  Future<void> _getUserList(
+      PagingController<int, LMUserViewData> _pagingController,
+      int page,
+      List<String> votes) async {
+    GetPollVotesRequest request = (GetPollVotesRequestBuilder()
+          ..pollId(widget.pollId)
+          ..votes(votes)
+          ..page(page)
+          ..pageSize(pageSize))
+        .build();
+
+    LMResponse<GetPollVotesResponse> response =
+        await LMFeedCore.instance.lmFeedClient.getPollVotes(request);
+    if (!response.success) {
+      _pagingController.error = response.errorMessage;
+      return;
+    }
+
+    Map<String, LMWidgetViewData> widgets =
+        response.data?.widgets.map((key, value) {
+              return MapEntry(
+                  key, LMWidgetViewDataConvertor.fromWidgetModel(value));
+            }) ??
+            {};
+    Map<String, LMTopicViewData> topics =
+        response.data?.topics.map((key, value) {
+              return MapEntry(key, LMTopicViewDataConvertor.fromTopic(value));
+            }) ??
+            {};
+
+    List<LMUserViewData> users = [];
+    if (response.data?.votes.isEmpty ?? true) {
+      _pagingController.appendLastPage([]);
+      return;
+    }
+    response.data?.votes.first.users.forEach((e) {
+      final LMUserViewData user = LMUserViewDataConvertor.fromUser(
+        response.data!.users[e]!,
+        topics: topics,
+        widgets: widgets,
+        userTopics: response.data!.userTopics,
+      );
+      users.add(user);
+    });
+
+    if (users.isEmpty) {
+      _pagingController.appendLastPage([]);
+    } else {
+      final isLastPage = users.length < pageSize;
+      if (isLastPage) {
+        _pagingController.appendLastPage(users);
+      } else {
+        _pagingController.appendPage(users, page + 1);
+      }
+    }
   }
 }
 

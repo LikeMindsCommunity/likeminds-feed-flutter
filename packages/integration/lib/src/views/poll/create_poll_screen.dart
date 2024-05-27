@@ -232,6 +232,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                       text: user?.name ?? '',
                       style: LMFeedTextStyle(
                         textStyle: TextStyle(
+                          color: theme.onContainer,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           height: 1.33,
@@ -256,9 +257,15 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                   TextField(
                     controller: _questionController,
                     maxLines: 3,
+                    style: TextStyle(
+                      color: theme.onContainer,
+                    ),
                     decoration: widget.pollQuestionStyle?.decoration ??
                         InputDecoration(
                           hintText: 'Ask a question',
+                          hintStyle: TextStyle(
+                            color: theme.inActiveColor,
+                          ),
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           enabledBorder: InputBorder.none,
@@ -551,6 +558,14 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                                                           _multiSelectStateBuilder
                                                               .value = value;
                                                       },
+                                                      dropdownColor:
+                                                          theme.container,
+                                                      iconEnabledColor:
+                                                          theme.onContainer,
+                                                      style: TextStyle(
+                                                        color:
+                                                            theme.onContainer,
+                                                      ),
                                                       items: [
                                                         DropdownMenuItem(
                                                           child: LMFeedText(
@@ -617,6 +632,15 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
                                                                   value: i,
                                                                 ),
                                                             ],
+                                                            dropdownColor:
+                                                                theme.container,
+                                                            iconEnabledColor:
+                                                                theme
+                                                                    .onContainer,
+                                                            style: TextStyle(
+                                                              color: theme
+                                                                  .onContainer,
+                                                            ),
                                                             onChanged: (value) {
                                                               if (value != null)
                                                                 _multiSelectNoBuilder
@@ -657,17 +681,29 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
       onTap: () {
         _advancedBuilder.value = !_advancedBuilder.value;
       },
-      text: LMFeedText(text: 'ADVANCED'),
+      text: LMFeedText(
+        text: 'ADVANCED',
+        style: LMFeedTextStyle(
+            textStyle: TextStyle(
+          color: theme.onContainer,
+        )),
+      ),
       isActive: value,
       style: LMFeedButtonStyle(
         placement: LMFeedIconButtonPlacement.end,
         activeIcon: LMFeedIcon(
           type: LMFeedIconType.icon,
           icon: Icons.expand_less,
+          style: LMFeedIconStyle(
+            color: theme.onContainer,
+          ),
         ),
         icon: LMFeedIcon(
           type: LMFeedIconType.icon,
           icon: Icons.expand_more,
+          style: LMFeedIconStyle(
+            color: theme.onContainer,
+          ),
         ),
       ),
     );
@@ -784,9 +820,15 @@ class _OptionTileState extends State<OptionTile> {
           child: TextField(
             controller: _controller,
             onChanged: widget.onChanged,
+            style: TextStyle(
+              color: theme.onContainer,
+            ),
             decoration: widget.optionStyle?.decoration ??
                 InputDecoration(
                   hintText: 'Option',
+                  hintStyle: TextStyle(
+                    color: theme.inActiveColor,
+                  ),
                   border: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   enabledBorder: InputBorder.none,
@@ -804,7 +846,7 @@ class _OptionTileState extends State<OptionTile> {
           ),
         ),
         Divider(
-          color: Colors.grey,
+          color: theme.inActiveColor,
           height: 0,
         ),
       ],

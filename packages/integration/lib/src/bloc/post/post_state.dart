@@ -94,12 +94,13 @@ class LMFeedEditPostUploadedState extends LMFeedPostState {
 /// [postId] contains the id of the deleted post
 /// and is of type [String]
 class LMFeedPostDeletedState extends LMFeedPostState {
-  final String postId;
+  final String? postId;
+  final String? pendingPostId;
 
-  const LMFeedPostDeletedState({required this.postId});
+  const LMFeedPostDeletedState({this.postId, this.pendingPostId});
 
   @override
-  List<Object> get props => [postId];
+  List<Object> get props => [postId ?? pendingPostId ?? ''];
 }
 
 /// When an existing post is successfully updated
