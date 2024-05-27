@@ -155,15 +155,16 @@ class LMFeedPostReviewBannerStyle {
   /// Creates a copy of this [LMFeedPostReviewBannerStyle]
   /// but with the default theme
   /// {@endtemplate}
-  factory LMFeedPostReviewBannerStyle.basic() {
+  factory LMFeedPostReviewBannerStyle.basic(
+      {Color? onContainer, Color? backgroundColor}) {
     return LMFeedPostReviewBannerStyle(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       margin: EdgeInsets.zero,
-      backgroundColor: LikeMindsTheme.container,
-      reviewStatusTextStyle: const LMFeedTextStyle(
+      backgroundColor: backgroundColor ?? LikeMindsTheme.container,
+      reviewStatusTextStyle: LMFeedTextStyle(
         textStyle: TextStyle(
           fontWeight: FontWeight.w400,
-          color: LikeMindsTheme.headingColor,
+          color: onContainer ?? LikeMindsTheme.headingColor,
         ),
       ),
       infoIconStyle: LMFeedIconStyle.basic(),

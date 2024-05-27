@@ -82,6 +82,53 @@ class LMFeedScreen extends StatefulWidget {
 
   @override
   State<LMFeedScreen> createState() => _LMFeedScreenState();
+
+  LMFeedScreen copyWith({
+    LMFeedPostAppBarBuilder? appBar,
+    LMFeedContextWidgetBuilder? customWidgetBuilder,
+    Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
+        topicChipBuilder,
+    LMFeedPostWidgetBuilder? postBuilder,
+    LMFeedContextButtonBuilder? floatingActionButtonBuilder,
+    LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder,
+    LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder,
+    LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder,
+    LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder,
+    LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder,
+    LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder,
+    Widget Function(BuildContext context, int noOfPendingPost)?
+        pendingPostBannerBuilder,
+    LMFeedTopicBarBuilder? topicBarBuilder,
+    FloatingActionButtonLocation? floatingActionButtonLocation,
+    LMFeedScreenConfig? config,
+  }) {
+    return LMFeedScreen(
+      appBar: appBar ?? this.appBar,
+      customWidgetBuilder: customWidgetBuilder ?? this.customWidgetBuilder,
+      topicChipBuilder: topicChipBuilder ?? this.topicChipBuilder,
+      postBuilder: postBuilder ?? this.postBuilder,
+      floatingActionButtonBuilder:
+          floatingActionButtonBuilder ?? this.floatingActionButtonBuilder,
+      noItemsFoundIndicatorBuilder:
+          noItemsFoundIndicatorBuilder ?? this.noItemsFoundIndicatorBuilder,
+      firstPageProgressIndicatorBuilder: firstPageProgressIndicatorBuilder ??
+          this.firstPageProgressIndicatorBuilder,
+      newPageProgressIndicatorBuilder: newPageProgressIndicatorBuilder ??
+          this.newPageProgressIndicatorBuilder,
+      noMoreItemsIndicatorBuilder:
+          noMoreItemsIndicatorBuilder ?? this.noMoreItemsIndicatorBuilder,
+      firstPageErrorIndicatorBuilder:
+          firstPageErrorIndicatorBuilder ?? this.firstPageErrorIndicatorBuilder,
+      newPageErrorIndicatorBuilder:
+          newPageErrorIndicatorBuilder ?? this.newPageErrorIndicatorBuilder,
+      pendingPostBannerBuilder:
+          pendingPostBannerBuilder ?? this.pendingPostBannerBuilder,
+      topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
+      floatingActionButtonLocation:
+          floatingActionButtonLocation ?? this.floatingActionButtonLocation,
+      config: config ?? this.config,
+    );
+  }
 }
 
 class _LMFeedScreenState extends State<LMFeedScreen> {

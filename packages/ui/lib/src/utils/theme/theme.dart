@@ -156,8 +156,11 @@ class LMFeedThemeData {
             containerColor: container ?? LikeMindsTheme.container,
             inActiveColor: inActiveColor ?? LikeMindsTheme.unSelectedColor,
           ),
-      reviewBannerStyle:
-          reviewBannerStyle ?? LMFeedPostReviewBannerStyle.basic(),
+      reviewBannerStyle: reviewBannerStyle ??
+          LMFeedPostReviewBannerStyle.basic(
+            backgroundColor: container ?? LikeMindsTheme.container,
+            onContainer: onContainer ?? LikeMindsTheme.onContainer,
+          ),
       footerStyle: footerStyle ??
           LMFeedPostFooterStyle.basic(primaryColor: primaryColor),
       headerStyle: headerStyle ?? LMFeedPostHeaderStyle.basic(),
