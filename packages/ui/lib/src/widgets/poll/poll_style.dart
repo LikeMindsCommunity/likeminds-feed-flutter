@@ -65,8 +65,6 @@ class LMFeedPollStyle {
     this.pollOptionStyle,
   });
 
-
-
   factory LMFeedPollStyle.basic({
     Color? primaryColor,
     Color? containerColor,
@@ -74,9 +72,9 @@ class LMFeedPollStyle {
     bool isComposable = false,
   }) {
     return LMFeedPollStyle(
-      margin: const EdgeInsets.symmetric(
-        vertical: 8,
-      ),
+      isComposable: isComposable,
+      margin: EdgeInsets.symmetric(
+          vertical: 8, horizontal: isComposable ? 16.0 : 0),
       backgroundColor: containerColor ?? Colors.white,
       decoration: BoxDecoration(
         color: containerColor ?? Colors.white,

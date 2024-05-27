@@ -4,7 +4,7 @@ description: Monorepo workspace for managing LikeMinds Feed Flutter packages
 homepage: https://likeminds.community
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: ">=3.0.2 <4.0.0"
+  flutter: ">=3.10.2"
 dev_dependencies:
   melos: ^4.1.0
