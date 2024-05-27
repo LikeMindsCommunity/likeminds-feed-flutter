@@ -499,6 +499,25 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         context,
                         curr.postData,
                         LMFeedPendingPostDialog(
+                          dialogStyle: feedThemeData.dialogStyle,
+                          headingTextStyles: LMFeedTextStyle.basic().copyWith(
+                            maxLines: 2,
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              color: feedThemeData.onContainer,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          dialogMessageTextStyles:
+                              LMFeedTextStyle.basic().copyWith(
+                            overflow: TextOverflow.visible,
+                            maxLines: 10,
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              color: feedThemeData.textSecondary,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                           pendingPostId: curr.postData.id,
                           onCancelButtonClicked: () {
                             Navigator.of(context).pop();

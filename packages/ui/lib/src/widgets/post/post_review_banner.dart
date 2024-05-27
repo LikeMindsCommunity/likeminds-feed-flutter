@@ -71,7 +71,8 @@ class LMFeedPostReviewBanner extends StatelessWidget {
                 assetPath: postReviewStatus == LMPostReviewStatus.pending
                     ? lmWarningPendingPostSvg
                     : lmRejectPendingPostSvg,
-                style: style?.reviewStatusIconStyle,
+                style: style?.reviewStatusIconStyle ??
+                    postReviewStatusStyle.reviewStatusIconStyle,
               ),
           const SizedBox(width: 8.0),
           reviewStatusText ??
@@ -79,7 +80,8 @@ class LMFeedPostReviewBanner extends StatelessWidget {
                 text: postReviewStatus == LMPostReviewStatus.pending
                     ? "Under review"
                     : "Post rejected",
-                style: style?.reviewStatusTextStyle,
+                style: style?.reviewStatusTextStyle ??
+                    postReviewStatusStyle.reviewStatusTextStyle,
               ),
           const Spacer(),
           LMFeedButton(
@@ -95,7 +97,8 @@ class LMFeedPostReviewBanner extends StatelessWidget {
                   LMFeedIcon(
                     type: LMFeedIconType.svg,
                     assetPath: lmInfoPendingPostSvg,
-                    style: style?.infoIconStyle,
+                    style: style?.infoIconStyle ??
+                        postReviewStatusStyle.infoIconStyle,
                   ),
             ),
           ),
@@ -162,14 +165,30 @@ class LMFeedPostReviewBannerStyle {
           color: LikeMindsTheme.headingColor,
         ),
       ),
-      infoIconStyle: const LMFeedIconStyle(
-        size: 24,
-        boxSize: 0,
-      ),
-      reviewStatusIconStyle: const LMFeedIconStyle(
-        size: 24,
-        boxSize: 0,
-      ),
+      infoIconStyle: LMFeedIconStyle.basic(),
+      reviewStatusIconStyle: LMFeedIconStyle.basic(),
+    );
+  }
+
+  /// Creates a copy of this [LMFeedPostReviewBannerStyle] but with the given
+  /// fields
+  LMFeedPostReviewBannerStyle copyWith({
+    LMFeedTextStyle? reviewStatusTextStyle,
+    LMFeedIconStyle? reviewStatusIconStyle,
+    LMFeedIconStyle? infoIconStyle,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    Color? backgroundColor,
+  }) {
+    return LMFeedPostReviewBannerStyle(
+      reviewStatusTextStyle:
+          reviewStatusTextStyle ?? this.reviewStatusTextStyle,
+      reviewStatusIconStyle:
+          reviewStatusIconStyle ?? this.reviewStatusIconStyle,
+      infoIconStyle: infoIconStyle ?? this.infoIconStyle,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
     );
   }
 }

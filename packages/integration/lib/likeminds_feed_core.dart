@@ -29,6 +29,7 @@ export 'package:likeminds_feed/likeminds_feed.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
+export 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;

@@ -20,4 +20,9 @@ class LMFeedPendingPostScreenBuilderDeletegate {
       useRootNavigator: true,
     );
   }
+
+  AppBar appBarBuilder(
+      BuildContext context, AppBar pendingPostAppBar, int postViewData) {
+    return pendingPostAppBar;
+  }
 }

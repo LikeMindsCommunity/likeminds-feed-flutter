@@ -23,8 +23,8 @@ class LMFeedPendingPostDialog extends StatelessWidget {
     required this.description,
     this.headingTextStyles,
     this.dialogMessageTextStyles,
-    this.editPostButtonStyles,
-    this.cancelButtonStyles,
+    this.editPostButtonStyles = const LMFeedButtonStyle.basic(),
+    this.cancelButtonStyles = const LMFeedButtonStyle.basic(),
     this.dialogStyle,
     this.onEditButtonClicked,
     this.onCancelButtonClicked,
@@ -129,7 +129,7 @@ class LMFeedPendingPostDialog extends StatelessWidget {
           ),
         ),
       ),
-      style: cancelButtonStyles,
+      style: cancelButtonStyles ?? LMFeedButtonStyle.basic(),
     );
   }
 
@@ -138,7 +138,7 @@ class LMFeedPendingPostDialog extends StatelessWidget {
       onTap: () {
         onEditButtonClicked?.call();
       },
-      style: editPostButtonStyles,
+      style: editPostButtonStyles ?? LMFeedButtonStyle.basic(),
       text: LMFeedText(
         text: "EDIT $postTitleAllCaps",
         style: LMFeedTextStyle(
