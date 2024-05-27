@@ -9,6 +9,7 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 enum LMPostReviewStatus {
   rejected,
   pending,
+  approved,
 }
 
 /// {@template post_review_banner}
