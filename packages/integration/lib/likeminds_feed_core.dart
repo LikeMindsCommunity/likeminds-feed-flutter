@@ -251,6 +251,9 @@ class LMFeedCore {
       LMResponse<InitiateUserResponse> initiateUserResponse =
           await initiateUser(initiateUserRequest: initiateUserRequest);
       if (initiateUserResponse.success) {
+        LMNotificationHandler.instance.registerDevice(
+          initiateUserResponse.data!.user!.sdkClientInfo.uuid,
+        );
         // Call member state and community configurations and store them in local preference
         LMResponse initialiseFeedResponse = await initialiseFeed();
         if (!initialiseFeedResponse.success) {
