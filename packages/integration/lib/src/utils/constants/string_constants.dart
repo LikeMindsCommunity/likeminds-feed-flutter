@@ -11,6 +11,14 @@ class LMFeedStringConstants {
   static const String accessToken = "accessToken";
   static const String refreshToken = 'refreshToken';
 
+  // Constants related to poll
+  static const String pollId = 'poll_id';
+  static const String pollTitle = 'poll_title';
+  static const String pollOptionVoted = 'option_voted';
+  static const String pollNumberOfVotesSelected = 'number_of_votes_selected';
+  static const String pollOptionText = 'option_text';
+  static const String pollOptionId = 'option_id';
+
   static const String underReviewKey = 'under_review';
   static const String rejectedKey = 'rejected';
   static const String postApprovalNeeded = 'post_approval_needed';
