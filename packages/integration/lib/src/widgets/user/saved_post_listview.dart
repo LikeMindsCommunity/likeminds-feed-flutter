@@ -482,7 +482,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        debugPrint("this is selected");
         if (hasPollEnded(pollValue.expiryTime!)) {
           LMFeedCore.showSnackBar(
             context,
