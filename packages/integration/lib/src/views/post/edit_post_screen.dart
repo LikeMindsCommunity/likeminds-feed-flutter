@@ -196,11 +196,11 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
     String postText = LMFeedTaggingHelper.convertRouteToTag(postViewData!.text);
 
-    _controller = TextEditingController();
-    _controller.value = TextEditingValue(text: postText);
-
     composeBloc.userTags =
         LMFeedTaggingHelper.addUserTagsIfMatched(postViewData!.text);
+
+    _controller = TextEditingController();
+    _controller.value = TextEditingValue(text: postText);
   }
 
   // This function is used to populate
@@ -939,6 +939,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                       isDown: true,
                       minLines: 3,
                       enabled: config!.enableTagging,
+                      userTags: composeBloc.userTags,
                       // maxLines: 200,
                       decoration: InputDecoration(
                         border: InputBorder.none,
