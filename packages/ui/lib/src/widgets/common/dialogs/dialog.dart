@@ -33,4 +33,14 @@ class LMFeedDialog extends StatelessWidget {
       ),
     );
   }
+
+  LMFeedDialog copyWith({
+    Widget? child,
+    LMFeedDialogStyle? dialogStyle,
+  }) {
+    return LMFeedDialog(
+      dialogStyle: dialogStyle ?? this.dialogStyle,
+      child: child ?? this.child,
+    );
+  }
 }

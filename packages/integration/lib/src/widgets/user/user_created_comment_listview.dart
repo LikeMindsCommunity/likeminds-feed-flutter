@@ -500,6 +500,7 @@ class _LMFeedUserCreatedCommentListViewState
             ));
           },
           action: LMFeedMenuAction(
+            onPostReport: () => handlePostReportAction(postViewData),
             onPostUnpin: () => handlePostPinAction(postViewData),
             onPostPin: () => handlePostPinAction(postViewData),
             onPostEdit: () {
@@ -768,6 +769,18 @@ class _LMFeedUserCreatedCommentListViewState
           ],
         ),
       );
+
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
+        ),
+      ),
+    );
+  }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     lmFeedPostBloc.add(LMFeedUpdatePostEvent(

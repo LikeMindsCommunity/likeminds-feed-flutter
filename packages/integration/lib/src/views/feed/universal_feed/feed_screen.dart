@@ -82,6 +82,53 @@ class LMFeedScreen extends StatefulWidget {
 
   @override
   State<LMFeedScreen> createState() => _LMFeedScreenState();
+
+  LMFeedScreen copyWith({
+    LMFeedPostAppBarBuilder? appBar,
+    LMFeedContextWidgetBuilder? customWidgetBuilder,
+    Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
+        topicChipBuilder,
+    LMFeedPostWidgetBuilder? postBuilder,
+    LMFeedContextButtonBuilder? floatingActionButtonBuilder,
+    LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder,
+    LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder,
+    LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder,
+    LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder,
+    LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder,
+    LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder,
+    Widget Function(BuildContext context, int noOfPendingPost)?
+        pendingPostBannerBuilder,
+    LMFeedTopicBarBuilder? topicBarBuilder,
+    FloatingActionButtonLocation? floatingActionButtonLocation,
+    LMFeedScreenConfig? config,
+  }) {
+    return LMFeedScreen(
+      appBar: appBar ?? this.appBar,
+      customWidgetBuilder: customWidgetBuilder ?? this.customWidgetBuilder,
+      topicChipBuilder: topicChipBuilder ?? this.topicChipBuilder,
+      postBuilder: postBuilder ?? this.postBuilder,
+      floatingActionButtonBuilder:
+          floatingActionButtonBuilder ?? this.floatingActionButtonBuilder,
+      noItemsFoundIndicatorBuilder:
+          noItemsFoundIndicatorBuilder ?? this.noItemsFoundIndicatorBuilder,
+      firstPageProgressIndicatorBuilder: firstPageProgressIndicatorBuilder ??
+          this.firstPageProgressIndicatorBuilder,
+      newPageProgressIndicatorBuilder: newPageProgressIndicatorBuilder ??
+          this.newPageProgressIndicatorBuilder,
+      noMoreItemsIndicatorBuilder:
+          noMoreItemsIndicatorBuilder ?? this.noMoreItemsIndicatorBuilder,
+      firstPageErrorIndicatorBuilder:
+          firstPageErrorIndicatorBuilder ?? this.firstPageErrorIndicatorBuilder,
+      newPageErrorIndicatorBuilder:
+          newPageErrorIndicatorBuilder ?? this.newPageErrorIndicatorBuilder,
+      pendingPostBannerBuilder:
+          pendingPostBannerBuilder ?? this.pendingPostBannerBuilder,
+      topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
+      floatingActionButtonLocation:
+          floatingActionButtonLocation ?? this.floatingActionButtonLocation,
+      config: config ?? this.config,
+    );
+  }
 }
 
 class _LMFeedScreenState extends State<LMFeedScreen> {
@@ -133,6 +180,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   // Create a ValueNotifier to track if a post is uploading
   final ValueNotifier postUploading = ValueNotifier(false);
+  bool isPostEditing = false;
 
   LMFeedScreenConfig? config;
   /* 
@@ -199,6 +247,20 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     // Sets the value of postUploading based on the state of newPostBloc
     postUploading.value = newPostBloc.state is LMFeedNewPostUploadingState ||
         newPostBloc.state is LMFeedEditPostUploadingState;
+
+    newPostBloc.stream.listen((state) {
+      if (state is LMFeedNewPostUploadingState ||
+          state is LMFeedEditPostUploadingState) {
+        postUploading.value = true;
+        isPostEditing = state is LMFeedEditPostUploadingState;
+      } else if (state is LMFeedNewPostUploadedState ||
+          state is LMFeedEditPostUploadedState ||
+          state is LMFeedNewPostErrorState ||
+          state is LMFeedEditPostErrorState) {
+        postUploading.value = false;
+        isPostEditing = false;
+      }
+    });
 
     // Adds a feed opened event to the LMFeedAnalyticsBloc
     LMFeedAnalyticsBloc.instance.add(
@@ -478,26 +540,31 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     _pagingController.itemList = feedRoomItemList;
                     rebuildPostWidget.value = !rebuildPostWidget.value;
                   }
-                  if (curr is LMFeedNewPostUploadingState ||
-                      curr is LMFeedEditPostUploadingState) {
-                    // if current state is uploading
-                    // change postUploading flag to true
-                    // to block new post creation
-                    postUploading.value = true;
-                  }
-                  if (prev is LMFeedNewPostUploadingState ||
-                      prev is LMFeedEditPostUploadingState) {
-                    // if state has changed from uploading
-                    // change postUploading flag to false
-                    // to allow new post creation
-                    postUploading.value = false;
-                  }
                   if (curr is LMFeedNewPostUploadedState) {
                     if (LMFeedPostUtils.doPostNeedsApproval) {
                       _pendingPostScreenBuilderDelegate.showPostApprovalDialog(
                         context,
                         curr.postData,
                         LMFeedPendingPostDialog(
+                          dialogStyle: feedThemeData.dialogStyle,
+                          headingTextStyles: LMFeedTextStyle.basic().copyWith(
+                            maxLines: 2,
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              color: feedThemeData.onContainer,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          dialogMessageTextStyles:
+                              LMFeedTextStyle.basic().copyWith(
+                            overflow: TextOverflow.visible,
+                            maxLines: 10,
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              color: feedThemeData.textSecondary,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
                           pendingPostId: curr.postData.id,
                           onCancelButtonClicked: () {
                             Navigator.of(context).pop();
@@ -520,7 +587,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       getUserFeedMeta = getUserFeedMetaFuture();
                       pendingPostCount++;
                       _rebuildAppBar.value = !_rebuildAppBar.value;
-                      postUploading.value = false;
                       return;
                     }
                     LMPostViewData? item = curr.postData;
@@ -605,34 +671,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   }
                 },
                 builder: (context, state) {
-                  if (state is LMFeedEditPostUploadingState) {
-                    return Container(
-                      height: 72,
-                      color: feedThemeData.container,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0,
-                        vertical: 6,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              SizedBox(
-                                width: 50,
-                                height: 50,
-                              ),
-                              LikeMindsTheme.kHorizontalPaddingMedium,
-                              Text('Saving $postTitleSmallCap')
-                            ],
-                          ),
-                          LMFeedLoader(),
-                        ],
-                      ),
-                    );
-                  }
-                  if (state is LMFeedNewPostUploadingState) {
+                  if (postUploading.value) {
                     return Container(
                       height: 72,
                       color: feedThemeData.backgroundColor,
@@ -646,29 +685,11 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         children: <Widget>[
                           Row(
                             children: <Widget>[
-                              getLoaderThumbnail(state.thumbnailMedia),
-                              LikeMindsTheme.kHorizontalPaddingMedium,
-                              Text('Creating $postTitleSmallCap')
+                              Text(
+                                  '${isPostEditing ? "Saving" : "Creating"} $postTitleSmallCap')
                             ],
                           ),
-                          StreamBuilder<double>(
-                              initialData: 0,
-                              stream: state.progress,
-                              builder: (context, snapshot) {
-                                return SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    value: (snapshot.data == null ||
-                                            snapshot.data == 0.0
-                                        ? null
-                                        : snapshot.data),
-                                    valueColor: AlwaysStoppedAnimation(
-                                        feedThemeData.primaryColor),
-                                    strokeWidth: 3,
-                                  ),
-                                );
-                              }),
+                          LMFeedLoader(),
                         ],
                       ),
                     );
@@ -1673,30 +1694,14 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               },
       );
 
-  Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
-    return showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      useSafeArea: true,
-      isScrollControlled: true,
-      elevation: 10,
-      enableDrag: true,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-        minHeight: MediaQuery.of(context).size.height * 0.3,
-      ),
-      backgroundColor: feedThemeData.container,
-      clipBehavior: Clip.hardEdge,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.0),
-          topRight: Radius.circular(20.0),
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
         ),
-      ),
-      builder: (context) => LMFeedReportBottomSheet(
-        entityId: postViewData.id,
-        entityType: 5,
-        entityCreatorId: postViewData.uuid,
       ),
     );
   }

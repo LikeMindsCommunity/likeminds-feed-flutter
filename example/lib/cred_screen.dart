@@ -9,9 +9,69 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/themes/social_dark/likeminds_feed_nova_fl.dart';
 import 'package:likeminds_feed_sample/themes/social_feedroom/koshiqa_theme.dart';
 import 'package:likeminds_feed_sample/themes/social_feedroom/likeminds_feed_flutter_koshiqa.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
+const _isProd = !bool.fromEnvironment('DEBUG');
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return OverlaySupport.global(
+      child: MaterialApp(
+        title: 'Integration App for UI + SDK package',
+        debugShowCheckedModeBanner: _isProd,
+        navigatorKey: rootNavigatorKey,
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
+        theme: ThemeData(
+          useMaterial3: false,
+          primaryColor: Colors.deepPurple,
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            outlineBorder: const BorderSide(
+              color: Colors.deepPurple,
+              width: 2,
+            ),
+            activeIndicatorBorder: const BorderSide(
+              color: Colors.deepPurple,
+              width: 2,
+            ),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.deepPurple,
+                width: 2,
+              ),
+            ),
+            enabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.deepPurple,
+                width: 2,
+              ),
+            ),
+          ),
+        ),
+        home: LMFeedBlocListener(
+          analyticsListener:
+              (BuildContext context, LMFeedAnalyticsState state) {
+            if (state is LMFeedAnalyticsEventFired) {
+              debugPrint("Bloc Listened for event, - ${state.eventName}");
+              debugPrint("////////////////");
+              debugPrint("With properties - ${state.eventProperties}");
+            }
+          },
+          profileListener: (BuildContext context, LMFeedProfileState state) {},
+          routingListener: (BuildContext context, LMFeedRoutingState state) {},
+          child: const CredScreen(),
+        ),
+      ),
+    );
+  }
+}
 
 class CredScreen extends StatefulWidget {
   const CredScreen({super.key});
@@ -33,6 +93,7 @@ class _CredScreenState extends State<CredScreen> {
   @override
   void initState() {
     super.initState();
+    fetchUserData();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       initUniLinks(context);
     });
@@ -263,6 +324,13 @@ class _CredScreenState extends State<CredScreen> {
               ElevatedButton(
                   onPressed: () {
                     LMFeedLocalPreference.instance.clearCache();
+
+                    _usernameController.clear();
+                    _uuidController.clear();
+                    _apiKeyController.clear();
+                    _feedRoomController.clear();
+
+                    setState(() {});
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -316,6 +384,7 @@ class _CredScreenState extends State<CredScreen> {
       _showSnackBar(response.errorMessage ?? "An error occurred");
       return;
     }
+
     // define the route
     Widget? navigationWidget = _getNavigationWidget(selectedTheme);
     if (navigationWidget == null) {
@@ -331,6 +400,24 @@ class _CredScreenState extends State<CredScreen> {
 
     // navigate to the feed screen
     Navigator.of(context).push(route);
+  }
+
+  fetchUserData() {
+    LMUserViewData? userViewData =
+        LMFeedLocalPreference.instance.fetchUserData();
+
+    if (userViewData != null) {
+      _uuidController.text = userViewData.sdkClientInfo.uuid;
+      _usernameController.text = userViewData.name;
+    }
+
+    LMResponse apiKeyCacheResponse =
+        LMFeedCore.client.getCache(LMFeedStringConstants.apiKey);
+
+    if (apiKeyCacheResponse.success) {
+      _apiKeyController.text =
+          (apiKeyCacheResponse.data as LMCache).value as String? ?? '';
+    }
   }
 
   Widget? _getNavigationWidget(LMFeedFlavor selectedTheme) {

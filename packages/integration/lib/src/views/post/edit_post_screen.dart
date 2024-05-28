@@ -194,13 +194,13 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   void fillScreenWithPostDetails() {
     _headingController?.text = postViewData?.heading ?? '';
 
-    composeBloc.userTags =
-        LMFeedTaggingHelper.addUserTagsIfMatched(_controller.text);
-
     String postText = LMFeedTaggingHelper.convertRouteToTag(postViewData!.text);
 
     _controller = TextEditingController();
-    _controller.text = postText;
+    _controller.value = TextEditingValue(text: postText);
+
+    composeBloc.userTags =
+        LMFeedTaggingHelper.addUserTagsIfMatched(postViewData!.text);
   }
 
   // This function is used to populate

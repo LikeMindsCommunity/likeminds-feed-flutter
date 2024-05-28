@@ -71,7 +71,7 @@ class _LMButtonState extends State<LMFeedButton> {
 
   @override
   Widget build(BuildContext context) {
-    final inStyle = widget.style ?? LMFeedButtonStyle.basic();
+    final inStyle = widget.style ?? const LMFeedButtonStyle.basic();
     return InkWell(
       onTap: () {
         setState(() {
@@ -195,16 +195,23 @@ class LMFeedButtonStyle {
     this.textPadding,
   });
 
-  factory LMFeedButtonStyle.basic() {
-    return const LMFeedButtonStyle(
-      padding: EdgeInsets.all(4),
-      backgroundColor: Colors.transparent,
-      borderRadius: 8,
-      height: 28,
-      margin: 4,
-      textPadding: EdgeInsets.zero,
-    );
-  }
+  const factory LMFeedButtonStyle.basic() = LMFeedButtonStyle._;
+
+  const LMFeedButtonStyle._({
+    this.padding = const EdgeInsets.all(4.0),
+    this.backgroundColor = Colors.transparent,
+    this.border,
+    this.borderRadius = 8.0,
+    this.height = 28.0,
+    this.width,
+    this.placement = LMFeedIconButtonPlacement.start,
+    this.mainAxisAlignment,
+    this.margin = 4.0,
+    this.showText = true,
+    this.icon,
+    this.activeIcon,
+    this.textPadding = EdgeInsets.zero,
+  });
 
   LMFeedButtonStyle copyWith({
     EdgeInsets? padding,

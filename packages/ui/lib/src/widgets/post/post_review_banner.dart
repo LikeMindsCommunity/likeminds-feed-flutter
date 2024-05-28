@@ -9,6 +9,7 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 enum LMPostReviewStatus {
   rejected,
   pending,
+  approved,
 }
 
 /// {@template post_review_banner}
@@ -71,7 +72,8 @@ class LMFeedPostReviewBanner extends StatelessWidget {
                 assetPath: postReviewStatus == LMPostReviewStatus.pending
                     ? lmWarningPendingPostSvg
                     : lmRejectPendingPostSvg,
-                style: style?.reviewStatusIconStyle,
+                style: style?.reviewStatusIconStyle ??
+                    postReviewStatusStyle.reviewStatusIconStyle,
               ),
           const SizedBox(width: 8.0),
           reviewStatusText ??
@@ -79,7 +81,8 @@ class LMFeedPostReviewBanner extends StatelessWidget {
                 text: postReviewStatus == LMPostReviewStatus.pending
                     ? "Under review"
                     : "Post rejected",
-                style: style?.reviewStatusTextStyle,
+                style: style?.reviewStatusTextStyle ??
+                    postReviewStatusStyle.reviewStatusTextStyle,
               ),
           const Spacer(),
           LMFeedButton(
@@ -95,7 +98,8 @@ class LMFeedPostReviewBanner extends StatelessWidget {
                   LMFeedIcon(
                     type: LMFeedIconType.svg,
                     assetPath: lmInfoPendingPostSvg,
-                    style: style?.infoIconStyle,
+                    style: style?.infoIconStyle ??
+                        postReviewStatusStyle.infoIconStyle,
                   ),
             ),
           ),
@@ -151,25 +155,42 @@ class LMFeedPostReviewBannerStyle {
   /// Creates a copy of this [LMFeedPostReviewBannerStyle]
   /// but with the default theme
   /// {@endtemplate}
-  factory LMFeedPostReviewBannerStyle.basic() {
+  factory LMFeedPostReviewBannerStyle.basic(
+      {Color? onContainer, Color? backgroundColor}) {
     return LMFeedPostReviewBannerStyle(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       margin: EdgeInsets.zero,
-      backgroundColor: LikeMindsTheme.container,
-      reviewStatusTextStyle: const LMFeedTextStyle(
+      backgroundColor: backgroundColor ?? LikeMindsTheme.container,
+      reviewStatusTextStyle: LMFeedTextStyle(
         textStyle: TextStyle(
           fontWeight: FontWeight.w400,
-          color: LikeMindsTheme.headingColor,
+          color: onContainer ?? LikeMindsTheme.headingColor,
         ),
       ),
-      infoIconStyle: const LMFeedIconStyle(
-        size: 24,
-        boxSize: 0,
-      ),
-      reviewStatusIconStyle: const LMFeedIconStyle(
-        size: 24,
-        boxSize: 0,
-      ),
+      infoIconStyle: LMFeedIconStyle.basic(),
+      reviewStatusIconStyle: LMFeedIconStyle.basic(),
+    );
+  }
+
+  /// Creates a copy of this [LMFeedPostReviewBannerStyle] but with the given
+  /// fields
+  LMFeedPostReviewBannerStyle copyWith({
+    LMFeedTextStyle? reviewStatusTextStyle,
+    LMFeedIconStyle? reviewStatusIconStyle,
+    LMFeedIconStyle? infoIconStyle,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    Color? backgroundColor,
+  }) {
+    return LMFeedPostReviewBannerStyle(
+      reviewStatusTextStyle:
+          reviewStatusTextStyle ?? this.reviewStatusTextStyle,
+      reviewStatusIconStyle:
+          reviewStatusIconStyle ?? this.reviewStatusIconStyle,
+      infoIconStyle: infoIconStyle ?? this.infoIconStyle,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
     );
   }
 }

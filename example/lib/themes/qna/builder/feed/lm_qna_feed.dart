@@ -585,7 +585,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                         );
                       }
                     },
-                    style: LMFeedButtonStyle.basic().copyWith(
+                    style: const LMFeedButtonStyle.basic().copyWith(
                       padding: const EdgeInsets.only(left: 10),
                       icon: const LMFeedIcon(
                         type: LMFeedIconType.icon,
@@ -685,7 +685,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (position) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -695,6 +695,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: _feedBloc.users[post.uuid]!,
+              position: position,
             ),
           ),
         );
@@ -846,7 +847,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
-      onMediaTap: () {
+      onMediaTap: (position) {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         // ignore: use_build_context_synchronously
@@ -857,6 +858,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: _feedBloc.users[post.uuid]!,
+              position: position,
             ),
           ),
         );

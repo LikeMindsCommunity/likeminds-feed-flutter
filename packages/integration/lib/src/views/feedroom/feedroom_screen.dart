@@ -33,6 +33,7 @@ class LMFeedRoomScreen extends StatefulWidget {
     this.noMoreItemsIndicatorBuilder,
     this.firstPageErrorIndicatorBuilder,
     this.newPageErrorIndicatorBuilder,
+    this.pendingPostBannerBuilder,
   });
 
   final int feedroomId;
@@ -66,6 +67,10 @@ class LMFeedRoomScreen extends StatefulWidget {
   // Builder for error view while loading the first page
   final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
+  // Builder for pending post banner on feed screen above post list
+  final Widget Function(BuildContext context, int noOfPendingPost)?
+      pendingPostBannerBuilder;
+
   final LMFeedTopicBarBuilder? topicBarBuilder;
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
@@ -74,15 +79,89 @@ class LMFeedRoomScreen extends StatefulWidget {
 
   @override
   State<LMFeedRoomScreen> createState() => _LMFeedRoomScreenState();
+
+  LMFeedRoomScreen copyWith({
+    int? feedroomId,
+    LMFeedPostAppBarBuilder? appBarBuilder,
+    LMFeedContextWidgetBuilder? customWidgetBuilder,
+    Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
+        topicChipBuilder,
+    LMFeedPostWidgetBuilder? postBuilder,
+    LMFeedContextButtonBuilder? floatingActionButtonBuilder,
+    LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder,
+    LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder,
+    LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder,
+    LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder,
+    LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder,
+    LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder,
+    Widget Function(BuildContext context, int noOfPendingPost)?
+        pendingPostBannerBuilder,
+    LMFeedTopicBarBuilder? topicBarBuilder,
+    FloatingActionButtonLocation? floatingActionButtonLocation,
+    LMFeedRoomScreenConfig? config,
+  }) {
+    return LMFeedRoomScreen(
+      feedroomId: feedroomId ?? this.feedroomId,
+      appBarBuilder: appBarBuilder ?? this.appBarBuilder,
+      customWidgetBuilder: customWidgetBuilder ?? this.customWidgetBuilder,
+      topicChipBuilder: topicChipBuilder ?? this.topicChipBuilder,
+      postBuilder: postBuilder ?? this.postBuilder,
+      floatingActionButtonBuilder:
+          floatingActionButtonBuilder ?? this.floatingActionButtonBuilder,
+      noItemsFoundIndicatorBuilder:
+          noItemsFoundIndicatorBuilder ?? this.noItemsFoundIndicatorBuilder,
+      firstPageProgressIndicatorBuilder: firstPageProgressIndicatorBuilder ??
+          this.firstPageProgressIndicatorBuilder,
+      newPageProgressIndicatorBuilder: newPageProgressIndicatorBuilder ??
+          this.newPageProgressIndicatorBuilder,
+      noMoreItemsIndicatorBuilder:
+          noMoreItemsIndicatorBuilder ?? this.noMoreItemsIndicatorBuilder,
+      firstPageErrorIndicatorBuilder:
+          firstPageErrorIndicatorBuilder ?? this.firstPageErrorIndicatorBuilder,
+      newPageErrorIndicatorBuilder:
+          newPageErrorIndicatorBuilder ?? this.newPageErrorIndicatorBuilder,
+      pendingPostBannerBuilder:
+          pendingPostBannerBuilder ?? this.pendingPostBannerBuilder,
+      topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
+      floatingActionButtonLocation:
+          floatingActionButtonLocation ?? this.floatingActionButtonLocation,
+      config: config ?? this.config,
+    );
+  }
 }
 
 class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
+  // Get the post title in first letter capital singular form
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  // Get the post title in all small singular form
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
+  // Get the post title in all small singular form
+  String postTitleSmallCapPlural =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
+
+  // Get the comment title in first letter capital plural form
+  String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural);
+  // Get the comment title in all small plural form
+  String commentTitleSmallCapPlural =
+      LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
+  // Get the comment title in first letter capital singular form
+  String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  // Get the comment title in all small singular form
+  String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+      LMFeedPluralizeWordAction.allSmallSingular);
+
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.feedroom;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
+  bool isPostEditing = false;
   bool right = true;
 
   LMFeedRoomScreenConfig? config;
@@ -125,11 +204,27 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             ..pageSize(20))
           .build(),
     );
+
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedRoomBloc.instance;
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
     postUploading.value = newPostBloc.state is LMFeedNewPostUploadingState ||
         newPostBloc.state is LMFeedEditPostUploadingState;
+
+    newPostBloc.stream.listen((state) {
+      if (state is LMFeedNewPostUploadingState ||
+          state is LMFeedEditPostUploadingState) {
+        postUploading.value = true;
+        isPostEditing = state is LMFeedEditPostUploadingState;
+      } else if (state is LMFeedNewPostUploadedState ||
+          state is LMFeedEditPostUploadedState ||
+          state is LMFeedNewPostErrorState ||
+          state is LMFeedEditPostErrorState) {
+        postUploading.value = false;
+        isPostEditing = false;
+      }
+    });
+
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.feedOpened,
@@ -137,6 +232,12 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           'feed_type': 'feedroom',
         },
       ),
+    );
+  }
+
+  Future<GetUserFeedMetaResponse> getUserFeedMetaFuture() {
+    return LMFeedCore.client.getUserFeedMeta(
+      (GetUserFeedMetaRequestBuilder()..uuid(currentUser?.uuid ?? '')).build(),
     );
   }
 
@@ -1309,30 +1410,14 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
               },
       );
 
-  Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
-    return showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      useSafeArea: true,
-      isScrollControlled: true,
-      elevation: 10,
-      enableDrag: true,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-        minHeight: MediaQuery.of(context).size.height * 0.3,
-      ),
-      backgroundColor: feedThemeData.container,
-      clipBehavior: Clip.hardEdge,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.0),
-          topRight: Radius.circular(20.0),
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
         ),
-      ),
-      builder: (context) => LMFeedReportBottomSheet(
-        entityId: postViewData.id,
-        entityType: 5,
-        entityCreatorId: postViewData.uuid,
       ),
     );
   }

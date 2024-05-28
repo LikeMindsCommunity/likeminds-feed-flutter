@@ -294,6 +294,7 @@ class _LMFeedListState extends State<LMFeedList> {
               ),
             );
           },
+          onPostReport: () => handlePostReportAction(postViewData),
           onPostUnpin: () => handlePostPinAction(postViewData),
           onPostPin: () => handlePostPinAction(postViewData),
           onPostDelete: () {
@@ -572,6 +573,18 @@ class _LMFeedListState extends State<LMFeedList> {
                           : null),
             )),
       );
+
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
+        ),
+      ),
+    );
+  }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;

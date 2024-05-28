@@ -24,13 +24,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Loading .env file
   await dotenv.load(fileName: ".env");
+  await LMFeedCore.instance.initialize(
+    domain: "feedsx://www.feedsx.com/",
+  );
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-   await LMFeedCore.instance.initialize();
   setupNotifications();
   runApp(const LMSampleApp());
 }

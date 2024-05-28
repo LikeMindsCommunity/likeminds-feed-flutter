@@ -29,6 +29,7 @@ export 'package:likeminds_feed/likeminds_feed.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
+export 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
@@ -67,7 +68,6 @@ class LMFeedCore {
   static set widgetUtility(LMFeedWidgetUtility value) {
     instance._widgetUtility = value;
   }
-
 
   static LMFeedBuilderDelegate get feedBuilderDelegate =>
       instance._feedBuilderDelegate;
@@ -147,11 +147,11 @@ class LMFeedCore {
     String? newRefreshToken;
     if (accessToken == null || refreshToken == null) {
       newAccessToken = LMFeedLocalPreference.instance
-          .fetchCache(LMFeedStringConstants.instance.accessToken)
+          .fetchCache(LMFeedStringConstants.accessToken)
           ?.value;
 
       newRefreshToken = LMFeedLocalPreference.instance
-          .fetchCache(LMFeedStringConstants.instance.refreshToken)
+          .fetchCache(LMFeedStringConstants.refreshToken)
           ?.value;
     } else {
       newAccessToken = accessToken;
@@ -247,11 +247,11 @@ class LMFeedCore {
     String? newRefreshToken;
 
     newAccessToken = LMFeedLocalPreference.instance
-        .fetchCache(LMFeedStringConstants.instance.accessToken)
+        .fetchCache(LMFeedStringConstants.accessToken)
         ?.value;
 
     newRefreshToken = LMFeedLocalPreference.instance
-        .fetchCache(LMFeedStringConstants.instance.refreshToken)
+        .fetchCache(LMFeedStringConstants.refreshToken)
         ?.value;
 
     if (newAccessToken == null || newRefreshToken == null) {
@@ -264,6 +264,9 @@ class LMFeedCore {
       LMResponse<InitiateUserResponse> initiateUserResponse =
           await initiateUser(initiateUserRequest: initiateUserRequest);
       if (initiateUserResponse.success) {
+        LMNotificationHandler.instance.registerDevice(
+          initiateUserResponse.data!.user!.sdkClientInfo.uuid,
+        );
         // Call member state and community configurations and store them in local preference
         LMResponse initialiseFeedResponse = await initialiseFeed();
         if (!initialiseFeedResponse.success) {

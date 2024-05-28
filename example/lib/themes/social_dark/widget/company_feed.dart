@@ -321,7 +321,7 @@ class _NovaLMFeedCompanyFeedWidgetState
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (position) async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoControllers(
                 LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id,
@@ -336,6 +336,7 @@ class _NovaLMFeedCompanyFeedWidgetState
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: position,
             ),
           ),
         );
@@ -475,7 +476,7 @@ class _NovaLMFeedCompanyFeedWidgetState
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData?.mediaStyle,
-      onMediaTap: () async {
+      onMediaTap: (position) async {
         VideoController? postVideoController = LMFeedVideoProvider.instance
             .getVideoControllers(
                 LMFeedVideoProvider.instance.currentVisiblePostId ?? post.id,
@@ -490,6 +491,7 @@ class _NovaLMFeedCompanyFeedWidgetState
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: position,
             ),
           ),
         );

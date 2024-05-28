@@ -48,6 +48,7 @@ class LMFeedThemeData {
   final Color container;
   final Color onContainer;
   final Color onPrimary;
+  final Color textSecondary;
 
   const LMFeedThemeData({
     required this.postStyle,
@@ -81,6 +82,7 @@ class LMFeedThemeData {
     required this.loaderStyle,
     required this.bottomSheetStyle,
     required this.snackBarTheme,
+    required this.textSecondary,
   });
 
   factory LMFeedThemeData.fromThemeData(ThemeData theme) {
@@ -130,6 +132,7 @@ class LMFeedThemeData {
     LMFeedLoaderStyle? loaderStyle,
     LMFeedBottomSheetStyle? bottomSheetStyle,
     LMFeedSnackBarStyle? snackBarTheme,
+    Color? textSecondary,
   }) {
     return LMFeedThemeData(
       backgroundColor: backgroundColor ?? LikeMindsTheme.backgroundColor,
@@ -153,14 +156,18 @@ class LMFeedThemeData {
             containerColor: container ?? LikeMindsTheme.container,
             inActiveColor: inActiveColor ?? LikeMindsTheme.unSelectedColor,
           ),
-      reviewBannerStyle:
-          reviewBannerStyle ?? LMFeedPostReviewBannerStyle.basic(),
+      reviewBannerStyle: reviewBannerStyle ??
+          LMFeedPostReviewBannerStyle.basic(
+            backgroundColor: container ?? LikeMindsTheme.container,
+            onContainer: onContainer ?? LikeMindsTheme.onContainer,
+          ),
       footerStyle: footerStyle ??
           LMFeedPostFooterStyle.basic(primaryColor: primaryColor),
       headerStyle: headerStyle ?? LMFeedPostHeaderStyle.basic(),
       hashTagColor: hashTagColor ?? LikeMindsTheme.hashTagColor,
       linkColor: linkColor ?? LikeMindsTheme.linkColor,
       tagColor: tagColor ?? LikeMindsTheme.tagColor,
+      textSecondary: textSecondary ?? LikeMindsTheme.greyColor,
       commentStyle: commentStyle ?? LMFeedCommentStyle.basic(),
       replyStyle: replyStyle ?? LMFeedCommentStyle.basic(isReply: true),
       feedButtonStyle: feedButtonStyle ?? const LMFeedButtonStyle(),
@@ -211,6 +218,7 @@ class LMFeedThemeData {
     Color? container,
     Color? onContainer,
     Color? onPrimary,
+    Color? textSecondary,
     LMFeedTextFieldStyle? textFieldStyle,
     LMFeedDialogStyle? dialogStyle,
     LMFeedPopUpMenuStyle? popUpMenuStyle,
@@ -257,6 +265,7 @@ class LMFeedThemeData {
       bottomSheetStyle: bottomSheetStyle ?? this.bottomSheetStyle,
       snackBarTheme: snackBarTheme ?? this.snackBarTheme,
       reviewBannerStyle: reviewBannerStyle ?? this.reviewBannerStyle,
+      textSecondary: textSecondary ?? this.textSecondary,
     );
   }
 }

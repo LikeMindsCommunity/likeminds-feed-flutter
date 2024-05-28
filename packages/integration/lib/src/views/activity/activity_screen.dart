@@ -398,6 +398,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             ));
           },
           action: LMFeedMenuAction(
+            onPostReport: () => handlePostReportAction(postViewData),
             onPostPin: () => handlePostPinAction(postViewData),
             onPostUnpin: () => handlePostPinAction(postViewData),
             onPostDelete: () {
@@ -973,6 +974,18 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     );
 
     LMFeedVideoProvider.instance.playCurrentVideo();
+  }
+
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
+        ),
+      ),
+    );
   }
 
   void handlePostPinAction(LMPostViewData postViewData) async {

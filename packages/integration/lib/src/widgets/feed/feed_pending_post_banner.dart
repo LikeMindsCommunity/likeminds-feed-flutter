@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/pending_post/pending_posts_screen.dart';
 
 /// {@template lm_feed_pending_post_banner}
 /// `LMFeedPendingPostBanner` is a widget that displays a banner for pending posts in the feed.

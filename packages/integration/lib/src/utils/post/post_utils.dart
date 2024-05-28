@@ -323,6 +323,10 @@ class LMFeedPostUtils {
                   activity.activityEntityData.isRepostedByUser ?? false)
               ..repostCount(activity.activityEntityData.repostCount ?? 0)
               ..isDeleted(activity.activityEntityData.isDeleted ?? false)
+              ..isPendingPost(
+                  activity.activityEntityData.isPendingPost ?? false)
+              ..postStatus(postReviewStatusFromString(
+                  activity.activityEntityData.postStatus ?? ''))
               ..updatedAt(DateTime.fromMillisecondsSinceEpoch(
                   activity.activityEntityData.updatedAt!))
               ..widgets(widgets ?? {}))
@@ -523,7 +527,7 @@ class LMFeedPostUtils {
       case LMFeedStringConstants.underReviewKey:
         return LMPostReviewStatus.pending;
       default:
-        return LMPostReviewStatus.pending;
+        return LMPostReviewStatus.approved;
     }
   }
 }
@@ -535,7 +539,7 @@ extension PostReviewToKey on LMPostReviewStatus {
         return LMFeedStringConstants.rejectedKey;
       case LMPostReviewStatus.pending:
         return LMFeedStringConstants.underReviewKey;
-      default:
+      case LMPostReviewStatus.approved:
         return '';
     }
   }

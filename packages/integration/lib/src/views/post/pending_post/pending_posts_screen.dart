@@ -72,8 +72,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   int pageSize = 10;
 
   // Define the initial values for the app bar title and subtitle
-  String _appBarTitle = '--';
-  String _appBarSubtitle = '--';
+  String _appBarTitle = '';
+  String _appBarSubtitle = '';
 
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
 
@@ -139,7 +139,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   @override
   Widget build(BuildContext context) {
     return _widgetsBuilder.scaffold(
-      appBar: defAppBar(),
+      appBar: _postScreenBuilderDeletegate.appBarBuilder(
+          context, defAppBar(), pendingPostCount),
       backgroundColor: feedThemeData.backgroundColor,
       body: MultiBlocListener(
         listeners: [
@@ -178,8 +179,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
                 if (state.posts.isEmpty || state.posts.length < pageSize)
                   pagingController.appendLastPage(state.posts);
                 else {
-                  pagingController.appendPage(
-                      state.posts, pagingController.nextPageKey);
+                  pagingController.appendPage(state.posts, state.page + 1);
                 }
               } else if (state is LMFeedPendingPostsErrorState) {
                 pagingController.error = state.errorMessage;
@@ -398,8 +398,30 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   }
 
   LMFeedPostReviewBanner _defPostReviewBanner(LMPostViewData postViewData) {
+    LMPostReviewStatus postReviewStatus = postViewData.postStatus;
+    LMFeedPostReviewBannerStyle postReviewStatusStyle =
+        feedThemeData.reviewBannerStyle;
     return LMFeedPostReviewBanner(
       postReviewStatus: postViewData.postStatus,
+      reviewStatusIcon: LMFeedIcon(
+        type: LMFeedIconType.svg,
+        assetPath: postReviewStatus == LMPostReviewStatus.pending
+            ? lmWarningPendingPostSvg
+            : lmRejectPendingPostSvg,
+        style: postReviewStatusStyle.reviewStatusIconStyle,
+      ),
+      infoIcon: LMFeedIcon(
+        type: LMFeedIconType.svg,
+        assetPath: lmInfoPendingPostSvg,
+        style: postReviewStatusStyle.infoIconStyle,
+      ),
+      reviewStatusText: LMFeedText(
+        text: postReviewStatus == LMPostReviewStatus.pending
+            ? "Under review"
+            : "$postTitleFirstCap rejected",
+        style: postReviewStatusStyle.reviewStatusTextStyle,
+      ),
+      style: postReviewStatusStyle,
       onInfoIconClicked: () {
         print("object");
         showPostReviewDialog(postViewData);
@@ -410,6 +432,24 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   void showPostReviewDialog(LMPostViewData postViewData) {
     if (postViewData.postStatus == LMPostReviewStatus.pending) {
       LMFeedPendingPostDialog postApprovalDialog = LMFeedPendingPostDialog(
+        dialogStyle: feedThemeData.dialogStyle,
+        headingTextStyles: LMFeedTextStyle.basic().copyWith(
+          maxLines: 2,
+          textStyle: TextStyle(
+            fontSize: 16,
+            color: feedThemeData.onContainer,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        dialogMessageTextStyles: LMFeedTextStyle.basic().copyWith(
+          overflow: TextOverflow.visible,
+          maxLines: 10,
+          textStyle: TextStyle(
+            fontSize: 16,
+            color: feedThemeData.textSecondary,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
         onEditButtonClicked: () {
           Navigator.of(context).pop();
           Navigator.of(context).push(
@@ -436,6 +476,24 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
       );
     } else if (postViewData.postStatus == LMPostReviewStatus.rejected) {
       LMFeedPendingPostDialog postRejectionDialog = LMFeedPendingPostDialog(
+        dialogStyle: feedThemeData.dialogStyle,
+        headingTextStyles: LMFeedTextStyle.basic().copyWith(
+          maxLines: 2,
+          textStyle: TextStyle(
+            fontSize: 16,
+            color: feedThemeData.onContainer,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        dialogMessageTextStyles: LMFeedTextStyle.basic().copyWith(
+          overflow: TextOverflow.visible,
+          maxLines: 10,
+          textStyle: TextStyle(
+            fontSize: 16,
+            color: feedThemeData.textSecondary,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
         onEditButtonClicked: () {
           Navigator.of(context).pop();
           Navigator.of(context).push(
@@ -452,7 +510,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
         pendingPostId: postViewData.id,
         title: "$postTitleFirstCap rejected",
         description:
-            "This $postTitleSmallCap was rejected by the admin. Edit post to submit again.",
+            "This $postTitleSmallCap was rejected by the admin. Edit $postTitleSmallCap to submit again.",
       );
 
       _postScreenBuilderDeletegate.showPostRejectionDialog(
@@ -523,58 +581,13 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
           LMFeedPollStyle.basic(
               primaryColor: feedThemeData.primaryColor,
               containerColor: feedThemeData.container),
-      onEditVote: (pollData) {
-        isVoteEditing["value"] = true;
-        selectedOptions.clear();
-        selectedOptions.addAll(pollData.options!
-            .where((element) => element.isSelected)
-            .map((e) => e.id)
-            .toList());
-        rebuildPollWidget.value = !rebuildPollWidget.value;
-      },
-      onOptionSelect: (optionData) async {
-        debugPrint("this is selected");
-        if (hasPollEnded(pollValue.expiryTime!)) {
-          LMFeedCore.showSnackBar(
-            context,
-            "Poll ended. Vote can not be submitted now.",
-            LMFeedWidgetSource.universalFeed,
-          );
-          return;
-        }
-        if ((isPollSubmitted(pollValue.options ?? [])) &&
-            !isVoteEditing["value"]!) return;
-        if (!isMultiChoicePoll(
-            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
-          submitVote(
-            context,
-            pollValue,
-            [optionData.id],
-            postViewData.id,
-            isVoteEditing,
-            previousValue,
-            rebuildPostWidget,
-            LMFeedWidgetSource.universalFeed,
-          );
-        } else if (selectedOptions.contains(optionData.id)) {
-          selectedOptions.remove(optionData.id);
-        } else {
-          selectedOptions.add(optionData.id);
-        }
-        rebuildPollWidget.value = !rebuildPollWidget.value;
-      },
-      showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
-      showEditVoteButton: !isVoteEditing["value"]! &&
-          !isInstantPoll(pollValue.pollType) &&
-          !hasPollEnded(pollValue.expiryTime!) &&
-          isPollSubmitted(pollValue.options ?? []),
-      showAddOptionButton: showAddOptionButton(pollValue),
+      showSubmitButton: false,
+      showEditVoteButton: false,
+      showAddOptionButton: false,
       showTick: (option) {
-        return showTick(
-            pollValue, option, selectedOptions, isVoteEditing["value"]!);
+        return false;
       },
-      isMultiChoicePoll: isMultiChoicePoll(
-          pollValue.multiSelectNo!, pollValue.multiSelectState!),
+      isMultiChoicePoll: false,
       pollSelectionText: getPollSelectionText(
           pollValue.multiSelectState, pollValue.multiSelectNo),
       timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
@@ -584,48 +597,6 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
           "Option already exists",
           LMFeedWidgetSource.universalFeed,
         );
-      },
-      onAddOptionSubmit: (option) async {
-        await addOption(
-          context,
-          pollValue,
-          option,
-          postViewData.id,
-          currentUser,
-          rebuildPollWidget,
-          LMFeedWidgetSource.universalFeed,
-        );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
-      },
-      onSubtextTap: () {
-        onVoteTextTap(
-          context,
-          pollValue,
-          LMFeedWidgetSource.universalFeed,
-        );
-      },
-      onVoteClick: (option) {
-        onVoteTextTap(
-          context,
-          pollValue,
-          LMFeedWidgetSource.universalFeed,
-          option: option,
-        );
-      },
-      onSubmit: (options) {
-        submitVote(
-          context,
-          pollValue,
-          options,
-          postViewData.id,
-          isVoteEditing,
-          previousValue,
-          rebuildPostWidget,
-          LMFeedWidgetSource.universalFeed,
-        );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }

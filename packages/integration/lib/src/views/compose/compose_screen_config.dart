@@ -40,6 +40,8 @@ class LMFeedComposeScreenConfig {
     this.showMediaCount = true,
     this.userDisplayType = LMFeedComposeUserDisplayType.profilePicture,
     this.multipleTopicsSelectable = false,
+    this.mediaLimit = 10,
+    this.documentLimit = 10,
   });
 
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]
@@ -98,6 +100,9 @@ class LMFeedComposeScreenConfig {
   /// [bool] to enable/disable polls
   final bool enablePolls;
 
+  final int mediaLimit;
+  final int documentLimit;
+
   LMFeedComposeScreenConfig copyWith({
     SystemUiOverlayStyle? composeSystemOverlayStyle,
     String? composeHint,
@@ -115,6 +120,8 @@ class LMFeedComposeScreenConfig {
     bool? multipleTopicsSelectable,
     bool? headingRequiredToCreatePost,
     bool? textRequiredToCreatePost,
+    int? mediaLimit,
+    int? documentLimit,
   }) {
     return LMFeedComposeScreenConfig(
       composeSystemOverlayStyle:
@@ -138,6 +145,8 @@ class LMFeedComposeScreenConfig {
           headingRequiredToCreatePost ?? this.headingRequiredToCreatePost,
       textRequiredToCreatePost:
           textRequiredToCreatePost ?? this.textRequiredToCreatePost,
+      mediaLimit: mediaLimit ?? this.mediaLimit,
+      documentLimit: documentLimit ?? this.documentLimit,
     );
   }
 }

@@ -118,6 +118,8 @@ class LMNotificationHandler {
     // Route the notification to the appropriate screen
     // If the notification is post related, route to the post detail screen
     if (host == "post_detail") {
+      await LMFeedCore.instance.showFeedWithoutApiKey();
+
       final String postId = queryParams["post_id"]!;
       LMFeedAnalyticsBloc.instance.add(
         LMFeedFireAnalyticsEvent(
@@ -135,6 +137,14 @@ class LMNotificationHandler {
           },
         ),
       );
+    } else if (host == 'pending_post_detail') {
+      await LMFeedCore.instance.showFeedWithoutApiKey();
+
+      final String? postId = queryParams["post_id"];
+      if (postId != null) {
+        navigatorKey.currentState!.push(MaterialPageRoute(
+            builder: (context) => LMFeedEditPostScreen(pendingPostId: postId)));
+      }
     }
   }
 
