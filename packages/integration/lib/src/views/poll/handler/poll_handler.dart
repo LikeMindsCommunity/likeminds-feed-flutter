@@ -109,7 +109,7 @@ Future<void> submitVote(
               eventName: LMFeedAnalyticsKeys.pollVotesEdited,
               eventProperties: {
                 LMFeedStringConstants.pollId: attachmentMeta.id,
-                LMFeedStringConstants.pollTitle: attachmentMeta.pollAnswerText,
+                LMFeedStringConstants.pollTitle: attachmentMeta.pollOptions,
                 LMFeedStringConstants.pollNumberOfVotesSelected: options.length,
               }));
         } else {
@@ -117,7 +117,7 @@ Future<void> submitVote(
               eventName: LMFeedAnalyticsKeys.pollVoted,
               eventProperties: {
                 LMFeedStringConstants.pollId: attachmentMeta.id,
-                LMFeedStringConstants.pollTitle: attachmentMeta.pollAnswerText,
+                LMFeedStringConstants.pollTitle: attachmentMeta.pollQuestion,
                 LMFeedStringConstants.pollNumberOfVotesSelected: options.length,
                 LMFeedStringConstants.pollOptionVoted: options.join(","),
               }));
@@ -299,7 +299,7 @@ Future<void> addOption(
         eventProperties: {
           LMFeedStringConstants.pollId: attachmentMeta.id,
           LMFeedStringConstants.pollOptionText: option,
-          LMFeedStringConstants.pollTitle: attachmentMeta.pollAnswerText,
+          LMFeedStringConstants.pollTitle: attachmentMeta.pollQuestion,
         }));
 
     final poll = LMAttachmentMetaViewDataConvertor.fromWidgetModel(
@@ -431,7 +431,7 @@ void onVoteTextTap(BuildContext context,
       MaterialPageRoute(
         builder: (context) => LMFeedPollResultScreen(
           pollId: attachmentMeta.id ?? '',
-          pollTitle: attachmentMeta.pollAnswerText ?? '',
+          pollTitle: attachmentMeta.pollQuestion ?? '',
           pollOptions: attachmentMeta.options ?? [],
           selectedOptionId: option?.id,
         ),
