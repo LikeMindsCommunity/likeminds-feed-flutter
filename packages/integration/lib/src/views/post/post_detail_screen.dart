@@ -108,7 +108,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         LMFeedPostDetailScreenHandler(_pagingController, widget.postId);
     updatePostAndCommentData();
     right = LMFeedUserUtils.checkCommentRights();
-    if (widget.openKeyboard) {
+    if (widget.openKeyboard && right) {
       _postDetailScreenHandler!.openOnScreenKeyboard();
     }
 
@@ -797,7 +797,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        debugPrint("this is selected");
         if (hasPollEnded(pollValue.expiryTime!)) {
           LMFeedCore.showSnackBar(
             context,

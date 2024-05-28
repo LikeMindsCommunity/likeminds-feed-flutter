@@ -1,10 +1,10 @@
 import 'package:bloc/bloc.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_document_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_link_preview_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_video_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/close_compose_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/remove_attahment_event_handler.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 

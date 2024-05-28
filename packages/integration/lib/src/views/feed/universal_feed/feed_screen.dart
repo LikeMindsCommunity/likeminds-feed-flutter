@@ -1249,7 +1249,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        debugPrint("this is selected");
         if (hasPollEnded(pollValue.expiryTime!)) {
           LMFeedCore.showSnackBar(
             context,
@@ -1650,7 +1649,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           borderRadius: 28,
           backgroundColor: userPostingRights
               ? feedThemeData.primaryColor
-              : feedThemeData.disabledColor,
+              : feedThemeData.inActiveColor,
           placement: LMFeedIconButtonPlacement.end,
           margin: 5.0,
         ),
