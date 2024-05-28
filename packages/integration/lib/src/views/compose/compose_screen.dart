@@ -1069,18 +1069,22 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         selectedTopics: composeBloc.selectedTopics,
                         isEnabled: true,
                         onTopicSelected: (updatedTopics, tappedTopic) {
-                          if (composeBloc.selectedTopics.isEmpty) {
-                            composeBloc.selectedTopics.add(tappedTopic);
-                          } else {
-                            if (composeBloc.selectedTopics.first.id ==
-                                tappedTopic.id) {
-                              composeBloc.selectedTopics.clear();
-                            } else {
-                              composeBloc.selectedTopics.clear();
+                          if (config!.multipleTopicsSelectable) {
+                            int index = composeBloc.selectedTopics.indexWhere(
+                                (element) => element.id == tappedTopic.id);
+                            if (index == -1) {
                               composeBloc.selectedTopics.add(tappedTopic);
+                            } else {
+                              composeBloc.selectedTopics.removeAt(index);
                             }
+                          } else {
+                            composeBloc.selectedTopics.clear();
+                            composeBloc.selectedTopics.add(tappedTopic);
                           }
-                          _controllerPopUp.hideMenu();
+
+                          if (!config!.multipleTopicsSelectable) {
+                            _controllerPopUp.hideMenu();
+                          }
                           rebuildTopicFloatingButton.value =
                               !rebuildTopicFloatingButton.value;
                         },
@@ -1104,7 +1108,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                                     ..isEnabled(true)
                                     ..name("Topic"))
                                   .build()
-                              : composeBloc.selectedTopics.first,
+                              : composeBloc.selectedTopics.length == 1
+                                  ? composeBloc.selectedTopics.first
+                                  : (LMTopicViewDataBuilder()
+                                        ..id("0")
+                                        ..isEnabled(true)
+                                        ..name(
+                                            "Topics (${composeBloc.selectedTopics.length})"))
+                                      .build(),
                           style: LMFeedTopicChipStyle(
                             textStyle: TextStyle(
                               color: LMFeedCore.theme.primaryColor,
