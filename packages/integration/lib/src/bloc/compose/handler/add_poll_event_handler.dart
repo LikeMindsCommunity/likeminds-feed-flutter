@@ -14,6 +14,9 @@ addPollEventHandler(
     LMFeedComposeBloc.instance.postMedia
         .removeWhere((element) => element.mediaType == LMMediaType.poll);
   }
+  LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+      eventName: LMFeedAnalyticsKeys.pollAdded, eventProperties: {}));
+
   LMFeedComposeBloc.instance.postMedia.add(
     LMMediaModel(
       mediaType: LMMediaType.poll,

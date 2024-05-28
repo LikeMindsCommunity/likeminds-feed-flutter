@@ -6,6 +6,7 @@ class LMFeedPollResultScreen extends StatefulWidget {
     super.key,
     required this.pollId,
     required this.pollOptions,
+    this.pollTitle,
     this.selectedOptionId,
     this.noItemsFoundIndicatorBuilder,
     this.firstPageProgressIndicatorBuilder,
@@ -17,6 +18,7 @@ class LMFeedPollResultScreen extends StatefulWidget {
   });
 
   final String pollId;
+  final String? pollTitle;
   final List<LMPollOptionViewData> pollOptions;
   final String? selectedOptionId;
   // Builder for empty feed view
@@ -52,6 +54,12 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
   @override
   initState() {
     super.initState();
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.pollAnswersViewed,
+        eventProperties: {
+          LMFeedStringConstants.pollId: widget.pollId,
+          LMFeedStringConstants.pollTitle: widget.pollTitle ?? '',
+        }));
     setTabController();
   }
 
@@ -87,6 +95,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
 
   @override
   void dispose() {
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -168,6 +177,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
               child: SafeArea(
                 child: PageView.builder(
                   onPageChanged: (index) {
+                    triggerPollAnswersToggledEvent(index);
                     _tabController.animateTo(index);
                   },
                   controller: _pagingController,
@@ -180,6 +190,17 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
             )
           ],
         ));
+  }
+
+  void triggerPollAnswersToggledEvent(int index) {
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.pollAnswersToggled,
+        eventProperties: {
+          LMFeedStringConstants.pollId: widget.pollId,
+          LMFeedStringConstants.pollOptionId: widget.pollOptions[index].id,
+          LMFeedStringConstants.pollOptionText: widget.pollOptions[index].text,
+          LMFeedStringConstants.pollTitle: widget.pollTitle ?? '',
+        }));
   }
 
   Widget _defListView(LMPollOptionViewData option) {

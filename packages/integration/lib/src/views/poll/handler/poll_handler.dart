@@ -58,6 +58,7 @@ Future<void> submitVote(
           return;
         }
       }
+      bool isPollSubmittedBefore = isVoteEditing["value"] ?? false;
       isVoteEditing["value"] = false;
       int totalVotes = attachmentMeta.options?.fold(0,
               (previousValue, element) => previousValue! + element.voteCount) ??
@@ -103,6 +104,25 @@ Future<void> submitVote(
           source,
         );
       } else {
+        if (isPollSubmittedBefore) {
+          LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+              eventName: LMFeedAnalyticsKeys.pollVotesEdited,
+              eventProperties: {
+                LMFeedStringConstants.pollId: attachmentMeta.id,
+                LMFeedStringConstants.pollTitle: attachmentMeta.pollAnswerText,
+                LMFeedStringConstants.pollNumberOfVotesSelected: options.length,
+              }));
+        } else {
+          LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+              eventName: LMFeedAnalyticsKeys.pollVoted,
+              eventProperties: {
+                LMFeedStringConstants.pollId: attachmentMeta.id,
+                LMFeedStringConstants.pollTitle: attachmentMeta.pollAnswerText,
+                LMFeedStringConstants.pollNumberOfVotesSelected: options.length,
+                LMFeedStringConstants.pollOptionVoted: options.join(","),
+              }));
+        }
+
         LMFeedCore.showSnackBar(
           context,
           "Vote submitted successfully",
@@ -236,7 +256,7 @@ bool showAddOptionButton(LMAttachmentMetaViewData attachmentMeta) {
 }
 
 bool showSubmitButton(LMAttachmentMetaViewData attachmentMeta) {
-  if (isPollSubmitted(attachmentMeta.options??[])) {
+  if (isPollSubmitted(attachmentMeta.options ?? [])) {
     return false;
   }
   if ((attachmentMeta.pollType != null &&
@@ -274,6 +294,14 @@ Future<void> addOption(
 
   final response = await LMFeedCore.client.addPollOption(request);
   if (response.success) {
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.pollOptionCreated,
+        eventProperties: {
+          LMFeedStringConstants.pollId: attachmentMeta.id,
+          LMFeedStringConstants.pollOptionText: option,
+          LMFeedStringConstants.pollTitle: attachmentMeta.pollAnswerText,
+        }));
+
     final poll = LMAttachmentMetaViewDataConvertor.fromWidgetModel(
         widget: response.data!.widget!,
         users: {
@@ -403,6 +431,7 @@ void onVoteTextTap(BuildContext context,
       MaterialPageRoute(
         builder: (context) => LMFeedPollResultScreen(
           pollId: attachmentMeta.id ?? '',
+          pollTitle: attachmentMeta.pollAnswerText ?? '',
           pollOptions: attachmentMeta.options ?? [],
           selectedOptionId: option?.id,
         ),

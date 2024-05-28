@@ -29,6 +29,14 @@ class LMFeedAnalyticsKeys {
   static const String postResponseClick = 'post_response_click';
   static const String postTopicClick = 'post_topic_click';
   static const String postCommentClick = 'post_comment_click';
+  // Events related to Poll in Feed
+  static const String pollVoted = 'poll_voted';
+  static const String pollVotingSkipped = 'poll_voting_skipped';
+  static const String pollVotesEdited = 'poll_votes_edited';
+  static const String pollAdded = 'poll_added';
+  static const String pollOptionCreated = 'poll_option_created';
+  static const String pollAnswersViewed = 'poll_answers_viewed';
+  static const String pollAnswersToggled = 'poll_answers_toggled';
   // Events related to Comments
   static const String commentListOpen = 'comment_list_open';
   static const String commentPosted = 'comment_posted';
