@@ -155,13 +155,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  // Create an instance of LMFeedScreenBuilderDelegate
-  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
-
-  LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
-
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
@@ -193,9 +186,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   // used to rebuild the appbar
   final ValueNotifier _rebuildAppBar = ValueNotifier(false);
 
-  late Future<GetUserFeedMetaResponse> getUserFeedMeta;
-  int pendingPostCount = 0;
-
   // to control paging on FeedRoom View
   final PagingController<int, LMPostViewData> _pagingController =
       PagingController(firstPageKey: 1);
@@ -214,7 +204,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             ..pageSize(20))
           .build(),
     );
-    getUserFeedMeta = getUserFeedMetaFuture();
 
     Bloc.observer = LMFeedBlocObserver();
     _feedBloc = LMFeedRoomBloc.instance;
@@ -392,45 +381,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           controller: _controller,
           slivers: [
             SliverToBoxAdapter(
-              child: ValueListenableBuilder(
-                  valueListenable: _rebuildAppBar,
-                  builder: (context, _, __) {
-                    return FutureBuilder(
-                        future: getUserFeedMeta,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.done) {
-                            if (snapshot.hasData && snapshot.data != null) {
-                              GetUserFeedMetaResponse response =
-                                  snapshot.data as GetUserFeedMetaResponse;
-
-                              if (response.success) {
-                                pendingPostCount =
-                                    response.pendingPostCount ?? 0;
-                              }
-                            }
-                          }
-
-                          return Container(
-                            child: widget.pendingPostBannerBuilder
-                                    ?.call(context, pendingPostCount) ??
-                                _screenBuilderDelegate.pendingPostBannerBuilder(
-                                  context,
-                                  pendingPostCount,
-                                  LMFeedPendingPostBanner(
-                                      pendingPostCount: pendingPostCount,
-                                      onPendingPostBannerPressed: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    LMFeedPendingPostsScreen()));
-                                      }),
-                                ),
-                          );
-                        });
-                  }),
-            ),
-            SliverToBoxAdapter(
               child: config!.showCustomWidget
                   ? widget.customWidgetBuilder == null
                       ? LMFeedPostSomething(
@@ -521,54 +471,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     postUploading.value = false;
                   }
                   if (curr is LMFeedNewPostUploadedState) {
-                    if (LMFeedPostUtils.doPostNeedsApproval) {
-                      _pendingPostScreenBuilderDelegate.showPostApprovalDialog(
-                        context,
-                        curr.postData,
-                        LMFeedPendingPostDialog(
-                          dialogStyle: feedThemeData.dialogStyle,
-                          headingTextStyles: LMFeedTextStyle.basic().copyWith(
-                            maxLines: 2,
-                            textStyle: TextStyle(
-                              fontSize: 16,
-                              color: feedThemeData.onContainer,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          dialogMessageTextStyles:
-                              LMFeedTextStyle.basic().copyWith(
-                            overflow: TextOverflow.visible,
-                            maxLines: 10,
-                            textStyle: TextStyle(
-                              fontSize: 16,
-                              color: feedThemeData.textSecondary,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          pendingPostId: curr.postData.id,
-                          onCancelButtonClicked: () {
-                            Navigator.of(context).pop();
-                          },
-                          onEditButtonClicked: () {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => LMFeedEditPostScreen(
-                                  pendingPostId: curr.postData.id,
-                                ),
-                              ),
-                            );
-                          },
-                          title: "$postTitleFirstCap submitted for approval",
-                          description:
-                              "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
-                        ),
-                      );
-                      getUserFeedMeta = getUserFeedMetaFuture();
-                      pendingPostCount++;
-                      _rebuildAppBar.value = !_rebuildAppBar.value;
-                      return;
-                    }
                     LMPostViewData? item = curr.postData;
                     int length = _pagingController.itemList?.length ?? 0;
                     List<LMPostViewData> feedRoomItemList =

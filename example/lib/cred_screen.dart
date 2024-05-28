@@ -93,6 +93,7 @@ class _CredScreenState extends State<CredScreen> {
   @override
   void initState() {
     super.initState();
+    fetchUserData();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       initUniLinks(context);
     });
@@ -323,6 +324,13 @@ class _CredScreenState extends State<CredScreen> {
               ElevatedButton(
                   onPressed: () {
                     LMFeedLocalPreference.instance.clearCache();
+
+                    _usernameController.clear();
+                    _uuidController.clear();
+                    _apiKeyController.clear();
+                    _feedRoomController.clear();
+
+                    setState(() {});
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -376,6 +384,7 @@ class _CredScreenState extends State<CredScreen> {
       _showSnackBar(response.errorMessage ?? "An error occurred");
       return;
     }
+
     // define the route
     Widget? navigationWidget = _getNavigationWidget(selectedTheme);
     if (navigationWidget == null) {
@@ -391,6 +400,24 @@ class _CredScreenState extends State<CredScreen> {
 
     // navigate to the feed screen
     Navigator.of(context).push(route);
+  }
+
+  fetchUserData() {
+    LMUserViewData? userViewData =
+        LMFeedLocalPreference.instance.fetchUserData();
+
+    if (userViewData != null) {
+      _uuidController.text = userViewData.sdkClientInfo.uuid;
+      _usernameController.text = userViewData.name;
+    }
+
+    LMResponse apiKeyCacheResponse =
+        LMFeedCore.client.getCache(LMFeedStringConstants.apiKey);
+
+    if (apiKeyCacheResponse.success) {
+      _apiKeyController.text =
+          (apiKeyCacheResponse.data as LMCache).value as String? ?? '';
+    }
   }
 
   Widget? _getNavigationWidget(LMFeedFlavor selectedTheme) {

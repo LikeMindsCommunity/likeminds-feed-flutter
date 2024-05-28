@@ -69,7 +69,6 @@ class LMFeedCore {
     instance._widgetUtility = value;
   }
 
-
   static LMFeedBuilderDelegate get feedBuilderDelegate =>
       instance._feedBuilderDelegate;
 
@@ -148,11 +147,11 @@ class LMFeedCore {
     String? newRefreshToken;
     if (accessToken == null || refreshToken == null) {
       newAccessToken = LMFeedLocalPreference.instance
-          .fetchCache(LMFeedStringConstants.instance.accessToken)
+          .fetchCache(LMFeedStringConstants.accessToken)
           ?.value;
 
       newRefreshToken = LMFeedLocalPreference.instance
-          .fetchCache(LMFeedStringConstants.instance.refreshToken)
+          .fetchCache(LMFeedStringConstants.refreshToken)
           ?.value;
     } else {
       newAccessToken = accessToken;
@@ -248,11 +247,11 @@ class LMFeedCore {
     String? newRefreshToken;
 
     newAccessToken = LMFeedLocalPreference.instance
-        .fetchCache(LMFeedStringConstants.instance.accessToken)
+        .fetchCache(LMFeedStringConstants.accessToken)
         ?.value;
 
     newRefreshToken = LMFeedLocalPreference.instance
-        .fetchCache(LMFeedStringConstants.instance.refreshToken)
+        .fetchCache(LMFeedStringConstants.refreshToken)
         ?.value;
 
     if (newAccessToken == null || newRefreshToken == null) {
