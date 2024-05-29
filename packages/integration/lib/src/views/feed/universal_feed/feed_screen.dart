@@ -546,7 +546,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         context,
                         curr.postData,
                         LMFeedPendingPostDialog(
-                          dialogStyle: feedThemeData.dialogStyle,
+                          dialogStyle: feedThemeData.dialogStyle.copyWith(
+                              insetPadding: EdgeInsets.all(40.0),
+                              padding: EdgeInsets.all(24.0)),
                           headingTextStyles: LMFeedTextStyle.basic().copyWith(
                             maxLines: 2,
                             textStyle: TextStyle(

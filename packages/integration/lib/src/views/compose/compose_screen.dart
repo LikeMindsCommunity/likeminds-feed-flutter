@@ -421,6 +421,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
             width: screenSize?.width,
+            height: LMFeedComposeBloc.instance.documentCount > 0
+                ? null
+                : screenSize?.width,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
                   ? Axis.vertical
@@ -434,18 +437,44 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 Widget mediaWidget;
                 switch (composeBloc.postMedia[index].mediaType) {
                   case LMMediaType.image:
-                    mediaWidget = LMFeedImage(
-                      imageFile: composeBloc.postMedia[index].mediaFile,
-                      style: style?.mediaStyle?.imageStyle,
-                      position: index,
+                    mediaWidget = Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                        borderRadius:
+                            style?.mediaStyle?.imageStyle?.borderRadius,
+                      ),
+                      height: style?.mediaStyle?.imageStyle?.height ??
+                          screenSize?.width,
+                      width: style?.mediaStyle?.imageStyle?.width ??
+                          screenSize?.width,
+                      alignment: Alignment.center,
+                      child: LMFeedImage(
+                        imageFile: composeBloc.postMedia[index].mediaFile,
+                        style: style?.mediaStyle?.imageStyle,
+                        position: index,
+                      ),
                     );
                     break;
                   case LMMediaType.video:
-                    mediaWidget = LMFeedVideo(
-                      videoFile: composeBloc.postMedia[index].mediaFile,
-                      style: style?.mediaStyle?.videoStyle,
-                      postId:
-                          "${composeBloc.postMedia[index].mediaFile!.uri.toString()}$index",
+                    mediaWidget = Container(
+                      clipBehavior: Clip.hardEdge,
+                      height: style?.mediaStyle?.videoStyle?.height ??
+                          screenSize?.width,
+                      width: style?.mediaStyle?.videoStyle?.width ??
+                          screenSize?.width,
+                      decoration: BoxDecoration(
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                        borderRadius:
+                            style?.mediaStyle?.videoStyle?.borderRadius,
+                      ),
+                      alignment: Alignment.center,
+                      child: LMFeedVideo(
+                        videoFile: composeBloc.postMedia[index].mediaFile,
+                        style: style?.mediaStyle?.videoStyle,
+                        postId:
+                            "${composeBloc.postMedia[index].mediaFile!.uri.toString()}$index",
+                      ),
                     );
                     break;
                   case LMMediaType.link:

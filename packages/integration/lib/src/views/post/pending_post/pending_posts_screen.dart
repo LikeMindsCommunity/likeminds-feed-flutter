@@ -430,92 +430,68 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   }
 
   void showPostReviewDialog(LMPostViewData postViewData) {
-    if (postViewData.postStatus == LMPostReviewStatus.pending) {
-      LMFeedPendingPostDialog postApprovalDialog = LMFeedPendingPostDialog(
-        dialogStyle: feedThemeData.dialogStyle,
-        headingTextStyles: LMFeedTextStyle.basic().copyWith(
-          maxLines: 2,
-          textStyle: TextStyle(
-            fontSize: 16,
-            color: feedThemeData.onContainer,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        dialogMessageTextStyles: LMFeedTextStyle.basic().copyWith(
-          overflow: TextOverflow.visible,
-          maxLines: 10,
-          textStyle: TextStyle(
-            fontSize: 16,
-            color: feedThemeData.textSecondary,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        onEditButtonClicked: () {
-          Navigator.of(context).pop();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedEditPostScreen(
-                pendingPostId: postViewData.id,
-              ),
-            ),
-          );
-        },
-        onCancelButtonClicked: () {
-          Navigator.of(context).pop();
-        },
-        pendingPostId: postViewData.id,
-        title: "$postTitleFirstCap submitted for approval",
-        description:
-            "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
-      );
+    LMFeedPendingPostDialog pendingPostDialog =
+        _defPendingPostDialog(postViewData);
 
-      _postScreenBuilderDeletegate.showPostApprovalDialog(
-        context,
-        postViewData,
-        postApprovalDialog,
-      );
-    } else if (postViewData.postStatus == LMPostReviewStatus.rejected) {
-      LMFeedPendingPostDialog postRejectionDialog = LMFeedPendingPostDialog(
-        dialogStyle: feedThemeData.dialogStyle,
-        headingTextStyles: LMFeedTextStyle.basic().copyWith(
-          maxLines: 2,
-          textStyle: TextStyle(
-            fontSize: 16,
-            color: feedThemeData.onContainer,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        dialogMessageTextStyles: LMFeedTextStyle.basic().copyWith(
-          overflow: TextOverflow.visible,
-          maxLines: 10,
-          textStyle: TextStyle(
-            fontSize: 16,
-            color: feedThemeData.textSecondary,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        onEditButtonClicked: () {
-          Navigator.of(context).pop();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedEditPostScreen(
-                pendingPostId: postViewData.id,
-              ),
-            ),
-          );
-        },
-        onCancelButtonClicked: () {
-          Navigator.of(context).pop();
-        },
-        pendingPostId: postViewData.id,
-        title: "$postTitleFirstCap rejected",
-        description:
-            "This $postTitleSmallCap was rejected by the admin. Edit $postTitleSmallCap to submit again.",
-      );
-
+    if (postViewData.postStatus == LMPostReviewStatus.rejected) {
       _postScreenBuilderDeletegate.showPostRejectionDialog(
-          context, postViewData, postRejectionDialog);
+          context, postViewData, pendingPostDialog);
+    } else if (postViewData.postStatus == LMPostReviewStatus.pending) {
+      _postScreenBuilderDeletegate.showPostApprovalDialog(
+          context, postViewData, pendingPostDialog);
     }
+  }
+
+  LMFeedPendingPostDialog _defPendingPostDialog(LMPostViewData postViewData) {
+    LMFeedDialogStyle dialogStyle = feedThemeData.dialogStyle.copyWith(
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: 40.0,
+          vertical: 80.0,
+        ),
+        padding: EdgeInsets.all(24.0));
+
+    return LMFeedPendingPostDialog(
+      dialogStyle: dialogStyle,
+      headingTextStyles: LMFeedTextStyle.basic().copyWith(
+        maxLines: 2,
+        textStyle: TextStyle(
+          fontSize: 16,
+          color: feedThemeData.onContainer,
+          fontWeight: FontWeight.w500,
+          height: 1.25,
+        ),
+      ),
+      dialogMessageTextStyles: LMFeedTextStyle.basic().copyWith(
+        overflow: TextOverflow.visible,
+        maxLines: 10,
+        textStyle: TextStyle(
+          fontSize: 16,
+          color: feedThemeData.textSecondary,
+          fontWeight: FontWeight.w400,
+          height: 1.25,
+        ),
+      ),
+      onEditButtonClicked: () {
+        Navigator.of(context).pop();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => LMFeedEditPostScreen(
+              pendingPostId: postViewData.id,
+            ),
+          ),
+        );
+      },
+      onCancelButtonClicked: () {
+        Navigator.of(context).pop();
+      },
+      pendingPostId: postViewData.id,
+      title: postViewData.postStatus == LMPostReviewStatus.rejected
+          ? "$postTitleFirstCap rejected"
+          : "$postTitleFirstCap submitted for approval",
+      description: postViewData.postStatus == LMPostReviewStatus.rejected
+          ? "This $postTitleSmallCap was rejected by the admin. Edit $postTitleSmallCap to submit again."
+          : "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
+    );
   }
 
   LMFeedPostMedia _defPostMedia(

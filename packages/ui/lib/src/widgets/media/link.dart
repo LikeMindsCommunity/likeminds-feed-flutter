@@ -164,7 +164,8 @@ class LMFeedLinkPreview extends StatelessWidget {
                                 MediaQuery.of(context).size.width,
                             child: LMFeedText(
                               text: linkModel != null
-                                  ? linkModel!.link ?? linkModel!.ogTags!.url!
+                                  ? linkModel!.link?.toLowerCase() ??
+                                      linkModel!.ogTags!.url!.toLowerCase()
                                   : attachment!.attachmentMeta.ogTags!.url !=
                                           null
                                       ? attachment!.attachmentMeta.ogTags!.url!

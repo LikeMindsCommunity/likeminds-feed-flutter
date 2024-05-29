@@ -390,6 +390,7 @@ class LMFeedDialogStyle {
     Curve? insetAnimationCurve,
     Duration? insetAnimationDuration,
     EdgeInsets? insetPadding,
+    EdgeInsets? padding,
     Color? shadowColor,
     ShapeBorder? shape,
     Color? surfaceTintColor,
@@ -406,6 +407,7 @@ class LMFeedDialogStyle {
       shadowColor: shadowColor ?? this.shadowColor,
       shape: shape ?? this.shape,
       surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
+      padding: padding ?? this.padding,
     );
   }
 }
