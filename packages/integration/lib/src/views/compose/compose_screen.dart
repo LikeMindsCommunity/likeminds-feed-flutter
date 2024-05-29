@@ -438,7 +438,16 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 switch (composeBloc.postMedia[index].mediaType) {
                   case LMMediaType.image:
                     mediaWidget = Container(
-                      color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                        borderRadius:
+                            style?.mediaStyle?.imageStyle?.borderRadius,
+                      ),
+                      height: style?.mediaStyle?.imageStyle?.height ??
+                          screenSize?.width,
+                      width: style?.mediaStyle?.imageStyle?.width ??
+                          screenSize?.width,
                       alignment: Alignment.center,
                       child: LMFeedImage(
                         imageFile: composeBloc.postMedia[index].mediaFile,
@@ -449,7 +458,16 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     break;
                   case LMMediaType.video:
                     mediaWidget = Container(
-                      color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                      clipBehavior: Clip.hardEdge,
+                      height: style?.mediaStyle?.videoStyle?.height ??
+                          screenSize?.width,
+                      width: style?.mediaStyle?.videoStyle?.width ??
+                          screenSize?.width,
+                      decoration: BoxDecoration(
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                        borderRadius:
+                            style?.mediaStyle?.videoStyle?.borderRadius,
+                      ),
                       alignment: Alignment.center,
                       child: LMFeedVideo(
                         videoFile: composeBloc.postMedia[index].mediaFile,

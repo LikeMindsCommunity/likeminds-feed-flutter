@@ -553,7 +553,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
             height: screenSize?.width,
-            width: screenSize?.width,
+            width: LMFeedComposeBloc.instance.documentCount > 0
+                ? null
+                : screenSize?.width,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
                   ? Axis.vertical
@@ -569,9 +571,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 switch (mediaModel.mediaType) {
                   case LMMediaType.image:
                     mediaWidget = Container(
+                      alignment: Alignment.center,
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
-                        color: feedTheme.onContainer,
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
                         borderRadius:
                             style?.mediaStyle?.imageStyle?.borderRadius,
                       ),
@@ -588,13 +591,14 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     break;
                   case LMMediaType.video:
                     mediaWidget = Container(
+                      alignment: Alignment.center,
                       clipBehavior: Clip.hardEdge,
                       height: style?.mediaStyle?.videoStyle?.height ??
                           screenSize?.width,
                       width: style?.mediaStyle?.videoStyle?.width ??
                           screenSize?.width,
                       decoration: BoxDecoration(
-                        color: feedTheme.onContainer,
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
                         borderRadius:
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),

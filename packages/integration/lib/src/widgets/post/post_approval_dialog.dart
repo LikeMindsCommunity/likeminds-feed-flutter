@@ -120,7 +120,7 @@ class LMFeedPendingPostDialog extends StatelessWidget {
         onCancelButtonClicked?.call();
       },
       text: LMFeedText(
-        text: "CANCEL",
+        text: "CLOSE",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 14,
