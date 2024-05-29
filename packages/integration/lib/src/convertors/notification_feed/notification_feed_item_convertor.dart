@@ -24,9 +24,11 @@ class LMNotificationFeedItemViewDataConvertor {
 
     notificationFeedItemViewDataBuilder.actionOn(notificationFeedItem.actionOn);
 
-    notificationFeedItemViewDataBuilder.activityEntityViewData(
-        LMActivityEntityViewDataConvertor.fromActivityEntity(
-            notificationFeedItem.activityEntityData, users));
+    if (notificationFeedItem.activityEntityData != null) {
+      notificationFeedItemViewDataBuilder.activityEntityViewData(
+          LMActivityEntityViewDataConvertor.fromActivityEntity(
+              notificationFeedItem.activityEntityData!, users));
+    }
 
     notificationFeedItemViewDataBuilder
         .activityText(notificationFeedItem.activityText);
@@ -65,8 +67,11 @@ class LMNotificationFeedItemViewDataConvertor {
           .map((e) => e.sdkClientInfo.uuid)
           .toList(),
       actionOn: notificationFeedItemViewData.actionOn,
-      activityEntityData: LMActivityEntityViewDataConvertor.toActivityEntity(
-          notificationFeedItemViewData.activityEntityData),
+      activityEntityData:
+          notificationFeedItemViewData.activityEntityData == null
+              ? null
+              : LMActivityEntityViewDataConvertor.toActivityEntity(
+                  notificationFeedItemViewData.activityEntityData!),
       activityText: notificationFeedItemViewData.activityText,
       createdAt: notificationFeedItemViewData.createdAt.millisecondsSinceEpoch,
       cta: notificationFeedItemViewData.cta,
