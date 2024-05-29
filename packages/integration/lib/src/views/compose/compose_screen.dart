@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/create_poll_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LMFeedComposeScreen extends StatefulWidget {
@@ -422,8 +420,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           }
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
-            height: screenSize?.width,
             width: screenSize?.width,
+            height: LMFeedComposeBloc.instance.documentCount > 0
+                ? null
+                : screenSize?.width,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
                   ? Axis.vertical
@@ -431,23 +431,50 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               physics: LMFeedComposeBloc.instance.documentCount > 0
                   ? const NeverScrollableScrollPhysics()
                   : null,
-              // shrinkWrap: true,
+              shrinkWrap: true,
               itemCount: composeBloc.postMedia.length,
               itemBuilder: (context, index) {
                 Widget mediaWidget;
                 switch (composeBloc.postMedia[index].mediaType) {
                   case LMMediaType.image:
-                    mediaWidget = LMFeedImage(
-                      imageFile: composeBloc.postMedia[index].mediaFile,
-                      style: style?.mediaStyle?.imageStyle,
+                    mediaWidget = Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                        borderRadius:
+                            style?.mediaStyle?.imageStyle?.borderRadius,
+                      ),
+                      height: style?.mediaStyle?.imageStyle?.height ??
+                          screenSize?.width,
+                      width: style?.mediaStyle?.imageStyle?.width ??
+                          screenSize?.width,
+                      alignment: Alignment.center,
+                      child: LMFeedImage(
+                        imageFile: composeBloc.postMedia[index].mediaFile,
+                        style: style?.mediaStyle?.imageStyle,
+                        position: index,
+                      ),
                     );
                     break;
                   case LMMediaType.video:
-                    mediaWidget = LMFeedVideo(
-                      videoFile: composeBloc.postMedia[index].mediaFile,
-                      style: style?.mediaStyle?.videoStyle,
-                      postId:
-                          "${composeBloc.postMedia[index].mediaFile!.uri.toString()}$index",
+                    mediaWidget = Container(
+                      clipBehavior: Clip.hardEdge,
+                      height: style?.mediaStyle?.videoStyle?.height ??
+                          screenSize?.width,
+                      width: style?.mediaStyle?.videoStyle?.width ??
+                          screenSize?.width,
+                      decoration: BoxDecoration(
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                        borderRadius:
+                            style?.mediaStyle?.videoStyle?.borderRadius,
+                      ),
+                      alignment: Alignment.center,
+                      child: LMFeedVideo(
+                        videoFile: composeBloc.postMedia[index].mediaFile,
+                        style: style?.mediaStyle?.videoStyle,
+                        postId:
+                            "${composeBloc.postMedia[index].mediaFile!.uri.toString()}$index",
+                      ),
                     );
                     break;
                   case LMMediaType.link:
@@ -1071,18 +1098,22 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         selectedTopics: composeBloc.selectedTopics,
                         isEnabled: true,
                         onTopicSelected: (updatedTopics, tappedTopic) {
-                          if (composeBloc.selectedTopics.isEmpty) {
-                            composeBloc.selectedTopics.add(tappedTopic);
-                          } else {
-                            if (composeBloc.selectedTopics.first.id ==
-                                tappedTopic.id) {
-                              composeBloc.selectedTopics.clear();
-                            } else {
-                              composeBloc.selectedTopics.clear();
+                          if (config!.multipleTopicsSelectable) {
+                            int index = composeBloc.selectedTopics.indexWhere(
+                                (element) => element.id == tappedTopic.id);
+                            if (index == -1) {
                               composeBloc.selectedTopics.add(tappedTopic);
+                            } else {
+                              composeBloc.selectedTopics.removeAt(index);
                             }
+                          } else {
+                            composeBloc.selectedTopics.clear();
+                            composeBloc.selectedTopics.add(tappedTopic);
                           }
-                          _controllerPopUp.hideMenu();
+
+                          if (!config!.multipleTopicsSelectable) {
+                            _controllerPopUp.hideMenu();
+                          }
                           rebuildTopicFloatingButton.value =
                               !rebuildTopicFloatingButton.value;
                         },
@@ -1106,7 +1137,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                                     ..isEnabled(true)
                                     ..name("Topic"))
                                   .build()
-                              : composeBloc.selectedTopics.first,
+                              : composeBloc.selectedTopics.length == 1
+                                  ? composeBloc.selectedTopics.first
+                                  : (LMTopicViewDataBuilder()
+                                        ..id("0")
+                                        ..isEnabled(true)
+                                        ..name(
+                                            "Topics (${composeBloc.selectedTopics.length})"))
+                                      .build(),
                           style: LMFeedTopicChipStyle(
                             textStyle: TextStyle(
                               color: LMFeedCore.theme.primaryColor,

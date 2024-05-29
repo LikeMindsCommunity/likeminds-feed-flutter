@@ -298,7 +298,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           ),
         );
       },
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         await Navigator.push(
@@ -308,6 +308,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -371,7 +372,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       isFeed: true,
       postViewData: postViewData,
       onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
-          postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
+          postViewData, LMFeedAnalyticsKeys.postProfileName, widgetSource),
       onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
           postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
       subText: LMFeedText(
@@ -397,6 +398,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             ));
           },
           action: LMFeedMenuAction(
+            onPostReport: () => handlePostReportAction(postViewData),
             onPostPin: () => handlePostPinAction(postViewData),
             onPostUnpin: () => handlePostPinAction(postViewData),
             onPostDelete: () {
@@ -460,7 +462,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       postId: post.id,
       pollBuilder: _widgetUtility.pollWidgetBuilder,
       poll: _defPollWidget(post),
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
         await Navigator.push(
@@ -470,6 +472,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -519,7 +522,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        debugPrint("this is selected");
         if (hasPollEnded(pollValue.expiryTime!)) {
           LMFeedCore.showSnackBar(
             context,
@@ -971,6 +973,18 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     );
 
     LMFeedVideoProvider.instance.playCurrentVideo();
+  }
+
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
+        ),
+      ),
+    );
   }
 
   void handlePostPinAction(LMPostViewData postViewData) async {

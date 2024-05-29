@@ -93,7 +93,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     screenSize = MediaQuery.of(context).size;
     return _widgetUtility.scaffold(
       source: _widgetSource,
-      backgroundColor: _theme.backgroundColor,
+      backgroundColor: _theme.container,
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       body: BlocConsumer(
         bloc: _notificationsBloc,
@@ -134,15 +134,24 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
 
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
-      style: LMFeedAppBarStyle(
-        backgroundColor: _theme.backgroundColor,
-        border: Border(),
-        padding: EdgeInsets.zero,
-      ),
-      leading: BackButton(
-        color: _theme.onContainer,
-      ),
-    );
+        style: LMFeedAppBarStyle(
+          backgroundColor: _theme.container,
+          border: Border(),
+          padding: EdgeInsets.zero,
+        ),
+        leading: BackButton(
+          color: _theme.onContainer,
+        ),
+        title: LMFeedText(
+          text: 'Notifications',
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: _theme.onContainer,
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ));
   }
 
   Widget getNotificationsLoadedView({
@@ -151,7 +160,8 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        widget.customWidgetBuilder?.call(context) ?? _defCustomWidget(),
+        if (widget.customWidgetBuilder != null)
+          widget.customWidgetBuilder!.call(context),
         Expanded(
           child: PagedListView<int, LMNotificationFeedItemViewData>(
             padding: EdgeInsets.zero,
@@ -244,20 +254,6 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
     );
   }
 
-  Widget _defCustomWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 20),
-      child: LMFeedText(
-          text: 'Notifications',
-          style: LMFeedTextStyle(
-              textStyle: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ))),
-    );
-  }
-
   Widget _defNotificationsErrorView(String message) {
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -298,6 +294,18 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
           context,
           MaterialPageRoute(
               builder: (context) => LMFeedPostDetailScreen(postId: postId)));
+    } else if (host == 'pending_post_detail') {
+      final String? postId = queryParams["post_id"];
+      if (postId != null) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LMFeedEditPostScreen(pendingPostId: postId)));
+      } else {
+        LMFeedCore.showSnackBar(context, "Please try again later",
+            LMFeedWidgetSource.notificationScreen);
+      }
     }
   }
 }

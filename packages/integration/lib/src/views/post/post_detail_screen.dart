@@ -108,7 +108,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         LMFeedPostDetailScreenHandler(_pagingController, widget.postId);
     updatePostAndCommentData();
     right = LMFeedUserUtils.checkCommentRights();
-    if (widget.openKeyboard) {
+    if (widget.openKeyboard && right) {
       _postDetailScreenHandler!.openOnScreenKeyboard();
     }
 
@@ -401,29 +401,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   LMFeedMenuAction defLMFeedMenuAction(LMCommentViewData commentViewData) =>
       LMFeedMenuAction(
         onCommentReport: () {
-          showModalBottomSheet(
-            context: context,
-            useRootNavigator: true,
-            useSafeArea: true,
-            isScrollControlled: true,
-            elevation: 10,
-            enableDrag: true,
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.7,
-              minHeight: MediaQuery.of(context).size.height * 0.3,
-            ),
-            backgroundColor: feedTheme.container,
-            clipBehavior: Clip.hardEdge,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => LMFeedReportScreen(
+                entityId: commentViewData.id,
+                entityType: commentEntityId,
+                entityCreatorId: commentViewData.user.uuid,
               ),
-            ),
-            builder: (context) => LMFeedReportBottomSheet(
-              entityId: commentViewData.id,
-              entityType: 6,
-              entityCreatorId: commentViewData.uuid,
             ),
           );
         },
@@ -573,7 +557,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       user: _postDetailScreenHandler!
           .users[_postDetailScreenHandler!.postData!.uuid]!,
       topics: _postDetailScreenHandler!.postData!.topics,
-      onMediaTap: () {
+      onMediaTap: (int index) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -583,6 +567,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               post: _postDetailScreenHandler!.postData!,
               user: _postDetailScreenHandler!
                   .users[_postDetailScreenHandler!.postData!.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -754,7 +739,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       videoBuilder: _widgetBuilder.videoBuilder,
       pollBuilder: _widgetBuilder.pollWidgetBuilder,
       poll: _defPollWidget(_postDetailScreenHandler!.postData!),
-      onMediaTap: () {
+      onMediaTap: (int index) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -764,6 +749,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               post: _postDetailScreenHandler!.postData!,
               user: _postDetailScreenHandler!
                   .users[_postDetailScreenHandler!.postData!.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -811,7 +797,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        debugPrint("this is selected");
         if (hasPollEnded(pollValue.expiryTime!)) {
           LMFeedCore.showSnackBar(
             context,
@@ -1643,30 +1628,15 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     );
   }
 
-  Future<dynamic> handlePostReportAction() {
-    return showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      useSafeArea: true,
-      isScrollControlled: true,
-      elevation: 10,
-      enableDrag: true,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-        minHeight: MediaQuery.of(context).size.height * 0.3,
-      ),
-      backgroundColor: feedTheme.container,
-      clipBehavior: Clip.hardEdge,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.0),
-          topRight: Radius.circular(20.0),
+  void handlePostReportAction() {
+    LMPostViewData postViewData = _postDetailScreenHandler!.postData!;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
         ),
-      ),
-      builder: (context) => LMFeedReportBottomSheet(
-        entityId: _postDetailScreenHandler!.postId,
-        entityType: 5,
-        entityCreatorId: _postDetailScreenHandler!.postData!.uuid,
       ),
     );
   }

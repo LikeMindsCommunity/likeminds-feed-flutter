@@ -14,13 +14,18 @@ abstract class LMFeedPostEvents extends Equatable {
 /// [postId] contains the id of the post to be fetched
 /// {@endtemplate}
 class LMFeedGetPostEvent extends LMFeedPostEvents {
-  final String postId;
+  final String? postId;
+  final String? pendingPostId;
   final int page;
   final int pageSize;
 
   ///{@macro lm_feed_get_post_event}
   LMFeedGetPostEvent(
-      {required this.postId, required this.page, required this.pageSize});
+      {this.postId,
+      this.pendingPostId,
+      required this.page,
+      required this.pageSize})
+      : assert(postId != null || pendingPostId != null);
 }
 
 /// {@template lm_feed_create_new_post_event}
@@ -70,21 +75,25 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
 /// {@endtemplate}
 class LMFeedEditPostEvent extends LMFeedPostEvents {
   final String? postText;
-  final String postId;
+  final String? postId;
+  final String? pendingPostId;
   final String? heading;
   final List<LMTopicViewData> selectedTopics;
 
   ///{@macro lm_feed_edit_post_event}
   LMFeedEditPostEvent({
     this.postText,
-    required this.postId,
+    this.postId,
+    this.pendingPostId,
     required this.selectedTopics,
     this.heading,
-  }) : assert(postText != null || heading != null);
+  }) : assert(postText != null ||
+            heading != null && (pendingPostId != null || postId != null));
 }
 
 class LMFeedDeletePostEvent extends LMFeedPostEvents {
-  final String postId;
+  final String? postId;
+  final String? pendingPostId;
   final String reason;
   final int? feedRoomId;
   final bool isRepost;
@@ -94,17 +103,18 @@ class LMFeedDeletePostEvent extends LMFeedPostEvents {
   final String? postType; // type of post i.e video, photo, text
 
   LMFeedDeletePostEvent({
-    required this.postId,
+    this.postId,
+    this.pendingPostId,
     required this.reason,
     this.feedRoomId,
     this.isRepost = false,
     this.userState,
     this.userId,
     this.postType,
-  });
+  }) : assert(pendingPostId != null || postId != null);
 
   @override
-  List<Object> get props => [postId, reason, isRepost];
+  List<Object> get props => [reason, isRepost, postId ?? pendingPostId ?? ''];
 }
 
 class LMFeedUpdatePostEvent extends LMFeedPostEvents {

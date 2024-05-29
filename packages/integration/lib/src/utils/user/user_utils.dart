@@ -20,13 +20,13 @@ class LMFeedUserUtils {
         memberStateResponse.state == 1) {
       return true;
     }
-    int? index = memberStateResponse.memberRights
-        ?.indexWhere((element) => element.state == 9);
-    if (index == -1) {
-      return false;
-    } else {
-      return true;
-    }
+    bool isPostCreationAllowed = true;
+    memberStateResponse.memberRights?.forEach((element) {
+      if (element.state == 9) {
+        isPostCreationAllowed = element.isSelected;
+      }
+    });
+    return isPostCreationAllowed;
   }
 
   static bool checkCommentRights() {
@@ -37,12 +37,12 @@ class LMFeedUserUtils {
         memberStateResponse.state == 1) {
       return true;
     }
-    int? index = memberStateResponse.memberRights
-        ?.indexWhere((element) => element.state == 10);
-    if (index == -1) {
-      return false;
-    } else {
-      return true;
-    }
+    bool isCommentCreationAllowed = true;
+    memberStateResponse.memberRights?.forEach((element) {
+      if (element.state == 10) {
+        isCommentCreationAllowed = element.isSelected;
+      }
+    });
+    return isCommentCreationAllowed;
   }
 }

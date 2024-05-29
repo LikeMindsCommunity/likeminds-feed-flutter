@@ -401,7 +401,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: theme.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -411,6 +411,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );
@@ -495,6 +496,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
             ));
           },
           action: LMFeedMenuAction(
+            onPostReport: () => handlePostReportAction(postViewData),
             onPostUnpin: () => handlePostPinAction(postViewData),
             onPostPin: () => handlePostPinAction(postViewData),
             onPostEdit: () {
@@ -556,7 +558,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       style: theme.mediaStyle,
       pollBuilder: widgetUtility.pollWidgetBuilder,
       poll: _defPollWidget(post),
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -566,6 +568,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: post.user,
+              position: index,
             ),
           ),
         );
@@ -614,7 +617,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        debugPrint("this is selected");
         if (hasPollEnded(pollValue.expiryTime!)) {
           LMFeedCore.showSnackBar(
             context,
@@ -992,6 +994,18 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           ],
         ),
       );
+
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
+        ),
+      ),
+    );
+  }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;

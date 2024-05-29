@@ -30,11 +30,11 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
       String accessToken, String refreshToken) {
     //TODO can be removed
     LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-          ..key(LMFeedStringConstants.instance.accessToken)
+          ..key(LMFeedStringConstants.accessToken)
           ..value(accessToken))
         .build());
     LMFeedLocalPreference.instance.storeCache((LMCacheBuilder()
-          ..key(LMFeedStringConstants.instance.refreshToken)
+          ..key(LMFeedStringConstants.refreshToken)
           ..value(refreshToken))
         .build());
     //Redirecting from core to example app
@@ -45,7 +45,7 @@ class LMSDKCallbackImplementation implements LMSDKCallback {
   @override
   Future<LMAuthToken> onRefreshTokenExpired() async {
     String? apiKey = LMFeedLocalPreference.instance
-        .fetchCache(LMFeedStringConstants.instance.apiKey)
+        .fetchCache(LMFeedStringConstants.apiKey)
         ?.value as String?;
 
     if (apiKey != null) {

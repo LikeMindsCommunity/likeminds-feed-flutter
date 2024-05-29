@@ -171,7 +171,7 @@ class _LMFeedListState extends State<LMFeedList> {
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -181,6 +181,7 @@ class _LMFeedListState extends State<LMFeedList> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: _feedBloc.users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -293,6 +294,7 @@ class _LMFeedListState extends State<LMFeedList> {
               ),
             );
           },
+          onPostReport: () => handlePostReportAction(postViewData),
           onPostUnpin: () => handlePostPinAction(postViewData),
           onPostPin: () => handlePostPinAction(postViewData),
           onPostDelete: () {
@@ -344,7 +346,7 @@ class _LMFeedListState extends State<LMFeedList> {
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -354,6 +356,7 @@ class _LMFeedListState extends State<LMFeedList> {
               postAttachments: post.attachments ?? [],
               post: post,
               user: _feedBloc.users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -570,6 +573,18 @@ class _LMFeedListState extends State<LMFeedList> {
                           : null),
             )),
       );
+
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
+        ),
+      ),
+    );
+  }
 
   void handlePostPinAction(LMPostViewData postViewData) async {
     postViewData.isPinned = !postViewData.isPinned;

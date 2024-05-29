@@ -47,8 +47,17 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
     post = widget.post;
     user = widget.user;
     position = widget.position;
+    currPosition = widget.position ?? 0;
     _filterPostAttachments();
+
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(LMFeedMediaPreviewScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    position = widget.position;
+    currPosition = widget.position ?? 0;
   }
 
   _filterPostAttachments() {
@@ -163,6 +172,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                             style: LMFeedPostImageStyle(
                               boxFit: BoxFit.contain,
                             ),
+                            position: index,
                           ),
                         ),
                       );

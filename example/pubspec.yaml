@@ -2,10 +2,11 @@ name: likeminds_feed_sample
 description: Master sample app for LikeMinds Feed SDK
 publish_to: "none"
 
-version: 1.4.2
+version: 1.5.0
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.0.2 <4.0.0"
+  flutter: ">=3.10.2"
 
 dependencies:
   flutter:
@@ -14,7 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_svg:
   dotenv: ^4.2.0
-  likeminds_feed_flutter_core: 1.4.2
+  likeminds_feed_flutter_core: 1.5.0
   flutter_notification_channel: ^2.0.0
   firebase_core: ^2.24.0
   firebase_messaging: ^14.7.6
@@ -22,6 +23,8 @@ dependencies:
   uni_links:
   envied: ^0.3.0+3
   flutter_dotenv:
+  timeago: ^3.6.1
+  overlay_support: 
 
 dependency_overrides:
   extended_text_field: ^14.0.0
@@ -41,4 +44,6 @@ flutter:
   assets:
     - assets/
     - assets/icons/
+    - assets/qna/icons/
+    - assets/social_dark/icons/
     - .env

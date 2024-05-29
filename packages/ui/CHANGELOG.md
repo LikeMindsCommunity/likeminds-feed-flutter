@@ -64,4 +64,11 @@ Added api key security
 Updated Data layer to v1.10.1
 
 # 1.4.2
- Added customisibility to poll
+
+Added customisibility to poll
+
+# 1.5.0
+
+Added support for pending post
+Fixed issue with media position in Media Preview Screen
+Fixed Minor UI Issues

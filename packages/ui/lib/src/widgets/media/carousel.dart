@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -26,7 +27,7 @@ class LMFeedCarousel extends StatefulWidget {
 
   /// {@macro feed_error_handler}
   final LMFeedErrorHandler? onError;
-  final VoidCallback? onMediaTap;
+  final Function(int)? onMediaTap;
 
   const LMFeedCarousel({
     Key? key,
@@ -57,7 +58,7 @@ class LMFeedCarousel extends StatefulWidget {
     LMFeedPostImageStyle? imageStyle,
     LMFeedPostCarouselStyle? style,
     Function(VideoController)? initialiseVideoController,
-    VoidCallback? onMediaTap,
+    Function(int)? onMediaTap,
     Widget Function(LMFeedImage)? imageBuilder,
     Widget Function(LMFeedVideo)? videoBuilder,
     LMFeedCarouselIndicatorBuilder? carouselIndicatorBuilder,
@@ -96,9 +97,10 @@ class _LMCarouselState extends State<LMFeedCarousel> {
   }
 
   void mapAttachmentsToWidget() {
-    mediaWidgets = widget.attachments.map((e) {
+    mediaWidgets = [];
+    widget.attachments.forEachIndexed((index, e) {
       if (e.attachmentType == 1) {
-        return Container(
+        mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             borderRadius: style?.carouselBorderRadius,
@@ -112,11 +114,12 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                   style: widget.imageStyle,
                   onError: widget.onError,
                   onMediaTap: widget.onMediaTap,
+                  position: index,
                 ),
           ),
-        );
+        ));
       } else if ((e.attachmentType == 2)) {
-        return Container(
+        mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             borderRadius: style?.carouselBorderRadius,
@@ -134,13 +137,11 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                   widget.postId,
                   widget.attachments.indexOf(e),
                 ),
-                position: widget.attachments.indexOf(e),
+                position: index,
               ),
-        );
-      } else {
-        return const SizedBox.shrink();
+        ));
       }
-    }).toList();
+    });
   }
 
   @override
@@ -149,7 +150,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
     style = widget.style ?? feedTheme.mediaStyle.carouselStyle;
     mapAttachmentsToWidget();
     return GestureDetector(
-      onTap: () => widget.onMediaTap?.call(),
+      onTap: () => widget.onMediaTap?.call(currPosition),
       child: Container(
         width: style!.carouselWidth ?? MediaQuery.of(context).size.width,
         height: style!.carouselHeight,

@@ -18,65 +18,65 @@ class LMFeedNotificationTile extends StatelessWidget {
     final _theme = LMFeedCore.theme;
     debugPrint(_theme.contentStyle.headingStyle?.color?.value.toString());
     return ValueListenableBuilder(
-        valueListenable: _rebuild,
-        builder: (context, _, __) {
-          return LMFeedTile(
-              style: style?.copyWith(
-                backgroundColor: notificationItemViewData.isRead
-                    ? style?.backgroundColor
-                    : style?.activeBackgroundColor,
-              ),
-              onTap: () {
-                onTap?.call();
-                notificationItemViewData.isRead = true;
-                _rebuild.value = !_rebuild.value;
-              },
-              leading: LMFeedProfilePicture(
-                  imageUrl: notificationItemViewData.actionBy.last.imageUrl,
-                  fallbackText: notificationItemViewData.actionBy.last.name,
-                  style: LMFeedProfilePictureStyle(
-                    size: 35,
-                  )),
-              title: RichText(
-                text: TextSpan(
-                  children: LMFeedTaggingHelper.extractNotificationTags(
-                    notificationItemViewData.activityText,
-                    normalTextStyle: TextStyle(
-                      color: _theme.contentStyle.headingStyle?.color,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Inter',
-                      height: 1.5,
-                      letterSpacing: 0.15,
-                    ),
-                    tagTextStyle: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      color: _theme.primaryColor,
-                      height: 1.5,
-                      letterSpacing: 0.15,
-                    ),
+      valueListenable: _rebuild,
+      builder: (context, _, __) {
+        return LMFeedTile(
+            style: style?.copyWith(
+              backgroundColor: notificationItemViewData.isRead
+                  ? style?.backgroundColor
+                  : style?.activeBackgroundColor,
+            ),
+            onTap: () {
+              onTap?.call();
+              notificationItemViewData.isRead = true;
+              _rebuild.value = !_rebuild.value;
+            },
+            leading: LMFeedProfilePicture(
+                imageUrl: notificationItemViewData.actionBy.last.imageUrl,
+                fallbackText: notificationItemViewData.actionBy.last.name,
+                style: LMFeedProfilePictureStyle(
+                  size: 35,
+                )),
+            title: RichText(
+              text: TextSpan(
+                children: LMFeedTaggingHelper.extractNotificationTags(
+                  notificationItemViewData.activityText,
+                  normalTextStyle: TextStyle(
+                    color: _theme.onContainer,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    height: 1.5,
+                    letterSpacing: 0.15,
+                  ),
+                  tagTextStyle: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                    color: _theme.onContainer,
+                    height: 1.5,
+                    letterSpacing: 0.15,
                   ),
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
-              subtitle: Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: LMFeedText(
-                  text: LMFeedTimeAgo.instance
-                      .format(notificationItemViewData.updatedAt),
-                  style: LMFeedTextStyle(
-                    maxLines: 1,
-                    textStyle: TextStyle(
-                      color: Color(0xff5A6068),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Inter',
-                    ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: LMFeedText(
+                text: LMFeedTimeAgo.instance
+                    .format(notificationItemViewData.updatedAt),
+                style: LMFeedTextStyle(
+                  maxLines: 1,
+                  textStyle: TextStyle(
+                    color: Color(0xff5A6068),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
-              ));
-        });
+              ),
+            ));
+      },
+    );
   }
 }
 

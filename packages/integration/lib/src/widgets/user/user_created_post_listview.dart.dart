@@ -360,7 +360,7 @@ class _LMFeedUserCreatedPostListViewState
         LMFeedVideoProvider.instance.clearPostController(post.id);
       },
       style: feedThemeData?.postStyle,
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -370,6 +370,7 @@ class _LMFeedUserCreatedPostListViewState
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -507,7 +508,7 @@ class _LMFeedUserCreatedPostListViewState
           _widgetsBuilder.postMediaCarouselIndicatorBuilder,
       pollBuilder: _widgetsBuilder.pollWidgetBuilder,
       poll: _defPollWidget(post),
-      onMediaTap: () async {
+      onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.push(
@@ -517,6 +518,7 @@ class _LMFeedUserCreatedPostListViewState
               postAttachments: post.attachments ?? [],
               post: post,
               user: users[post.uuid]!,
+              position: index,
             ),
           ),
         );
@@ -565,7 +567,6 @@ class _LMFeedUserCreatedPostListViewState
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        debugPrint("this is selected");
         if (hasPollEnded(pollValue.expiryTime!)) {
           LMFeedCore.showSnackBar(
             context,
@@ -913,30 +914,14 @@ class _LMFeedUserCreatedPostListViewState
     );
   }
 
-  Future<dynamic> handlePostReportAction(LMPostViewData postViewData) {
-    return showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      useSafeArea: true,
-      isScrollControlled: true,
-      elevation: 10,
-      enableDrag: true,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-        minHeight: MediaQuery.of(context).size.height * 0.3,
-      ),
-      backgroundColor: feedThemeData.container,
-      clipBehavior: Clip.hardEdge,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20.0),
-          topRight: Radius.circular(20.0),
+  void handlePostReportAction(LMPostViewData postViewData) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedReportScreen(
+          entityId: postViewData.id,
+          entityType: postEntityId,
+          entityCreatorId: postViewData.user.uuid,
         ),
-      ),
-      builder: (context) => LMFeedReportBottomSheet(
-        entityId: postViewData.id,
-        entityType: 5,
-        entityCreatorId: postViewData.uuid,
       ),
     );
   }

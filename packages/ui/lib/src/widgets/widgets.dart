@@ -5,6 +5,7 @@ export 'post/post_header.dart';
 export 'post/post_media.dart';
 export 'post/post_menu.dart';
 export 'post/post_topic.dart';
+export 'post/post_review_banner.dart';
 
 export 'comment/comment_tile.dart';
 

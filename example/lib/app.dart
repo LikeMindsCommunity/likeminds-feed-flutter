@@ -1,78 +1,33 @@
-// import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_sample/cred_screen.dart';
+import 'package:likeminds_feed_sample/globals.dart';
+import 'package:likeminds_feed_sample/main.dart';
 
-class LMSampleApp extends StatefulWidget {
-  final String? accessToken;
-  final String? refreshToken;
-  const LMSampleApp({super.key, this.accessToken, required this.refreshToken});
-
-  @override
-  State<LMSampleApp> createState() => _LMSampleAppState();
-}
-
-class _LMSampleAppState extends State<LMSampleApp> {
-  Future<LMResponse>? initialiseFeed;
-
-  @override
-  void initState() {
-    super.initState();
-    initialiseFeed = LMFeedCore.instance.showFeedWithoutApiKey(
-      accessToken: widget.accessToken,
-      refreshToken: widget.refreshToken,
-    );
-  }
+class LMSampleApp extends StatelessWidget {
+  const LMSampleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder(
-        future: initialiseFeed,
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.success) {
-            return const LMFeedScreen();
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LMFeedLoader();
-          } else {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                LikeMindsTheme.kVerticalPaddingLarge,
-                Center(
-                  child: LMFeedText(
-                    text: snapshot.data?.errorMessage ??
-                        "An error occurred, please try again later",
-                    style: const LMFeedTextStyle(textAlign: TextAlign.center),
-                  ),
-                ),
-                LikeMindsTheme.kVerticalPaddingLarge,
-                GestureDetector(
-                  onTap: () {
-                    initialiseFeed = LMFeedCore.instance.showFeedWithoutApiKey(
-                        accessToken: widget.accessToken,
-                        refreshToken: widget.refreshToken);
-                    setState(() {});
-                  },
-                  child: Container(
-                    color: Colors.transparent,
-                    child: const Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.refresh,
-                          size: 45,
-                          color: Colors.black,
-                        ),
-                        LikeMindsTheme.kVerticalPaddingSmall,
-                        LMFeedText(text: 'Retry')
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );
+    return MaterialApp(
+      title: 'Integration App for UI + SDK package',
+      debugShowCheckedModeBanner: false,
+      navigatorKey: rootNavigatorKey,
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
+      theme: ThemeData(
+        useMaterial3: false,
+      ),
+      home: LMFeedBlocListener(
+        analyticsListener: (BuildContext context, LMFeedAnalyticsState state) {
+          if (state is LMFeedAnalyticsEventFired) {
+            debugPrint("Bloc Listened for event, - ${state.eventName}");
+            debugPrint("////////////////");
+            debugPrint("With properties - ${state.eventProperties}");
           }
         },
+        profileListener: (BuildContext context, LMFeedProfileState state) {},
+        routingListener: (BuildContext context, LMFeedRoutingState state) {},
+        child: const CredScreen(),
       ),
     );
   }

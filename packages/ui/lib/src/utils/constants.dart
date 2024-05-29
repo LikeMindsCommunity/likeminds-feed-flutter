@@ -27,3 +27,11 @@ const String lmPollSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/poll.svg";
 const String lmTickSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/tick.svg";
+const String lmRejectPendingPostSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/reject_pending_post.svg";
+const String lmInfoPendingPostSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/info_pending_post.svg";
+const String lmWarningPendingPostSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/warning_pending_post.svg";
+const String lmNotificationBellSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/notification_bell.svg";

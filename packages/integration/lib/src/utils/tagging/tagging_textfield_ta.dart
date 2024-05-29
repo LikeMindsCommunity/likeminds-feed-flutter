@@ -6,6 +6,7 @@ import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/flutt
 class LMTaggingAheadTextField extends StatefulWidget {
   final bool isDown;
   final FocusNode focusNode;
+  final List<LMUserTagViewData>? userTags;
   final Function(LMUserTagViewData) onTagSelected;
   final TextEditingController controller;
   final InputDecoration? decoration;
@@ -26,6 +27,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
     this.maxLines,
     this.minLines = 1,
     this.enabled = true,
+    this.userTags,
     this.scrollPhysics = const NeverScrollableScrollPhysics(),
   });
 
@@ -66,7 +68,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
   final SuggestionsBoxController _suggestionsBoxController =
       SuggestionsBoxController();
 
-  List<UserTag> userTags = [];
+  List<LMUserTagViewData> userTags = [];
 
   int page = 1;
   int tagCount = 0;
@@ -85,6 +87,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
   @override
   void initState() {
     super.initState();
+    userTags = [...widget.userTags ?? []];
     _focusNode = widget.focusNode;
     _controller = widget.controller;
     _scrollController.addListener(() async {
@@ -103,7 +106,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
             taggingData.members!.isNotEmpty) {
           page++;
 
-          userTags.addAll(taggingData.members!.map((e) => e).toList());
+          userTags.addAll(taggingData.members!
+              .map((e) => LMUserTagViewDataConvertor.fromUserTag(e))
+              .toList());
           // return userTags;
         }
       }
@@ -118,7 +123,10 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       if (currentText.isEmpty) {
         return const Iterable.empty();
       } else if (!tagComplete && currentText.contains('@')) {
-        String tag = tagValue.substring(1).replaceAll(' ', '');
+        String tag = '';
+        if (tagValue.length > 1) {
+          tag = tagValue.substring(1).replaceAll(' ', '');
+        }
         final taggingData =
             await LMFeedCore.instance.lmFeedClient.getTaggingList(
           request: (GetTaggingListRequestBuilder()
@@ -131,10 +139,10 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
             taggingData.members != null &&
             taggingData.members!.isNotEmpty) {
           page += 1;
-          userTags = taggingData.members!.map((e) => e).toList();
-          return userTags
+          userTags = taggingData.members!
               .map((e) => LMUserTagViewDataConvertor.fromUserTag(e))
               .toList();
+          return userTags;
         }
         return const Iterable.empty();
       } else {

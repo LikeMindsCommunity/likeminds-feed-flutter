@@ -7,11 +7,12 @@ import 'package:likeminds_feed_flutter_core/src/bloc/post/post_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
+import 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.dart';
 
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
-import 'package:likeminds_feed_flutter_core/src/views/feed/feed_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/universal_feed/feed_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feedroom/feedroom_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
@@ -28,10 +29,12 @@ export 'package:likeminds_feed/likeminds_feed.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
+export 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.dart';
 
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
   LMSDKCallbackImplementation? sdkCallback;
+  late LMFeedBuilderDelegate _feedBuilderDelegate;
   LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
 
   /// This is the domain of the client. This is used to show
@@ -48,11 +51,26 @@ class LMFeedCore {
 
   static LMFeedConfig get config => instance.feedConfig;
 
+  static set config(LMFeedConfig value) {
+    instance.feedConfig = value;
+  }
+
   static String? get domain => instance.clientDomain;
 
   static LMFeedThemeData get theme => LMFeedTheme.instance.theme;
 
+  static set theme(LMFeedThemeData value) {
+    LMFeedTheme.instance.initialise(theme: value);
+  }
+
   static LMFeedWidgetUtility get widgetUtility => instance._widgetUtility;
+
+  static set widgetUtility(LMFeedWidgetUtility value) {
+    instance._widgetUtility = value;
+  }
+
+  static LMFeedBuilderDelegate get feedBuilderDelegate =>
+      instance._feedBuilderDelegate;
 
   static void showSnackBar(BuildContext context, String snackBarMessage,
       LMFeedWidgetSource widgetSource,
@@ -72,6 +90,7 @@ class LMFeedCore {
     Function(LMFeedAnalyticsEventFired)? analyticsListener,
     Function(LMFeedProfileState)? profileListener,
     LMFeedCoreCallback? lmFeedCallback,
+    LMFeedBuilderDelegate? builderDelegate,
   }) async {
     LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
     this.sdkCallback =
@@ -95,6 +114,8 @@ class LMFeedCore {
       LMFeedProfileBloc.instance.stream.listen((event) {
         profileListener.call(event);
       });
+
+    _feedBuilderDelegate = builderDelegate ?? LMFeedBuilderDelegate();
   }
 
   Future<void> closeBlocs() async {
@@ -126,11 +147,11 @@ class LMFeedCore {
     String? newRefreshToken;
     if (accessToken == null || refreshToken == null) {
       newAccessToken = LMFeedLocalPreference.instance
-          .fetchCache(LMFeedStringConstants.instance.accessToken)
+          .fetchCache(LMFeedStringConstants.accessToken)
           ?.value;
 
       newRefreshToken = LMFeedLocalPreference.instance
-          .fetchCache(LMFeedStringConstants.instance.refreshToken)
+          .fetchCache(LMFeedStringConstants.refreshToken)
           ?.value;
     } else {
       newAccessToken = accessToken;
@@ -183,6 +204,11 @@ class LMFeedCore {
     ValidateUserResponse response = await lmFeedClient.validateUser(request);
 
     if (response.success) {
+      response.community?.communitySettings?.forEach((element) {
+        if (element.settingType == LMFeedStringConstants.postApprovalNeeded) {
+          LMFeedPostUtils.doPostNeedsApproval = element.enabled;
+        }
+      });
       return LMResponse(success: true, data: response);
     } else {
       return LMResponse(
@@ -221,11 +247,11 @@ class LMFeedCore {
     String? newRefreshToken;
 
     newAccessToken = LMFeedLocalPreference.instance
-        .fetchCache(LMFeedStringConstants.instance.accessToken)
+        .fetchCache(LMFeedStringConstants.accessToken)
         ?.value;
 
     newRefreshToken = LMFeedLocalPreference.instance
-        .fetchCache(LMFeedStringConstants.instance.refreshToken)
+        .fetchCache(LMFeedStringConstants.refreshToken)
         ?.value;
 
     if (newAccessToken == null || newRefreshToken == null) {
@@ -238,6 +264,9 @@ class LMFeedCore {
       LMResponse<InitiateUserResponse> initiateUserResponse =
           await initiateUser(initiateUserRequest: initiateUserRequest);
       if (initiateUserResponse.success) {
+        LMNotificationHandler.instance.registerDevice(
+          initiateUserResponse.data!.user!.sdkClientInfo.uuid,
+        );
         // Call member state and community configurations and store them in local preference
         LMResponse initialiseFeedResponse = await initialiseFeed();
         if (!initialiseFeedResponse.success) {
@@ -273,6 +302,11 @@ class LMFeedCore {
         return LMResponse(
             success: false, errorMessage: initiateUserResponse.errorMessage);
       } else {
+        initiateUserResponse.community?.communitySettings?.forEach((element) {
+          if (element.settingType == LMFeedStringConstants.postApprovalNeeded) {
+            LMFeedPostUtils.doPostNeedsApproval = element.enabled;
+          }
+        });
         return LMResponse(success: true, data: initiateUserResponse);
       }
     }

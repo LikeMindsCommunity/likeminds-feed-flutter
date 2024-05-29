@@ -60,9 +60,9 @@ class LMPostOptionViewDataBuilder {
     return LMPollOptionViewData._(
       id: _id ?? "",
       text: _text!,
-      voteCount: _votes!,
-      percentage: _percentage!,
-      isSelected: _isSelected!,
+      voteCount: _votes ?? 0,
+      percentage: _percentage ?? 0.0,
+      isSelected: _isSelected ?? false,
       userViewData: _userViewData,
     );
   }

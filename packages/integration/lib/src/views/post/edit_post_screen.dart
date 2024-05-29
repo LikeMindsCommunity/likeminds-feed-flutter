@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/poll/handler/poll_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// {@template lm_feed_edit_post_screen}
@@ -33,10 +32,11 @@ class LMFeedEditPostScreen extends StatefulWidget {
     // Style for the screen
     this.style,
     // Post data to be edited
-    required this.postId,
+    this.postId,
+    this.pendingPostId,
     this.displayName,
     this.displayUrl,
-  });
+  }) : assert(pendingPostId != null || postId != null);
 
   final LMFeedComposeScreenConfig? config;
 
@@ -52,7 +52,8 @@ class LMFeedEditPostScreen extends StatefulWidget {
   final Widget Function()? composeMediaPreviewBuilder;
   final Widget Function(BuildContext context, LMUserViewData user)?
       composeUserHeaderBuilder;
-  final String postId;
+  final String? postId;
+  final String? pendingPostId;
   final String? displayName;
   final String? displayUrl;
 
@@ -91,8 +92,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   // and don't generate link preview any further
   bool linkCancelled = false;
 
-  /// Value notifiers to rebuild small widgets throughout the screen
-  /// Rather than handling state management from complex classes
+  // Value notifiers to rebuild small widgets throughout the screen
+  // Rather than handling state management from complex classes
   ValueNotifier<bool> rebuildLinkPreview = ValueNotifier(false);
   ValueNotifier<bool> rebuildTopicFloatingButton = ValueNotifier(false);
 
@@ -153,8 +154,15 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     super.initState();
     // populate the post details
     // when the screen is initialized
-    LMFeedPostBloc.instance
-        .add(LMFeedGetPostEvent(postId: widget.postId, page: 1, pageSize: 10));
+
+    LMFeedPostBloc.instance.add(
+      LMFeedGetPostEvent(
+        postId: widget.postId,
+        pendingPostId: widget.pendingPostId,
+        page: 1,
+        pageSize: 10,
+      ),
+    );
   }
 
   @override
@@ -186,13 +194,13 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   void fillScreenWithPostDetails() {
     _headingController?.text = postViewData?.heading ?? '';
 
-    composeBloc.userTags =
-        LMFeedTaggingHelper.addUserTagsIfMatched(_controller.text);
-
     String postText = LMFeedTaggingHelper.convertRouteToTag(postViewData!.text);
 
+    composeBloc.userTags =
+        LMFeedTaggingHelper.addUserTagsIfMatched(postViewData!.text);
+
     _controller = TextEditingController();
-    _controller.text = postText;
+    _controller.value = TextEditingValue(text: postText);
   }
 
   // This function is used to populate
@@ -545,7 +553,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
             height: screenSize?.width,
-            width: screenSize?.width,
+            width: LMFeedComposeBloc.instance.documentCount > 0
+                ? null
+                : screenSize?.width,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
                   ? Axis.vertical
@@ -561,9 +571,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 switch (mediaModel.mediaType) {
                   case LMMediaType.image:
                     mediaWidget = Container(
+                      alignment: Alignment.center,
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
-                        color: feedTheme.onContainer,
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
                         borderRadius:
                             style?.mediaStyle?.imageStyle?.borderRadius,
                       ),
@@ -574,18 +585,20 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                       child: LMFeedImage(
                         imageUrl: mediaModel.link,
                         style: style?.mediaStyle?.imageStyle,
+                        position: index,
                       ),
                     );
                     break;
                   case LMMediaType.video:
                     mediaWidget = Container(
+                      alignment: Alignment.center,
                       clipBehavior: Clip.hardEdge,
                       height: style?.mediaStyle?.videoStyle?.height ??
                           screenSize?.width,
                       width: style?.mediaStyle?.videoStyle?.width ??
                           screenSize?.width,
                       decoration: BoxDecoration(
-                        color: feedTheme.onContainer,
+                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
                         borderRadius:
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),
@@ -847,7 +860,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
                 LMFeedPostBloc.instance.add(
                   LMFeedEditPostEvent(
-                    postId: postViewData!.id,
+                    postId: widget.postId,
+                    pendingPostId: widget.pendingPostId,
                     postText: result!,
                     selectedTopics: selectedTopics,
                     heading: _headingController?.text,
@@ -929,6 +943,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                       isDown: true,
                       minLines: 3,
                       enabled: config!.enableTagging,
+                      userTags: composeBloc.userTags,
                       // maxLines: 200,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -1131,18 +1146,22 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                           selectedTopics: composeBloc.selectedTopics,
                           isEnabled: true,
                           onTopicSelected: (updatedTopics, tappedTopic) {
-                            if (composeBloc.selectedTopics.isEmpty) {
-                              composeBloc.selectedTopics.add(tappedTopic);
-                            } else {
-                              if (composeBloc.selectedTopics.first.id ==
-                                  tappedTopic.id) {
-                                composeBloc.selectedTopics.clear();
-                              } else {
-                                composeBloc.selectedTopics.clear();
+                            if (config!.multipleTopicsSelectable) {
+                              int index = composeBloc.selectedTopics.indexWhere(
+                                  (element) => element.id == tappedTopic.id);
+                              if (index == -1) {
                                 composeBloc.selectedTopics.add(tappedTopic);
+                              } else {
+                                composeBloc.selectedTopics.removeAt(index);
                               }
+                            } else {
+                              composeBloc.selectedTopics.clear();
+                              composeBloc.selectedTopics.add(tappedTopic);
                             }
-                            _controllerPopUp.hideMenu();
+
+                            if (!config!.multipleTopicsSelectable) {
+                              _controllerPopUp.hideMenu();
+                            }
                             rebuildTopicFloatingButton.value =
                                 !rebuildTopicFloatingButton.value;
                           },
@@ -1166,7 +1185,14 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                                       ..isEnabled(true)
                                       ..name("Topic"))
                                     .build()
-                                : composeBloc.selectedTopics.first,
+                                : composeBloc.selectedTopics.length == 1
+                                    ? composeBloc.selectedTopics.first
+                                    : (LMTopicViewDataBuilder()
+                                          ..id("0")
+                                          ..isEnabled(true)
+                                          ..name(
+                                              "Topics (${composeBloc.selectedTopics.length})"))
+                                        .build(),
                             style: LMFeedTopicChipStyle(
                               textStyle: TextStyle(
                                 color: LMFeedCore.theme.primaryColor,

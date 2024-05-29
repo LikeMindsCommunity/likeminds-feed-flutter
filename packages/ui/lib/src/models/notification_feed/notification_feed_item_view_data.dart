@@ -5,7 +5,7 @@ class LMNotificationFeedItemViewData {
   int action;
   List<LMUserViewData> actionBy;
   String actionOn;
-  LMActivityEntityViewData activityEntityData;
+  LMActivityEntityViewData? activityEntityData;
   String activityText;
   String? cta;
   DateTime createdAt;
@@ -20,7 +20,7 @@ class LMNotificationFeedItemViewData {
     required this.action,
     required this.actionBy,
     required this.actionOn,
-    required this.activityEntityData,
+    this.activityEntityData,
     required this.activityText,
     this.cta,
     required this.createdAt,
@@ -105,7 +105,7 @@ class LMNotificationFeedItemViewDataBuilder {
       action: _action!,
       actionBy: _actionBy!,
       actionOn: _actionOn!,
-      activityEntityData: _activityEntityData!,
+      activityEntityData: _activityEntityData,
       activityText: _activityText!,
       cta: _cta,
       createdAt: _createdAt!,
