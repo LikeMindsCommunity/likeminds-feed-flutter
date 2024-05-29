@@ -60,16 +60,16 @@ class LMFeedPendingPostDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SizedBox kPaddingLarge = LikeMindsTheme.kVerticalPaddingLarge;
+    SizedBox kPaddingXLarge = LikeMindsTheme.kVerticalPaddingXLarge;
     return LMFeedDialog(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           getTitleText(),
-          kPaddingLarge,
+          kPaddingXLarge,
           getBodyText(),
-          kPaddingLarge,
+          const SizedBox(height: 44),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [

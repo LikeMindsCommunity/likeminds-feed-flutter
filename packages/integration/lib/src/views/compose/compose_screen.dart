@@ -421,6 +421,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
             width: screenSize?.width,
+            height: LMFeedComposeBloc.instance.documentCount > 0
+                ? null
+                : screenSize?.width,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
                   ? Axis.vertical
@@ -434,18 +437,26 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 Widget mediaWidget;
                 switch (composeBloc.postMedia[index].mediaType) {
                   case LMMediaType.image:
-                    mediaWidget = LMFeedImage(
-                      imageFile: composeBloc.postMedia[index].mediaFile,
-                      style: style?.mediaStyle?.imageStyle,
-                      position: index,
+                    mediaWidget = Container(
+                      color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                      alignment: Alignment.center,
+                      child: LMFeedImage(
+                        imageFile: composeBloc.postMedia[index].mediaFile,
+                        style: style?.mediaStyle?.imageStyle,
+                        position: index,
+                      ),
                     );
                     break;
                   case LMMediaType.video:
-                    mediaWidget = LMFeedVideo(
-                      videoFile: composeBloc.postMedia[index].mediaFile,
-                      style: style?.mediaStyle?.videoStyle,
-                      postId:
-                          "${composeBloc.postMedia[index].mediaFile!.uri.toString()}$index",
+                    mediaWidget = Container(
+                      color: style?.mediaStyle?.imageStyle?.backgroundColor,
+                      alignment: Alignment.center,
+                      child: LMFeedVideo(
+                        videoFile: composeBloc.postMedia[index].mediaFile,
+                        style: style?.mediaStyle?.videoStyle,
+                        postId:
+                            "${composeBloc.postMedia[index].mediaFile!.uri.toString()}$index",
+                      ),
                     );
                     break;
                   case LMMediaType.link:
