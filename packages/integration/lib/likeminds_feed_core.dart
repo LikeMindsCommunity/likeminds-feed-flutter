@@ -82,7 +82,7 @@ class LMFeedCore {
 
   LMFeedCore._();
 
-  Future<LMResponse<void>> initialize({
+  Future<LMResponse<LMResponse<void>>> initialize({
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
@@ -93,31 +93,38 @@ class LMFeedCore {
     LMFeedBuilderDelegate? builderDelegate,
   }) async {
     try {
-      LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
-      this.sdkCallback =
-          LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
-      clientBuilder.sdkCallback(this.sdkCallback);
+      try {
+        LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
+        this.sdkCallback =
+            LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
+        clientBuilder.sdkCallback(this.sdkCallback);
 
-      this.lmFeedClient = clientBuilder.build();
+        this.lmFeedClient = clientBuilder.build();
 
-      clientDomain = domain;
-      feedConfig = config ?? LMFeedConfig();
-      if (widgets != null) _widgetUtility = widgets;
-      LMFeedTheme.instance.initialise(theme: theme ?? LMFeedThemeData.light());
-      MediaKit.ensureInitialized();
-      if (analyticsListener != null)
-        LMFeedAnalyticsBloc.instance.stream
-            .listen((LMFeedAnalyticsState event) {
-          if (event is LMFeedAnalyticsEventFired) {
-            analyticsListener.call(event);
-          }
-        });
-      if (profileListener != null)
-        LMFeedProfileBloc.instance.stream.listen((event) {
-          profileListener.call(event);
-        });
+        clientDomain = domain;
+        feedConfig = config ?? LMFeedConfig();
+        if (widgets != null) _widgetUtility = widgets;
+        LMFeedTheme.instance
+            .initialise(theme: theme ?? LMFeedThemeData.light());
+        MediaKit.ensureInitialized();
+        if (analyticsListener != null)
+          LMFeedAnalyticsBloc.instance.stream
+              .listen((LMFeedAnalyticsState event) {
+            if (event is LMFeedAnalyticsEventFired) {
+              analyticsListener.call(event);
+            }
+          });
+        if (profileListener != null)
+          LMFeedProfileBloc.instance.stream.listen((event) {
+            profileListener.call(event);
+          });
 
-      _feedBuilderDelegate = builderDelegate ?? LMFeedBuilderDelegate();
+        _feedBuilderDelegate = builderDelegate ?? LMFeedBuilderDelegate();
+
+        return LMResponse(success: true);
+      } catch (e) {
+        return LMResponse(success: false, errorMessage: e.toString());
+      }
 
       return LMResponse(success: true);
     } catch (e) {
