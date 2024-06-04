@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/cupertino.dart';
@@ -82,6 +83,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   Timer? _debounce;
   String? result;
   Size? screenSize;
+  double? screenWidth;
   // bool to check if the user has tapped on the cancel icon
   // of link preview, in that case toggle the bool to true
   // and don't generate link preview any further
@@ -170,7 +172,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenSize = MediaQuery.of(context).size;
+    screenSize = MediaQuery.sizeOf(context);
+    screenWidth = min(600, screenSize!.width);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: config!.composeSystemOverlayStyle,
@@ -217,25 +220,29 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               ),
             ),
             body: SafeArea(
-              child: Container(
-                margin: EdgeInsets.only(
-                  bottom: 100,
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 18),
-                      widget.composeUserHeaderBuilder?.call(context, user!) ??
-                          widgetUtility.composeScreenUserHeaderBuilder(
-                              context, user!),
-                      const SizedBox(height: 18),
-                      widget.composeContentBuilder?.call() ??
-                          _defContentInput(),
-                      const SizedBox(height: 18),
-                      widget.composeMediaPreviewBuilder?.call() ??
-                          _defMediaPreview(),
-                      const SizedBox(height: 150),
-                    ],
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  width: screenWidth,
+                  margin: EdgeInsets.only(
+                    bottom: 100,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 18),
+                        widget.composeUserHeaderBuilder?.call(context, user!) ??
+                            widgetUtility.composeScreenUserHeaderBuilder(
+                                context, user!),
+                        const SizedBox(height: 18),
+                        widget.composeContentBuilder?.call() ??
+                            _defContentInput(),
+                        const SizedBox(height: 18),
+                        widget.composeMediaPreviewBuilder?.call() ??
+                            _defMediaPreview(),
+                        const SizedBox(height: 150),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -360,7 +367,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 children: <Widget>[
                   Container(
                     clipBehavior: Clip.hardEdge,
-                    width: screenSize?.width,
+                    width: screenWidth,
                     decoration: const BoxDecoration(),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -420,10 +427,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           }
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
-            width: screenSize?.width,
+            width: screenWidth,
             height: LMFeedComposeBloc.instance.documentCount > 0
                 ? null
-                : screenSize?.width,
+                : screenWidth,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
                   ? Axis.vertical
@@ -444,10 +451,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         borderRadius:
                             style?.mediaStyle?.imageStyle?.borderRadius,
                       ),
-                      height: style?.mediaStyle?.imageStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.imageStyle?.width ??
-                          screenSize?.width,
+                      height:
+                          style?.mediaStyle?.imageStyle?.height ?? screenWidth,
+                      width:
+                          style?.mediaStyle?.imageStyle?.width ?? screenWidth,
                       alignment: Alignment.center,
                       child: LMFeedImage(
                         imageFile: composeBloc.postMedia[index].mediaFile,
@@ -459,10 +466,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   case LMMediaType.video:
                     mediaWidget = Container(
                       clipBehavior: Clip.hardEdge,
-                      height: style?.mediaStyle?.videoStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.videoStyle?.width ??
-                          screenSize?.width,
+                      height:
+                          style?.mediaStyle?.videoStyle?.height ?? screenWidth,
+                      width:
+                          style?.mediaStyle?.videoStyle?.width ?? screenWidth,
                       decoration: BoxDecoration(
                         color: style?.mediaStyle?.imageStyle?.backgroundColor,
                         borderRadius:
@@ -482,11 +489,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       linkModel: composeBloc.postMedia[index],
                       style: style?.mediaStyle?.linkStyle?.copyWith(
                             width: style?.mediaStyle?.linkStyle?.width ??
-                                MediaQuery.of(context).size.width - 84,
+                                screenWidth! - 84,
                           ) ??
                           LMFeedPostLinkPreviewStyle(
                             height: 215,
-                            width: MediaQuery.of(context).size.width - 84,
+                            width: screenWidth! - 84,
                             imageHeight: 138,
                             backgroundColor: LikeMindsTheme.backgroundColor,
                             border: Border.all(
@@ -542,10 +549,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         documentFile: composeBloc.postMedia[index].mediaFile,
                         style: style?.mediaStyle?.documentStyle?.copyWith(
                               width: style?.mediaStyle?.documentStyle?.width ??
-                                  MediaQuery.of(context).size.width,
+                                  screenWidth,
                             ) ??
                             LMFeedPostDocumentStyle(
-                              width: screenSize!.width,
+                              width: screenWidth,
                               height: 90,
                             ),
                         size: PostHelper.getFileSizeString(
@@ -560,7 +567,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   padding: EdgeInsets.zero,
                   child: Stack(
                     children: <Widget>[
-                      SizedBox(width: screenSize?.width, child: mediaWidget),
+                      SizedBox(width: screenWidth, child: mediaWidget),
                       if (composeBloc.postMedia[index].mediaType !=
                           LMMediaType.document)
                         Positioned(
@@ -794,7 +801,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               Column(
                 children: [
                   Container(
-                      width: MediaQuery.of(context).size.width - 82,
+                      width: screenWidth! - 82,
                       decoration: BoxDecoration(
                         color: theme.container,
                       ),

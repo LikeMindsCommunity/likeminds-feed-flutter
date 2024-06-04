@@ -1,9 +1,11 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -87,6 +89,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   Timer? _debounce;
   String? result;
   Size? screenSize;
+  double? screenWidth;
   // bool to check if the user has tapped on the cancel icon
   // of link preview, in that case toggle the bool to true
   // and don't generate link preview any further
@@ -317,7 +320,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.composeConfig;
     style = widget.style ?? feedTheme.composeScreenStyle;
-    screenSize = MediaQuery.of(context).size;
+    screenSize = MediaQuery.sizeOf(context);
+    screenWidth = min(600, screenSize!.width);
 
     return WillPopScope(
       onWillPop: () {
@@ -336,7 +340,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           bloc: LMFeedPostBloc.instance,
           builder: (context, state) {
             if (state is LMFeedGetPostLoadingState) {
-              return Scaffold(
+              return widgetUtility.scaffold(
                 backgroundColor: feedTheme.container,
                 body: Center(child: LMFeedLoader()),
               );
@@ -350,7 +354,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     listener: _composeBlocListener,
                     child: widgetUtility.scaffold(
                       source: widgetSource,
-                      backgroundColor: feedTheme.container,
+                      backgroundColor: kIsWeb
+                          ? feedTheme.backgroundColor
+                          : feedTheme.container,
                       appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
                           _defAppBar(),
                       floatingActionButton: Padding(
@@ -381,27 +387,32 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         ),
                       ),
                       body: SafeArea(
-                        child: Container(
-                          margin: EdgeInsets.only(
-                            bottom: 100,
-                          ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 18),
-                                widget.composeUserHeaderBuilder
-                                        ?.call(context, user!) ??
-                                    widgetUtility
-                                        .composeScreenUserHeaderBuilder(
-                                            context, user!),
-                                const SizedBox(height: 18),
-                                widget.composeContentBuilder?.call() ??
-                                    _defContentInput(),
-                                const SizedBox(height: 18),
-                                widget.composeMediaPreviewBuilder?.call() ??
-                                    _defMediaPreview(),
-                                const SizedBox(height: 150),
-                              ],
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            color: kIsWeb ? feedTheme.container : null,
+                            width: screenWidth,
+                            margin: EdgeInsets.only(
+                              bottom: 100,
+                            ),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 18),
+                                  widget.composeUserHeaderBuilder
+                                          ?.call(context, user!) ??
+                                      widgetUtility
+                                          .composeScreenUserHeaderBuilder(
+                                              context, user!),
+                                  const SizedBox(height: 18),
+                                  widget.composeContentBuilder?.call() ??
+                                      _defContentInput(),
+                                  const SizedBox(height: 18),
+                                  widget.composeMediaPreviewBuilder?.call() ??
+                                      _defMediaPreview(),
+                                  const SizedBox(height: 150),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -411,7 +422,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 ),
               );
             } else {
-              return Scaffold(
+              return widgetUtility.scaffold(
                 backgroundColor: feedTheme.container,
                 body: const SizedBox(),
               );
@@ -519,7 +530,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 children: <Widget>[
                   Container(
                     clipBehavior: Clip.hardEdge,
-                    width: screenSize?.width,
+                    width: screenWidth,
                     decoration: const BoxDecoration(),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -552,10 +563,12 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           }
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
-            height: screenSize?.width,
+            height: LMFeedComposeBloc.instance.documentCount > 0
+                ? null
+                : screenWidth,
             width: LMFeedComposeBloc.instance.documentCount > 0
                 ? null
-                : screenSize?.width,
+                : screenWidth,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
                   ? Axis.vertical
@@ -578,10 +591,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         borderRadius:
                             style?.mediaStyle?.imageStyle?.borderRadius,
                       ),
-                      height: style?.mediaStyle?.imageStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.imageStyle?.width ??
-                          screenSize?.width,
+                      height:
+                          style?.mediaStyle?.imageStyle?.height ?? screenWidth,
+                      width:
+                          style?.mediaStyle?.imageStyle?.width ?? screenWidth,
                       child: LMFeedImage(
                         imageUrl: mediaModel.link,
                         style: style?.mediaStyle?.imageStyle,
@@ -593,10 +606,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     mediaWidget = Container(
                       alignment: Alignment.center,
                       clipBehavior: Clip.hardEdge,
-                      height: style?.mediaStyle?.videoStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.videoStyle?.width ??
-                          screenSize?.width,
+                      height:
+                          style?.mediaStyle?.videoStyle?.height ?? screenWidth,
+                      width:
+                          style?.mediaStyle?.videoStyle?.width ?? screenWidth,
                       decoration: BoxDecoration(
                         color: style?.mediaStyle?.imageStyle?.backgroundColor,
                         borderRadius:
@@ -666,7 +679,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                                   MediaQuery.of(context).size.width - 84,
                             ) ??
                             LMFeedPostDocumentStyle(
-                              width: screenSize!.width - 84,
+                              width: screenWidth != null
+                                  ? (screenWidth! - 84)
+                                  : null,
                               height: 90,
                               removeIcon: null,
                             ),
@@ -935,7 +950,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               Column(
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width - 82,
+                    width: screenWidth == null ? null : screenWidth! - 82,
                     decoration: BoxDecoration(
                       color: theme.container,
                     ),
