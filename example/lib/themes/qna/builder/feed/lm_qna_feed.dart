@@ -1110,7 +1110,6 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
         borderRadius: 28,
         backgroundColor: feedThemeData.primaryColor,
         height: 44,
-        width: 160,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),
