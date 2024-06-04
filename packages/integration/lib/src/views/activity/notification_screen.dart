@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/activity/notification_tile.dart';
 
 class LMFeedNotificationScreen extends StatefulWidget {
@@ -32,6 +35,9 @@ class LMFeedNotificationScreen extends StatefulWidget {
 
 class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   Size? screenSize;
+  double? screenWidth;
+
+  bool isWeb = LMFeedPlatform.instance.isWeb();
   PagingController<int, LMNotificationFeedItemViewData> pagingController =
       PagingController<int, LMNotificationFeedItemViewData>(
     firstPageKey: 1,
@@ -90,38 +96,45 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenSize = MediaQuery.of(context).size;
+    screenSize = MediaQuery.sizeOf(context);
+    screenWidth = min(screenSize!.width, 600);
     return _widgetUtility.scaffold(
       source: _widgetSource,
       backgroundColor: _theme.container,
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
-      body: BlocConsumer(
-        bloc: _notificationsBloc,
-        buildWhen: (previous, current) {
-          if (current is LMFeedNotificationsPaginationLoadingState &&
-              (previous is LMFeedNotificationsLoadingState ||
-                  previous is LMFeedNotificationsLoadedState)) {
-            return false;
-          }
-          return true;
-        },
-        listener: (context, state) {
-          if (state is LMFeedNotificationsLoadedState) {
-            updatePagingControllers(state);
-          }
-        },
-        builder: (context, state) {
-          if (state is LMFeedNotificationsLoadingState) {
-            return widget.loaderBuilder?.call(context) ?? _defLoader();
-          } else if (state is LMFeedNotificationsErrorState) {
-            return widget.errorViewBuilder?.call(context, state.message) ??
-                _defNotificationsErrorView(state.message);
-          } else if (state is LMFeedNotificationsLoadedState) {
-            return getNotificationsLoadedView(state: state);
-          } else {
-            return const SizedBox();
-          }
-        },
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: screenWidth,
+          child: BlocConsumer(
+            bloc: _notificationsBloc,
+            buildWhen: (previous, current) {
+              if (current is LMFeedNotificationsPaginationLoadingState &&
+                  (previous is LMFeedNotificationsLoadingState ||
+                      previous is LMFeedNotificationsLoadedState)) {
+                return false;
+              }
+              return true;
+            },
+            listener: (context, state) {
+              if (state is LMFeedNotificationsLoadedState) {
+                updatePagingControllers(state);
+              }
+            },
+            builder: (context, state) {
+              if (state is LMFeedNotificationsLoadingState) {
+                return widget.loaderBuilder?.call(context) ?? _defLoader();
+              } else if (state is LMFeedNotificationsErrorState) {
+                return widget.errorViewBuilder?.call(context, state.message) ??
+                    _defNotificationsErrorView(state.message);
+              } else if (state is LMFeedNotificationsLoadedState) {
+                return getNotificationsLoadedView(state: state);
+              } else {
+                return const SizedBox();
+              }
+            },
+          ),
+        ),
       ),
     );
   }
@@ -229,7 +242,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
       style: LMFeedNotificationTileStyle.basic().copyWith(
         activeBackgroundColor: _theme.disabledColor.withOpacity(0.5),
         crossAxisAlignment: CrossAxisAlignment.start,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.all(16),
       ),
       onTap: () {
         // Fire analytics events when a user taps on a activity item

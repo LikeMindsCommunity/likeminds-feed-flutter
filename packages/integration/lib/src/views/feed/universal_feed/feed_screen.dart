@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -405,405 +407,425 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       ),
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
-      body: RefreshIndicator.adaptive(
-        onRefresh: () async {
-          getUserFeedMeta = getUserFeedMetaFuture();
-          _rebuildAppBar.value = !_rebuildAppBar.value;
-          refresh();
-          clearPagingController();
-        },
-        color: feedThemeData.primaryColor,
-        backgroundColor: feedThemeData.container,
-        child: CustomScrollView(
-          controller: _controller,
-          slivers: [
-            SliverToBoxAdapter(
-              child: ValueListenableBuilder(
-                  valueListenable: _rebuildAppBar,
-                  builder: (context, _, __) {
-                    return FutureBuilder(
-                        future: getUserFeedMeta,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.done) {
-                            if (snapshot.hasData && snapshot.data != null) {
-                              GetUserFeedMetaResponse response =
-                                  snapshot.data as GetUserFeedMetaResponse;
-
-                              if (response.success) {
-                                pendingPostCount =
-                                    response.pendingPostCount ?? 0;
-                              }
-                            }
-                          }
-
-                          return Container(
-                            child: widget.pendingPostBannerBuilder
-                                    ?.call(context, pendingPostCount) ??
-                                _screenBuilderDelegate.pendingPostBannerBuilder(
-                                  context,
-                                  pendingPostCount,
-                                  LMFeedPendingPostBanner(
-                                      pendingPostCount: pendingPostCount,
-                                      onPendingPostBannerPressed: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    LMFeedPendingPostsScreen()));
-                                      }),
-                                ),
-                          );
-                        });
-                  }),
-            ),
-            SliverToBoxAdapter(
-              child: config!.showCustomWidget
-                  ? widget.customWidgetBuilder == null
-                      ? LMFeedPostSomething(
-                          onTap: userPostingRights
-                              ? () async {
-                                  LMFeedVideoProvider.instance
-                                      .forcePauseAllControllers();
-                                  // ignore: use_build_context_synchronously
-                                  await Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const LMFeedComposeScreen(
-                                                widgetSource: LMFeedWidgetSource
-                                                    .universalFeed,
-                                              )));
-                                }
-                              : () {
-                                  LMFeedCore.showSnackBar(
-                                    context,
-                                    "You do not have permission to create a $postTitleSmallCap",
-                                    _widgetSource,
-                                    style: LMFeedCore.theme.snackBarTheme,
-                                  );
-                                })
-                      : widget.customWidgetBuilder!(context)
-                  : const SizedBox(),
-            ),
-            SliverToBoxAdapter(
-              child: config!.enableTopicFiltering
-                  ? ValueListenableBuilder(
-                      valueListenable: rebuildTopicFeed,
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: min(600, MediaQuery.sizeOf(context).width),
+          child: RefreshIndicator.adaptive(
+            onRefresh: () async {
+              getUserFeedMeta = getUserFeedMetaFuture();
+              _rebuildAppBar.value = !_rebuildAppBar.value;
+              refresh();
+              clearPagingController();
+            },
+            color: feedThemeData.primaryColor,
+            backgroundColor: feedThemeData.container,
+            child: CustomScrollView(
+              controller: _controller,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: ValueListenableBuilder(
+                      valueListenable: _rebuildAppBar,
                       builder: (context, _, __) {
-                        return FutureBuilder<GetTopicsResponse>(
-                          future: getTopicsResponse,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const SizedBox.shrink();
-                            } else if (snapshot.hasData &&
-                                snapshot.data != null &&
-                                snapshot.data!.success == true) {
-                              if (snapshot.data!.topics!.isNotEmpty) {
-                                return widget.topicBarBuilder
-                                        ?.call(_defTopicBar()) ??
-                                    _defTopicBar();
-                              } else {
-                                return const SizedBox.shrink();
-                              }
-                            }
-                            return const SizedBox();
-                          },
-                        );
-                      })
-                  : const SizedBox(),
-            ),
-            SliverToBoxAdapter(
-              child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
-                bloc: newPostBloc,
-                listener: (prev, curr) {
-                  if (curr is LMFeedPostDeletedState) {
-                    // show a snackbar when post is deleted
-                    // will only be shown if a messenger key is provided
-                    LMFeedCore.showSnackBar(
-                      context,
-                      '$postTitleFirstCap Deleted',
-                      _widgetSource,
-                    );
+                        return FutureBuilder(
+                            future: getUserFeedMeta,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                if (snapshot.hasData && snapshot.data != null) {
+                                  GetUserFeedMetaResponse response =
+                                      snapshot.data as GetUserFeedMetaResponse;
 
-                    if (curr.pendingPostId != null) {
-                      if (pendingPostCount > 0) {
-                        pendingPostCount--;
+                                  if (response.success) {
+                                    pendingPostCount =
+                                        response.pendingPostCount ?? 0;
+                                  }
+                                }
+                              }
+
+                              return Container(
+                                child: widget.pendingPostBannerBuilder
+                                        ?.call(context, pendingPostCount) ??
+                                    _screenBuilderDelegate
+                                        .pendingPostBannerBuilder(
+                                      context,
+                                      pendingPostCount,
+                                      LMFeedPendingPostBanner(
+                                          pendingPostCount: pendingPostCount,
+                                          onPendingPostBannerPressed: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        LMFeedPendingPostsScreen()));
+                                          }),
+                                    ),
+                              );
+                            });
+                      }),
+                ),
+                SliverToBoxAdapter(
+                  child: config!.showCustomWidget
+                      ? widget.customWidgetBuilder == null
+                          ? LMFeedPostSomething(
+                              onTap: userPostingRights
+                                  ? () async {
+                                      LMFeedVideoProvider.instance
+                                          .forcePauseAllControllers();
+                                      // ignore: use_build_context_synchronously
+                                      await Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const LMFeedComposeScreen(
+                                                    widgetSource:
+                                                        LMFeedWidgetSource
+                                                            .universalFeed,
+                                                  )));
+                                    }
+                                  : () {
+                                      LMFeedCore.showSnackBar(
+                                        context,
+                                        "You do not have permission to create a $postTitleSmallCap",
+                                        _widgetSource,
+                                        style: LMFeedCore.theme.snackBarTheme,
+                                      );
+                                    })
+                          : widget.customWidgetBuilder!(context)
+                      : const SizedBox(),
+                ),
+                SliverToBoxAdapter(
+                  child: config!.enableTopicFiltering
+                      ? ValueListenableBuilder(
+                          valueListenable: rebuildTopicFeed,
+                          builder: (context, _, __) {
+                            return FutureBuilder<GetTopicsResponse>(
+                              future: getTopicsResponse,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const SizedBox.shrink();
+                                } else if (snapshot.hasData &&
+                                    snapshot.data != null &&
+                                    snapshot.data!.success == true) {
+                                  if (snapshot.data!.topics!.isNotEmpty) {
+                                    return widget.topicBarBuilder
+                                            ?.call(_defTopicBar()) ??
+                                        _defTopicBar();
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
+                                }
+                                return const SizedBox();
+                              },
+                            );
+                          })
+                      : const SizedBox(),
+                ),
+                SliverToBoxAdapter(
+                  child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
+                    bloc: newPostBloc,
+                    listener: (prev, curr) {
+                      if (curr is LMFeedPostDeletedState) {
+                        // show a snackbar when post is deleted
+                        // will only be shown if a messenger key is provided
+                        LMFeedCore.showSnackBar(
+                          context,
+                          '$postTitleFirstCap Deleted',
+                          _widgetSource,
+                        );
+
+                        if (curr.pendingPostId != null) {
+                          if (pendingPostCount > 0) {
+                            pendingPostCount--;
+                            rebuildPostWidget.value = !rebuildPostWidget.value;
+                          }
+                          return;
+                        }
+
+                        List<LMPostViewData>? feedRoomItemList =
+                            _pagingController.itemList;
+                        feedRoomItemList
+                            ?.removeWhere((item) => item.id == curr.postId);
+                        _pagingController.itemList = feedRoomItemList;
                         rebuildPostWidget.value = !rebuildPostWidget.value;
                       }
-                      return;
-                    }
-
-                    List<LMPostViewData>? feedRoomItemList =
-                        _pagingController.itemList;
-                    feedRoomItemList
-                        ?.removeWhere((item) => item.id == curr.postId);
-                    _pagingController.itemList = feedRoomItemList;
-                    rebuildPostWidget.value = !rebuildPostWidget.value;
-                  }
-                  if (curr is LMFeedNewPostUploadedState) {
-                    if (LMFeedPostUtils.doPostNeedsApproval) {
-                      _pendingPostScreenBuilderDelegate.showPostApprovalDialog(
-                        context,
-                        curr.postData,
-                        LMFeedPendingPostDialog(
-                          dialogStyle: feedThemeData.dialogStyle.copyWith(
-                              insetPadding: EdgeInsets.all(40.0),
-                              padding: EdgeInsets.all(24.0)),
-                          headingTextStyles: LMFeedTextStyle.basic().copyWith(
-                            maxLines: 2,
-                            textStyle: TextStyle(
-                              fontSize: 16,
-                              color: feedThemeData.onContainer,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          dialogMessageTextStyles:
-                              LMFeedTextStyle.basic().copyWith(
-                            overflow: TextOverflow.visible,
-                            maxLines: 10,
-                            textStyle: TextStyle(
-                              fontSize: 16,
-                              color: feedThemeData.textSecondary,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          pendingPostId: curr.postData.id,
-                          onCancelButtonClicked: () {
-                            Navigator.of(context).pop();
-                          },
-                          onEditButtonClicked: () {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => LMFeedEditPostScreen(
-                                  pendingPostId: curr.postData.id,
+                      if (curr is LMFeedNewPostUploadedState) {
+                        if (LMFeedPostUtils.doPostNeedsApproval) {
+                          _pendingPostScreenBuilderDelegate
+                              .showPostApprovalDialog(
+                            context,
+                            curr.postData,
+                            LMFeedPendingPostDialog(
+                              dialogStyle: feedThemeData.dialogStyle.copyWith(
+                                  insetPadding: EdgeInsets.all(40.0),
+                                  padding: EdgeInsets.all(24.0)),
+                              headingTextStyles:
+                                  LMFeedTextStyle.basic().copyWith(
+                                maxLines: 2,
+                                textStyle: TextStyle(
+                                  fontSize: 16,
+                                  color: feedThemeData.onContainer,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            );
-                          },
-                          title: "$postTitleFirstCap submitted for approval",
-                          description:
-                              "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
-                        ),
-                      );
-                      getUserFeedMeta = getUserFeedMetaFuture();
-                      pendingPostCount++;
-                      _rebuildAppBar.value = !_rebuildAppBar.value;
-                      return;
-                    }
-                    LMPostViewData? item = curr.postData;
-                    int length = _pagingController.itemList?.length ?? 0;
-                    List<LMPostViewData> feedRoomItemList =
-                        _pagingController.itemList ?? [];
-                    for (int i = 0; i < feedRoomItemList.length; i++) {
-                      if (!feedRoomItemList[i].isPinned) {
-                        feedRoomItemList.insert(i, item);
-                        break;
+                              dialogMessageTextStyles:
+                                  LMFeedTextStyle.basic().copyWith(
+                                overflow: TextOverflow.visible,
+                                maxLines: 10,
+                                textStyle: TextStyle(
+                                  fontSize: 16,
+                                  color: feedThemeData.textSecondary,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              pendingPostId: curr.postData.id,
+                              onCancelButtonClicked: () {
+                                Navigator.of(context).pop();
+                              },
+                              onEditButtonClicked: () {
+                                Navigator.of(context).pop();
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => LMFeedEditPostScreen(
+                                      pendingPostId: curr.postData.id,
+                                    ),
+                                  ),
+                                );
+                              },
+                              title:
+                                  "$postTitleFirstCap submitted for approval",
+                              description:
+                                  "Your $postTitleSmallCap has been submitted for approval. Once approved, you will get a notification and it will be visible to others.",
+                            ),
+                          );
+                          getUserFeedMeta = getUserFeedMetaFuture();
+                          pendingPostCount++;
+                          _rebuildAppBar.value = !_rebuildAppBar.value;
+                          return;
+                        }
+                        LMPostViewData? item = curr.postData;
+                        int length = _pagingController.itemList?.length ?? 0;
+                        List<LMPostViewData> feedRoomItemList =
+                            _pagingController.itemList ?? [];
+                        for (int i = 0; i < feedRoomItemList.length; i++) {
+                          if (!feedRoomItemList[i].isPinned) {
+                            feedRoomItemList.insert(i, item);
+                            break;
+                          }
+                        }
+                        if (length == feedRoomItemList.length) {
+                          feedRoomItemList.add(item);
+                        }
+                        if (feedRoomItemList.isNotEmpty &&
+                            feedRoomItemList.length > 10) {
+                          feedRoomItemList.removeLast();
+                        }
+                        _feedBloc.users.addAll(curr.userData);
+                        _feedBloc.topics.addAll(curr.topics);
+                        _pagingController.itemList = feedRoomItemList;
+                        postUploading.value = false;
+                        rebuildPostWidget.value = !rebuildPostWidget.value;
+
+                        LMFeedCore.showSnackBar(
+                          context,
+                          '$postTitleFirstCap Created',
+                          _widgetSource,
+                        );
+                        _scrollToTop();
                       }
-                    }
-                    if (length == feedRoomItemList.length) {
-                      feedRoomItemList.add(item);
-                    }
-                    if (feedRoomItemList.isNotEmpty &&
-                        feedRoomItemList.length > 10) {
-                      feedRoomItemList.removeLast();
-                    }
-                    _feedBloc.users.addAll(curr.userData);
-                    _feedBloc.topics.addAll(curr.topics);
-                    _pagingController.itemList = feedRoomItemList;
-                    postUploading.value = false;
-                    rebuildPostWidget.value = !rebuildPostWidget.value;
+                      if (curr is LMFeedEditPostUploadedState) {
+                        LMPostViewData? item = curr.postData.copyWith();
+                        List<LMPostViewData>? feedRoomItemList =
+                            _pagingController.itemList;
+                        int index = feedRoomItemList?.indexWhere(
+                                (element) => element.id == item.id) ??
+                            -1;
+                        if (index != -1) {
+                          feedRoomItemList![index] = item;
+                        }
+                        _feedBloc.users.addAll(curr.userData);
+                        _feedBloc.topics.addAll(curr.topics);
+                        postUploading.value = false;
+                        rebuildPostWidget.value = !rebuildPostWidget.value;
 
-                    LMFeedCore.showSnackBar(
-                      context,
-                      '$postTitleFirstCap Created',
-                      _widgetSource,
-                    );
-                    _scrollToTop();
-                  }
-                  if (curr is LMFeedEditPostUploadedState) {
-                    LMPostViewData? item = curr.postData.copyWith();
-                    List<LMPostViewData>? feedRoomItemList =
-                        _pagingController.itemList;
-                    int index = feedRoomItemList
-                            ?.indexWhere((element) => element.id == item.id) ??
-                        -1;
-                    if (index != -1) {
-                      feedRoomItemList![index] = item;
-                    }
-                    _feedBloc.users.addAll(curr.userData);
-                    _feedBloc.topics.addAll(curr.topics);
-                    postUploading.value = false;
-                    rebuildPostWidget.value = !rebuildPostWidget.value;
+                        LMFeedCore.showSnackBar(context,
+                            '$postTitleFirstCap Edited', _widgetSource);
+                      }
+                      if (curr is LMFeedNewPostErrorState) {
+                        postUploading.value = false;
+                        LMFeedCore.showSnackBar(
+                          context,
+                          curr.errorMessage,
+                          _widgetSource,
+                        );
+                      }
+                      if (curr is LMFeedPostUpdateState) {
+                        List<LMPostViewData>? feedRoomItemList =
+                            _pagingController.itemList;
+                        int index = feedRoomItemList?.indexWhere(
+                                (element) => element.id == curr.postId) ??
+                            -1;
 
-                    LMFeedCore.showSnackBar(
-                        context, '$postTitleFirstCap Edited', _widgetSource);
-                  }
-                  if (curr is LMFeedNewPostErrorState) {
-                    postUploading.value = false;
-                    LMFeedCore.showSnackBar(
-                      context,
-                      curr.errorMessage,
-                      _widgetSource,
-                    );
-                  }
-                  if (curr is LMFeedPostUpdateState) {
-                    List<LMPostViewData>? feedRoomItemList =
-                        _pagingController.itemList;
-                    int index = feedRoomItemList?.indexWhere(
-                            (element) => element.id == curr.postId) ??
-                        -1;
-
-                    if (index != -1) {
-                      feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
-                        postViewData: curr.post ?? feedRoomItemList[index],
-                        actionType: curr.actionType,
-                        commentId: curr.commentId,
-                        pollOptions: curr.pollOptions,
-                      );
-                    }
-                    rebuildPostWidget.value = !rebuildPostWidget.value;
-                  }
-                  if (curr is LMFeedPostDeletionErrorState) {
-                    LMFeedCore.showSnackBar(
-                      context,
-                      curr.message,
-                      _widgetSource,
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (postUploading.value) {
-                    return Container(
-                      height: 72,
-                      color: feedThemeData.backgroundColor,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0,
-                        vertical: 6,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(
+                        if (index != -1) {
+                          feedRoomItemList![index] =
+                              LMFeedPostUtils.updatePostData(
+                            postViewData: curr.post ?? feedRoomItemList[index],
+                            actionType: curr.actionType,
+                            commentId: curr.commentId,
+                            pollOptions: curr.pollOptions,
+                          );
+                        }
+                        rebuildPostWidget.value = !rebuildPostWidget.value;
+                      }
+                      if (curr is LMFeedPostDeletionErrorState) {
+                        LMFeedCore.showSnackBar(
+                          context,
+                          curr.message,
+                          _widgetSource,
+                        );
+                      }
+                    },
+                    builder: (context, state) {
+                      if (postUploading.value) {
+                        return Container(
+                          height: 72,
+                          color: feedThemeData.backgroundColor,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0,
+                            vertical: 6,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text(
-                                  '${isPostEditing ? "Saving" : "Creating"} $postTitleSmallCap')
+                              Row(
+                                children: <Widget>[
+                                  Text(
+                                      '${isPostEditing ? "Saving" : "Creating"} $postTitleSmallCap')
+                                ],
+                              ),
+                              LMFeedLoader(),
                             ],
                           ),
-                          LMFeedLoader(),
-                        ],
-                      ),
-                    );
-                  }
-                  if (state is LMFeedNewPostErrorState) {
-                    return Container(
-                      height: 72,
-                      color: feedThemeData.backgroundColor,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0,
-                        vertical: 8,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          LMFeedText(
-                            text: "Post uploading failed.. try again",
-                            style: LMFeedTextStyle(
-                              maxLines: 1,
-                              textStyle: TextStyle(
-                                color: Colors.red,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                        );
+                      }
+                      if (state is LMFeedNewPostErrorState) {
+                        return Container(
+                          height: 72,
+                          color: feedThemeData.backgroundColor,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0,
+                            vertical: 8,
                           ),
-                          LMFeedButton(
-                            onTap: () {
-                              newPostBloc.add(state.event!);
-                            },
-                            style: LMFeedButtonStyle(
-                              icon: LMFeedIcon(
-                                type: LMFeedIconType.icon,
-                                icon: Icons.refresh_rounded,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              LMFeedText(
+                                text: "Post uploading failed.. try again",
+                                style: LMFeedTextStyle(
+                                  maxLines: 1,
+                                  textStyle: TextStyle(
+                                    color: Colors.red,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
-              ),
+                              LMFeedButton(
+                                onTap: () {
+                                  newPostBloc.add(state.event!);
+                                },
+                                style: LMFeedButtonStyle(
+                                  icon: LMFeedIcon(
+                                    type: LMFeedIconType.icon,
+                                    icon: Icons.refresh_rounded,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                  ),
+                ),
+                BlocListener<LMFeedBloc, LMFeedState>(
+                  bloc: _feedBloc,
+                  listener: (context, LMFeedState state) =>
+                      updatePagingControllers(state),
+                  child: ValueListenableBuilder(
+                    valueListenable: rebuildPostWidget,
+                    builder: (context, _, __) {
+                      return PagedSliverList<int, LMPostViewData>(
+                        pagingController: _pagingController,
+                        builderDelegate:
+                            PagedChildBuilderDelegate<LMPostViewData>(
+                          itemBuilder: (context, item, index) {
+                            if (_feedBloc.users[item.uuid] == null) {
+                              return const SizedBox();
+                            }
+                            LMFeedPostWidget postWidget =
+                                defPostWidget(context, feedThemeData, item);
+                            return widget.postBuilder
+                                    ?.call(context, postWidget, item) ??
+                                _widgetsBuilder.postWidgetBuilder.call(
+                                    context, postWidget, item,
+                                    source: _widgetSource);
+                          },
+                          noItemsFoundIndicatorBuilder: (context) {
+                            if (_feedBloc.state
+                                    is LMFeedUniversalFeedLoadedState &&
+                                (_feedBloc.state
+                                        as LMFeedUniversalFeedLoadedState)
+                                    .topics
+                                    .isNotEmpty) {
+                              return _widgetsBuilder.noPostUnderTopicFeed(
+                                  context,
+                                  actionable: changeFilter(context));
+                            }
+                            return _widgetsBuilder
+                                .noItemsFoundIndicatorBuilderFeed(context,
+                                    createPostButton:
+                                        createPostButton(context));
+                          },
+                          noMoreItemsIndicatorBuilder: (context) {
+                            return widget.noMoreItemsIndicatorBuilder
+                                    ?.call(context) ??
+                                _widgetsBuilder
+                                    .noMoreItemsIndicatorBuilderFeed(context);
+                          },
+                          newPageProgressIndicatorBuilder: (context) {
+                            return widget.newPageProgressIndicatorBuilder
+                                    ?.call(context) ??
+                                _widgetsBuilder
+                                    .newPageProgressIndicatorBuilderFeed(
+                                        context);
+                          },
+                          firstPageProgressIndicatorBuilder: (context) =>
+                              widget.firstPageProgressIndicatorBuilder
+                                  ?.call(context) ??
+                              _widgetsBuilder
+                                  .firstPageProgressIndicatorBuilderFeed(
+                                      context),
+                          firstPageErrorIndicatorBuilder: (context) =>
+                              widget.firstPageErrorIndicatorBuilder
+                                  ?.call(context) ??
+                              _widgetsBuilder
+                                  .firstPageErrorIndicatorBuilderFeed(context),
+                          newPageErrorIndicatorBuilder: (context) =>
+                              widget.newPageErrorIndicatorBuilder
+                                  ?.call(context) ??
+                              _widgetsBuilder
+                                  .newPageErrorIndicatorBuilderFeed(context),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-            BlocListener<LMFeedBloc, LMFeedState>(
-              bloc: _feedBloc,
-              listener: (context, LMFeedState state) =>
-                  updatePagingControllers(state),
-              child: ValueListenableBuilder(
-                valueListenable: rebuildPostWidget,
-                builder: (context, _, __) {
-                  return PagedSliverList<int, LMPostViewData>(
-                    pagingController: _pagingController,
-                    builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
-                      itemBuilder: (context, item, index) {
-                        if (_feedBloc.users[item.uuid] == null) {
-                          return const SizedBox();
-                        }
-                        LMFeedPostWidget postWidget =
-                            defPostWidget(context, feedThemeData, item);
-                        return widget.postBuilder
-                                ?.call(context, postWidget, item) ??
-                            _widgetsBuilder.postWidgetBuilder.call(
-                                context, postWidget, item,
-                                source: _widgetSource);
-                      },
-                      noItemsFoundIndicatorBuilder: (context) {
-                        if (_feedBloc.state is LMFeedUniversalFeedLoadedState &&
-                            (_feedBloc.state as LMFeedUniversalFeedLoadedState)
-                                .topics
-                                .isNotEmpty) {
-                          return _widgetsBuilder.noPostUnderTopicFeed(context,
-                              actionable: changeFilter(context));
-                        }
-                        return _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(
-                            context,
-                            createPostButton: createPostButton(context));
-                      },
-                      noMoreItemsIndicatorBuilder: (context) {
-                        return widget.noMoreItemsIndicatorBuilder
-                                ?.call(context) ??
-                            _widgetsBuilder
-                                .noMoreItemsIndicatorBuilderFeed(context);
-                      },
-                      newPageProgressIndicatorBuilder: (context) {
-                        return widget.newPageProgressIndicatorBuilder
-                                ?.call(context) ??
-                            _widgetsBuilder
-                                .newPageProgressIndicatorBuilderFeed(context);
-                      },
-                      firstPageProgressIndicatorBuilder: (context) =>
-                          widget.firstPageProgressIndicatorBuilder
-                              ?.call(context) ??
-                          _widgetsBuilder
-                              .firstPageProgressIndicatorBuilderFeed(context),
-                      firstPageErrorIndicatorBuilder: (context) =>
-                          widget.firstPageErrorIndicatorBuilder
-                              ?.call(context) ??
-                          _widgetsBuilder
-                              .firstPageErrorIndicatorBuilderFeed(context),
-                      newPageErrorIndicatorBuilder: (context) =>
-                          widget.newPageErrorIndicatorBuilder?.call(context) ??
-                          _widgetsBuilder
-                              .newPageErrorIndicatorBuilderFeed(context),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

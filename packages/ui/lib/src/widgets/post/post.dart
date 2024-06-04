@@ -231,6 +231,7 @@ class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
           boxShadow: style?.boxShadow,
           border: style?.border,
         ),
+        clipBehavior: Clip.hardEdge,
         padding: style?.padding,
         margin: style?.margin,
         child: Column(

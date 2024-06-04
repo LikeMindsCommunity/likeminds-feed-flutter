@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     final theme = LMFeedTheme.instance.theme;
 
     return Container(
+      width: min(600, MediaQuery.of(context).size.width),
       decoration: BoxDecoration(
         color: inStyle.backgroundColor ?? Colors.white,
         border: inStyle.border ??
@@ -61,9 +63,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 style: LMFeedButtonStyle(
                                   icon: LMFeedIcon(
                                     type: LMFeedIconType.icon,
-                                    icon: Platform.isAndroid
-                                        ? Icons.arrow_back
-                                        : CupertinoIcons.chevron_back,
+                                    icon: Icons.arrow_back,
                                     style: LMFeedIconStyle(
                                       color: theme.onContainer,
                                       size: 24,
@@ -100,9 +100,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                           style: LMFeedButtonStyle(
                             icon: LMFeedIcon(
                               type: LMFeedIconType.icon,
-                              icon: Platform.isAndroid
-                                  ? Icons.chevron_left
-                                  : CupertinoIcons.chevron_back,
+                              icon: Icons.chevron_left,
                               style: LMFeedIconStyle(
                                 color: theme.onContainer,
                                 size: 24,

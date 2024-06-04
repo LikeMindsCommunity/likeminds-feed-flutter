@@ -3,11 +3,14 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+LMFeedPlatform feedPlatform = LMFeedPlatform.instance;
 
 class LMFeedMediaHandler {
   static Future<LMResponse<bool>> handlePermissions(int mediaType) async {
-    if (Platform.isAndroid) {
+    if (feedPlatform.isAndroid()) {
       PermissionStatus permissionStatus;
 
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -133,7 +136,7 @@ class LMFeedMediaHandler {
                 'A total of ${composeScreenConfig.mediaLimit} attachments can be added to a post');
       } else {
         for (PlatformFile pFile in pickedFiles.files) {
-          File file = File(pFile.path!);
+          File file = File.fromRawPath(pFile.bytes!);
           int fileBytes = await file.length();
           double fileSize = getFileSizeInDouble(fileBytes);
           if (fileSize > sizeLimit) {
@@ -190,7 +193,7 @@ class LMFeedMediaHandler {
           } else {
             LMMediaModel documentFile = LMMediaModel(
               mediaType: LMMediaType.document,
-              mediaFile: File(pickedFile.path!),
+              mediaFile: File.fromRawPath(pickedFile.bytes!),
               format: pickedFile.extension,
               size: pickedFile.size,
             );
@@ -254,11 +257,12 @@ class LMFeedMediaHandler {
                   'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB');
         }
       }
-      List<File> pickedFiles = list.files.map((e) => File(e.path!)).toList();
+      List<File> pickedFiles =
+          list.files.map((e) => File.fromRawPath(e.bytes!)).toList();
       List<LMMediaModel> mediaFiles = pickedFiles
           .map(
             (e) => LMMediaModel(
-              mediaFile: File(e.path),
+              mediaFile: e,
               mediaType: LMMediaType.image,
             ),
           )
@@ -307,9 +311,10 @@ class LMFeedMediaHandler {
           );
         }
       }
-      List<File> pickedFiles = list.files.map((e) => File(e.path!)).toList();
+      List<File> pickedFiles =
+          list.files.map((e) => File.fromRawPath(e.bytes!)).toList();
       LMMediaModel mediaFile = LMMediaModel(
-        mediaFile: File(pickedFiles.first.path),
+        mediaFile: pickedFiles.first,
         mediaType: LMMediaType.image,
       );
 

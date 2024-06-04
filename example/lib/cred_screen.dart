@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_sample/globals.dart';
 import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
 import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
@@ -94,9 +95,11 @@ class _CredScreenState extends State<CredScreen> {
   void initState() {
     super.initState();
     fetchUserData();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      initUniLinks(context);
-    });
+    if (!kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        initUniLinks(context);
+      });
+    }
   }
 
   @override

@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/pending_post/pending_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/post_approval_dialog.dart';
 
 part './pending_post_screen_builder_delegate.dart';
@@ -67,7 +69,11 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
 
-  bool iSiOS = Platform.isIOS;
+  bool iSiOS = LMFeedPlatform.instance.isIOS();
+  bool isWeb = LMFeedPlatform.instance.isWeb();
+
+  Size? screenSize;
+  double? screenWidth;
 
   int pageSize = 10;
 
@@ -138,108 +144,121 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenSize = MediaQuery.sizeOf(context);
+    screenWidth = min(600, screenSize!.width);
     return _widgetsBuilder.scaffold(
       appBar: _postScreenBuilderDeletegate.appBarBuilder(
           context, defAppBar(), pendingPostCount),
       backgroundColor: feedThemeData.backgroundColor,
-      body: MultiBlocListener(
-        listeners: [
-          BlocListener<LMFeedPostBloc, LMFeedPostState>(
-            bloc: newPostBloc,
-            listener: (context, state) {
-              if (state is LMFeedEditPostUploadedState) {
-                // Clear the post list and refresh the page
-                pagingController.itemList?.clear();
-                pagingController.refresh();
-              } else if (state is LMFeedPostDeletedState) {
-                // Fetch the post id of the deleted post
-                String postId = state.pendingPostId ?? state.postId ?? '';
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: screenWidth,
+          child: MultiBlocListener(
+            listeners: [
+              BlocListener<LMFeedPostBloc, LMFeedPostState>(
+                bloc: newPostBloc,
+                listener: (context, state) {
+                  if (state is LMFeedEditPostUploadedState) {
+                    // Clear the post list and refresh the page
+                    pagingController.itemList?.clear();
+                    pagingController.refresh();
+                  } else if (state is LMFeedPostDeletedState) {
+                    // Fetch the post id of the deleted post
+                    String postId = state.pendingPostId ?? state.postId ?? '';
 
-                List<LMPostViewData> postList = pagingController.itemList ?? [];
-                // Remove the deleted post from the list
-                postList.removeWhere((element) => element.id == postId);
-                // Update pending post count
-                pendingPostCount--;
-                // Update app bar title according to the newly update
-                // pending post count
-                updateAppBarTitle();
-                // rebuild the post list to update the UI
-                rebuildPostWidget.value = !rebuildPostWidget.value;
-              }
-            },
+                    List<LMPostViewData> postList =
+                        pagingController.itemList ?? [];
+                    // Remove the deleted post from the list
+                    postList.removeWhere((element) => element.id == postId);
+                    // Update pending post count
+                    pendingPostCount--;
+                    // Update app bar title according to the newly update
+                    // pending post count
+                    updateAppBarTitle();
+                    // rebuild the post list to update the UI
+                    rebuildPostWidget.value = !rebuildPostWidget.value;
+                  }
+                },
+              ),
+              BlocListener<LMFeedPendingBloc, LMFeedPendingState>(
+                bloc: pendingBloc,
+                listener: (context, state) {
+                  if (state is LMFeedPendingPostsLoadedState) {
+                    if (state.page == 1) {
+                      pendingPostCount = state.totalCount;
+                      updateAppBarTitle();
+                    }
+                    if (state.posts.isEmpty || state.posts.length < pageSize)
+                      pagingController.appendLastPage(state.posts);
+                    else {
+                      pagingController.appendPage(state.posts, state.page + 1);
+                    }
+                  } else if (state is LMFeedPendingPostsErrorState) {
+                    pagingController.error = state.errorMessage;
+                  }
+                },
+              ),
+            ],
+            child: RefreshIndicator.adaptive(
+              color: feedThemeData.primaryColor,
+              onRefresh: () async {
+                refreshPage();
+              },
+              child: ValueListenableBuilder(
+                  valueListenable: rebuildPostWidget,
+                  builder: (context, _, __) {
+                    return PagedListView(
+                      pagingController: pagingController,
+                      padding:
+                          isWeb ? EdgeInsets.only(top: 20.0) : EdgeInsets.zero,
+                      builderDelegate:
+                          PagedChildBuilderDelegate<LMPostViewData>(
+                        itemBuilder: (context, item, index) {
+                          LMFeedPostWidget postWidget =
+                              defPostWidget(context, item);
+                          return widget.postBuilder
+                                  ?.call(context, postWidget, item) ??
+                              _widgetsBuilder.postWidgetBuilder.call(
+                                  context, postWidget, item,
+                                  source: _widgetSource);
+                        },
+                        noItemsFoundIndicatorBuilder: (context) {
+                          return _widgetsBuilder
+                              .noItemsFoundIndicatorBuilderFeed(context);
+                        },
+                        noMoreItemsIndicatorBuilder: (context) {
+                          return widget.noMoreItemsIndicatorBuilder
+                                  ?.call(context) ??
+                              _widgetsBuilder
+                                  .noMoreItemsIndicatorBuilderFeed(context);
+                        },
+                        newPageProgressIndicatorBuilder: (context) {
+                          return widget.newPageProgressIndicatorBuilder
+                                  ?.call(context) ??
+                              _widgetsBuilder
+                                  .newPageProgressIndicatorBuilderFeed(context);
+                        },
+                        firstPageProgressIndicatorBuilder: (context) =>
+                            widget.firstPageProgressIndicatorBuilder
+                                ?.call(context) ??
+                            _widgetsBuilder
+                                .firstPageProgressIndicatorBuilderFeed(context),
+                        firstPageErrorIndicatorBuilder: (context) =>
+                            widget.firstPageErrorIndicatorBuilder
+                                ?.call(context) ??
+                            _widgetsBuilder
+                                .firstPageErrorIndicatorBuilderFeed(context),
+                        newPageErrorIndicatorBuilder: (context) =>
+                            widget.newPageErrorIndicatorBuilder
+                                ?.call(context) ??
+                            _widgetsBuilder
+                                .newPageErrorIndicatorBuilderFeed(context),
+                      ),
+                    );
+                  }),
+            ),
           ),
-          BlocListener<LMFeedPendingBloc, LMFeedPendingState>(
-            bloc: pendingBloc,
-            listener: (context, state) {
-              if (state is LMFeedPendingPostsLoadedState) {
-                if (state.page == 1) {
-                  pendingPostCount = state.totalCount;
-                  updateAppBarTitle();
-                }
-                if (state.posts.isEmpty || state.posts.length < pageSize)
-                  pagingController.appendLastPage(state.posts);
-                else {
-                  pagingController.appendPage(state.posts, state.page + 1);
-                }
-              } else if (state is LMFeedPendingPostsErrorState) {
-                pagingController.error = state.errorMessage;
-              }
-            },
-          ),
-        ],
-        child: RefreshIndicator.adaptive(
-          color: feedThemeData.primaryColor,
-          onRefresh: () async {
-            refreshPage();
-          },
-          child: ValueListenableBuilder(
-              valueListenable: rebuildPostWidget,
-              builder: (context, _, __) {
-                return PagedListView(
-                  pagingController: pagingController,
-                  padding: EdgeInsets.zero,
-                  builderDelegate: PagedChildBuilderDelegate<LMPostViewData>(
-                    itemBuilder: (context, item, index) {
-                      LMFeedPostWidget postWidget =
-                          defPostWidget(context, item);
-                      return widget.postBuilder
-                              ?.call(context, postWidget, item) ??
-                          _widgetsBuilder.postWidgetBuilder.call(
-                              context, postWidget, item,
-                              source: _widgetSource);
-                    },
-                    noItemsFoundIndicatorBuilder: (context) {
-                      return _widgetsBuilder
-                          .noItemsFoundIndicatorBuilderFeed(context);
-                    },
-                    noMoreItemsIndicatorBuilder: (context) {
-                      return widget.noMoreItemsIndicatorBuilder
-                              ?.call(context) ??
-                          _widgetsBuilder
-                              .noMoreItemsIndicatorBuilderFeed(context);
-                    },
-                    newPageProgressIndicatorBuilder: (context) {
-                      return widget.newPageProgressIndicatorBuilder
-                              ?.call(context) ??
-                          _widgetsBuilder
-                              .newPageProgressIndicatorBuilderFeed(context);
-                    },
-                    firstPageProgressIndicatorBuilder: (context) =>
-                        widget.firstPageProgressIndicatorBuilder
-                            ?.call(context) ??
-                        _widgetsBuilder
-                            .firstPageProgressIndicatorBuilderFeed(context),
-                    firstPageErrorIndicatorBuilder: (context) =>
-                        widget.firstPageErrorIndicatorBuilder?.call(context) ??
-                        _widgetsBuilder
-                            .firstPageErrorIndicatorBuilderFeed(context),
-                    newPageErrorIndicatorBuilder: (context) =>
-                        widget.newPageErrorIndicatorBuilder?.call(context) ??
-                        _widgetsBuilder
-                            .newPageErrorIndicatorBuilderFeed(context),
-                  ),
-                );
-              }),
         ),
       ),
     );
