@@ -389,7 +389,7 @@ class _CredScreenState extends State<CredScreen> {
     }
 
     // define the route
-    Widget? navigationWidget = _getNavigationWidget(selectedTheme);
+    Widget? navigationWidget = _getNavigationWidget(selectedTheme, uuid);
     if (navigationWidget == null) {
       Navigator.pop(context);
       return;
@@ -423,13 +423,13 @@ class _CredScreenState extends State<CredScreen> {
     }
   }
 
-  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme) {
+  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme, String uuid) {
     switch (selectedTheme) {
       case LMFeedFlavor.social:
         {
-          return const ExampleTabScreen(
-            uuid: "",
-            feedWidget: LMFeedScreen(),
+          return ExampleTabScreen(
+            uuid: uuid,
+            feedWidget: const LMFeedScreen(),
           );
         }
       case LMFeedFlavor.socialFeedRoom:
