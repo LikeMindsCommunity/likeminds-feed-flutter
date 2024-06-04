@@ -927,6 +927,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 _postDetailScreenHandler!.postData!.likeCount)),
         style: feedTheme.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (_postDetailScreenHandler!.postData!.likeCount == 0) {
+            return;
+          }
           LMFeedVideoProvider.instance.pauseCurrentVideo();
 
           Navigator.of(context, rootNavigator: true).push(
