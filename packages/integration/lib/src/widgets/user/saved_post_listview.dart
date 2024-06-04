@@ -572,8 +572,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }

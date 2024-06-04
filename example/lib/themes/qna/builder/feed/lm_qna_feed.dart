@@ -847,6 +847,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
+      pollBuilder: LMFeedCore.widgetUtility.pollWidgetBuilder,
       onMediaTap: (position) {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 

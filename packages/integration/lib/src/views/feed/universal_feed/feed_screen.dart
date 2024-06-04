@@ -1341,8 +1341,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }

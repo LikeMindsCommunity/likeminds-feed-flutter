@@ -36,7 +36,7 @@ Future<void> submitVote(
             "Please select exactly ${attachmentMeta.multiSelectNo} options",
             source,
           );
-          rebuildPostWidget.value = !rebuildPostWidget.value;
+          // rebuildPostWidget.value = !rebuildPostWidget.value;
           return;
         } else if (attachmentMeta.multiSelectState! ==
                 PollMultiSelectState.atLeast &&

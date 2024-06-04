@@ -659,19 +659,23 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     break;
                   case LMMediaType.document:
                     {
-                      mediaWidget = LMFeedDocument(
-                        documentUrl: mediaModel.link,
-                        style: style?.mediaStyle?.documentStyle?.copyWith(
-                              width: style?.mediaStyle?.documentStyle?.width ??
-                                  MediaQuery.of(context).size.width - 84,
-                            ) ??
-                            LMFeedPostDocumentStyle(
-                              width: screenSize!.width - 84,
-                              height: 90,
-                              removeIcon: null,
-                            ),
-                        size: PostHelper.getFileSizeString(
-                            bytes: mediaModel.size ?? 0),
+                      mediaWidget = Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: LMFeedDocument(
+                          documentUrl: mediaModel.link,
+                          style: style?.mediaStyle?.documentStyle?.copyWith(
+                                width:
+                                    style?.mediaStyle?.documentStyle?.width ??
+                                        MediaQuery.of(context).size.width - 84,
+                              ) ??
+                              LMFeedPostDocumentStyle(
+                                width: screenSize!.width - 84,
+                                height: 90,
+                                removeIcon: null,
+                              ),
+                          size: PostHelper.getFileSizeString(
+                              bytes: mediaModel.size ?? 0),
+                        ),
                       );
                       break;
                     }

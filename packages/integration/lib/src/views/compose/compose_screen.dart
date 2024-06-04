@@ -531,25 +531,29 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     break;
                   case LMMediaType.document:
                     {
-                      mediaWidget = LMFeedDocument(
-                        onRemove: () {
-                          composeBloc.add(
-                            LMFeedComposeRemoveAttachmentEvent(
-                              index: index,
-                            ),
-                          );
-                        },
-                        documentFile: composeBloc.postMedia[index].mediaFile,
-                        style: style?.mediaStyle?.documentStyle?.copyWith(
-                              width: style?.mediaStyle?.documentStyle?.width ??
-                                  MediaQuery.of(context).size.width,
-                            ) ??
-                            LMFeedPostDocumentStyle(
-                              width: screenSize!.width,
-                              height: 90,
-                            ),
-                        size: PostHelper.getFileSizeString(
-                            bytes: composeBloc.postMedia[index].size ?? 0),
+                      mediaWidget = Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: LMFeedDocument(
+                          onRemove: () {
+                            composeBloc.add(
+                              LMFeedComposeRemoveAttachmentEvent(
+                                index: index,
+                              ),
+                            );
+                          },
+                          documentFile: composeBloc.postMedia[index].mediaFile,
+                          style: style?.mediaStyle?.documentStyle?.copyWith(
+                                width:
+                                    style?.mediaStyle?.documentStyle?.width ??
+                                        MediaQuery.of(context).size.width,
+                              ) ??
+                              LMFeedPostDocumentStyle(
+                                width: screenSize!.width,
+                                height: 90,
+                              ),
+                          size: PostHelper.getFileSizeString(
+                              bytes: composeBloc.postMedia[index].size ?? 0),
+                        ),
                       );
                       break;
                     }

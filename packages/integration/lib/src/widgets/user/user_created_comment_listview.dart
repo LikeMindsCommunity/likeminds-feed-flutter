@@ -444,8 +444,6 @@ class _LMFeedUserCreatedCommentListViewState
           rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }
