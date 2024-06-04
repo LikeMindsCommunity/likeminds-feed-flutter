@@ -570,7 +570,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   padding: EdgeInsets.zero,
                   child: Stack(
                     children: <Widget>[
-                      SizedBox(width: screenWidth, child: mediaWidget),
+                      mediaWidget,
                       if (composeBloc.postMedia[index].mediaType !=
                           LMMediaType.document)
                         Positioned(
