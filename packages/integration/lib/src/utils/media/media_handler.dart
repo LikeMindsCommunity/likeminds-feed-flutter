@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -136,7 +137,12 @@ class LMFeedMediaHandler {
                 'A total of ${composeScreenConfig.mediaLimit} attachments can be added to a post');
       } else {
         for (PlatformFile pFile in pickedFiles.files) {
-          File file = File.fromRawPath(pFile.bytes!);
+          File file;
+          if (kIsWeb) {
+            file = File.fromRawPath(pFile.bytes!);
+          } else {
+            file = File(pFile.path!);
+          }
           int fileBytes = await file.length();
           double fileSize = getFileSizeInDouble(fileBytes);
           if (fileSize > sizeLimit) {
@@ -191,9 +197,15 @@ class LMFeedMediaHandler {
                 success: false,
                 errorMessage: 'File size should be smaller than 100MB');
           } else {
+            File file;
+            if (kIsWeb) {
+              file = File.fromRawPath(pickedFile.bytes!);
+            } else {
+              file = File(pickedFile.path!);
+            }
             LMMediaModel documentFile = LMMediaModel(
               mediaType: LMMediaType.document,
-              mediaFile: File.fromRawPath(pickedFile.bytes!),
+              mediaFile: file,
               format: pickedFile.extension,
               size: pickedFile.size,
             );
@@ -257,8 +269,13 @@ class LMFeedMediaHandler {
                   'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB');
         }
       }
-      List<File> pickedFiles =
-          list.files.map((e) => File.fromRawPath(e.bytes!)).toList();
+      List<File> pickedFiles = list.files.map((e) {
+        if (kIsWeb) {
+          return File.fromRawPath(e.bytes!);
+        } else {
+          return File(e.path!);
+        }
+      }).toList();
       List<LMMediaModel> mediaFiles = pickedFiles
           .map(
             (e) => LMMediaModel(
@@ -311,8 +328,13 @@ class LMFeedMediaHandler {
           );
         }
       }
-      List<File> pickedFiles =
-          list.files.map((e) => File.fromRawPath(e.bytes!)).toList();
+      List<File> pickedFiles = list.files.map((e) {
+        if (kIsWeb) {
+          return File.fromRawPath(e.bytes!);
+        } else {
+          return File(e.path!);
+        }
+      }).toList();
       LMMediaModel mediaFile = LMMediaModel(
         mediaFile: pickedFiles.first,
         mediaType: LMMediaType.image,

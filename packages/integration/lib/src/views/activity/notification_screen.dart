@@ -205,32 +205,37 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   Widget _defEmptyNotificationFeedView() {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          LMFeedIcon(
-            type: LMFeedIconType.icon,
-            icon: Icons.post_add,
-            style: LMFeedIconStyle(
-              size: 48,
-              color: feedThemeData.onContainer,
-            ),
-          ),
-          const SizedBox(height: 12),
-          LMFeedText(
-            text: 'No notifications to show',
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 38.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            LMFeedIcon(
+              type: LMFeedIconType.png,
+              assetPath: lmNoResponsePng,
+              style: LMFeedIconStyle(
+                size: 100,
                 color: feedThemeData.onContainer,
               ),
             ),
-          ),
-          SizedBox(
-            height: 48,
-          )
-        ],
+            const SizedBox(height: 18.0),
+            LMFeedText(
+              text: 'Oops! You don\'t have any no notifications yet.',
+              style: LMFeedTextStyle(
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                textStyle: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: feedThemeData.onContainer,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 48,
+            )
+          ],
+        ),
       ),
     );
   }
