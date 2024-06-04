@@ -100,12 +100,6 @@ class LMFeedCore {
 
       this.lmFeedClient = clientBuilder.build();
 
-      LMResponse dbInitResponse = await this.lmFeedClient.init();
-
-      if (!dbInitResponse.success) {
-        return dbInitResponse;
-      }
-
       clientDomain = domain;
       feedConfig = config ?? LMFeedConfig();
       if (widgets != null) _widgetUtility = widgets;
