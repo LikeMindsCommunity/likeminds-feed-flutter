@@ -93,38 +93,31 @@ class LMFeedCore {
     LMFeedBuilderDelegate? builderDelegate,
   }) async {
     try {
-      try {
-        LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
-        this.sdkCallback =
-            LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
-        clientBuilder.sdkCallback(this.sdkCallback);
+      LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
+      this.sdkCallback =
+          LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
+      clientBuilder.sdkCallback(this.sdkCallback);
 
-        this.lmFeedClient = clientBuilder.build();
+      this.lmFeedClient = clientBuilder.build();
 
-        clientDomain = domain;
-        feedConfig = config ?? LMFeedConfig();
-        if (widgets != null) _widgetUtility = widgets;
-        LMFeedTheme.instance
-            .initialise(theme: theme ?? LMFeedThemeData.light());
-        MediaKit.ensureInitialized();
-        if (analyticsListener != null)
-          LMFeedAnalyticsBloc.instance.stream
-              .listen((LMFeedAnalyticsState event) {
-            if (event is LMFeedAnalyticsEventFired) {
-              analyticsListener.call(event);
-            }
-          });
-        if (profileListener != null)
-          LMFeedProfileBloc.instance.stream.listen((event) {
-            profileListener.call(event);
-          });
+      clientDomain = domain;
+      feedConfig = config ?? LMFeedConfig();
+      if (widgets != null) _widgetUtility = widgets;
+      LMFeedTheme.instance.initialise(theme: theme ?? LMFeedThemeData.light());
+      MediaKit.ensureInitialized();
+      if (analyticsListener != null)
+        LMFeedAnalyticsBloc.instance.stream
+            .listen((LMFeedAnalyticsState event) {
+          if (event is LMFeedAnalyticsEventFired) {
+            analyticsListener.call(event);
+          }
+        });
+      if (profileListener != null)
+        LMFeedProfileBloc.instance.stream.listen((event) {
+          profileListener.call(event);
+        });
 
-        _feedBuilderDelegate = builderDelegate ?? LMFeedBuilderDelegate();
-
-        return LMResponse(success: true);
-      } catch (e) {
-        return LMResponse(success: false, errorMessage: e.toString());
-      }
+      _feedBuilderDelegate = builderDelegate ?? LMFeedBuilderDelegate();
 
       return LMResponse(success: true);
     } catch (e) {
