@@ -652,6 +652,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       }
                       if (curr is LMFeedNewPostErrorState) {
                         postUploading.value = false;
+                        isPostEditing = false;
                         LMFeedCore.showSnackBar(
                           context,
                           curr.errorMessage,
