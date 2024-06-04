@@ -875,6 +875,10 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                 postViewData.likeCount)),
         style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           LMFeedVideoProvider.instance.pauseCurrentVideo();
 
           Navigator.of(context, rootNavigator: true).push(

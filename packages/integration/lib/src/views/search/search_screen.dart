@@ -749,6 +749,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 postViewData.likeCount)),
         style: theme.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
