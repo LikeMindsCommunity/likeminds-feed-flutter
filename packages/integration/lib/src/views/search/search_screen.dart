@@ -983,7 +983,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 borderRadius: 28,
                 backgroundColor: theme.primaryColor,
                 height: 44,
-                width: 153,
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 placement: LMFeedIconButtonPlacement.end,
