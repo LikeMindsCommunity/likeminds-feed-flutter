@@ -183,9 +183,9 @@ class _LMFeedUserCreatedCommentListViewState
             }));
   }
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -195,13 +195,13 @@ class _LMFeedUserCreatedCommentListViewState
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return LMFeedIcon(
           type: LMFeedIconType.svg,
           assetPath: kAssetNoPostsIcon,
@@ -321,7 +321,7 @@ class _LMFeedUserCreatedCommentListViewState
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });
@@ -706,7 +706,7 @@ class _LMFeedUserCreatedCommentListViewState
             // ignore: use_build_context_synchronously
             LMAttachmentViewData attachmentViewData =
                 (LMAttachmentViewDataBuilder()
-                      ..attachmentType(8)
+                      ..attachmentType(LMMediaType.repost)
                       ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                             ..repost(postViewData))
                           .build()))

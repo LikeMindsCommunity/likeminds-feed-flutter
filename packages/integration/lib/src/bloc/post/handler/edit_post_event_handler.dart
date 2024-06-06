@@ -25,10 +25,8 @@ Future<void> editPost(
   try {
     emit(LMFeedEditPostUploadingState());
 
-    List<LMAttachmentViewData> attachmentViewData = LMFeedComposeBloc
-        .instance.postMedia
-        .map((e) => e.toAttachmentViewData())
-        .toList();
+    List<LMAttachmentViewData> attachmentViewData =
+        LMFeedComposeBloc.instance.postMedia;
     // Mapping [LMAttachmentViewData] to [Attachment]
     List<Attachment>? attachments = attachmentViewData
         .map((e) => LMAttachmentViewDataConvertor.toAttachment(e))
@@ -152,10 +150,8 @@ Future<void> editPendingPost(
   try {
     emit(LMFeedEditPostUploadingState());
 
-    List<LMAttachmentViewData> attachmentViewData = LMFeedComposeBloc
-        .instance.postMedia
-        .map((e) => e.toAttachmentViewData())
-        .toList();
+    List<LMAttachmentViewData> attachmentViewData =
+        LMFeedComposeBloc.instance.postMedia;
     // Mapping [LMAttachmentViewData] to [Attachment]
     List<Attachment>? attachments = attachmentViewData
         .map((e) => LMAttachmentViewDataConvertor.toAttachment(e))

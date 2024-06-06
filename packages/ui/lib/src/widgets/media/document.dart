@@ -8,7 +8,7 @@ class LMFeedDocument extends StatefulWidget {
   const LMFeedDocument({
     super.key,
     this.onTap,
-    this.documentFile,
+    this.documentPath,
     this.documentUrl,
     this.type = 'pdf',
     this.size,
@@ -16,11 +16,11 @@ class LMFeedDocument extends StatefulWidget {
     this.subtitle,
     this.onRemove,
     this.style,
-  }) : assert(documentFile != null || documentUrl != null);
+  }) : assert(documentPath != null || documentUrl != null);
 
   final Function()? onTap;
 
-  final File? documentFile;
+  final String? documentPath;
   final String? documentUrl;
   final String? type;
   final String? size;
@@ -37,7 +37,7 @@ class LMFeedDocument extends StatefulWidget {
 
   LMFeedDocument copyWith({
     Function()? onTap,
-    File? documentFile,
+    String? documentPath,
     String? documentUrl,
     String? type,
     String? size,
@@ -48,7 +48,7 @@ class LMFeedDocument extends StatefulWidget {
   }) {
     return LMFeedDocument(
       onTap: onTap ?? this.onTap,
-      documentFile: documentFile ?? this.documentFile,
+      documentPath: documentPath ?? this.documentPath,
       documentUrl: documentUrl ?? this.documentUrl,
       type: type ?? this.type,
       size: size ?? this.size,
@@ -75,7 +75,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
       final String url = widget.documentUrl!;
       file = File(url);
     } else {
-      file = widget.documentFile!;
+      file = File(widget.documentPath!);
     }
     _fileExtension = widget.type;
     _fileSize = widget.size;
@@ -92,7 +92,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
   @override
   void didUpdateWidget(covariant LMFeedDocument oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.documentFile != widget.documentFile ||
+    if (oldWidget.documentPath != widget.documentPath ||
         oldWidget.documentUrl != widget.documentUrl) {
       fileLoaderFuture = loadFile();
     }
@@ -207,7 +207,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                       ),
                     ),
                     const SizedBox(width: 32),
-                    widget.documentFile != null
+                    widget.documentPath != null
                         ? LMFeedButton(
                             style: LMFeedButtonStyle(
                               icon: style!.removeIcon ??

@@ -11,9 +11,10 @@ addLinkPreviewEventHandler(
     LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
 
     if (composeBloc.imageCount +
-            composeBloc.videoCount +
-            composeBloc.documentCount >
-        0 || composeBloc.isPollAdded) {
+                composeBloc.videoCount +
+                composeBloc.documentCount >
+            0 ||
+        composeBloc.isPollAdded) {
       return;
     }
 
@@ -31,9 +32,9 @@ addLinkPreviewEventHandler(
     if (response.success == true) {
       OgTags responseTags = response.ogTags!;
 
-      LMMediaModel linkModel = LMMediaModel(
-        mediaType: LMMediaType.link,
-        link: url,
+      LMAttachmentViewData linkModel = LMAttachmentViewData.fromMediaUrl(
+        attachmentType: LMMediaType.link,
+        url: url,
         ogTags: LMOgTagsViewDataConvertor.fromAttachmentsMetaOgTags(
           responseTags,
         ),

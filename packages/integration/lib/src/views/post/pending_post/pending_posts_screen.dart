@@ -553,7 +553,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });

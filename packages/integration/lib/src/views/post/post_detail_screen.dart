@@ -791,7 +791,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });
@@ -1051,7 +1051,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
                       (LMAttachmentViewDataBuilder()
-                            ..attachmentType(8)
+                            ..attachmentType(LMMediaType.repost)
                             ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                                   ..repost(_postDetailScreenHandler!.postData!))
                                 .build()))

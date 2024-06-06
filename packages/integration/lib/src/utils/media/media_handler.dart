@@ -94,13 +94,13 @@ class LMFeedMediaHandler {
     return LMResponse(success: true);
   }
 
-  static Future<LMResponse<List<LMMediaModel>>> pickVideos(
+  static Future<LMResponse<List<LMAttachmentViewData>>> pickVideos(
       int currentMediaLength) async {
     try {
       LMFeedComposeScreenConfig composeScreenConfig =
           LMFeedCore.config.composeConfig;
       // final XFile? pickedFile =
-      List<LMMediaModel> videoFiles = [];
+      List<LMAttachmentViewData> videoFiles = [];
       final FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
         allowMultiple: true,
         type: FileType.video,
@@ -145,12 +145,22 @@ class LMFeedMediaHandler {
                 errorMessage:
                     'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB');
           } else {
-            LMMediaModel videoFile = LMMediaModel(
-              mediaType: LMMediaType.video,
-              mediaFile: file,
-              size: fileSize.toInt(),
-              duration: 0,
-            );
+            LMAttachmentViewData videoFile;
+            if (kIsWeb) {
+              videoFile = LMAttachmentViewData.fromMediaBytes(
+                attachmentType: LMMediaType.video,
+                bytes: pFile.bytes!,
+                size: fileSize.toInt(),
+                duration: 0,
+              );
+            } else {
+              videoFile = LMAttachmentViewData.fromMediaPath(
+                attachmentType: LMMediaType.video,
+                path: pFile.path!,
+                size: fileSize.toInt(),
+                duration: 0,
+              );
+            }
             videoFiles.add(videoFile);
           }
         }
@@ -162,7 +172,7 @@ class LMFeedMediaHandler {
     }
   }
 
-  static Future<LMResponse<List<LMMediaModel>>> pickDocuments(
+  static Future<LMResponse<List<LMAttachmentViewData>>> pickDocuments(
       int currentMediaLength) async {
     try {
       LMFeedComposeScreenConfig composeScreenConfig =
@@ -184,19 +194,31 @@ class LMFeedMediaHandler {
               errorMessage:
                   'A total of ${composeScreenConfig.documentLimit} documents can be added to a post');
         }
-        List<LMMediaModel> attachedFiles = [];
+        List<LMAttachmentViewData> attachedFiles = [];
         for (var pickedFile in pickedFiles.files) {
           if (getFileSizeInDouble(pickedFile.size) > 100) {
             return LMResponse(
                 success: false,
                 errorMessage: 'File size should be smaller than 100MB');
           } else {
-            LMMediaModel documentFile = LMMediaModel(
-              mediaType: LMMediaType.document,
-              mediaFile: File.fromRawPath(pickedFile.bytes!),
-              format: pickedFile.extension,
-              size: pickedFile.size,
-            );
+            LMAttachmentViewData documentFile;
+
+            if (kIsWeb) {
+              documentFile = LMAttachmentViewData.fromMediaBytes(
+                attachmentType: LMMediaType.document,
+                bytes: pickedFile.bytes!,
+                format: pickedFile.extension,
+                size: pickedFile.size,
+              );
+            } else {
+              documentFile = LMAttachmentViewData.fromMediaPath(
+                attachmentType: LMMediaType.document,
+                path: pickedFile.path!,
+                format: pickedFile.extension,
+                size: pickedFile.size,
+              );
+            }
+
             attachedFiles.add(documentFile);
           }
         }
@@ -212,7 +234,7 @@ class LMFeedMediaHandler {
     }
   }
 
-  static Future<LMResponse<List<LMMediaModel>>> pickImages(
+  static Future<LMResponse<List<LMAttachmentViewData>>> pickImages(
       int mediaCount) async {
     LMFeedComposeScreenConfig composeScreenConfig =
         LMFeedCore.config.composeConfig;
@@ -257,24 +279,34 @@ class LMFeedMediaHandler {
                   'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB');
         }
       }
-      List<File> pickedFiles =
-          list.files.map((e) => File.fromRawPath(e.bytes!)).toList();
-      List<LMMediaModel> mediaFiles = pickedFiles
-          .map(
-            (e) => LMMediaModel(
-              mediaFile: e,
-              mediaType: LMMediaType.image,
-            ),
-          )
-          .toList();
 
-      return LMResponse(success: true, data: mediaFiles);
+      List<LMAttachmentViewData> attachedImages;
+
+      if (kIsWeb) {
+        attachedImages = list.files.map((e) {
+          return LMAttachmentViewData.fromMediaBytes(
+            attachmentType: LMMediaType.image,
+            bytes: e.bytes!,
+            format: 'image',
+          );
+        }).toList();
+      } else {
+        attachedImages = list.files.map((e) {
+          return LMAttachmentViewData.fromMediaPath(
+            attachmentType: LMMediaType.image,
+            path: e.path!,
+            format: 'image',
+          );
+        }).toList();
+      }
+
+      return LMResponse(success: true, data: attachedImages);
     } else {
       return LMResponse(success: true);
     }
   }
 
-  static Future<LMResponse<LMMediaModel>> pickSingleImage() async {
+  static Future<LMResponse<LMAttachmentViewData>> pickSingleImage() async {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
@@ -311,12 +343,19 @@ class LMFeedMediaHandler {
           );
         }
       }
-      List<File> pickedFiles =
-          list.files.map((e) => File.fromRawPath(e.bytes!)).toList();
-      LMMediaModel mediaFile = LMMediaModel(
-        mediaFile: pickedFiles.first,
-        mediaType: LMMediaType.image,
-      );
+      LMAttachmentViewData mediaFile;
+
+      if (kIsWeb) {
+        mediaFile = LMAttachmentViewData.fromMediaBytes(
+          attachmentType: LMMediaType.image,
+          bytes: list.files.first.bytes!,
+        );
+      } else {
+        mediaFile = LMAttachmentViewData.fromMediaPath(
+          attachmentType: LMMediaType.image,
+          path: list.files.first.path!,
+        );
+      }
 
       return LMResponse(success: true, data: mediaFile);
     } else {

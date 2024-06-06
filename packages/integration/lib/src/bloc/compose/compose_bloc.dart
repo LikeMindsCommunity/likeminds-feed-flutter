@@ -36,7 +36,7 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
   // is poll added to the post
   bool isPollAdded = false;
   // List of media attached to the post
-  List<LMMediaModel> postMedia = [];
+  List<LMAttachmentViewData> postMedia = [];
   // List of user tags added to the post
   List<LMUserTagViewData> userTags = [];
   // List of topics added to the post

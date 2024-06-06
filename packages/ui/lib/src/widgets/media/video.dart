@@ -15,7 +15,7 @@ class LMFeedVideo extends StatefulWidget {
     super.key,
     required this.postId,
     this.videoUrl,
-    this.videoFile,
+    this.videoPath,
     this.playButton,
     this.pauseButton,
     this.muteButton,
@@ -24,11 +24,11 @@ class LMFeedVideo extends StatefulWidget {
     this.videoController,
     this.position,
     this.autoPlay = false,
-  }) : assert(videoUrl != null || videoFile != null);
+  }) : assert(videoUrl != null || videoPath != null);
 
   //Video asset variables
   final String? videoUrl;
-  final File? videoFile;
+  final String? videoPath;
   final VideoController? videoController;
   final int? position;
 
@@ -50,7 +50,7 @@ class LMFeedVideo extends StatefulWidget {
   LMFeedVideo copyWith(
       {String? postId,
       String? videoUrl,
-      File? videoFile,
+      String? videoPath,
       LMFeedButton? playButton,
       LMFeedButton? pauseButton,
       LMFeedButton? muteButton,
@@ -60,7 +60,7 @@ class LMFeedVideo extends StatefulWidget {
     return LMFeedVideo(
       postId: postId ?? this.postId,
       videoUrl: videoUrl ?? this.videoUrl,
-      videoFile: videoFile ?? this.videoFile,
+      videoPath: videoPath ?? this.videoPath,
       playButton: playButton ?? this.playButton,
       pauseButton: pauseButton ?? this.pauseButton,
       muteButton: muteButton ?? this.muteButton,
@@ -146,7 +146,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     } else {
       requestBuilder
         ..autoPlay(widget.autoPlay)
-        ..videoSource(widget.videoFile!.uri.toString())
+        ..videoSource(widget.videoPath!)
         ..videoType(LMFeedVideoSourceType.file)
         ..position(widget.position ?? 0);
     }

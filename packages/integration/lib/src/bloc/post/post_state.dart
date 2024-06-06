@@ -208,7 +208,7 @@ class LMFeedUploadingState extends LMFeedPostState {
 /// and is of type [LMMediaModel]
 class LMFeedNewPostUploadingState extends LMFeedUploadingState {
   final Stream<double> progress;
-  final LMMediaModel? thumbnailMedia;
+  final LMAttachmentViewData? thumbnailMedia;
 
   const LMFeedNewPostUploadingState(
       {required this.progress, this.thumbnailMedia});

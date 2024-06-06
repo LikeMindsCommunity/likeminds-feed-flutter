@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -783,9 +786,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
     }
   }
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -795,13 +798,13 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return LMFeedTheme
                 .instance.theme.mediaStyle.documentStyle.documentIcon ??
             LMFeedIcon(
@@ -813,35 +816,45 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 boxPadding: 0,
               ),
             );
-      } else if (media.mediaType == LMMediaType.video) {
-        final thumbnailFile = VideoCompress.getFileThumbnail(
-          media.mediaFile!.path,
-          quality: 50, // default(100)
-          position: -1, // default(-1)
-        );
-        return FutureBuilder(
-          future: thumbnailFile,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Container(
-                height: 50,
-                width: 50,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                child: LMFeedImage(
-                  imageFile: snapshot.data,
-                  style: const LMFeedPostImageStyle(
-                    boxFit: BoxFit.contain,
-                  ),
-                ),
-              );
-            }
-            return LMFeedLoader();
-          },
-        );
+      } else if (media.attachmentType == LMMediaType.video) {
+        return const SizedBox();
+        // TODO: Add video thumbnail
+        // File videoThumbnail;
+
+        // if (kIsWeb) {
+        //   videoThumbnail = File(media.attachmentMeta.path!);
+        // } else {
+        //   videoThumbnail = File.fromRawPath(media.attachmentMeta.bytes!);
+        // }
+
+        // final thumbnailFile = VideoCompress.getFileThumbnail(
+        //   videoThumbnail.path,
+        //   quality: 50, // default(100)
+        //   position: -1, // default(-1)
+        // );
+        // return FutureBuilder(
+        //   future: thumbnailFile,
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasData) {
+        //       return Container(
+        //         height: 50,
+        //         width: 50,
+        //         clipBehavior: Clip.hardEdge,
+        //         decoration: BoxDecoration(
+        //           color: Colors.black,
+        //           borderRadius: BorderRadius.circular(6.0),
+        //         ),
+        //         child: LMFeedImage(
+        //           image: snapshot.data,
+        //           style: const LMFeedPostImageStyle(
+        //             boxFit: BoxFit.contain,
+        //           ),
+        //         ),
+        //       );
+        //     }
+        //     return LMFeedLoader();
+        //   },
+        // );
       } else {
         return const SizedBox.shrink();
       }
@@ -1218,7 +1231,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
                       (LMAttachmentViewDataBuilder()
-                            ..attachmentType(8)
+                            ..attachmentType(LMMediaType.repost)
                             ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                                   ..repost(postViewData))
                                 .build()))

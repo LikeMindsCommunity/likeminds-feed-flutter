@@ -22,7 +22,7 @@ addVideoEventHandler(
   final LMResponse<bool> result = await LMFeedMediaHandler.handlePermissions(2);
   if (result.success) {
     try {
-      final LMResponse<List<LMMediaModel>> videos =
+      final LMResponse<List<LMAttachmentViewData>> videos =
           await LMFeedMediaHandler.pickVideos(mediaCount);
       if (videos.success) {
         if (videos.data != null && videos.data!.isNotEmpty) {
@@ -30,8 +30,8 @@ addVideoEventHandler(
 
           LMFeedComposeBloc.instance.videoCount += countOfPickedVideos;
           LMFeedComposeBloc.instance.postMedia.addAll(videos.data!);
-          LMFeedComposeBloc.instance.postMedia
-              .removeWhere((element) => element.mediaType == LMMediaType.link);
+          LMFeedComposeBloc.instance.postMedia.removeWhere(
+              (element) => element.attachmentType == LMMediaType.link);
 
           LMFeedAnalyticsBloc.instance.add(
             LMFeedFireAnalyticsEvent(

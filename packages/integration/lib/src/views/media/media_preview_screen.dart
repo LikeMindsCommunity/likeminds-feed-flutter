@@ -167,8 +167,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                         width: MediaQuery.of(context).size.width,
                         child: Center(
                           child: LMFeedImage(
-                            imageUrl:
-                                postAttachments[index].attachmentMeta.url!,
+                            image: postAttachments[index],
                             style: LMFeedPostImageStyle(
                               boxFit: BoxFit.contain,
                             ),

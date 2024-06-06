@@ -13,7 +13,8 @@ class LMAttachmentViewDataConvertor {
     LMAttachmentViewDataBuilder attachmentViewDataBuilder =
         LMAttachmentViewDataBuilder();
 
-    attachmentViewDataBuilder.attachmentType(attachment.attachmentType);
+    attachmentViewDataBuilder
+        .attachmentType(mapIntToMediaType(attachment.attachmentType));
     attachmentViewDataBuilder
         .attachmentMeta(LMAttachmentMetaViewDataConvertor.attachmentMeta(
       attachmentMeta: attachment.attachmentMeta,
@@ -27,7 +28,7 @@ class LMAttachmentViewDataConvertor {
 
   static Attachment toAttachment(LMAttachmentViewData attachmentViewData) {
     return Attachment(
-      attachmentType: attachmentViewData.attachmentType,
+      attachmentType: attachmentViewData.mapMediaTypeToInt(),
       attachmentMeta: AttachmentMeta(
         url: attachmentViewData.attachmentMeta.url,
         format: attachmentViewData.attachmentMeta.format,

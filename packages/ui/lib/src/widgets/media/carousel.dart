@@ -110,7 +110,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
           child: Center(
             child: widget.imageItem ??
                 LMFeedImage(
-                  imageUrl: e.attachmentMeta.url,
+                  image: e,
                   style: widget.imageStyle,
                   onError: widget.onError,
                   onMediaTap: widget.onMediaTap,

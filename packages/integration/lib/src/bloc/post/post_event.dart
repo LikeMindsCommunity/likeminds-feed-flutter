@@ -41,7 +41,7 @@ class LMFeedGetPostEvent extends LMFeedPostEvents {
 /// and is of type [List<LMTopicViewData>]
 /// {@endtemplate}
 class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
-  final List<LMMediaModel>? postMedia;
+  final List<LMAttachmentViewData>? postMedia;
   final String? postText;
   final String? heading;
   final LMUserViewData user;

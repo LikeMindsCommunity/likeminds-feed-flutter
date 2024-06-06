@@ -30,7 +30,7 @@ class _LMQnAEditProfileScreenState extends State<LMQnAEditProfileScreen> {
   Future<GetTopicsResponse>? getParentTopics;
   Future<GetTopicsResponse>? getChildTopics;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
-  LMMediaModel? _image;
+  LMAttachmentViewData? _image;
   final ValueNotifier<bool> _rebuildProfileImage = ValueNotifier(false);
 
   @override
@@ -210,7 +210,8 @@ class _LMQnAEditProfileScreenState extends State<LMQnAEditProfileScreen> {
                                   valueListenable: _rebuildProfileImage,
                                   builder: (context, _, __) {
                                     return LMFeedProfilePicture(
-                                      filePath: _image?.mediaFile?.path,
+                                      // TODO: replace this with attachmentviewdata
+                                      filePath: _image?.attachmentMeta.path,
                                       imageUrl: widget.user.imageUrl,
                                       fallbackText: widget.user.name,
                                       style: LMFeedProfilePictureStyle.basic()
@@ -702,7 +703,7 @@ class _LMQnAEditProfileScreenState extends State<LMQnAEditProfileScreen> {
                                 userMetaBloc.add(
                                   LMFeedUserMetaUpdateEvent(
                                     user: widget.user,
-                                    imageFile: _image?.mediaFile,
+                                    imagePath: _image?.attachmentMeta.path,
                                     metadata: {
                                       'username': _userIdController.text,
                                       'description':
@@ -814,7 +815,9 @@ class _LMQnAEditProfileScreenState extends State<LMQnAEditProfileScreen> {
               icon: topic.widgetViewData != null &&
                       topic.widgetViewData!.metadata.containsKey("icon")
                   ? LMFeedImage(
-                      imageUrl: topic.widgetViewData?.metadata['icon'],
+                      image: LMAttachmentViewData.fromMediaUrl(
+                          url: topic.widgetViewData?.metadata['icon'],
+                          attachmentType: LMMediaType.image),
                       style: const LMFeedPostImageStyle(
                           boxFit: BoxFit.contain, height: 15, width: 15),
                     )
@@ -828,7 +831,9 @@ class _LMQnAEditProfileScreenState extends State<LMQnAEditProfileScreen> {
               icon: topic.widgetViewData != null &&
                       topic.widgetViewData!.metadata.containsKey("icon")
                   ? LMFeedImage(
-                      imageUrl: topic.widgetViewData?.metadata['icon'],
+                      image: LMAttachmentViewData.fromMediaUrl(
+                          url: topic.widgetViewData?.metadata['icon'],
+                          attachmentType: LMMediaType.image),
                       style: const LMFeedPostImageStyle(
                           boxFit: BoxFit.contain, height: 15, width: 15),
                     )

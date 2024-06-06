@@ -120,9 +120,11 @@ class _LMFeedTopicDetailsScreenState extends State<LMFeedTopicDetailsScreen> {
                 ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: LMFeedImage(
-                    imageUrl: topicViewData!
-                            .widgetViewData?.metadata["cover_image"] ??
-                        "",
+                    image: LMAttachmentViewData.fromMediaUrl(
+                        url: topicViewData!
+                                .widgetViewData?.metadata["cover_image"] ??
+                            "",
+                        attachmentType: LMMediaType.image),
                     style: const LMFeedPostImageStyle(
                       errorWidget: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -192,8 +194,10 @@ class _LMFeedTopicDetailsScreenState extends State<LMFeedTopicDetailsScreen> {
                     ),
                   ),
                   child: LMFeedImage(
-                    imageUrl:
-                        topicViewData!.widgetViewData?.metadata["icon"] ?? "",
+                    image: LMAttachmentViewData.fromMediaUrl(
+                        url: topicViewData!.widgetViewData?.metadata["icon"] ??
+                            "",
+                        attachmentType: LMMediaType.image),
                     style: const LMFeedPostImageStyle(
                       errorWidget: LMFeedIcon(
                         type: LMFeedIconType.icon,

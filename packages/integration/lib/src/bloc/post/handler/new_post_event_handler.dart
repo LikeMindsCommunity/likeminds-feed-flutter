@@ -3,7 +3,7 @@ part of '../post_bloc.dart';
 void newPostEventHandler(
     LMFeedCreateNewPostEvent event, Emitter<LMFeedPostState> emit) async {
   try {
-    List<LMMediaModel>? postMedia = event.postMedia;
+    List<LMAttachmentViewData>? postMedia = event.postMedia;
     List<Attachment> attachments = [];
     int index = 0;
     bool? isRepost;
@@ -18,61 +18,67 @@ void newPostEventHandler(
           progress: progress.stream,
           thumbnailMedia: postMedia.isEmpty
               ? null
-              : postMedia[0].mediaType == LMMediaType.link
+              : postMedia[0].attachmentType == LMMediaType.link
                   ? null
                   : postMedia[0],
         ),
       );
       for (final media in postMedia) {
-        if (media.mediaType == LMMediaType.poll) {
+        if (media.attachmentType == LMMediaType.poll) {
           attachments.add(
             Attachment(
               attachmentType: 6,
               attachmentMeta:
                   LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMetaViewData!),
+                      media.attachmentMeta),
             ),
           );
           continue;
         }
-        if (media.mediaType == LMMediaType.repost) {
+        if (media.attachmentType == LMMediaType.repost) {
           attachments.add(
             Attachment(
               attachmentType: 8,
-              attachmentMeta: AttachmentMeta(
-                entityId: media.postId,
-              ),
+              attachmentMeta:
+                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
+                      media.attachmentMeta),
             ),
           );
           isRepost = true;
           break;
-        } else if (media.mediaType == LMMediaType.link) {
+        } else if (media.attachmentType == LMMediaType.link) {
           attachments.add(
             Attachment(
               attachmentType: 4,
-              attachmentMeta: AttachmentMeta(
-                  url: media.ogTags!.url,
-                  ogTags: OgTags(
-                    description: media.ogTags!.description,
-                    image: media.ogTags!.image,
-                    title: media.ogTags!.title,
-                    url: media.ogTags!.url,
-                  )),
+              attachmentMeta:
+                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
+                      media.attachmentMeta),
             ),
           );
-        } else if (media.mediaType == LMMediaType.widget) {
+        } else if (media.attachmentType == LMMediaType.widget) {
           attachments.add(
             Attachment(
               attachmentType: 5,
-              attachmentMeta: AttachmentMeta(
-                meta: media.widgetsMeta,
-              ),
+              attachmentMeta:
+                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
+                      media.attachmentMeta),
             ),
           );
         } else {
-          File mediaFile = media.mediaFile!;
-          if (media.mediaType == LMMediaType.video) {
-            int originalSize = media.size!;
+          late File mediaFile;
+          if (media.attachmentMeta.bytes != null) {
+            mediaFile = File.fromRawPath(media.attachmentMeta.bytes!);
+          } else if (media.attachmentMeta.path != null) {
+            mediaFile = File(media.attachmentMeta.path!);
+          } else {
+            LMFeedNewPostErrorState(
+              errorMessage: 'Attachment file not found',
+              event: event,
+            );
+          }
+
+          if (media.attachmentType == LMMediaType.video) {
+            int originalSize = media.attachmentMeta.size!;
 
             var tempFile = await VideoCompress.compressVideo(
               mediaFile.path,
@@ -93,15 +99,9 @@ void newPostEventHandler(
             attachments.add(
               Attachment(
                 attachmentType: media.mapMediaTypeToInt(),
-                attachmentMeta: AttachmentMeta(
-                    url: response,
-                    size: media.mediaType == LMMediaType.document
-                        ? media.size
-                        : null,
-                    format: media.mediaType == LMMediaType.document
-                        ? media.format
-                        : null,
-                    duration: media.mediaType == LMMediaType.video ? 10 : null),
+                attachmentMeta:
+                    LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
+                        media.attachmentMeta),
               ),
             );
             progress.add(index / postMedia.length);
@@ -214,28 +214,27 @@ void newPostEventHandler(
 }
 
 void sendPostCreationCompletedEvent(
-  List<LMMediaModel> postMedia,
+  List<LMAttachmentViewData> postMedia,
   List<LMUserTagViewData> usersTagged,
   List<LMTopicViewData> topics,
 ) {
   Map<String, String> propertiesMap = {};
 
   if (postMedia.isNotEmpty) {
-    if (postMedia.first.mediaType == LMMediaType.link) {
+    if (postMedia.first.attachmentType == LMMediaType.link) {
       propertiesMap['link_attached'] = 'yes';
-      propertiesMap['link'] =
-          postMedia.first.ogTags?.url ?? postMedia.first.link!;
+      propertiesMap['link'] = postMedia.first.attachmentMeta.ogTags?.url ?? '';
     } else {
       propertiesMap['link_attached'] = 'no';
       int imageCount = 0;
       int videoCount = 0;
       int documentCount = 0;
-      for (LMMediaModel media in postMedia) {
-        if (media.mediaType == LMMediaType.image) {
+      for (LMAttachmentViewData media in postMedia) {
+        if (media.attachmentType == LMMediaType.image) {
           imageCount++;
-        } else if (media.mediaType == LMMediaType.video) {
+        } else if (media.attachmentType == LMMediaType.video) {
           videoCount++;
-        } else if (media.mediaType == LMMediaType.document) {
+        } else if (media.attachmentType == LMMediaType.document) {
           documentCount++;
         }
       }
