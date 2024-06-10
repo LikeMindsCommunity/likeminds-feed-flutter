@@ -85,7 +85,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
   void initialiseAttachments() {
     attachments = [...widget.attachments];
     attachments?.removeWhere((element) =>
-        (element.attachmentType == 5 || element.attachmentType == 9));
+        (element.attachmentType == LMMediaType.widget ||
+            element.attachmentType == LMMediaType.repost));
   }
 
   @override
@@ -109,7 +110,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
     }
 
     /// if attachment is a poll
-    if (attachments!.first.attachmentType == 6) {
+    if (attachments!.first.attachmentType == LMMediaType.poll) {
       Widget poll = widget.pollBuilder?.call(
             context,
             _defPoll(),
@@ -117,14 +118,14 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
           _defPoll();
       return poll;
     }
-    if (attachments!.first.attachmentType == 3) {
+    if (attachments!.first.attachmentType == LMMediaType.document) {
       /// If the attachment is a document,
       /// we need to call the method 'getDocumentList'
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: getPostDocuments(),
       );
-    } else if (attachments!.first.attachmentType == 4) {
+    } else if (attachments!.first.attachmentType == LMMediaType.link) {
       return LMFeedLinkPreview(
         attachment: attachments![0],
         title: widget.title,
@@ -132,8 +133,8 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         onError: widget.onError,
         style: widget.style?.linkStyle,
       );
-    } else if (attachments!.first.attachmentType == 1 ||
-        attachments!.first.attachmentType == 2) {
+    } else if (attachments!.first.attachmentType == LMMediaType.image ||
+        attachments!.first.attachmentType == LMMediaType.video) {
       return LMFeedCarousel(
         postId: widget.postId,
         attachments: attachments!,
@@ -146,7 +147,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
         videoBuilder: widget.videoBuilder,
         style: widget.style?.carouselStyle,
       );
-    } else if (attachments!.first.attachmentType == 8) {
+    } else if (attachments!.first.attachmentType == LMMediaType.repost) {
       final repostData = attachments!.first.attachmentMeta.repost!;
       return Padding(
         padding: const EdgeInsets.all(8.0),

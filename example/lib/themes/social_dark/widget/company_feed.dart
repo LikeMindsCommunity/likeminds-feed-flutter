@@ -397,7 +397,7 @@ class _NovaLMFeedCompanyFeedWidgetState
     LMCompanyViewDataBuilder companyViewDataBuilder =
         LMCompanyViewDataBuilder();
     for (LMAttachmentViewData attachment in post.attachments ?? []) {
-      if (attachment.attachmentType == 5) {
+      if (attachment.attachmentType == LMMediaType.widget) {
         final entityId = attachment.attachmentMeta.meta?['entity_id'];
         if (widgets.containsKey(entityId)) {
           companyViewDataBuilder

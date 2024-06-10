@@ -824,7 +824,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        if (hasPollEnded(pollValue.expiryTime!)) {
+        if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
             "Poll ended. Vote can not be submitted now.",
@@ -835,7 +835,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         if ((isPollSubmitted(pollValue.options ?? [])) &&
             !isVoteEditing["value"]!) return;
         if (!isMultiChoicePoll(
-            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+            pollValue.multiSelectNo, pollValue.multiSelectState)) {
           submitVote(
             context,
             pollValue,
@@ -856,7 +856,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
       showEditVoteButton: !isVoteEditing["value"]! &&
           !isInstantPoll(pollValue.pollType) &&
-          !hasPollEnded(pollValue.expiryTime!) &&
+          !hasPollEnded(pollValue.expiryTime) &&
           isPollSubmitted(pollValue.options ?? []),
       showAddOptionButton: showAddOptionButton(pollValue),
       showTick: (option) {
@@ -864,10 +864,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             pollValue, option, selectedOptions, isVoteEditing["value"]!);
       },
       isMultiChoicePoll: isMultiChoicePoll(
-          pollValue.multiSelectNo!, pollValue.multiSelectState!),
+          pollValue.multiSelectNo, pollValue.multiSelectState),
       pollSelectionText: getPollSelectionText(
           pollValue.multiSelectState, pollValue.multiSelectNo),
-      timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
+      timeLeft: getTimeLeftInPoll(pollValue.expiryTime),
       onSameOptionAdded: () {
         LMFeedCore.showSnackBar(
           context,

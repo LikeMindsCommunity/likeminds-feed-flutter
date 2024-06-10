@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:visibility_aware_state/visibility_aware_state.dart';
@@ -14,8 +12,7 @@ class LMFeedVideo extends StatefulWidget {
   const LMFeedVideo({
     super.key,
     required this.postId,
-    this.videoUrl,
-    this.videoPath,
+    required this.video,
     this.playButton,
     this.pauseButton,
     this.muteButton,
@@ -24,11 +21,10 @@ class LMFeedVideo extends StatefulWidget {
     this.videoController,
     this.position,
     this.autoPlay = false,
-  }) : assert(videoUrl != null || videoPath != null);
+  });
 
   //Video asset variables
-  final String? videoUrl;
-  final String? videoPath;
+  final LMAttachmentViewData video;
   final VideoController? videoController;
   final int? position;
 
@@ -59,8 +55,7 @@ class LMFeedVideo extends StatefulWidget {
       int? position}) {
     return LMFeedVideo(
       postId: postId ?? this.postId,
-      videoUrl: videoUrl ?? this.videoUrl,
-      videoPath: videoPath ?? this.videoPath,
+      video: video,
       playButton: playButton ?? this.playButton,
       pauseButton: pauseButton ?? this.pauseButton,
       muteButton: muteButton ?? this.muteButton,
@@ -137,17 +132,23 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
 
     requestBuilder.postId(widget.postId);
 
-    if (widget.videoUrl != null) {
+    if (widget.video.attachmentMeta.url != null) {
       requestBuilder
         ..autoPlay(widget.autoPlay)
-        ..videoSource(widget.videoUrl!)
+        ..videoSource(widget.video.attachmentMeta.url!)
         ..videoType(LMFeedVideoSourceType.network)
         ..position(widget.position ?? 0);
-    } else {
+    } else if (widget.video.attachmentMeta.path != null) {
       requestBuilder
         ..autoPlay(widget.autoPlay)
-        ..videoSource(widget.videoPath!)
-        ..videoType(LMFeedVideoSourceType.file)
+        ..videoSource(widget.video.attachmentMeta.path!)
+        ..videoType(LMFeedVideoSourceType.path)
+        ..position(widget.position ?? 0);
+    } else if (widget.video.attachmentMeta.bytes != null) {
+      requestBuilder
+        ..autoPlay(widget.autoPlay)
+        ..videoBytes(widget.video.attachmentMeta.bytes!)
+        ..videoType(LMFeedVideoSourceType.bytes)
         ..position(widget.position ?? 0);
     }
 

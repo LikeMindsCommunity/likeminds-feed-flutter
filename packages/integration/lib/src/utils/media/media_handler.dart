@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -137,8 +138,7 @@ class LMFeedMediaHandler {
       } else {
         for (PlatformFile pFile in pickedFiles.files) {
           File file = File.fromRawPath(pFile.bytes!);
-          int fileBytes = await file.length();
-          double fileSize = getFileSizeInDouble(fileBytes);
+          double fileSize = getFileSizeInDouble(pFile.size);
           if (fileSize > sizeLimit) {
             return LMResponse(
                 success: false,
@@ -151,14 +151,15 @@ class LMFeedMediaHandler {
                 attachmentType: LMMediaType.video,
                 bytes: pFile.bytes!,
                 size: fileSize.toInt(),
-                duration: 0,
+                duration: 10,
               );
             } else {
               videoFile = LMAttachmentViewData.fromMediaPath(
                 attachmentType: LMMediaType.video,
                 path: pFile.path!,
+                bytes: pFile.bytes!,
                 size: fileSize.toInt(),
-                duration: 0,
+                duration: 10,
               );
             }
             videoFiles.add(videoFile);
@@ -216,6 +217,7 @@ class LMFeedMediaHandler {
                 path: pickedFile.path!,
                 format: pickedFile.extension,
                 size: pickedFile.size,
+                bytes: pickedFile.bytes!,
               );
             }
 
@@ -295,6 +297,7 @@ class LMFeedMediaHandler {
           return LMAttachmentViewData.fromMediaPath(
             attachmentType: LMMediaType.image,
             path: e.path!,
+            bytes: e.bytes!,
             format: 'image',
           );
         }).toList();
@@ -354,6 +357,7 @@ class LMFeedMediaHandler {
         mediaFile = LMAttachmentViewData.fromMediaPath(
           attachmentType: LMMediaType.image,
           path: list.files.first.path!,
+          bytes: list.files.first.bytes!,
         );
       }
 

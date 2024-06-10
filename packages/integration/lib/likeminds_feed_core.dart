@@ -8,6 +8,7 @@ import 'package:likeminds_feed_flutter_core/src/bloc/profile/profile_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/routing/routing_bloc.dart';
 import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.dart';
+import 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
 
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
@@ -93,6 +94,8 @@ class LMFeedCore {
     LMFeedBuilderDelegate? builderDelegate,
   }) async {
     try {
+      LMFeedMediaService.instance;
+
       LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
       this.sdkCallback =
           LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);

@@ -143,7 +143,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   void _checkForRepost() {
     if (widget.attachments != null) {
       for (LMAttachmentViewData attachment in widget.attachments!) {
-        if (attachment.attachmentType == 8) {
+        if (attachment.attachmentType == LMMediaType.repost) {
           repost = attachment.attachmentMeta.repost;
           composeBloc.postMedia.add(
             LMAttachmentViewData.fromAttachmentMeta(
@@ -336,7 +336,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               subTextBuilder: (context) {
                 return LMFeedText(
                   text: getFormattedDateTime(
-                      composeBloc.postMedia.first.attachmentMeta.expiryTime!),
+                      composeBloc.postMedia.first.attachmentMeta.expiryTime),
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
                       color: feedTheme.onContainer.withOpacity(0.5),
@@ -479,9 +479,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       ),
                       alignment: Alignment.center,
                       child: LMFeedVideo(
-                        videoPath:
-                            composeBloc.postMedia[index].attachmentMeta.path ??
-                                '',
+                        video: composeBloc.postMedia[index],
                         style: style?.mediaStyle?.videoStyle,
                         postId:
                             "${composeBloc.postMedia[index].attachmentMeta.path.toString()}$index",
@@ -745,7 +743,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
                 if (widget.attachments != null &&
                     widget.attachments!.isNotEmpty &&
-                    widget.attachments!.first.attachmentType == 5) {
+                    widget.attachments!.first.attachmentType ==
+                        LMMediaType.widget) {
                   composeBloc.postMedia.add(
                     LMAttachmentViewData.fromAttachmentMeta(
                       attachmentType: LMMediaType.widget,

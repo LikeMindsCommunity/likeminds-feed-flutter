@@ -62,7 +62,8 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
 
   _filterPostAttachments() {
     postAttachments.removeWhere((element) =>
-        !(element.attachmentType == 1 || element.attachmentType == 2));
+        !(element.attachmentType == LMMediaType.image ||
+            element.attachmentType == LMMediaType.video));
   }
 
   @override
@@ -146,9 +147,10 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                       }),
                   itemCount: postAttachments.length,
                   itemBuilder: (context, index, realIndex) {
-                    if (postAttachments[index].attachmentType == 2) {
+                    if (postAttachments[index].attachmentType ==
+                        LMMediaType.video) {
                       return LMFeedVideo(
-                        videoUrl: postAttachments[index].attachmentMeta.url,
+                        video: postAttachments[index],
                         postId: widget.post.id,
                         autoPlay: true,
                         style: LMFeedPostVideoStyle.basic().copyWith(
@@ -161,7 +163,8 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                         ),
                         position: index,
                       );
-                    } else if (postAttachments[index].attachmentType == 1) {
+                    } else if (postAttachments[index].attachmentType ==
+                        LMMediaType.image) {
                       return Container(
                         color: Colors.black,
                         width: MediaQuery.of(context).size.width,

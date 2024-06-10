@@ -99,7 +99,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
   void mapAttachmentsToWidget() {
     mediaWidgets = [];
     widget.attachments.forEachIndexed((index, e) {
-      if (e.attachmentType == 1) {
+      if (e.attachmentType == LMMediaType.image) {
         mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -118,7 +118,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 ),
           ),
         ));
-      } else if ((e.attachmentType == 2)) {
+      } else if ((e.attachmentType == LMMediaType.video)) {
         mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -128,7 +128,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
           width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
           child: widget.videoItem ??
               LMFeedVideo(
-                videoUrl: e.attachmentMeta.url,
+                video: e,
                 style: widget.videoStyle,
                 postId: widget.postId,
                 onMediaTap: widget.onMediaTap,

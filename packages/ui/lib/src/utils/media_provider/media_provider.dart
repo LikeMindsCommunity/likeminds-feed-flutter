@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:media_kit/media_kit.dart';
@@ -132,13 +133,19 @@ class LMFeedVideoProvider with ChangeNotifier {
     if (request.videoType == LMFeedVideoSourceType.network) {
       // if the video source type is network, then the video source is a url
       await player.open(
-        Media(request.videoSource),
+        Media(Media.normalizeURI(request.videoSource!)),
         play: request.autoPlay,
       );
-    } else {
+    } else if (request.videoType == LMFeedVideoSourceType.bytes) {
       // if the video source type is file, then the video source is a file path
       await player.open(
-        Media(request.videoSource),
+        await Media.memory(request.videoBytes!),
+        play: request.autoPlay,
+      );
+    } else if (request.videoType == LMFeedVideoSourceType.path) {
+      // if the video source type is file, then the video source is a file path
+      await player.open(
+        Media(request.videoSource!),
         play: request.autoPlay,
       );
     }

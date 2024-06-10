@@ -3,33 +3,33 @@ import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMAttachmentMetaViewData {
-  final String? url;
-  final String? path;
-  final Uint8List? bytes;
-  final String? format;
-  final int? size;
-  final int? duration;
-  final int? pageCount;
-  final LMOgTagsViewData? ogTags;
-  final double? height;
-  final double? width;
-  final double? aspectRatio;
-  final LMPostViewData? repost;
-  final Map<String, dynamic>? meta;
-  final String? id;
-  final String? postId;
-  final LMPostViewData? post;
-  final String? pollQuestion;
-  final int? expiryTime;
-  final List<String>? pollOptions;
-  final PollMultiSelectState? multiSelectState;
-  final PollType? pollType;
-  final int? multiSelectNo;
-  final bool? isAnonymous;
-  final bool? allowAddOption;
-  final List<LMPollOptionViewData>? options;
+  String? url;
+  String? path;
+  Uint8List? bytes;
+  String? format;
+  int? size;
+  int? duration;
+  int? pageCount;
+  LMOgTagsViewData? ogTags;
+  double? height;
+  double? width;
+  double? aspectRatio;
+  LMPostViewData? repost;
+  Map<String, dynamic>? meta;
+  String? id;
+  String? postId;
+  LMPostViewData? post;
+  String? pollQuestion;
+  int? expiryTime;
+  List<String>? pollOptions;
+  PollMultiSelectState? multiSelectState;
+  PollType? pollType;
+  int? multiSelectNo;
+  bool? isAnonymous;
+  bool? allowAddOption;
+  List<LMPollOptionViewData>? options;
   bool? toShowResult;
-  final String? pollAnswerText;
+  String? pollAnswerText;
 
   LMAttachmentMetaViewData._({
     this.url,
@@ -123,7 +123,8 @@ class LMAttachmentMetaViewData {
   }
 
   factory LMAttachmentMetaViewData.fromMediaBytes({
-    required Uint8List bytes,
+    Uint8List? bytes,
+    String? path,
     String? format,
     int? size,
     int? duration,
@@ -151,6 +152,7 @@ class LMAttachmentMetaViewData {
   }) {
     return LMAttachmentMetaViewData._(
       bytes: bytes,
+      path: path,
       format: format,
       size: size,
       duration: duration,
@@ -180,6 +182,7 @@ class LMAttachmentMetaViewData {
 
   factory LMAttachmentMetaViewData.fromMediaPath({
     required String path,
+    Uint8List? bytes,
     String? format,
     int? size,
     int? duration,
@@ -207,6 +210,7 @@ class LMAttachmentMetaViewData {
   }) {
     return LMAttachmentMetaViewData._(
       path: path,
+      bytes: bytes,
       format: format,
       size: size,
       duration: duration,

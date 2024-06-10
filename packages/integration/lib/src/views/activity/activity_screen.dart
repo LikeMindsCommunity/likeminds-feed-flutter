@@ -525,7 +525,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        if (hasPollEnded(pollValue.expiryTime!)) {
+        if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
             "Poll ended. Vote can not be submitted now.",
@@ -536,7 +536,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         if ((isPollSubmitted(pollValue.options ?? [])) &&
             !isVoteEditing["value"]!) return;
         if (!isMultiChoicePoll(
-            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+            pollValue.multiSelectNo, pollValue.multiSelectState)) {
           submitVote(
             context,
             pollValue,

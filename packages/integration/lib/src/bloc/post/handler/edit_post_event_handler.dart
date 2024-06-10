@@ -215,7 +215,7 @@ Future<void> editPendingPost(
                   )));
 
       Map<String, LMPostViewData> respostedPost =
-          editPendingPostResponse.repostedPosts?.map((key, value) => MapEntry(
+          editPendingPostResponse.repostedPosts.map((key, value) => MapEntry(
                   key,
                   LMPostViewDataConvertor.fromPost(
                     post: value,
@@ -226,7 +226,7 @@ Future<void> editPendingPost(
               {};
 
       LMPostViewData post = LMPostViewDataConvertor.fromPost(
-        post: editPendingPostResponse.post!,
+        post: editPendingPostResponse.post,
         widgets: widgets,
         repostedPosts: respostedPost,
         users: users,

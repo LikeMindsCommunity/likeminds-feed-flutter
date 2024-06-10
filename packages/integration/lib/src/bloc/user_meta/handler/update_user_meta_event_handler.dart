@@ -9,11 +9,11 @@ updateUserMetaEventHandler(
     ..metadata(event.metadata);
 
   try {
-    if (event.imagePath != null) {
-      String? imageUrl = await LMFeedMediaService.instance
-          .uploadFile(File(event.imagePath!), event.user.sdkClientInfo.uuid);
-      if (imageUrl != null) {
-        editProfileRequest..imageUrl(imageUrl);
+    if (event.image != null) {
+      LMResponse<String> imageUrl = await LMFeedMediaService.uploadFile(
+          event.image!.attachmentMeta.bytes!, event.user.sdkClientInfo.uuid);
+      if (imageUrl.success) {
+        editProfileRequest..imageUrl(imageUrl.data!);
       }
     }
     final response = await LMFeedCore.instance.lmFeedClient

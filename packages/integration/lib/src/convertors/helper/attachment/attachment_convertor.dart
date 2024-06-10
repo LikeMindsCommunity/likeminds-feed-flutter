@@ -44,7 +44,7 @@ class LMAttachmentViewDataConvertor {
         height: attachmentViewData.attachmentMeta.height,
         meta: attachmentViewData.attachmentMeta.meta,
         // send the id of the reposted post in case of repost else send the id of the attachment
-        entityId: attachmentViewData.attachmentType == 8
+        entityId: attachmentViewData.attachmentType == LMMediaType.repost
             ? attachmentViewData.attachmentMeta.repost?.id
             : attachmentViewData.attachmentMeta.id,
         pollQuestion: attachmentViewData.attachmentMeta.pollQuestion,

@@ -80,28 +80,28 @@ void newPostEventHandler(
           if (media.attachmentType == LMMediaType.video) {
             int originalSize = media.attachmentMeta.size!;
 
-            var tempFile = await VideoCompress.compressVideo(
-              mediaFile.path,
-              deleteOrigin: false,
-              includeAudio: true,
-            );
-            double reducedSize = getFileSizeInDouble(tempFile!.filesize!);
-            double compression = (reducedSize / originalSize) * 100;
+            if (!kIsWeb) {
+              var tempFile = await VideoCompress.compressVideo(
+                mediaFile.path,
+                deleteOrigin: false,
+                includeAudio: true,
+              );
 
-            mediaFile = tempFile.file!;
-            debugPrint(
-              'Finished compression (${compression.toStringAsFixed(2)}) reduced to ${reducedSize}MBs',
-            );
+              mediaFile = tempFile!.file!;
+            }
           }
-          final String? response = await LMFeedMediaService.instance
-              .uploadFile(mediaFile, event.user.sdkClientInfo.uuid);
-          if (response != null) {
+          final LMResponse<String> response =
+              await LMFeedMediaService.uploadFile(
+                  media.attachmentMeta.bytes!, event.user.sdkClientInfo.uuid);
+          if (response.success) {
+            media.attachmentMeta.url = response.data;
             attachments.add(
               Attachment(
                 attachmentType: media.mapMediaTypeToInt(),
                 attachmentMeta:
                     LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                        media.attachmentMeta),
+                  media.attachmentMeta,
+                ),
               ),
             );
             progress.add(index / postMedia.length);

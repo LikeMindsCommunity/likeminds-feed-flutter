@@ -211,7 +211,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   void _checkForRepost() {
     if (postViewData?.attachments != null) {
       for (LMAttachmentViewData attachment in postViewData!.attachments!) {
-        if (attachment.attachmentType == 8) {
+        if (attachment.attachmentType == LMMediaType.repost) {
           repost = attachment.attachmentMeta.repost;
           composeBloc.postMedia.add(
             LMAttachmentViewData.fromAttachmentMeta(
@@ -509,7 +509,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               subTextBuilder: (context) {
                 return LMFeedText(
                   text: getFormattedDateTime(
-                      composeBloc.postMedia.first.attachmentMeta.expiryTime!),
+                      composeBloc.postMedia.first.attachmentMeta.expiryTime),
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
                       color: feedTheme.onContainer.withOpacity(0.5),
@@ -615,7 +615,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),
                       child: LMFeedVideo(
-                        videoUrl: mediaModel.attachmentMeta.url,
+                        video: mediaModel,
                         style: style?.mediaStyle?.videoStyle,
                         postId: postViewData!.id,
                       ),
@@ -864,7 +864,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
                 if (postViewData?.attachments != null &&
                     postViewData!.attachments!.isNotEmpty &&
-                    postViewData!.attachments!.first.attachmentType == 5) {
+                    postViewData!.attachments!.first.attachmentType ==
+                        LMMediaType.widget) {
                   composeBloc.postMedia.add(
                     LMAttachmentViewData.fromAttachmentMeta(
                       attachmentType: LMMediaType.widget,

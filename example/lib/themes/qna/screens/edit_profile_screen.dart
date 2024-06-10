@@ -703,7 +703,7 @@ class _LMQnAEditProfileScreenState extends State<LMQnAEditProfileScreen> {
                                 userMetaBloc.add(
                                   LMFeedUserMetaUpdateEvent(
                                     user: widget.user,
-                                    imagePath: _image?.attachmentMeta.path,
+                                    image: _image,
                                     metadata: {
                                       'username': _userIdController.text,
                                       'description':

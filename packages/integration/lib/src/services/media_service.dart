@@ -1,10 +1,8 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/credentials/credentials.dart';
-import 'package:path/path.dart' as path;
+import 'dart:typed_data';
 
-import 'package:simple_s3/simple_s3.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/services/lm_amazon_s3_service.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/credentials/credentials.dart';
 
 /// Flutter flavour/environment manager v0.0.1
 const _prod = !bool.fromEnvironment('DEBUG');
@@ -12,48 +10,48 @@ const _prod = !bool.fromEnvironment('DEBUG');
 class LMFeedMediaService {
   late final String _bucketName;
   late final String _poolId;
-  final _region = AWSRegions.apSouth1;
-  final SimpleS3 _s3Client = SimpleS3();
+  late final String _region;
+  late final String _accessKey;
+  late final String _secretKey;
 
   static LMFeedMediaService? _instance;
 
   static LMFeedMediaService get instance =>
-      _instance ??= LMFeedMediaService._(_prod);
+      _instance ??= LMFeedMediaService._();
 
-  LMFeedMediaService._(bool isProd) {
-    _bucketName = isProd ? CredsProd.bucketName : CredsDev.bucketName;
-    _poolId = isProd ? CredsProd.poolId : CredsDev.poolId;
+  LMFeedMediaService._() {
+    _bucketName = _prod ? CredsProd.bucketName : CredsDev.bucketName;
+    _poolId = _prod ? CredsProd.poolId : CredsDev.poolId;
+    _region = _prod ? CredsProd.region : CredsDev.region;
+    _accessKey = _prod ? CredsProd.accessKey : CredsDev.accessKey;
+    _secretKey = _prod ? CredsProd.secretKey : CredsDev.secretKey;
   }
 
-  Future<String?> uploadFile(File file, String uuid) async {
+  static Future<LMResponse<String>> uploadFile(
+      Uint8List bytes, String postUuid) async {
+    return instance._uploadFile(bytes, postUuid);
+  }
+
+  Future<LMResponse<String>> _uploadFile(
+      Uint8List bytes, String postUuid) async {
     try {
-      String extension = path.extension(file.path);
-      String fileName = path.basenameWithoutExtension(file.path);
-      fileName = fileName.replaceAll(RegExp('[^A-Za-z0-9]'), '');
-      String currTimeInMilli = DateTime.now().millisecondsSinceEpoch.toString();
-      fileName = '$fileName-$currTimeInMilli$extension';
-
-      String dir = path.dirname(file.path);
-      String newPath = path.join(dir, fileName);
-
-      File renamedFile = file.copySync(newPath);
-
-      String result = await _s3Client.uploadFile(
-        renamedFile,
-        _bucketName,
-        _poolId,
-        _region,
-        s3FolderPath: "files/post/$uuid",
+      String url = "https://${_bucketName}.s3.$_region.amazonaws.com/";
+      String folderName = "posts/$postUuid";
+      String fileName = "$postUuid-${DateTime.now().millisecondsSinceEpoch}";
+      LMResponse<String> response = await LMAWSWebClient.uploadFile(
+        s3UploadUrl: url,
+        s3SecretKey: _secretKey,
+        s3Region: _region,
+        s3AccessKey: _accessKey,
+        s3BucketName: _bucketName,
+        folderName: folderName,
+        fileName: fileName,
+        fileBytes: bytes,
       );
 
-      return result;
-    } on SimpleS3Errors catch (e, stacktrace) {
-      Exception exception = Exception(e.toString());
-
-      LMFeedPersistence.instance.handleException(exception, stacktrace);
-      debugPrint(e.name);
-      debugPrint(e.index.toString());
-      return null;
+      return response;
+    } on Exception catch (err) {
+      return LMResponse(success: false, errorMessage: err.toString());
     }
   }
 }

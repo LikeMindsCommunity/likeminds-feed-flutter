@@ -102,8 +102,9 @@ class LMAttachmentViewData {
   }
 
   factory LMAttachmentViewData.fromMediaBytes({
-    required Uint8List bytes,
+    Uint8List? bytes,
     required LMMediaType attachmentType,
+    String? path,
     String? format,
     int? size,
     int? duration,
@@ -126,11 +127,16 @@ class LMAttachmentViewData {
     List<LMPollOptionViewData>? options,
     bool? toShowResult,
     String? pollAnswerText,
+    LMPostViewData? post,
+    String? postId,
   }) {
     return LMAttachmentViewData._(
       attachmentType: attachmentType,
       attachmentMeta: LMAttachmentMetaViewData.fromMediaBytes(
         bytes: bytes,
+        post: post,
+        postId: postId,
+        path: path,
         format: format,
         size: size,
         duration: duration,
@@ -160,6 +166,7 @@ class LMAttachmentViewData {
   factory LMAttachmentViewData.fromMediaPath({
     required String path,
     required LMMediaType attachmentType,
+    Uint8List? bytes,
     String? format,
     int? size,
     int? duration,
@@ -187,6 +194,7 @@ class LMAttachmentViewData {
       attachmentType: attachmentType,
       attachmentMeta: LMAttachmentMetaViewData.fromMediaPath(
         path: path,
+        bytes: bytes,
         format: format,
         size: size,
         duration: duration,
@@ -245,7 +253,7 @@ LMMediaType mapIntToMediaType(int attachmentType) {
     return LMMediaType.link;
   } else if (attachmentType == 5) {
     return LMMediaType.widget;
-  } else if (attachmentType == 8) {
+  } else if (attachmentType == 8 || attachmentType == 9) {
     return LMMediaType.repost;
   } else if (attachmentType == 6) {
     return LMMediaType.poll;
