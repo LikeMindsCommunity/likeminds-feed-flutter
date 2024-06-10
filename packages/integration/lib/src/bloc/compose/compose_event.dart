@@ -4,7 +4,6 @@ part of 'compose_bloc.dart';
 /// [LMFeedComposeEvent] defines the events which are
 /// handled by [LMFeedComposeBloc]
 /// {@endtemplate}
-@immutable
 class LMFeedComposeEvent extends Equatable {
   const LMFeedComposeEvent();
 

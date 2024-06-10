@@ -24,6 +24,7 @@ dependencies:
   flutter_dotenv:
   timeago: ^3.6.1
   overlay_support: 
+  shared_preferences: ^2.2.2
 
 dependency_overrides:
   extended_text_field: ^14.0.0
