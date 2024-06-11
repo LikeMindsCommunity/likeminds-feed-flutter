@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_sample/globals.dart';
 import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
 import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
@@ -94,9 +95,11 @@ class _CredScreenState extends State<CredScreen> {
   void initState() {
     super.initState();
     fetchUserData();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      initUniLinks(context);
-    });
+    if (!kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        initUniLinks(context);
+      });
+    }
   }
 
   @override
@@ -386,7 +389,7 @@ class _CredScreenState extends State<CredScreen> {
     }
 
     // define the route
-    Widget? navigationWidget = _getNavigationWidget(selectedTheme);
+    Widget? navigationWidget = _getNavigationWidget(selectedTheme, uuid);
     if (navigationWidget == null) {
       Navigator.pop(context);
       return;
@@ -420,13 +423,13 @@ class _CredScreenState extends State<CredScreen> {
     }
   }
 
-  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme) {
+  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme, String uuid) {
     switch (selectedTheme) {
       case LMFeedFlavor.social:
         {
-          return const ExampleTabScreen(
-            uuid: "",
-            feedWidget: LMFeedScreen(),
+          return ExampleTabScreen(
+            uuid: uuid,
+            feedWidget: const LMFeedScreen(),
           );
         }
       case LMFeedFlavor.socialFeedRoom:

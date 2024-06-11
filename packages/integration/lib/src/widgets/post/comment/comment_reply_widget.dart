@@ -563,6 +563,10 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
           ),
         ),
         onTextTap: () {
+          if (commentViewData.likesCount == 0) {
+            return;
+          }
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(

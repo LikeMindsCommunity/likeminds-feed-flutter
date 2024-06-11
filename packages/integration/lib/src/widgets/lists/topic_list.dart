@@ -40,6 +40,7 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
         ..name("All Topics"))
       .build();
   final int pageSize = 100;
+  bool allTopicsLoaded = false;
   LMFeedTopicBloc topicBloc = LMFeedTopicBloc();
   ValueNotifier<bool> rebuildTopicsScreen = ValueNotifier<bool>(false);
   PagingController<int, LMTopicViewData> topicsPagingController =
@@ -80,8 +81,9 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
   _addPaginationListener() {
     controller.addListener(
       () {
-        if (controller.position.atEdge) {
+        if (controller.position.atEdge && !allTopicsLoaded) {
           bool isTop = controller.position.pixels == 0;
+
           if (!isTop) {
             topicBloc.add(LMFeedGetTopicEvent(
               getTopicFeedRequest: (GetTopicsRequestBuilder()
@@ -124,12 +126,21 @@ class _LMFeedTopicListState extends State<LMFeedTopicList> {
             } else {
               state.getTopicFeedResponse.topics?.removeWhere(
                   (element) => selectedTopicId.contains(element.id));
-              topicsPagingController.appendPage(
-                state.getTopicFeedResponse.topics!
+
+              if (state.getTopicFeedResponse.topics!.length < pageSize) {
+                allTopicsLoaded = true;
+                topicsPagingController.appendLastPage(state
+                    .getTopicFeedResponse.topics!
                     .map((e) => LMTopicViewDataConvertor.fromTopic(e))
-                    .toList(),
-                _page,
-              );
+                    .toList());
+              } else {
+                topicsPagingController.appendPage(
+                  state.getTopicFeedResponse.topics!
+                      .map((e) => LMTopicViewDataConvertor.fromTopic(e))
+                      .toList(),
+                  _page,
+                );
+              }
             }
           } else if (state is LMFeedTopicErrorState) {
             topicsPagingController.error = state.errorMessage;

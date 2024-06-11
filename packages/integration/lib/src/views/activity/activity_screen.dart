@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -48,6 +49,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   Map<String, Comment> filteredComments = {};
 
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+
+  bool isAndroid = LMFeedPlatform.instance.isAndroid();
 
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
@@ -133,7 +136,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       appBar: LMFeedAppBar(
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme.container,
-          centerTitle: Platform.isAndroid ? false : true,
+          centerTitle: !isAndroid,
           height: 50,
         ),
         title: const LMFeedText(
@@ -627,6 +630,10 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 postViewData.likeCount)),
         style: feedTheme?.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
