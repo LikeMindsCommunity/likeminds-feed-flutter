@@ -374,6 +374,10 @@ class _LMFeedListState extends State<LMFeedList> {
                 postViewData.likeCount)),
         style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(

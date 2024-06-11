@@ -83,7 +83,7 @@ class LMFeedCore {
 
   LMFeedCore._();
 
-  Future<LMResponse<void>> initialize({
+  Future<LMResponse<LMResponse<void>>> initialize({
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
@@ -102,12 +102,6 @@ class LMFeedCore {
       clientBuilder.sdkCallback(this.sdkCallback);
 
       this.lmFeedClient = clientBuilder.build();
-
-      LMResponse dbInitResponse = await this.lmFeedClient.init();
-
-      if (!dbInitResponse.success) {
-        return dbInitResponse;
-      }
 
       clientDomain = domain;
       feedConfig = config ?? LMFeedConfig();

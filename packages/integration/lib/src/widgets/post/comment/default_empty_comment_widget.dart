@@ -32,7 +32,7 @@ class LMFeedEmptyCommentWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                'Be the first one to $commentTitleSmallCapSingular',
+                'Be the first one to create a $commentTitleSmallCapSingular',
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   color: feedTheme.onContainer,

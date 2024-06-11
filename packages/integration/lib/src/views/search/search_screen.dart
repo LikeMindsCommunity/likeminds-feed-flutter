@@ -54,6 +54,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier<bool>(false);
   // check whether current logged in user is CM or not
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+  FocusNode focusNode = FocusNode();
   LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
   final PagingController<int, LMPostViewData> _pagingController =
       PagingController(firstPageKey: 1);
@@ -72,6 +73,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
     searchController.addListener(() {
       _onTextChanged(searchController.text);
     });
+
+    if (focusNode.canRequestFocus) {
+      focusNode.requestFocus();
+    }
 
     // Fire analytics for search screen opened event
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
@@ -125,6 +130,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   @override
   void dispose() {
     _debounceOperation?.cancel();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -174,6 +180,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         foregroundColor: theme.onContainer,
         title: TextField(
           controller: searchController,
+          focusNode: focusNode,
           onChanged: _onTextChanged,
           cursorColor: theme.primaryColor,
           decoration: InputDecoration(
@@ -742,6 +749,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 postViewData.likeCount)),
         style: theme.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
@@ -972,7 +983,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 borderRadius: 28,
                 backgroundColor: theme.primaryColor,
                 height: 44,
-                width: 153,
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 placement: LMFeedIconButtonPlacement.end,

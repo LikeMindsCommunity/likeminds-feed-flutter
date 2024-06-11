@@ -139,6 +139,7 @@ class LMFeedMediaHandler {
         for (PlatformFile pFile in pickedFiles.files) {
           File file = File.fromRawPath(pFile.bytes!);
           double fileSize = getFileSizeInDouble(pFile.size);
+
           if (fileSize > sizeLimit) {
             return LMResponse(
                 success: false,
@@ -204,22 +205,13 @@ class LMFeedMediaHandler {
           } else {
             LMAttachmentViewData documentFile;
 
-            if (kIsWeb) {
-              documentFile = LMAttachmentViewData.fromMediaBytes(
-                attachmentType: LMMediaType.document,
-                bytes: pickedFile.bytes!,
-                format: pickedFile.extension,
-                size: pickedFile.size,
-              );
-            } else {
-              documentFile = LMAttachmentViewData.fromMediaPath(
-                attachmentType: LMMediaType.document,
-                path: pickedFile.path!,
-                format: pickedFile.extension,
-                size: pickedFile.size,
-                bytes: pickedFile.bytes!,
-              );
-            }
+            documentFile = LMAttachmentViewData.fromMediaBytes(
+              attachmentType: LMMediaType.document,
+              bytes: pickedFile.bytes!,
+              path: kIsWeb ? null : pickedFile.path!,
+              format: pickedFile.extension,
+              size: pickedFile.size,
+            );
 
             attachedFiles.add(documentFile);
           }
@@ -348,18 +340,11 @@ class LMFeedMediaHandler {
       }
       LMAttachmentViewData mediaFile;
 
-      if (kIsWeb) {
-        mediaFile = LMAttachmentViewData.fromMediaBytes(
-          attachmentType: LMMediaType.image,
-          bytes: list.files.first.bytes!,
-        );
-      } else {
-        mediaFile = LMAttachmentViewData.fromMediaPath(
-          attachmentType: LMMediaType.image,
-          path: list.files.first.path!,
-          bytes: list.files.first.bytes!,
-        );
-      }
+      mediaFile = LMAttachmentViewData.fromMediaBytes(
+        attachmentType: LMMediaType.image,
+        bytes: list.files.first.bytes!,
+        path: kIsWeb ? null : list.files.first.path!,
+      );
 
       return LMResponse(success: true, data: mediaFile);
     } else {

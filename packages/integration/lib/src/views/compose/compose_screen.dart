@@ -207,6 +207,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 },
                 builder: (context, state) {
                   if (state is LMFeedComposeFetchedTopicsState) {
+                    if (state.topics.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
                     return widget.composeTopicSelectorBuilder?.call(
                             context,
                             _defTopicSelector(state.topics),
@@ -1083,6 +1086,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   Widget _defTopicSelector(List<LMTopicViewData> topics) {
     if (!config!.enableTopics) {
       return const SizedBox.shrink();
+    }
+
+    if (topics.isEmpty) {
+      return const SizedBox();
     }
 
     return ValueListenableBuilder(
