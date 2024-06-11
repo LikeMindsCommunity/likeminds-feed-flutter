@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -25,6 +27,7 @@ class LMFeedMediaPreviewScreen extends StatefulWidget {
 }
 
 class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
+  late Size screenSize;
   final DateFormat formatter = DateFormat('MMMM d, hh:mm');
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
@@ -73,6 +76,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenSize = MediaQuery.sizeOf(context);
     final String formatted = formatter.format(post.createdAt);
     return widgetUtility.scaffold(
       source: LMFeedWidgetSource.mediaPreviewScreen,
@@ -131,70 +135,71 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
       ),
       body: SafeArea(
         top: false,
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: CarouselSlider.builder(
-                  options: CarouselOptions(
-                      initialPage: position ?? 0,
-                      enableInfiniteScroll: false,
-                      enlargeFactor: 0.0,
-                      viewportFraction: 1.0,
-                      aspectRatio: 1,
-                      onPageChanged: (index, reason) {
-                        currPosition = index;
-                        rebuildCurr.value = !rebuildCurr.value;
-                      }),
-                  itemCount: postAttachments.length,
-                  itemBuilder: (context, index, realIndex) {
-                    if (postAttachments[index].attachmentType ==
-                        LMMediaType.video) {
-                      return LMFeedVideo(
-                        video: postAttachments[index],
-                        postId: widget.post.id,
-                        autoPlay: true,
-                        style: LMFeedPostVideoStyle.basic().copyWith(
-                          showControls: true,
-                        ),
-                        videoController:
-                            LMFeedVideoProvider.instance.getVideoControllers(
-                          post.id,
-                          index,
-                        ),
-                        position: index,
-                      );
-                    } else if (postAttachments[index].attachmentType ==
-                        LMMediaType.image) {
-                      return Container(
-                        color: Colors.black,
-                        width: MediaQuery.of(context).size.width,
-                        child: Center(
-                          child: LMFeedImage(
-                            image: postAttachments[index],
-                            style: LMFeedPostImageStyle(
-                              boxFit: BoxFit.contain,
+        child: Align(
+          alignment: Alignment.center,
+          child: Container(
+            width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: CarouselSlider.builder(
+                      options: CarouselOptions(
+                          initialPage: position ?? 0,
+                          enableInfiniteScroll: false,
+                          enlargeFactor: 0.0,
+                          viewportFraction: 1.0,
+                          aspectRatio: 1,
+                          onPageChanged: (index, reason) {
+                            currPosition = index;
+                            rebuildCurr.value = !rebuildCurr.value;
+                          }),
+                      itemCount: postAttachments.length,
+                      itemBuilder: (context, index, realIndex) {
+                        if (postAttachments[index].attachmentType ==
+                            LMMediaType.video) {
+                          return LMFeedVideo(
+                            video: postAttachments[index],
+                            postId: widget.post.id,
+                            autoPlay: true,
+                            style: LMFeedPostVideoStyle.basic().copyWith(
+                              showControls: true,
                             ),
                             position: index,
-                          ),
-                        ),
-                      );
-                    } else {
-                      return const SizedBox.shrink();
-                    }
-                  }),
+                          );
+                        } else if (postAttachments[index].attachmentType ==
+                            LMMediaType.image) {
+                          return Container(
+                            color: Colors.black,
+                            width: screenSize.width,
+                            child: Center(
+                              child: LMFeedImage(
+                                image: postAttachments[index],
+                                style: LMFeedPostImageStyle(
+                                  boxFit: BoxFit.contain,
+                                ),
+                                position: index,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return const SizedBox.shrink();
+                        }
+                      }),
+                ),
+                if (checkIfMultipleAttachments())
+                  ValueListenableBuilder(
+                    valueListenable: rebuildCurr,
+                    builder: (context, _, __) {
+                      return widgetUtility.postMediaCarouselIndicatorBuilder(
+                          context,
+                          currPosition,
+                          postAttachments.length,
+                          carouselIndexIndicatorWidget());
+                    },
+                  ),
+              ],
             ),
-            if (checkIfMultipleAttachments())
-              ValueListenableBuilder(
-                valueListenable: rebuildCurr,
-                builder: (context, _, __) {
-                  return widgetUtility.postMediaCarouselIndicatorBuilder(
-                      context,
-                      currPosition,
-                      postAttachments.length,
-                      carouselIndexIndicatorWidget());
-                },
-              ),
-          ],
+          ),
         ),
       ),
     );

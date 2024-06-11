@@ -1,6 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
@@ -133,7 +131,7 @@ class LMFeedVideoProvider with ChangeNotifier {
     if (request.videoType == LMFeedVideoSourceType.network) {
       // if the video source type is network, then the video source is a url
       await player.open(
-        Media(Media.normalizeURI(request.videoSource!)),
+        Media(request.videoSource!),
         play: request.autoPlay,
       );
     } else if (request.videoType == LMFeedVideoSourceType.bytes) {

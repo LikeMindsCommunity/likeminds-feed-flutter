@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -410,7 +411,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(600, MediaQuery.sizeOf(context).width),
+          width: min(LMFeedCore.webConfiguration.maxWidth,
+              MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
               getUserFeedMeta = getUserFeedMetaFuture();
@@ -492,6 +494,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                           : widget.customWidgetBuilder!(context)
                       : const SizedBox(),
                 ),
+                if (kIsWeb) SliverPadding(padding: EdgeInsets.only(top: 12.0)),
                 SliverToBoxAdapter(
                   child: config!.enableTopicFiltering
                       ? ValueListenableBuilder(
@@ -751,6 +754,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     },
                   ),
                 ),
+                if (kIsWeb) SliverPadding(padding: EdgeInsets.only(top: 12.0)),
                 BlocListener<LMFeedBloc, LMFeedState>(
                   bloc: _feedBloc,
                   listener: (context, LMFeedState state) =>
@@ -933,6 +937,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       style: LMFeedTopicBarStyle(
           height: 60,
           padding: EdgeInsets.all(16),
+          borderRadius: kIsWeb ? feedThemeData.postStyle.borderRadius : null,
           border: Border.symmetric(
             horizontal: BorderSide(
               color: LMFeedCore.theme.onContainer,
@@ -1295,7 +1300,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             postViewData.id,
             isVoteEditing,
             previousValue,
-            rebuildPostWidget,
+            rebuildPollWidget,
             LMFeedWidgetSource.universalFeed,
           );
         } else if (selectedOptions.contains(optionData.id)) {
@@ -1363,7 +1368,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           postViewData.id,
           isVoteEditing,
           previousValue,
-          rebuildPostWidget,
+          rebuildPollWidget,
           LMFeedWidgetSource.universalFeed,
         );
         selectedOptions.clear();

@@ -142,7 +142,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(600, screenSize!.width);
+    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
     return _widgetsBuilder.scaffold(
       appBar: _postScreenBuilderDeletegate.appBarBuilder(
           context, defAppBar(), pendingPostCount),

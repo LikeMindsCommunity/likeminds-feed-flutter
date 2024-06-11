@@ -16,64 +16,6 @@ import 'package:uni_links/uni_links.dart';
 bool initialURILinkHandled = false;
 const _isProd = !bool.fromEnvironment('DEBUG');
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return OverlaySupport.global(
-      child: MaterialApp(
-        title: 'Integration App for UI + SDK package',
-        debugShowCheckedModeBanner: _isProd,
-        navigatorKey: rootNavigatorKey,
-        scaffoldMessengerKey: rootScaffoldMessengerKey,
-        theme: ThemeData(
-          useMaterial3: false,
-          primaryColor: Colors.deepPurple,
-          inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            outlineBorder: const BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-            activeIndicatorBorder: const BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.deepPurple,
-                width: 2,
-              ),
-            ),
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.deepPurple,
-                width: 2,
-              ),
-            ),
-          ),
-        ),
-        home: LMFeedBlocListener(
-          analyticsListener:
-              (BuildContext context, LMFeedAnalyticsState state) {
-            if (state is LMFeedAnalyticsEventFired) {
-              debugPrint("Bloc Listened for event, - ${state.eventName}");
-              debugPrint("////////////////");
-              debugPrint("With properties - ${state.eventProperties}");
-            }
-          },
-          profileListener: (BuildContext context, LMFeedProfileState state) {},
-          routingListener: (BuildContext context, LMFeedRoutingState state) {},
-          child: const CredScreen(),
-        ),
-      ),
-    );
-  }
-}
-
 class CredScreen extends StatefulWidget {
   const CredScreen({super.key});
 

@@ -11,6 +11,8 @@ class LMTaggingAheadTextField extends StatefulWidget {
   final TextEditingController controller;
   final InputDecoration? decoration;
   final Function(String)? onChange;
+  final VoidCallback? onEditingComplete;
+  final Function(String)? onSubmitted;
   final int? maxLines;
   final int minLines;
   final bool enabled;
@@ -24,6 +26,8 @@ class LMTaggingAheadTextField extends StatefulWidget {
     required this.focusNode,
     this.decoration,
     required this.onChange,
+    this.onEditingComplete,
+    this.onSubmitted,
     this.maxLines,
     this.minLines = 1,
     this.enabled = true,
@@ -45,6 +49,9 @@ class LMTaggingAheadTextField extends StatefulWidget {
     int? minLines,
     bool? enabled,
     ScrollPhysics? scrollPhysics,
+    List<LMUserTagViewData>? userTags,
+    VoidCallback? onEditingComplete,
+    Function(String)? onSubmitted,
   }) {
     return LMTaggingAheadTextField(
       isDown: isDown ?? this.isDown,
@@ -57,6 +64,9 @@ class LMTaggingAheadTextField extends StatefulWidget {
       minLines: minLines ?? this.minLines,
       enabled: enabled ?? this.enabled,
       scrollPhysics: scrollPhysics ?? this.scrollPhysics,
+      onEditingComplete: onEditingComplete ?? this.onEditingComplete,
+      onSubmitted: onSubmitted ?? this.onSubmitted,
+      userTags: userTags ?? this.userTags,
     );
   }
 }
@@ -189,6 +199,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
               hintText: 'Write something here...',
               border: InputBorder.none,
             ),
+        textInputAction: TextInputAction.done,
+        onEditingComplete: () => widget.onEditingComplete?.call(),
+        onSubmitted: (String value) => widget.onSubmitted?.call(value),
         onChanged: (value) {
           page = 1;
           widget.onChange!(value);

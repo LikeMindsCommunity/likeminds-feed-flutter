@@ -320,7 +320,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     config = widget.config ?? LMFeedCore.config.composeConfig;
     style = widget.style ?? feedTheme.composeScreenStyle;
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(600, screenSize!.width);
+    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
 
     return WillPopScope(
       onWillPop: () {
@@ -353,9 +353,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     listener: _composeBlocListener,
                     child: widgetUtility.scaffold(
                       source: widgetSource,
-                      backgroundColor: kIsWeb
-                          ? feedTheme.backgroundColor
-                          : feedTheme.container,
+                      backgroundColor: feedTheme.container,
                       appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
                           _defAppBar(),
                       floatingActionButton: Padding(
@@ -674,7 +672,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   case LMMediaType.document:
                     {
                       mediaWidget = LMFeedDocument(
-                        documentUrl: mediaModel.attachmentMeta.url,
+                        document: mediaModel,
                         style: style?.mediaStyle?.documentStyle?.copyWith(
                               width: style?.mediaStyle?.documentStyle?.width ??
                                   MediaQuery.of(context).size.width - 84,

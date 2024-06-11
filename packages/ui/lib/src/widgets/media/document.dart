@@ -1,6 +1,5 @@
 import 'dart:io';
-import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:path/path.dart';
 import 'package:flutter/material.dart';
 
@@ -8,20 +7,19 @@ class LMFeedDocument extends StatefulWidget {
   const LMFeedDocument({
     super.key,
     this.onTap,
-    this.documentPath,
-    this.documentUrl,
+    required this.document,
     this.type = 'pdf',
     this.size,
     this.title,
     this.subtitle,
     this.onRemove,
     this.style,
-  }) : assert(documentPath != null || documentUrl != null);
+  });
 
   final Function()? onTap;
 
-  final String? documentPath;
-  final String? documentUrl;
+  final LMAttachmentViewData document;
+
   final String? type;
   final String? size;
 
@@ -37,8 +35,7 @@ class LMFeedDocument extends StatefulWidget {
 
   LMFeedDocument copyWith({
     Function()? onTap,
-    String? documentPath,
-    String? documentUrl,
+    LMAttachmentViewData? document,
     String? type,
     String? size,
     LMFeedText? title,
@@ -48,8 +45,7 @@ class LMFeedDocument extends StatefulWidget {
   }) {
     return LMFeedDocument(
       onTap: onTap ?? this.onTap,
-      documentPath: documentPath ?? this.documentPath,
-      documentUrl: documentUrl ?? this.documentUrl,
+      document: document ?? this.document,
       type: type ?? this.type,
       size: size ?? this.size,
       title: title ?? this.title,
@@ -71,11 +67,15 @@ class _LMDocumentState extends State<LMFeedDocument> {
 
   Future<File> loadFile() async {
     File file;
-    if (widget.documentUrl != null) {
-      final String url = widget.documentUrl!;
+    if (widget.document.attachmentMeta.url != null) {
+      final String url = widget.document.attachmentMeta.url!;
       file = File(url);
+    } else if (widget.document.attachmentMeta.bytes != null) {
+      file = File.fromRawPath(widget.document.attachmentMeta.bytes!);
+    } else if (widget.document.attachmentMeta.path != null) {
+      file = File(widget.document.attachmentMeta.path!);
     } else {
-      file = File(widget.documentPath!);
+      throw Exception('File not found');
     }
     _fileExtension = widget.type;
     _fileSize = widget.size;
@@ -92,8 +92,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
   @override
   void didUpdateWidget(covariant LMFeedDocument oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.documentPath != widget.documentPath ||
-        oldWidget.documentUrl != widget.documentUrl) {
+    if (oldWidget.document != widget.document) {
       fileLoaderFuture = loadFile();
     }
   }
@@ -207,7 +206,7 @@ class _LMDocumentState extends State<LMFeedDocument> {
                       ),
                     ),
                     const SizedBox(width: 32),
-                    widget.documentPath != null
+                    isLocalFile()
                         ? LMFeedButton(
                             style: LMFeedButtonStyle(
                               icon: style!.removeIcon ??
@@ -232,6 +231,14 @@ class _LMDocumentState extends State<LMFeedDocument> {
             return const SizedBox.shrink();
           }
         });
+  }
+
+  bool isLocalFile() {
+    if (widget.document.attachmentMeta.url != null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }
 
@@ -306,6 +313,7 @@ class LMFeedPostDocumentStyle {
   factory LMFeedPostDocumentStyle.basic({Color? primaryColor}) =>
       LMFeedPostDocumentStyle(
         height: 72,
+        margin: const EdgeInsets.symmetric(horizontal: 12.0),
         width: double.infinity,
         borderRadius: LikeMindsTheme.kBorderRadiusMedium,
         borderSize: 1,

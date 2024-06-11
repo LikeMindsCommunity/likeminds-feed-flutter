@@ -209,8 +209,7 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
           (e) => LMFeedDocument(
             // document: e,
             size: PostHelper.getFileSizeString(bytes: e.attachmentMeta.size!),
-            documentUrl: e.attachmentMeta.url,
-
+            document: e,
             type: e.attachmentMeta.format!,
             style: widget.style?.documentStyle,
             onTap: () {
@@ -294,7 +293,7 @@ class LMFeedPostMediaStyle {
           {Color? primaryColor, Color? containerColor, Color? inActiveColor}) =>
       LMFeedPostMediaStyle(
         carouselStyle: const LMFeedPostCarouselStyle(),
-        documentStyle: const LMFeedPostDocumentStyle(),
+        documentStyle: LMFeedPostDocumentStyle.basic(),
         imageStyle: const LMFeedPostImageStyle(),
         linkStyle: LMFeedPostLinkPreviewStyle.basic(),
         videoStyle: const LMFeedPostVideoStyle(),

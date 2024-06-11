@@ -117,6 +117,11 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
       controller?.player.pause();
     } else if (visibility == WidgetVisibility.GONE) {
       controller?.player.pause();
+    } else if (visibility == WidgetVisibility.VISIBLE) {
+      if (!(controller?.player.platform?.isVideoControllerAttached ?? false)) {
+        initialiseVideo = initialiseControllers();
+        rebuildVideo.value = !rebuildVideo.value;
+      }
     }
     super.onVisibilityChanged(visibility);
   }
@@ -378,11 +383,19 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                                   size: 28,
                                   color: Colors.white,
                                 ),
-                    onPressed: () {
+                    onPressed: () async {
                       _timer?.cancel();
                       if (controller == null) {
                         return;
                       }
+
+                      if (!(controller
+                              ?.player.platform?.isVideoControllerAttached ??
+                          false)) {
+                        await initialiseControllers();
+                        rebuildVideo.value = !rebuildVideo.value;
+                      }
+
                       controller!.player.state.playing
                           ? state.widget.controller.player.pause()
                           : state.widget.controller.player.play();

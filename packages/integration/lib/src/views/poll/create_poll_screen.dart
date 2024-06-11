@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
@@ -39,6 +41,7 @@ class LMFeedCreatePollScreen extends StatefulWidget {
 }
 
 class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
+  late Size screenSize;
   LMFeedThemeData theme = LMFeedCore.theme;
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
@@ -209,468 +212,498 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenSize = MediaQuery.sizeOf(context);
     return _widgetsBuilder.scaffold(
       backgroundColor: theme.backgroundColor,
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              color: theme.container,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  LMFeedTile(
-                    leading: LMFeedProfilePicture(
-                        fallbackText: user?.name ?? '',
-                        imageUrl: user?.imageUrl,
-                        style: LMFeedProfilePictureStyle(
-                          size: 40,
-                        )),
-                    title: LMFeedText(
-                      text: user?.name ?? '',
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          color: theme.onContainer,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          height: 1.33,
-                        ),
-                      ),
-                    ),
-                    style: LMFeedTileStyle(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
-                  LMFeedText(
-                    text: 'Poll question',
-                    style: LMFeedTextStyle(
-                      textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: theme.primaryColor),
-                    ),
-                  ),
-                  TextField(
-                    controller: _questionController,
-                    maxLines: 3,
-                    style: TextStyle(
-                      color: theme.onContainer,
-                    ),
-                    decoration: widget.pollQuestionStyle?.decoration ??
-                        InputDecoration(
-                          hintText: 'Ask a question',
-                          hintStyle: TextStyle(
-                            color: theme.inActiveColor,
-                          ),
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-            Container(
-              color: theme.container,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 18, vertical: 12),
-                    child: LMFeedText(
-                      text: 'Answer Options',
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                            color: theme.primaryColor),
-                      ),
-                    ),
-                  ),
-                  ValueListenableBuilder(
-                      valueListenable: _optionBuilder,
-                      builder: (context, _, __) {
-                        return ListView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: options.length,
-                            itemBuilder: (context, index) {
-                              return OptionTile(
-                                index: index,
-                                isRemovable: options.length > 2,
-                                option: options[index],
-                                onDelete: () {
-                                  if (options.length > 2) {
-                                    options.removeAt(index);
-                                    _optionBuilder.value =
-                                        !_optionBuilder.value;
-                                    _rebuildMultiSelectStateBuilder.value =
-                                        !_rebuildMultiSelectStateBuilder.value;
-                                    if (_multiSelectNoBuilder.value >
-                                        options.length) {
-                                      _multiSelectNoBuilder.value = 1;
-                                    }
-                                  }
-                                },
-                                onChanged: (value) {
-                                  options[index] = value;
-                                },
-                              );
-                            });
-                      }),
-                  LMFeedTile(
-                    onTap: () {
-                      if (options.length < 10) {
-                        options.add('');
-                        _optionBuilder.value = !_optionBuilder.value;
-                        _rebuildMultiSelectStateBuilder.value =
-                            !_rebuildMultiSelectStateBuilder.value;
-                        debugPrint('Add option');
-                      } else {
-                        showSnackBar('You can add at max 10 options');
-                      }
-                    },
-                    style: LMFeedTileStyle(
-                        padding: EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 16,
-                    )),
-                    leading: LMFeedIcon(
-                      type: LMFeedIconType.icon,
-                      icon: Icons.add_circle_outline,
-                      style: LMFeedIconStyle(
-                        size: 24,
-                        color: theme.primaryColor,
-                      ),
-                    ),
-                    title: LMFeedText(
-                      text: 'Add an option...',
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: theme.primaryColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-            Container(
-              color: theme.container,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  LMFeedText(
-                    text: 'Poll expires on',
-                    style: LMFeedTextStyle(
-                      textStyle: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: theme.primaryColor),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    child: GestureDetector(
-                      onTap: () async {
-                        DateTime? selectedDate = await showDateTimePicker(
-                          context: context,
-                          initialDate: _expiryDateBuilder.value,
-                        );
-                        if (selectedDate != null) {
-                          _expiryDateBuilder.value = selectedDate;
-                        }
-                      },
-                      child: SizedBox(
-                          width: double.infinity,
-                          child: ValueListenableBuilder(
-                              valueListenable: _expiryDateBuilder,
-                              builder: (context, value, child) {
-                                return LMFeedText(
-                                  text: value == null
-                                      ? 'DD-MM-YYYY hh:mm'
-                                      : getFormattedDate(value),
-                                  style: LMFeedTextStyle(
-                                    textStyle: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w400,
-                                      color: theme.inActiveColor,
-                                    ),
-                                  ),
-                                );
-                              })),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(height: 16),
-            // Advanced settings
-            ValueListenableBuilder(
-                valueListenable: _advancedBuilder,
-                builder: (context, value, child) {
-                  return Column(
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  color: theme.container,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AnimatedSwitcher(
-                        duration: Duration(milliseconds: 300),
-                        child: value
-                            ? Container(
-                                color: theme.container,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ValueListenableBuilder(
-                                        valueListenable: _allowAddOptionBuilder,
-                                        builder: (context, value, child) {
-                                          return SwitchListTile(
-                                            value: value,
-                                            onChanged: (value) {
-                                              _allowAddOptionBuilder.value =
-                                                  value;
-                                            },
-                                            activeColor: theme.primaryColor,
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                              horizontal: 18,
-                                            ),
-                                            title: LMFeedText(
-                                              text:
-                                                  'Allow voters to add options',
-                                              style: LMFeedTextStyle(
-                                                textStyle: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: theme.onContainer,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                    Divider(
-                                      color: theme.inActiveColor,
-                                      height: 0,
-                                    ),
-                                    ValueListenableBuilder(
-                                        valueListenable: _isAnonymousBuilder,
-                                        builder: (context, value, child) {
-                                          return SwitchListTile(
-                                            value: value,
-                                            onChanged: (value) {
-                                              _isAnonymousBuilder.value = value;
-                                            },
-                                            activeColor: theme.primaryColor,
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                              horizontal: 18,
-                                            ),
-                                            title: LMFeedText(
-                                              text: 'Anonymous poll',
-                                              style: LMFeedTextStyle(
-                                                textStyle: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: theme.onContainer,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                    Divider(
-                                      color: theme.inActiveColor,
-                                      height: 0,
-                                    ),
-                                    ValueListenableBuilder(
-                                        valueListenable: _pollTypeBuilder,
-                                        builder: (context, value, child) {
-                                          return SwitchListTile(
-                                            value: value,
-                                            onChanged: (value) {
-                                              _pollTypeBuilder.value = value;
-                                            },
-                                            activeColor: theme.primaryColor,
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                              horizontal: 18,
-                                            ),
-                                            title: LMFeedText(
-                                              text: 'Don\'t show live results',
-                                              style: LMFeedTextStyle(
-                                                textStyle: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w400,
-                                                  color: theme.onContainer,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                    Divider(
-                                      color: theme.inActiveColor,
-                                      height: 0,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 18,
-                                        vertical: 12,
+                      LMFeedTile(
+                        leading: LMFeedProfilePicture(
+                            fallbackText: user?.name ?? '',
+                            imageUrl: user?.imageUrl,
+                            style: LMFeedProfilePictureStyle(
+                              size: 40,
+                            )),
+                        title: LMFeedText(
+                          text: user?.name ?? '',
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              color: theme.onContainer,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              height: 1.33,
+                            ),
+                          ),
+                        ),
+                        style: LMFeedTileStyle(
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                      LMFeedText(
+                        text: 'Poll question',
+                        style: LMFeedTextStyle(
+                          textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: theme.primaryColor),
+                        ),
+                      ),
+                      TextField(
+                        controller: _questionController,
+                        maxLines: 3,
+                        style: TextStyle(
+                          color: theme.onContainer,
+                        ),
+                        decoration: widget.pollQuestionStyle?.decoration ??
+                            InputDecoration(
+                              hintText: 'Ask a question',
+                              hintStyle: TextStyle(
+                                color: theme.inActiveColor,
+                              ),
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  color: theme.container,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 18, vertical: 12),
+                        child: LMFeedText(
+                          text: 'Answer Options',
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: theme.primaryColor),
+                          ),
+                        ),
+                      ),
+                      ValueListenableBuilder(
+                          valueListenable: _optionBuilder,
+                          builder: (context, _, __) {
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: options.length,
+                                itemBuilder: (context, index) {
+                                  return OptionTile(
+                                    index: index,
+                                    isRemovable: options.length > 2,
+                                    option: options[index],
+                                    onDelete: () {
+                                      if (options.length > 2) {
+                                        options.removeAt(index);
+                                        _optionBuilder.value =
+                                            !_optionBuilder.value;
+                                        _rebuildMultiSelectStateBuilder.value =
+                                            !_rebuildMultiSelectStateBuilder
+                                                .value;
+                                        if (_multiSelectNoBuilder.value >
+                                            options.length) {
+                                          _multiSelectNoBuilder.value = 1;
+                                        }
+                                      }
+                                    },
+                                    onChanged: (value) {
+                                      options[index] = value;
+                                    },
+                                  );
+                                });
+                          }),
+                      LMFeedTile(
+                        onTap: () {
+                          if (options.length < 10) {
+                            options.add('');
+                            _optionBuilder.value = !_optionBuilder.value;
+                            _rebuildMultiSelectStateBuilder.value =
+                                !_rebuildMultiSelectStateBuilder.value;
+                            debugPrint('Add option');
+                          } else {
+                            showSnackBar('You can add at max 10 options');
+                          }
+                        },
+                        style: LMFeedTileStyle(
+                            padding: EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 16,
+                        )),
+                        leading: LMFeedIcon(
+                          type: LMFeedIconType.icon,
+                          icon: Icons.add_circle_outline,
+                          style: LMFeedIconStyle(
+                            size: 24,
+                            color: theme.primaryColor,
+                          ),
+                        ),
+                        title: LMFeedText(
+                          text: 'Add an option...',
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: theme.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  color: theme.container,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      LMFeedText(
+                        text: 'Poll expires on',
+                        style: LMFeedTextStyle(
+                          textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: theme.primaryColor),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: GestureDetector(
+                          onTap: () async {
+                            DateTime? selectedDate = await showDateTimePicker(
+                              context: context,
+                              initialDate: _expiryDateBuilder.value,
+                            );
+                            if (selectedDate != null) {
+                              _expiryDateBuilder.value = selectedDate;
+                            }
+                          },
+                          child: SizedBox(
+                              width: double.infinity,
+                              child: ValueListenableBuilder(
+                                  valueListenable: _expiryDateBuilder,
+                                  builder: (context, value, child) {
+                                    return LMFeedText(
+                                      text: value == null
+                                          ? 'DD-MM-YYYY hh:mm'
+                                          : getFormattedDate(value),
+                                      style: LMFeedTextStyle(
+                                        textStyle: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: theme.inActiveColor,
+                                        ),
                                       ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          LMFeedText(
-                                            text: 'User can vote for',
-                                            style: LMFeedTextStyle(
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: theme.inActiveColor,
-                                              ),
-                                            ),
+                                    );
+                                  })),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+                // Advanced settings
+                ValueListenableBuilder(
+                    valueListenable: _advancedBuilder,
+                    builder: (context, value, child) {
+                      return Column(
+                        children: [
+                          AnimatedSwitcher(
+                            duration: Duration(milliseconds: 300),
+                            child: value
+                                ? Container(
+                                    color: theme.container,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ValueListenableBuilder(
+                                            valueListenable:
+                                                _allowAddOptionBuilder,
+                                            builder: (context, value, child) {
+                                              return SwitchListTile(
+                                                value: value,
+                                                onChanged: (value) {
+                                                  _allowAddOptionBuilder.value =
+                                                      value;
+                                                },
+                                                activeColor: theme.primaryColor,
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  horizontal: 18,
+                                                ),
+                                                title: LMFeedText(
+                                                  text:
+                                                      'Allow voters to add options',
+                                                  style: LMFeedTextStyle(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: theme.onContainer,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                        Divider(
+                                          color: theme.inActiveColor,
+                                          height: 0,
+                                        ),
+                                        ValueListenableBuilder(
+                                            valueListenable:
+                                                _isAnonymousBuilder,
+                                            builder: (context, value, child) {
+                                              return SwitchListTile(
+                                                value: value,
+                                                onChanged: (value) {
+                                                  _isAnonymousBuilder.value =
+                                                      value;
+                                                },
+                                                activeColor: theme.primaryColor,
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  horizontal: 18,
+                                                ),
+                                                title: LMFeedText(
+                                                  text: 'Anonymous poll',
+                                                  style: LMFeedTextStyle(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: theme.onContainer,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                        Divider(
+                                          color: theme.inActiveColor,
+                                          height: 0,
+                                        ),
+                                        ValueListenableBuilder(
+                                            valueListenable: _pollTypeBuilder,
+                                            builder: (context, value, child) {
+                                              return SwitchListTile(
+                                                value: value,
+                                                onChanged: (value) {
+                                                  _pollTypeBuilder.value =
+                                                      value;
+                                                },
+                                                activeColor: theme.primaryColor,
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                  horizontal: 18,
+                                                ),
+                                                title: LMFeedText(
+                                                  text:
+                                                      'Don\'t show live results',
+                                                  style: LMFeedTextStyle(
+                                                    textStyle: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: theme.onContainer,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                        Divider(
+                                          color: theme.inActiveColor,
+                                          height: 0,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 18,
+                                            vertical: 12,
                                           ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              ValueListenableBuilder(
-                                                  valueListenable:
-                                                      _multiSelectStateBuilder,
-                                                  builder:
-                                                      (context, value, child) {
-                                                    return DropdownButton<
-                                                        PollMultiSelectState>(
-                                                      value: value,
-                                                      onChanged: (value) {
-                                                        if (value != null)
-                                                          _multiSelectStateBuilder
-                                                              .value = value;
-                                                      },
-                                                      dropdownColor:
-                                                          theme.container,
-                                                      iconEnabledColor:
-                                                          theme.onContainer,
-                                                      style: TextStyle(
-                                                        color:
-                                                            theme.onContainer,
-                                                      ),
-                                                      items: [
-                                                        DropdownMenuItem(
-                                                          child: LMFeedText(
-                                                            text: "Exactly",
-                                                          ),
-                                                          value:
-                                                              PollMultiSelectState
-                                                                  .exactly,
-                                                        ),
-                                                        DropdownMenuItem(
-                                                          child: LMFeedText(
-                                                            text: "At least",
-                                                          ),
-                                                          value:
-                                                              PollMultiSelectState
-                                                                  .atLeast,
-                                                        ),
-                                                        DropdownMenuItem(
-                                                          child: LMFeedText(
-                                                            text: "At max",
-                                                          ),
-                                                          value:
-                                                              PollMultiSelectState
-                                                                  .atMax,
-                                                        ),
-                                                      ],
-                                                    );
-                                                  }),
                                               LMFeedText(
-                                                text: '=',
+                                                text: 'User can vote for',
                                                 style: LMFeedTextStyle(
                                                   textStyle: TextStyle(
-                                                    fontSize: 24,
+                                                    fontSize: 14,
                                                     fontWeight: FontWeight.w400,
                                                     color: theme.inActiveColor,
                                                   ),
                                                 ),
                                               ),
-                                              ValueListenableBuilder(
-                                                  valueListenable:
-                                                      _rebuildMultiSelectStateBuilder,
-                                                  builder: (context, _, __) {
-                                                    return ValueListenableBuilder(
-                                                        valueListenable:
-                                                            _multiSelectNoBuilder,
-                                                        builder: (context,
-                                                            value, child) {
-                                                          return DropdownButton<
-                                                              int>(
-                                                            value: value,
-                                                            items: [
-                                                              // create dropdown items based on current options length min 1 and max options.length
-                                                              for (int i = 1;
-                                                                  i <=
-                                                                      options
-                                                                          .length;
-                                                                  i++)
-                                                                DropdownMenuItem(
-                                                                  child:
-                                                                      LMFeedText(
-                                                                    text:
-                                                                        '$i ${i == 1 ? 'option' : 'options'}',
-                                                                  ),
-                                                                  value: i,
-                                                                ),
-                                                            ],
-                                                            dropdownColor:
-                                                                theme.container,
-                                                            iconEnabledColor:
-                                                                theme
-                                                                    .onContainer,
-                                                            style: TextStyle(
-                                                              color: theme
-                                                                  .onContainer,
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  ValueListenableBuilder(
+                                                      valueListenable:
+                                                          _multiSelectStateBuilder,
+                                                      builder: (context, value,
+                                                          child) {
+                                                        return DropdownButton<
+                                                            PollMultiSelectState>(
+                                                          value: value,
+                                                          onChanged: (value) {
+                                                            if (value != null)
+                                                              _multiSelectStateBuilder
+                                                                      .value =
+                                                                  value;
+                                                          },
+                                                          dropdownColor:
+                                                              theme.container,
+                                                          iconEnabledColor:
+                                                              theme.onContainer,
+                                                          style: TextStyle(
+                                                            color: theme
+                                                                .onContainer,
+                                                          ),
+                                                          items: [
+                                                            DropdownMenuItem(
+                                                              child: LMFeedText(
+                                                                text: "Exactly",
+                                                              ),
+                                                              value:
+                                                                  PollMultiSelectState
+                                                                      .exactly,
                                                             ),
-                                                            onChanged: (value) {
-                                                              if (value != null)
-                                                                _multiSelectNoBuilder
-                                                                        .value =
-                                                                    value;
-                                                            },
-                                                          );
-                                                        });
-                                                  })
+                                                            DropdownMenuItem(
+                                                              child: LMFeedText(
+                                                                text:
+                                                                    "At least",
+                                                              ),
+                                                              value:
+                                                                  PollMultiSelectState
+                                                                      .atLeast,
+                                                            ),
+                                                            DropdownMenuItem(
+                                                              child: LMFeedText(
+                                                                text: "At max",
+                                                              ),
+                                                              value:
+                                                                  PollMultiSelectState
+                                                                      .atMax,
+                                                            ),
+                                                          ],
+                                                        );
+                                                      }),
+                                                  LMFeedText(
+                                                    text: '=',
+                                                    style: LMFeedTextStyle(
+                                                      textStyle: TextStyle(
+                                                        fontSize: 24,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color:
+                                                            theme.inActiveColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  ValueListenableBuilder(
+                                                      valueListenable:
+                                                          _rebuildMultiSelectStateBuilder,
+                                                      builder:
+                                                          (context, _, __) {
+                                                        return ValueListenableBuilder(
+                                                            valueListenable:
+                                                                _multiSelectNoBuilder,
+                                                            builder: (context,
+                                                                value, child) {
+                                                              return DropdownButton<
+                                                                  int>(
+                                                                value: value,
+                                                                items: [
+                                                                  // create dropdown items based on current options length min 1 and max options.length
+                                                                  for (int i =
+                                                                          1;
+                                                                      i <=
+                                                                          options
+                                                                              .length;
+                                                                      i++)
+                                                                    DropdownMenuItem(
+                                                                      child:
+                                                                          LMFeedText(
+                                                                        text:
+                                                                            '$i ${i == 1 ? 'option' : 'options'}',
+                                                                      ),
+                                                                      value: i,
+                                                                    ),
+                                                                ],
+                                                                dropdownColor:
+                                                                    theme
+                                                                        .container,
+                                                                iconEnabledColor:
+                                                                    theme
+                                                                        .onContainer,
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: theme
+                                                                      .onContainer,
+                                                                ),
+                                                                onChanged:
+                                                                    (value) {
+                                                                  if (value !=
+                                                                      null)
+                                                                    _multiSelectNoBuilder
+                                                                            .value =
+                                                                        value;
+                                                                },
+                                                              );
+                                                            });
+                                                      })
+                                                ],
+                                              )
                                             ],
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                            : SizedBox.shrink(),
-                      ),
-                      SizedBox(height: 24),
-                      widget.addOptionButtonBuilder
-                              ?.call(_defAdvancedButton(value)) ??
-                          _defAdvancedButton(value),
-                    ],
-                  );
-                }),
-            SizedBox(
-              height: 50,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox.shrink(),
+                          ),
+                          SizedBox(height: 24),
+                          widget.addOptionButtonBuilder
+                                  ?.call(_defAdvancedButton(value)) ??
+                              _defAdvancedButton(value),
+                        ],
+                      );
+                    }),
+                SizedBox(
+                  height: 50,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

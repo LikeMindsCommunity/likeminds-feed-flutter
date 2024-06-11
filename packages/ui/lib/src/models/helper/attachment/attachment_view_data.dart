@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
-import 'package:likeminds_feed_flutter_ui/src/models/helper/attachment/attachment_meta_view_data.dart';
 
 enum LMMediaType { none, video, image, document, link, widget, repost, poll }
 
@@ -13,23 +12,29 @@ class LMAttachmentViewData {
     required this.attachmentMeta,
   });
 
+  static const int imageMediaType = 1;
+  static const int videoMediaType = 2;
+  static const int documentMediaType = 3;
+  static const int linkMediaType = 4;
+  static const int widgetMediaType = 5;
+  static const int repostMediaType = 8;
+  static const int pollMediaType = 6;
+
   int mapMediaTypeToInt() {
     if (attachmentType == LMMediaType.image) {
-      return 1;
+      return imageMediaType;
     } else if (attachmentType == LMMediaType.video) {
-      return 2;
+      return videoMediaType;
     } else if (attachmentType == LMMediaType.document) {
-      return 3;
+      return documentMediaType;
     } else if (attachmentType == LMMediaType.link) {
-      return 4;
+      return linkMediaType;
     } else if (attachmentType == LMMediaType.widget) {
-      return 5;
-    }
-    if (attachmentType == LMMediaType.repost) {
-      return 8;
-    }
-    if (attachmentType == LMMediaType.poll) {
-      return 6;
+      return widgetMediaType;
+    } else if (attachmentType == LMMediaType.repost) {
+      return repostMediaType;
+    } else if (attachmentType == LMMediaType.poll) {
+      return pollMediaType;
     } else {
       throw 'no valid media type provided';
     }

@@ -83,13 +83,20 @@ class LMFeedCarousel extends StatefulWidget {
 
 class _LMCarouselState extends State<LMFeedCarousel> {
   final ValueNotifier<bool> rebuildCurr = ValueNotifier(false);
+  LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
+
   List<Widget> mediaWidgets = [];
   int currPosition = 0;
-  LMFeedPostCarouselStyle? style;
+  late LMFeedPostCarouselStyle? style;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant LMFeedCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
   }
 
   bool checkIfMultipleAttachments() {
@@ -118,7 +125,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 ),
           ),
         ));
-      } else if ((e.attachmentType == LMMediaType.video)) {
+      } else if (e.attachmentType == LMMediaType.video) {
         mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -132,11 +139,6 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 style: widget.videoStyle,
                 postId: widget.postId,
                 onMediaTap: widget.onMediaTap,
-                videoController:
-                    LMFeedVideoProvider.instance.getVideoControllers(
-                  widget.postId,
-                  widget.attachments.indexOf(e),
-                ),
                 position: index,
               ),
         ));
@@ -146,7 +148,6 @@ class _LMCarouselState extends State<LMFeedCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     style = widget.style ?? feedTheme.mediaStyle.carouselStyle;
     mapAttachmentsToWidget();
     return GestureDetector(

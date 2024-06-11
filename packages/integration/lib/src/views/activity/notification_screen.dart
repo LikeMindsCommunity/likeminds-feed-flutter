@@ -97,7 +97,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(screenSize!.width, 600);
+    screenWidth = min(screenSize!.width, LMFeedCore.webConfiguration.maxWidth);
     return _widgetUtility.scaffold(
       source: _widgetSource,
       backgroundColor: _theme.container,

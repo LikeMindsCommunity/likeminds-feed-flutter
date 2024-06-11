@@ -175,7 +175,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(600, screenSize!.width);
+    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: config!.composeSystemOverlayStyle,
@@ -553,9 +553,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                             ),
                           );
                         },
-                        documentPath:
-                            composeBloc.postMedia[index].attachmentMeta.path ??
-                                "",
+                        document: composeBloc.postMedia[index],
                         style: style?.mediaStyle?.documentStyle?.copyWith(
                               width: style?.mediaStyle?.documentStyle?.width ??
                                   screenWidth,

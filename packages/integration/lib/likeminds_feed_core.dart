@@ -11,6 +11,7 @@ import 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.da
 import 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
 
 import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/universal_feed/feed_screen.dart';
@@ -32,6 +33,15 @@ export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 export 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.dart';
 
+/// {@template lm_feed_core}
+/// This class is the core of the feed.
+/// It is used to initialize the feed and configure the feed screens.
+///
+/// This class represents the core functionality of the LikeMinds feed.
+///
+/// It provides methods and properties to interact with the feed data.
+///
+/// {@endtemplate}
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
   LMSDKCallbackImplementation? sdkCallback;
@@ -51,6 +61,9 @@ class LMFeedCore {
   static LMFeedClient get client => instance.lmFeedClient;
 
   static LMFeedConfig get config => instance.feedConfig;
+
+  static LMFeedWebConfiguration get webConfiguration =>
+      instance.feedConfig.webConfiguration;
 
   static set config(LMFeedConfig value) {
     instance.feedConfig = value;
@@ -83,7 +96,7 @@ class LMFeedCore {
 
   LMFeedCore._();
 
-  Future<LMResponse<LMResponse<void>>> initialize({
+  Future<LMResponse<void>> initialize({
     String? domain,
     LMFeedConfig? config,
     LMFeedWidgetUtility? widgets,
@@ -102,6 +115,12 @@ class LMFeedCore {
       clientBuilder.sdkCallback(this.sdkCallback);
 
       this.lmFeedClient = clientBuilder.build();
+
+      LMResponse initResponse = await this.lmFeedClient.init();
+
+      if (!initResponse.success) {
+        return initResponse;
+      }
 
       clientDomain = domain;
       feedConfig = config ?? LMFeedConfig();
@@ -356,32 +375,47 @@ class LMFeedCore {
   }
 }
 
+/// {@template lm_feed_config}
+/// This class is used to configure the feed screens.
+/// {@endtemplate}
 class LMFeedConfig {
   final LMFeedScreenConfig feedScreenConfig;
   final LMFeedComposeScreenConfig composeConfig;
   final LMPostDetailScreenConfig postDetailConfig;
   final LMFeedRoomScreenConfig feedRoomScreenConfig;
   final SystemUiOverlayStyle? globalSystemOverlayStyle;
+  final LMFeedWebConfiguration webConfiguration;
 
+  /// {@macro lm_feed_config}
   LMFeedConfig({
     this.feedScreenConfig = const LMFeedScreenConfig(),
     this.composeConfig = const LMFeedComposeScreenConfig(),
     this.postDetailConfig = const LMPostDetailScreenConfig(),
     this.feedRoomScreenConfig = const LMFeedRoomScreenConfig(),
+    this.webConfiguration = const LMFeedWebConfiguration(),
     this.globalSystemOverlayStyle,
   });
 
+  /// {@template lm_feed_config_copywith}
+  /// [copyWith] to create a new instance of [LMFeedConfig]
+  /// with the provided values
+  /// {@endtemplate}
   LMFeedConfig copyWith({
     LMFeedScreenConfig? config,
     LMFeedComposeScreenConfig? composeConfig,
     LMPostDetailScreenConfig? postDetailConfig,
     LMFeedRoomScreenConfig? feedRoomScreenConfig,
+    SystemUiOverlayStyle? globalSystemOverlayStyle,
+    LMFeedWebConfiguration? webConfiguration,
   }) {
     return LMFeedConfig(
       feedScreenConfig: config ?? feedScreenConfig,
       composeConfig: composeConfig ?? this.composeConfig,
       postDetailConfig: postDetailConfig ?? this.postDetailConfig,
       feedRoomScreenConfig: feedRoomScreenConfig ?? this.feedRoomScreenConfig,
+      globalSystemOverlayStyle:
+          globalSystemOverlayStyle ?? this.globalSystemOverlayStyle,
+      webConfiguration: webConfiguration ?? this.webConfiguration,
     );
   }
 }

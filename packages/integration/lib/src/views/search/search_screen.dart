@@ -169,7 +169,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(600, screenSize!.width);
+    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
     return widgetUtility.scaffold(
       source: widgetSource,
       resizeToAvoidBottomInset: false,
