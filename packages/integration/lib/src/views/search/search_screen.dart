@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:async/async.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
 class LMFeedSearchScreen extends StatefulWidget {
   const LMFeedSearchScreen({
@@ -51,12 +54,16 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier<bool>(false);
   // check whether current logged in user is CM or not
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+  FocusNode focusNode = FocusNode();
   LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
   final PagingController<int, LMPostViewData> _pagingController =
       PagingController(firstPageKey: 1);
   bool userPostingRights = true;
   int page = 1;
   int pageSize = 10;
+  Size? screenSize;
+  double? screenWidth;
+  bool isWeb = LMFeedPlatform.instance.isWeb();
 
   @override
   void initState() {
@@ -66,6 +73,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
     searchController.addListener(() {
       _onTextChanged(searchController.text);
     });
+
+    if (focusNode.canRequestFocus) {
+      focusNode.requestFocus();
+    }
 
     // Fire analytics for search screen opened event
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
@@ -119,6 +130,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   @override
   void dispose() {
     _debounceOperation?.cancel();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -156,6 +168,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenSize = MediaQuery.sizeOf(context);
+    screenWidth = min(600, screenSize!.width);
     return widgetUtility.scaffold(
       source: widgetSource,
       resizeToAvoidBottomInset: false,
@@ -166,6 +180,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         foregroundColor: theme.onContainer,
         title: TextField(
           controller: searchController,
+          focusNode: focusNode,
           onChanged: _onTextChanged,
           cursorColor: theme.primaryColor,
           decoration: InputDecoration(
@@ -197,151 +212,165 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               }),
         ],
       ),
-      body: BlocListener(
-        bloc: newPostBloc,
-        listener: (context, state) {
-          if (state is LMFeedNewPostErrorState) {
-            postUploading.value = false;
-            LMFeedCore.showSnackBar(
-              context,
-              state.errorMessage,
-              widgetSource,
-            );
-          }
-          if (state is LMFeedNewPostUploadedState) {
-            LMPostViewData? item = state.postData;
-            int length = _pagingController.itemList?.length ?? 0;
-            List<LMPostViewData> feedRoomItemList =
-                _pagingController.itemList ?? [];
-            for (int i = 0; i < feedRoomItemList.length; i++) {
-              if (!feedRoomItemList[i].isPinned) {
-                feedRoomItemList.insert(i, item);
-                break;
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: screenWidth,
+          child: BlocListener(
+            bloc: newPostBloc,
+            listener: (context, state) {
+              if (state is LMFeedNewPostErrorState) {
+                postUploading.value = false;
+                LMFeedCore.showSnackBar(
+                  context,
+                  state.errorMessage,
+                  widgetSource,
+                );
               }
-            }
-            if (length == feedRoomItemList.length) {
-              feedRoomItemList.add(item);
-            }
-            if (feedRoomItemList.isNotEmpty && feedRoomItemList.length > 10) {
-              feedRoomItemList.removeLast();
+              if (state is LMFeedNewPostUploadedState) {
+                LMPostViewData? item = state.postData;
+                int length = _pagingController.itemList?.length ?? 0;
+                List<LMPostViewData> feedRoomItemList =
+                    _pagingController.itemList ?? [];
+                for (int i = 0; i < feedRoomItemList.length; i++) {
+                  if (!feedRoomItemList[i].isPinned) {
+                    feedRoomItemList.insert(i, item);
+                    break;
+                  }
+                }
+                if (length == feedRoomItemList.length) {
+                  feedRoomItemList.add(item);
+                }
+                if (feedRoomItemList.isNotEmpty &&
+                    feedRoomItemList.length > 10) {
+                  feedRoomItemList.removeLast();
 
-              postUploading.value = false;
-              rebuildPostWidget.value = !rebuildPostWidget.value;
-            } else {
-              postUploading.value = false;
-              rebuildPostWidget.value = !rebuildPostWidget.value;
-            }
-          }
-          if (state is LMFeedPostDeletedState) {
-            List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-            feedRoomItemList?.removeWhere((item) => item.id == state.postId);
-            _pagingController.itemList = feedRoomItemList;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
-          }
-          if (state is LMFeedPostUpdateState) {
-            List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-            int index = feedRoomItemList
-                    ?.indexWhere((element) => element.id == state.post?.id) ??
-                -1;
-            if (index != -1) {
-              feedRoomItemList![index] = state.post!;
-            }
-            _pagingController.itemList = feedRoomItemList;
-            rebuildPostWidget.value = !rebuildPostWidget.value;
-          }
-          if (state is LMFeedEditPostUploadedState) {
-            LMPostViewData? item = state.postData.copyWith();
-            List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-            int index = feedRoomItemList
-                    ?.indexWhere((element) => element.id == item.id) ??
-                -1;
-            if (index != -1) {
-              feedRoomItemList?[index] = item;
-            }
+                  postUploading.value = false;
+                  rebuildPostWidget.value = !rebuildPostWidget.value;
+                } else {
+                  postUploading.value = false;
+                  rebuildPostWidget.value = !rebuildPostWidget.value;
+                }
+              }
+              if (state is LMFeedPostDeletedState) {
+                List<LMPostViewData>? feedRoomItemList =
+                    _pagingController.itemList;
+                feedRoomItemList
+                    ?.removeWhere((item) => item.id == state.postId);
+                _pagingController.itemList = feedRoomItemList;
+                rebuildPostWidget.value = !rebuildPostWidget.value;
+              }
+              if (state is LMFeedPostUpdateState) {
+                List<LMPostViewData>? feedRoomItemList =
+                    _pagingController.itemList;
+                int index = feedRoomItemList?.indexWhere(
+                        (element) => element.id == state.post?.id) ??
+                    -1;
+                if (index != -1) {
+                  feedRoomItemList![index] = state.post!;
+                }
+                _pagingController.itemList = feedRoomItemList;
+                rebuildPostWidget.value = !rebuildPostWidget.value;
+              }
+              if (state is LMFeedEditPostUploadedState) {
+                LMPostViewData? item = state.postData.copyWith();
+                List<LMPostViewData>? feedRoomItemList =
+                    _pagingController.itemList;
+                int index = feedRoomItemList
+                        ?.indexWhere((element) => element.id == item.id) ??
+                    -1;
+                if (index != -1) {
+                  feedRoomItemList?[index] = item;
+                }
 
-            rebuildPostWidget.value = !rebuildPostWidget.value;
-          }
+                rebuildPostWidget.value = !rebuildPostWidget.value;
+              }
 
-          if (state is LMFeedPostUpdateState) {
-            List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
-            int index = feedRoomItemList
-                    ?.indexWhere((element) => element.id == state.post?.id) ??
-                -1;
-            if (index != -1) {
-              feedRoomItemList?[index] = state.post!;
-            }
-            rebuildPostWidget.value = !rebuildPostWidget.value;
-          }
-        },
-        child: BlocConsumer<LMFeedSearchBloc, LMFeedSearchState>(
-          bloc: searchBloc,
-          buildWhen: (previous, current) {
-            if (current is LMFeedSearchPaginationLoadingState &&
-                (previous is LMFeedSearchLoadingState ||
-                    previous is LMFeedSearchLoadedState)) {
-              return false;
-            }
-            return true;
-          },
-          listener: (context, state) {
-            if (state is LMFeedSearchErrorState) {
-              LMFeedCore.showSnackBar(
-                context,
-                state.message,
-                widgetSource,
-              );
-            }
-            if (state is LMFeedSearchLoadedState) {
-              // FocusScope.of(context).unfocus();
-              updatePagingControllers(state);
-            }
-          },
-          builder: (context, state) {
-            if (state is LMFeedSearchLoadingState) {
-              return widget.firstPageLoaderBuilder?.call(context) ??
-                  const LMFeedLoader();
-            }
+              if (state is LMFeedPostUpdateState) {
+                List<LMPostViewData>? feedRoomItemList =
+                    _pagingController.itemList;
+                int index = feedRoomItemList?.indexWhere(
+                        (element) => element.id == state.post?.id) ??
+                    -1;
+                if (index != -1) {
+                  feedRoomItemList?[index] = state.post!;
+                }
+                rebuildPostWidget.value = !rebuildPostWidget.value;
+              }
+            },
+            child: BlocConsumer<LMFeedSearchBloc, LMFeedSearchState>(
+              bloc: searchBloc,
+              buildWhen: (previous, current) {
+                if (current is LMFeedSearchPaginationLoadingState &&
+                    (previous is LMFeedSearchLoadingState ||
+                        previous is LMFeedSearchLoadedState)) {
+                  return false;
+                }
+                return true;
+              },
+              listener: (context, state) {
+                if (state is LMFeedSearchErrorState) {
+                  LMFeedCore.showSnackBar(
+                    context,
+                    state.message,
+                    widgetSource,
+                  );
+                }
+                if (state is LMFeedSearchLoadedState) {
+                  // FocusScope.of(context).unfocus();
+                  updatePagingControllers(state);
+                }
+              },
+              builder: (context, state) {
+                if (state is LMFeedSearchLoadingState) {
+                  return widget.firstPageLoaderBuilder?.call(context) ??
+                      const LMFeedLoader();
+                }
 
-            if (state is LMFeedSearchLoadedState) {
-              return ValueListenableBuilder(
-                  valueListenable: rebuildPostWidget,
-                  builder: (context, _, __) {
-                    return PagedListView(
-                      pagingController: _pagingController,
-                      builderDelegate:
-                          PagedChildBuilderDelegate<LMPostViewData>(
-                        noItemsFoundIndicatorBuilder: (context) {
-                          return widget.emptyFeedViewBuilder?.call(context) ??
-                              noPostInFeedWidget();
-                        },
-                        itemBuilder: (context, item, index) {
-                          return Column(
-                            children: [
-                              const SizedBox(height: 2),
-                              widget.postBuilder?.call(
-                                    context,
-                                    defPostWidget(item),
-                                    item,
-                                  ) ??
-                                  widgetUtility.postWidgetBuilder(
-                                      context, defPostWidget(item), item,
-                                      source: widgetSource),
-                            ],
-                          );
-                        },
-                        firstPageProgressIndicatorBuilder: (context) =>
-                            const SizedBox(),
-                        newPageProgressIndicatorBuilder: (context) =>
-                            const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                      ),
-                    );
-                  });
-            }
-            return SizedBox.shrink();
-          },
+                if (state is LMFeedSearchLoadedState) {
+                  return ValueListenableBuilder(
+                      valueListenable: rebuildPostWidget,
+                      builder: (context, _, __) {
+                        return PagedListView(
+                          pagingController: _pagingController,
+                          padding: isWeb ? EdgeInsets.only(top: 20) : null,
+                          builderDelegate:
+                              PagedChildBuilderDelegate<LMPostViewData>(
+                            noItemsFoundIndicatorBuilder: (context) {
+                              return widget.emptyFeedViewBuilder
+                                      ?.call(context) ??
+                                  noPostInFeedWidget();
+                            },
+                            itemBuilder: (context, item, index) {
+                              return Column(
+                                children: [
+                                  const SizedBox(height: 2),
+                                  widget.postBuilder?.call(
+                                        context,
+                                        defPostWidget(item),
+                                        item,
+                                      ) ??
+                                      widgetUtility.postWidgetBuilder(
+                                          context, defPostWidget(item), item,
+                                          source: widgetSource),
+                                ],
+                              );
+                            },
+                            firstPageProgressIndicatorBuilder: (context) =>
+                                const SizedBox(),
+                            newPageProgressIndicatorBuilder: (context) =>
+                                const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                          ),
+                        );
+                      });
+                }
+                return SizedBox.shrink();
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -718,6 +747,10 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 postViewData.likeCount)),
         style: theme.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
@@ -948,7 +981,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 borderRadius: 28,
                 backgroundColor: theme.primaryColor,
                 height: 44,
-                width: 153,
                 padding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 placement: LMFeedIconButtonPlacement.end,

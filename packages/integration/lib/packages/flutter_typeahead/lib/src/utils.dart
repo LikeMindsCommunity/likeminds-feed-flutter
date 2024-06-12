@@ -1,5 +1,5 @@
-import 'dart:io';
+import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
-import 'package:flutter/foundation.dart';
+final LMFeedPlatform _feedPlatform = LMFeedPlatform.instance;
 
-final supportedPlatform = (kIsWeb || Platform.isAndroid || Platform.isIOS);
+final supportedPlatform = (_feedPlatform.isWeb() || _feedPlatform.isMobile());

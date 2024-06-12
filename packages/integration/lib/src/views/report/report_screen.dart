@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
 class LMFeedReportScreen extends StatefulWidget {
   final Widget Function(BuildContext, LMDeleteReasonViewData)?
@@ -61,7 +62,7 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
   Future<LMResponse<List<LMDeleteReasonViewData>>>? getReportTagsFuture;
   TextEditingController reportReasonController = TextEditingController();
   Set<int> selectedTags = {};
-  bool isIos = Platform.isIOS;
+  bool isIos = LMFeedPlatform.instance.isIOS();
   LMDeleteReasonViewData? deleteReason;
 
   @override

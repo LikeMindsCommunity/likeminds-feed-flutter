@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -336,9 +338,11 @@ class LMFeedWidgetUtility {
   SnackBar snackBarBuilder(
       BuildContext context, String snackBarMessage, LMFeedWidgetSource source,
       {LMFeedSnackBarStyle? style}) {
+    Size size = MediaQuery.sizeOf(context);
+    LMFeedSnackBarStyle inStyle = style ?? LMFeedCore.theme.snackBarTheme;
     return LMFeedSnackBar(
       content: LMFeedText(text: snackBarMessage),
-      style: style ?? LMFeedCore.theme.snackBarTheme,
+      style: inStyle.copyWith(width: min(400, inStyle.width ?? size.width)),
     );
   }
 }

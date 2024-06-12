@@ -1067,6 +1067,10 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 postViewData.likeCount)),
         style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           LMFeedVideoProvider.instance.pauseCurrentVideo();
 
           Navigator.of(context, rootNavigator: true).push(
@@ -1303,7 +1307,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         borderRadius: 28,
         backgroundColor: feedThemeData.primaryColor,
         height: 44,
-        width: 160,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),

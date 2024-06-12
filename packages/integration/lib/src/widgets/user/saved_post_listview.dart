@@ -583,6 +583,9 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                 postViewData.likeCount)),
         style: _theme.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
