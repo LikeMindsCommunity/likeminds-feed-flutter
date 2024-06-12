@@ -93,6 +93,7 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const LMFeedText(
             text: 'Likes',
@@ -126,37 +127,28 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
 
   Widget getLikesLoadedView() {
     return SafeArea(
-      child: Column(
-        children: [
-          Expanded(
-            child: PagedListView<int, LMLikeViewData>(
-              padding: EdgeInsets.zero,
-              pagingController: handler!.pagingController,
-              builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
-                noMoreItemsIndicatorBuilder: (context) => const SizedBox(
-                  height: 20,
-                ),
-                noItemsFoundIndicatorBuilder: (context) => Scaffold(
-                  backgroundColor: LikeMindsTheme.whiteColor,
-                  body: noItemLikesView(),
-                ),
-                itemBuilder: (context, item, index) =>
-                    LikesTile(user: handler!.userData[item.uuid]),
-                firstPageProgressIndicatorBuilder: (context) => SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 50.0),
-                    child: ListView.builder(
-                        itemCount: 5,
-                        itemBuilder: (context, index) =>
-                            const LMFeedUserTileShimmer()),
-                  ),
-                ),
-                newPageProgressIndicatorBuilder: (context) =>
-                    newPageProgressLikesView(),
-              ),
+      child: PagedListView<int, LMLikeViewData>(
+        padding: EdgeInsets.zero,
+        pagingController: handler!.pagingController,
+        builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
+          noMoreItemsIndicatorBuilder: (context) => const SizedBox(
+            height: 20,
+          ),
+          noItemsFoundIndicatorBuilder: (context) => Scaffold(
+            backgroundColor: LikeMindsTheme.whiteColor,
+            body: noItemLikesView(),
+          ),
+          itemBuilder: (context, item, index) =>
+              LikesTile(user: handler!.userData[item.uuid]),
+          firstPageProgressIndicatorBuilder: (context) => Padding(
+            padding: const EdgeInsets.only(top: 50.0),
+            child: Column(
+              children: List.generate(5, (index) => LMFeedUserTileShimmer()),
             ),
-          )
-        ],
+          ),
+          newPageProgressIndicatorBuilder: (context) =>
+              newPageProgressLikesView(),
+        ),
       ),
     );
   }
