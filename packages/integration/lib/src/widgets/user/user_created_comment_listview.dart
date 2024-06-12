@@ -498,8 +498,9 @@ class _LMFeedUserCreatedCommentListViewState
           },
           action: LMFeedMenuAction(
             onPostReport: () => handlePostReportAction(postViewData),
-            onPostUnpin: () => handlePostPinAction(postViewData),
-            onPostPin: () => handlePostPinAction(postViewData),
+            onPostUnpin: () =>
+                LMFeedPostUtils.handlePostPinAction(postViewData),
+            onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
             onPostEdit: () {
               // Mute all video controllers
               // to prevent video from playing in background
@@ -780,48 +781,6 @@ class _LMFeedUserCreatedCommentListViewState
         ),
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    lmFeedPostBloc.add(LMFeedUpdatePostEvent(
-      post: postViewData,
-      actionType: postViewData.isPinned
-          ? LMFeedPostActionType.unpinned
-          : LMFeedPostActionType.pinned,
-      postId: postViewData.id,
-    ));
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      lmFeedPostBloc.add(LMFeedUpdatePostEvent(
-        post: postViewData,
-        actionType: postViewData.isPinned
-            ? LMFeedPostActionType.unpinned
-            : LMFeedPostActionType.pinned,
-        postId: postViewData.id,
-      ));
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: widgetSource,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 }
 

@@ -20,6 +20,45 @@ class LMFeedPostUtils {
     return LMFeedPluralize.instance.pluralizeOrCapitalize(commentTitle, action);
   }
 
+  static void handlePostPinAction(LMPostViewData postViewData) async {
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+      postId: postViewData.id,
+      actionType: postViewData.isPinned
+          ? LMFeedPostActionType.pinned
+          : LMFeedPostActionType.unpinned,
+    ));
+
+    final pinPostRequest =
+        (PinPostRequestBuilder()..postId(postViewData.id)).build();
+
+    final PinPostResponse response =
+        await LMFeedCore.client.pinPost(pinPostRequest);
+
+    if (!response.success) {
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          postId: postViewData.id,
+          actionType: postViewData.isPinned
+              ? LMFeedPostActionType.pinned
+              : LMFeedPostActionType.unpinned));
+    } else {
+      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeys.postPinned
+              : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.universalFeed,
+          eventProperties: {
+            'created_by_id': postViewData.uuid,
+            'post_id': postViewData.id,
+            'post_type': postType,
+          },
+        ),
+      );
+    }
+  }
+
   static LMPostViewData updatePostData({
     required LMPostViewData postViewData,
     required LMFeedPostActionType actionType,
@@ -52,8 +91,22 @@ class LMFeedPostUtils {
           break;
         }
       case (LMFeedPostActionType.pinned || LMFeedPostActionType.unpinned):
-        postViewData.isPinned = !postViewData.isPinned;
-        break;
+        {
+          String postTitle = getPostTitle(
+              LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+          postViewData.menuItems = postViewData.menuItems.map((e) {
+            if (e.id == postPinId) {
+              e.id = postUnpinId;
+              e.title = "Unpin This $postTitle";
+            } else if (e.id == postUnpinId) {
+              e.id = postPinId;
+              e.title = "Pin This $postTitle";
+            }
+            return e;
+          }).toList();
+          postViewData.isPinned = !postViewData.isPinned;
+          break;
+        }
       case (LMFeedPostActionType.saved || LMFeedPostActionType.unsaved):
         postViewData.isSaved = !postViewData.isSaved;
         break;

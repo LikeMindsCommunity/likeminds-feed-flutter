@@ -667,31 +667,25 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   LMFeedPostHeader _defPostHeader(BuildContext context) {
+    LMPostViewData postViewData = _postDetailScreenHandler!.postData!;
+    LMUserViewData userViewData = postViewData.user;
     return LMFeedPostHeader(
-      user: _postDetailScreenHandler!
-          .users[_postDetailScreenHandler!.postData!.uuid]!,
+      user: userViewData,
       isFeed: true,
-      postViewData: _postDetailScreenHandler!.postData!,
+      postViewData: postViewData,
       postHeaderStyle: feedTheme.headerStyle,
-      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(
-          context,
-          _postDetailScreenHandler!.postData!,
-          LMFeedAnalyticsKeys.postProfilePicture,
-          _widgetSource),
-      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(
-          context,
-          _postDetailScreenHandler!.postData!,
-          LMFeedAnalyticsKeys.postProfilePicture,
-          _widgetSource),
+      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, _widgetSource),
+      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, _widgetSource),
       menu: LMFeedMenu(
-        menuItems: _postDetailScreenHandler!.postData?.menuItems ?? [],
+        menuItems: postViewData.menuItems,
         removeItemIds: {},
         onMenuOpen: () {
-          LMPostViewData postViewData = _postDetailScreenHandler!.postData!;
           LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
             eventName: LMFeedAnalyticsKeys.postMenu,
             eventProperties: {
-              'uuid': postViewData.user.sdkClientInfo.uuid,
+              'uuid': userViewData.sdkClientInfo.uuid,
               'post_id': postViewData.id,
               'topics': postViewData.topics.map((e) => e.name).toList(),
               'post_type':
@@ -701,8 +695,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         },
         action: LMFeedMenuAction(
           onPostReport: () => handlePostReportAction(),
-          onPostPin: () => handlePostPinAction(),
-          onPostUnpin: () => handlePostPinAction(),
+          onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
+          onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
           onPostEdit: () {
             // Mute all video controllers
             // to prevent video from playing in background
@@ -718,8 +712,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             );
           },
           onPostDelete: () {
-            String postCreatorUUID =
-                _postDetailScreenHandler!.postData!.user.sdkClientInfo.uuid;
+            String postCreatorUUID = userViewData.sdkClientInfo.uuid;
 
             showDialog(
               context: context,
@@ -732,14 +725,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
 
-                  String postType = LMFeedPostUtils.getPostType(
-                      _postDetailScreenHandler!.postData!.attachments);
+                  String postType =
+                      LMFeedPostUtils.getPostType(postViewData.attachments);
 
                   postBloc.add(
                     LMFeedDeletePostEvent(
-                      postId: _postDetailScreenHandler!.postData!.id,
+                      postId: postViewData.id,
                       reason: reason,
-                      isRepost: _postDetailScreenHandler!.postData!.isRepost,
+                      isRepost: postViewData.isRepost,
                       postType: postType,
                       userId: postCreatorUUID,
                       userState: isCm ? "CM" : "member",
@@ -757,26 +750,27 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   LMFeedPostMedia _defPostMedia() {
+    LMPostViewData postViewData = _postDetailScreenHandler!.postData!;
+    LMUserViewData userViewData =
+        _postDetailScreenHandler!.users[postViewData.uuid]!;
     return LMFeedPostMedia(
-      postId: _postDetailScreenHandler!.postData!.id,
-      attachments: _postDetailScreenHandler!.postData!.attachments!,
+      postId: postViewData.id,
+      attachments: postViewData.attachments!,
       style: feedTheme.mediaStyle,
       carouselIndicatorBuilder:
           _widgetBuilder.postMediaCarouselIndicatorBuilder,
       imageBuilder: _widgetBuilder.imageBuilder,
       videoBuilder: _widgetBuilder.videoBuilder,
       pollBuilder: _widgetBuilder.pollWidgetBuilder,
-      poll: _defPollWidget(_postDetailScreenHandler!.postData!),
+      poll: _defPollWidget(postViewData),
       onMediaTap: (int index) {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => LMFeedMediaPreviewScreen(
-              postAttachments:
-                  _postDetailScreenHandler!.postData!.attachments ?? [],
-              post: _postDetailScreenHandler!.postData!,
-              user: _postDetailScreenHandler!
-                  .users[_postDetailScreenHandler!.postData!.uuid]!,
+              postAttachments: postViewData.attachments ?? [],
+              post: postViewData,
+              user: userViewData,
               position: index,
             ),
           ),
@@ -1515,50 +1509,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ),
       ),
     );
-  }
-
-  void handlePostPinAction() async {
-    final pinPostRequest = (PinPostRequestBuilder()
-          ..postId(_postDetailScreenHandler!.postData!.id))
-        .build();
-
-    postBloc.add(LMFeedUpdatePostEvent(
-      postId: _postDetailScreenHandler!.postData!.id,
-      source: LMFeedWidgetSource.postDetailScreen,
-      actionType: _postDetailScreenHandler!.postData!.isPinned
-          ? LMFeedPostActionType.unpinned
-          : LMFeedPostActionType.pinned,
-    ));
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      postBloc.add(LMFeedUpdatePostEvent(
-        postId: _postDetailScreenHandler!.postData!.id,
-        source: LMFeedWidgetSource.postDetailScreen,
-        actionType: _postDetailScreenHandler!.postData!.isPinned
-            ? LMFeedPostActionType.unpinned
-            : LMFeedPostActionType.pinned,
-      ));
-    } else {
-      String postType = LMFeedPostUtils.getPostType(
-          _postDetailScreenHandler!.postData!.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: _postDetailScreenHandler!.postData!.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: LMFeedWidgetSource.postDetailScreen,
-          eventProperties: {
-            'created_by_id': _postDetailScreenHandler!.postData!.uuid,
-            'post_id': _postDetailScreenHandler!.postData!.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 
   void updatePostAndCommentData() {

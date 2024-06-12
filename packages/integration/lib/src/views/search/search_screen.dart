@@ -260,18 +260,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                 _pagingController.itemList = feedRoomItemList;
                 rebuildPostWidget.value = !rebuildPostWidget.value;
               }
-              if (state is LMFeedPostUpdateState) {
-                List<LMPostViewData>? feedRoomItemList =
-                    _pagingController.itemList;
-                int index = feedRoomItemList?.indexWhere(
-                        (element) => element.id == state.post?.id) ??
-                    -1;
-                if (index != -1) {
-                  feedRoomItemList![index] = state.post!;
-                }
-                _pagingController.itemList = feedRoomItemList;
-                rebuildPostWidget.value = !rebuildPostWidget.value;
-              }
+
               if (state is LMFeedEditPostUploadedState) {
                 LMPostViewData? item = state.postData.copyWith();
                 List<LMPostViewData>? feedRoomItemList =
@@ -289,11 +278,17 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
               if (state is LMFeedPostUpdateState) {
                 List<LMPostViewData>? feedRoomItemList =
                     _pagingController.itemList;
-                int index = feedRoomItemList?.indexWhere(
-                        (element) => element.id == state.post?.id) ??
+                int index = feedRoomItemList
+                        ?.indexWhere((element) => element.id == state.postId) ??
                     -1;
+
                 if (index != -1) {
-                  feedRoomItemList?[index] = state.post!;
+                  feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
+                    postViewData: state.post ?? feedRoomItemList[index],
+                    actionType: state.actionType,
+                    commentId: state.commentId,
+                    pollOptions: state.pollOptions,
+                  );
                 }
                 rebuildPostWidget.value = !rebuildPostWidget.value;
               }
@@ -526,8 +521,9 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           },
           action: LMFeedMenuAction(
             onPostReport: () => handlePostReportAction(postViewData),
-            onPostUnpin: () => handlePostPinAction(postViewData),
-            onPostPin: () => handlePostPinAction(postViewData),
+            onPostUnpin: () =>
+                LMFeedPostUtils.handlePostPinAction(postViewData),
+            onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
             onPostEdit: () {
               // Mute all video controllers
               // to prevent video from playing in background
@@ -1035,48 +1031,5 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         ),
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    postViewData.isPinned = !postViewData.isPinned;
-    rebuildPostWidget.value = !rebuildPostWidget.value;
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-      post: postViewData,
-      actionType: LMFeedPostActionType.pinned,
-      postId: postViewData.id,
-    ));
-
-    if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
-      rebuildPostWidget.value = !rebuildPostWidget.value;
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        post: postViewData,
-        actionType: LMFeedPostActionType.pinned,
-        postId: postViewData.id,
-      ));
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: widgetSource,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 }
