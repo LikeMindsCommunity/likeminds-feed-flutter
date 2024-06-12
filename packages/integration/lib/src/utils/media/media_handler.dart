@@ -137,7 +137,6 @@ class LMFeedMediaHandler {
                 'A total of ${composeScreenConfig.mediaLimit} attachments can be added to a post');
       } else {
         for (PlatformFile pFile in pickedFiles.files) {
-          File file = File.fromRawPath(pFile.bytes!);
           double fileSize = getFileSizeInDouble(pFile.size);
 
           if (fileSize > sizeLimit) {
@@ -149,19 +148,22 @@ class LMFeedMediaHandler {
             LMAttachmentViewData videoFile;
             if (kIsWeb) {
               videoFile = LMAttachmentViewData.fromMediaBytes(
-                attachmentType: LMMediaType.video,
-                bytes: pFile.bytes!,
-                size: fileSize.toInt(),
-                duration: 10,
-              );
+                  attachmentType: LMMediaType.video,
+                  bytes: pFile.bytes!,
+                  size: fileSize.toInt(),
+                  duration: 10,
+                  meta: {
+                    'file_name': pFile.name,
+                  });
             } else {
               videoFile = LMAttachmentViewData.fromMediaPath(
-                attachmentType: LMMediaType.video,
-                path: pFile.path!,
-                bytes: pFile.bytes!,
-                size: fileSize.toInt(),
-                duration: 10,
-              );
+                  attachmentType: LMMediaType.video,
+                  path: pFile.path!,
+                  size: fileSize.toInt(),
+                  duration: 10,
+                  meta: {
+                    'file_name': pFile.name,
+                  });
             }
             videoFiles.add(videoFile);
           }
@@ -206,12 +208,14 @@ class LMFeedMediaHandler {
             LMAttachmentViewData documentFile;
 
             documentFile = LMAttachmentViewData.fromMediaBytes(
-              attachmentType: LMMediaType.document,
-              bytes: pickedFile.bytes!,
-              path: kIsWeb ? null : pickedFile.path!,
-              format: pickedFile.extension,
-              size: pickedFile.size,
-            );
+                attachmentType: LMMediaType.document,
+                bytes: kIsWeb ? pickedFile.bytes! : null,
+                path: kIsWeb ? null : pickedFile.path!,
+                format: pickedFile.extension,
+                size: pickedFile.size,
+                meta: {
+                  'file_name': pickedFile.name,
+                });
 
             attachedFiles.add(documentFile);
           }
@@ -279,19 +283,22 @@ class LMFeedMediaHandler {
       if (kIsWeb) {
         attachedImages = list.files.map((e) {
           return LMAttachmentViewData.fromMediaBytes(
-            attachmentType: LMMediaType.image,
-            bytes: e.bytes!,
-            format: 'image',
-          );
+              attachmentType: LMMediaType.image,
+              bytes: e.bytes!,
+              format: 'image',
+              meta: {
+                'file_name': e.name,
+              });
         }).toList();
       } else {
         attachedImages = list.files.map((e) {
           return LMAttachmentViewData.fromMediaPath(
-            attachmentType: LMMediaType.image,
-            path: e.path!,
-            bytes: e.bytes!,
-            format: 'image',
-          );
+              attachmentType: LMMediaType.image,
+              path: e.path!,
+              format: 'image',
+              meta: {
+                'file_name': e.name,
+              });
         }).toList();
       }
 
@@ -341,10 +348,12 @@ class LMFeedMediaHandler {
       LMAttachmentViewData mediaFile;
 
       mediaFile = LMAttachmentViewData.fromMediaBytes(
-        attachmentType: LMMediaType.image,
-        bytes: list.files.first.bytes!,
-        path: kIsWeb ? null : list.files.first.path!,
-      );
+          attachmentType: LMMediaType.image,
+          bytes: kIsWeb ? list.files.first.bytes! : null,
+          path: kIsWeb ? null : list.files.first.path!,
+          meta: {
+            'file_name': list.files.first.name,
+          });
 
       return LMResponse(success: true, data: mediaFile);
     } else {

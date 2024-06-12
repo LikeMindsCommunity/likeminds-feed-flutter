@@ -10,8 +10,17 @@ updateUserMetaEventHandler(
 
   try {
     if (event.image != null) {
+      File imageFile;
+
+      if (event.image!.attachmentMeta.bytes != null) {
+        imageFile = File.fromRawPath(event.image!.attachmentMeta.bytes!);
+      } else {
+        imageFile = File(event.image!.attachmentMeta.path!);
+      }
+
       LMResponse<String> imageUrl = await LMFeedMediaService.uploadFile(
-          event.image!.attachmentMeta.bytes!, event.user.sdkClientInfo.uuid);
+          imageFile.readAsBytesSync(), event.user.sdkClientInfo.uuid,
+          fileName: event.image!.attachmentMeta.meta?['file_name']);
       if (imageUrl.success) {
         editProfileRequest..imageUrl(imageUrl.data!);
       }

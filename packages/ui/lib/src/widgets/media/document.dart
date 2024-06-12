@@ -79,7 +79,8 @@ class _LMDocumentState extends State<LMFeedDocument> {
     }
     _fileExtension = widget.type;
     _fileSize = widget.size;
-    _fileName = basenameWithoutExtension(file.path);
+    _fileName = widget.document.attachmentMeta.meta?['file_name'] ??
+        basenameWithoutExtension(file.path);
     return file;
   }
 

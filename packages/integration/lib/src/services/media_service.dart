@@ -27,17 +27,18 @@ class LMFeedMediaService {
     _secretKey = _prod ? CredsProd.secretKey : CredsDev.secretKey;
   }
 
-  static Future<LMResponse<String>> uploadFile(
-      Uint8List bytes, String postUuid) async {
-    return instance._uploadFile(bytes, postUuid);
+  static Future<LMResponse<String>> uploadFile(Uint8List bytes, String postUuid,
+      {String? fileName}) async {
+    return instance._uploadFile(bytes, postUuid, fileName: fileName);
   }
 
-  Future<LMResponse<String>> _uploadFile(
-      Uint8List bytes, String postUuid) async {
+  Future<LMResponse<String>> _uploadFile(Uint8List bytes, String uuid,
+      {String? fileName}) async {
     try {
       String url = "https://${_bucketName}.s3.$_region.amazonaws.com/";
-      String folderName = "posts/$postUuid";
-      String fileName = "$postUuid-${DateTime.now().millisecondsSinceEpoch}";
+      String folderName = "posts/$uuid";
+      String generateFileName =
+          fileName ?? "$uuid-${DateTime.now().millisecondsSinceEpoch}";
       LMResponse<String> response = await LMAWSWebClient.uploadFile(
         s3UploadUrl: url,
         s3SecretKey: _secretKey,
@@ -45,7 +46,7 @@ class LMFeedMediaService {
         s3AccessKey: _accessKey,
         s3BucketName: _bucketName,
         folderName: folderName,
-        fileName: fileName,
+        fileName: generateFileName,
         fileBytes: bytes,
       );
 
