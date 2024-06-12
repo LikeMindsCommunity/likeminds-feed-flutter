@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
@@ -30,7 +28,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
     final theme = LMFeedTheme.instance.theme;
 
     return Container(
-      width: min(600, MediaQuery.of(context).size.width),
+      width: min(inStyle.width ?? 600, MediaQuery.of(context).size.width),
       decoration: BoxDecoration(
         color: inStyle.backgroundColor ?? Colors.white,
         border: inStyle.border ??

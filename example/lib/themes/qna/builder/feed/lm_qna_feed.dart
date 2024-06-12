@@ -628,9 +628,9 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
         ]);
   }
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -640,13 +640,13 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return LMFeedTheme
                 .instance.theme.mediaStyle.documentStyle.documentIcon ??
             const LMFeedIcon(
@@ -1030,7 +1030,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
                       (LMAttachmentViewDataBuilder()
-                            ..attachmentType(8)
+                            ..attachmentType(LMMediaType.repost)
                             ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                                   ..repost(postViewData))
                                 .build()))

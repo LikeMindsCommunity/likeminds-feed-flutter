@@ -1,12 +1,9 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/pending_post/pending_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post/post_approval_dialog.dart';
 
 part './pending_post_screen_builder_delegate.dart';
 
@@ -145,7 +142,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(600, screenSize!.width);
+    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
     return _widgetsBuilder.scaffold(
       appBar: _postScreenBuilderDeletegate.appBarBuilder(
           context, defAppBar(), pendingPostCount),
@@ -553,7 +550,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });
@@ -585,7 +582,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
       isMultiChoicePoll: false,
       pollSelectionText: getPollSelectionText(
           pollValue.multiSelectState, pollValue.multiSelectNo),
-      timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
+      timeLeft: getTimeLeftInPoll(pollValue.expiryTime),
       onSameOptionAdded: () {
         LMFeedCore.showSnackBar(
           context,

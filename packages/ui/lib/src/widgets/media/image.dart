@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
-import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 /// {@template feed_image}
 /// A widget to display an image in a post.
@@ -14,19 +13,17 @@ import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 /// The image can be customized by passing in the required parameters
 /// and can be used in a post.
 /// {@endtemplate}
-class LMFeedImage extends StatefulWidget {
+class LMFeedImage extends StatelessWidget {
   const LMFeedImage({
     super.key,
-    this.imageUrl,
-    this.imageFile,
+    required this.image,
     this.onError,
     this.style,
     this.onMediaTap,
     this.position = 0,
-  }) : assert(imageUrl != null || imageFile != null);
+  });
 
-  final String? imageUrl;
-  final File? imageFile;
+  final LMAttachmentViewData image;
 
   /// {@macro feed_error_handler}
   final LMFeedErrorHandler? onError;
@@ -38,18 +35,41 @@ class LMFeedImage extends StatefulWidget {
   final int position;
 
   @override
-  State<LMFeedImage> createState() => _LMImageState();
+  Widget build(BuildContext context) {
+    LMFeedPostImageStyle inStyle =
+        style ?? LMFeedTheme.instance.theme.mediaStyle.imageStyle;
+
+    if (image.attachmentMeta.url != null) {
+      return _LMFeedCloudImage(
+        image: image,
+        onError: onError,
+        style: inStyle,
+        onMediaTap: onMediaTap,
+        position: position,
+      );
+    }
+
+    if (image.attachmentMeta.path != null ||
+        image.attachmentMeta.bytes != null) {
+      return _LMFeedLocalImage(
+        image: image,
+        style: inStyle,
+        onMediaTap: onMediaTap,
+        position: position,
+        onError: onError,
+      );
+    }
+    return const SizedBox();
+  }
 
   LMFeedImage copyWith({
-    String? imageUrl,
-    File? imageFile,
+    LMAttachmentViewData? image,
     LMFeedPostImageStyle? style,
     Function(String, StackTrace)? onError,
     Function(int)? onMediaTap,
   }) {
     return LMFeedImage(
-      imageUrl: imageUrl ?? this.imageUrl,
-      imageFile: imageFile ?? this.imageFile,
+      image: image ?? this.image,
       style: style ?? this.style,
       onError: onError ?? this.onError,
       onMediaTap: onMediaTap ?? this.onMediaTap,
@@ -57,81 +77,140 @@ class LMFeedImage extends StatefulWidget {
   }
 }
 
-class _LMImageState extends State<LMFeedImage> {
-  LMFeedPostImageStyle? style;
+class _LMFeedLocalImage extends StatelessWidget {
+  final LMAttachmentViewData image;
+
+  /// {@macro feed_error_handler}
+  final LMFeedErrorHandler? onError;
+
+  final LMFeedPostImageStyle style;
+
+  final Function(int)? onMediaTap;
+
+  final int position;
+  const _LMFeedLocalImage(
+      {super.key,
+      required this.image,
+      this.onError,
+      required this.style,
+      this.onMediaTap,
+      this.position = 0});
 
   @override
   Widget build(BuildContext context) {
-    style = widget.style ?? LMFeedTheme.instance.theme.mediaStyle.imageStyle;
+    Widget? imageWidget;
+
+    if (image.attachmentMeta.bytes != null) {
+      imageWidget = Image.memory(
+        image.attachmentMeta.bytes!,
+        height: style.height,
+        width: style.width,
+        fit: style.boxFit ?? BoxFit.contain,
+      );
+    } else if (image.attachmentMeta.path != null) {
+      imageWidget = Image.file(
+        File(image.attachmentMeta.path!),
+        height: style.height,
+        width: style.width,
+        fit: style.boxFit ?? BoxFit.contain,
+      );
+    }
+
+    // If the image is null, return an empty container
+    if (imageWidget == null) {
+      return const SizedBox();
+    }
+
     return GestureDetector(
-      onTap: () => widget.onMediaTap?.call(widget.position),
-      child: widget.imageUrl != null
-          ? Container(
-              padding: style?.padding,
-              margin: style?.margin,
-              decoration: BoxDecoration(
-                  borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                  color: style?.backgroundColor),
-              clipBehavior: Clip.hardEdge,
-              child: CachedNetworkImage(
-                cacheKey: widget.imageUrl!,
-                height: style!.height,
-                width: style!.width,
-                imageUrl: widget.imageUrl!,
-                fit: style!.boxFit ?? BoxFit.contain,
-                fadeInDuration: const Duration(
-                  milliseconds: 100,
-                ),
-                errorWidget: (context, url, error) {
-                  if (widget.onError != null) {
-                    widget.onError!(error.toString(), StackTrace.empty);
-                  }
-                  return style!.errorWidget ??
-                      Container(
-                        color: Colors.grey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            LMFeedIcon(
-                              type: LMFeedIconType.icon,
-                              icon: Icons.error_outline,
-                              style: LMFeedIconStyle(
-                                size: 24,
-                                color: Colors.grey.shade300,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            const LMFeedText(
-                              text: "An error occurred fetching media",
-                              style: LMFeedTextStyle(
-                                textStyle: TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ],
+      onTap: () => onMediaTap?.call(position),
+      child: Container(
+        padding: style.padding,
+        margin: style.margin,
+        decoration: BoxDecoration(
+          borderRadius: style.borderRadius ?? BorderRadius.zero,
+          color: style.backgroundColor,
+        ),
+        child: imageWidget,
+      ),
+    );
+  }
+}
+
+class _LMFeedCloudImage extends StatelessWidget {
+  final LMAttachmentViewData image;
+
+  /// {@macro feed_error_handler}
+  final LMFeedErrorHandler? onError;
+
+  final LMFeedPostImageStyle style;
+
+  final Function(int)? onMediaTap;
+
+  final int position;
+
+  const _LMFeedCloudImage(
+      {super.key,
+      required this.image,
+      this.onError,
+      required this.style,
+      this.onMediaTap,
+      this.position = 0});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onMediaTap?.call(position),
+      child: Container(
+        padding: style.padding,
+        margin: style.margin,
+        decoration: BoxDecoration(
+            borderRadius: style.borderRadius ?? BorderRadius.zero,
+            color: style.backgroundColor),
+        clipBehavior: Clip.hardEdge,
+        child: CachedNetworkImage(
+          cacheKey: image.attachmentMeta.url!,
+          height: style.height,
+          width: style.width,
+          imageUrl: image.attachmentMeta.url!,
+          fit: style.boxFit ?? BoxFit.contain,
+          fadeInDuration: const Duration(
+            milliseconds: 100,
+          ),
+          errorWidget: (context, url, error) {
+            if (onError != null) {
+              onError!(error.toString(), StackTrace.empty);
+            }
+            return style.errorWidget ??
+                Container(
+                  color: Colors.grey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LMFeedIcon(
+                        type: LMFeedIconType.icon,
+                        icon: Icons.error_outline,
+                        style: LMFeedIconStyle(
+                          size: 24,
+                          color: Colors.grey.shade300,
                         ),
-                      );
-                },
-                progressIndicatorBuilder: (context, url, progress) =>
-                    style!.shimmerWidget ?? const LMPostMediaShimmer(),
-              ),
-            )
-          : widget.imageFile != null
-              ? Container(
-                  padding: style?.padding,
-                  margin: style?.margin,
-                  decoration: BoxDecoration(
-                      borderRadius: style!.borderRadius ?? BorderRadius.zero,
-                      color: style?.backgroundColor),
-                  child: Image.file(
-                    widget.imageFile!,
-                    height: style!.height,
-                    width: style!.width,
-                    fit: style!.boxFit ?? BoxFit.contain,
+                      ),
+                      const SizedBox(height: 24),
+                      const LMFeedText(
+                        text: "An error occurred fetching media",
+                        style: LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                )
-              : const SizedBox(),
+                );
+          },
+          progressIndicatorBuilder: (context, url, progress) =>
+              style.shimmerWidget ?? const LMPostMediaShimmer(),
+        ),
+      ),
     );
   }
 }

@@ -13,7 +13,7 @@ Future<void> submitVote(
   LMFeedWidgetSource source,
 ) async {
   try {
-    if (hasPollEnded(attachmentMeta.expiryTime!)) {
+    if (hasPollEnded(attachmentMeta.expiryTime)) {
       LMFeedCore.showSnackBar(
         context,
         "Poll ended. Vote can not be submitted now.",
@@ -28,7 +28,7 @@ Future<void> submitVote(
       return;
     } else {
       if (isMultiChoicePoll(
-          attachmentMeta.multiSelectNo!, attachmentMeta.multiSelectState!)) {
+          attachmentMeta.multiSelectNo, attachmentMeta.multiSelectState)) {
         if (attachmentMeta.multiSelectState! == PollMultiSelectState.exactly &&
             options.length != attachmentMeta.multiSelectNo) {
           LMFeedCore.showSnackBar(
@@ -228,8 +228,8 @@ bool showTick(
   if (isVoteEditing) {
     return selectedOption.contains(option.id);
   }
-  if ((isMultiChoicePoll(attachmentMeta.multiSelectNo!,
-                  attachmentMeta.multiSelectState!) ==
+  if ((isMultiChoicePoll(attachmentMeta.multiSelectNo,
+                  attachmentMeta.multiSelectState) ==
               true ||
           isInstantPoll(attachmentMeta.pollType!) == false) &&
       option.isSelected == true) {
@@ -389,7 +389,10 @@ bool isMultiChoicePoll(
   return true;
 }
 
-String getFormattedDateTime(int expiryTime) {
+String getFormattedDateTime(int? expiryTime) {
+  if (expiryTime == null) {
+    return "";
+  }
   DateTime expiryTimeInDateTime =
       DateTime.fromMillisecondsSinceEpoch(expiryTime);
   String formattedDateTime =
@@ -425,7 +428,7 @@ void onVoteTextTap(BuildContext context,
       ),
     );
   } else if (attachmentMeta.toShowResult! ||
-      hasPollEnded(attachmentMeta.expiryTime!)) {
+      hasPollEnded(attachmentMeta.expiryTime)) {
     Navigator.push(
       context,
       MaterialPageRoute(

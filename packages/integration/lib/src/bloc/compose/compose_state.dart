@@ -1,6 +1,5 @@
 part of 'compose_bloc.dart';
 
-@immutable
 class LMFeedComposeState extends Equatable {
   const LMFeedComposeState();
 

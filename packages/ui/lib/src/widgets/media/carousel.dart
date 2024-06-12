@@ -83,13 +83,20 @@ class LMFeedCarousel extends StatefulWidget {
 
 class _LMCarouselState extends State<LMFeedCarousel> {
   final ValueNotifier<bool> rebuildCurr = ValueNotifier(false);
+  LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
+
   List<Widget> mediaWidgets = [];
   int currPosition = 0;
-  LMFeedPostCarouselStyle? style;
+  late LMFeedPostCarouselStyle? style;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant LMFeedCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
   }
 
   bool checkIfMultipleAttachments() {
@@ -99,7 +106,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
   void mapAttachmentsToWidget() {
     mediaWidgets = [];
     widget.attachments.forEachIndexed((index, e) {
-      if (e.attachmentType == 1) {
+      if (e.attachmentType == LMMediaType.image) {
         mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -110,7 +117,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
           child: Center(
             child: widget.imageItem ??
                 LMFeedImage(
-                  imageUrl: e.attachmentMeta.url,
+                  image: e,
                   style: widget.imageStyle,
                   onError: widget.onError,
                   onMediaTap: widget.onMediaTap,
@@ -118,7 +125,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 ),
           ),
         ));
-      } else if ((e.attachmentType == 2)) {
+      } else if (e.attachmentType == LMMediaType.video) {
         mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
@@ -128,15 +135,10 @@ class _LMCarouselState extends State<LMFeedCarousel> {
           width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
           child: widget.videoItem ??
               LMFeedVideo(
-                videoUrl: e.attachmentMeta.url,
+                video: e,
                 style: widget.videoStyle,
                 postId: widget.postId,
                 onMediaTap: widget.onMediaTap,
-                videoController:
-                    LMFeedVideoProvider.instance.getVideoControllers(
-                  widget.postId,
-                  widget.attachments.indexOf(e),
-                ),
                 position: index,
               ),
         ));
@@ -146,7 +148,6 @@ class _LMCarouselState extends State<LMFeedCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     style = widget.style ?? feedTheme.mediaStyle.carouselStyle;
     mapAttachmentsToWidget();
     return GestureDetector(

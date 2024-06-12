@@ -183,7 +183,7 @@ class LMFeedPostWidget extends StatefulWidget {
   }
 }
 
-class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
+class _LMPostWidgetState extends State<LMFeedPostWidget> {
   int postLikes = 0;
   int comments = 0;
   bool? isLiked;
@@ -198,22 +198,6 @@ class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
   void dispose() {
     widget.disposeVideoPlayerOnInActive?.call();
     super.dispose();
-  }
-
-  @override
-  void deactivate() async {
-    widget.disposeVideoPlayerOnInActive?.call();
-    super.deactivate();
-  }
-
-  @override
-  void onVisibilityChanged(WidgetVisibility visibility) {
-    if (visibility == WidgetVisibility.INVISIBLE) {
-      widget.disposeVideoPlayerOnInActive?.call();
-    } else if (visibility == WidgetVisibility.GONE) {
-      widget.disposeVideoPlayerOnInActive?.call();
-    }
-    super.onVisibilityChanged(visibility);
   }
 
   @override
@@ -339,7 +323,7 @@ class _LMPostWidgetState extends VisibilityAwareState<LMFeedPostWidget> {
 class LMFeedPostStyle {
   // Styling variables
   final List<BoxShadow>? boxShadow;
-  final BorderRadiusGeometry? borderRadius;
+  final BorderRadius? borderRadius;
   final EdgeInsetsGeometry? padding;
   final EdgeInsetsGeometry? margin;
   final BoxBorder? border;
@@ -375,7 +359,7 @@ class LMFeedPostStyle {
   /// {@endtemplate}
   LMFeedPostStyle copyWith({
     List<BoxShadow>? boxShadow,
-    BorderRadiusGeometry? borderRadius,
+    BorderRadius? borderRadius,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
     BoxBorder? border,

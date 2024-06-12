@@ -2,6 +2,7 @@
 
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -410,7 +411,8 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(600, MediaQuery.sizeOf(context).width),
+          width: min(LMFeedCore.webConfiguration.maxWidth,
+              MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
               getUserFeedMeta = getUserFeedMetaFuture();
@@ -492,6 +494,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                           : widget.customWidgetBuilder!(context)
                       : const SizedBox(),
                 ),
+                if (kIsWeb) SliverPadding(padding: EdgeInsets.only(top: 12.0)),
                 SliverToBoxAdapter(
                   child: config!.enableTopicFiltering
                       ? ValueListenableBuilder(
@@ -751,6 +754,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     },
                   ),
                 ),
+                if (kIsWeb) SliverPadding(padding: EdgeInsets.only(top: 12.0)),
                 BlocListener<LMFeedBloc, LMFeedState>(
                   bloc: _feedBloc,
                   listener: (context, LMFeedState state) =>
@@ -933,6 +937,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       style: LMFeedTopicBarStyle(
           height: 60,
           padding: EdgeInsets.all(16),
+          borderRadius: kIsWeb ? feedThemeData.postStyle.borderRadius : null,
           border: Border.symmetric(
             horizontal: BorderSide(
               color: LMFeedCore.theme.onContainer,
@@ -954,9 +959,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     }
   }
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -966,13 +971,13 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return LMFeedTheme
                 .instance.theme.mediaStyle.documentStyle.documentIcon ??
             LMFeedIcon(
@@ -984,35 +989,37 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 boxPadding: 0,
               ),
             );
-      } else if (media.mediaType == LMMediaType.video) {
-        final thumbnailFile = VideoCompress.getFileThumbnail(
-          media.mediaFile!.path,
-          quality: 50, // default(100)
-          position: -1, // default(-1)
-        );
-        return FutureBuilder(
-          future: thumbnailFile,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Container(
-                height: 50,
-                width: 50,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                child: LMFeedImage(
-                  imageFile: snapshot.data,
-                  style: const LMFeedPostImageStyle(
-                    boxFit: BoxFit.contain,
-                  ),
-                ),
-              );
-            }
-            return LMFeedLoader();
-          },
-        );
+      } else if (media.attachmentType == LMMediaType.video) {
+        return const SizedBox();
+        // TODO: add video thumbnail
+        // final thumbnailFile = VideoCompress.getFileThumbnail(
+        //   media.mediaFile!.path,
+        //   quality: 50, // default(100)
+        //   position: -1, // default(-1)
+        // );
+        // return FutureBuilder(
+        //   future: thumbnailFile,
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasData) {
+        //       return Container(
+        //         height: 50,
+        //         width: 50,
+        //         clipBehavior: Clip.hardEdge,
+        //         decoration: BoxDecoration(
+        //           color: Colors.black,
+        //           borderRadius: BorderRadius.circular(6.0),
+        //         ),
+        //         child: LMFeedImage(
+        //           imageFile: snapshot.data,
+        //           style: const LMFeedPostImageStyle(
+        //             boxFit: BoxFit.contain,
+        //           ),
+        //         ),
+        //       );
+        //     }
+        //     return LMFeedLoader();
+        //   },
+        // );
       } else {
         return const SizedBox.shrink();
       }
@@ -1241,7 +1248,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });
@@ -1274,7 +1281,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        if (hasPollEnded(pollValue.expiryTime!)) {
+        if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
             "Poll ended. Vote can not be submitted now.",
@@ -1285,7 +1292,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         if ((isPollSubmitted(pollValue.options ?? [])) &&
             !isVoteEditing["value"]!) return;
         if (!isMultiChoicePoll(
-            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+            pollValue.multiSelectNo, pollValue.multiSelectState)) {
           submitVote(
             context,
             pollValue,
@@ -1293,7 +1300,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             postViewData.id,
             isVoteEditing,
             previousValue,
-            rebuildPostWidget,
+            rebuildPollWidget,
             LMFeedWidgetSource.universalFeed,
           );
         } else if (selectedOptions.contains(optionData.id)) {
@@ -1306,7 +1313,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
       showEditVoteButton: !isVoteEditing["value"]! &&
           !isInstantPoll(pollValue.pollType) &&
-          !hasPollEnded(pollValue.expiryTime!) &&
+          !hasPollEnded(pollValue.expiryTime) &&
           isPollSubmitted(pollValue.options ?? []),
       showAddOptionButton: showAddOptionButton(pollValue),
       showTick: (option) {
@@ -1314,10 +1321,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             pollValue, option, selectedOptions, isVoteEditing["value"]!);
       },
       isMultiChoicePoll: isMultiChoicePoll(
-          pollValue.multiSelectNo!, pollValue.multiSelectState!),
+          pollValue.multiSelectNo, pollValue.multiSelectState),
       pollSelectionText: getPollSelectionText(
           pollValue.multiSelectState, pollValue.multiSelectNo),
-      timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
+      timeLeft: getTimeLeftInPoll(pollValue.expiryTime),
       onSameOptionAdded: () {
         LMFeedCore.showSnackBar(
           context,
@@ -1361,7 +1368,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           postViewData.id,
           isVoteEditing,
           previousValue,
-          rebuildPostWidget,
+          rebuildPollWidget,
           LMFeedWidgetSource.universalFeed,
         );
       },
@@ -1531,7 +1538,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
                       (LMAttachmentViewDataBuilder()
-                            ..attachmentType(8)
+                            ..attachmentType(LMMediaType.repost)
                             ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                                   ..repost(postViewData))
                                 .build()))

@@ -98,22 +98,22 @@ class LMFeedPostUtils {
     String postTypeString;
     if (attachments == null || attachments.isEmpty) return 'text';
     switch (attachments.first.attachmentType) {
-      case 1: // Image
+      case LMMediaType.image: // Image
         postTypeString = "image";
         break;
-      case 2: // Video
+      case LMMediaType.video: // Video
         postTypeString = "video";
         break;
-      case 3: // Document
+      case LMMediaType.document: // Document
         postTypeString = "document";
         break;
-      case 4: // Link
+      case LMMediaType.link: // Link
         postTypeString = "link";
         break;
-      case 6: // Poll
+      case LMMediaType.poll: // Poll
         postTypeString = "poll";
         break;
-      case 8: // Repost
+      case LMMediaType.repost: // Repost
         postTypeString = "repost";
         break;
       default:

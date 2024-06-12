@@ -1,7 +1,9 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'dart:io';
+import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
@@ -25,6 +27,7 @@ class LMFeedActivityScreen extends StatefulWidget {
 }
 
 class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
+  late Size screenSize;
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
   String postTitleSmallCap =
@@ -130,6 +133,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenSize = MediaQuery.sizeOf(context);
     return _widgetUtility.scaffold(
       source: widgetSource,
       backgroundColor: feedTheme.backgroundColor,
@@ -149,107 +153,120 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           ),
         ),
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: PagedListView<int, UserActivityItem>(
-          pagingController: _pagingController,
-          builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(
-            noItemsFoundIndicatorBuilder: (context) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LMFeedIcon(
-                      type: LMFeedIconType.svg,
-                      assetPath: kAssetNoPostsIcon,
-                      style: LMFeedIconStyle(
-                        size: 130,
-                      ),
-                    ),
-                    LMFeedText(
-                        text:
-                            'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
-                        style: LMFeedTextStyle(
-                          textStyle: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              );
-            },
-            itemBuilder: (context, item, index) {
-              final LMPostViewData postViewData =
-                  LMFeedPostUtils.postViewDataFromActivity(
-                item,
-                widgets,
-                users,
-                topics,
-              );
-              final user = users[item.activityEntityData.uuid]!;
-
-              LMFeedPostWidget postWidget =
-                  defPostWidget(feedTheme, postViewData, item);
-
-              return Column(
-                children: [
-                  widget.postBuilder?.call(context, postWidget, postViewData) ??
-                      _widgetUtility.postWidgetBuilder(
-                          context, postWidget, postViewData,
-                          source: widgetSource),
-                  if (item.action == 7)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      decoration: BoxDecoration(
-                        color: feedTheme.container,
-                        border: Border(
-                          bottom: BorderSide(
-                            width: 0.2,
-                            color: feedTheme.container.withOpacity(0.1),
-                          ),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+          height: MediaQuery.of(context).size.height,
+          padding: EdgeInsets.only(top: kIsWeb ? 10 : 0),
+          child: PagedListView<int, UserActivityItem>(
+            pagingController: _pagingController,
+            builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(
+              noItemsFoundIndicatorBuilder: (context) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LMFeedIcon(
+                        type: LMFeedIconType.svg,
+                        assetPath: kAssetNoPostsIcon,
+                        style: LMFeedIconStyle(
+                          size: 130,
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Divider(
-                            color: feedTheme.onContainer.withOpacity(0.05),
-                            thickness: 1,
+                      LMFeedText(
+                          text:
+                              'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )),
+                      SizedBox(height: 20),
+                    ],
+                  ),
+                );
+              },
+              itemBuilder: (context, item, index) {
+                final LMPostViewData postViewData =
+                    LMFeedPostUtils.postViewDataFromActivity(
+                  item,
+                  widgets,
+                  users,
+                  topics,
+                );
+                final user = users[item.activityEntityData.uuid]!;
+
+                LMFeedPostWidget postWidget =
+                    defPostWidget(feedTheme, postViewData, item);
+
+                return Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                      borderRadius:
+                          kIsWeb ? feedTheme.postStyle.borderRadius : null),
+                  child: Column(
+                    children: [
+                      widget.postBuilder
+                              ?.call(context, postWidget, postViewData) ??
+                          _widgetUtility.postWidgetBuilder(
+                              context, postWidget, postViewData,
+                              source: widgetSource),
+                      if (item.action == 7)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: feedTheme.container,
+                            border: Border(
+                              bottom: BorderSide(
+                                width: 0.5,
+                                color: feedTheme.onContainer.withOpacity(0.2),
+                              ),
+                            ),
                           ),
-                          StatefulBuilder(
-                            builder: (context, setCommentState) {
-                              final commentData = item.activityEntityData;
-                              final LMCommentViewData commentViewData =
-                                  LMFeedPostUtils.commentViewDataFromActivity(
-                                      commentData,
-                                      users.map((key, value) => MapEntry(
-                                          key,
-                                          LMUserViewDataConvertor.toUser(
-                                              value))));
+                          child: Column(
+                            children: [
+                              StatefulBuilder(
+                                builder: (context, setCommentState) {
+                                  final commentData = item.activityEntityData;
+                                  final LMCommentViewData commentViewData =
+                                      LMFeedPostUtils
+                                          .commentViewDataFromActivity(
+                                              commentData,
+                                              users.map((key, value) =>
+                                                  MapEntry(
+                                                      key,
+                                                      LMUserViewDataConvertor
+                                                          .toUser(value))));
 
-                              commentData.menuItems?.removeWhere((element) =>
-                                  element.id ==
-                                      LMFeedMenuAction.commentReportId ||
-                                  element.id == LMFeedMenuAction.commentEditId);
+                                  commentData.menuItems?.removeWhere(
+                                      (element) =>
+                                          element.id ==
+                                              LMFeedMenuAction
+                                                  .commentReportId ||
+                                          element.id ==
+                                              LMFeedMenuAction.commentEditId);
 
-                              LMFeedCommentWidget commentWidget =
-                                  defCommentTile(feedTheme, commentViewData,
-                                      postViewData, user);
+                                  LMFeedCommentWidget commentWidget =
+                                      defCommentTile(feedTheme, commentViewData,
+                                          postViewData, user);
 
-                              return widget.commentBuilder?.call(
-                                      context, commentWidget, postViewData) ??
-                                  _widgetUtility.commentBuilder(
-                                      context, commentWidget, postViewData);
-                            },
+                                  return widget.commentBuilder?.call(context,
+                                          commentWidget, postViewData) ??
+                                      _widgetUtility.commentBuilder(
+                                          context, commentWidget, postViewData);
+                                },
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  LikeMindsTheme.kVerticalPaddingLarge,
-                ],
-              );
-            },
+                        ),
+                      LikeMindsTheme.kVerticalPaddingLarge,
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -328,6 +345,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       topicWidget: _defTopicWidget(feedTheme, post),
       style: feedTheme?.postStyle.copyWith(
         margin: EdgeInsets.zero,
+        borderRadius: BorderRadius.zero,
       ),
     );
   }
@@ -492,7 +510,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });
@@ -525,7 +543,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        if (hasPollEnded(pollValue.expiryTime!)) {
+        if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
             "Poll ended. Vote can not be submitted now.",
@@ -536,7 +554,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         if ((isPollSubmitted(pollValue.options ?? [])) &&
             !isVoteEditing["value"]!) return;
         if (!isMultiChoicePoll(
-            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+            pollValue.multiSelectNo, pollValue.multiSelectState)) {
           submitVote(
             context,
             pollValue,

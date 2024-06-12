@@ -342,7 +342,9 @@ class LMFeedWidgetUtility {
     LMFeedSnackBarStyle inStyle = style ?? LMFeedCore.theme.snackBarTheme;
     return LMFeedSnackBar(
       content: LMFeedText(text: snackBarMessage),
-      style: inStyle.copyWith(width: min(400, inStyle.width ?? size.width)),
+      style: inStyle.copyWith(
+          width: min(LMFeedCore.webConfiguration.maxWidthForSnackBars,
+              inStyle.width ?? size.width)),
     );
   }
 }

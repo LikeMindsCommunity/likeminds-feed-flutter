@@ -266,9 +266,9 @@ class _NovaLMFeedCompanyFeedWidgetState
     );
   }
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -278,13 +278,13 @@ class _NovaLMFeedCompanyFeedWidgetState
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return const LMFeedIcon(
           type: LMFeedIconType.svg,
           assetPath: kAssetDocPDFIcon,
@@ -397,7 +397,7 @@ class _NovaLMFeedCompanyFeedWidgetState
     LMCompanyViewDataBuilder companyViewDataBuilder =
         LMCompanyViewDataBuilder();
     for (LMAttachmentViewData attachment in post.attachments ?? []) {
-      if (attachment.attachmentType == 5) {
+      if (attachment.attachmentType == LMMediaType.widget) {
         final entityId = attachment.attachmentMeta.meta?['entity_id'];
         if (widgets.containsKey(entityId)) {
           companyViewDataBuilder

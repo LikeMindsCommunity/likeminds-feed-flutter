@@ -443,8 +443,8 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
       left: 20,
     ),
     mediaStyle: LMFeedComposeMediaStyle.basic().copyWith(
-      documentStyle: const LMFeedPostDocumentStyle(
-        titleStyle: LMFeedTextStyle(
+      documentStyle: LMFeedPostDocumentStyle.basic().copyWith(
+        titleStyle: const LMFeedTextStyle(
           maxLines: 1,
           textStyle: TextStyle(
             color: onSurface900,
@@ -453,7 +453,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
             fontWeight: FontWeight.w600,
           ),
         ),
-        subtitleStyle: LMFeedTextStyle(
+        subtitleStyle: const LMFeedTextStyle(
           maxLines: 1,
           textStyle: TextStyle(
             color: onSurface700,

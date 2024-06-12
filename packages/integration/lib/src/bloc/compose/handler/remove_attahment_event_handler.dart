@@ -3,9 +3,10 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 removeAttachmentEventHandler(LMFeedComposeRemoveAttachmentEvent event,
     Emitter<LMFeedComposeState> emitter) {
-  LMMediaModel mediaModel = LMFeedComposeBloc.instance.postMedia[event.index];
+  LMAttachmentViewData mediaModel =
+      LMFeedComposeBloc.instance.postMedia[event.index];
 
-  switch (mediaModel.mediaType) {
+  switch (mediaModel.attachmentType) {
     case LMMediaType.image:
       LMFeedComposeBloc.instance.imageCount--;
       break;

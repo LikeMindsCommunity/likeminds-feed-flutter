@@ -13,7 +13,6 @@ class LMFeedLinkPreview extends StatelessWidget {
   const LMFeedLinkPreview({
     super.key,
     this.attachment,
-    this.linkModel,
     this.onTap,
     this.title,
     this.subtitle,
@@ -23,8 +22,6 @@ class LMFeedLinkPreview extends StatelessWidget {
     this.style,
   });
 
-  // data class to provide link preview data
-  final LMMediaModel? linkModel;
   final LMAttachmentViewData? attachment;
 
   final VoidCallback? onTap;
@@ -48,13 +45,9 @@ class LMFeedLinkPreview extends StatelessWidget {
   final LMFeedPostLinkPreviewStyle? style;
 
   bool checkNullMedia() {
-    return ((linkModel == null ||
-            linkModel!.ogTags == null ||
-            linkModel!.ogTags!.image == null ||
-            linkModel!.ogTags!.image!.isEmpty) &&
-        (attachment == null ||
-            attachment!.attachmentMeta.ogTags == null ||
-            attachment!.attachmentMeta.ogTags!.image == null));
+    return (attachment == null ||
+        attachment!.attachmentMeta.ogTags == null ||
+        attachment!.attachmentMeta.ogTags!.image == null);
   }
 
   @override
@@ -65,10 +58,7 @@ class LMFeedLinkPreview extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         onTap?.call();
-        String uri = linkModel?.link ??
-            linkModel?.ogTags!.url ??
-            attachment?.attachmentMeta.ogTags?.url ??
-            '';
+        String uri = attachment?.attachmentMeta.ogTags?.url ?? '';
         launchUrl(Uri.parse(uri));
       },
       child: Container(
@@ -105,10 +95,9 @@ class LMFeedLinkPreview extends StatelessWidget {
                       errorWidget: style.errorWidget,
                     ),
                     onError: onError,
-                    imageUrl: imageUrl ??
-                        (linkModel != null
-                            ? linkModel!.ogTags!.image!
-                            : attachment!.attachmentMeta.ogTags!.image!),
+                    image: LMAttachmentViewData.fromMediaUrl(
+                        url: attachment!.attachmentMeta.ogTags!.image!,
+                        attachmentType: LMMediaType.image),
                   ),
             const Spacer(),
             Container(
@@ -123,10 +112,8 @@ class LMFeedLinkPreview extends StatelessWidget {
                       width: style.width ?? MediaQuery.of(context).size.width,
                       child: title ??
                           LMFeedText(
-                            text: linkModel != null
-                                ? linkModel!.ogTags!.title!
-                                : attachment!.attachmentMeta.ogTags!.title ??
-                                    '- -',
+                            text: attachment!.attachmentMeta.ogTags!.title ??
+                                '- -',
                             style: style.titleStyle ??
                                 const LMFeedTextStyle(
                                   textStyle: TextStyle(
@@ -142,11 +129,9 @@ class LMFeedLinkPreview extends StatelessWidget {
                       width: style.width ?? MediaQuery.of(context).size.width,
                       child: subtitle ??
                           LMFeedText(
-                            text: linkModel != null
-                                ? linkModel!.ogTags!.description!
-                                : attachment!
-                                        .attachmentMeta.ogTags!.description ??
-                                    '-- --',
+                            text: attachment!
+                                    .attachmentMeta.ogTags!.description ??
+                                '-- --',
                             style: style.subtitleStyle ??
                                 LMFeedTextStyle(
                                   maxLines: 2,
@@ -163,11 +148,8 @@ class LMFeedLinkPreview extends StatelessWidget {
                             width: style.width ??
                                 MediaQuery.of(context).size.width,
                             child: LMFeedText(
-                              text: linkModel != null
-                                  ? linkModel!.link?.toLowerCase() ??
-                                      linkModel!.ogTags!.url!.toLowerCase()
-                                  : attachment!.attachmentMeta.ogTags!.url !=
-                                          null
+                              text:
+                                  attachment!.attachmentMeta.ogTags!.url != null
                                       ? attachment!.attachmentMeta.ogTags!.url!
                                           .toLowerCase()
                                       : 'NOT PRODUCING',
@@ -195,7 +177,6 @@ class LMFeedLinkPreview extends StatelessWidget {
   /// copyWith function to get a new object of [LMFeedLinkPreview]
   /// with specific single values passed
   LMFeedLinkPreview copyWith({
-    LMMediaModel? linkModel,
     LMAttachmentViewData? attachment,
     double? width,
     double? height,
@@ -214,7 +195,6 @@ class LMFeedLinkPreview extends StatelessWidget {
     LMFeedPostLinkPreviewStyle? style,
   }) {
     return LMFeedLinkPreview(
-      linkModel: linkModel ?? this.linkModel,
       attachment: attachment ?? this.attachment,
       onTap: onTap ?? this.onTap,
       title: title ?? this.title,

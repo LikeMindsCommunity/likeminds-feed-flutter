@@ -22,6 +22,12 @@ abstract class CredsDev {
   static final String bucketName = _CredsDev.bucketName;
   @EnviedField(varName: 'POOL_ID', obfuscate: true)
   static final String poolId = _CredsDev.poolId;
+  @EnviedField(varName: 'REGION', obfuscate: true)
+  static final String region = _CredsDev.region;
+  @EnviedField(varName: 'ACCESS_KEY', obfuscate: true)
+  static final String accessKey = _CredsDev.accessKey;
+  @EnviedField(varName: 'SECRET_KEY', obfuscate: true)
+  static final String secretKey = _CredsDev.secretKey;
 }
 
 ///These are PROD community credentials
@@ -35,4 +41,10 @@ abstract class CredsProd {
   static final String bucketName = _CredsProd.bucketName;
   @EnviedField(varName: 'POOL_ID', obfuscate: true)
   static final String poolId = _CredsProd.poolId;
+  @EnviedField(varName: 'REGION', obfuscate: true)
+  static final String region = _CredsProd.region;
+  @EnviedField(varName: 'ACCESS_KEY', obfuscate: true)
+  static final String accessKey = _CredsProd.accessKey;
+  @EnviedField(varName: 'SECRET_KEY', obfuscate: true)
+  static final String secretKey = _CredsProd.secretKey;
 }
