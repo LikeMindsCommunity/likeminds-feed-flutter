@@ -92,7 +92,7 @@ void newPostEventHandler(
           }
           final LMResponse<String> response =
               await LMFeedMediaService.uploadFile(
-            mediaFile.readAsBytesSync(),
+            kIsWeb ? media.attachmentMeta.bytes! : mediaFile.readAsBytesSync(),
             event.user.sdkClientInfo.uuid,
             fileName: media.attachmentMeta.meta?['file_name'],
           );

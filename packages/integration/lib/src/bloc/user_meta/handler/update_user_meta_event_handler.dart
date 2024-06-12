@@ -19,7 +19,10 @@ updateUserMetaEventHandler(
       }
 
       LMResponse<String> imageUrl = await LMFeedMediaService.uploadFile(
-          imageFile.readAsBytesSync(), event.user.sdkClientInfo.uuid,
+          kIsWeb
+              ? event.image!.attachmentMeta.bytes!
+              : imageFile.readAsBytesSync(),
+          event.user.sdkClientInfo.uuid,
           fileName: event.image!.attachmentMeta.meta?['file_name']);
       if (imageUrl.success) {
         editProfileRequest..imageUrl(imageUrl.data!);

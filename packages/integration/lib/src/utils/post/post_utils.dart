@@ -122,25 +122,6 @@ class LMFeedPostUtils {
     return postTypeString;
   }
 
-  static Future<Map<String, int>> getImageFileDimensions(File image) async {
-    Map<String, int> dimensions = {};
-    final decodedImage = await decodeImageFromList(image.readAsBytesSync());
-    dimensions.addAll({"width": decodedImage.width});
-    dimensions.addAll({"height": decodedImage.height});
-    return dimensions;
-  }
-
-  static Future<Map<String, int>> getNetworkImageDimensions(
-      String image) async {
-    Map<String, int> dimensions = {};
-    final response = await http.get(Uri.parse(image));
-    final bytes = response.bodyBytes;
-    final decodedImage = await decodeImageFromList(bytes);
-    dimensions.addAll({"width": decodedImage.width});
-    dimensions.addAll({"height": decodedImage.height});
-    return dimensions;
-  }
-
   static String getLikeCountText(int likes) {
     if (likes == 1) {
       return 'Like';

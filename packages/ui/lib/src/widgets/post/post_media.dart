@@ -206,16 +206,20 @@ class _LMPostMediaState extends State<LMFeedPostMedia> {
 
     documents = attachments!
         .map(
-          (e) => LMFeedDocument(
-            // document: e,
-            size: PostHelper.getFileSizeString(bytes: e.attachmentMeta.size!),
-            document: e,
-            type: e.attachmentMeta.format!,
-            style: widget.style?.documentStyle,
-            onTap: () {
-              Uri fileUrl = Uri.parse(e.attachmentMeta.url!);
-              launchUrl(fileUrl, mode: LaunchMode.externalApplication);
-            },
+          (e) => Padding(
+            padding:
+                EdgeInsets.only(bottom: attachments!.length > 1 ? 8.0 : 0.0),
+            child: LMFeedDocument(
+              // document: e,
+              size: PostHelper.getFileSizeString(bytes: e.attachmentMeta.size!),
+              document: e,
+              type: e.attachmentMeta.format!,
+              style: widget.style?.documentStyle,
+              onTap: () {
+                Uri fileUrl = Uri.parse(e.attachmentMeta.url!);
+                launchUrl(fileUrl, mode: LaunchMode.externalApplication);
+              },
+            ),
           ),
         )
         .toList();
