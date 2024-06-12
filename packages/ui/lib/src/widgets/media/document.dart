@@ -318,8 +318,8 @@ class LMFeedPostDocumentStyle {
         width: double.infinity,
         borderRadius: LikeMindsTheme.kBorderRadiusMedium,
         borderSize: 1,
-        borderColor: primaryColor ?? Colors.grey.shade300,
-        textColor: primaryColor ?? Colors.grey.shade300,
+        borderColor: primaryColor ?? const Color.fromRGBO(102, 102, 102, 1),
+        textColor: primaryColor ?? const Color.fromRGBO(102, 102, 102, 1),
         documentIcon: const LMFeedIcon(
           type: LMFeedIconType.icon,
           icon: Icons.picture_as_pdf,
@@ -338,7 +338,7 @@ class LMFeedPostDocumentStyle {
           overflow: TextOverflow.ellipsis,
           textStyle: TextStyle(
             fontSize: 14,
-            color: Colors.grey,
+            color: Color.fromRGBO(102, 102, 102, 1),
             fontWeight: FontWeight.w500,
           ),
         ),

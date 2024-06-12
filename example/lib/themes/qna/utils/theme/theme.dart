@@ -129,7 +129,11 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
         vertical: 7.5,
       ),
     ),
-    pollStyle: const LMFeedPollStyle(),
+    pollStyle: LMFeedPollStyle.basic(
+      primaryColor: qNaPrimaryColor,
+      containerColor: surface,
+      inActiveColor: primaryBackgroundDark,
+    ),
     documentStyle: const LMFeedPostDocumentStyle(
       height: 90,
       padding: EdgeInsets.symmetric(
@@ -431,6 +435,10 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
         size: 36,
       ),
     ),
+    addPollIcon: const LMFeedIcon(
+        type: LMFeedIconType.svg,
+        assetPath: qNaAssetAddPollIcon,
+        style: LMFeedIconStyle(boxPadding: 0, size: 36)),
     mediaPadding: const EdgeInsets.only(
       left: 20,
     ),
