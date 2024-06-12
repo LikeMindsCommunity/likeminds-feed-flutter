@@ -615,8 +615,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           rebuildPollWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }

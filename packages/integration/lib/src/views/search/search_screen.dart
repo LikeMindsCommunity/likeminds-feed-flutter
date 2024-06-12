@@ -736,8 +736,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }

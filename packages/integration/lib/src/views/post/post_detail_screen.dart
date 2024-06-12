@@ -914,8 +914,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
           _postDetailScreenHandler!.rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }
