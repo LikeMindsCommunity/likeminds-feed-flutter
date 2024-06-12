@@ -216,7 +216,7 @@ class _NovaLMFeedCompanyFeedWidgetState
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == curr.postId) ??
+                  ?.indexWhere((element) => element.id == state.postId) ??
               -1;
 
           if (index != -1) {
