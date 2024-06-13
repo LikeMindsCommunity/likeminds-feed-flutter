@@ -106,10 +106,12 @@ class LMFeedCore {
     Function(LMFeedProfileState)? profileListener,
     LMFeedCoreCallback? lmFeedCallback,
     LMFeedBuilderDelegate? builderDelegate,
+    SystemUiOverlayStyle? systemUiOverlayStyle,
   }) async {
     try {
       if (kIsWeb) {
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+        SystemChrome.setSystemUIOverlayStyle(
+            systemUiOverlayStyle ?? SystemUiOverlayStyle.dark);
       }
       LMFeedMediaService.instance;
 
