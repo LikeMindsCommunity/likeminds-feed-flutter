@@ -109,7 +109,7 @@ class LMFeedCore {
   }) async {
     try {
       if (kIsWeb) {
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
       }
       LMFeedMediaService.instance;
 
