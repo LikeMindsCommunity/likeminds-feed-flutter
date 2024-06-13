@@ -1,5 +1,6 @@
 library likeminds_feed_flutter_core;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/analytics/analytics_bloc.dart';
@@ -107,6 +108,9 @@ class LMFeedCore {
     LMFeedBuilderDelegate? builderDelegate,
   }) async {
     try {
+      if (kIsWeb) {
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+      }
       LMFeedMediaService.instance;
 
       LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
