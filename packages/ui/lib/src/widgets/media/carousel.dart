@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -206,7 +207,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                           },
                         ),
                   ),
-                  if (checkIfMultipleAttachments())
+                  if (checkIfMultipleAttachments() && kIsWeb)
                     ValueListenableBuilder(
                       valueListenable: rebuildCurr,
                       builder: (context, _, __) {
@@ -229,8 +230,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                                         },
                                         child: Container(
                                           alignment: Alignment.centerLeft,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 10.0),
+                                          height: 50,
                                           width: (style!.carouselWidth ??
                                                   screenSize.width) *
                                               0.25,
@@ -254,8 +254,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                                         },
                                         child: Container(
                                           alignment: Alignment.centerRight,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 10.0),
+                                          height: 50,
                                           width: (style!.carouselWidth ??
                                                   screenSize.width) *
                                               0.25,

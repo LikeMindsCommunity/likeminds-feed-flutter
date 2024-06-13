@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
@@ -136,7 +137,6 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
         child: Align(
           alignment: Alignment.center,
           child: Container(
-            width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
             child: Column(
               children: <Widget>[
                 Expanded(
@@ -187,7 +187,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                               return const SizedBox.shrink();
                             }
                           }),
-                      if (mediaLength > 1)
+                      if (mediaLength > 1 && kIsWeb)
                         ValueListenableBuilder(
                           valueListenable: rebuildCurr,
                           builder: (context, _, __) {
@@ -210,9 +210,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                                               }
                                             },
                                             child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10.0),
+                                              height: 50,
                                               width: screenSize.width * 0.25,
                                               alignment: Alignment.centerLeft,
                                               child: Icon(
@@ -235,9 +233,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                                               }
                                             },
                                             child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10.0),
+                                              height: 50,
                                               width: screenSize.width * 0.25,
                                               alignment: Alignment.centerRight,
                                               child: Icon(

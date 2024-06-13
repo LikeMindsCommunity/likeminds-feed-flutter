@@ -243,7 +243,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               width: screenWidth,
                               child: CustomScrollView(
                                 slivers: [
-                                  if (isWeb)
+                                  if (isDesktopWeb)
                                     SliverPadding(
                                         padding: EdgeInsets.only(top: 20.0)),
                                   SliverToBoxAdapter(

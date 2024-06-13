@@ -105,32 +105,30 @@ class _LMFeedTopicBarState extends State<LMFeedTopicBar> {
                 isDesktopWeb ? BorderRadius.circular(4.0) : BorderRadius.zero,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Flexible(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                LMFeedText(
-                  text: "All Topics",
-                  style: LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: feedThemeData.textSecondary,
-                    ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LMFeedText(
+                text: "All Topics",
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: feedThemeData.textSecondary,
                   ),
                 ),
-                LikeMindsTheme.kHorizontalPaddingSmall,
-                LMFeedIcon(
-                  type: LMFeedIconType.icon,
-                  icon: Icons.arrow_downward,
-                  style: LMFeedIconStyle(
-                    color: feedThemeData.textSecondary,
-                    size: 16,
-                    boxSize: 20,
-                  ),
-                )
-              ],
-            ),
+              ),
+              LikeMindsTheme.kHorizontalPaddingSmall,
+              LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.arrow_downward,
+                style: LMFeedIconStyle(
+                  color: feedThemeData.textSecondary,
+                  size: 16,
+                  boxSize: 20,
+                ),
+              )
+            ],
           ),
         ),
       ],

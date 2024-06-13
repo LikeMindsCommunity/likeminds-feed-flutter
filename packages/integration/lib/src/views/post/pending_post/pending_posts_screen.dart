@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 
 part './pending_post_screen_builder_delegate.dart';
 
@@ -69,7 +71,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   bool iSiOS = LMFeedPlatform.instance.isIOS();
   bool isWeb = LMFeedPlatform.instance.isWeb();
 
-  Size? screenSize;
+  late Size screenSize;
   double? screenWidth;
 
   int pageSize = 10;
@@ -101,6 +103,20 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   );
 
   int pendingPostCount = 0;
+
+  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+
+  bool isDesktopWeb = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.sizeOf(context);
+    if (screenSize.width > webConfig.maxWidth && kIsWeb) {
+      isDesktopWeb = true;
+    } else {
+      isDesktopWeb = false;
+    }
+  }
 
   @override
   void initState() {
@@ -141,8 +157,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
+    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize.width);
     return _widgetsBuilder.scaffold(
       appBar: _postScreenBuilderDeletegate.appBarBuilder(
           context, defAppBar(), pendingPostCount),
@@ -207,8 +222,9 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
                   builder: (context, _, __) {
                     return PagedListView(
                       pagingController: pagingController,
-                      padding:
-                          isWeb ? EdgeInsets.only(top: 20.0) : EdgeInsets.zero,
+                      padding: isDesktopWeb
+                          ? EdgeInsets.only(top: 20.0)
+                          : EdgeInsets.zero,
                       builderDelegate:
                           PagedChildBuilderDelegate<LMPostViewData>(
                         itemBuilder: (context, item, index) {

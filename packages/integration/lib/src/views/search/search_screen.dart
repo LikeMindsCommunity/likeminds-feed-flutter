@@ -1,10 +1,12 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:async/async.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 
 class LMFeedSearchScreen extends StatefulWidget {
   const LMFeedSearchScreen({
@@ -61,9 +63,22 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   bool userPostingRights = true;
   int page = 1;
   int pageSize = 10;
-  Size? screenSize;
+  late Size screenSize;
   double? screenWidth;
   bool isWeb = LMFeedPlatform.instance.isWeb();
+
+  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  bool isDesktopWeb = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.sizeOf(context);
+    if (screenSize.width > webConfig.maxWidth && kIsWeb) {
+      isDesktopWeb = true;
+    } else {
+      isDesktopWeb = false;
+    }
+  }
 
   @override
   void initState() {
@@ -168,8 +183,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
+    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize.width);
     return widgetUtility.scaffold(
       source: widgetSource,
       resizeToAvoidBottomInset: false,
@@ -328,7 +342,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                       builder: (context, _, __) {
                         return PagedListView(
                           pagingController: _pagingController,
-                          padding: isWeb ? EdgeInsets.only(top: 20) : null,
+                          padding:
+                              isDesktopWeb ? EdgeInsets.only(top: 20) : null,
                           builderDelegate:
                               PagedChildBuilderDelegate<LMPostViewData>(
                             noItemsFoundIndicatorBuilder: (context) {

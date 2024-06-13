@@ -208,29 +208,26 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
             padding: style!.actionsPadding ?? EdgeInsets.zero,
             child: Row(
               children: [
+                widget.likeButtonBuilder?.call(_defLikeCommentButton()) ??
+                    _defLikeCommentButton(),
                 Padding(
-                    padding: style!.likeButtonStyle?.padding ??
-                        const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: widget.likeButtonBuilder
-                            ?.call(_defLikeCommentButton()) ??
-                        _defLikeCommentButton()),
-                widget.buttonSeparator ??
-                    const Text(
-                      '|',
-                      style: TextStyle(
-                        fontSize: LikeMindsTheme.kFontSmallMed,
-                        color: LikeMindsTheme.greyColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: widget.buttonSeparator ??
+                      const Text(
+                        '|',
+                        style: TextStyle(
+                          fontSize: LikeMindsTheme.kFontSmallMed,
+                          color: LikeMindsTheme.greyColor,
+                        ),
                       ),
-                    ),
+                ),
                 style!.showReplyButton
-                    ? Padding(
-                        padding: style!.replyButtonStyle?.padding ??
-                            const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: widget.replyButtonBuilder
-                                ?.call(_defReplyToCommentButton()) ??
-                            _defReplyToCommentButton())
+                    ? widget.replyButtonBuilder
+                            ?.call(_defReplyToCommentButton()) ??
+                        _defReplyToCommentButton()
                     : const SizedBox.shrink(),
-                if (style!.showRepliesButton) ...[
+                if (style!.showRepliesButton &&
+                    widget.comment.repliesCount > 0) ...[
                   if (style!.showReplyButton)
                     const Text(
                       ' · ',
@@ -239,11 +236,9 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                         color: LikeMindsTheme.greyColor,
                       ),
                     ),
-                  widget.comment.repliesCount > 0
-                      ? widget.showRepliesButtonBuilder
-                              ?.call(_defShowRepliesButton()) ??
-                          _defShowRepliesButton()
-                      : const SizedBox.shrink()
+                  widget.showRepliesButtonBuilder
+                          ?.call(_defShowRepliesButton()) ??
+                      _defShowRepliesButton()
                 ],
                 const Spacer(),
                 if (widget.comment.isEdited)
