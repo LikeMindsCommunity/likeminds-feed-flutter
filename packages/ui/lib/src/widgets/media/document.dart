@@ -167,42 +167,17 @@ class _LMDocumentState extends State<LMFeedDocument> {
                               ),
                           LikeMindsTheme.kVerticalPaddingSmall,
                           widget.subtitle ??
-                              Row(
-                                children: [
-                                  LikeMindsTheme.kHorizontalPaddingXSmall,
-                                  LMFeedText(
-                                      text: _fileSize?.toUpperCase() ?? '--',
-                                      style: LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: LikeMindsTheme.kFontSmall,
-                                          color: style!.textColor ??
-                                              Colors.grey.shade500,
-                                        ),
-                                      )),
-                                  LikeMindsTheme.kHorizontalPaddingXSmall,
-                                  LMFeedText(
-                                    text: '·',
-                                    style: LMFeedTextStyle(
-                                      textStyle: TextStyle(
-                                        fontSize: LikeMindsTheme.kFontSmall,
-                                        color: style!.textColor ??
-                                            Colors.grey.shade500,
-                                      ),
-                                    ),
+                              LMFeedText(
+                                text:
+                                    "${_fileSize?.toUpperCase() ?? '--'} · ${_fileExtension!.toUpperCase()}",
+                                style: LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    fontSize: LikeMindsTheme.kFontSmall,
+                                    color: style!.textColor ??
+                                        Colors.grey.shade500,
                                   ),
-                                  LikeMindsTheme.kHorizontalPaddingXSmall,
-                                  LMFeedText(
-                                    text: _fileExtension!.toUpperCase(),
-                                    style: LMFeedTextStyle(
-                                      textStyle: TextStyle(
-                                        fontSize: LikeMindsTheme.kFontSmall,
-                                        color: style!.textColor ??
-                                            Colors.grey.shade500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
+                                ),
+                              ),
                         ],
                       ),
                     ),

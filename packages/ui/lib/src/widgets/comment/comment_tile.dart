@@ -171,44 +171,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                       widget.customTitle ?? const SizedBox.shrink(),
                     ],
                   ),
-                  widget.subtitleText != null
-                      ? Container(
-                          padding: style?.subtitlePadding,
-                          child: Row(
-                            children: [
-                              widget.subtitleText ?? const SizedBox.shrink(),
-                              if (widget.comment.isEdited)
-                                LikeMindsTheme.kHorizontalPaddingSmall,
-                              if (widget.comment.isEdited)
-                                widget.subTextSeparator ??
-                                    LMFeedText(
-                                      text: widget.comment.isEdited ? '•' : '',
-                                      style: LMFeedTextStyle(
-                                        textStyle: TextStyle(
-                                          fontSize: LikeMindsTheme.kFontSmall,
-                                          color: Colors.grey[700],
-                                        ),
-                                      ),
-                                    ),
-                              LikeMindsTheme.kHorizontalPaddingSmall,
-                              widget.comment.isEdited
-                                  ? widget.editedText ??
-                                      LMFeedText(
-                                        text: widget.comment.isEdited
-                                            ? 'Edited'
-                                            : '',
-                                        style: LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize: LikeMindsTheme.kFontSmall,
-                                            color: Colors.grey[700],
-                                          ),
-                                        ),
-                                      )
-                                  : const SizedBox(),
-                            ],
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                  getCommentSubtitleText(),
                 ],
               ),
               const Spacer(),
@@ -252,11 +215,11 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                             ?.call(_defLikeCommentButton()) ??
                         _defLikeCommentButton()),
                 widget.buttonSeparator ??
-                    Text(
+                    const Text(
                       '|',
                       style: TextStyle(
                         fontSize: LikeMindsTheme.kFontSmallMed,
-                        color: Colors.grey.shade300,
+                        color: LikeMindsTheme.greyColor,
                       ),
                     ),
                 style!.showReplyButton
@@ -267,35 +230,58 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                                 ?.call(_defReplyToCommentButton()) ??
                             _defReplyToCommentButton())
                     : const SizedBox.shrink(),
-                style!.showRepliesButton
-                    ? Padding(
-                        padding: style!.showRepliesButtonStyle?.padding ??
-                            const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: widget.comment.repliesCount > 0
-                            ? widget.showRepliesButtonBuilder
-                                    ?.call(_defShowRepliesButton()) ??
-                                _defShowRepliesButton()
-                            : const SizedBox.shrink())
-                    : const SizedBox.shrink(),
-                if (style?.showTimestamp ?? true) ...[
-                  const Spacer(),
+                if (style!.showRepliesButton) ...[
+                  if (style!.showReplyButton)
+                    const Text(
+                      ' · ',
+                      style: TextStyle(
+                        fontSize: LikeMindsTheme.kFontSmallMed,
+                        color: LikeMindsTheme.greyColor,
+                      ),
+                    ),
+                  widget.comment.repliesCount > 0
+                      ? widget.showRepliesButtonBuilder
+                              ?.call(_defShowRepliesButton()) ??
+                          _defShowRepliesButton()
+                      : const SizedBox.shrink()
+                ],
+                const Spacer(),
+                if (widget.comment.isEdited)
+                  widget.editedText ??
+                      LMFeedText(
+                        text:
+                            'Edited ${(style?.showTimestamp ?? true) ? " · " : ""}',
+                        style: LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontSize: LikeMindsTheme.kFontSmall,
+                            color: feedTheme.inActiveColor,
+                          ),
+                        ),
+                      ),
+                if (style?.showTimestamp ?? true)
                   LMFeedText(
                     text:
                         LMFeedTimeAgo.instance.format(widget.comment.createdAt),
                     style: LMFeedTextStyle(
                       textStyle: TextStyle(
-                        fontSize: LikeMindsTheme.kFontSmallMed,
-                        color: Colors.grey.shade300,
+                        fontSize: LikeMindsTheme.kFontSmall,
+                        color: feedTheme.inActiveColor,
                       ),
                     ),
                   ),
-                ]
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget getCommentSubtitleText() {
+    return widget.subtitleText == null
+        ? const SizedBox.shrink()
+        : Container(
+            padding: style?.subtitlePadding, child: widget.subtitleText);
   }
 
   LMFeedMenu _defCommentMenu() {
@@ -309,12 +295,12 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
     return widget.likeButton ??
         LMFeedButton(
           onTap: () {},
-          text: LMFeedText(
+          text: const LMFeedText(
             text: 'Like',
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade200,
+                color: LikeMindsTheme.greyColor,
               ),
             ),
           ),
@@ -333,7 +319,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                   type: LMFeedIconType.icon,
                   style: LMFeedIconStyle(
                     size: 16,
-                    color: Colors.blue,
+                    color: LikeMindsTheme.errorColor,
                   ),
                 ),
               ),
@@ -344,22 +330,22 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
     return widget.replyButton ??
         LMFeedButton(
           onTap: () {},
-          text: LMFeedText(
+          text: const LMFeedText(
             text: 'Reply',
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 fontSize: 14,
-                color: Colors.grey.shade200,
+                color: LikeMindsTheme.greyColor,
               ),
             ),
           ),
           style: style!.replyButtonStyle ??
-              LMFeedButtonStyle(
+              const LMFeedButtonStyle(
                 icon: LMFeedIcon(
                   type: LMFeedIconType.icon,
                   icon: Icons.comment_outlined,
                   style: LMFeedIconStyle(
-                    color: Colors.grey.shade200,
+                    color: LikeMindsTheme.greyColor,
                     size: 16,
                   ),
                 ),
@@ -376,9 +362,9 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
             text: widget.comment.repliesCount > 1
                 ? "${widget.comment.repliesCount}  replies"
                 : "${widget.comment.repliesCount}  reply",
-            style: LMFeedTextStyle(
+            style: const LMFeedTextStyle(
               textStyle: TextStyle(
-                color: Colors.grey.shade200,
+                color: LikeMindsTheme.greyColor,
                 fontSize: 12,
               ),
             ),
@@ -570,7 +556,6 @@ class LMFeedCommentStyle {
           ),
         ),
         showRepliesButton: false,
-        showReplyButton: false,
         replyButtonStyle: const LMFeedButtonStyle(),
       );
 }

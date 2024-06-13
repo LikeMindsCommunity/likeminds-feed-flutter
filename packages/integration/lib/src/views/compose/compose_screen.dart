@@ -1149,15 +1149,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                       ),
                       child: Container(
                         height: 36,
-                        alignment: Alignment.bottomLeft,
+                        alignment: Alignment.center,
                         margin: const EdgeInsets.only(left: 16.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(500),
-                          color: LMFeedCore.theme.container,
-                          border: Border.all(
-                            color: LMFeedCore.theme.primaryColor,
-                          ),
-                        ),
                         child: LMFeedTopicChip(
                           isSelected: false,
                           topic: composeBloc.selectedTopics.isEmpty
@@ -1178,11 +1171,16 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                             textStyle: TextStyle(
                               color: LMFeedCore.theme.primaryColor,
                             ),
+                            backgroundColor: feedTheme.container,
+                            showBorder: true,
+                            borderColor: LMFeedCore.theme.primaryColor,
+                            borderRadius: BorderRadius.circular(500),
                             icon: LMFeedIcon(
                               type: LMFeedIconType.icon,
                               icon: CupertinoIcons.chevron_down,
                               style: LMFeedIconStyle(
                                 size: 16,
+                                boxPadding: 0.0,
                                 color: LMFeedCore.theme.primaryColor,
                               ),
                             ),
