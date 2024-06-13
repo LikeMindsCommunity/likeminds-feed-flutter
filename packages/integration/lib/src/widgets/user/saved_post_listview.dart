@@ -361,8 +361,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         },
         action: LMFeedMenuAction(
           onPostReport: () => handlePostReportAction(postViewData),
-          onPostUnpin: () => handlePostPinAction(postViewData),
-          onPostPin: () => handlePostPinAction(postViewData),
+          onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
+          onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
           onPostEdit: () {
             // Mute all video controllers
             // to prevent video from playing in background
@@ -877,79 +877,5 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         ),
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    if (postViewData.isPinned) {
-      int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
-      if (index != -1) {
-        postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
-        postViewData.menuItems[index].id = postUnpinId;
-      }
-    } else {
-      int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
-
-      if (index != -1) {
-        postViewData.menuItems[index]
-          ..title = "Pin This $postTitleFirstCap"
-          ..id = postPinId;
-      }
-    }
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        post: postViewData,
-        actionType: LMFeedPostActionType.pinned,
-        postId: postViewData.id));
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        post: postViewData,
-        actionType: LMFeedPostActionType.pinned,
-        postId: postViewData.id,
-      ));
-
-      if (postViewData.isPinned) {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Unpin This $postTitleFirstCap"
-            ..id = postUnpinId;
-        }
-      } else {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
-
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Pin This $postTitleFirstCap"
-            ..id = postPinId;
-        }
-      }
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: widgetSource,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 }

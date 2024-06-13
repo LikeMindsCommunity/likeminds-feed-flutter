@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/constants/post_action_id.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/typedefs.dart';
-import 'package:likeminds_feed_flutter_core/src/views/media/media_preview_screen.dart';
 import 'package:likeminds_feed_sample/themes/social_dark/model/company_view_data.dart';
 import 'package:likeminds_feed_sample/themes/social_dark/builder/utils/constants/assets_constants.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -220,10 +216,16 @@ class _NovaLMFeedCompanyFeedWidgetState
         if (state is LMFeedPostUpdateState) {
           List<LMPostViewData>? feedRoomItemList = _pagingController.itemList;
           int index = feedRoomItemList
-                  ?.indexWhere((element) => element.id == state.post?.id) ??
+                  ?.indexWhere((element) => element.id == state.postId) ??
               -1;
+
           if (index != -1) {
-            feedRoomItemList?[index] = state.post!;
+            feedRoomItemList![index] = LMFeedPostUtils.updatePostData(
+              postViewData: state.post ?? feedRoomItemList[index],
+              actionType: state.actionType,
+              commentId: state.commentId,
+              pollOptions: state.pollOptions,
+            );
           }
           rebuildPostWidget.value = !rebuildPostWidget.value;
         }
@@ -429,8 +431,9 @@ class _NovaLMFeedCompanyFeedWidgetState
         return menu.copyWith(
           removeItemIds: {postReportId, postEditId},
           action: LMFeedMenuAction(
-            onPostUnpin: () => handlePostPinAction(postViewData),
-            onPostPin: () => handlePostPinAction(postViewData),
+            onPostUnpin: () =>
+                LMFeedPostUtils.handlePostPinAction(postViewData),
+            onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
             onPostDelete: () {
               showDialog(
                 context: context,
@@ -733,35 +736,4 @@ class _NovaLMFeedCompanyFeedWidgetState
           ],
         ),
       );
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    postViewData.isPinned = !postViewData.isPinned;
-    rebuildPostWidget.value = !rebuildPostWidget.value;
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    LMFeedPostBloc.instance.add(
-      LMFeedUpdatePostEvent(
-        postId: postViewData.id,
-        post: postViewData,
-        actionType: LMFeedPostActionType.pinned,
-      ),
-    );
-
-    if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
-      rebuildPostWidget.value = !rebuildPostWidget.value;
-      LMFeedPostBloc.instance.add(
-        LMFeedUpdatePostEvent(
-          postId: postViewData.id,
-          post: postViewData,
-          actionType: LMFeedPostActionType.unpinned,
-        ),
-      );
-    }
-  }
 }

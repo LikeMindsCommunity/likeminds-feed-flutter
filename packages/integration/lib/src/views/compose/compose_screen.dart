@@ -575,13 +575,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 return Padding(
                   padding: EdgeInsets.zero,
                   child: Stack(
+                    alignment: Alignment.topCenter,
                     children: <Widget>[
                       mediaWidget,
                       if (composeBloc.postMedia[index].attachmentType !=
                           LMMediaType.document)
                         Positioned(
                           top: 7.5,
-                          right: 7.5,
+                          right: composeBloc.postMedia.first.attachmentType ==
+                                  LMMediaType.link
+                              ? 20.0
+                              : 7.5,
                           child: GestureDetector(
                             onTap: () {
                               LMAttachmentViewData removedMedia =
