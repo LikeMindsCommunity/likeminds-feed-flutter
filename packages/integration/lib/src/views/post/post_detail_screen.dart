@@ -1,14 +1,13 @@
 // ignore_for_file: deprecated_member_use_from_same_package
-
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_reply_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/default_empty_comment_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/handler/post_detail_screen_handler.dart';
@@ -68,6 +67,10 @@ class LMFeedPostDetailScreen extends StatefulWidget {
 }
 
 class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
+  late Size screenSize;
+  late bool isDesktopWeb;
+
+  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
   String postTitleSmallCap =
@@ -143,6 +146,18 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.sizeOf(context);
+    screenWidth = min(webConfig.maxWidth, screenSize.width);
+    if (screenSize.width > webConfig.maxWidth && kIsWeb) {
+      isDesktopWeb = true;
+    } else {
+      isDesktopWeb = false;
+    }
+  }
+
+  @override
   void dispose() {
     LMFeedCommentBloc.instance.add(LMFeedCommentCancelEvent());
     super.dispose();
@@ -150,8 +165,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = min(
-        LMFeedCore.webConfiguration.maxWidth, MediaQuery.sizeOf(context).width);
     return Scaffold(
       body: RefreshIndicator.adaptive(
         onRefresh: () {
@@ -230,7 +243,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               width: screenWidth,
                               child: CustomScrollView(
                                 slivers: [
-                                  if (isWeb)
+                                  if (isDesktopWeb)
                                     SliverPadding(
                                         padding: EdgeInsets.only(top: 20.0)),
                                   SliverToBoxAdapter(
@@ -254,7 +267,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                         : Container(
                                             clipBehavior: Clip.hardEdge,
                                             decoration: BoxDecoration(
-                                                borderRadius: isWeb
+                                                borderRadius: isDesktopWeb
                                                     ? BorderRadius.vertical(
                                                         top: Radius.circular(
                                                             8.0))
@@ -1179,15 +1192,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       text: LMFeedText(
         text: LMFeedPostUtils.getLikeCountTextWithCount(
             commentViewData.likesCount),
-        style: const LMFeedTextStyle(
-          textStyle: TextStyle(fontSize: 12),
-        ),
-      ),
-      activeText: LMFeedText(
-        text: LMFeedPostUtils.getLikeCountTextWithCount(
-            commentViewData.likesCount),
         style: LMFeedTextStyle(
-          textStyle: TextStyle(color: feedTheme.primaryColor, fontSize: 12),
+          textStyle: TextStyle(fontSize: 12, color: feedTheme.inActiveColor),
         ),
       ),
       onTextTap: () {
@@ -1258,12 +1264,10 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ),
             ),
           ),
-      text: const LMFeedText(
+      text: LMFeedText(
         text: "Reply",
         style: LMFeedTextStyle(
-            textStyle: TextStyle(
-          fontSize: 12,
-        )),
+            textStyle: TextStyle(fontSize: 12, color: feedTheme.inActiveColor)),
       ),
       onTap: () {
         LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
@@ -1279,8 +1283,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
             .add(LMFeedCommentOngoingEvent(
           commentMetaData: commentMetaData,
         ));
-
-        _postDetailScreenHandler!.openOnScreenKeyboard();
       },
     );
   }
@@ -1349,6 +1351,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
         ],
       ),
       child: SafeArea(
+        top: false,
         child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentHandlerState>(
           bloc: _postDetailScreenHandler!.commentHandlerBloc,
           builder: (context, state) => Column(
@@ -1491,6 +1494,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   ],
                 ),
               ),
+              LikeMindsTheme.kVerticalPaddingMedium,
             ],
           ),
         ),
@@ -1608,6 +1612,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 commentActionRequest: addReplyRequest,
                 commentMetaData: commentMetaData));
       }
+      _postDetailScreenHandler!.openOnScreenKeyboard();
     } else {
       DateTime currentTime = DateTime.now();
 

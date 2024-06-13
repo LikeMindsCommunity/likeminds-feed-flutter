@@ -7,12 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/universal_feed/feed_screen_builder_delegate.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/feed/feed_pending_post_banner.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post/post_approval_dialog.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/pending_post/pending_posts_screen.dart';
-import 'package:video_compress/video_compress.dart';
-// import 'package:media_kit_video/media_kit_video.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 
 part 'feed_screen_configuration.dart';
 
@@ -135,6 +130,7 @@ class LMFeedScreen extends StatefulWidget {
 }
 
 class _LMFeedScreenState extends State<LMFeedScreen> {
+  late Size screenSize;
   // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
@@ -186,6 +182,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   bool isPostEditing = false;
 
   LMFeedScreenConfig? config;
+  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
   /* 
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
@@ -221,12 +218,15 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   bool userPostingRights = true;
 
   int pendingPostCount = 0;
+  bool isDesktopWeb = false;
 
   @override
   void initState() {
     super.initState();
     // Adds pagination listener to the feed
     _addPaginationListener();
+
+    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
 
     // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(
@@ -392,8 +392,18 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.sizeOf(context);
+    if (screenSize.width > webConfig.maxWidth && kIsWeb) {
+      isDesktopWeb = true;
+    } else {
+      isDesktopWeb = false;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
     return _widgetsBuilder.scaffold(
       source: _widgetSource,
       backgroundColor: feedThemeData.backgroundColor,
@@ -492,35 +502,6 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                       );
                                     })
                           : widget.customWidgetBuilder!(context)
-                      : const SizedBox(),
-                ),
-                if (kIsWeb) SliverPadding(padding: EdgeInsets.only(top: 12.0)),
-                SliverToBoxAdapter(
-                  child: config!.enableTopicFiltering
-                      ? ValueListenableBuilder(
-                          valueListenable: rebuildTopicFeed,
-                          builder: (context, _, __) {
-                            return FutureBuilder<GetTopicsResponse>(
-                              future: getTopicsResponse,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const SizedBox.shrink();
-                                } else if (snapshot.hasData &&
-                                    snapshot.data != null &&
-                                    snapshot.data!.success == true) {
-                                  if (snapshot.data!.topics!.isNotEmpty) {
-                                    return widget.topicBarBuilder
-                                            ?.call(_defTopicBar()) ??
-                                        _defTopicBar();
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
-                                }
-                                return const SizedBox();
-                              },
-                            );
-                          })
                       : const SizedBox(),
                 ),
                 SliverToBoxAdapter(
@@ -754,7 +735,38 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                     },
                   ),
                 ),
-                if (kIsWeb) SliverPadding(padding: EdgeInsets.only(top: 12.0)),
+                if (isDesktopWeb)
+                  SliverPadding(padding: EdgeInsets.only(top: 12.0)),
+                SliverToBoxAdapter(
+                  child: config!.enableTopicFiltering
+                      ? ValueListenableBuilder(
+                          valueListenable: rebuildTopicFeed,
+                          builder: (context, _, __) {
+                            return FutureBuilder<GetTopicsResponse>(
+                              future: getTopicsResponse,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const SizedBox.shrink();
+                                } else if (snapshot.hasData &&
+                                    snapshot.data != null &&
+                                    snapshot.data!.success == true) {
+                                  if (snapshot.data!.topics!.isNotEmpty) {
+                                    return widget.topicBarBuilder
+                                            ?.call(_defTopicBar()) ??
+                                        _defTopicBar();
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
+                                }
+                                return const SizedBox();
+                              },
+                            );
+                          })
+                      : const SizedBox(),
+                ),
+                if (isDesktopWeb)
+                  SliverPadding(padding: EdgeInsets.only(top: 12.0)),
                 BlocListener<LMFeedBloc, LMFeedState>(
                   bloc: _feedBloc,
                   listener: (context, LMFeedState state) =>
@@ -932,18 +944,28 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   LMFeedTopicBar _defTopicBar() {
     return LMFeedTopicBar(
+      isDesktopWeb: isDesktopWeb,
       selectedTopics: _feedBloc.selectedTopics,
       openTopicSelector: openTopicSelector,
+      clearAllSelection: () {
+        updateSelectedTopics([]);
+      },
+      removeTopicFromSelection: (topic) {
+        List<LMTopicViewData> updatedTopics = [..._feedBloc.selectedTopics];
+        updatedTopics.removeWhere((element) => element.id == topic.id);
+        updateSelectedTopics(updatedTopics);
+      },
       style: LMFeedTopicBarStyle(
           height: 60,
-          padding: EdgeInsets.all(16),
-          borderRadius: kIsWeb ? feedThemeData.postStyle.borderRadius : null,
-          border: Border.symmetric(
-            horizontal: BorderSide(
-              color: LMFeedCore.theme.onContainer,
-              width: 0.1,
-            ),
-          )),
+          padding: EdgeInsets.symmetric(vertical: isDesktopWeb ? 0.0 : 8.0),
+          border: isDesktopWeb
+              ? null
+              : Border.symmetric(
+                  horizontal: BorderSide(
+                    color: LMFeedCore.theme.onContainer,
+                    width: 0.1,
+                  ),
+                )),
     );
   }
 

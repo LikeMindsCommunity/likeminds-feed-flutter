@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
@@ -37,12 +38,9 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
   late int? position;
 
   int currPosition = 0;
+  int mediaLength = 0;
   CarouselController controller = CarouselController();
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
-
-  bool checkIfMultipleAttachments() {
-    return (postAttachments.length > 1);
-  }
 
   @override
   void initState() {
@@ -67,6 +65,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
     postAttachments.removeWhere((element) =>
         !(element.attachmentType == LMMediaType.image ||
             element.attachmentType == LMMediaType.video));
+    mediaLength = postAttachments.length;
   }
 
   @override
@@ -138,55 +137,123 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
         child: Align(
           alignment: Alignment.center,
           child: Container(
-            width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
             child: Column(
               children: <Widget>[
                 Expanded(
-                  child: CarouselSlider.builder(
-                      options: CarouselOptions(
-                          initialPage: position ?? 0,
-                          enableInfiniteScroll: false,
-                          enlargeFactor: 0.0,
-                          viewportFraction: 1.0,
-                          aspectRatio: 1,
-                          onPageChanged: (index, reason) {
-                            currPosition = index;
-                            rebuildCurr.value = !rebuildCurr.value;
-                          }),
-                      itemCount: postAttachments.length,
-                      itemBuilder: (context, index, realIndex) {
-                        if (postAttachments[index].attachmentType ==
-                            LMMediaType.video) {
-                          return LMFeedVideo(
-                            video: postAttachments[index],
-                            postId: widget.post.id,
-                            autoPlay: true,
-                            style: LMFeedPostVideoStyle.basic().copyWith(
-                              showControls: true,
-                            ),
-                            position: index,
-                          );
-                        } else if (postAttachments[index].attachmentType ==
-                            LMMediaType.image) {
-                          return Container(
-                            color: Colors.black,
-                            width: screenSize.width,
-                            child: Center(
-                              child: LMFeedImage(
-                                image: postAttachments[index],
-                                style: LMFeedPostImageStyle(
-                                  boxFit: BoxFit.contain,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CarouselSlider.builder(
+                          carouselController: controller,
+                          options: CarouselOptions(
+                              initialPage: position ?? 0,
+                              enableInfiniteScroll: false,
+                              enlargeFactor: 0.0,
+                              viewportFraction: 1.0,
+                              aspectRatio: 1,
+                              onPageChanged: (index, reason) {
+                                currPosition = index;
+                                rebuildCurr.value = !rebuildCurr.value;
+                              }),
+                          itemCount: postAttachments.length,
+                          itemBuilder: (context, index, realIndex) {
+                            if (postAttachments[index].attachmentType ==
+                                LMMediaType.video) {
+                              return LMFeedVideo(
+                                video: postAttachments[index],
+                                postId: widget.post.id,
+                                autoPlay: true,
+                                style: LMFeedPostVideoStyle.basic().copyWith(
+                                  showControls: true,
                                 ),
                                 position: index,
+                              );
+                            } else if (postAttachments[index].attachmentType ==
+                                LMMediaType.image) {
+                              return Container(
+                                color: Colors.black,
+                                width: screenSize.width,
+                                child: Center(
+                                  child: LMFeedImage(
+                                    image: postAttachments[index],
+                                    style: LMFeedPostImageStyle(
+                                      boxFit: BoxFit.contain,
+                                    ),
+                                    position: index,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return const SizedBox.shrink();
+                            }
+                          }),
+                      if (mediaLength > 1 && kIsWeb)
+                        ValueListenableBuilder(
+                          valueListenable: rebuildCurr,
+                          builder: (context, _, __) {
+                            return Positioned(
+                              bottom: 0,
+                              top: 0,
+                              child: SizedBox(
+                                width: screenSize.width,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    currPosition > 0
+                                        ? InkWell(
+                                            onTap: () {
+                                              if (currPosition > 0) {
+                                                currPosition--;
+                                                controller.animateToPage(
+                                                    currPosition);
+                                              }
+                                            },
+                                            child: Container(
+                                              height: 50,
+                                              width: screenSize.width * 0.25,
+                                              alignment: Alignment.centerLeft,
+                                              child: Icon(
+                                                Icons
+                                                    .arrow_back_ios_new_rounded,
+                                                color: feedTheme.container
+                                                    .withOpacity(0.3),
+                                              ),
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                    currPosition != mediaLength - 1
+                                        ? InkWell(
+                                            onTap: () {
+                                              if (currPosition <
+                                                  mediaLength - 1) {
+                                                currPosition++;
+                                                controller.animateToPage(
+                                                    currPosition);
+                                              }
+                                            },
+                                            child: Container(
+                                              height: 50,
+                                              width: screenSize.width * 0.25,
+                                              alignment: Alignment.centerRight,
+                                              child: Icon(
+                                                Icons.arrow_forward_ios_rounded,
+                                                color: feedTheme.container
+                                                    .withOpacity(0.3),
+                                              ),
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        } else {
-                          return const SizedBox.shrink();
-                        }
-                      }),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
                 ),
-                if (checkIfMultipleAttachments())
+                if (mediaLength > 1)
                   ValueListenableBuilder(
                     valueListenable: rebuildCurr,
                     builder: (context, _, __) {

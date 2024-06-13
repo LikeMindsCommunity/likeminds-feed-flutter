@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -60,6 +61,20 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   LMFeedThemeData feedTheme = LMFeedCore.theme;
 
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.activityScreen;
+
+  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  bool isDesktopWeb = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.sizeOf(context);
+    if (screenSize.width > webConfig.maxWidth && kIsWeb) {
+      isDesktopWeb = true;
+    } else {
+      isDesktopWeb = false;
+    }
+  }
 
   @override
   void initState() {
@@ -133,7 +148,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenSize = MediaQuery.sizeOf(context);
     return _widgetUtility.scaffold(
       source: widgetSource,
       backgroundColor: feedTheme.backgroundColor,
@@ -158,7 +172,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         child: Container(
           width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
           height: MediaQuery.of(context).size.height,
-          padding: EdgeInsets.only(top: kIsWeb ? 10 : 0),
+          padding: EdgeInsets.only(top: isDesktopWeb ? 10 : 0),
           child: PagedListView<int, UserActivityItem>(
             pagingController: _pagingController,
             builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(

@@ -147,9 +147,7 @@ class LMFeedThemeData {
       onContainer: onContainer ?? LikeMindsTheme.onContainer,
       onPrimary: onPrimary ?? LikeMindsTheme.onPrimary,
       postStyle: postStyle ??
-          LMFeedPostStyle.basic().copyWith(
-              borderRadius:
-                  kIsWeb ? BorderRadius.circular(8.0) : BorderRadius.zero),
+          LMFeedPostStyle.basic().copyWith(borderRadius: BorderRadius.zero),
       topicStyle:
           topicStyle ?? LMFeedPostTopicStyle.basic(primaryColor: primaryColor),
       contentStyle: contentStyle ??
