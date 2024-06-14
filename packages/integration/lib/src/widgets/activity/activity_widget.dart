@@ -79,8 +79,7 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                               late final VideoPlayerController controller;
                               late final Future<void> futureValue;
                               if (postData.attachments!.isNotEmpty &&
-                                  mapIntToMediaType(postData
-                                          .attachments![0].attachmentType) ==
+                                  postData.attachments![0].attachmentType ==
                                       LMMediaType.video) {
                                 controller = VideoPlayerController.networkUrl(
                                     Uri.parse(postData
@@ -166,18 +165,14 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                                       ),
                                       trailing: postData
                                                   .attachments!.isNotEmpty &&
-                                              mapIntToMediaType(postData
-                                                      .attachments![0]
-                                                      .attachmentType) ==
+                                              postData.attachments![0]
+                                                      .attachmentType ==
                                                   LMMediaType.image
                                           ? ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(4),
                                               child: LMFeedImage(
-                                                imageUrl: postData
-                                                    .attachments![0]
-                                                    .attachmentMeta
-                                                    .url,
+                                                image: postData.attachments![0],
                                                 style:
                                                     const LMFeedPostImageStyle(
                                                   height: 64,
@@ -188,9 +183,8 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                                               ),
                                             )
                                           : postData.attachments!.isNotEmpty &&
-                                                  mapIntToMediaType(postData
-                                                          .attachments![0]
-                                                          .attachmentType) ==
+                                                  postData.attachments![0]
+                                                          .attachmentType ==
                                                       LMMediaType.video
                                               ? FutureBuilder(
                                                   future: futureValue,

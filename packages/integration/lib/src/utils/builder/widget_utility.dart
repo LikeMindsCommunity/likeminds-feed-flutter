@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -92,6 +95,14 @@ class LMFeedWidgetUtility {
   Widget postWidgetBuilder(
       BuildContext context, LMFeedPostWidget post, LMPostViewData postViewData,
       {LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed}) {
+    Size screenSize = MediaQuery.sizeOf(context);
+    bool isDesktopWeb;
+    if (screenSize.width > LMFeedCore.webConfiguration.maxWidth && kIsWeb) {
+      isDesktopWeb = true;
+    } else {
+      isDesktopWeb = false;
+    }
+
     return post.copyWith(
       headerBuilder: this.headerBuilder,
       contentBuilder: this.postContentBuilder,
@@ -100,6 +111,10 @@ class LMFeedWidgetUtility {
       menuBuilder: this.menuBuilder,
       topicBuilder: this.topicBuilder,
       reviewBannerBuilder: this.postReviewBannerBuilder,
+      style: post.style?.copyWith(
+          borderRadius: isDesktopWeb
+              ? BorderRadius.circular(8.0)
+              : post.style?.borderRadius),
     );
   }
 
@@ -336,9 +351,13 @@ class LMFeedWidgetUtility {
   SnackBar snackBarBuilder(
       BuildContext context, String snackBarMessage, LMFeedWidgetSource source,
       {LMFeedSnackBarStyle? style}) {
+    Size size = MediaQuery.sizeOf(context);
+    LMFeedSnackBarStyle inStyle = style ?? LMFeedCore.theme.snackBarTheme;
+    double width = inStyle.width ?? size.width * 0.8;
     return LMFeedSnackBar(
       content: LMFeedText(text: snackBarMessage),
-      style: style ?? LMFeedCore.theme.snackBarTheme,
+      style: inStyle.copyWith(
+          width: min(LMFeedCore.webConfiguration.maxWidthForSnackBars, width)),
     );
   }
 }

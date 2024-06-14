@@ -22,7 +22,7 @@ addDocumentEventHandler(
   final LMResponse<bool> result = await LMFeedMediaHandler.handlePermissions(3);
   if (result.success) {
     try {
-      final LMResponse<List<LMMediaModel>> documents =
+      final LMResponse<List<LMAttachmentViewData>> documents =
           await LMFeedMediaHandler.pickDocuments(mediaCount);
       if (documents.success) {
         if (documents.data != null && documents.data!.isNotEmpty) {
@@ -30,8 +30,8 @@ addDocumentEventHandler(
 
           LMFeedComposeBloc.instance.documentCount += countOfPickedDocument;
           LMFeedComposeBloc.instance.postMedia.addAll(documents.data!);
-          LMFeedComposeBloc.instance.postMedia
-              .removeWhere((element) => element.mediaType == LMMediaType.link);
+          LMFeedComposeBloc.instance.postMedia.removeWhere(
+              (element) => element.attachmentType == LMMediaType.link);
 
           LMFeedAnalyticsBloc.instance.add(
             LMFeedFireAnalyticsEvent(

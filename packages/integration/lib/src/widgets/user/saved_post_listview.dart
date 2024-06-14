@@ -361,8 +361,8 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         },
         action: LMFeedMenuAction(
           onPostReport: () => handlePostReportAction(postViewData),
-          onPostUnpin: () => handlePostPinAction(postViewData),
-          onPostPin: () => handlePostPinAction(postViewData),
+          onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
+          onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
           onPostEdit: () {
             // Mute all video controllers
             // to prevent video from playing in background
@@ -449,7 +449,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });
@@ -482,7 +482,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        if (hasPollEnded(pollValue.expiryTime!)) {
+        if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
             "Poll ended. Vote can not be submitted now.",
@@ -493,7 +493,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         if ((isPollSubmitted(pollValue.options ?? [])) &&
             !isVoteEditing["value"]!) return;
         if (!isMultiChoicePoll(
-            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+            pollValue.multiSelectNo, pollValue.multiSelectState)) {
           submitVote(
             context,
             pollValue,
@@ -514,7 +514,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
       showEditVoteButton: !isVoteEditing["value"]! &&
           !isInstantPoll(pollValue.pollType) &&
-          !hasPollEnded(pollValue.expiryTime!) &&
+          !hasPollEnded(pollValue.expiryTime) &&
           isPollSubmitted(pollValue.options ?? []),
       showAddOptionButton: showAddOptionButton(pollValue),
       showTick: (option) {
@@ -522,10 +522,10 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
             pollValue, option, selectedOptions, isVoteEditing["value"]!);
       },
       isMultiChoicePoll: isMultiChoicePoll(
-          pollValue.multiSelectNo!, pollValue.multiSelectState!),
+          pollValue.multiSelectNo, pollValue.multiSelectState),
       pollSelectionText: getPollSelectionText(
           pollValue.multiSelectState, pollValue.multiSelectNo),
-      timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
+      timeLeft: getTimeLeftInPoll(pollValue.expiryTime),
       onSameOptionAdded: () {
         LMFeedCore.showSnackBar(
           context,
@@ -572,8 +572,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
           rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }
@@ -585,6 +583,9 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                 postViewData.likeCount)),
         style: _theme.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
@@ -729,7 +730,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
                       (LMAttachmentViewDataBuilder()
-                            ..attachmentType(8)
+                            ..attachmentType(LMMediaType.repost)
                             ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                                   ..repost(postViewData))
                                 .build()))
@@ -876,79 +877,5 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
         ),
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    if (postViewData.isPinned) {
-      int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
-      if (index != -1) {
-        postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
-        postViewData.menuItems[index].id = postUnpinId;
-      }
-    } else {
-      int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
-
-      if (index != -1) {
-        postViewData.menuItems[index]
-          ..title = "Pin This $postTitleFirstCap"
-          ..id = postPinId;
-      }
-    }
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        post: postViewData,
-        actionType: LMFeedPostActionType.pinned,
-        postId: postViewData.id));
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        post: postViewData,
-        actionType: LMFeedPostActionType.pinned,
-        postId: postViewData.id,
-      ));
-
-      if (postViewData.isPinned) {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Unpin This $postTitleFirstCap"
-            ..id = postUnpinId;
-        }
-      } else {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
-
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Pin This $postTitleFirstCap"
-            ..id = postPinId;
-        }
-      }
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: widgetSource,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 }

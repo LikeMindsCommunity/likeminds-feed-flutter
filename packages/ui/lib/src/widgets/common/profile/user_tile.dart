@@ -65,17 +65,7 @@ class LMFeedUserTile extends LMFeedTile {
               ),
             ),
           ),
-      subtitle: subtitle ??
-          LMFeedText(
-            text: "@${user.name.toLowerCase().split(' ').join()} ",
-            style: const LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: LikeMindsTheme.kFontSmall,
-                color: Colors.grey,
-                fontWeight: FontWeight.w300,
-              ),
-            ),
-          ),
+      subtitle: subtitle,
     );
   }
 }

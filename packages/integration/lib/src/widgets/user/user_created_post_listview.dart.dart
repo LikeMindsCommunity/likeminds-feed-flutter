@@ -303,9 +303,9 @@ class _LMFeedUserCreatedPostListViewState
     );
   }
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -315,13 +315,13 @@ class _LMFeedUserCreatedPostListViewState
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return LMFeedTheme
                 .instance.theme.mediaStyle.documentStyle.documentIcon ??
             LMFeedIcon(
@@ -458,8 +458,8 @@ class _LMFeedUserCreatedPostListViewState
             );
           },
           onPostReport: () => handlePostReportAction(postViewData),
-          onPostUnpin: () => handlePostPinAction(postViewData),
-          onPostPin: () => handlePostPinAction(postViewData),
+          onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
+          onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
           onPostDelete: () {
             String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
 
@@ -534,7 +534,7 @@ class _LMFeedUserCreatedPostListViewState
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });
@@ -567,7 +567,7 @@ class _LMFeedUserCreatedPostListViewState
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        if (hasPollEnded(pollValue.expiryTime!)) {
+        if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
             "Poll ended. Vote can not be submitted now.",
@@ -578,7 +578,7 @@ class _LMFeedUserCreatedPostListViewState
         if ((isPollSubmitted(pollValue.options ?? [])) &&
             !isVoteEditing["value"]!) return;
         if (!isMultiChoicePoll(
-            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+            pollValue.multiSelectNo, pollValue.multiSelectState)) {
           submitVote(
             context,
             pollValue,
@@ -599,7 +599,7 @@ class _LMFeedUserCreatedPostListViewState
       showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
       showEditVoteButton: !isVoteEditing["value"]! &&
           !isInstantPoll(pollValue.pollType) &&
-          !hasPollEnded(pollValue.expiryTime!) &&
+          !hasPollEnded(pollValue.expiryTime) &&
           isPollSubmitted(pollValue.options ?? []),
       showAddOptionButton: showAddOptionButton(pollValue),
       showTick: (option) {
@@ -607,10 +607,10 @@ class _LMFeedUserCreatedPostListViewState
             pollValue, option, selectedOptions, isVoteEditing["value"]!);
       },
       isMultiChoicePoll: isMultiChoicePoll(
-          pollValue.multiSelectNo!, pollValue.multiSelectState!),
+          pollValue.multiSelectNo, pollValue.multiSelectState),
       pollSelectionText: getPollSelectionText(
           pollValue.multiSelectState, pollValue.multiSelectNo),
-      timeLeft: getTimeLeftInPoll(pollValue.expiryTime!),
+      timeLeft: getTimeLeftInPoll(pollValue.expiryTime),
       onSameOptionAdded: () {
         LMFeedCore.showSnackBar(
           context,
@@ -657,8 +657,6 @@ class _LMFeedUserCreatedPostListViewState
           rebuildPostWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }
@@ -670,6 +668,10 @@ class _LMFeedUserCreatedPostListViewState
                 postViewData.likeCount)),
         style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
@@ -816,7 +818,7 @@ class _LMFeedUserCreatedPostListViewState
             // ignore: use_build_context_synchronously
             LMAttachmentViewData attachmentViewData =
                 (LMAttachmentViewDataBuilder()
-                      ..attachmentType(8)
+                      ..attachmentType(LMMediaType.repost)
                       ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                             ..repost(postViewData))
                           .build()))
@@ -924,43 +926,5 @@ class _LMFeedUserCreatedPostListViewState
         ),
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        postId: postViewData.id,
-        actionType: postViewData.isPinned
-            ? LMFeedPostActionType.pinned
-            : LMFeedPostActionType.unpinned));
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-          postId: postViewData.id,
-          actionType: postViewData.isPinned
-              ? LMFeedPostActionType.pinned
-              : LMFeedPostActionType.unpinned));
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: _widgetSource,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 }

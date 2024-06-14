@@ -1,9 +1,11 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -87,6 +89,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   Timer? _debounce;
   String? result;
   Size? screenSize;
+  double? screenWidth;
   // bool to check if the user has tapped on the cancel icon
   // of link preview, in that case toggle the bool to true
   // and don't generate link preview any further
@@ -122,19 +125,16 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     // Map the list of [AttachmentViewData] to [LMMediaModel]
     // and set the list in the compose bloc
-    composeBloc.postMedia = postViewData.attachments
-            ?.map((e) => LMMediaModel.fromAttachmentViewData(e))
-            .toList() ??
-        [];
+    composeBloc.postMedia = postViewData.attachments ?? [];
 
-    for (LMMediaModel media in composeBloc.postMedia) {
-      if (media.mediaType == LMMediaType.video) {
+    for (LMAttachmentViewData media in composeBloc.postMedia) {
+      if (media.attachmentType == LMMediaType.video) {
         composeBloc.videoCount++;
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         composeBloc.documentCount++;
-      } else if (media.mediaType == LMMediaType.image) {
+      } else if (media.attachmentType == LMMediaType.image) {
         composeBloc.imageCount++;
-      } else if (media.mediaType == LMMediaType.poll) {
+      } else if (media.attachmentType == LMMediaType.poll) {
         composeBloc.isPollAdded = true;
       }
     }
@@ -179,7 +179,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     // to free up memory and avoid memory leaks
     if (composeBloc.videoCount > 0) {
       LMFeedVideoProvider.instance.clearPostController(
-          composeBloc.postMedia.first.mediaFile?.uri.toString() ?? '');
+          composeBloc.postMedia.first.attachmentMeta.path?.toString() ?? '');
     }
     // Add an event in the compose bloc to clear the current state
     composeBloc.add(LMFeedComposeCloseEvent());
@@ -211,13 +211,15 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   void _checkForRepost() {
     if (postViewData?.attachments != null) {
       for (LMAttachmentViewData attachment in postViewData!.attachments!) {
-        if (attachment.attachmentType == 8) {
+        if (attachment.attachmentType == LMMediaType.repost) {
           repost = attachment.attachmentMeta.repost;
           composeBloc.postMedia.add(
-            LMMediaModel(
-              mediaType: LMMediaType.repost,
-              postId: repost?.id,
-              post: repost,
+            LMAttachmentViewData.fromAttachmentMeta(
+              attachmentType: LMMediaType.repost,
+              attachmentMeta: (LMAttachmentMetaViewDataBuilder()
+                    ..post(repost)
+                    ..postId(repost?.id))
+                  .build(),
             ),
           );
           return;
@@ -317,7 +319,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.composeConfig;
     style = widget.style ?? feedTheme.composeScreenStyle;
-    screenSize = MediaQuery.of(context).size;
+    screenSize = MediaQuery.sizeOf(context);
+    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
 
     return WillPopScope(
       onWillPop: () {
@@ -336,7 +339,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           bloc: LMFeedPostBloc.instance,
           builder: (context, state) {
             if (state is LMFeedGetPostLoadingState) {
-              return Scaffold(
+              return widgetUtility.scaffold(
                 backgroundColor: feedTheme.container,
                 body: Center(child: LMFeedLoader()),
               );
@@ -381,27 +384,32 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         ),
                       ),
                       body: SafeArea(
-                        child: Container(
-                          margin: EdgeInsets.only(
-                            bottom: 100,
-                          ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                const SizedBox(height: 18),
-                                widget.composeUserHeaderBuilder
-                                        ?.call(context, user!) ??
-                                    widgetUtility
-                                        .composeScreenUserHeaderBuilder(
-                                            context, user!),
-                                const SizedBox(height: 18),
-                                widget.composeContentBuilder?.call() ??
-                                    _defContentInput(),
-                                const SizedBox(height: 18),
-                                widget.composeMediaPreviewBuilder?.call() ??
-                                    _defMediaPreview(),
-                                const SizedBox(height: 150),
-                              ],
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            color: kIsWeb ? feedTheme.container : null,
+                            width: screenWidth,
+                            margin: EdgeInsets.only(
+                              bottom: 100,
+                            ),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 18),
+                                  widget.composeUserHeaderBuilder
+                                          ?.call(context, user!) ??
+                                      widgetUtility
+                                          .composeScreenUserHeaderBuilder(
+                                              context, user!),
+                                  const SizedBox(height: 18),
+                                  widget.composeContentBuilder?.call() ??
+                                      _defContentInput(),
+                                  const SizedBox(height: 18),
+                                  widget.composeMediaPreviewBuilder?.call() ??
+                                      _defMediaPreview(),
+                                  const SizedBox(height: 150),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -411,7 +419,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 ),
               );
             } else {
-              return Scaffold(
+              return widgetUtility.scaffold(
                 backgroundColor: feedTheme.container,
                 body: const SizedBox(),
               );
@@ -495,12 +503,11 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               style: LMFeedPollStyle.basic(isComposable: true).copyWith(
                 backgroundColor: feedTheme.container,
               ),
-              attachmentMeta:
-                  composeBloc.postMedia.first.attachmentMetaViewData!,
+              attachmentMeta: composeBloc.postMedia.first.attachmentMeta,
               subTextBuilder: (context) {
                 return LMFeedText(
-                  text: getFormattedDateTime(composeBloc
-                      .postMedia.first.attachmentMetaViewData!.expiryTime!),
+                  text: getFormattedDateTime(
+                      composeBloc.postMedia.first.attachmentMeta.expiryTime),
                   style: LMFeedTextStyle(
                     textStyle: TextStyle(
                       color: feedTheme.onContainer.withOpacity(0.5),
@@ -512,14 +519,15 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               },
             );
           }
-          if (composeBloc.postMedia.first.mediaType == LMMediaType.repost) {
+          if (composeBloc.postMedia.first.attachmentType ==
+              LMMediaType.repost) {
             return Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: Stack(
                 children: <Widget>[
                   Container(
                     clipBehavior: Clip.hardEdge,
-                    width: screenSize?.width,
+                    width: screenWidth,
                     decoration: const BoxDecoration(),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -552,10 +560,12 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           }
           return Container(
             padding: style?.mediaPadding ?? EdgeInsets.zero,
-            height: screenSize?.width,
+            height: LMFeedComposeBloc.instance.documentCount > 0
+                ? null
+                : screenWidth,
             width: LMFeedComposeBloc.instance.documentCount > 0
                 ? null
-                : screenSize?.width,
+                : screenWidth,
             child: ListView.builder(
               scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
                   ? Axis.vertical
@@ -567,8 +577,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               itemCount: composeBloc.postMedia.length,
               itemBuilder: (context, index) {
                 Widget mediaWidget;
-                LMMediaModel mediaModel = composeBloc.postMedia[index];
-                switch (mediaModel.mediaType) {
+                LMAttachmentViewData mediaModel = composeBloc.postMedia[index];
+                switch (mediaModel.attachmentType) {
                   case LMMediaType.image:
                     mediaWidget = Container(
                       alignment: Alignment.center,
@@ -578,12 +588,12 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         borderRadius:
                             style?.mediaStyle?.imageStyle?.borderRadius,
                       ),
-                      height: style?.mediaStyle?.imageStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.imageStyle?.width ??
-                          screenSize?.width,
+                      height:
+                          style?.mediaStyle?.imageStyle?.height ?? screenWidth,
+                      width:
+                          style?.mediaStyle?.imageStyle?.width ?? screenWidth,
                       child: LMFeedImage(
-                        imageUrl: mediaModel.link,
+                        image: mediaModel,
                         style: style?.mediaStyle?.imageStyle,
                         position: index,
                       ),
@@ -593,17 +603,17 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     mediaWidget = Container(
                       alignment: Alignment.center,
                       clipBehavior: Clip.hardEdge,
-                      height: style?.mediaStyle?.videoStyle?.height ??
-                          screenSize?.width,
-                      width: style?.mediaStyle?.videoStyle?.width ??
-                          screenSize?.width,
+                      height:
+                          style?.mediaStyle?.videoStyle?.height ?? screenWidth,
+                      width:
+                          style?.mediaStyle?.videoStyle?.width ?? screenWidth,
                       decoration: BoxDecoration(
                         color: style?.mediaStyle?.imageStyle?.backgroundColor,
                         borderRadius:
                             style?.mediaStyle?.videoStyle?.borderRadius,
                       ),
                       child: LMFeedVideo(
-                        videoUrl: mediaModel.link,
+                        video: mediaModel,
                         style: style?.mediaStyle?.videoStyle,
                         postId: postViewData!.id,
                       ),
@@ -611,7 +621,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     break;
                   case LMMediaType.link:
                     mediaWidget = LMFeedLinkPreview(
-                      linkModel: mediaModel,
+                      attachment: mediaModel,
                       style: style?.mediaStyle?.linkStyle?.copyWith(
                             width: style?.mediaStyle?.linkStyle?.width ??
                                 MediaQuery.of(context).size.width - 84,
@@ -627,12 +637,13 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                           ),
                       onTap: () {
                         launchUrl(
-                          Uri.parse(mediaModel.ogTags?.url ?? ''),
+                          Uri.parse(
+                              mediaModel.attachmentMeta.ogTags?.url ?? ''),
                           mode: LaunchMode.externalApplication,
                         );
                       },
                       title: LMFeedText(
-                        text: mediaModel.ogTags?.title ?? "--",
+                        text: mediaModel.attachmentMeta.ogTags?.title ?? "--",
                         style: const LMFeedTextStyle(
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -644,7 +655,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         ),
                       ),
                       subtitle: LMFeedText(
-                        text: mediaModel.ogTags?.description ?? "--",
+                        text: mediaModel.attachmentMeta.ogTags?.description ??
+                            "--",
                         style: const LMFeedTextStyle(
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -660,18 +672,20 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   case LMMediaType.document:
                     {
                       mediaWidget = LMFeedDocument(
-                        documentUrl: mediaModel.link,
+                        document: mediaModel,
                         style: style?.mediaStyle?.documentStyle?.copyWith(
                               width: style?.mediaStyle?.documentStyle?.width ??
                                   MediaQuery.of(context).size.width - 84,
                             ) ??
                             LMFeedPostDocumentStyle(
-                              width: screenSize!.width - 84,
+                              width: screenWidth != null
+                                  ? (screenWidth! - 84)
+                                  : null,
                               height: 90,
                               removeIcon: null,
                             ),
                         size: PostHelper.getFileSizeString(
-                            bytes: mediaModel.size ?? 0),
+                            bytes: mediaModel.attachmentMeta.size ?? 0),
                       );
                       break;
                     }
@@ -683,14 +697,14 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   child: Stack(
                     children: <Widget>[
                       mediaWidget,
-                      if (composeBloc.postMedia[index].mediaType ==
+                      if (composeBloc.postMedia[index].attachmentType ==
                           LMMediaType.link)
                         Positioned(
                           top: 7.5,
                           right: 7.5,
                           child: GestureDetector(
                             onTap: () {
-                              if (composeBloc.postMedia[index].mediaType ==
+                              if (composeBloc.postMedia[index].attachmentType ==
                                   LMMediaType.link) {
                                 linkCancelled = true;
                               }
@@ -848,12 +862,16 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
                 if (postViewData?.attachments != null &&
                     postViewData!.attachments!.isNotEmpty &&
-                    postViewData!.attachments!.first.attachmentType == 5) {
+                    postViewData!.attachments!.first.attachmentType ==
+                        LMMediaType.widget) {
                   composeBloc.postMedia.add(
-                    LMMediaModel(
-                      mediaType: LMMediaType.widget,
-                      widgetsMeta:
-                          postViewData!.attachments?.first.attachmentMeta.meta,
+                    LMAttachmentViewData.fromAttachmentMeta(
+                      attachmentType: LMMediaType.widget,
+                      attachmentMeta: (LMAttachmentMetaViewDataBuilder()
+                            ..meta(postViewData!
+                                    .attachments?.first.attachmentMeta.meta ??
+                                {}))
+                          .build(),
                     ),
                   );
                 }
@@ -935,7 +953,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               Column(
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width - 82,
+                    width: screenWidth == null ? null : screenWidth! - 82,
                     decoration: BoxDecoration(
                       color: theme.container,
                     ),
@@ -1015,7 +1033,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           return const SizedBox();
         }
         if (composeBloc.postMedia.isNotEmpty &&
-            composeBloc.postMedia.first.mediaType == LMMediaType.repost) {
+            composeBloc.postMedia.first.attachmentType == LMMediaType.repost) {
           return const SizedBox();
         }
         return Container(

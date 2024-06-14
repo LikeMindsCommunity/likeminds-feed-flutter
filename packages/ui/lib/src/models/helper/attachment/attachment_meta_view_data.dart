@@ -1,33 +1,40 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMAttachmentMetaViewData {
-  final String? url;
-  final String? format;
-  final int? size;
-  final int? duration;
-  final int? pageCount;
-  final LMOgTagsViewData? ogTags;
-  final double? height;
-  final double? width;
-  final double? aspectRatio;
-  final LMPostViewData? repost;
-  final Map<String, dynamic>? meta;
-  final String? id;
-  final String? pollQuestion;
-  final int? expiryTime;
-  final List<String>? pollOptions;
-  final PollMultiSelectState? multiSelectState;
-  final PollType? pollType;
-  final int? multiSelectNo;
-  final bool? isAnonymous;
-  final bool? allowAddOption;
-  final List<LMPollOptionViewData>? options;
+  String? url;
+  String? path;
+  Uint8List? bytes;
+  String? format;
+  int? size;
+  int? duration;
+  int? pageCount;
+  LMOgTagsViewData? ogTags;
+  double? height;
+  double? width;
+  double? aspectRatio;
+  LMPostViewData? repost;
+  Map<String, dynamic>? meta;
+  String? id;
+  String? postId;
+  LMPostViewData? post;
+  String? pollQuestion;
+  int? expiryTime;
+  List<String>? pollOptions;
+  PollMultiSelectState? multiSelectState;
+  PollType? pollType;
+  int? multiSelectNo;
+  bool? isAnonymous;
+  bool? allowAddOption;
+  List<LMPollOptionViewData>? options;
   bool? toShowResult;
-  final String? pollAnswerText;
+  String? pollAnswerText;
 
   LMAttachmentMetaViewData._({
     this.url,
+    this.path,
+    this.bytes,
     this.format,
     this.size,
     this.duration,
@@ -50,11 +57,15 @@ class LMAttachmentMetaViewData {
     this.options,
     this.toShowResult,
     this.pollAnswerText,
+    this.post,
+    this.postId,
   });
 
   /// copyWith method
   LMAttachmentMetaViewData copyWith({
     String? url,
+    String? path,
+    Uint8List? bytes,
     String? format,
     int? size,
     int? duration,
@@ -77,9 +88,13 @@ class LMAttachmentMetaViewData {
     List<LMPollOptionViewData>? options,
     bool? toShowResult,
     String? pollAnswerText,
+    LMPostViewData? post,
+    String? postId,
   }) {
     return LMAttachmentMetaViewData._(
       url: url ?? this.url,
+      bytes: bytes ?? this.bytes,
+      path: path ?? this.path,
       format: format ?? this.format,
       size: size ?? this.size,
       duration: duration ?? this.duration,
@@ -102,6 +117,180 @@ class LMAttachmentMetaViewData {
       options: options ?? this.options,
       toShowResult: toShowResult ?? this.toShowResult,
       pollAnswerText: pollAnswerText ?? this.pollAnswerText,
+      post: post ?? this.post,
+      postId: postId ?? this.postId,
+    );
+  }
+
+  factory LMAttachmentMetaViewData.fromMediaBytes({
+    Uint8List? bytes,
+    String? path,
+    String? format,
+    int? size,
+    int? duration,
+    int? pageCount,
+    LMOgTagsViewData? ogTags,
+    double? height,
+    double? width,
+    double? aspectRatio,
+    LMPostViewData? repost,
+    Map<String, dynamic>? meta,
+    String? id,
+    String? pollQuestion,
+    int? expiryTime,
+    List<String>? pollOptions,
+    PollMultiSelectState? multiSelectState,
+    PollType? pollType,
+    int? multiSelectNo,
+    bool? isAnonymous,
+    bool? allowAddOption,
+    List<LMPollOptionViewData>? options,
+    bool? toShowResult,
+    String? pollAnswerText,
+    LMPostViewData? post,
+    String? postId,
+  }) {
+    return LMAttachmentMetaViewData._(
+      bytes: bytes,
+      path: path,
+      format: format,
+      size: size,
+      duration: duration,
+      pageCount: pageCount,
+      ogTags: ogTags,
+      height: height,
+      width: width,
+      aspectRatio: aspectRatio,
+      repost: repost,
+      meta: meta,
+      id: id,
+      pollQuestion: pollQuestion,
+      expiryTime: expiryTime,
+      pollOptions: pollOptions,
+      multiSelectState: multiSelectState,
+      pollType: pollType,
+      multiSelectNo: multiSelectNo,
+      isAnonymous: isAnonymous,
+      allowAddOption: allowAddOption,
+      options: options,
+      toShowResult: toShowResult,
+      pollAnswerText: pollAnswerText,
+      post: post,
+      postId: postId,
+    );
+  }
+
+  factory LMAttachmentMetaViewData.fromMediaPath({
+    required String path,
+    Uint8List? bytes,
+    String? format,
+    int? size,
+    int? duration,
+    int? pageCount,
+    LMOgTagsViewData? ogTags,
+    double? height,
+    double? width,
+    double? aspectRatio,
+    LMPostViewData? repost,
+    Map<String, dynamic>? meta,
+    String? id,
+    String? pollQuestion,
+    int? expiryTime,
+    List<String>? pollOptions,
+    PollMultiSelectState? multiSelectState,
+    PollType? pollType,
+    int? multiSelectNo,
+    bool? isAnonymous,
+    bool? allowAddOption,
+    List<LMPollOptionViewData>? options,
+    bool? toShowResult,
+    String? pollAnswerText,
+    LMPostViewData? post,
+    String? postId,
+  }) {
+    return LMAttachmentMetaViewData._(
+      path: path,
+      bytes: bytes,
+      format: format,
+      size: size,
+      duration: duration,
+      pageCount: pageCount,
+      ogTags: ogTags,
+      height: height,
+      width: width,
+      aspectRatio: aspectRatio,
+      repost: repost,
+      meta: meta,
+      id: id,
+      pollQuestion: pollQuestion,
+      expiryTime: expiryTime,
+      pollOptions: pollOptions,
+      multiSelectState: multiSelectState,
+      pollType: pollType,
+      multiSelectNo: multiSelectNo,
+      isAnonymous: isAnonymous,
+      allowAddOption: allowAddOption,
+      options: options,
+      toShowResult: toShowResult,
+      pollAnswerText: pollAnswerText,
+      post: post,
+      postId: postId,
+    );
+  }
+
+  factory LMAttachmentMetaViewData.fromMediaUrl({
+    required String url,
+    String? format,
+    int? size,
+    int? duration,
+    int? pageCount,
+    LMOgTagsViewData? ogTags,
+    double? height,
+    double? width,
+    double? aspectRatio,
+    LMPostViewData? repost,
+    Map<String, dynamic>? meta,
+    String? id,
+    String? pollQuestion,
+    int? expiryTime,
+    List<String>? pollOptions,
+    PollMultiSelectState? multiSelectState,
+    PollType? pollType,
+    int? multiSelectNo,
+    bool? isAnonymous,
+    bool? allowAddOption,
+    List<LMPollOptionViewData>? options,
+    bool? toShowResult,
+    String? pollAnswerText,
+    LMPostViewData? post,
+    String? postId,
+  }) {
+    return LMAttachmentMetaViewData._(
+      url: url,
+      format: format,
+      size: size,
+      duration: duration,
+      pageCount: pageCount,
+      ogTags: ogTags,
+      height: height,
+      width: width,
+      aspectRatio: aspectRatio,
+      meta: meta,
+      repost: repost,
+      id: id,
+      pollQuestion: pollQuestion,
+      expiryTime: expiryTime,
+      pollOptions: pollOptions,
+      multiSelectState: multiSelectState,
+      pollType: pollType,
+      multiSelectNo: multiSelectNo,
+      isAnonymous: isAnonymous,
+      allowAddOption: allowAddOption,
+      options: options,
+      toShowResult: toShowResult,
+      pollAnswerText: pollAnswerText,
+      post: post,
+      postId: postId,
     );
   }
 
@@ -136,6 +325,8 @@ class LMAttachmentMetaViewDataBuilder {
   List<LMPollOptionViewData>? _options;
   bool? _toShowResult;
   String? _pollAnswerText;
+  String? _postId;
+  LMPostViewData? _post;
 
   void url(String url) {
     _url = url;
@@ -229,6 +420,14 @@ class LMAttachmentMetaViewDataBuilder {
     _pollAnswerText = pollAnswerText;
   }
 
+  void postId(String? postId) {
+    _postId = postId;
+  }
+
+  void post(LMPostViewData? post) {
+    _post = post;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -254,6 +453,8 @@ class LMAttachmentMetaViewDataBuilder {
       options: _options,
       toShowResult: _toShowResult,
       pollAnswerText: _pollAnswerText,
+      postId: _postId,
+      post: _post,
     );
   }
 }

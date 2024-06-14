@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
@@ -41,7 +43,8 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
       ),
       elevation: 5,
       child: Container(
-        width: screenSize.width * 0.7,
+        width: min(LMFeedCore.webConfiguration.maxWidgetForDialog,
+            screenSize.width * 0.7),
         padding: const EdgeInsets.symmetric(
           horizontal: 20.0,
           vertical: 20.0,
@@ -96,6 +99,12 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                 clipBehavior: Clip.hardEdge,
                                                 backgroundColor:
                                                     feedTheme.container,
+                                                constraints: BoxConstraints(
+                                                    maxWidth: min(
+                                                        LMFeedCore
+                                                            .webConfiguration
+                                                            .maxWidth,
+                                                        screenSize.width)),
                                                 useSafeArea: true,
                                                 shape:
                                                     const RoundedRectangleBorder(
@@ -113,7 +122,11 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                         .symmetric(
                                                         horizontal: 20.0,
                                                         vertical: 30.0),
-                                                    width: screenSize.width,
+                                                    width: min(
+                                                        LMFeedCore
+                                                            .webConfiguration
+                                                            .maxWidth,
+                                                        screenSize.width),
                                                     child: Column(
                                                       crossAxisAlignment:
                                                           CrossAxisAlignment

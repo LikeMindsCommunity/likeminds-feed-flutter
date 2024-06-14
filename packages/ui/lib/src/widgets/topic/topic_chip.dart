@@ -52,11 +52,10 @@ class LMFeedTopicChip extends StatelessWidget {
       ),
     );
 
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         onTap?.call(context, topic);
       },
-      behavior: HitTestBehavior.translucent,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -82,7 +81,7 @@ class LMFeedTopicChip extends StatelessWidget {
               children: [
                 style?.icon != null &&
                         style?.iconPlacement == LMFeedIconButtonPlacement.start
-                    ? GestureDetector(
+                    ? InkWell(
                         onTap:
                             onIconTap != null ? () => onIconTap!(topic) : null,
                         child: Container(
@@ -106,7 +105,7 @@ class LMFeedTopicChip extends StatelessWidget {
                     : const SizedBox(),
                 style?.icon != null &&
                         style?.iconPlacement == LMFeedIconButtonPlacement.end
-                    ? GestureDetector(
+                    ? InkWell(
                         onTap:
                             onIconTap != null ? () => onIconTap!(topic) : null,
                         child: Container(

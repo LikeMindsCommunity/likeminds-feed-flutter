@@ -8,7 +8,6 @@ export 'commons/popup_menu_view_data.dart';
 
 export 'feed/feedroom_view_data.dart';
 
-export 'media/media_model.dart';
 export 'helper/og_tags_view_data.dart';
 export 'helper/attachment/attachment_meta_view_data.dart';
 export 'helper/attachment/attachment_view_data.dart';

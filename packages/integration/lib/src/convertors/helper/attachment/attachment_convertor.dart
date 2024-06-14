@@ -13,7 +13,8 @@ class LMAttachmentViewDataConvertor {
     LMAttachmentViewDataBuilder attachmentViewDataBuilder =
         LMAttachmentViewDataBuilder();
 
-    attachmentViewDataBuilder.attachmentType(attachment.attachmentType);
+    attachmentViewDataBuilder
+        .attachmentType(mapIntToMediaType(attachment.attachmentType));
     attachmentViewDataBuilder
         .attachmentMeta(LMAttachmentMetaViewDataConvertor.attachmentMeta(
       attachmentMeta: attachment.attachmentMeta,
@@ -27,7 +28,7 @@ class LMAttachmentViewDataConvertor {
 
   static Attachment toAttachment(LMAttachmentViewData attachmentViewData) {
     return Attachment(
-      attachmentType: attachmentViewData.attachmentType,
+      attachmentType: attachmentViewData.mapMediaTypeToInt(),
       attachmentMeta: AttachmentMeta(
         url: attachmentViewData.attachmentMeta.url,
         format: attachmentViewData.attachmentMeta.format,
@@ -43,7 +44,7 @@ class LMAttachmentViewDataConvertor {
         height: attachmentViewData.attachmentMeta.height,
         meta: attachmentViewData.attachmentMeta.meta,
         // send the id of the reposted post in case of repost else send the id of the attachment
-        entityId: attachmentViewData.attachmentType == 8
+        entityId: attachmentViewData.attachmentType == LMMediaType.repost
             ? attachmentViewData.attachmentMeta.repost?.id
             : attachmentViewData.attachmentMeta.id,
         pollQuestion: attachmentViewData.attachmentMeta.pollQuestion,

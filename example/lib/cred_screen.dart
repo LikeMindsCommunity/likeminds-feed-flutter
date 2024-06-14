@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_sample/globals.dart';
 import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
 import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
@@ -14,64 +15,6 @@ import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
 const _isProd = !bool.fromEnvironment('DEBUG');
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return OverlaySupport.global(
-      child: MaterialApp(
-        title: 'Integration App for UI + SDK package',
-        debugShowCheckedModeBanner: _isProd,
-        navigatorKey: rootNavigatorKey,
-        scaffoldMessengerKey: rootScaffoldMessengerKey,
-        theme: ThemeData(
-          useMaterial3: false,
-          primaryColor: Colors.deepPurple,
-          inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            outlineBorder: const BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-            activeIndicatorBorder: const BorderSide(
-              color: Colors.deepPurple,
-              width: 2,
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.deepPurple,
-                width: 2,
-              ),
-            ),
-            enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.deepPurple,
-                width: 2,
-              ),
-            ),
-          ),
-        ),
-        home: LMFeedBlocListener(
-          analyticsListener:
-              (BuildContext context, LMFeedAnalyticsState state) {
-            if (state is LMFeedAnalyticsEventFired) {
-              debugPrint("Bloc Listened for event, - ${state.eventName}");
-              debugPrint("////////////////");
-              debugPrint("With properties - ${state.eventProperties}");
-            }
-          },
-          profileListener: (BuildContext context, LMFeedProfileState state) {},
-          routingListener: (BuildContext context, LMFeedRoutingState state) {},
-          child: const CredScreen(),
-        ),
-      ),
-    );
-  }
-}
 
 class CredScreen extends StatefulWidget {
   const CredScreen({super.key});
@@ -94,9 +37,11 @@ class _CredScreenState extends State<CredScreen> {
   void initState() {
     super.initState();
     fetchUserData();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      initUniLinks(context);
-    });
+    if (!kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        initUniLinks(context);
+      });
+    }
   }
 
   @override
@@ -386,7 +331,7 @@ class _CredScreenState extends State<CredScreen> {
     }
 
     // define the route
-    Widget? navigationWidget = _getNavigationWidget(selectedTheme);
+    Widget? navigationWidget = _getNavigationWidget(selectedTheme, uuid);
     if (navigationWidget == null) {
       Navigator.pop(context);
       return;
@@ -420,13 +365,13 @@ class _CredScreenState extends State<CredScreen> {
     }
   }
 
-  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme) {
+  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme, String uuid) {
     switch (selectedTheme) {
       case LMFeedFlavor.social:
         {
-          return const ExampleTabScreen(
-            uuid: "",
-            feedWidget: LMFeedScreen(),
+          return ExampleTabScreen(
+            uuid: uuid,
+            feedWidget: const LMFeedScreen(),
           );
         }
       case LMFeedFlavor.socialFeedRoom:

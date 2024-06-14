@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 export 'styles/styles.dart';
@@ -145,7 +146,8 @@ class LMFeedThemeData {
       container: container ?? LikeMindsTheme.container,
       onContainer: onContainer ?? LikeMindsTheme.onContainer,
       onPrimary: onPrimary ?? LikeMindsTheme.onPrimary,
-      postStyle: postStyle ?? LMFeedPostStyle.basic(),
+      postStyle: postStyle ??
+          LMFeedPostStyle.basic().copyWith(borderRadius: BorderRadius.zero),
       topicStyle:
           topicStyle ?? LMFeedPostTopicStyle.basic(primaryColor: primaryColor),
       contentStyle: contentStyle ??
@@ -366,6 +368,7 @@ class LMFeedDialogStyle {
   final Color? shadowColor;
   final ShapeBorder? shape;
   final Color surfaceTintColor;
+  final BoxConstraints constraints;
 
   const LMFeedDialogStyle({
     this.alignment,
@@ -380,6 +383,7 @@ class LMFeedDialogStyle {
     this.shadowColor,
     this.shape,
     this.surfaceTintColor = Colors.transparent,
+    this.constraints = const BoxConstraints(maxWidth: 400),
   });
 
   LMFeedDialogStyle copyWith({
@@ -394,6 +398,7 @@ class LMFeedDialogStyle {
     Color? shadowColor,
     ShapeBorder? shape,
     Color? surfaceTintColor,
+    BoxConstraints? constraints,
   }) {
     return LMFeedDialogStyle(
       alignment: alignment ?? this.alignment,
@@ -408,6 +413,7 @@ class LMFeedDialogStyle {
       shape: shape ?? this.shape,
       surfaceTintColor: surfaceTintColor ?? this.surfaceTintColor,
       padding: padding ?? this.padding,
+      constraints: constraints ?? this.constraints,
     );
   }
 }

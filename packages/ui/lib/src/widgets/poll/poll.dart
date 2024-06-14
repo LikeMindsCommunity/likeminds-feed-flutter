@@ -590,7 +590,6 @@ class _LMFeedPollState extends State<LMFeedPoll> {
     return LMFeedExpandableText(
       pollQuestion,
       expandText: _lmFeedPollStyle.pollQuestionExpandedText ?? "See more",
-      maxLines: 3,
       onTagTap: (value) {},
       style: _lmFeedPollStyle.pollQuestionStyle ??
           TextStyle(

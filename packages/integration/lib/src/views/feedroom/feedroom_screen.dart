@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -783,9 +786,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
     }
   }
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -795,13 +798,13 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return LMFeedTheme
                 .instance.theme.mediaStyle.documentStyle.documentIcon ??
             LMFeedIcon(
@@ -813,35 +816,45 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 boxPadding: 0,
               ),
             );
-      } else if (media.mediaType == LMMediaType.video) {
-        final thumbnailFile = VideoCompress.getFileThumbnail(
-          media.mediaFile!.path,
-          quality: 50, // default(100)
-          position: -1, // default(-1)
-        );
-        return FutureBuilder(
-          future: thumbnailFile,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Container(
-                height: 50,
-                width: 50,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                child: LMFeedImage(
-                  imageFile: snapshot.data,
-                  style: const LMFeedPostImageStyle(
-                    boxFit: BoxFit.contain,
-                  ),
-                ),
-              );
-            }
-            return LMFeedLoader();
-          },
-        );
+      } else if (media.attachmentType == LMMediaType.video) {
+        return const SizedBox();
+        // TODO: Add video thumbnail
+        // File videoThumbnail;
+
+        // if (kIsWeb) {
+        //   videoThumbnail = File(media.attachmentMeta.path!);
+        // } else {
+        //   videoThumbnail = File.fromRawPath(media.attachmentMeta.bytes!);
+        // }
+
+        // final thumbnailFile = VideoCompress.getFileThumbnail(
+        //   videoThumbnail.path,
+        //   quality: 50, // default(100)
+        //   position: -1, // default(-1)
+        // );
+        // return FutureBuilder(
+        //   future: thumbnailFile,
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasData) {
+        //       return Container(
+        //         height: 50,
+        //         width: 50,
+        //         clipBehavior: Clip.hardEdge,
+        //         decoration: BoxDecoration(
+        //           color: Colors.black,
+        //           borderRadius: BorderRadius.circular(6.0),
+        //         ),
+        //         child: LMFeedImage(
+        //           image: snapshot.data,
+        //           style: const LMFeedPostImageStyle(
+        //             boxFit: BoxFit.contain,
+        //           ),
+        //         ),
+        //       );
+        //     }
+        //     return LMFeedLoader();
+        //   },
+        // );
       } else {
         return const SizedBox.shrink();
       }
@@ -987,8 +1000,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             );
           },
           onPostReport: () => handlePostReportAction(postViewData),
-          onPostUnpin: () => handlePostPinAction(postViewData),
-          onPostPin: () => handlePostPinAction(postViewData),
+          onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
+          onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
           onPostDelete: () {
             String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
             showDialog(
@@ -1067,6 +1080,10 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                 postViewData.likeCount)),
         style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           LMFeedVideoProvider.instance.pauseCurrentVideo();
 
           Navigator.of(context, rootNavigator: true).push(
@@ -1218,7 +1235,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
                       (LMAttachmentViewDataBuilder()
-                            ..attachmentType(8)
+                            ..attachmentType(LMMediaType.repost)
                             ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                                   ..repost(postViewData))
                                 .build()))
@@ -1303,7 +1320,6 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         borderRadius: 28,
         backgroundColor: feedThemeData.primaryColor,
         height: 44,
-        width: 160,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),
@@ -1420,86 +1436,5 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         ),
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    postViewData.isPinned = !postViewData.isPinned;
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        postId: postViewData.id,
-        actionType: postViewData.isPinned
-            ? LMFeedPostActionType.pinned
-            : LMFeedPostActionType.unpinned));
-
-    if (postViewData.isPinned) {
-      int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
-      if (index != -1) {
-        postViewData.menuItems[index].title = "Unpin This Post";
-        postViewData.menuItems[index].id = postUnpinId;
-      }
-    } else {
-      int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
-      if (index != -1) {
-        postViewData.menuItems[index]
-          ..title = "Pin This Post"
-          ..id = postPinId;
-      }
-    }
-
-    rebuildPostWidget.value = !rebuildPostWidget.value;
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
-
-      if (postViewData.isPinned) {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Unpin This Post"
-            ..id = postUnpinId;
-        }
-      } else {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
-
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Pin This Post"
-            ..id = postPinId;
-        }
-      }
-
-      rebuildPostWidget.value = !rebuildPostWidget.value;
-
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-          postId: postViewData.id,
-          actionType: postViewData.isPinned
-              ? LMFeedPostActionType.pinned
-              : LMFeedPostActionType.unpinned));
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 }

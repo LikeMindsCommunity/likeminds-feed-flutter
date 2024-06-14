@@ -1,10 +1,14 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'dart:io';
+import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -24,6 +28,7 @@ class LMFeedActivityScreen extends StatefulWidget {
 }
 
 class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
+  late Size screenSize;
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
   String postTitleSmallCap =
@@ -49,11 +54,27 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
 
+  bool isAndroid = LMFeedPlatform.instance.isAndroid();
+
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
   LMFeedThemeData feedTheme = LMFeedCore.theme;
 
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.activityScreen;
+
+  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  bool isDesktopWeb = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.sizeOf(context);
+    if (screenSize.width > webConfig.maxWidth && kIsWeb) {
+      isDesktopWeb = true;
+    } else {
+      isDesktopWeb = false;
+    }
+  }
 
   @override
   void initState() {
@@ -133,7 +154,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       appBar: LMFeedAppBar(
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme.container,
-          centerTitle: Platform.isAndroid ? false : true,
+          centerTitle: !isAndroid,
           height: 50,
         ),
         title: const LMFeedText(
@@ -146,107 +167,120 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           ),
         ),
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: PagedListView<int, UserActivityItem>(
-          pagingController: _pagingController,
-          builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(
-            noItemsFoundIndicatorBuilder: (context) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LMFeedIcon(
-                      type: LMFeedIconType.svg,
-                      assetPath: kAssetNoPostsIcon,
-                      style: LMFeedIconStyle(
-                        size: 130,
-                      ),
-                    ),
-                    LMFeedText(
-                        text:
-                            'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
-                        style: LMFeedTextStyle(
-                          textStyle: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              );
-            },
-            itemBuilder: (context, item, index) {
-              final LMPostViewData postViewData =
-                  LMFeedPostUtils.postViewDataFromActivity(
-                item,
-                widgets,
-                users,
-                topics,
-              );
-              final user = users[item.activityEntityData.uuid]!;
-
-              LMFeedPostWidget postWidget =
-                  defPostWidget(feedTheme, postViewData, item);
-
-              return Column(
-                children: [
-                  widget.postBuilder?.call(context, postWidget, postViewData) ??
-                      _widgetUtility.postWidgetBuilder(
-                          context, postWidget, postViewData,
-                          source: widgetSource),
-                  if (item.action == 7)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      decoration: BoxDecoration(
-                        color: feedTheme.container,
-                        border: Border(
-                          bottom: BorderSide(
-                            width: 0.2,
-                            color: feedTheme.container.withOpacity(0.1),
-                          ),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+          height: MediaQuery.of(context).size.height,
+          padding: EdgeInsets.only(top: isDesktopWeb ? 10 : 0),
+          child: PagedListView<int, UserActivityItem>(
+            pagingController: _pagingController,
+            builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(
+              noItemsFoundIndicatorBuilder: (context) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LMFeedIcon(
+                        type: LMFeedIconType.svg,
+                        assetPath: kAssetNoPostsIcon,
+                        style: LMFeedIconStyle(
+                          size: 130,
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Divider(
-                            color: feedTheme.onContainer.withOpacity(0.05),
-                            thickness: 1,
+                      LMFeedText(
+                          text:
+                              'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )),
+                      SizedBox(height: 20),
+                    ],
+                  ),
+                );
+              },
+              itemBuilder: (context, item, index) {
+                final LMPostViewData postViewData =
+                    LMFeedPostUtils.postViewDataFromActivity(
+                  item,
+                  widgets,
+                  users,
+                  topics,
+                );
+                final user = users[item.activityEntityData.uuid]!;
+
+                LMFeedPostWidget postWidget =
+                    defPostWidget(feedTheme, postViewData, item);
+
+                return Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                      borderRadius:
+                          kIsWeb ? feedTheme.postStyle.borderRadius : null),
+                  child: Column(
+                    children: [
+                      widget.postBuilder
+                              ?.call(context, postWidget, postViewData) ??
+                          _widgetUtility.postWidgetBuilder(
+                              context, postWidget, postViewData,
+                              source: widgetSource),
+                      if (item.action == 7)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          decoration: BoxDecoration(
+                            color: feedTheme.container,
+                            border: Border(
+                              bottom: BorderSide(
+                                width: 0.5,
+                                color: feedTheme.onContainer.withOpacity(0.2),
+                              ),
+                            ),
                           ),
-                          StatefulBuilder(
-                            builder: (context, setCommentState) {
-                              final commentData = item.activityEntityData;
-                              final LMCommentViewData commentViewData =
-                                  LMFeedPostUtils.commentViewDataFromActivity(
-                                      commentData,
-                                      users.map((key, value) => MapEntry(
-                                          key,
-                                          LMUserViewDataConvertor.toUser(
-                                              value))));
+                          child: Column(
+                            children: [
+                              StatefulBuilder(
+                                builder: (context, setCommentState) {
+                                  final commentData = item.activityEntityData;
+                                  final LMCommentViewData commentViewData =
+                                      LMFeedPostUtils
+                                          .commentViewDataFromActivity(
+                                              commentData,
+                                              users.map((key, value) =>
+                                                  MapEntry(
+                                                      key,
+                                                      LMUserViewDataConvertor
+                                                          .toUser(value))));
 
-                              commentData.menuItems?.removeWhere((element) =>
-                                  element.id ==
-                                      LMFeedMenuAction.commentReportId ||
-                                  element.id == LMFeedMenuAction.commentEditId);
+                                  commentData.menuItems?.removeWhere(
+                                      (element) =>
+                                          element.id ==
+                                              LMFeedMenuAction
+                                                  .commentReportId ||
+                                          element.id ==
+                                              LMFeedMenuAction.commentEditId);
 
-                              LMFeedCommentWidget commentWidget =
-                                  defCommentTile(feedTheme, commentViewData,
-                                      postViewData, user);
+                                  LMFeedCommentWidget commentWidget =
+                                      defCommentTile(feedTheme, commentViewData,
+                                          postViewData, user);
 
-                              return widget.commentBuilder?.call(
-                                      context, commentWidget, postViewData) ??
-                                  _widgetUtility.commentBuilder(
-                                      context, commentWidget, postViewData);
-                            },
+                                  return widget.commentBuilder?.call(context,
+                                          commentWidget, postViewData) ??
+                                      _widgetUtility.commentBuilder(
+                                          context, commentWidget, postViewData);
+                                },
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                  LikeMindsTheme.kVerticalPaddingLarge,
-                ],
-              );
-            },
+                        ),
+                      LikeMindsTheme.kVerticalPaddingLarge,
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -325,6 +359,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       topicWidget: _defTopicWidget(feedTheme, post),
       style: feedTheme?.postStyle.copyWith(
         margin: EdgeInsets.zero,
+        borderRadius: BorderRadius.zero,
       ),
     );
   }
@@ -399,8 +434,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           },
           action: LMFeedMenuAction(
             onPostReport: () => handlePostReportAction(postViewData),
-            onPostPin: () => handlePostPinAction(postViewData),
-            onPostUnpin: () => handlePostPinAction(postViewData),
+            onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
+            onPostUnpin: () =>
+                LMFeedPostUtils.handlePostPinAction(postViewData),
             onPostDelete: () {
               String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
 
@@ -489,7 +525,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     }
     bool isPoll = false;
     postViewData.attachments?.forEach((element) {
-      if (mapIntToMediaType(element.attachmentType) == LMMediaType.poll) {
+      if (element.attachmentType == LMMediaType.poll) {
         isPoll = true;
       }
     });
@@ -522,7 +558,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
-        if (hasPollEnded(pollValue.expiryTime!)) {
+        if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
             "Poll ended. Vote can not be submitted now.",
@@ -533,7 +569,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         if ((isPollSubmitted(pollValue.options ?? [])) &&
             !isVoteEditing["value"]!) return;
         if (!isMultiChoicePoll(
-            pollValue.multiSelectNo!, pollValue.multiSelectState!)) {
+            pollValue.multiSelectNo, pollValue.multiSelectState)) {
           submitVote(
             context,
             pollValue,
@@ -612,8 +648,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           rebuildPollWidget,
           LMFeedWidgetSource.universalFeed,
         );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
       },
     );
   }
@@ -627,6 +661,10 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 postViewData.likeCount)),
         style: feedTheme?.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
@@ -985,46 +1023,5 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         ),
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        postId: postViewData.id,
-        actionType: postViewData.isPinned
-            ? LMFeedPostActionType.unpinned
-            : LMFeedPostActionType.pinned));
-    postViewData.isPinned = !postViewData.isPinned;
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-          postId: postViewData.id,
-          actionType: postViewData.isPinned
-              ? LMFeedPostActionType.unpinned
-              : LMFeedPostActionType.pinned));
-
-      postViewData.isPinned = !postViewData.isPinned;
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: LMFeedWidgetSource.activityScreen,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 }

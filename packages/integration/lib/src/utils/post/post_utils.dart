@@ -20,6 +20,45 @@ class LMFeedPostUtils {
     return LMFeedPluralize.instance.pluralizeOrCapitalize(commentTitle, action);
   }
 
+  static void handlePostPinAction(LMPostViewData postViewData) async {
+    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+      postId: postViewData.id,
+      actionType: postViewData.isPinned
+          ? LMFeedPostActionType.pinned
+          : LMFeedPostActionType.unpinned,
+    ));
+
+    final pinPostRequest =
+        (PinPostRequestBuilder()..postId(postViewData.id)).build();
+
+    final PinPostResponse response =
+        await LMFeedCore.client.pinPost(pinPostRequest);
+
+    if (!response.success) {
+      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
+          postId: postViewData.id,
+          actionType: postViewData.isPinned
+              ? LMFeedPostActionType.pinned
+              : LMFeedPostActionType.unpinned));
+    } else {
+      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
+
+      LMFeedAnalyticsBloc.instance.add(
+        LMFeedFireAnalyticsEvent(
+          eventName: postViewData.isPinned
+              ? LMFeedAnalyticsKeys.postPinned
+              : LMFeedAnalyticsKeys.postUnpinned,
+          widgetSource: LMFeedWidgetSource.universalFeed,
+          eventProperties: {
+            'created_by_id': postViewData.uuid,
+            'post_id': postViewData.id,
+            'post_type': postType,
+          },
+        ),
+      );
+    }
+  }
+
   static LMPostViewData updatePostData({
     required LMPostViewData postViewData,
     required LMFeedPostActionType actionType,
@@ -52,8 +91,22 @@ class LMFeedPostUtils {
           break;
         }
       case (LMFeedPostActionType.pinned || LMFeedPostActionType.unpinned):
-        postViewData.isPinned = !postViewData.isPinned;
-        break;
+        {
+          String postTitle = getPostTitle(
+              LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+          postViewData.menuItems = postViewData.menuItems.map((e) {
+            if (e.id == postPinId) {
+              e.id = postUnpinId;
+              e.title = "Unpin This $postTitle";
+            } else if (e.id == postUnpinId) {
+              e.id = postPinId;
+              e.title = "Pin This $postTitle";
+            }
+            return e;
+          }).toList();
+          postViewData.isPinned = !postViewData.isPinned;
+          break;
+        }
       case (LMFeedPostActionType.saved || LMFeedPostActionType.unsaved):
         postViewData.isSaved = !postViewData.isSaved;
         break;
@@ -98,47 +151,28 @@ class LMFeedPostUtils {
     String postTypeString;
     if (attachments == null || attachments.isEmpty) return 'text';
     switch (attachments.first.attachmentType) {
-      case 1: // Image
+      case LMMediaType.image: // Image
         postTypeString = "image";
         break;
-      case 2: // Video
+      case LMMediaType.video: // Video
         postTypeString = "video";
         break;
-      case 3: // Document
+      case LMMediaType.document: // Document
         postTypeString = "document";
         break;
-      case 4: // Link
+      case LMMediaType.link: // Link
         postTypeString = "link";
         break;
-      case 6: // Poll
+      case LMMediaType.poll: // Poll
         postTypeString = "poll";
         break;
-      case 8: // Repost
+      case LMMediaType.repost: // Repost
         postTypeString = "repost";
         break;
       default:
         postTypeString = "text";
     }
     return postTypeString;
-  }
-
-  static Future<Map<String, int>> getImageFileDimensions(File image) async {
-    Map<String, int> dimensions = {};
-    final decodedImage = await decodeImageFromList(image.readAsBytesSync());
-    dimensions.addAll({"width": decodedImage.width});
-    dimensions.addAll({"height": decodedImage.height});
-    return dimensions;
-  }
-
-  static Future<Map<String, int>> getNetworkImageDimensions(
-      String image) async {
-    Map<String, int> dimensions = {};
-    final response = await http.get(Uri.parse(image));
-    final bytes = response.bodyBytes;
-    final decodedImage = await decodeImageFromList(bytes);
-    dimensions.addAll({"width": decodedImage.width});
-    dimensions.addAll({"height": decodedImage.height});
-    return dimensions;
   }
 
   static String getLikeCountText(int likes) {

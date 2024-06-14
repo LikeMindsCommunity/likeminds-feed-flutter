@@ -616,7 +616,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               icon: topic.widgetViewData != null &&
                       topic.widgetViewData!.metadata.containsKey("icon")
                   ? LMFeedImage(
-                      imageUrl: topic.widgetViewData?.metadata['icon'],
+                      image: LMAttachmentViewData.fromMediaUrl(
+                          url: topic.widgetViewData?.metadata['icon'],
+                          attachmentType: LMMediaType.image),
                       style: const LMFeedPostImageStyle(
                           boxFit: BoxFit.contain, height: 15, width: 15),
                     )
@@ -630,7 +632,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               icon: topic.widgetViewData != null &&
                       topic.widgetViewData!.metadata.containsKey("icon")
                   ? LMFeedImage(
-                      imageUrl: topic.widgetViewData?.metadata['icon'],
+                      image: LMAttachmentViewData.fromMediaUrl(
+                          url: topic.widgetViewData?.metadata['icon'],
+                          attachmentType: LMMediaType.image),
                       style: const LMFeedPostImageStyle(
                           boxFit: BoxFit.contain, height: 15, width: 15),
                     )

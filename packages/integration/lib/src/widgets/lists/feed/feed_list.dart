@@ -45,9 +45,9 @@ class _LMFeedListState extends State<LMFeedList> {
 
   bool userPostingRights = true;
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -57,13 +57,13 @@ class _LMFeedListState extends State<LMFeedList> {
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return LMFeedTheme
                 .instance.theme.mediaStyle.documentStyle.documentIcon ??
             LMFeedIcon(
@@ -295,8 +295,8 @@ class _LMFeedListState extends State<LMFeedList> {
             );
           },
           onPostReport: () => handlePostReportAction(postViewData),
-          onPostUnpin: () => handlePostPinAction(postViewData),
-          onPostPin: () => handlePostPinAction(postViewData),
+          onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
+          onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
           onPostDelete: () {
             String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
 
@@ -374,6 +374,10 @@ class _LMFeedListState extends State<LMFeedList> {
                 postViewData.likeCount)),
         style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
@@ -528,7 +532,7 @@ class _LMFeedListState extends State<LMFeedList> {
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
                       (LMAttachmentViewDataBuilder()
-                            ..attachmentType(8)
+                            ..attachmentType(LMMediaType.repost)
                             ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                                   ..repost(postViewData))
                                 .build()))
@@ -584,88 +588,5 @@ class _LMFeedListState extends State<LMFeedList> {
         ),
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    postViewData.isPinned = !postViewData.isPinned;
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        postId: postViewData.id,
-        actionType: postViewData.isPinned
-            ? LMFeedPostActionType.pinned
-            : LMFeedPostActionType.unpinned));
-
-    if (postViewData.isPinned) {
-      int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postPinId);
-      if (index != -1) {
-        postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
-        postViewData.menuItems[index].id = postUnpinId;
-      }
-    } else {
-      int index = postViewData.menuItems
-          .indexWhere((element) => element.id == postUnpinId);
-
-      if (index != -1) {
-        postViewData.menuItems[index]
-          ..title = "Pin This $postTitleFirstCap"
-          ..id = postPinId;
-      }
-    }
-
-    rebuildPostWidget.value = !rebuildPostWidget.value;
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      postViewData.isPinned = !postViewData.isPinned;
-
-      if (postViewData.isPinned) {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Unpin This $postTitleFirstCap"
-            ..id = postUnpinId;
-        }
-      } else {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
-
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Pin This $postTitleFirstCap"
-            ..id = postPinId;
-        }
-      }
-
-      rebuildPostWidget.value = !rebuildPostWidget.value;
-
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-          postId: postViewData.id,
-          actionType: postViewData.isPinned
-              ? LMFeedPostActionType.pinned
-              : LMFeedPostActionType.unpinned));
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          widgetSource: widget.widgetSource,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
@@ -6,17 +5,21 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 // A [LMFeedTopicBar] displays a list of selected topics
 // The [LMFeedTopicBar] can be customized by
 // passing in the required parameters
-class LMFeedTopicBar extends StatelessWidget {
+class LMFeedTopicBar extends StatefulWidget {
   final List<LMTopicViewData> selectedTopics;
   final Function(BuildContext) openTopicSelector;
   final Function(LMTopicViewData)? removeTopicFromSelection;
+  final Function()? clearAllSelection;
   final LMFeedTopicBarStyle? style;
+  final bool isDesktopWeb;
 
   const LMFeedTopicBar({
     super.key,
     required this.selectedTopics,
     required this.openTopicSelector,
     this.removeTopicFromSelection,
+    this.clearAllSelection,
+    this.isDesktopWeb = false,
     this.style,
   });
 
@@ -24,7 +27,9 @@ class LMFeedTopicBar extends StatelessWidget {
     List<LMTopicViewData>? selectedTopics,
     Function(BuildContext)? openTopicSelector,
     Function(LMTopicViewData)? removeTopicFromSelection,
+    Function()? clearAllSelection,
     LMFeedTopicBarStyle? style,
+    bool? isDesktopWeb,
   }) {
     return LMFeedTopicBar(
       selectedTopics: selectedTopics ?? this.selectedTopics,
@@ -32,97 +37,153 @@ class LMFeedTopicBar extends StatelessWidget {
       removeTopicFromSelection:
           removeTopicFromSelection ?? this.removeTopicFromSelection,
       style: style ?? this.style,
+      isDesktopWeb: isDesktopWeb ?? this.isDesktopWeb,
+      clearAllSelection: clearAllSelection ?? this.clearAllSelection,
     );
   }
 
   @override
+  State<LMFeedTopicBar> createState() => _LMFeedTopicBarState();
+}
+
+class _LMFeedTopicBarState extends State<LMFeedTopicBar> {
+  late LMFeedThemeData feedThemeData;
+  late Size screenSize;
+  late bool isDesktopWeb;
+
+  @override
+  void initState() {
+    super.initState();
+    isDesktopWeb = widget.isDesktopWeb;
+  }
+
+  @override
+  void didUpdateWidget(covariant LMFeedTopicBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    isDesktopWeb = widget.isDesktopWeb;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    feedThemeData = LMFeedTheme.instance.theme;
+    screenSize = MediaQuery.sizeOf(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedTheme.instance.theme;
     return Container(
-      width: style?.width,
+      width: widget.style?.width ?? double.infinity,
+      height: widget.style?.height ?? 52,
       decoration: BoxDecoration(
-        color: style?.backgroundColor ?? feedThemeData.container,
-        border: style?.border,
-        borderRadius: style?.borderRadius,
-        boxShadow: style?.boxShadow,
+        color: isDesktopWeb
+            ? null
+            : widget.style?.backgroundColor ?? feedThemeData.container,
+        border: widget.style?.border,
+        borderRadius: widget.style?.borderRadius,
+        boxShadow: widget.style?.boxShadow,
       ),
-      margin: style?.margin,
-      padding: style?.padding ??
-          const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+      margin: widget.style?.margin,
+      padding: widget.style?.padding ??
+          const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
       child: GestureDetector(
-        onTap: () => openTopicSelector(context),
-        child: Row(
-          children: [
-            selectedTopics.isEmpty
-                ? LMFeedTopicChip(
-                    topic: (LMTopicViewDataBuilder()
-                          ..id("0")
-                          ..isEnabled(true)
-                          ..name(style?.topicChipText ?? "All Topic"))
-                        .build(),
-                    style: style?.topicChipStyle ??
-                        feedThemeData.topicStyle.inactiveChipStyle,
-                    isSelected: false,
-                    onTap: (p0, p1) => openTopicSelector(context),
-                  )
-                : selectedTopics.length == 1
-                    ? LMFeedTopicChip(
-                        topic: (LMTopicViewDataBuilder()
-                              ..id(selectedTopics.first.id)
-                              ..isEnabled(selectedTopics.first.isEnabled)
-                              ..name(selectedTopics.first.name))
-                            .build(),
-                        style: feedThemeData.topicStyle.activeChipStyle,
-                        isSelected: false,
-                        onTap: (p0, p1) => openTopicSelector(context),
-                      )
-                    : LMFeedTopicChip(
-                        topic: (LMTopicViewDataBuilder()
-                              ..id("0")
-                              ..isEnabled(true)
-                              ..name("Topics"))
-                            .build(),
-                        isSelected: false,
-                        onTap: (p0, p1) => openTopicSelector(context),
-                        style:
-                            feedThemeData.topicStyle.activeChipStyle?.copyWith(
-                          icon: Row(
-                            children: [
-                              LikeMindsTheme.kHorizontalPaddingXSmall,
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                decoration: ShapeDecoration(
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(4)),
-                                ),
-                                child: LMFeedText(
-                                  text: selectedTopics.length.toString(),
-                                  style: LMFeedTextStyle(
-                                    textStyle: TextStyle(
-                                      color: feedThemeData.primaryColor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              LikeMindsTheme.kHorizontalPaddingSmall,
-                              LMFeedIcon(
-                                type: LMFeedIconType.icon,
-                                icon: CupertinoIcons.chevron_down,
-                                style: LMFeedIconStyle(
-                                  size: 16,
-                                  color: feedThemeData.onPrimary,
-                                ),
-                              ),
-                            ],
+        onTap: () => widget.openTopicSelector(context),
+        child: widget.selectedTopics.isEmpty
+            ? _buildNoTopicSelectedView()
+            : _buildTopicSelectedView(),
+      ),
+    );
+  }
+
+  Widget _buildNoTopicSelectedView() {
+    return Row(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: widget.style?.backgroundColor ?? feedThemeData.container,
+            borderRadius:
+                isDesktopWeb ? BorderRadius.circular(4.0) : BorderRadius.zero,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LMFeedText(
+                text: "All Topics",
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: feedThemeData.textSecondary,
+                  ),
+                ),
+              ),
+              LikeMindsTheme.kHorizontalPaddingSmall,
+              LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.arrow_downward,
+                style: LMFeedIconStyle(
+                  color: feedThemeData.textSecondary,
+                  size: 16,
+                  boxSize: 20,
+                ),
+              )
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTopicSelectedView() {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          horizontal: isDesktopWeb ? 0.0 : 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: widget.selectedTopics.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return LMFeedTopicChip(
+                  isSelected: false,
+                  topic: widget.selectedTopics[index],
+                  onIconTap: widget.removeTopicFromSelection,
+                  style: widget.style?.topicChipStyle ??
+                      feedThemeData.topicStyle.inactiveChipStyle?.copyWith(
+                        icon: LMFeedIcon(
+                          type: LMFeedIconType.icon,
+                          icon: Icons.close,
+                          style: LMFeedIconStyle(
+                            color: feedThemeData.primaryColor,
+                            size: 16,
                           ),
                         ),
                       ),
-          ],
-        ),
+                  onTap: (context, topic) {
+                    widget.openTopicSelector(context);
+                  },
+                );
+              },
+            ),
+          ),
+          LMFeedButton(
+            onTap: () {
+              widget.clearAllSelection?.call();
+            },
+            text: LMFeedText(
+              text: "Clear",
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                    color: feedThemeData.primaryColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

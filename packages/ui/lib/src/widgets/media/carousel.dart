@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -82,14 +83,29 @@ class LMFeedCarousel extends StatefulWidget {
 }
 
 class _LMCarouselState extends State<LMFeedCarousel> {
+  late Size screenSize;
   final ValueNotifier<bool> rebuildCurr = ValueNotifier(false);
+  LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
+  CarouselController carouselController = CarouselController();
+
   List<Widget> mediaWidgets = [];
   int currPosition = 0;
-  LMFeedPostCarouselStyle? style;
+  late LMFeedPostCarouselStyle? style;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant LMFeedCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenSize = MediaQuery.of(context).size;
   }
 
   bool checkIfMultipleAttachments() {
@@ -99,18 +115,18 @@ class _LMCarouselState extends State<LMFeedCarousel> {
   void mapAttachmentsToWidget() {
     mediaWidgets = [];
     widget.attachments.forEachIndexed((index, e) {
-      if (e.attachmentType == 1) {
+      if (e.attachmentType == LMMediaType.image) {
         mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             borderRadius: style?.carouselBorderRadius,
             color: Colors.black,
           ),
-          width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
+          width: style?.carouselWidth ?? screenSize.width,
           child: Center(
             child: widget.imageItem ??
                 LMFeedImage(
-                  imageUrl: e.attachmentMeta.url,
+                  image: e,
                   style: widget.imageStyle,
                   onError: widget.onError,
                   onMediaTap: widget.onMediaTap,
@@ -118,25 +134,20 @@ class _LMCarouselState extends State<LMFeedCarousel> {
                 ),
           ),
         ));
-      } else if ((e.attachmentType == 2)) {
+      } else if (e.attachmentType == LMMediaType.video) {
         mediaWidgets.add(Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             borderRadius: style?.carouselBorderRadius,
             color: Colors.black,
           ),
-          width: style?.carouselWidth ?? MediaQuery.of(context).size.width,
+          width: style?.carouselWidth ?? screenSize.width,
           child: widget.videoItem ??
               LMFeedVideo(
-                videoUrl: e.attachmentMeta.url,
+                video: e,
                 style: widget.videoStyle,
                 postId: widget.postId,
                 onMediaTap: widget.onMediaTap,
-                videoController:
-                    LMFeedVideoProvider.instance.getVideoControllers(
-                  widget.postId,
-                  widget.attachments.indexOf(e),
-                ),
                 position: index,
               ),
         ));
@@ -146,13 +157,12 @@ class _LMCarouselState extends State<LMFeedCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
     style = widget.style ?? feedTheme.mediaStyle.carouselStyle;
     mapAttachmentsToWidget();
     return GestureDetector(
       onTap: () => widget.onMediaTap?.call(currPosition),
       child: Container(
-        width: style!.carouselWidth ?? MediaQuery.of(context).size.width,
+        width: style!.carouselWidth ?? screenSize.width,
         height: style!.carouselHeight,
         padding: style!.carouselPadding,
         margin: style!.carouselMargin,
@@ -170,28 +180,99 @@ class _LMCarouselState extends State<LMFeedCarousel> {
             ClipRRect(
               clipBehavior: Clip.hardEdge,
               borderRadius: style!.carouselBorderRadius ?? BorderRadius.zero,
-              child: CarouselSlider.builder(
-                itemCount: mediaWidgets.length,
-                itemBuilder: (context, index, _) {
-                  return mediaWidgets[index];
-                },
-                options: style!.carouselOptions?.copyWith(
-                      onPageChanged: (index, reason) {
-                        currPosition = index;
-                        rebuildCurr.value = !rebuildCurr.value;
-                      },
-                    ) ??
-                    CarouselOptions(
-                      animateToClosest: false,
-                      aspectRatio: 1,
-                      enableInfiniteScroll: false,
-                      enlargeFactor: 0.0,
-                      viewportFraction: 1.0,
-                      onPageChanged: (index, reason) {
-                        currPosition = index;
-                        rebuildCurr.value = !rebuildCurr.value;
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CarouselSlider.builder(
+                    carouselController: carouselController,
+                    itemCount: mediaWidgets.length,
+                    itemBuilder: (context, index, _) {
+                      return mediaWidgets[index];
+                    },
+                    options: style!.carouselOptions?.copyWith(
+                          onPageChanged: (index, reason) {
+                            currPosition = index;
+                            rebuildCurr.value = !rebuildCurr.value;
+                          },
+                        ) ??
+                        CarouselOptions(
+                          animateToClosest: false,
+                          aspectRatio: 1,
+                          enableInfiniteScroll: false,
+                          enlargeFactor: 0.0,
+                          viewportFraction: 1.0,
+                          onPageChanged: (index, reason) {
+                            currPosition = index;
+                            rebuildCurr.value = !rebuildCurr.value;
+                          },
+                        ),
+                  ),
+                  if (checkIfMultipleAttachments() && kIsWeb)
+                    ValueListenableBuilder(
+                      valueListenable: rebuildCurr,
+                      builder: (context, _, __) {
+                        return Positioned(
+                          bottom: 0,
+                          top: 0,
+                          child: SizedBox(
+                            width: style!.carouselWidth ?? screenSize.width,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                currPosition > 0
+                                    ? InkWell(
+                                        onTap: () {
+                                          if (currPosition > 0) {
+                                            currPosition--;
+                                            carouselController
+                                                .animateToPage(currPosition);
+                                          }
+                                        },
+                                        child: Container(
+                                          alignment: Alignment.centerLeft,
+                                          height: 50,
+                                          width: (style!.carouselWidth ??
+                                                  screenSize.width) *
+                                              0.25,
+                                          child: Icon(
+                                            Icons.arrow_back_ios_new_rounded,
+                                            color: feedTheme.container
+                                                .withOpacity(0.3),
+                                          ),
+                                        ),
+                                      )
+                                    : const SizedBox(),
+                                currPosition != mediaWidgets.length - 1
+                                    ? InkWell(
+                                        onTap: () {
+                                          if (currPosition <
+                                              mediaWidgets.length - 1) {
+                                            currPosition++;
+                                            carouselController
+                                                .animateToPage(currPosition);
+                                          }
+                                        },
+                                        child: Container(
+                                          alignment: Alignment.centerRight,
+                                          height: 50,
+                                          width: (style!.carouselWidth ??
+                                                  screenSize.width) *
+                                              0.25,
+                                          child: Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            color: feedTheme.container
+                                                .withOpacity(0.3),
+                                          ),
+                                        ),
+                                      )
+                                    : const SizedBox(),
+                              ],
+                            ),
+                          ),
+                        );
                       },
                     ),
+                ],
               ),
             ),
             (style!.showIndicator ?? true) && checkIfMultipleAttachments()

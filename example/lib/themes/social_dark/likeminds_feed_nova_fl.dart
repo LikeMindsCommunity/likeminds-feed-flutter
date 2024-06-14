@@ -25,7 +25,6 @@ class _LMFeedNovaState extends State<LMFeedNova> {
   @override
   void initState() {
     super.initState();
-    // var env = DotEnv(includePlatformEnvironment: true)..load();
   }
 
   @override

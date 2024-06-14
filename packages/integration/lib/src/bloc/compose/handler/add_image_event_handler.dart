@@ -22,12 +22,12 @@ addImageEventHandler(
   final LMResponse<bool> result = await LMFeedMediaHandler.handlePermissions(1);
   if (result.success) {
     try {
-      final LMResponse<List<LMMediaModel>> images =
+      final LMResponse<List<LMAttachmentViewData>> images =
           await LMFeedMediaHandler.pickImages(mediaCount);
       if (images.success) {
         if (images.data != null && images.data!.isNotEmpty) {
-          LMFeedComposeBloc.instance.postMedia
-              .removeWhere((element) => element.mediaType == LMMediaType.link);
+          LMFeedComposeBloc.instance.postMedia.removeWhere(
+              (element) => element.attachmentType == LMMediaType.link);
           int countOfPickedImages = images.data!.length;
           LMFeedComposeBloc.instance.imageCount += countOfPickedImages;
           LMFeedComposeBloc.instance.postMedia.addAll(images.data!);

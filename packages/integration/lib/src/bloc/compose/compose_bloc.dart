@@ -5,7 +5,7 @@ import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_link_pr
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/add_video_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/close_compose_event_handler.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/compose/handler/remove_attahment_event_handler.dart';
-import 'package:meta/meta.dart';
+
 import 'package:equatable/equatable.dart';
 
 import 'handler/compose_topic_event_handler.dart';
@@ -36,7 +36,7 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
   // is poll added to the post
   bool isPollAdded = false;
   // List of media attached to the post
-  List<LMMediaModel> postMedia = [];
+  List<LMAttachmentViewData> postMedia = [];
   // List of user tags added to the post
   List<LMUserTagViewData> userTags = [];
   // List of topics added to the post

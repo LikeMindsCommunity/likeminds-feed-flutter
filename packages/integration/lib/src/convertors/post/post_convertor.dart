@@ -34,16 +34,17 @@ class LMPostViewDataConvertor {
       postViewDataBuilder.attachments(post.attachments!.map((e) {
         LMPostViewData? repost;
 
-        if (e.attachmentType == 5 && widgets != null) {
+        if (e.attachmentType == LMAttachmentViewData.widgetMediaType &&
+            widgets != null) {
           String? key = e.attachmentMeta.meta?['entity_id'];
           if (key != null && widgets[key] != null) {
             postWidget[key] = widgets[key]!;
           }
-        } else if (e.attachmentType == 8 &&
+        } else if (e.attachmentType == LMAttachmentViewData.repostMediaType &&
             repostedPosts != null &&
             repostedPosts[e.attachmentMeta.entityId] != null) {
           repost = repostedPosts[e.attachmentMeta.entityId]!;
-        } else if (e.attachmentType == 6) {
+        } else if (e.attachmentType == LMAttachmentViewData.pollMediaType) {
           String? key = e.attachmentMeta.entityId;
           if (key != null && widgets?[key] != null) {
             postWidget[key] = widgets![key]!;

@@ -62,8 +62,7 @@ class LMFeedPostHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            color: Colors.transparent,
+          Expanded(
             child: Row(
               children: [
                 profilePicture ??
@@ -77,11 +76,10 @@ class LMFeedPostHeader extends StatelessWidget {
                       onTap: onProfilePictureTap,
                     ),
                 LikeMindsTheme.kHorizontalPaddingMedium,
-                Container(
-                  constraints: BoxConstraints(
-                    maxWidth: screenSize.width * 0.66,
-                  ),
-                  child: IntrinsicWidth(
+                IntrinsicWidth(
+                  child: Container(
+                    constraints:
+                        BoxConstraints(maxWidth: screenSize.width * 0.6),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -90,84 +88,25 @@ class LMFeedPostHeader extends StatelessWidget {
                           onTap: onProfileNameTap,
                           behavior: HitTestBehavior.translucent,
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Flexible(
-                                child: titleText ??
-                                    LMFeedText(
-                                      text: user.name,
-                                      style: postHeaderStyle?.titleTextStyle ??
-                                          LMFeedTextStyle(
-                                            textStyle: TextStyle(
-                                              fontSize:
-                                                  LikeMindsTheme.kFontMedium,
-                                              color: feedTheme.onContainer,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                    ),
-                              ),
-                              LikeMindsTheme.kHorizontalPaddingMedium,
-                              !headerStyle.showCustomTitle
-                                  ? const SizedBox()
-                                  : ((user.customTitle == null ||
-                                              user.customTitle!.isEmpty &&
-                                                  customTitle == null) ||
-                                          (user.isDeleted != null &&
-                                              user.isDeleted!))
-                                      ? const SizedBox()
-                                      : IntrinsicWidth(
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              customTitle ??
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              3.0),
-                                                      color: feedTheme
-                                                          .primaryColor,
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              4.0),
-                                                      child: LMFeedText(
-                                                        text: user.customTitle!
-                                                                .isNotEmpty
-                                                            ? user.customTitle!
-                                                            : "",
-                                                        // maxLines: 1,
-                                                        style: postHeaderStyle
-                                                                ?.customTitleTextStyle ??
-                                                            LMFeedTextStyle(
-                                                              textStyle:
-                                                                  TextStyle(
-                                                                fontSize:
-                                                                    LikeMindsTheme
-                                                                        .kFontSmall,
-                                                                color: Colors
-                                                                    .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                fontStyle: user
-                                                                        .name
-                                                                        .isNotEmpty
-                                                                    ? FontStyle
-                                                                        .normal
-                                                                    : FontStyle
-                                                                        .italic,
-                                                              ),
-                                                            ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                            ],
+                              titleText ??
+                                  LMFeedText(
+                                    text: user.name,
+                                    style: postHeaderStyle?.titleTextStyle ??
+                                        LMFeedTextStyle(
+                                          textStyle: TextStyle(
+                                            fontSize:
+                                                LikeMindsTheme.kFontMedium,
+                                            color: feedTheme.onContainer,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
+                                  ),
+                              LikeMindsTheme.kHorizontalPaddingMedium,
+                              Expanded(
+                                  child:
+                                      getCustomTitle(headerStyle, feedTheme)),
                             ],
                           ),
                         ),
@@ -244,7 +183,6 @@ class LMFeedPostHeader extends StatelessWidget {
               ],
             ),
           ),
-          const Spacer(),
           if ((postHeaderStyle?.showPinnedIcon ?? true) &&
               postViewData.isPinned)
             Padding(
@@ -262,6 +200,39 @@ class LMFeedPostHeader extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget getCustomTitle(
+      LMFeedPostHeaderStyle headerStyle, LMFeedThemeData feedTheme) {
+    return !headerStyle.showCustomTitle
+        ? const SizedBox()
+        : ((user.customTitle == null ||
+                    user.customTitle!.isEmpty && customTitle == null) ||
+                (user.isDeleted != null && user.isDeleted!))
+            ? const SizedBox()
+            : customTitle ??
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3.0),
+                    color: feedTheme.primaryColor,
+                  ),
+                  padding: const EdgeInsets.all(4.0),
+                  child: LMFeedText(
+                    text: user.customTitle!.isNotEmpty ? user.customTitle! : "",
+                    style: postHeaderStyle?.customTitleTextStyle ??
+                        LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontSize: LikeMindsTheme.kFontSmall,
+                            color: Colors.white,
+                            overflow: TextOverflow.ellipsis,
+                            fontWeight: FontWeight.w600,
+                            fontStyle: user.name.isNotEmpty
+                                ? FontStyle.normal
+                                : FontStyle.italic,
+                          ),
+                        ),
+                  ),
+                );
   }
 
   LMFeedPostHeader copyWith({

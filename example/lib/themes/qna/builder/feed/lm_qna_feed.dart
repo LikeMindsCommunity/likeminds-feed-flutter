@@ -628,9 +628,9 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
         ]);
   }
 
-  Widget getLoaderThumbnail(LMMediaModel? media) {
+  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
-      if (media.mediaType == LMMediaType.image) {
+      if (media.attachmentType == LMMediaType.image) {
         return Container(
           height: 50,
           width: 50,
@@ -640,13 +640,13 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
             borderRadius: BorderRadius.circular(6.0),
           ),
           child: LMFeedImage(
-            imageFile: media.mediaFile!,
+            image: media,
             style: const LMFeedPostImageStyle(
               boxFit: BoxFit.contain,
             ),
           ),
         );
-      } else if (media.mediaType == LMMediaType.document) {
+      } else if (media.attachmentType == LMMediaType.document) {
         return LMFeedTheme
                 .instance.theme.mediaStyle.documentStyle.documentIcon ??
             const LMFeedIcon(
@@ -787,8 +787,8 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
             );
           },
           onPostReport: () => handlePostReportAction(postViewData),
-          onPostUnpin: () => handlePostPinAction(postViewData),
-          onPostPin: () => handlePostPinAction(postViewData),
+          onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
+          onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
           onPostDelete: () {
             String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
 
@@ -847,6 +847,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
+      pollBuilder: LMFeedCore.widgetUtility.pollWidgetBuilder,
       onMediaTap: (position) {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
@@ -875,6 +876,10 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                 postViewData.likeCount)),
         style: feedThemeData.footerStyle.likeButtonStyle,
         onTextTap: () {
+          if (postViewData.likeCount == 0) {
+            return;
+          }
+
           LMFeedVideoProvider.instance.pauseCurrentVideo();
 
           Navigator.of(context, rootNavigator: true).push(
@@ -1025,7 +1030,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
                       (LMAttachmentViewDataBuilder()
-                            ..attachmentType(8)
+                            ..attachmentType(LMMediaType.repost)
                             ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
                                   ..repost(postViewData))
                                 .build()))
@@ -1106,7 +1111,6 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
         borderRadius: 28,
         backgroundColor: feedThemeData.primaryColor,
         height: 44,
-        width: 160,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         placement: LMFeedIconButtonPlacement.end,
       ),
@@ -1237,84 +1241,6 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
         entityCreatorId: postViewData.uuid,
       ),
     );
-  }
-
-  void handlePostPinAction(LMPostViewData postViewData) async {
-    if (postViewData.isPinned) {
-      int index = postViewData.menuItems.indexWhere(
-          (element) => element.id == postPinId || element.id == postUnpinId);
-      if (index != -1) {
-        postViewData.menuItems[index].title = "Unpin This $postTitleFirstCap";
-        postViewData.menuItems[index].id = postUnpinId;
-      }
-    } else {
-      int index = postViewData.menuItems.indexWhere(
-          (element) => element.id == postUnpinId || element.id == postPinId);
-
-      if (index != -1) {
-        postViewData.menuItems[index]
-          ..title = "Pin This $postTitleFirstCap"
-          ..id = postPinId;
-      }
-    }
-
-    LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-        postId: postViewData.id,
-        actionType: postViewData.isPinned
-            ? LMFeedPostActionType.pinned
-            : LMFeedPostActionType.unpinned));
-
-    rebuildPostWidget.value = !rebuildPostWidget.value;
-
-    final pinPostRequest =
-        (PinPostRequestBuilder()..postId(postViewData.id)).build();
-
-    final PinPostResponse response =
-        await LMFeedCore.client.pinPost(pinPostRequest);
-
-    if (!response.success) {
-      if (postViewData.isPinned) {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postPinId);
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Unpin This $postTitleFirstCap"
-            ..id = postUnpinId;
-        }
-      } else {
-        int index = postViewData.menuItems
-            .indexWhere((element) => element.id == postUnpinId);
-
-        if (index != -1) {
-          postViewData.menuItems[index]
-            ..title = "Pin This $postTitleFirstCap"
-            ..id = postPinId;
-        }
-      }
-
-      rebuildPostWidget.value = !rebuildPostWidget.value;
-
-      LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-          postId: postViewData.id,
-          actionType: postViewData.isPinned
-              ? LMFeedPostActionType.pinned
-              : LMFeedPostActionType.unpinned));
-    } else {
-      String postType = LMFeedPostUtils.getPostType(postViewData.attachments);
-
-      LMFeedAnalyticsBloc.instance.add(
-        LMFeedFireAnalyticsEvent(
-          eventName: postViewData.isPinned
-              ? LMFeedAnalyticsKeys.postPinned
-              : LMFeedAnalyticsKeys.postUnpinned,
-          eventProperties: {
-            'created_by_id': postViewData.uuid,
-            'post_id': postViewData.id,
-            'post_type': postType,
-          },
-        ),
-      );
-    }
   }
 
   Future<void> onBoardFeedForUser() async {

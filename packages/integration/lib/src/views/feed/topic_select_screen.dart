@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class LMFeedTopicSelectScreen extends StatefulWidget {
 }
 
 class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
+  late Size screenSize;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
   List<LMTopicViewData> selectedTopics = [];
@@ -136,6 +138,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    screenSize = MediaQuery.sizeOf(context);
     return widgetUtility.scaffold(
       source: LMFeedWidgetSource.topicSelectScreen,
       backgroundColor: feedThemeData.backgroundColor,
@@ -257,118 +260,120 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
           ),
         ),
       ),
-      body: BlocListener<LMFeedTopicBloc, LMFeedTopicState>(
-        bloc: topicBloc,
-        // buildWhen: (previous, current) {
-        //   if (current is LMFeedTopicLoadingState && _page != 1) {
-        //     return false;
-        //   }
-        //   return true;
-        // },
-        listener: (context, state) {
-          if (state is LMFeedTopicLoadedState) {
-            _page++;
-            if (state.getTopicFeedResponse.topics!.isEmpty) {
-              topicsPagingController.appendLastPage([]);
-            } else {
-              state.getTopicFeedResponse.topics?.removeWhere(
-                  (element) => selectedTopicId.contains(element.id));
-              topicsPagingController.appendPage(
-                state.getTopicFeedResponse.topics!
-                    .map((e) => LMTopicViewDataConvertor.fromTopic(e))
-                    .toList(),
-                _page,
-              );
-            }
-          } else if (state is LMFeedTopicErrorState) {
-            topicsPagingController.error = state.errorMessage;
-          }
-        },
-        child: ValueListenableBuilder(
-            valueListenable: rebuildTopicsScreen,
-            builder: (context, _, __) {
-              return Column(
-                children: [
-                  isSearching
-                      ? const SizedBox()
-                      : LMFeedTopicTile(
-                          isSelected: selectedTopics.isEmpty,
-                          height: 50,
-                          topic: allTopics,
-                          text: LMFeedText(
-                            text: allTopics.name,
-                            style: LMFeedTextStyle(
-                              textStyle: TextStyle(
-                                color: feedThemeData.onContainer,
-                                fontWeight: FontWeight.w600,
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+          child: BlocListener<LMFeedTopicBloc, LMFeedTopicState>(
+            bloc: topicBloc,
+            listener: (context, state) {
+              if (state is LMFeedTopicLoadedState) {
+                _page++;
+                if (state.getTopicFeedResponse.topics!.isEmpty) {
+                  topicsPagingController.appendLastPage([]);
+                } else {
+                  state.getTopicFeedResponse.topics?.removeWhere(
+                      (element) => selectedTopicId.contains(element.id));
+                  topicsPagingController.appendPage(
+                    state.getTopicFeedResponse.topics!
+                        .map((e) => LMTopicViewDataConvertor.fromTopic(e))
+                        .toList(),
+                    _page,
+                  );
+                }
+              } else if (state is LMFeedTopicErrorState) {
+                topicsPagingController.error = state.errorMessage;
+              }
+            },
+            child: ValueListenableBuilder(
+                valueListenable: rebuildTopicsScreen,
+                builder: (context, _, __) {
+                  return Column(
+                    children: [
+                      isSearching
+                          ? const SizedBox()
+                          : LMFeedTopicTile(
+                              isSelected: selectedTopics.isEmpty,
+                              height: 50,
+                              topic: allTopics,
+                              text: LMFeedText(
+                                text: allTopics.name,
+                                style: LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    color: feedThemeData.onContainer,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
+                              backgroundColor: feedThemeData.container,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 16.0),
+                              icon: Icon(
+                                Icons.check_circle,
+                                color: feedThemeData.primaryColor,
+                              ),
+                              onTap: (LMTopicViewData tappedTopic) {
+                                selectedTopics.clear();
+                                selectedTopicId.clear();
+                                rebuildTopicsScreen.value =
+                                    !rebuildTopicsScreen.value;
+                              },
+                            ),
+                      Expanded(
+                        child: PagedListView(
+                          pagingController: topicsPagingController,
+                          padding: EdgeInsets.zero,
+                          physics: const ClampingScrollPhysics(),
+                          builderDelegate:
+                              PagedChildBuilderDelegate<LMTopicViewData>(
+                            noItemsFoundIndicatorBuilder: (context) =>
+                                const Center(
+                                    child: Text(
+                              "Opps, no topics found!",
+                            )),
+                            itemBuilder: (context, item, index) =>
+                                LMFeedTopicTile(
+                              isSelected: checkSelectedTopicExistsInList(item),
+                              topic: item,
+                              height: 50,
+                              text: LMFeedText(
+                                text: item.name,
+                                style: LMFeedTextStyle(
+                                  textStyle: TextStyle(
+                                    color: feedThemeData.onContainer,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              backgroundColor: feedThemeData.container,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 16.0),
+                              icon: Icon(
+                                Icons.check_circle,
+                                color: feedThemeData.primaryColor,
+                              ),
+                              onTap: (LMTopicViewData tappedTopic) {
+                                int index = selectedTopics.indexWhere(
+                                    (element) => element.id == tappedTopic.id);
+                                if (index != -1) {
+                                  selectedTopics.removeAt(index);
+                                  selectedTopicId.remove(tappedTopic.id);
+                                } else {
+                                  selectedTopics.add(tappedTopic);
+                                  selectedTopicId.add(tappedTopic.id);
+                                }
+                                rebuildTopicsScreen.value =
+                                    !rebuildTopicsScreen.value;
+                              },
                             ),
                           ),
-                          backgroundColor: feedThemeData.container,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 16.0),
-                          icon: Icon(
-                            Icons.check_circle,
-                            color: feedThemeData.primaryColor,
-                          ),
-                          onTap: (LMTopicViewData tappedTopic) {
-                            selectedTopics.clear();
-                            selectedTopicId.clear();
-                            rebuildTopicsScreen.value =
-                                !rebuildTopicsScreen.value;
-                          },
-                        ),
-                  Expanded(
-                    child: PagedListView(
-                      pagingController: topicsPagingController,
-                      padding: EdgeInsets.zero,
-                      physics: const ClampingScrollPhysics(),
-                      builderDelegate:
-                          PagedChildBuilderDelegate<LMTopicViewData>(
-                        noItemsFoundIndicatorBuilder: (context) => const Center(
-                            child: Text(
-                          "Opps, no topics found!",
-                        )),
-                        itemBuilder: (context, item, index) => LMFeedTopicTile(
-                          isSelected: checkSelectedTopicExistsInList(item),
-                          topic: item,
-                          height: 50,
-                          text: LMFeedText(
-                            text: item.name,
-                            style: LMFeedTextStyle(
-                              textStyle: TextStyle(
-                                color: feedThemeData.onContainer,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          backgroundColor: feedThemeData.container,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 16.0),
-                          icon: Icon(
-                            Icons.check_circle,
-                            color: feedThemeData.primaryColor,
-                          ),
-                          onTap: (LMTopicViewData tappedTopic) {
-                            int index = selectedTopics.indexWhere(
-                                (element) => element.id == tappedTopic.id);
-                            if (index != -1) {
-                              selectedTopics.removeAt(index);
-                              selectedTopicId.remove(tappedTopic.id);
-                            } else {
-                              selectedTopics.add(tappedTopic);
-                              selectedTopicId.add(tappedTopic.id);
-                            }
-                            rebuildTopicsScreen.value =
-                                !rebuildTopicsScreen.value;
-                          },
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              );
-            }),
+                    ],
+                  );
+                }),
+          ),
+        ),
       ),
     );
   }

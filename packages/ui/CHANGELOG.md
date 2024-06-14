@@ -72,3 +72,7 @@ Added customisibility to poll
 Added support for pending post
 Fixed issue with media position in Media Preview Screen
 Fixed Minor UI Issues
+
+# 1.6.0
+
+Added support for web platform

@@ -178,7 +178,7 @@ LMFeedThemeData darkTheme = LMFeedThemeData.light(
   ),
   footerStyle: LMFeedPostFooterStyle.basic().copyWith(
     showSaveButton: false,
-    likeButtonStyle: LMFeedButtonStyle.basic().copyWith(
+    likeButtonStyle: const LMFeedButtonStyle.basic().copyWith(
       activeIcon: LMFeedIcon(
         type: LMFeedIconType.svg,
         assetPath: kAssetLikeFilledIcon,
@@ -194,7 +194,7 @@ LMFeedThemeData darkTheme = LMFeedThemeData.light(
             size: 16, color: ColorTheme.novaTheme.colorScheme.onPrimary),
       ),
     ),
-    commentButtonStyle: LMFeedButtonStyle.basic().copyWith(
+    commentButtonStyle: const LMFeedButtonStyle.basic().copyWith(
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
         assetPath: kAssetCommentIcon,
@@ -202,7 +202,7 @@ LMFeedThemeData darkTheme = LMFeedThemeData.light(
             size: 20, color: ColorTheme.novaTheme.colorScheme.onPrimary),
       ),
     ),
-    shareButtonStyle: LMFeedButtonStyle.basic().copyWith(
+    shareButtonStyle: const LMFeedButtonStyle.basic().copyWith(
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
         assetPath: kAssetShareIcon,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
 
 class LMFeedCommentReplyWidget extends StatefulWidget {
   final String postId;
@@ -447,6 +446,43 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         commentViewData,
         setReplyState,
       ),
+      replyButton: defCommentReplyButton(commentViewData),
+    );
+  }
+
+  LMFeedButton defCommentReplyButton(LMCommentViewData commentViewData) {
+    return LMFeedButton(
+      style: feedTheme!.commentStyle.replyButtonStyle ??
+          const LMFeedButtonStyle(
+            margin: 10,
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.comment_outlined,
+              style: LMFeedIconStyle(
+                size: 20,
+              ),
+            ),
+          ),
+      text: LMFeedText(
+        text: "Reply",
+        style: LMFeedTextStyle(
+            textStyle:
+                TextStyle(fontSize: 12, color: feedTheme!.inActiveColor)),
+      ),
+      onTap: () {
+        LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
+              ..commentActionEntity(LMFeedCommentType.parent)
+              ..postId(widget.postId)
+              ..commentActionType(LMFeedCommentActionType.replying)
+              ..level(0)
+              ..user(widget.reply.user)
+              ..commentId(widget.reply.id))
+            .build();
+
+        _commentHandlerBloc!.add(LMFeedCommentOngoingEvent(
+          commentMetaData: commentMetaData,
+        ));
+      },
     );
   }
 
@@ -546,23 +582,17 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                   ? "1 Like"
                   : "${commentViewData.likesCount} Likes",
           style: const LMFeedTextStyle(
-            textStyle: TextStyle(fontSize: 12),
-          ),
-        ),
-        activeText: LMFeedText(
-          text: commentViewData.likesCount == 0
-              ? "Like"
-              : commentViewData.likesCount == 1
-                  ? "1 Like"
-                  : "${commentViewData.likesCount} Likes",
-          style: LMFeedTextStyle(
             textStyle: TextStyle(
-              color: feedTheme?.primaryColor,
               fontSize: 12,
+              color: LikeMindsTheme.greyColor,
             ),
           ),
         ),
         onTextTap: () {
+          if (commentViewData.likesCount == 0) {
+            return;
+          }
+
           Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
