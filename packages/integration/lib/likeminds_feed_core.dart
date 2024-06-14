@@ -23,6 +23,8 @@ import 'package:media_kit/media_kit.dart';
 import 'dart:async';
 
 export 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
+export 'package:likeminds_feed_flutter_core/src/utils/web/web_scroll_behavior.dart';
 export 'package:likeminds_feed_flutter_core/src/views/views.dart';
 export 'package:likeminds_feed_flutter_core/src/bloc/bloc.dart';
 export 'package:likeminds_feed_flutter_core/src/convertors/model_convertor.dart';
