@@ -41,3 +41,5 @@ build/
 
 # FVM Version Cache
 .fvm/
+example/ios/Runner/GoogleService-Info.plist
+GoogleService-Info.plist
