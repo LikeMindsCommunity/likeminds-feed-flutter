@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_feed_sample/app.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_sample/credentials/credentials.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:likeminds_feed_sample/globals.dart';
@@ -36,7 +37,7 @@ void main() async {
     DeviceOrientation.landscapeRight,
   ]);
   if (!kIsWeb) {
-    setupNotifications();
+    await setupNotifications();
   }
   runApp(const LMSampleApp());
 }
@@ -48,8 +49,9 @@ void main() async {
 /// 4. Register device with LM - [LMNotificationHandler]
 /// 5. Listen for FG and BG notifications
 /// 6. Handle notifications - [_handleNotification]
-void setupNotifications() async {
+Future<void> setupNotifications() async {
   await Firebase.initializeApp(
+    name: FirebaseCreds.projectId,
     options: DefaultFirebaseOptions.currentPlatform,
   );
   final devId = await deviceId();
@@ -60,6 +62,12 @@ void setupNotifications() async {
   }
   // Register device with LM, and listen for notifications
   LMNotificationHandler.instance.init(deviceId: devId, fcmToken: fcmToken);
+
+  FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
   FirebaseMessaging.onBackgroundMessage(_handleNotification);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     await LMNotificationHandler.instance
