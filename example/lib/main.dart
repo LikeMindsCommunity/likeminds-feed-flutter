@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -64,6 +66,7 @@ void setupNotifications() async {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     await LMNotificationHandler.instance
         .handleNotification(message, true, rootNavigatorKey);
+  log(message.data.toString());
   });
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
     debugPrint("---The app is opened from a notification---");

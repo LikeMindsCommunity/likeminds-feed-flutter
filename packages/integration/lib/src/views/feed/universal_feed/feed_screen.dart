@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -219,6 +220,41 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
 
   int pendingPostCount = 0;
   bool isDesktopWeb = false;
+  // create a timer to call seen api after 10 seconds
+  late Timer timer;
+  
+  int sentIndex = -1;
+  // map to store post id and index
+  Map<String, int> postIndex = {};
+
+  // clear post index map
+  void clearPostIndex() {
+    postIndex.clear();
+  }
+
+  // set post index map with post id and index and increment sent index
+  void setPostIndex(String postId, int index) {
+    if (index > sentIndex) {
+      sentIndex = index;
+      postIndex[postId] = index;
+    }
+  }
+
+  // call seenApi for post
+  void callSeenApi() {
+    debugPrint("------ calling seen api ------");
+    if(postIndex.isEmpty) {
+      return;
+    }
+    List<String> postIds = [];
+    postIndex.forEach((key, value) {
+      postIds.add(key);
+    });
+    clearPostIndex();
+    LMFeedCore.client.seenApi(
+      postIds,
+    );
+  }
 
   @override
   void initState() {
@@ -275,6 +311,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         },
       ),
     );
+    timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      callSeenApi();
+    });
   }
 
   // This function updates the selected topics and fetches the universal
@@ -295,6 +334,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   void dispose() {
     _pagingController.dispose();
     _rebuildAppBar.dispose();
+    timer.cancel();
     super.dispose();
   }
 
@@ -315,6 +355,10 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
             topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
           ),
         );
+        // // call seen api if post index map is not empty
+        // if (postIndex.isNotEmpty) {
+        //   callSeenApi();
+        // }
       },
     );
   }
@@ -779,6 +823,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                         builderDelegate:
                             PagedChildBuilderDelegate<LMPostViewData>(
                           itemBuilder: (context, item, index) {
+                            setPostIndex(item.id, index);
                             if (_feedBloc.users[item.uuid] == null) {
                               return const SizedBox();
                             }
