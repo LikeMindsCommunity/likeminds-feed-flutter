@@ -77,3 +77,7 @@ Fixed Minor UI Issues
 # 1.6.0
 
 Added support for web platform
+
+# 1.6.1
+
+Fixed a bug in method responsible for extracting initials for LMFeedProfilePicture
