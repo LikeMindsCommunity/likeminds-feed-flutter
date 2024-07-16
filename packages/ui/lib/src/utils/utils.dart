@@ -14,5 +14,11 @@ extension StringColor on String {
 }
 
 String getInitials(String name) => name.isNotEmpty
-    ? name.trim().split(' ').map((l) => l[0]).take(2).join()
+    ? name
+        .trim()
+        .split(' ')
+        .where((element) => element.isNotEmpty)
+        .map((l) => l[0])
+        .take(2)
+        .join()
     : '';
