@@ -94,7 +94,6 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
               style: LMFeedIconStyle(
                 color: feedTheme.container,
                 size: 24,
-                boxSize: 64,
                 boxPadding: 12,
               ),
             ),
