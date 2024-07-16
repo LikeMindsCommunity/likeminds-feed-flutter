@@ -80,4 +80,4 @@ Added support for web platform
 
 # 1.6.1
 
-Fixed getInitials method
+Fixed a bug in method responsible for extracting initials for LMFeedProfilePicture
