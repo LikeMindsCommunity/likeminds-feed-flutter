@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,8 +40,9 @@ class LMFeedRoomScreen extends StatefulWidget {
   // Builder for appbar
   final LMFeedPostAppBarBuilder? appBarBuilder;
 
-  // Builder for custom widget on top
-  final LMFeedContextWidgetBuilder? customWidgetBuilder;
+  final Widget Function(
+          BuildContext context, LMFeedPostSomething postSomethingWidget)?
+      customWidgetBuilder;
   // Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
@@ -83,7 +83,9 @@ class LMFeedRoomScreen extends StatefulWidget {
   LMFeedRoomScreen copyWith({
     int? feedroomId,
     LMFeedPostAppBarBuilder? appBarBuilder,
-    LMFeedContextWidgetBuilder? customWidgetBuilder,
+    final Widget Function(
+            BuildContext context, LMFeedPostSomething postSomethingWidget)?
+        customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
         topicChipBuilder,
     LMFeedPostWidgetBuilder? postBuilder,
@@ -382,31 +384,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           slivers: [
             SliverToBoxAdapter(
               child: config!.showCustomWidget
-                  ? widget.customWidgetBuilder == null
-                      ? LMFeedPostSomething(
-                          onTap: userPostingRights
-                              ? () async {
-                                  LMFeedVideoProvider.instance
-                                      .forcePauseAllControllers();
-                                  // ignore: use_build_context_synchronously
-                                  await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            LMFeedComposeScreen(
-                                              feedroomId: widget.feedroomId,
-                                              widgetSource: LMFeedWidgetSource
-                                                  .universalFeed,
-                                            )),
-                                  );
-                                }
-                              : () {
-                                  LMFeedCore.showSnackBar(
-                                    context,
-                                    "You do not have permission to create a post",
-                                    _widgetSource,
-                                  );
-                                })
-                      : widget.customWidgetBuilder!(context)
+                  ? widget.customWidgetBuilder
+                          ?.call(context, _defPostSomethingWidget(context)) ??
+                      _defPostSomethingWidget(context)
                   : const SizedBox(),
             ),
             SliverToBoxAdapter(
@@ -708,6 +688,33 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  LMFeedPostSomething _defPostSomethingWidget(BuildContext context) {
+    return LMFeedPostSomething(
+      onTap: userPostingRights
+          ? () async {
+              LMFeedVideoProvider.instance.forcePauseAllControllers();
+              // ignore: use_build_context_synchronously
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) => LMFeedComposeScreen(
+                          feedroomId: widget.feedroomId,
+                          widgetSource: LMFeedWidgetSource.universalFeed,
+                        )),
+              );
+            }
+          : () {
+              LMFeedCore.showSnackBar(
+                context,
+                "You do not have permission to create a post",
+                _widgetSource,
+              );
+            },
+      style: LMFeedPostSomethingStyle.basic(
+        theme: feedThemeData,
       ),
     );
   }
