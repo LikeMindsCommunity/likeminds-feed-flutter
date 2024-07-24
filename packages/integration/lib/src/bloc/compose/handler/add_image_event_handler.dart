@@ -19,46 +19,41 @@ addImageEventHandler(
     widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'image'},
   ));
-  final LMResponse<bool> result = await LMFeedMediaHandler.handlePermissions(1);
-  if (result.success) {
-    try {
-      final LMResponse<List<LMAttachmentViewData>> images =
-          await LMFeedMediaHandler.pickImages(mediaCount);
-      if (images.success) {
-        if (images.data != null && images.data!.isNotEmpty) {
-          LMFeedComposeBloc.instance.postMedia.removeWhere(
-              (element) => element.attachmentType == LMMediaType.link);
-          int countOfPickedImages = images.data!.length;
-          LMFeedComposeBloc.instance.imageCount += countOfPickedImages;
-          LMFeedComposeBloc.instance.postMedia.addAll(images.data!);
+  try {
+    final LMResponse<List<LMAttachmentViewData>> images =
+        await LMFeedMediaHandler.pickImages(mediaCount);
+    if (images.success) {
+      if (images.data != null && images.data!.isNotEmpty) {
+        LMFeedComposeBloc.instance.postMedia.removeWhere(
+            (element) => element.attachmentType == LMMediaType.link);
+        int countOfPickedImages = images.data!.length;
+        LMFeedComposeBloc.instance.imageCount += countOfPickedImages;
+        LMFeedComposeBloc.instance.postMedia.addAll(images.data!);
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.imageAttachedToPost,
-              widgetSource: LMFeedWidgetSource.createPostScreen,
-              eventProperties: {
-                'imageCount': countOfPickedImages,
-              },
-            ),
-          );
+        LMFeedAnalyticsBloc.instance.add(
+          LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.imageAttachedToPost,
+            widgetSource: LMFeedWidgetSource.createPostScreen,
+            eventProperties: {
+              'imageCount': countOfPickedImages,
+            },
+          ),
+        );
 
-          emitter(LMFeedComposeAddedImageState());
-        } else {
-          if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
-            emitter(LMFeedComposeInitialState());
-          } else {
-            emitter(LMFeedComposeAddedImageState());
-          }
-        }
+        emitter(LMFeedComposeAddedImageState());
       } else {
-        emitter(LMFeedComposeMediaErrorState(error: images.errorMessage));
+        if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
+          emitter(LMFeedComposeInitialState());
+        } else {
+          emitter(LMFeedComposeAddedImageState());
+        }
       }
-    } on Exception catch (err, stacktrace) {
-      LMFeedPersistence.instance.handleException(err, stacktrace);
-
-      emitter(LMFeedComposeMediaErrorState());
+    } else {
+      emitter(LMFeedComposeMediaErrorState(error: images.errorMessage));
     }
-  } else {
-    emitter(LMFeedComposeMediaErrorState(error: result.errorMessage));
+  } on Exception catch (err, stacktrace) {
+    LMFeedPersistence.instance.handleException(err, stacktrace);
+
+    emitter(LMFeedComposeMediaErrorState());
   }
 }

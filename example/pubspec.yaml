@@ -17,17 +17,14 @@ dependencies:
   dotenv: ^4.2.0
   likeminds_feed_flutter_core: 1.6.1
   flutter_notification_channel: ^2.0.0
-  firebase_core: ^2.24.0
-  firebase_messaging: ^14.7.6
+  firebase_core: ^3.2.0
+  firebase_messaging: ^15.0.3
   uni_links:
-  envied: ^0.3.0+3
+  envied: ^0.5.4+1
   flutter_dotenv:
   timeago: ^3.6.1
   overlay_support: 
   shared_preferences: ^2.2.2
-
-dependency_overrides:
-  extended_text_field: ^14.0.0
 
 dev_dependencies:
   flutter_test:
@@ -35,7 +32,7 @@ dev_dependencies:
   envied_generator:
   build_runner:
 
-  flutter_lints: ^3.0.1
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
