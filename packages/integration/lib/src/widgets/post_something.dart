@@ -3,9 +3,6 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedPostSomething extends StatelessWidget {
   final VoidCallback? onTap;
-  final Color? borderColor;
-  final Color? backgroundColor;
-  final Color? primaryColor;
   final LMFeedPostSomethingStyle? style;
   final Widget Function(LMFeedProfilePicture profilePicture)?
       profilePictureBuilder;
@@ -14,9 +11,6 @@ class LMFeedPostSomething extends StatelessWidget {
   const LMFeedPostSomething({
     super.key,
     this.onTap,
-    this.borderColor,
-    this.backgroundColor,
-    this.primaryColor,
     this.style,
     this.profilePictureBuilder,
     this.textBuilder,
@@ -24,18 +18,12 @@ class LMFeedPostSomething extends StatelessWidget {
 
   LMFeedPostSomething copyWith({
     VoidCallback? onTap,
-    Color? borderColor,
-    Color? backgroundColor,
-    Color? primaryColor,
     LMFeedPostSomethingStyle? style,
     Widget Function(LMFeedProfilePicture profilePicture)? profilePictureBuilder,
     Widget Function(LMFeedText text)? textBuilder,
   }) {
     return LMFeedPostSomething(
       onTap: onTap ?? this.onTap,
-      borderColor: borderColor ?? this.borderColor,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      primaryColor: primaryColor ?? this.primaryColor,
       style: style ?? this.style,
       profilePictureBuilder:
           profilePictureBuilder ?? this.profilePictureBuilder,
@@ -50,7 +38,8 @@ class LMFeedPostSomething extends StatelessWidget {
     LMFeedThemeData feedTheme = LMFeedCore.theme;
     return GestureDetector(
       onTap: onTap,
-      child: SizedBox(
+      child: Container(
+        color: style?.backgroundColor ?? feedTheme.backgroundColor,
         width: screenSize.width,
         child: Container(
           margin: style?.margin,
@@ -90,9 +79,8 @@ class LMFeedPostSomething extends StatelessWidget {
 }
 
 class LMFeedPostSomethingStyle {
-  final Color? borderColor;
   final Color? backgroundColor;
-  final Color? primaryColor;
+
   final double? height;
   final double? width;
   final EdgeInsets? margin;
@@ -100,9 +88,7 @@ class LMFeedPostSomethingStyle {
   final BoxDecoration? decoration;
 
   const LMFeedPostSomethingStyle({
-    this.borderColor,
     this.backgroundColor,
-    this.primaryColor,
     this.height,
     this.width,
     this.margin,
@@ -111,9 +97,7 @@ class LMFeedPostSomethingStyle {
   });
 
   LMFeedPostSomethingStyle copyWith({
-    Color? borderColor,
     Color? backgroundColor,
-    Color? primaryColor,
     double? height,
     double? width,
     EdgeInsets? margin,
@@ -121,9 +105,7 @@ class LMFeedPostSomethingStyle {
     BoxDecoration? decoration,
   }) {
     return LMFeedPostSomethingStyle(
-      borderColor: borderColor ?? this.borderColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,
-      primaryColor: primaryColor ?? this.primaryColor,
       height: height ?? this.height,
       width: width ?? this.width,
       margin: margin ?? this.margin,
@@ -134,9 +116,7 @@ class LMFeedPostSomethingStyle {
 
   factory LMFeedPostSomethingStyle.basic({LMFeedThemeData? theme}) {
     return LMFeedPostSomethingStyle(
-      borderColor: theme?.disabledColor,
       backgroundColor: theme?.container,
-      primaryColor: theme?.primaryColor,
       height: 60,
       margin: const EdgeInsets.symmetric(
         horizontal: 16,
