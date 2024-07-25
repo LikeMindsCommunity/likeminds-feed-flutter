@@ -480,7 +480,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                       }),
                 ),
                 SliverToBoxAdapter(
-                  child: !config!.showCustomWidget
+                  child: config!.showCustomWidget
                       ? widget.customWidgetBuilder?.call(
                               context, _defPostSomeThingWidget(context)) ??
                           _defPostSomeThingWidget(context)
