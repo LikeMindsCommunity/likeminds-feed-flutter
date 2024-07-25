@@ -19,47 +19,42 @@ addDocumentEventHandler(
     widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: {'type': 'file'},
   ));
-  final LMResponse<bool> result = await LMFeedMediaHandler.handlePermissions(3);
-  if (result.success) {
-    try {
-      final LMResponse<List<LMAttachmentViewData>> documents =
-          await LMFeedMediaHandler.pickDocuments(mediaCount);
-      if (documents.success) {
-        if (documents.data != null && documents.data!.isNotEmpty) {
-          int countOfPickedDocument = documents.data!.length;
+  try {
+    final LMResponse<List<LMAttachmentViewData>> documents =
+        await LMFeedMediaHandler.pickDocuments(mediaCount);
+    if (documents.success) {
+      if (documents.data != null && documents.data!.isNotEmpty) {
+        int countOfPickedDocument = documents.data!.length;
 
-          LMFeedComposeBloc.instance.documentCount += countOfPickedDocument;
-          LMFeedComposeBloc.instance.postMedia.addAll(documents.data!);
-          LMFeedComposeBloc.instance.postMedia.removeWhere(
-              (element) => element.attachmentType == LMMediaType.link);
+        LMFeedComposeBloc.instance.documentCount += countOfPickedDocument;
+        LMFeedComposeBloc.instance.postMedia.addAll(documents.data!);
+        LMFeedComposeBloc.instance.postMedia.removeWhere(
+            (element) => element.attachmentType == LMMediaType.link);
 
-          LMFeedAnalyticsBloc.instance.add(
-            LMFeedFireAnalyticsEvent(
-              eventName: LMFeedAnalyticsKeys.documentAttachedInPost,
-              widgetSource: LMFeedWidgetSource.createPostScreen,
-              eventProperties: {
-                'imageCount': countOfPickedDocument,
-              },
-            ),
-          );
+        LMFeedAnalyticsBloc.instance.add(
+          LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.documentAttachedInPost,
+            widgetSource: LMFeedWidgetSource.createPostScreen,
+            eventProperties: {
+              'imageCount': countOfPickedDocument,
+            },
+          ),
+        );
 
-          emitter(LMFeedComposeAddedDocumentState());
-        } else {
-          if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
-            emitter(LMFeedComposeInitialState());
-          } else {
-            emitter(LMFeedComposeAddedDocumentState());
-          }
-        }
+        emitter(LMFeedComposeAddedDocumentState());
       } else {
-        emitter(LMFeedComposeMediaErrorState(error: documents.errorMessage));
+        if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
+          emitter(LMFeedComposeInitialState());
+        } else {
+          emitter(LMFeedComposeAddedDocumentState());
+        }
       }
-    } on Exception catch (err, stacktrace) {
-      LMFeedPersistence.instance.handleException(err, stacktrace);
-
-      emitter(LMFeedComposeMediaErrorState());
+    } else {
+      emitter(LMFeedComposeMediaErrorState(error: documents.errorMessage));
     }
-  } else {
-    emitter(LMFeedComposeMediaErrorState(error: result.errorMessage));
+  } on Exception catch (err, stacktrace) {
+    LMFeedPersistence.instance.handleException(err, stacktrace);
+
+    emitter(LMFeedComposeMediaErrorState());
   }
 }
