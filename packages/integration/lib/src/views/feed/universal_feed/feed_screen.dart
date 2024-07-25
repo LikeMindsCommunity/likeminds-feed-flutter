@@ -42,10 +42,8 @@ class LMFeedScreen extends StatefulWidget {
   // Builder for appbar
   final LMFeedPostAppBarBuilder? appBar;
 
-  // Builder for custom widget on top
-  final Widget Function(
-          BuildContext context, LMFeedPostSomething postSomethingWidget)?
-      customWidgetBuilder;
+  /// Builder for custom widget on top
+  final LMFeedCustomWidgetBuilder? customWidgetBuilder;
   // Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
@@ -85,9 +83,7 @@ class LMFeedScreen extends StatefulWidget {
 
   LMFeedScreen copyWith({
     LMFeedPostAppBarBuilder? appBar,
-    Widget Function(
-            BuildContext context, LMFeedPostSomething postSomethingWidget)?
-        customWidgetBuilder,
+    LMFeedCustomWidgetBuilder? customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
         topicChipBuilder,
     LMFeedPostWidgetBuilder? postBuilder,

@@ -40,9 +40,8 @@ class LMFeedRoomScreen extends StatefulWidget {
   // Builder for appbar
   final LMFeedPostAppBarBuilder? appBarBuilder;
 
-  final Widget Function(
-          BuildContext context, LMFeedPostSomething postSomethingWidget)?
-      customWidgetBuilder;
+  /// Builder for custom widget
+  final LMFeedCustomWidgetBuilder? customWidgetBuilder;
   // Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
@@ -83,9 +82,7 @@ class LMFeedRoomScreen extends StatefulWidget {
   LMFeedRoomScreen copyWith({
     int? feedroomId,
     LMFeedPostAppBarBuilder? appBarBuilder,
-    final Widget Function(
-            BuildContext context, LMFeedPostSomething postSomethingWidget)?
-        customWidgetBuilder,
+    final LMFeedCustomWidgetBuilder? customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
         topicChipBuilder,
     LMFeedPostWidgetBuilder? postBuilder,
