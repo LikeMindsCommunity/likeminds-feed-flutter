@@ -210,7 +210,7 @@ class _LMQnAEditProfileScreenState extends State<LMQnAEditProfileScreen> {
                                   valueListenable: _rebuildProfileImage,
                                   builder: (context, _, __) {
                                     return LMFeedProfilePicture(
-                                      // TODO: replace this with attachmentviewdata
+                                      bytes: _image?.attachmentMeta.bytes,
                                       filePath: _image?.attachmentMeta.path,
                                       imageUrl: widget.user.imageUrl,
                                       fallbackText: widget.user.name,

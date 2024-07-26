@@ -16,19 +16,24 @@ getUserMetaEventHandler(
     Map<String, LMTopicViewData> topics = (response.topics ?? <String, Topic>{})
         .map((key, value) => MapEntry(
             key, LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
+    if (user != null) {
+      User? currentUser = await LMFeedPersistence.instance.getUserDB().data;
+      if (currentUser?.id == user.id) {
+        await LMFeedPersistence.instance.insertOrUpdateUser(user);
+      }
+      final userViewData = LMUserViewDataConvertor.fromUser(
+        user,
+        widgets: widgets,
+        userTopics: response.userTopics,
+        topics: topics,
+      );
 
-    final userViewData = LMUserViewDataConvertor.fromUser(
-      user!,
-      widgets: widgets,
-      userTopics: response.userTopics,
-      topics: topics,
-    );
-
-    emit(LMFeedUserMetaLoadedState(
-      user: userViewData,
-      postsCount: response.postsCount,
-      commentsCount: response.commentsCount,
-    ));
+      emit(LMFeedUserMetaLoadedState(
+        user: userViewData,
+        postsCount: response.postsCount,
+        commentsCount: response.commentsCount,
+      ));
+    }
   } on Exception catch (e, stackTrace) {
     LMFeedPersistence.instance.handleException(e, stackTrace);
     emit(LMFeedUserMetaErrorState(

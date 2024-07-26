@@ -603,26 +603,37 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                 );
               }),
           const SizedBox(width: 10),
-          LMFeedProfilePicture(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LMQnAUserProfileScreen(
-                    uuid: currentUser!.sdkClientInfo.uuid,
+          BlocBuilder<LMFeedUserMetaBloc, LMFeedUserMetaState>(
+            bloc: LMFeedUserMetaBloc.instance,
+            buildWhen: (previous, current) {
+              return current is LMFeedUserMetaLoadedState;
+            },
+            builder: (context, state) {
+              currentUser = LMFeedLocalPreference.instance.fetchUserData();
+              return LMFeedProfilePicture(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMQnAUserProfileScreen(
+                        uuid: currentUser!.sdkClientInfo.uuid,
+                      ),
+                    ),
+                  );
+                },
+                imageUrl: currentUser!.imageUrl,
+                fallbackText: currentUser!.name,
+                style: LMFeedProfilePictureStyle.basic().copyWith(
+                  size: 40,
+                  fallbackTextStyle: LMFeedTextStyle.basic().copyWith(
+                    textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: surface),
                   ),
                 ),
               );
             },
-            imageUrl: currentUser!.imageUrl,
-            fallbackText: currentUser!.name,
-            style: LMFeedProfilePictureStyle.basic().copyWith(
-              size: 40,
-              fallbackTextStyle: LMFeedTextStyle.basic().copyWith(
-                textStyle: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w600, color: surface),
-              ),
-            ),
           ),
           const SizedBox(width: 5),
         ]);
@@ -898,8 +909,6 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
           LMFeedPollStyle.basic(
             primaryColor: feedThemeData.primaryColor,
             containerColor: feedThemeData.container,
-          ).copyWith(
-           
           ),
       onEditVote: (pollData) {
         isVoteEditing["value"] = true;
