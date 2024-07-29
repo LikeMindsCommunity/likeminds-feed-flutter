@@ -1045,7 +1045,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
-                    placement: LMFeedIconButtonPlacement.end,
+                    placement: LMFeedIconButtonPlacement.start,
                     showText: false,
                     icon: style?.addPollIcon ??
                         LMFeedIcon(

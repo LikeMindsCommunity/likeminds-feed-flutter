@@ -681,7 +681,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                             vertical: 8,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               LMFeedText(
                                 text: "Post uploading failed.. try again",
@@ -693,6 +693,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              Spacer(),
                               LMFeedButton(
                                 onTap: () {
                                   newPostBloc.add(state.event!);
@@ -701,6 +702,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                   icon: LMFeedIcon(
                                     type: LMFeedIconType.icon,
                                     icon: Icons.refresh_rounded,
+                                  ),
+                                ),
+                              ),
+                              LMFeedButton(
+                                onTap: () {
+                                  newPostBloc.add(LMFeedPostInitiateEvent());
+                                },
+                                style: LMFeedButtonStyle(
+                                  icon: LMFeedIcon(
+                                    type: LMFeedIconType.icon,
+                                    icon: Icons.close,
                                   ),
                                 ),
                               )
@@ -927,19 +939,27 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ),
             ),
           ),
-        LMFeedProfilePicture(
-          fallbackText: currentUser!.name,
-          imageUrl: currentUser!.imageUrl,
-          style: LMFeedProfilePictureStyle.basic().copyWith(
-            size: 42,
-            fallbackTextStyle: LMFeedTextStyle.basic().copyWith(
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: LMFeedCore.theme.onPrimary,
+        BlocBuilder<LMFeedUserMetaBloc, LMFeedUserMetaState>(
+          bloc: LMFeedUserMetaBloc.instance,
+          buildWhen: (previous, current) =>
+              current is LMFeedUserMetaLoadedState,
+          builder: (context, state) {
+            currentUser = LMFeedLocalPreference.instance.fetchUserData();
+            return LMFeedProfilePicture(
+              fallbackText: currentUser!.name,
+              imageUrl: currentUser!.imageUrl,
+              style: LMFeedProfilePictureStyle.basic().copyWith(
+                size: 42,
+                fallbackTextStyle: LMFeedTextStyle.basic().copyWith(
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: LMFeedCore.theme.onPrimary,
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         )
       ],
     );

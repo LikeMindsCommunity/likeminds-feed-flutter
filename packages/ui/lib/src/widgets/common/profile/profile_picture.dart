@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
@@ -9,6 +10,7 @@ class LMFeedProfilePicture extends StatelessWidget {
     super.key,
     this.imageUrl,
     this.filePath,
+    this.bytes,
     required this.fallbackText,
     this.onTap,
     this.style,
@@ -16,6 +18,7 @@ class LMFeedProfilePicture extends StatelessWidget {
 
   final String? imageUrl;
   final String? filePath;
+  final Uint8List? bytes;
   final String fallbackText;
   final Function()? onTap;
   final LMFeedProfilePictureStyle? style;
@@ -42,15 +45,22 @@ class LMFeedProfilePicture extends StatelessWidget {
           color: imageUrl != null && imageUrl!.isNotEmpty
               ? Colors.grey.shade300
               : LMFeedTheme.instance.theme.primaryColor,
-          image: filePath != null
+          image: bytes != null
               ? DecorationImage(
-                  image: FileImage(File(filePath!)), fit: BoxFit.cover)
-              : imageUrl != null && imageUrl!.isNotEmpty
+                  image: MemoryImage(bytes!),
+                  fit: BoxFit.cover,
+                )
+              : filePath != null
                   ? DecorationImage(
-                      image: NetworkImage(imageUrl!),
+                      image: FileImage(File(filePath!)),
                       fit: BoxFit.cover,
                     )
-                  : null,
+                  : imageUrl != null && imageUrl!.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(imageUrl!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
         ),
         child: (imageUrl == null || imageUrl!.isEmpty) && filePath == null
             ? Center(

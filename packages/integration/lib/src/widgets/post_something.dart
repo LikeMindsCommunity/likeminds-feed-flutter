@@ -80,7 +80,6 @@ class LMFeedPostSomething extends StatelessWidget {
 
 class LMFeedPostSomethingStyle {
   final Color? backgroundColor;
-
   final double? height;
   final double? width;
   final EdgeInsets? margin;
