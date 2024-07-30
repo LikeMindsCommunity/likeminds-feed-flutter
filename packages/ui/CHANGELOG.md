@@ -80,3 +80,7 @@ Added support for web platform
 # 1.6.1
 
 Patch update for core lib
+
+# 1.7.0
+
+Updated dependencies to migrate to Android Target SDK version to 34
