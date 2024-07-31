@@ -42,8 +42,8 @@ class LMFeedScreen extends StatefulWidget {
   // Builder for appbar
   final LMFeedPostAppBarBuilder? appBar;
 
-  // Builder for custom widget on top
-  final LMFeedContextWidgetBuilder? customWidgetBuilder;
+  /// Builder for custom widget on top
+  final LMFeedCustomWidgetBuilder? customWidgetBuilder;
   // Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
@@ -83,7 +83,7 @@ class LMFeedScreen extends StatefulWidget {
 
   LMFeedScreen copyWith({
     LMFeedPostAppBarBuilder? appBar,
-    LMFeedContextWidgetBuilder? customWidgetBuilder,
+    LMFeedCustomWidgetBuilder? customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
         topicChipBuilder,
     LMFeedPostWidgetBuilder? postBuilder,
@@ -477,31 +477,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
                 SliverToBoxAdapter(
                   child: config!.showCustomWidget
-                      ? widget.customWidgetBuilder == null
-                          ? LMFeedPostSomething(
-                              onTap: userPostingRights
-                                  ? () async {
-                                      LMFeedVideoProvider.instance
-                                          .forcePauseAllControllers();
-                                      // ignore: use_build_context_synchronously
-                                      await Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LMFeedComposeScreen(
-                                                    widgetSource:
-                                                        LMFeedWidgetSource
-                                                            .universalFeed,
-                                                  )));
-                                    }
-                                  : () {
-                                      LMFeedCore.showSnackBar(
-                                        context,
-                                        "You do not have permission to create a $postTitleSmallCap",
-                                        _widgetSource,
-                                        style: LMFeedCore.theme.snackBarTheme,
-                                      );
-                                    })
-                          : widget.customWidgetBuilder!(context)
+                      ? widget.customWidgetBuilder?.call(
+                              context, _defPostSomeThingWidget(context)) ??
+                          _defPostSomeThingWidget(context)
                       : const SizedBox(),
                 ),
                 SliverToBoxAdapter(
@@ -703,7 +681,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                             vertical: 8,
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               LMFeedText(
                                 text: "Post uploading failed.. try again",
@@ -715,6 +693,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              Spacer(),
                               LMFeedButton(
                                 onTap: () {
                                   newPostBloc.add(state.event!);
@@ -723,6 +702,17 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                                   icon: LMFeedIcon(
                                     type: LMFeedIconType.icon,
                                     icon: Icons.refresh_rounded,
+                                  ),
+                                ),
+                              ),
+                              LMFeedButton(
+                                onTap: () {
+                                  newPostBloc.add(LMFeedPostInitiateEvent());
+                                },
+                                style: LMFeedButtonStyle(
+                                  icon: LMFeedIcon(
+                                    type: LMFeedIconType.icon,
+                                    icon: Icons.close,
                                   ),
                                 ),
                               )
@@ -848,6 +838,31 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     );
   }
 
+  LMFeedPostSomething _defPostSomeThingWidget(BuildContext context) {
+    return LMFeedPostSomething(
+      onTap: userPostingRights
+          ? () async {
+              LMFeedVideoProvider.instance.forcePauseAllControllers();
+              // ignore: use_build_context_synchronously
+              await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const LMFeedComposeScreen(
+                        widgetSource: LMFeedWidgetSource.universalFeed,
+                      )));
+            }
+          : () {
+              LMFeedCore.showSnackBar(
+                context,
+                "You do not have permission to create a $postTitleSmallCap",
+                _widgetSource,
+                style: LMFeedCore.theme.snackBarTheme,
+              );
+            },
+      style: LMFeedPostSomethingStyle.basic(
+        theme: feedThemeData,
+      ),
+    );
+  }
+
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
       leading: const SizedBox.shrink(),
@@ -924,19 +939,27 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               ),
             ),
           ),
-        LMFeedProfilePicture(
-          fallbackText: currentUser!.name,
-          imageUrl: currentUser!.imageUrl,
-          style: LMFeedProfilePictureStyle.basic().copyWith(
-            size: 42,
-            fallbackTextStyle: LMFeedTextStyle.basic().copyWith(
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: LMFeedCore.theme.onPrimary,
+        BlocBuilder<LMFeedUserMetaBloc, LMFeedUserMetaState>(
+          bloc: LMFeedUserMetaBloc.instance,
+          buildWhen: (previous, current) =>
+              current is LMFeedUserMetaLoadedState,
+          builder: (context, state) {
+            currentUser = LMFeedLocalPreference.instance.fetchUserData();
+            return LMFeedProfilePicture(
+              fallbackText: currentUser!.name,
+              imageUrl: currentUser!.imageUrl,
+              style: LMFeedProfilePictureStyle.basic().copyWith(
+                size: 42,
+                fallbackTextStyle: LMFeedTextStyle.basic().copyWith(
+                  textStyle: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: LMFeedCore.theme.onPrimary,
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         )
       ],
     );

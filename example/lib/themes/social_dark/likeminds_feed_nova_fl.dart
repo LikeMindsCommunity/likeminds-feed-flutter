@@ -40,7 +40,7 @@ class _LMFeedNovaState extends State<LMFeedNova> {
             ),
           );
         },
-        customWidgetBuilder: (context) {
+        customWidgetBuilder: (customWidget, context) {
           return const SizedBox.shrink();
         },
         postBuilder: (context, postWidget, postViewData) => novaPostBuilder(

@@ -8,91 +8,6 @@ import 'package:permission_handler/permission_handler.dart';
 LMFeedPlatform feedPlatform = LMFeedPlatform.instance;
 
 class LMFeedMediaHandler {
-  static Future<LMResponse<bool>> handlePermissions(int mediaType) async {
-    if (feedPlatform.isAndroid()) {
-      PermissionStatus permissionStatus;
-
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      if (androidInfo.version.sdkInt >= 33) {
-        if (mediaType == 1) {
-          permissionStatus = await Permission.photos.status;
-          if (permissionStatus == PermissionStatus.granted) {
-            return LMResponse(success: true);
-          } else if (permissionStatus == PermissionStatus.denied) {
-            permissionStatus = await Permission.photos.request();
-            if (permissionStatus == PermissionStatus.permanentlyDenied) {
-              return LMResponse(
-                  success: false,
-                  errorMessage: 'Permissions denied, change app settings');
-            } else if (permissionStatus == PermissionStatus.granted) {
-              return LMResponse(success: true);
-            } else {
-              return LMResponse(success: false);
-            }
-          }
-        } else if (mediaType == 2) {
-          permissionStatus = await Permission.videos.status;
-          if (permissionStatus == PermissionStatus.granted) {
-            return LMResponse(success: true);
-          } else if (permissionStatus == PermissionStatus.denied) {
-            permissionStatus = await Permission.videos.request();
-            if (permissionStatus == PermissionStatus.permanentlyDenied) {
-              return LMResponse(
-                  success: false,
-                  errorMessage: 'Permissions denied, change app settings');
-            } else if (permissionStatus == PermissionStatus.granted) {
-              return LMResponse(success: true);
-            } else {
-              return LMResponse(success: false);
-            }
-          }
-        } else if (mediaType == 3) {
-          // permissionStatus = await Permission.manageExternalStorage.status;
-          // if (permissionStatus == PermissionStatus.granted) {
-          //   return true;
-          // } else if (permissionStatus == PermissionStatus.denied) {
-          //   permissionStatus = await Permission.storage.request();
-          //   if (permissionStatus == PermissionStatus.permanentlyDenied) {
-          //     toast(
-          //       'Permissions denied, change app settings',
-          //       duration: Toast.LENGTH_LONG,
-          //     );
-          //     return false;
-          //   } else if (permissionStatus == PermissionStatus.granted) {
-          //     return true;
-          //   } else {
-          //     return false;
-          //   }
-          // }
-          // on android 33, storage permission always returns PermissionStatus.denied, since it is deprecated in android 30 and fully removed in android 33
-          return LMResponse(success: true);
-        }
-      } else {
-        // permissionStatus = await Permission.storage.status;
-        // if (permissionStatus == PermissionStatus.granted) {
-        //   return true;
-        // } else {
-        //   permissionStatus = await Permission.storage.request();
-        //   if (permissionStatus == PermissionStatus.granted) {
-        //     return true;
-        //   } else if (permissionStatus == PermissionStatus.denied) {
-        //     return false;
-        //   } else if (permissionStatus == PermissionStatus.permanentlyDenied) {
-        //     toast(
-        //       'Permissions denied, change app settings',
-        //       duration: Toast.LENGTH_LONG,
-        //     );
-        //     return false;
-        //   }
-        // }
-        // on android 33, storage permission always returns PermissionStatus.denied, since it is deprecated in android 30 and fully removed in android 33
-        return LMResponse(success: true);
-      }
-    }
-    return LMResponse(success: true);
-  }
-
   static Future<LMResponse<List<LMAttachmentViewData>>> pickVideos(
       int currentMediaLength) async {
     try {
@@ -238,6 +153,7 @@ class LMFeedMediaHandler {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.image,
+      compressionQuality: 0,
     );
     CommunityConfigurations? config = LMFeedLocalPreference.instance
         .fetchCommunityConfiguration("media_limits");

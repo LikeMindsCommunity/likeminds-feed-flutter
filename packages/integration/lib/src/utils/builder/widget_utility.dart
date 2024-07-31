@@ -191,8 +191,8 @@ class LMFeedWidgetUtility {
   // Feed Screen Builder Widgets
 
   /// Builds a custom widget for the feed screen.
-  Widget customWidgetBuilder(BuildContext context) {
-    return const SizedBox.shrink();
+  Widget customWidgetBuilder(LMFeedPostSomething postSomethingWidget,BuildContext context) {
+    return postSomethingWidget;
   }
 
   /// Builds a floating action button for the feed screen.

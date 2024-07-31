@@ -8,6 +8,11 @@ abstract class LMFeedPostEvents extends Equatable {
   List<Object> get props => [];
 }
 
+/// {@template lm_feed_post_initiate_event}
+/// Initial state of the bloc
+/// {@endtemplate}
+class LMFeedPostInitiateEvent extends LMFeedPostEvents {}
+
 /// {@template lm_feed_get_post_event}
 /// When a post is to be fetched from the server
 /// [LMFeedGetPostEvent] is raised to fetch the post details

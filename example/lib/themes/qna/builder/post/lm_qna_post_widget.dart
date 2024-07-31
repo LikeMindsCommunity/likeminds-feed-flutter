@@ -142,9 +142,7 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
                 postWidget!.content != null)
               postWidget!.content!,
             if (postWidget!.media != null)
-              postWidget!.media!.copyWith(
-                pollBuilder: LMFeedCore.widgetUtility.pollWidgetBuilder,
-              ),
+              postWidget!.media!,
             if (postWidget!.topicWidget != null)
               postWidget!.topicWidget!.copyWith(
                 onTopicTap: (context, topicViewData) {

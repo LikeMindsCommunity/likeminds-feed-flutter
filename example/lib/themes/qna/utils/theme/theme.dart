@@ -133,6 +133,8 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
       primaryColor: qNaPrimaryColor,
       containerColor: surface,
       inActiveColor: primaryBackgroundDark,
+    ).copyWith(
+      padding: EdgeInsets.zero,
     ),
     documentStyle: const LMFeedPostDocumentStyle(
       height: 90,
