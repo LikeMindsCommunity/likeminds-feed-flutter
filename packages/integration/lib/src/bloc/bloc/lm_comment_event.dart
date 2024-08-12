@@ -37,16 +37,16 @@ final class LMAddCommentEvent extends LMCommentEvent {
 final class LMEditingCommentEvent extends LMCommentEvent {
   final String postId;
   final String commentId;
-  final String commentText;
+  final String replyText;
 
   LMEditingCommentEvent({
     required this.postId,
     required this.commentId,
-    required this.commentText,
+    required this.replyText,
   });
 
   @override
-  List<Object> get props => [postId, commentId, commentText];
+  List<Object> get props => [postId, commentId, replyText];
 }
 
 final class LMEditCommentEvent extends LMCommentEvent {
@@ -122,21 +122,66 @@ final class LMGetReplyEvent extends LMCommentEvent {
   List<Object> get props => [postId, commentId, page, pageSize];
 }
 
+final class LMCloseReplyEvent extends LMCommentEvent {
+  final String commentId;
+
+  LMCloseReplyEvent({
+    required this.commentId,
+  });
+
+  @override
+  List<Object> get props => [commentId];
+}
+
+final class LMEditingReplyEvent extends LMCommentEvent {
+  final String postId;
+  final String commentId;
+  final String replyId;
+  final String replyText;
+
+  LMEditingReplyEvent({
+    required this.postId,
+    required this.commentId,
+    required this.replyId,
+    required this.replyText,
+  });
+
+  @override
+  List<Object> get props => [postId, commentId, replyId, replyText];
+}
+
 final class LMEditReply extends LMCommentEvent {
   final String postId;
   final String commentId;
   final String replyId;
-  final String comment;
+  final String replyText;
 
-  LMEditReply(this.postId, this.commentId, this.replyId, this.comment);
+  LMEditReply({
+    required this.postId,
+    required this.commentId,
+    required this.replyId,
+    required this.replyText,
+  });
+
+  @override
+  List<Object> get props => [postId, commentId, replyId, replyText];
 }
 
 final class LMEditReplyCancelEvent extends LMCommentEvent {}
 
 final class LMDeleteReplyEvent extends LMCommentEvent {
   final String postId;
-  final String commentId;
   final String replyId;
+  final String reason;
+  final String commentId;
 
-  LMDeleteReplyEvent(this.postId, this.commentId, this.replyId);
+  LMDeleteReplyEvent({
+    required this.postId,
+    required this.replyId,
+    required this.reason,
+    required this.commentId,
+  });
+
+  @override
+  List<Object> get props => [postId, replyId, reason, commentId];
 }

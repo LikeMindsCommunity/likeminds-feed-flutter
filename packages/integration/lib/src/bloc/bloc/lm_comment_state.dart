@@ -145,14 +145,14 @@ final class LMReplyCancelState extends LMCommentState {}
 final class LMReplyCommentLoading extends LMCommentState {}
 
 final class LMReplyCommentSuccess extends LMCommentState {
-  final LMCommentViewData comment;
+  final LMCommentViewData reply;
 
   LMReplyCommentSuccess({
-    required this.comment,
+    required this.reply,
   });
 
   @override
-  List<Object> get props => [comment];
+  List<Object> get props => [reply];
 }
 
 final class LMReplyCommentError extends LMCommentState {
@@ -169,19 +169,84 @@ final class LMReplyCommentError extends LMCommentState {
 final class LMGetReplyCommentSuccess extends LMCommentState {
   final List<LMCommentViewData> replies;
   final int page;
+  final String commentId;
 
   LMGetReplyCommentSuccess({
     required this.replies,
     required this.page,
+    required this.commentId,
   });
 
   @override
-  List<Object> get props => [replies, page];
+  List<Object> get props => [replies, page, commentId];
+}
+
+final class LMGetReplyCommentLoading extends LMCommentState {
+  final String commentId;
+
+  LMGetReplyCommentLoading({
+    required this.commentId,
+  });
+
+  @override
+  List<Object> get props => [commentId];
+}
+
+final class LMGetReplyCommentPaginationLoading extends LMCommentState {
+  final String commentId;
+
+  LMGetReplyCommentPaginationLoading({
+    required this.commentId,
+  });
+
+  @override
+  List<Object> get props => [commentId];
+}
+
+final class LMCloseReplyState extends LMCommentState {
+  final String commentId;
+
+  LMCloseReplyState({
+    required this.commentId,
+  });
+
+  @override
+  List<Object> get props => [commentId];
+}
+
+final class LMEditingReplyState extends LMCommentState {
+  final String postId;
+  final String commentId;
+  final String replyId;
+  final String replyText;
+
+  LMEditingReplyState({
+    required this.postId,
+    required this.commentId,
+    required this.replyId,
+    required this.replyText,
+  });
+
+  @override
+  List<Object> get props => [postId, commentId, replyId, replyText];
 }
 
 final class LMEditReplyLoading extends LMCommentState {}
 
-final class LMEditReplySuccess extends LMCommentState {}
+final class LMEditReplySuccess extends LMCommentState {
+  final String commentId;
+  final String replyId;
+  final LMCommentViewData reply;
+
+  LMEditReplySuccess({
+    required this.commentId,
+    required this.replyId,
+    required this.reply,
+  });
+
+  @override
+  List<Object> get props => [commentId, replyId, reply];
+}
 
 final class LMEditReplyError extends LMCommentState {
   final String error;
@@ -196,7 +261,18 @@ final class LMEditReplyError extends LMCommentState {
 
 final class LMDeleteReplyLoading extends LMCommentState {}
 
-final class LMDeleteReplySuccess extends LMCommentState {}
+final class LMDeleteReplySuccess extends LMCommentState {
+  final String replyId;
+  final String commentId;
+
+  LMDeleteReplySuccess({
+    required this.replyId,
+    required this.commentId,
+  });
+
+  @override
+  List<Object> get props => [replyId, commentId];
+}
 
 final class LMDeleteReplyError extends LMCommentState {
   final String error;

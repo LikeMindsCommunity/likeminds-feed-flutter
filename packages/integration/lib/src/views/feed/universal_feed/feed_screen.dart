@@ -1115,7 +1115,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
-            builder: (context) => TestLMFeedPostDetailScreen(
+            builder: (context) => LMFeedPostDetailScreen(
               postId: post.id,
               postBuilder: widget.postBuilder,
             ),
@@ -1487,7 +1487,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
-              builder: (context) => TestLMFeedPostDetailScreen(
+              builder: (context) => LMFeedPostDetailScreen(
                 postId: postViewData.id,
                 openKeyboard: true,
                 postBuilder: widget.postBuilder,
@@ -1501,7 +1501,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
-              builder: (context) => TestLMFeedPostDetailScreen(
+              builder: (context) => LMFeedPostDetailScreen(
                 postId: postViewData.id,
                 openKeyboard: true,
                 postBuilder: widget.postBuilder,

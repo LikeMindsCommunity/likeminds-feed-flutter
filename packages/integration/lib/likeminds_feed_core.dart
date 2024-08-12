@@ -17,7 +17,7 @@ import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_con
 
 import 'package:likeminds_feed_flutter_core/src/views/feed/universal_feed/feed_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feedroom/feedroom_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/test_post_detail_screen.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit/media_kit.dart';
 import 'dart:async';

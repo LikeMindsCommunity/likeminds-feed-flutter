@@ -12,6 +12,7 @@ part 'handler/add_comment_handler.dart';
 part 'handler/edit_comment_handler.dart';
 part 'handler/delete_comment_handler.dart';
 part 'handler/reply_comment_handler.dart';
+part 'handler/get_reply_handler.dart';
 
 class LMCommentBloc extends Bloc<LMCommentEvent, LMCommentState> {
   static final LMCommentBloc _instance = LMCommentBloc._();
@@ -34,22 +35,55 @@ class LMCommentBloc extends Bloc<LMCommentEvent, LMCommentState> {
     on<LMReplyCancelEvent>(_cancelReplyCommentHandler);
 
     on<LMGetReplyEvent>(_getReplyHandler);
-    on<LMEditReply>((event, emit) {});
+    on<LMCloseReplyEvent>((event, emit) {
+      emit(LMCloseReplyState(commentId: event.commentId));
+    });
+
+    on<LMEditingReplyEvent>((event, emit) {
+      emit(LMEditingReplyState(
+        commentId: event.commentId,
+        replyId: event.replyId,
+        postId: event.postId,
+        replyText: event.replyText,
+      ));
+    });
+    on<LMEditReply>(_editReplyHandler);
 
     on<LMEditReplyCancelEvent>((event, emit) {});
 
-    on<LMDeleteReplyEvent>((event, emit) {});
+    on<LMDeleteReplyEvent>((LMDeleteReplyEvent event, emit) async {
+      emit(LMDeleteReplyLoading());
+      DeleteCommentRequest deleteCommentRequest = (DeleteCommentRequestBuilder()
+            ..postId(event.postId)
+            ..commentId(event.replyId)
+            ..reason(event.reason))
+          .build();
+      final DeleteCommentResponse response =
+          await LMFeedCore.client.deleteComment(deleteCommentRequest);
+      if (response.success) {
+        emit(LMDeleteReplySuccess(
+          commentId: event.commentId,
+          replyId: event.replyId,
+        ));
+      } else {
+        emit(LMDeleteReplyError(
+            error: response.errorMessage ?? 'Failed to delete reply'));
+      }
+    });
   }
 
-  FutureOr<void> _getReplyHandler(LMGetReplyEvent event, emit) async {
-    final GetCommentRequest request = (GetCommentRequestBuilder()
-          ..commentId(event.commentId)
-          ..postId(event.postId)
-          ..page(event.page)
-          ..pageSize(10))
-        .build();
+  Future<FutureOr<void>> _editReplyHandler(LMEditReply event, emit) async {
+    EditCommentReplyRequest editCommentReplyRequest =
+        (EditCommentReplyRequestBuilder()
+              ..commentId(event.commentId)
+              ..postId(event.postId)
+              ..replyId(event.replyId)
+              ..text(event.replyText))
+            .build();
 
-    GetCommentResponse response = await LMFeedCore.client.getComment(request);
+    EditCommentReplyResponse response =
+        await LMFeedCore.client.editCommentReply(editCommentReplyRequest);
+
     if (response.success) {
       final Map<String, LMTopicViewData> topics = {};
       final Map<String, LMWidgetViewData> widgets = {};
@@ -74,10 +108,18 @@ class LMCommentBloc extends Bloc<LMCommentEvent, LMCommentState> {
                 userTopics: response.userTopics,
               ))) ??
           {});
-      LMCommentViewData commentViewData =
-          LMCommentViewDataConvertor.fromComment(response.postReplies!, users);
-      emit(LMGetReplyCommentSuccess(
-          replies: commentViewData.replies ?? [], page: event.page));
+
+      LMCommentViewData reply =
+          LMCommentViewDataConvertor.fromComment(response.reply!, users);
+
+      emit(LMEditReplySuccess(
+        commentId: event.commentId,
+        replyId: event.replyId,
+        reply: reply,
+      ));
+    } else {
+      emit(LMEditReplyError(
+          error: response.errorMessage ?? 'Failed to edit reply'));
     }
   }
 }

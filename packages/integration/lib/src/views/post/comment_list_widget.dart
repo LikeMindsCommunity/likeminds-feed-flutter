@@ -37,15 +37,13 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
-  String? commentIdReplyId;
-  bool replyShown = false;
-  final LMFeedFetchCommentReplyBloc _commentRepliesBloc =
-      LMFeedFetchCommentReplyBloc.instance;
+  List<String> showReplyCommentIds = [];
   final LMCommentBloc _commentBloc = LMCommentBloc.instance();
+  final LMFeedPostBloc _postBloc = LMFeedPostBloc.instance;
   final PagingController<int, LMCommentViewData> _commentListPagingController =
       PagingController(firstPageKey: 1);
   LMPostViewData? _postViewData;
-  final _pageSize = 2;
+  final _pageSize = 10;
 
   @override
   void initState() {
@@ -62,7 +60,6 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   void _addPaginationListener() {
     _commentListPagingController.addPageRequestListener(
       (pageKey) {
-        debugPrint('Page key: $pageKey');
         _commentBloc.add(
           LMGetCommentsEvent(
             postId: widget.postId,
@@ -92,6 +89,19 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     return BlocConsumer<LMCommentBloc, LMCommentState>(
         bloc: _commentBloc,
         listener: _handleBlocListeners,
+        buildWhen: (previous, current) {
+          if (current is LMAddCommentSuccess ||
+              current is LMEditCommentSuccess ||
+              current is LMDeleteCommentSuccess ||
+              current is LMReplyCommentSuccess ||
+              current is LMDeleteReplySuccess ||
+              current is LMGetCommentSuccess ||
+              current is LMGetReplyCommentLoading ||
+              current is LMCloseReplyState) {
+            return true;
+          }
+          return false;
+        },
         builder: (context, state) {
           return ValueListenableBuilder(
               valueListenable: _rebuildCommentList,
@@ -130,23 +140,20 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                                           context,
                                           commentWidget,
                                           _postViewData!),
-                                  (replyShown &&
-                                          commentIdReplyId ==
-                                              commentViewData.id)
-                                      ? TempLMFeedCommentReplyWidget(
-                                          post: _postViewData!,
-                                          commentBuilder:
-                                              widget.commentBuilder ??
-                                                  LMFeedCore.widgetUtility
-                                                      .commentBuilder,
-                                          refresh: () {
-                                            //  _postDetailScreenHandler _pagingController.refresh();
-                                          },
-                                          postId: widget.postId,
-                                          reply: commentViewData,
-                                          user: userViewData,
-                                        )
-                                      : const SizedBox.shrink()
+                                  // if (replyShown &&
+                                  //     commentIdReplyId == commentViewData.id)
+                                  TempLMFeedCommentReplyWidget(
+                                    // key: ValueKey(commentViewData.id),
+                                    commentBuilder: widget.commentBuilder ??
+                                        LMFeedCore.widgetUtility.commentBuilder,
+                                    refresh: () {
+                                      //  _postDetailScreenHandler _pagingController.refresh();
+                                    },
+                                    post: _postViewData!,
+                                    postId: widget.postId,
+                                    comment: commentViewData,
+                                    user: userViewData,
+                                  )
                                 ],
                               ),
                             );
@@ -165,12 +172,41 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   }
 
   void _handleBlocListeners(context, state) {
-    if (state is LMGetCommentSuccess) {
+    if (state is LMReplyCommentSuccess) {
+      int? index = _commentListPagingController.value.itemList?.indexWhere(
+          (element) => element.id == state.reply.parentComment?.id);
+      if (index != null && index != -1) {
+        int replyCount =
+            _commentListPagingController.itemList?[index].repliesCount ?? 0;
+        _commentListPagingController.itemList?[index].repliesCount =
+            replyCount + 1;
+      }
+    } else if (state is LMDeleteReplySuccess) {
+      int? index = _commentListPagingController.value.itemList
+          ?.indexWhere((element) => element.id == state.commentId);
+      if (index != null && index != -1) {
+        int replyCount =
+            _commentListPagingController.itemList?[index].repliesCount ?? 0;
+        _commentListPagingController.itemList?[index].repliesCount =
+            replyCount - 1;
+        _rebuildCommentList.value = !_rebuildCommentList.value;
+      }
+      LMFeedCore.showSnackBar(
+        context,
+        '$commentTitleSmallCapSingular Deleted',
+        _widgetSource,
+      );
+    } else if (state is LMGetCommentSuccess) {
       updatePagingControllers(state);
     } else if (state is LMAddCommentSuccess) {
       final LMCommentViewData commentViewData = state.comment;
       if (commentViewData.tempId == commentViewData.id) {
         _commentListPagingController.value.itemList?.insert(0, state.comment);
+        _postBloc.add(LMFeedUpdatePostEvent(
+          postId: widget.postId,
+          source: LMFeedWidgetSource.postDetailScreen,
+          actionType: LMFeedPostActionType.commentAdded,
+        ));
         _rebuildCommentList.value = !_rebuildCommentList.value;
       } else {
         final int? index = _commentListPagingController.value.itemList
@@ -191,11 +227,21 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     } else if (state is LMDeleteCommentSuccess) {
       _commentListPagingController.value.itemList
           ?.removeWhere((element) => element.id == state.commentId);
+      _postBloc.add(LMFeedUpdatePostEvent(
+        postId: widget.postId,
+        source: LMFeedWidgetSource.postDetailScreen,
+        actionType: LMFeedPostActionType.commentDeleted,
+      ));
+      LMFeedCore.showSnackBar(
+        context,
+        '$commentTitleSmallCapSingular Deleted',
+        _widgetSource,
+      );
       _rebuildCommentList.value = !_rebuildCommentList.value;
     } else if (state is LMReplyCommentSuccess) {
-      final LMCommentViewData commentViewData = state.comment;
+      final LMCommentViewData commentViewData = state.reply;
       if (commentViewData.tempId == commentViewData.id) {
-        _commentListPagingController.value.itemList?.insert(0, state.comment);
+        _commentListPagingController.value.itemList?.insert(0, state.reply);
         _rebuildCommentList.value = !_rebuildCommentList.value;
       } else {
         final int? index = _commentListPagingController.value.itemList
@@ -205,6 +251,10 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
           _rebuildCommentList.value = !_rebuildCommentList.value;
         }
       }
+    } else if (state is LMGetReplyCommentLoading) {
+      showReplyCommentIds.add(state.commentId);
+    } else if (state is LMCloseReplyState) {
+      showReplyCommentIds.remove(state.commentId);
     }
   }
 
@@ -394,38 +444,17 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   LMFeedButton defCommentShowRepliesButton(LMCommentViewData commentViewData) {
     return LMFeedButton(
       onTap: () {
-        if (replyShown &&
-            commentIdReplyId != null &&
-            commentIdReplyId == commentViewData.id) {
-          _commentRepliesBloc.add(LMFeedClearCommentRepliesEvent());
-          replyShown = false;
-          commentIdReplyId = null;
-        } else if (replyShown &&
-            commentIdReplyId != null &&
-            commentIdReplyId != commentViewData.id) {
-          _commentRepliesBloc.add(LMFeedClearCommentRepliesEvent());
-          replyShown = true;
-          commentIdReplyId = commentViewData.id;
-          _commentRepliesBloc.add(LMFeedGetCommentRepliesEvent(
-              commentDetailRequest: (GetCommentRequestBuilder()
-                    ..commentId(commentViewData.id)
-                    ..postId(widget.postId)
-                    ..page(1))
-                  .build(),
-              forLoadMore: true));
-        } else {
-          replyShown = true;
-          commentIdReplyId = commentViewData.id;
-          _commentRepliesBloc.add(LMFeedGetCommentRepliesEvent(
-              commentDetailRequest: (GetCommentRequestBuilder()
-                    ..commentId(commentViewData.id)
-                    ..postId(widget.postId)
-                    ..page(1))
-                  .build(),
-              forLoadMore: true));
-        }
-        // _postDetailScreenHandler!.rebuildPostWidget.value =
-        //     !_postDetailScreenHandler!.rebuildPostWidget.value;
+        bool isReplyShown = showReplyCommentIds.contains(commentViewData.id);
+        isReplyShown
+            ? _commentBloc.add(LMCloseReplyEvent(commentId: commentViewData.id))
+            : _commentBloc.add(
+                LMGetReplyEvent(
+                  postId: widget.postId,
+                  commentId: commentViewData.id,
+                  page: 1,
+                  pageSize: 10,
+                ),
+              );
       },
       text: LMFeedText(
         text:
@@ -455,38 +484,12 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
           );
         },
         onCommentEdit: () {
-          LMCommentMetaDataBuilder commentMetaDataBuilder =
-              LMCommentMetaDataBuilder()
-                ..postId(_postViewData!.id)
-                ..commentActionType(LMFeedCommentActionType.edit)
-                ..commentText(LMFeedTaggingHelper.convertRouteToTag(
-                    commentViewData.text));
-
-          if (commentViewData.level == 0) {
-            commentMetaDataBuilder
-              ..commentActionEntity(LMFeedCommentType.parent)
-              ..level(0)
-              ..commentId(commentViewData.id);
-          } else {
-            commentMetaDataBuilder
-              ..level(1)
-              ..commentActionEntity(LMFeedCommentType.reply)
-              ..commentId(commentViewData.parentComment!.id)
-              ..replyId(commentViewData.id);
-          }
-
           _commentBloc.add(
             LMEditingCommentEvent(
                 postId: widget.postId,
                 commentId: commentViewData.id,
-                commentText: commentViewData.text),
+                replyText: commentViewData.text),
           );
-
-          // _postDetailScreenHandler!.commentHandlerBloc.add(
-          //   LMFeedCommentOngoingEvent(
-          //     commentMetaData: commentMetaDataBuilder.build(),
-          //   ),
-          // );
         },
         onCommentDelete: () {
           String commentCreatorUUID = commentViewData.user.sdkClientInfo.uuid;

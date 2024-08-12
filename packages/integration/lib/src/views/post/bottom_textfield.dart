@@ -10,8 +10,10 @@ class LMFeedBottomTextField extends StatefulWidget {
   const LMFeedBottomTextField({
     super.key,
     required this.postId,
+    this.focusNode,
   });
   final String postId;
+  final FocusNode? focusNode;
   @override
   State<LMFeedBottomTextField> createState() => _LMFeedBottomTextFieldState();
 }
@@ -23,7 +25,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
   late bool isDesktopWeb;
   final TextEditingController _commentController = TextEditingController();
-  final FocusNode _commentFocusNode = FocusNode();
+  late FocusNode _commentFocusNode;
   bool right = LMFeedUserUtils.checkCommentRights();
   final LMCommentBloc _commentBloc = LMCommentBloc.instance();
   final ValueNotifier<bool> _rebuildCommentTextField = ValueNotifier(false);
@@ -41,6 +43,18 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   List<LMUserTagViewData> userTags = [];
   LMPostDetailScreenConfig? config = LMFeedCore.config.postDetailConfig;
+
+  @override
+  void initState() {
+    super.initState();
+    _commentFocusNode = widget.focusNode ?? FocusNode();
+  }
+
+  @override
+  void didUpdateWidget(covariant LMFeedBottomTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _commentFocusNode = widget.focusNode ?? FocusNode();
+  }
 
   @override
   void didChangeDependencies() {
@@ -71,26 +85,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       child: SafeArea(
         top: false,
         child: BlocListener<LMCommentBloc, LMCommentState>(
-          listener: (context, state) {
-            if (state is LMEditingCommentState) {
-              _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-              openOnScreenKeyboard();
-              _commentController.text = state.comment;
-            } else if (state is LMEditingCommentCancelState) {
-              _commentController.clear();
-              closeOnScreenKeyboard();
-              _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-            } else if (state is LMReplyingCommentState) {
-              _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-              openOnScreenKeyboard();
-            } else if (state is LMReplyCancelState) {
-              _commentController.clear();
-              _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-              closeOnScreenKeyboard();
-            } else {
-              _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-            }
-          },
+          listener: _handleListener,
           bloc: _commentBloc,
           child: ValueListenableBuilder(
               valueListenable: _rebuildCommentTextField,
@@ -257,10 +252,40 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
     );
   }
 
+  void _handleListener(context, state) {
+    if (state is LMEditingCommentState) {
+      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+      openOnScreenKeyboard();
+      _commentController.text = state.comment;
+    } else if (state is LMEditingCommentCancelState) {
+      _commentController.clear();
+      closeOnScreenKeyboard();
+      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+    } else if (state is LMReplyingCommentState) {
+      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+      openOnScreenKeyboard();
+    } else if (state is LMReplyCancelState) {
+      _commentController.clear();
+      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+      closeOnScreenKeyboard();
+    } else if (state is LMEditingReplyState) {
+      openOnScreenKeyboard();
+      _commentController.text = state.replyText;
+      // _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+    } else if (state is LMEditReplyCancelEvent) {
+      _commentController.clear();
+      closeOnScreenKeyboard();
+      // _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+    } else {
+      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+    }
+  }
+
   void handleCreateCommentButtonAction([LMCommentState? state]) {
     closeOnScreenKeyboard();
     bool isEditing = _commentBloc.state is LMEditingCommentState;
     bool isReply = _commentBloc.state is LMReplyingCommentState;
+    bool isReplyEditing = _commentBloc.state is LMEditingReplyState;
     // extract text from comment controller
     String commentText = LMFeedTaggingHelper.encodeString(
       _commentController.text,
@@ -293,6 +318,15 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
         commentId: currentState.commentId,
         comment: commentText,
       ));
+    } else if (isReplyEditing) {
+      // edit an existing reply
+      final currentState = _commentBloc.state as LMEditingReplyState;
+      _commentBloc.add(LMEditReply(
+        postId: currentState.postId,
+        commentId: currentState.commentId,
+        replyId: currentState.replyId,
+        replyText: commentText,
+      ));
     } else {
       // create new comment
       _commentBloc.add(LMAddCommentEvent(
@@ -303,91 +337,6 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
 
     _commentController.clear();
     closeOnScreenKeyboard();
-    // _postDetailScreenHandler!.users
-    //     .putIfAbsent(currentUser.uuid, () => currentUser);
-
-    // if (state is LMFeedCommentActionOngoingState) {
-    // if (state.commentMetaData.commentActionType ==
-    //     LMFeedCommentActionType.edit) {
-    //   if (state.commentMetaData.commentActionEntity ==
-    //       LMFeedCommentType.parent) {
-    //     EditCommentRequest editCommentRequest = (EditCommentRequestBuilder()
-    //           ..postId(widget.postId)
-    //           ..commentId(state.commentMetaData.commentId!)
-    //           ..text(commentText))
-    //         .build();
-
-    // _postDetailScreenHandler!.addTempEditingComment(
-    //     state.commentMetaData.commentId ?? '', commentText);
-
-    // _postDetailScreenHandler!.commentHandlerBloc.add(
-    //     LMFeedCommentActionEvent(
-    //         commentActionRequest: editCommentRequest,
-    //         commentMetaData: state.commentMetaData));
-    // } else {
-    // EditCommentReplyRequest editCommentReplyRequest =
-    //     (EditCommentReplyRequestBuilder()
-    //           ..commentId(state.commentMetaData.commentId!)
-    //           ..postId(widget.postId)
-    //           ..replyId(state.commentMetaData.replyId!)
-    //           ..text(commentText))
-    //         .build();
-
-    // _commentRepliesBloc.add(LMFeedEditLocalReplyEvent(
-    //     text: commentText, replyId: state.commentMetaData.replyId!));
-
-    // _postDetailScreenHandler!.commentHandlerBloc.add(
-    //     LMFeedCommentActionEvent(
-    //         commentActionRequest: editCommentReplyRequest,
-    //         commentMetaData: state.commentMetaData));
-    // }
-    // } else if (state.commentMetaData.commentActionType ==
-    // LMFeedCommentActionType.replying) {
-    // LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-    //       ..commentActionEntity(LMFeedCommentType.reply)
-    //       ..level(1)
-    //       ..postId(widget.postId)
-    //       ..commentId(state.commentMetaData.commentId!)
-    //       ..commentActionType(LMFeedCommentActionType.replying))
-    //     .build();
-    // AddCommentReplyRequest addReplyRequest =
-    //     (AddCommentReplyRequestBuilder()
-    //           ..postId(widget.postId)
-    //           ..text(commentText)
-    //           ..tempId('${-DateTime.now().millisecondsSinceEpoch}')
-    //           ..commentId(state.commentMetaData.commentId!))
-    //         .build();
-
-    // _postDetailScreenHandler!.addTempReplyCommentToController(
-    //   addReplyRequest.tempId ?? '',
-    //   commentText,
-    //   1,
-    //   state.commentMetaData.commentId!,
-    //   replyShown,
-    // );
-    // commentIdReplyId = state.commentMetaData.commentId;
-    // replyShown = true;
-    // _rebuildComment.value = !_rebuildComment.value;
-    // _postDetailScreenHandler!.commentHandlerBloc.add(
-    //     LMFeedCommentActionEvent(
-    //         commentActionRequest: addReplyRequest,
-    //         commentMetaData: commentMetaData));
-    // }
-    // _postDetailScreenHandler!.openOnScreenKeyboard();
-    // } else {
-    // _postDetailScreenHandler!.addTempCommentToController(
-    //   addCommentRequest.tempId ?? '',
-    //   commentText,
-    //   0,
-    //   createdTime: currentTime,
-    // );
-    // _postDetailScreenHandler!.commentHandlerBloc.add(LMFeedCommentActionEvent(
-    //     commentActionRequest: addCommentRequest,
-    //     commentMetaData: commentMetaData));
-    // }
-
-    // _postDetailScreenHandler!.closeOnScreenKeyboard();
-    // _postDetailScreenHandler!.commentController.clear();
   }
 
   void closeOnScreenKeyboard() {

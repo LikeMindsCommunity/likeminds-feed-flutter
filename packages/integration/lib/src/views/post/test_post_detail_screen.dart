@@ -10,14 +10,15 @@ import 'package:likeminds_feed_flutter_core/src/bloc/bloc/lm_comment_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/bottom_textfield.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/comment_list_widget.dart';
+part 'post_detail_screen_configuration.dart';
 
 /// {@template post_detail_screen}
 /// A screen that displays a post in detail
 /// with comments and likes
 /// {@endtemplate}
-class TestLMFeedPostDetailScreen extends StatefulWidget {
+class LMFeedPostDetailScreen extends StatefulWidget {
   ///{@macro post_detail_screen}
-  const TestLMFeedPostDetailScreen({
+  const LMFeedPostDetailScreen({
     super.key,
     required this.postId,
     this.postBuilder,
@@ -59,12 +60,10 @@ class TestLMFeedPostDetailScreen extends StatefulWidget {
   final LMPostDetailScreenConfig? config;
 
   @override
-  State<TestLMFeedPostDetailScreen> createState() =>
-      _TestLMFeedPostDetailScreenState();
+  State<LMFeedPostDetailScreen> createState() => _LMFeedPostDetailScreenState();
 }
 
-class _TestLMFeedPostDetailScreenState
-    extends State<TestLMFeedPostDetailScreen> {
+class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   late Size screenSize;
   late bool isDesktopWeb;
 
@@ -86,11 +85,8 @@ class _TestLMFeedPostDetailScreenState
   final LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
   final LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
-  final ValueNotifier<bool> _rebuildCommentTextField = ValueNotifier(false);
   final PagingController<int, LMCommentViewData> _pagingController =
       PagingController(firstPageKey: 1);
-  final LMFeedFetchCommentReplyBloc _commentRepliesBloc =
-      LMFeedFetchCommentReplyBloc.instance;
   LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
   String? commentIdReplyId;
   bool replyShown = false;
@@ -110,6 +106,7 @@ class _TestLMFeedPostDetailScreenState
   LMPostViewData? postData;
   final TextEditingController _commentController = TextEditingController();
   final FocusNode _commentFocusNode = FocusNode();
+  int _commentCount = 0;
 
   @override
   void initState() {
@@ -134,7 +131,7 @@ class _TestLMFeedPostDetailScreenState
   }
 
   @override
-  void didUpdateWidget(covariant TestLMFeedPostDetailScreen oldWidget) {
+  void didUpdateWidget(covariant LMFeedPostDetailScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.postId != widget.postId) {
       _pagingController.itemList?.clear();
@@ -166,7 +163,7 @@ class _TestLMFeedPostDetailScreenState
       body: RefreshIndicator.adaptive(
         onRefresh: () {
           _pagingController.refresh();
-          _commentRepliesBloc.add(LMFeedClearCommentRepliesEvent());
+          //TODO: implement refresh
           return Future.value();
         },
         color: feedTheme.primaryColor,
@@ -214,6 +211,7 @@ class _TestLMFeedPostDetailScreenState
                   backgroundColor: feedTheme.backgroundColor,
                   bottomNavigationBar: LMFeedBottomTextField(
                     postId: widget.postId,
+                    focusNode: _commentFocusNode,
                   ),
                   appBar: widget.appBarBuilder?.call(context, defAppBar()) ??
                       defAppBar(),
@@ -277,42 +275,52 @@ class _TestLMFeedPostDetailScreenState
 
   SliverToBoxAdapter _defCommentsCount() {
     return SliverToBoxAdapter(
-      child: BlocBuilder<LMCommentBloc, LMCommentState>(
+      child: BlocConsumer<LMCommentBloc, LMCommentState>(
         bloc: _commentBloc,
-        buildWhen: (previous, current) =>
-            current is LMGetCommentSuccess || current is LMGetCommentLoading,
-        builder: (context, state) {
+        listener: (context, state) {
           if (state is LMGetCommentSuccess) {
-            final LMPostViewData postData = state.post;
-            return postData.commentCount == 0 || !config!.showCommentCountOnList
-                ? const SizedBox.shrink()
-                : Container(
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                        borderRadius: isDesktopWeb
-                            ? BorderRadius.vertical(top: Radius.circular(8.0))
-                            : null,
-                        color: feedTheme.container),
-                    margin: const EdgeInsets.only(top: 10.0),
-                    padding: feedTheme.commentStyle.padding ??
-                        const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                        ),
-                    alignment: Alignment.topLeft,
-                    child: LMFeedText(
-                      text: LMFeedPostUtils.getCommentCountTextWithCount(
-                          postData.commentCount),
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: feedTheme.onContainer,
-                        ),
+            _commentCount = state.post.commentCount;
+          } else if (state is LMAddCommentSuccess) {
+            if (state.comment.tempId == state.comment.id) {
+              _commentCount = _commentCount + 1;
+            }
+          } else if (state is LMDeleteCommentSuccess) {
+            _commentCount = _commentCount - 1;
+          }
+        },
+        buildWhen: (previous, current) =>
+            current is LMGetCommentSuccess ||
+            current is LMGetCommentLoading ||
+            current is LMAddCommentSuccess ||
+            current is LMDeleteCommentSuccess,
+        builder: (context, state) {
+          return _commentCount == 0 || !config!.showCommentCountOnList
+              ? const SizedBox.shrink()
+              : Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                      borderRadius: isDesktopWeb
+                          ? BorderRadius.vertical(top: Radius.circular(8.0))
+                          : null,
+                      color: feedTheme.container),
+                  margin: const EdgeInsets.only(top: 10.0),
+                  padding: feedTheme.commentStyle.padding ??
+                      const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                      ),
+                  alignment: Alignment.topLeft,
+                  child: LMFeedText(
+                    text: LMFeedPostUtils.getCommentCountTextWithCount(
+                        _commentCount),
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: feedTheme.onContainer,
                       ),
                     ),
-                  );
-          }
-          return SizedBox.shrink();
+                  ),
+                );
         },
       ),
     );
@@ -754,10 +762,10 @@ class _TestLMFeedPostDetailScreenState
         style: feedTheme.footerStyle.commentButtonStyle,
         onTap: () {
           LMFeedPostUtils.handlePostCommentButtonTap(postData!, _widgetSource);
-          // _postDetailScreenHandler!.openOnScreenKeyboard();
+          openOnScreenKeyboard();
         },
         onTextTap: () {
-          // _postDetailScreenHandler!.openOnScreenKeyboard();
+          openOnScreenKeyboard();
         },
       );
 

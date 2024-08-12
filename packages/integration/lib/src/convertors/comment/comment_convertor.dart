@@ -12,6 +12,10 @@ class LMCommentViewDataConvertor {
       ..level(comment.level ?? 0)
       ..likesCount(comment.likesCount)
       ..repliesCount(comment.repliesCount)
+      ..replies(comment.replies
+              ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
+              .toList() ??
+          [])
       ..menuItems(comment.menuItems
           .map((e) => LMPopupMenuItemConvertor.fromPopUpMenuItemModel(item: e))
           .toList())

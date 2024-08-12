@@ -59,9 +59,9 @@ FutureOr<void> _replyCommentHandler(LMReplyCommentEvent event, emit) async {
               userTopics: response.userTopics,
             ))) ??
         {});
-    LMCommentViewData commentViewData =
+    LMCommentViewData reply =
         LMCommentViewDataConvertor.fromComment(response.reply!, users);
-    emit(LMAddCommentSuccess(comment: commentViewData));
+    emit(LMReplyCommentSuccess(reply: reply));
   } else {
     emit(
       LMAddCommentError(

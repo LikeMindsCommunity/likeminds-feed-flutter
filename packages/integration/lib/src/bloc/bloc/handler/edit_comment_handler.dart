@@ -56,6 +56,6 @@ FutureOr<void> _editingCommentHandler(LMEditingCommentEvent event, emit) {
   emit(LMEditingCommentState(
     postId: event.postId,
     commentId: event.commentId,
-    comment: event.commentText,
+    comment: event.replyText,
   ));
 }
