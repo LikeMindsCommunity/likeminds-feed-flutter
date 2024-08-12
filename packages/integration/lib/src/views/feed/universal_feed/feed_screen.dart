@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/test_post_detail_screen.dart';
 
 part 'feed_screen_configuration.dart';
 
@@ -1114,7 +1115,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
-            builder: (context) => LMFeedPostDetailScreen(
+            builder: (context) => TestLMFeedPostDetailScreen(
               postId: post.id,
               postBuilder: widget.postBuilder,
             ),
@@ -1486,7 +1487,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
-              builder: (context) => LMFeedPostDetailScreen(
+              builder: (context) => TestLMFeedPostDetailScreen(
                 postId: postViewData.id,
                 openKeyboard: true,
                 postBuilder: widget.postBuilder,
@@ -1500,7 +1501,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
-              builder: (context) => LMFeedPostDetailScreen(
+              builder: (context) => TestLMFeedPostDetailScreen(
                 postId: postViewData.id,
                 openKeyboard: true,
                 postBuilder: widget.postBuilder,
