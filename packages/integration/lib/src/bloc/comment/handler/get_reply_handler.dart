@@ -1,12 +1,12 @@
 part of '../comment_bloc.dart';
 
-Future<void> _getReplyHandler(LMGetReplyEvent event, emit) async {
+Future<void> _getReplyHandler(LMFeedGetReplyEvent event, emit) async {
   if (event.page == 1) {
-    emit(LMGetReplyCommentLoading(
+    emit(LMFeedGetReplyCommentLoadingState(
       commentId: event.commentId,
     ));
   } else {
-    emit(LMGetReplyCommentPaginationLoading(
+    emit(LMFeedGetReplyCommentPaginationLoadingState(
       commentId: event.commentId,
     ));
   }
@@ -44,7 +44,7 @@ Future<void> _getReplyHandler(LMGetReplyEvent event, emit) async {
         {});
     LMCommentViewData commentViewData =
         LMCommentViewDataConvertor.fromComment(response.postReplies!, users);
-    emit(LMGetReplyCommentSuccess(
+    emit(LMFeedGetReplyCommentSuccessState(
         replies: commentViewData.replies ?? [],
         page: event.page,
         commentId: event.commentId));
@@ -52,5 +52,5 @@ Future<void> _getReplyHandler(LMGetReplyEvent event, emit) async {
 }
 
 void _closeReplyHandler(event, emit) {
-  emit(LMCloseReplyState(commentId: event.commentId));
+  emit(LMFeedCloseReplyState(commentId: event.commentId));
 }

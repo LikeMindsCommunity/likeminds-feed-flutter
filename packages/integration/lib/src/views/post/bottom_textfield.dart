@@ -27,7 +27,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   final TextEditingController _commentController = TextEditingController();
   late FocusNode _commentFocusNode;
   bool right = LMFeedUserUtils.checkCommentRights();
-  final LMCommentBloc _commentBloc = LMCommentBloc.instance();
+  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance();
   final ValueNotifier<bool> _rebuildCommentTextField = ValueNotifier(false);
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
@@ -84,15 +84,15 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       ),
       child: SafeArea(
         top: false,
-        child: BlocListener<LMCommentBloc, LMCommentState>(
+        child: BlocListener<LMFeedCommentBloc, LMFeedCommentState>(
           listener: _handleListener,
           bloc: _commentBloc,
           child: ValueListenableBuilder(
               valueListenable: _rebuildCommentTextField,
               builder: (context, _, __) {
-                final LMCommentState state = _commentBloc.state;
-                final bool isEditing = (state is LMEditingCommentState);
-                final bool isReply = (state is LMReplyingCommentState);
+                final LMFeedCommentState state = _commentBloc.state;
+                final bool isEditing = (state is LMFeedEditingCommentState);
+                final bool isReply = (state is LMFeedReplyingCommentState);
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -118,7 +118,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                                 isEditing
                                     ? const SizedBox()
                                     : LMFeedText(
-                                        text: (state as LMReplyingCommentState)
+                                        text: (state as LMFeedReplyingCommentState)
                                             .userName,
                                         style: const LMFeedTextStyle(
                                           textStyle: TextStyle(
@@ -132,9 +132,9 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                                   onTap: () {
                                     isEditing
                                         ? _commentBloc
-                                            .add(LMEditCommentCancelEvent())
+                                            .add(LMFeedEditCommentCancelEvent())
                                         : _commentBloc
-                                            .add(LMReplyCancelEvent());
+                                            .add(LMFeedReplyCancelEvent());
                                   },
                                   style: const LMFeedButtonStyle(
                                     icon: LMFeedIcon(
@@ -253,26 +253,26 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   }
 
   void _handleListener(context, state) {
-    if (state is LMEditingCommentState) {
+    if (state is LMFeedEditingCommentState) {
       _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
       openOnScreenKeyboard();
       _commentController.text = state.oldComment.text;
-    } else if (state is LMEditingCommentCancelState) {
+    } else if (state is LMFeedEditingCommentCancelState) {
       _commentController.clear();
       closeOnScreenKeyboard();
       _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-    } else if (state is LMReplyingCommentState) {
+    } else if (state is LMFeedReplyingCommentState) {
       _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
       openOnScreenKeyboard();
-    } else if (state is LMReplyCancelState) {
+    } else if (state is LMFeedReplyCancelState) {
       _commentController.clear();
       _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
       closeOnScreenKeyboard();
-    } else if (state is LMEditingReplyState) {
+    } else if (state is LMFeedEditingReplyState) {
       openOnScreenKeyboard();
       _commentController.text = state.replyText;
       // _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-    } else if (state is LMEditReplyCancelEvent) {
+    } else if (state is LMFeedEditReplyCancelEvent) {
       _commentController.clear();
       closeOnScreenKeyboard();
       // _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
@@ -281,11 +281,11 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
     }
   }
 
-  void handleCreateCommentButtonAction([LMCommentState? state]) {
+  void handleCreateCommentButtonAction([LMFeedCommentState? state]) {
     closeOnScreenKeyboard();
-    bool isEditing = _commentBloc.state is LMEditingCommentState;
-    bool isReply = _commentBloc.state is LMReplyingCommentState;
-    bool isReplyEditing = _commentBloc.state is LMEditingReplyState;
+    bool isEditing = _commentBloc.state is LMFeedEditingCommentState;
+    bool isReply = _commentBloc.state is LMFeedReplyingCommentState;
+    bool isReplyEditing = _commentBloc.state is LMFeedEditingReplyState;
     // extract text from comment controller
     String commentText = LMFeedTaggingHelper.encodeString(
       _commentController.text,
@@ -304,24 +304,24 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
 
     if (isEditing) {
       // edit an existing comment
-      final currentState = _commentBloc.state as LMEditingCommentState;
-      _commentBloc.add(LMEditCommentEvent(
+      final currentState = _commentBloc.state as LMFeedEditingCommentState;
+      _commentBloc.add(LMFeedEditCommentEvent(
         widget.postId,
         currentState.oldComment,
         commentText,
       ));
     } else if (isReply) {
       // create new reply
-      final currentState = _commentBloc.state as LMReplyingCommentState;
-      _commentBloc.add(LMReplyCommentEvent(
+      final currentState = _commentBloc.state as LMFeedReplyingCommentState;
+      _commentBloc.add(LMFeedReplyCommentEvent(
         postId: widget.postId,
         parentComment: currentState.parentComment,
         replyText: commentText,
       ));
     } else if (isReplyEditing) {
       // edit an existing reply
-      final currentState = _commentBloc.state as LMEditingReplyState;
-      _commentBloc.add(LMEditReply(
+      final currentState = _commentBloc.state as LMFeedEditingReplyState;
+      _commentBloc.add(LMFeedEditReplyEvent(
         postId: currentState.postId,
         commentId: currentState.commentId,
         oldReply: currentState.oldReply,
@@ -329,9 +329,9 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       ));
     } else {
       // create new comment
-      _commentBloc.add(LMAddCommentEvent(
+      _commentBloc.add(LMFeedAddCommentEvent(
         postId: widget.postId,
-        comment: commentText,
+        commentText: commentText,
       ));
     }
 

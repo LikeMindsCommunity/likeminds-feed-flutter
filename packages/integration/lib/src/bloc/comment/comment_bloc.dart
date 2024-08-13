@@ -16,36 +16,36 @@ part 'handler/get_reply_handler.dart';
 part 'handler/edit_reply_handler.dart';
 part 'handler/delete_reply_handler.dart';
 
-class LMCommentBloc extends Bloc<LMCommentEvent, LMCommentState> {
-  static final LMCommentBloc _instance = LMCommentBloc._();
+class LMFeedCommentBloc extends Bloc<LMFeedCommentEvent, LMFeedCommentState> {
+  static final LMFeedCommentBloc _instance = LMFeedCommentBloc._();
 
-  factory LMCommentBloc.instance() {
+  factory LMFeedCommentBloc.instance() {
     return _instance;
   }
-  LMCommentBloc._() : super(LMCommentInitial()) {
-    on<LMCommentRefreshEvent>((event, emit) {
-      emit(LMCommentRefreshState());
+  LMFeedCommentBloc._() : super(LMFeedCommentInitialState()) {
+    on<LMFeedCommentRefreshEvent>((event, emit) {
+      emit(LMFeedCommentRefreshState());
     });
-    on<LMGetCommentsEvent>(_getCommentHandler);
-    on<LMAddCommentEvent>(_addCommentHandler);
+    on<LMFeedGetCommentsEvent>(_getCommentHandler);
+    on<LMFeedAddCommentEvent>(_addCommentHandler);
 
-    on<LMEditingCommentEvent>(_editingCommentHandler);
-    on<LMEditCommentCancelEvent>(_cancelEditingCommentHandler);
-    on<LMEditCommentEvent>(_editCommentHandler);
+    on<LMFeedEditingCommentEvent>(_editingCommentHandler);
+    on<LMFeedEditCommentCancelEvent>(_cancelEditingCommentHandler);
+    on<LMFeedEditCommentEvent>(_editCommentHandler);
 
-    on<LMDeleteComment>(_deleteCommentHandler);
+    on<LMFeedDeleteCommentEvent>(_deleteCommentHandler);
 
-    on<LMReplyingCommentEvent>(_replyingCommentHandler);
-    on<LMReplyCommentEvent>(_replyCommentHandler);
-    on<LMReplyCancelEvent>(_cancelReplyCommentHandler);
+    on<LMFeedReplyingCommentEvent>(_replyingCommentHandler);
+    on<LMFeedReplyCommentEvent>(_replyCommentHandler);
+    on<LMFeedReplyCancelEvent>(_cancelReplyCommentHandler);
 
-    on<LMGetReplyEvent>(_getReplyHandler);
-    on<LMCloseReplyEvent>(_closeReplyHandler);
+    on<LMFeedGetReplyEvent>(_getReplyHandler);
+    on<LMFeedCloseReplyEvent>(_closeReplyHandler);
 
-    on<LMEditingReplyEvent>(_editingReplyHandler);
-    on<LMEditReply>(_editReplyHandler);
+    on<LMFeedEditingReplyEvent>(_editingReplyHandler);
+    on<LMFeedEditReplyEvent>(_editReplyHandler);
 
-    on<LMEditReplyCancelEvent>(_editReplyCancelHandler);
+    on<LMFeedEditReplyCancelEvent>(_editReplyCancelHandler);
 
     on<LMDeleteReplyEvent>(_deleteReplyHandler);
   }

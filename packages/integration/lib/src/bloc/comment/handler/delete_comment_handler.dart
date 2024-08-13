@@ -1,8 +1,8 @@
 part of '../comment_bloc.dart';
 
-Future<void> _deleteCommentHandler(LMDeleteComment event, emit) async {
+Future<void> _deleteCommentHandler(LMFeedDeleteCommentEvent event, emit) async {
   // emit success state to remove the comment from the state locally
-  emit(LMDeleteCommentSuccess(
+  emit(LMFeedDeleteCommentSuccessState(
     commentId: event.oldComment.id,
   ));
   // create delete comment request
@@ -18,7 +18,7 @@ Future<void> _deleteCommentHandler(LMDeleteComment event, emit) async {
   // emit error state if the delete request fails and revert the state
   if (!response.success) {
     emit(
-      LMDeleteCommentError(
+      LMFeedDeleteCommentErrorState(
         error: response.errorMessage ?? 'Failed to delete comment',
         oldComment: event.oldComment,
         index: event.index,

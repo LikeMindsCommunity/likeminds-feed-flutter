@@ -1,12 +1,12 @@
 part of "../comment_bloc.dart";
 
-Future<void> _editCommentHandler(LMEditCommentEvent event, emit) async {
+Future<void> _editCommentHandler(LMFeedEditCommentEvent event, emit) async {
   // local commentViewData to add to the state
   LMCommentViewData commentViewData = event.oldComment.copyWith(
     text: event.editedText,
     isEdited: true,
   );
-  emit(LMEditCommentSuccess(
+  emit(LMFeedEditCommentSuccessState(
     commentViewData: commentViewData,
   ));
   // build edit comment request
@@ -45,23 +45,23 @@ Future<void> _editCommentHandler(LMEditCommentEvent event, emit) async {
 
     commentViewData =
         LMCommentViewDataConvertor.fromComment(response.reply!, users);
-    emit(LMEditCommentSuccess(
+    emit(LMFeedEditCommentSuccessState(
       commentViewData: commentViewData,
     ));
   } else {
-    emit(LMEditCommentError(
+    emit(LMFeedEditCommentErrorState(
       error: response.errorMessage ?? 'An error occurred',
       oldComment: event.oldComment,
     ));
   }
 }
 
-void _cancelEditingCommentHandler(LMEditCommentCancelEvent event, emit) {
-  emit(LMEditingCommentCancelState());
+void _cancelEditingCommentHandler(LMFeedEditCommentCancelEvent event, emit) {
+  emit(LMFeedEditingCommentCancelState());
 }
 
-void _editingCommentHandler(LMEditingCommentEvent event, emit) {
-  emit(LMEditingCommentState(
+void _editingCommentHandler(LMFeedEditingCommentEvent event, emit) {
+  emit(LMFeedEditingCommentState(
     postId: event.postId,
     oldComment: event.oldComment,
   ));

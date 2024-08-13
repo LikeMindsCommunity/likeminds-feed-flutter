@@ -1,8 +1,8 @@
 part of "../comment_bloc.dart";
 
-Future<void> _editReplyHandler(LMEditReply event, emit) async {
+Future<void> _editReplyHandler(LMFeedEditReplyEvent event, emit) async {
   // emit success state to edit the reply from the state locally
-  emit(LMEditReplySuccess(
+  emit(LMFeedEditReplySuccessState(
     commentId: event.commentId,
     replyId: event.oldReply.id,
     reply: event.oldReply.copyWith(text: event.editText),
@@ -47,13 +47,13 @@ Future<void> _editReplyHandler(LMEditReply event, emit) async {
     LMCommentViewData reply =
         LMCommentViewDataConvertor.fromComment(response.reply!, users);
 
-    emit(LMEditReplySuccess(
+    emit(LMFeedEditReplySuccessState(
       commentId: event.commentId,
       replyId: event.oldReply.id,
       reply: reply,
     ));
   } else {
-    emit(LMEditReplyError(
+    emit(LMFeedEditReplyErrorState(
       error: response.errorMessage ?? 'Failed to edit reply',
       commentId: event.commentId,
       oldReply: event.oldReply,
@@ -61,8 +61,8 @@ Future<void> _editReplyHandler(LMEditReply event, emit) async {
   }
 }
 
-void _editingReplyHandler(LMEditingReplyEvent event, emit) {
-  emit(LMEditingReplyState(
+void _editingReplyHandler(LMFeedEditingReplyEvent event, emit) {
+  emit(LMFeedEditingReplyState(
     commentId: event.commentId,
     oldReply: event.oldReply,
     postId: event.postId,
@@ -70,4 +70,4 @@ void _editingReplyHandler(LMEditingReplyEvent event, emit) {
   ));
 }
 
-void _editReplyCancelHandler(LMEditReplyCancelEvent event, emit) {}
+void _editReplyCancelHandler(LMFeedEditReplyCancelEvent event, emit) {}

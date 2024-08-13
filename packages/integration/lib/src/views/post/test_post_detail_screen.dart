@@ -99,7 +99,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   bool isAndroid = LMFeedPlatform.instance.isAndroid();
   bool isWeb = LMFeedPlatform.instance.isWeb();
   double? screenWidth;
-  final _commentBloc = LMCommentBloc.instance();
+  final _commentBloc = LMFeedCommentBloc.instance();
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   LMPostViewData? postData;
   final TextEditingController _commentController = TextEditingController();
@@ -146,7 +146,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return Scaffold(
       body: RefreshIndicator.adaptive(
         onRefresh: () {
-          _commentBloc.add(LMCommentRefreshEvent());
+          _commentBloc.add(LMFeedCommentRefreshEvent());
           return Future.value();
         },
         color: feedTheme.primaryColor,
@@ -208,25 +208,25 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               SliverPadding(
                                   padding: EdgeInsets.only(top: 20.0)),
                             SliverToBoxAdapter(
-                              child: BlocBuilder<LMCommentBloc, LMCommentState>(
+                              child: BlocBuilder<LMFeedCommentBloc, LMFeedCommentState>(
                                 bloc: _commentBloc,
                                 buildWhen: (previous, current) {
-                                  if (current is LMGetCommentSuccess) {
+                                  if (current is LMFeedGetCommentSuccessState) {
                                     return true;
                                   }
-                                  if (current is LMGetCommentError) {
+                                  if (current is LMFeedGetCommentErrorState) {
                                     return true;
                                   }
-                                  if (current is LMGetCommentLoading) {
+                                  if (current is LMFeedGetCommentLoadingState) {
                                     return true;
                                   }
                                   return false;
                                 },
                                 builder: (context, state) {
-                                  if (state is LMGetCommentLoading) {
+                                  if (state is LMFeedGetCommentLoadingState) {
                                     return SizedBox.shrink();
                                   }
-                                  if (state is LMGetCommentSuccess) {
+                                  if (state is LMFeedGetCommentSuccessState) {
                                     postData = state.post;
                                     return defPostWidget(context, state.post);
                                   }
@@ -258,32 +258,32 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   SliverToBoxAdapter _defCommentsCount() {
     return SliverToBoxAdapter(
-      child: BlocConsumer<LMCommentBloc, LMCommentState>(
+      child: BlocConsumer<LMFeedCommentBloc, LMFeedCommentState>(
         bloc: _commentBloc,
         listener: (context, state) {
-          if (state is LMGetCommentSuccess) {
+          if (state is LMFeedGetCommentSuccessState) {
             _commentCount = state.post.commentCount;
-          } else if (state is LMAddCommentSuccess) {
+          } else if (state is LMFeedAddCommentSuccessState) {
             if (state.comment.tempId == state.comment.id) {
               _commentCount = _commentCount + 1;
             }
-          } else if (state is LMAddCommentError) {
+          } else if (state is LMFeedAddCommentErrorState) {
             _commentCount = _commentCount - 1;
-          } else if (state is LMDeleteCommentSuccess) {
+          } else if (state is LMFeedDeleteCommentSuccessState) {
             _commentCount = _commentCount - 1;
-          } else if (state is LMDeleteCommentError) {
+          } else if (state is LMFeedDeleteCommentErrorState) {
             _commentCount = _commentCount + 1;
           }
         },
         buildWhen: (previous, current) =>
-            current is LMGetCommentSuccess ||
-            current is LMGetCommentLoading ||
-            current is LMAddCommentSuccess ||
-            current is LMDeleteCommentSuccess,
+            current is LMFeedGetCommentSuccessState ||
+            current is LMFeedGetCommentLoadingState ||
+            current is LMFeedAddCommentSuccessState ||
+            current is LMFeedDeleteCommentSuccessState,
         builder: (context, state) {
           return _commentCount == 0 ||
                   !config!.showCommentCountOnList ||
-                  state is LMGetCommentLoading
+                  state is LMFeedGetCommentLoadingState
               ? const SizedBox.shrink()
               : Container(
                   clipBehavior: Clip.hardEdge,
@@ -347,17 +347,17 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ),
             ),
           ),
-          BlocBuilder<LMCommentBloc, LMCommentState>(
+          BlocBuilder<LMFeedCommentBloc, LMFeedCommentState>(
             bloc: _commentBloc,
             buildWhen: (previous, current) =>
-                current is LMGetCommentSuccess ||
-                current is LMGetCommentLoading ||
-                current is LMAddCommentSuccess ||
-                current is LMDeleteCommentSuccess,
+                current is LMFeedGetCommentSuccessState ||
+                current is LMFeedGetCommentLoadingState ||
+                current is LMFeedAddCommentSuccessState ||
+                current is LMFeedDeleteCommentSuccessState,
             builder: (context, state) {
               return _commentCount == 0 ||
                       !config!.showCommentCountOnList ||
-                      state is LMGetCommentLoading
+                      state is LMFeedGetCommentLoadingState
                   ? const SizedBox.shrink()
                   : LMFeedText(
                       text: LMFeedPostUtils.getCommentCountTextWithCount(
@@ -899,9 +899,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     );
   }
 
-  void handleCreateCommentButtonAction([LMCommentState? state]) {
+  void handleCreateCommentButtonAction([LMFeedCommentState? state]) {
     closeOnScreenKeyboard();
-    bool isEditing = _commentBloc.state is LMEditingCommentState;
+    bool isEditing = _commentBloc.state is LMFeedEditingCommentState;
     // extract text from comment controller
     String commentText = LMFeedTaggingHelper.encodeString(
       _commentController.text,
@@ -920,17 +920,17 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
     if (isEditing) {
       // edit an existing comment
-      final currentState = _commentBloc.state as LMEditingCommentState;
-      _commentBloc.add(LMEditCommentEvent(
+      final currentState = _commentBloc.state as LMFeedEditingCommentState;
+      _commentBloc.add(LMFeedEditCommentEvent(
         widget.postId,
         currentState.oldComment,
         commentText,
       ));
     } else {
       // create new comment
-      _commentBloc.add(LMAddCommentEvent(
+      _commentBloc.add(LMFeedAddCommentEvent(
         postId: widget.postId,
-        comment: commentText,
+        commentText: commentText,
       ));
     }
 

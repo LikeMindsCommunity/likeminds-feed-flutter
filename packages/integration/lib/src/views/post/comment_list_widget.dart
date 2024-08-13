@@ -39,7 +39,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
   List<String> showReplyCommentIds = [];
-  final LMCommentBloc _commentBloc = LMCommentBloc.instance();
+  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance();
   final LMFeedPostBloc _postBloc = LMFeedPostBloc.instance;
   final PagingController<int, LMCommentViewData> _commentListPagingController =
       PagingController(firstPageKey: 1);
@@ -72,10 +72,10 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     _commentListPagingController.addPageRequestListener(
       (pageKey) {
         _commentBloc.add(
-          LMGetCommentsEvent(
+          LMFeedGetCommentsEvent(
             postId: widget.postId,
             page: pageKey,
-            commentListPageSize: _pageSize,
+            pageSize: _pageSize,
           ),
         );
       },
@@ -83,8 +83,8 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   }
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(LMCommentState state) {
-    if (state is LMGetCommentSuccess) {
+  void updatePagingControllers(LMFeedCommentState state) {
+    if (state is LMFeedGetCommentSuccessState) {
       _postViewData = state.post;
       final isLastPage = state.comments.length < _pageSize;
       if (isLastPage) {
@@ -97,21 +97,21 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<LMCommentBloc, LMCommentState>(
+    return BlocConsumer<LMFeedCommentBloc, LMFeedCommentState>(
         bloc: _commentBloc,
         listener: _handleBlocListeners,
         buildWhen: (previous, current) {
-          if (current is LMAddCommentSuccess ||
-              current is LMAddCommentError ||
-              current is LMEditCommentSuccess ||
-              current is LMEditCommentError ||
-              current is LMDeleteCommentSuccess ||
-              current is LMDeleteCommentError ||
-              current is LMReplyCommentSuccess ||
-              current is LMDeleteReplySuccess ||
-              current is LMGetCommentSuccess ||
-              current is LMGetReplyCommentLoading ||
-              current is LMCloseReplyState) {
+          if (current is LMFeedAddCommentSuccessState ||
+              current is LMFeedAddCommentErrorState ||
+              current is LMFeedEditCommentSuccessState ||
+              current is LMFeedEditCommentErrorState ||
+              current is LMFeedDeleteCommentSuccessState ||
+              current is LMFeedDeleteCommentErrorState ||
+              current is LMFeedReplyCommentSuccessState ||
+              current is LMFeedDeleteReplySuccessState ||
+              current is LMFeedGetCommentSuccessState ||
+              current is LMFeedGetReplyCommentLoadingState ||
+              current is LMFeedCloseReplyState) {
             return true;
           }
           return false;
@@ -174,11 +174,11 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   }
 
   void _handleBlocListeners(context, state) {
-    if (state is LMCommentRefreshState) {
+    if (state is LMFeedCommentRefreshState) {
       showReplyCommentIds.clear();
       _commentListPagingController.refresh();
     }
-    if (state is LMReplyCommentSuccess) {
+    if (state is LMFeedReplyCommentSuccessState) {
       if (state.reply.tempId != state.reply.id) {
         return;
       }
@@ -189,8 +189,9 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
             _commentListPagingController.itemList?[index].repliesCount ?? 0;
         _commentListPagingController.itemList?[index].repliesCount =
             replyCount + 1;
+        showReplyCommentIds.add(state.reply.parentComment!.id);
       }
-    } else if (state is LMReplyCommentError) {
+    } else if (state is LMFeedReplyCommentErrorState) {
       final int? index = _commentListPagingController.value.itemList
           ?.indexWhere((element) => element.id == state.commentId);
       if (index != null && index != -1) {
@@ -199,7 +200,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         _commentListPagingController.itemList?[index].repliesCount =
             replyCount - 1;
       }
-    } else if (state is LMDeleteReplySuccess) {
+    } else if (state is LMFeedDeleteReplySuccessState) {
       int? index = _commentListPagingController.value.itemList
           ?.indexWhere((element) => element.id == state.commentId);
       if (index != null && index != -1) {
@@ -214,7 +215,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         '$commentTitleSmallCapSingular Deleted',
         _widgetSource,
       );
-    } else if (state is LMDeleteCommentError) {
+    } else if (state is LMFeedDeleteCommentErrorState) {
       _commentListPagingController.value.itemList?[state.index] =
           state.oldComment;
       LMFeedCore.showSnackBar(
@@ -222,9 +223,9 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         state.error,
         _widgetSource,
       );
-    } else if (state is LMGetCommentSuccess) {
+    } else if (state is LMFeedGetCommentSuccessState) {
       updatePagingControllers(state);
-    } else if (state is LMAddCommentSuccess) {
+    } else if (state is LMFeedAddCommentSuccessState) {
       final LMCommentViewData commentViewData = state.comment;
       if (commentViewData.tempId == commentViewData.id) {
         _commentListPagingController.value.itemList?.insert(0, state.comment);
@@ -242,7 +243,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
           _rebuildCommentList.value = !_rebuildCommentList.value;
         }
       }
-    } else if (state is LMAddCommentError) {
+    } else if (state is LMFeedAddCommentErrorState) {
       final int? index = _commentListPagingController.value.itemList
           ?.indexWhere((element) => element.id == state.commentId);
       if (index != null && index != -1) {
@@ -254,7 +255,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         state.error,
         widget.widgetSource,
       );
-    } else if (state is LMEditCommentSuccess) {
+    } else if (state is LMFeedEditCommentSuccessState) {
       final int? index = _commentListPagingController.value.itemList
           ?.indexWhere((comment) => comment.id == state.commentViewData.id);
       if (index != null && index != -1) {
@@ -262,14 +263,14 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
             state.commentViewData;
         _rebuildCommentList.value = !_rebuildCommentList.value;
       }
-    } else if (state is LMEditCommentError) {
+    } else if (state is LMFeedEditCommentErrorState) {
       final int? index = _commentListPagingController.value.itemList
           ?.indexWhere((comment) => comment.id == state.oldComment.id);
       if (index != null && index != -1) {
         _commentListPagingController.value.itemList![index] = state.oldComment;
         _rebuildCommentList.value = !_rebuildCommentList.value;
       }
-    } else if (state is LMDeleteCommentSuccess) {
+    } else if (state is LMFeedDeleteCommentSuccessState) {
       _commentListPagingController.value.itemList
           ?.removeWhere((element) => element.id == state.commentId);
       _postBloc.add(LMFeedUpdatePostEvent(
@@ -283,7 +284,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         _widgetSource,
       );
       _rebuildCommentList.value = !_rebuildCommentList.value;
-    } else if (state is LMReplyCommentSuccess) {
+    } else if (state is LMFeedReplyCommentSuccessState) {
       final LMCommentViewData commentViewData = state.reply;
       if (commentViewData.tempId == commentViewData.id) {
         _commentListPagingController.value.itemList?.insert(0, state.reply);
@@ -296,9 +297,9 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
           _rebuildCommentList.value = !_rebuildCommentList.value;
         }
       }
-    } else if (state is LMGetReplyCommentLoading) {
+    } else if (state is LMFeedGetReplyCommentLoadingState) {
       showReplyCommentIds.add(state.commentId);
-    } else if (state is LMCloseReplyState) {
+    } else if (state is LMFeedCloseReplyState) {
       showReplyCommentIds.remove(state.commentId);
     }
   }
@@ -452,7 +453,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       ),
       onTap: () {
         _commentBloc.add(
-          LMReplyingCommentEvent(
+          LMFeedReplyingCommentEvent(
             postId: widget.postId,
             parentComment: commentViewData,
             userName: commentViewData.user.name,
@@ -467,9 +468,10 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       onTap: () {
         bool isReplyShown = showReplyCommentIds.contains(commentViewData.id);
         isReplyShown
-            ? _commentBloc.add(LMCloseReplyEvent(commentId: commentViewData.id))
+            ? _commentBloc
+                .add(LMFeedCloseReplyEvent(commentId: commentViewData.id))
             : _commentBloc.add(
-                LMGetReplyEvent(
+                LMFeedGetReplyEvent(
                   postId: widget.postId,
                   commentId: commentViewData.id,
                   page: 1,
@@ -507,7 +509,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         },
         onCommentEdit: () {
           _commentBloc.add(
-            LMEditingCommentEvent(
+            LMFeedEditingCommentEvent(
               postId: widget.postId,
               oldComment: commentViewData,
             ),
@@ -525,7 +527,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                   'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
               action: (String reason) async {
                 Navigator.of(childContext).pop();
-                _commentBloc.add(LMDeleteComment(
+                _commentBloc.add(LMFeedDeleteCommentEvent(
                   postId: widget.postId,
                   oldComment: commentViewData,
                   reason: reason.isEmpty ? "Reason for deletion" : reason,

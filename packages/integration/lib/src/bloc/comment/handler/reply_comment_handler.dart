@@ -1,6 +1,6 @@
 part of '../comment_bloc.dart';
 
-Future<void> _replyCommentHandler(LMReplyCommentEvent event, emit) async {
+Future<void> _replyCommentHandler(LMFeedReplyCommentEvent event, emit) async {
   DateTime currentTime = DateTime.now();
   String tempId = '${-currentTime.millisecondsSinceEpoch}';
   final LMUserViewData currentUser =
@@ -22,7 +22,7 @@ Future<void> _replyCommentHandler(LMReplyCommentEvent event, emit) async {
         ..user(currentUser)
         ..tempId(tempId))
       .build();
-  emit(LMReplyCommentSuccess(
+  emit(LMFeedReplyCommentSuccessState(
     reply: commentViewData,
   ));
   // create add reply comment request
@@ -86,10 +86,10 @@ Future<void> _replyCommentHandler(LMReplyCommentEvent event, emit) async {
         },
       ),
     );
-    emit(LMReplyCommentSuccess(reply: reply));
+    emit(LMFeedReplyCommentSuccessState(reply: reply));
   } else {
     emit(
-      LMReplyCommentError(
+      LMFeedReplyCommentErrorState(
         error: response.errorMessage ?? ' Something went wrong',
         commentId: event.parentComment.id,
         replyId: commentViewData.id,
@@ -98,8 +98,8 @@ Future<void> _replyCommentHandler(LMReplyCommentEvent event, emit) async {
   }
 }
 
-void _replyingCommentHandler(LMReplyingCommentEvent event, emit) {
-  emit(LMReplyingCommentState(
+void _replyingCommentHandler(LMFeedReplyingCommentEvent event, emit) {
+  emit(LMFeedReplyingCommentState(
     postId: event.postId,
     parentComment: event.parentComment,
     userName: event.userName,
@@ -107,5 +107,5 @@ void _replyingCommentHandler(LMReplyingCommentEvent event, emit) {
 }
 
 void _cancelReplyCommentHandler(event, emit) {
-  emit(LMReplyCancelState());
+  emit(LMFeedReplyCancelState());
 }

@@ -1,20 +1,20 @@
 part of '../comment_bloc.dart';
 
-Future<void> _getCommentHandler(LMGetCommentsEvent event, emit) async {
+Future<void> _getCommentHandler(LMFeedGetCommentsEvent event, emit) async {
   if (event.page == 1) {
-    emit(LMGetCommentLoading());
+    emit(LMFeedGetCommentLoadingState());
   } else {
-    emit(LMGetCommentPaginationLoading());
+    emit(LMFeedGetCommentPaginationLoadingState());
   }
   final (post, comments) = await fetchCommentListWithPage(
     event.page,
     event.postId,
-    event.commentListPageSize,
+    event.pageSize,
   );
   if (post != null && comments != null) {
-    emit(LMGetCommentSuccess(post: post, comments: comments, page: event.page));
+    emit(LMFeedGetCommentSuccessState(post: post, comments: comments, page: event.page));
   } else {
-    emit(LMGetCommentError(error: 'Failed to fetch comments'));
+    emit(LMFeedGetCommentErrorState(error: 'Failed to fetch comments'));
   }
 }
 

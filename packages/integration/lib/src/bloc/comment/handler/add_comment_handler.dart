@@ -1,6 +1,6 @@
 part of '../comment_bloc.dart';
 
-Future<void> _addCommentHandler(LMAddCommentEvent event, emit) async {
+Future<void> _addCommentHandler(LMFeedAddCommentEvent event, emit) async {
   DateTime currentTime = DateTime.now();
   String tempId = '${-currentTime.millisecondsSinceEpoch}';
   final LMUserViewData currentUser =
@@ -10,7 +10,7 @@ Future<void> _addCommentHandler(LMAddCommentEvent event, emit) async {
   LMCommentViewData commentViewData = (LMCommentViewDataBuilder()
         ..id(tempId)
         ..uuid(currentUser.uuid)
-        ..text(event.comment)
+        ..text(event.commentText)
         ..level(0)
         ..likesCount(0)
         ..isEdited(false)
@@ -22,12 +22,12 @@ Future<void> _addCommentHandler(LMAddCommentEvent event, emit) async {
         ..user(currentUser)
         ..tempId(tempId))
       .build();
-  emit(LMAddCommentSuccess(comment: commentViewData));
+  emit(LMFeedAddCommentSuccessState(comment: commentViewData));
 
   // Make a comment request
   AddCommentRequest addCommentRequest = (AddCommentRequestBuilder()
         ..postId(event.postId)
-        ..text(event.comment)
+        ..text(event.commentText)
         ..tempId(tempId))
       .build();
 
@@ -68,10 +68,10 @@ Future<void> _addCommentHandler(LMAddCommentEvent event, emit) async {
     ));
     commentViewData =
         LMCommentViewDataConvertor.fromComment(response.reply!, users);
-    emit(LMAddCommentSuccess(comment: commentViewData));
+    emit(LMFeedAddCommentSuccessState(comment: commentViewData));
   } else {
     emit(
-      LMAddCommentError(
+      LMFeedAddCommentErrorState(
         error: response.errorMessage ?? 'Failed to add comment',
         commentId: commentViewData.id,
       ),
