@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/default_empty_comment_widget.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_reply_widget.dart';
 
 class LMFeedCommentList extends StatefulWidget {
   const LMFeedCommentList({
@@ -25,7 +23,7 @@ class LMFeedCommentList extends StatefulWidget {
 }
 
 class _LMFeedCommentListState extends State<LMFeedCommentList> {
-  ValueNotifier<bool> _rebuildCommentList = ValueNotifier(false);
+  // ValueNotifier<bool> _rebuildCommentList = ValueNotifier(false);
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   final LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
@@ -110,71 +108,69 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
               current is LMFeedDeleteReplySuccessState ||
               current is LMFeedGetCommentSuccessState ||
               current is LMFeedGetReplyCommentLoadingState ||
-              current is LMFeedCloseReplyState) {
+              current is LMFeedCloseReplyState ||
+              current is LMFeedCommentRefreshState) {
             return true;
           }
           return false;
         },
         builder: (context, state) {
-          return ValueListenableBuilder(
-              valueListenable: _rebuildCommentList,
-              builder: (context, _, __) {
-                return PagedSliverList.separated(
-                  pagingController: _commentListPagingController,
-                  builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
-                    firstPageProgressIndicatorBuilder: (context) {
-                      return const Padding(
-                        padding: EdgeInsets.only(top: 150.0),
-                        child: LMFeedLoader(),
-                      );
-                    },
-                    newPageProgressIndicatorBuilder: (context) {
-                      return _widgetBuilder
-                          .newPageProgressIndicatorBuilderFeed(context);
-                    },
-                    noItemsFoundIndicatorBuilder: (context) =>
-                        const LMFeedEmptyCommentWidget(),
-                    itemBuilder: (context, commentViewData, index) {
-                      LMUserViewData userViewData;
-                      userViewData = commentViewData.user;
-
-                      LMFeedCommentWidget commentWidget = defCommentTile(
-                          commentViewData, index, userViewData, context);
-
-                      return SizedBox(
-                        child: Column(
-                          children: [
-                            widget.commentBuilder?.call(
-                                    context, commentWidget, _postViewData!) ??
-                                _widgetBuilder.commentBuilder.call(
-                                    context, commentWidget, _postViewData!),
-                            TempLMFeedCommentReplyWidget(
-                              commentBuilder: widget.commentBuilder ??
-                                  LMFeedCore.widgetUtility.commentBuilder,
-                              post: _postViewData!,
-                              postId: widget.postId,
-                              comment: commentViewData,
-                              user: userViewData,
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  separatorBuilder: (context, index) =>
-                      widget.commentSeparatorBuilder?.call(context) ??
-                      const Divider(
-                        thickness: 0.2,
-                        height: 0,
-                      ),
+          return PagedSliverList.separated(
+            pagingController: _commentListPagingController,
+            builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
+              firstPageProgressIndicatorBuilder: (context) {
+                return const Padding(
+                  padding: EdgeInsets.only(top: 150.0),
+                  child: LMFeedLoader(),
                 );
-              });
+              },
+              newPageProgressIndicatorBuilder: (context) {
+                return _widgetBuilder
+                    .newPageProgressIndicatorBuilderFeed(context);
+              },
+              noItemsFoundIndicatorBuilder: (context) =>
+                  const LMFeedEmptyCommentWidget(),
+              itemBuilder: (context, commentViewData, index) {
+                LMUserViewData userViewData;
+                userViewData = commentViewData.user;
+
+                LMFeedCommentWidget commentWidget = defCommentTile(
+                    commentViewData, index, userViewData, context);
+
+                return SizedBox(
+                  child: Column(
+                    children: [
+                      widget.commentBuilder
+                              ?.call(context, commentWidget, _postViewData!) ??
+                          _widgetBuilder.commentBuilder
+                              .call(context, commentWidget, _postViewData!),
+                      TempLMFeedCommentReplyWidget(
+                        commentBuilder: widget.commentBuilder ??
+                            LMFeedCore.widgetUtility.commentBuilder,
+                        post: _postViewData!,
+                        postId: widget.postId,
+                        comment: commentViewData,
+                        user: userViewData,
+                      )
+                    ],
+                  ),
+                );
+              },
+            ),
+            separatorBuilder: (context, index) =>
+                widget.commentSeparatorBuilder?.call(context) ??
+                const Divider(
+                  thickness: 0.2,
+                  height: 0,
+                ),
+          );
         });
   }
 
   void _handleBlocListeners(context, state) {
     if (state is LMFeedCommentRefreshState) {
       showReplyCommentIds.clear();
+      _commentListPagingController.value.itemList?.clear();
       _commentListPagingController.refresh();
     }
     if (state is LMFeedReplyCommentSuccessState) {
@@ -207,7 +203,6 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
             _commentListPagingController.itemList?[index].repliesCount ?? 0;
         _commentListPagingController.itemList?[index].repliesCount =
             replyCount - 1;
-        _rebuildCommentList.value = !_rebuildCommentList.value;
       }
       LMFeedCore.showSnackBar(
         context,
@@ -215,8 +210,8 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         _widgetSource,
       );
     } else if (state is LMFeedDeleteCommentErrorState) {
-      _commentListPagingController.value.itemList?[state.index] =
-          state.oldComment;
+      _commentListPagingController.value.itemList
+          ?.insert(state.index, state.oldComment);
       LMFeedCore.showSnackBar(
         context,
         state.error,
@@ -233,13 +228,11 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
           source: LMFeedWidgetSource.postDetailScreen,
           actionType: LMFeedPostActionType.commentAdded,
         ));
-        _rebuildCommentList.value = !_rebuildCommentList.value;
       } else {
         final int? index = _commentListPagingController.value.itemList
             ?.indexWhere((element) => element.id == commentViewData.tempId);
         if (index != null && index != -1) {
           _commentListPagingController.value.itemList![index] = commentViewData;
-          _rebuildCommentList.value = !_rebuildCommentList.value;
         }
       }
     } else if (state is LMFeedAddCommentErrorState) {
@@ -247,7 +240,6 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
           ?.indexWhere((element) => element.id == state.commentId);
       if (index != null && index != -1) {
         _commentListPagingController.value.itemList!.removeAt(index);
-        _rebuildCommentList.value = !_rebuildCommentList.value;
       }
       LMFeedCore.showSnackBar(
         context,
@@ -260,14 +252,12 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       if (index != null && index != -1) {
         _commentListPagingController.value.itemList![index] =
             state.commentViewData;
-        _rebuildCommentList.value = !_rebuildCommentList.value;
       }
     } else if (state is LMFeedEditCommentErrorState) {
       final int? index = _commentListPagingController.value.itemList
           ?.indexWhere((comment) => comment.id == state.oldComment.id);
       if (index != null && index != -1) {
         _commentListPagingController.value.itemList![index] = state.oldComment;
-        _rebuildCommentList.value = !_rebuildCommentList.value;
       }
     } else if (state is LMFeedDeleteCommentSuccessState) {
       _commentListPagingController.value.itemList
@@ -282,20 +272,6 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         '$commentTitleSmallCapSingular Deleted',
         _widgetSource,
       );
-      _rebuildCommentList.value = !_rebuildCommentList.value;
-    } else if (state is LMFeedReplyCommentSuccessState) {
-      final LMCommentViewData commentViewData = state.reply;
-      if (commentViewData.tempId == commentViewData.id) {
-        _commentListPagingController.value.itemList?.insert(0, state.reply);
-        _rebuildCommentList.value = !_rebuildCommentList.value;
-      } else {
-        final int? index = _commentListPagingController.value.itemList
-            ?.indexWhere((element) => element.id == commentViewData.tempId);
-        if (index != null && index != -1) {
-          _commentListPagingController.value.itemList![index] = commentViewData;
-          _rebuildCommentList.value = !_rebuildCommentList.value;
-        }
-      }
     } else if (state is LMFeedGetReplyCommentLoadingState) {
       showReplyCommentIds.add(state.commentId);
     } else if (state is LMFeedCloseReplyState) {

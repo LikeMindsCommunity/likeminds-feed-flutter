@@ -210,79 +210,81 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
           ],
         );
       }),
-      listener: (context, state) {
-        if (state is LMFeedGetReplyCommentSuccessState) {
-          if (state.commentId != widget.comment.id) {
-            return;
-          }
-          if (state.page == 1) {
-            comment?.replies = state.replies;
-          } else {
-            page = state.page;
-            comment?.replies?.addAll(state.replies);
-          }
-        } else if (state is LMFeedEditReplySuccessState) {
-          if (state.commentId != widget.comment.id) {
-            return;
-          }
-          int? index = comment?.replies
-              ?.indexWhere((element) => element.id == state.replyId);
-          if (index != null && index != -1) {
-            comment?.replies?[index] = state.reply;
-          }
-        } else if (state is LMFeedEditReplyErrorState) {
-          if (state.commentId != widget.comment.id) {
-            return;
-          }
-          int? index = comment?.replies
-              ?.indexWhere((element) => element.id == state.oldReply.id);
-          if (index != null && index != -1) {
-            comment?.replies?[index] = state.oldReply;
-          }
-        } else if (state is LMFeedDeleteReplySuccessState) {
-          if (state.commentId != widget.comment.id) {
-            return;
-          }
-          comment?.replies
-              ?.removeWhere((element) => element.id == state.replyId);
-        } else if (state is LMFeedDeleteReplyErrorState) {
-          LMFeedCore.showSnackBar(
-            context,
-            (state as DeleteCommentResponse).errorMessage ??
-                "An error occurred",
-            widgetSource,
-          );
-        } else if (state is LMFeedReplyCommentSuccessState) {
-          if (state.reply.parentComment?.id != widget.comment.id) {
-            return;
-          }
-          if (comment?.replies?.isEmpty ?? true) {
-            page = 0;
-          }
-          if (state.reply.tempId == state.reply.id) {
-            comment?.replies?.insert(0, state.reply);
-          } else {
-            int? index = comment?.replies
-                ?.indexWhere((element) => element.tempId == state.reply.tempId);
-            if (index != null && index != -1) {
-              comment?.replies?[index] = state.reply;
-            }
-          }
-        } else if (state is LMFeedReplyCommentErrorState) {
-          if (state.commentId != widget.comment.id) {
-            return;
-          }
-          comment?.replies
-              ?.removeWhere((element) => element.tempId == state.replyId);
-        } else if (state is LMFeedCloseReplyState) {
-          if (state.commentId != widget.comment.id) {
-            return;
-          }
-          page = 0;
-          comment?.replies?.clear();
-        }
-      },
+      listener: _handleListener,
     );
+  }
+
+  void _handleListener(context, state) {
+    // handle comment state changes
+    // it will ignore the state changes of other comments
+    if (state is LMFeedGetReplyCommentSuccessState) {
+      if (state.commentId != widget.comment.id) {
+        return;
+      }
+      if (state.page == 1) {
+        comment?.replies = state.replies;
+      } else {
+        page = state.page;
+        comment?.replies?.addAll(state.replies);
+      }
+    } else if (state is LMFeedEditReplySuccessState) {
+      if (state.commentId != widget.comment.id) {
+        return;
+      }
+      int? index = comment?.replies
+          ?.indexWhere((element) => element.id == state.replyId);
+      if (index != null && index != -1) {
+        comment?.replies?[index] = state.reply;
+      }
+    } else if (state is LMFeedEditReplyErrorState) {
+      if (state.commentId != widget.comment.id) {
+        return;
+      }
+      int? index = comment?.replies
+          ?.indexWhere((element) => element.id == state.oldReply.id);
+      if (index != null && index != -1) {
+        comment?.replies?[index] = state.oldReply;
+      }
+    } else if (state is LMFeedDeleteReplySuccessState) {
+      if (state.commentId != widget.comment.id) {
+        return;
+      }
+      comment?.replies?.removeWhere((element) => element.id == state.replyId);
+    } else if (state is LMFeedDeleteReplyErrorState) {
+      LMFeedCore.showSnackBar(
+        context,
+        (state as DeleteCommentResponse).errorMessage ?? "An error occurred",
+        widgetSource,
+      );
+    } else if (state is LMFeedReplyCommentSuccessState) {
+      if (state.reply.parentComment?.id != widget.comment.id) {
+        return;
+      }
+      if (comment?.replies?.isEmpty ?? true) {
+        page = 0;
+      }
+      if (state.reply.tempId == state.reply.id) {
+        comment?.replies?.insert(0, state.reply);
+      } else {
+        int? index = comment?.replies
+            ?.indexWhere((element) => element.tempId == state.reply.tempId);
+        if (index != null && index != -1) {
+          comment?.replies?[index] = state.reply;
+        }
+      }
+    } else if (state is LMFeedReplyCommentErrorState) {
+      if (state.commentId != widget.comment.id) {
+        return;
+      }
+      comment?.replies
+          ?.removeWhere((element) => element.tempId == state.replyId);
+    } else if (state is LMFeedCloseReplyState) {
+      if (state.commentId != widget.comment.id) {
+        return;
+      }
+      page = 0;
+      comment?.replies?.clear();
+    }
   }
 
   LMFeedCommentWidget _defCommentWidget(

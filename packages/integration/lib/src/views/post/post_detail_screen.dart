@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/bottom_textfield.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_count_widget.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_list_widget.dart';
 part 'post_detail_screen_configuration.dart';
 
@@ -240,6 +241,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               commentBuilder: widget.commentBuilder,
                               commentSeparatorBuilder:
                                   widget.commentSeparatorBuilder,
+                              widgetSource: _widgetSource,
                             ),
                             const SliverToBoxAdapter(
                               child: SizedBox(
@@ -257,62 +259,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   SliverToBoxAdapter _defCommentsCount() {
-    return SliverToBoxAdapter(
-      child: BlocConsumer<LMFeedCommentBloc, LMFeedCommentState>(
-        bloc: _commentBloc,
-        listener: (context, state) {
-          if (state is LMFeedGetCommentSuccessState) {
-            _commentCount = state.post.commentCount;
-          } else if (state is LMFeedAddCommentSuccessState) {
-            if (state.comment.tempId == state.comment.id) {
-              _commentCount = _commentCount + 1;
-            }
-          } else if (state is LMFeedAddCommentErrorState) {
-            _commentCount = _commentCount - 1;
-          } else if (state is LMFeedDeleteCommentSuccessState) {
-            _commentCount = _commentCount - 1;
-          } else if (state is LMFeedDeleteCommentErrorState) {
-            _commentCount = _commentCount + 1;
-          }
-        },
-        buildWhen: (previous, current) =>
-            current is LMFeedGetCommentSuccessState ||
-            current is LMFeedGetCommentLoadingState ||
-            current is LMFeedAddCommentSuccessState ||
-            current is LMFeedDeleteCommentSuccessState,
-        builder: (context, state) {
-          return _commentCount == 0 ||
-                  !config!.showCommentCountOnList ||
-                  state is LMFeedGetCommentLoadingState
-              ? const SizedBox.shrink()
-              : Container(
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                      borderRadius: isDesktopWeb
-                          ? BorderRadius.vertical(top: Radius.circular(8.0))
-                          : null,
-                      color: feedTheme.container),
-                  margin: const EdgeInsets.only(top: 10.0),
-                  padding: feedTheme.commentStyle.padding ??
-                      const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                      ),
-                  alignment: Alignment.topLeft,
-                  child: LMFeedText(
-                    text: LMFeedPostUtils.getCommentCountTextWithCount(
-                        _commentCount),
-                    style: LMFeedTextStyle(
-                      textStyle: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: feedTheme.onContainer,
-                      ),
-                    ),
-                  ),
-                );
-        },
-      ),
-    );
+    return SliverToBoxAdapter(child: LMFeedCommentCount());
   }
 
   LMFeedAppBar defAppBar() {
@@ -347,8 +294,23 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               ),
             ),
           ),
-          BlocBuilder<LMFeedCommentBloc, LMFeedCommentState>(
+          BlocConsumer<LMFeedCommentBloc, LMFeedCommentState>(
             bloc: _commentBloc,
+            listener: (context, state) {
+              if (state is LMFeedGetCommentSuccessState) {
+                _commentCount = state.post.commentCount;
+              } else if (state is LMFeedAddCommentSuccessState) {
+                if (state.comment.tempId == state.comment.id) {
+                  _commentCount++;
+                }
+              } else if (state is LMFeedAddCommentErrorState) {
+                _commentCount--;
+              } else if (state is LMFeedDeleteCommentSuccessState) {
+                _commentCount--;
+              } else if (state is LMFeedDeleteCommentErrorState) {
+                _commentCount++;
+              }
+            },
             buildWhen: (previous, current) =>
                 current is LMFeedGetCommentSuccessState ||
                 current is LMFeedGetCommentLoadingState ||
