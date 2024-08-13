@@ -1,6 +1,6 @@
-part of '../lm_comment_bloc.dart';
+part of '../comment_bloc.dart';
 
-FutureOr<void> _getReplyHandler(LMGetReplyEvent event, emit) async {
+Future<void> _getReplyHandler(LMGetReplyEvent event, emit) async {
   if (event.page == 1) {
     emit(LMGetReplyCommentLoading(
       commentId: event.commentId,
@@ -49,4 +49,8 @@ FutureOr<void> _getReplyHandler(LMGetReplyEvent event, emit) async {
         page: event.page,
         commentId: event.commentId));
   }
+}
+
+void _closeReplyHandler(event, emit) {
+  emit(LMCloseReplyState(commentId: event.commentId));
 }

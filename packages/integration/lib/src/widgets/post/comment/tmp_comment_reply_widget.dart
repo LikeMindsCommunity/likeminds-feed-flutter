@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/bloc/lm_comment_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/comment/comment_bloc.dart';
 
 class TempLMFeedCommentReplyWidget extends StatefulWidget {
   final String postId;
   final LMCommentViewData comment;
   final LMUserViewData user;
-  final Function() refresh;
   final LMFeedCommentStyle? style;
 
   final LMFeedPostCommentBuilder? commentBuilder;
@@ -20,7 +19,6 @@ class TempLMFeedCommentReplyWidget extends StatefulWidget {
     required this.user,
     required this.postId,
     this.style,
-    required this.refresh,
     this.commentBuilder,
     required this.post,
   }) : super(key: key);
@@ -36,13 +34,11 @@ class TempLMFeedCommentReplyWidget extends StatefulWidget {
     LMFeedCommentStyle? style,
     LMFeedPostCommentBuilder? commentBuilder,
     LMPostViewData? post,
-    Function()? refresh,
   }) {
     return TempLMFeedCommentReplyWidget(
       postId: postId ?? this.postId,
       comment: reply ?? this.comment,
       user: user ?? this.user,
-      refresh: refresh ?? this.refresh,
       style: style ?? this.style,
       commentBuilder: commentBuilder ?? this.commentBuilder,
       post: post ?? this.post,
@@ -51,13 +47,9 @@ class TempLMFeedCommentReplyWidget extends StatefulWidget {
 }
 
 class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
-  // final LMFeedFetchCommentReplyBloc _commentRepliesBloc =
-  //     LMFeedFetchCommentReplyBloc.instance;
   final LMCommentBloc _commentBloc = LMCommentBloc.instance();
-  // final LMFeedCommentBloc _commentHandlerBloc = LMFeedCommentBloc.instance;
   ValueNotifier<bool> rebuildLikeButton = ValueNotifier(false);
   ValueNotifier<bool> rebuildReplyList = ValueNotifier(false);
-  // List<LMCommentViewData> replies = [];
   Map<String, LMUserViewData> users = {};
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   LMFeedCommentStyle? replyStyle;
@@ -83,7 +75,6 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
     comment = widget.comment;
     isLiked = comment!.isLiked;
     replyCount = comment!.repliesCount;
-    refresh = widget.refresh;
   }
 
   @override
@@ -92,6 +83,14 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
     postId = widget.postId;
     user = widget.user;
     initializeReply();
+  }
+
+  @override
+  void didUpdateWidget(TempLMFeedCommentReplyWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.comment != widget.comment) {
+      initializeReply();
+    }
   }
 
   int page = 1;
@@ -168,7 +167,7 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
                   ),
                 ),
             if ((comment?.replies?.isNotEmpty ?? false) &&
-                comment?.replies?.length != comment!.repliesCount)
+                (comment?.replies?.length ?? 0) < comment!.repliesCount)
               Container(
                 color: feedTheme.container,
                 padding: replyStyle?.padding,
@@ -232,22 +231,55 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
           if (index != null && index != -1) {
             comment?.replies?[index] = state.reply;
           }
+        } else if (state is LMEditReplyError) {
+          if (state.commentId != widget.comment.id) {
+            return;
+          }
+          int? index = comment?.replies
+              ?.indexWhere((element) => element.id == state.oldReply.id);
+          if (index != null && index != -1) {
+            comment?.replies?[index] = state.oldReply;
+          }
         } else if (state is LMDeleteReplySuccess) {
           if (state.commentId != widget.comment.id) {
             return;
           }
           comment?.replies
               ?.removeWhere((element) => element.id == state.replyId);
+        } else if (state is LMDeleteReplyError) {
+          LMFeedCore.showSnackBar(
+            context,
+            (state as DeleteCommentResponse).errorMessage ??
+                "An error occurred",
+            widgetSource,
+          );
         } else if (state is LMReplyCommentSuccess) {
           if (state.reply.parentComment?.id != widget.comment.id) {
             return;
           }
-          page = 0;
-          comment?.replies?.insert(0, state.reply);
+          if (comment?.replies?.isEmpty ?? true) {
+            page = 0;
+          }
+          if (state.reply.tempId == state.reply.id) {
+            comment?.replies?.insert(0, state.reply);
+          } else {
+            int? index = comment?.replies
+                ?.indexWhere((element) => element.tempId == state.reply.tempId);
+            if (index != null && index != -1) {
+              comment?.replies?[index] = state.reply;
+            }
+          }
+        } else if (state is LMReplyCommentError) {
+          if (state.commentId != widget.comment.id) {
+            return;
+          }
+          comment?.replies
+              ?.removeWhere((element) => element.tempId == state.replyId);
         } else if (state is LMCloseReplyState) {
           if (state.commentId != widget.comment.id) {
             return;
           }
+          page = 0;
           comment?.replies?.clear();
         }
       },
@@ -329,10 +361,11 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
             textStyle: TextStyle(fontSize: 12, color: feedTheme.inActiveColor)),
       ),
       onTap: () {
+        if (comment == null) return;
         _commentBloc.add(
           LMReplyingCommentEvent(
             postId: widget.postId,
-            commentId: commentViewData.id,
+            parentComment: comment!,
             userName: commentViewData.user.name,
           ),
         );
@@ -347,7 +380,7 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
           postId: widget.post.id,
           commentId: widget.comment.id,
           replyText: commentViewData.text,
-          replyId: commentViewData.id,
+          oldReply: commentViewData,
         ));
       },
       onCommentDelete: () {
@@ -366,7 +399,7 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
                   Navigator.of(childContext).pop();
                   _commentBloc.add(LMDeleteReplyEvent(
                     postId: postId,
-                    replyId: commentViewData.id,
+                    oldReply: commentViewData,
                     reason: reason.isEmpty ? "Reason for deletion" : reason,
                     commentId: widget.comment.id,
                   ));

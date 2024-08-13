@@ -1,4 +1,4 @@
-part of 'lm_comment_bloc.dart';
+part of 'comment_bloc.dart';
 
 @immutable
 sealed class LMCommentState extends Equatable {
@@ -9,6 +9,8 @@ sealed class LMCommentState extends Equatable {
 }
 
 final class LMCommentInitial extends LMCommentState {}
+
+final class LMCommentRefreshState extends LMCommentState {}
 
 final class LMGetCommentLoading extends LMCommentState {}
 
@@ -40,8 +42,6 @@ final class LMGetCommentError extends LMCommentState {
   List<Object> get props => [error];
 }
 
-final class LMAddCommentLoading extends LMCommentState {}
-
 final class LMAddCommentSuccess extends LMCommentState {
   final LMCommentViewData comment;
 
@@ -55,33 +55,31 @@ final class LMAddCommentSuccess extends LMCommentState {
 
 final class LMAddCommentError extends LMCommentState {
   final String error;
+  final String commentId;
 
   LMAddCommentError({
     required this.error,
+    required this.commentId,
   });
 
   @override
-  List<Object> get props => [error];
+  List<Object> get props => [error, commentId];
 }
 
 final class LMEditingCommentState extends LMCommentState {
   final String postId;
-  final String commentId;
-  final String comment;
+  final LMCommentViewData oldComment;
 
   LMEditingCommentState({
     required this.postId,
-    required this.commentId,
-    required this.comment,
+    required this.oldComment,
   });
 
   @override
-  List<Object> get props => [postId, commentId, comment];
+  List<Object> get props => [postId, oldComment];
 }
 
 final class LMEditingCommentCancelState extends LMCommentState {}
-
-final class LMEditCommentLoading extends LMCommentState {}
 
 final class LMEditCommentSuccess extends LMCommentState {
   final LMCommentViewData commentViewData;
@@ -94,16 +92,16 @@ final class LMEditCommentSuccess extends LMCommentState {
 
 final class LMEditCommentError extends LMCommentState {
   final String error;
+  final LMCommentViewData oldComment;
 
   LMEditCommentError({
     required this.error,
+    required this.oldComment,
   });
 
   @override
-  List<Object> get props => [error];
+  List<Object> get props => [error, oldComment];
 }
-
-final class LMDeleteCommentLoading extends LMCommentState {}
 
 final class LMDeleteCommentSuccess extends LMCommentState {
   final String commentId;
@@ -116,33 +114,35 @@ final class LMDeleteCommentSuccess extends LMCommentState {
 
 final class LMDeleteCommentError extends LMCommentState {
   final String error;
+  final LMCommentViewData oldComment;
+  final int index;
 
   LMDeleteCommentError({
     required this.error,
+    required this.oldComment,
+    required this.index,
   });
 
   @override
-  List<Object> get props => [error];
+  List<Object> get props => [error, oldComment, index];
 }
 
 final class LMReplyingCommentState extends LMCommentState {
   final String postId;
-  final String commentId;
+  final LMCommentViewData parentComment;
   final String userName;
 
   LMReplyingCommentState({
     required this.postId,
-    required this.commentId,
+    required this.parentComment,
     required this.userName,
   });
 
   @override
-  List<Object> get props => [postId, commentId, userName];
+  List<Object> get props => [postId, parentComment, userName];
 }
 
 final class LMReplyCancelState extends LMCommentState {}
-
-final class LMReplyCommentLoading extends LMCommentState {}
 
 final class LMReplyCommentSuccess extends LMCommentState {
   final LMCommentViewData reply;
@@ -157,13 +157,17 @@ final class LMReplyCommentSuccess extends LMCommentState {
 
 final class LMReplyCommentError extends LMCommentState {
   final String error;
+  final String commentId;
+  final String replyId;
 
   LMReplyCommentError({
     required this.error,
+    required this.commentId,
+    required this.replyId,
   });
 
   @override
-  List<Object> get props => [error];
+  List<Object> get props => [error, commentId, replyId];
 }
 
 final class LMGetReplyCommentSuccess extends LMCommentState {
@@ -217,21 +221,19 @@ final class LMCloseReplyState extends LMCommentState {
 final class LMEditingReplyState extends LMCommentState {
   final String postId;
   final String commentId;
-  final String replyId;
+  final LMCommentViewData oldReply;
   final String replyText;
 
   LMEditingReplyState({
     required this.postId,
     required this.commentId,
-    required this.replyId,
+    required this.oldReply,
     required this.replyText,
   });
 
   @override
-  List<Object> get props => [postId, commentId, replyId, replyText];
+  List<Object> get props => [postId, commentId, oldReply, replyText];
 }
-
-final class LMEditReplyLoading extends LMCommentState {}
 
 final class LMEditReplySuccess extends LMCommentState {
   final String commentId;
@@ -250,16 +252,18 @@ final class LMEditReplySuccess extends LMCommentState {
 
 final class LMEditReplyError extends LMCommentState {
   final String error;
+  final String commentId;
+  final LMCommentViewData oldReply;
 
   LMEditReplyError({
     required this.error,
+    required this.commentId,
+    required this.oldReply,
   });
 
   @override
-  List<Object> get props => [error];
+  List<Object> get props => [error, commentId, oldReply];
 }
-
-final class LMDeleteReplyLoading extends LMCommentState {}
 
 final class LMDeleteReplySuccess extends LMCommentState {
   final String replyId;
@@ -276,11 +280,13 @@ final class LMDeleteReplySuccess extends LMCommentState {
 
 final class LMDeleteReplyError extends LMCommentState {
   final String error;
+  final LMCommentViewData oldReply;
 
   LMDeleteReplyError({
     required this.error,
+    required this.oldReply,
   });
 
   @override
-  List<Object> get props => [error];
+  List<Object> get props => [error, oldReply];
 }

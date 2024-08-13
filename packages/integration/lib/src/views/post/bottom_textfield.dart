@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/bloc/lm_comment_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/comment/comment_bloc.dart';
 
 class LMFeedBottomTextField extends StatefulWidget {
   const LMFeedBottomTextField({
@@ -256,7 +256,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
     if (state is LMEditingCommentState) {
       _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
       openOnScreenKeyboard();
-      _commentController.text = state.comment;
+      _commentController.text = state.oldComment.text;
     } else if (state is LMEditingCommentCancelState) {
       _commentController.clear();
       closeOnScreenKeyboard();
@@ -307,7 +307,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       final currentState = _commentBloc.state as LMEditingCommentState;
       _commentBloc.add(LMEditCommentEvent(
         widget.postId,
-        currentState.commentId,
+        currentState.oldComment,
         commentText,
       ));
     } else if (isReply) {
@@ -315,8 +315,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       final currentState = _commentBloc.state as LMReplyingCommentState;
       _commentBloc.add(LMReplyCommentEvent(
         postId: widget.postId,
-        commentId: currentState.commentId,
-        comment: commentText,
+        parentComment: currentState.parentComment,
+        replyText: commentText,
       ));
     } else if (isReplyEditing) {
       // edit an existing reply
@@ -324,8 +324,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       _commentBloc.add(LMEditReply(
         postId: currentState.postId,
         commentId: currentState.commentId,
-        replyId: currentState.replyId,
-        replyText: commentText,
+        oldReply: currentState.oldReply,
+        editText: commentText,
       ));
     } else {
       // create new comment

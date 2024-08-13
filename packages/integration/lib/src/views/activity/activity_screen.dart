@@ -6,7 +6,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/bloc/lm_comment_bloc.dart';
+import 'package:likeminds_feed_flutter_core/src/bloc/comment/comment_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
@@ -948,9 +948,9 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         onCommentEdit: () {
           LMCommentBloc.instance().add(
             LMEditingCommentEvent(
-                postId: postViewData.id,
-                commentId: commentViewData.id,
-                replyText: commentViewData.text),
+              postId: postViewData.id,
+              oldComment: commentViewData,
+            ),
           );
         },
         onCommentDelete: () {

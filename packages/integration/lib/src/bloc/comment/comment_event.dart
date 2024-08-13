@@ -1,4 +1,4 @@
-part of 'lm_comment_bloc.dart';
+part of 'comment_bloc.dart';
 
 @immutable
 sealed class LMCommentEvent extends Equatable {
@@ -7,6 +7,8 @@ sealed class LMCommentEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
+
+final class LMCommentRefreshEvent extends LMCommentEvent {}
 
 final class LMGetCommentsEvent extends LMCommentEvent {
   final String postId;
@@ -36,70 +38,70 @@ final class LMAddCommentEvent extends LMCommentEvent {
 
 final class LMEditingCommentEvent extends LMCommentEvent {
   final String postId;
-  final String commentId;
-  final String replyText;
+  final LMCommentViewData oldComment;
 
   LMEditingCommentEvent({
     required this.postId,
-    required this.commentId,
-    required this.replyText,
+    required this.oldComment,
   });
 
   @override
-  List<Object> get props => [postId, commentId, replyText];
+  List<Object> get props => [postId, oldComment];
 }
 
 final class LMEditCommentEvent extends LMCommentEvent {
   final String postId;
-  final String commentId;
-  final String commentText;
+  final LMCommentViewData oldComment;
+  final String editedText;
 
-  LMEditCommentEvent(this.postId, this.commentId, this.commentText);
+  LMEditCommentEvent(this.postId, this.oldComment, this.editedText);
   @override
-  List<Object> get props => [postId, commentId, commentText];
+  List<Object> get props => [postId, oldComment, editedText];
 }
 
 final class LMEditCommentCancelEvent extends LMCommentEvent {}
 
 final class LMDeleteComment extends LMCommentEvent {
   final String postId;
-  final String commentId;
+  final LMCommentViewData oldComment;
   final String reason;
+  final int index;
 
   LMDeleteComment({
     required this.postId,
-    required this.commentId,
+    required this.oldComment,
     required this.reason,
+    required this.index,
   });
 
   @override
-  List<Object> get props => [postId, commentId, reason];
+  List<Object> get props => [postId, oldComment, reason, index];
 }
 
 final class LMReplyingCommentEvent extends LMCommentEvent {
   final String postId;
-  final String commentId;
+  final LMCommentViewData parentComment;
   final String userName;
 
   LMReplyingCommentEvent({
     required this.postId,
-    required this.commentId,
+    required this.parentComment,
     required this.userName,
   });
 
   @override
-  List<Object> get props => [postId, commentId, userName];
+  List<Object> get props => [postId, parentComment, userName];
 }
 
 final class LMReplyCommentEvent extends LMCommentEvent {
   final String postId;
-  final String commentId;
-  final String comment;
+  final LMCommentViewData parentComment;
+  final String replyText;
 
   LMReplyCommentEvent({
     required this.postId,
-    required this.commentId,
-    required this.comment,
+    required this.parentComment,
+    required this.replyText,
   });
 }
 
@@ -136,52 +138,52 @@ final class LMCloseReplyEvent extends LMCommentEvent {
 final class LMEditingReplyEvent extends LMCommentEvent {
   final String postId;
   final String commentId;
-  final String replyId;
+  final LMCommentViewData oldReply;
   final String replyText;
 
   LMEditingReplyEvent({
     required this.postId,
     required this.commentId,
-    required this.replyId,
+    required this.oldReply,
     required this.replyText,
   });
 
   @override
-  List<Object> get props => [postId, commentId, replyId, replyText];
+  List<Object> get props => [postId, commentId, oldReply, replyText];
 }
 
 final class LMEditReply extends LMCommentEvent {
   final String postId;
   final String commentId;
-  final String replyId;
-  final String replyText;
+  final LMCommentViewData oldReply;
+  final String editText;
 
   LMEditReply({
     required this.postId,
     required this.commentId,
-    required this.replyId,
-    required this.replyText,
+    required this.oldReply,
+    required this.editText,
   });
 
   @override
-  List<Object> get props => [postId, commentId, replyId, replyText];
+  List<Object> get props => [postId, commentId, oldReply, editText];
 }
 
 final class LMEditReplyCancelEvent extends LMCommentEvent {}
 
 final class LMDeleteReplyEvent extends LMCommentEvent {
   final String postId;
-  final String replyId;
+  final LMCommentViewData oldReply;
   final String reason;
   final String commentId;
 
   LMDeleteReplyEvent({
     required this.postId,
-    required this.replyId,
+    required this.oldReply,
     required this.reason,
     required this.commentId,
   });
 
   @override
-  List<Object> get props => [postId, replyId, reason, commentId];
+  List<Object> get props => [postId, oldReply, reason, commentId];
 }

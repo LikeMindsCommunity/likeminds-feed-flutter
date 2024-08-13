@@ -1,6 +1,6 @@
-part of '../lm_comment_bloc.dart';
+part of '../comment_bloc.dart';
 
-void _getCommentHandler(LMGetCommentsEvent event, emit) async {
+Future<void> _getCommentHandler(LMGetCommentsEvent event, emit) async {
   if (event.page == 1) {
     emit(LMGetCommentLoading());
   } else {

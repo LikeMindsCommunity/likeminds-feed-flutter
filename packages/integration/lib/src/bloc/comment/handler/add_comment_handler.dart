@@ -1,6 +1,6 @@
-part of '../lm_comment_bloc.dart';
+part of '../comment_bloc.dart';
 
-FutureOr<void> _addCommentHandler(LMAddCommentEvent event, emit) async {
+Future<void> _addCommentHandler(LMAddCommentEvent event, emit) async {
   DateTime currentTime = DateTime.now();
   String tempId = '${-currentTime.millisecondsSinceEpoch}';
   final LMUserViewData currentUser =
@@ -58,13 +58,23 @@ FutureOr<void> _addCommentHandler(LMAddCommentEvent event, emit) async {
               userTopics: response.userTopics,
             ))) ??
         {});
-    LMCommentViewData commentViewData =
+    LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
+      eventName: LMFeedAnalyticsKeys.commentPosted,
+      widgetSource: LMFeedWidgetSource.postDetailScreen,
+      eventProperties: {
+        "post_id": addCommentRequest.postId,
+        "comment_id": response.reply?.id,
+      },
+    ));
+    commentViewData =
         LMCommentViewDataConvertor.fromComment(response.reply!, users);
     emit(LMAddCommentSuccess(comment: commentViewData));
   } else {
     emit(
       LMAddCommentError(
-          error: response.errorMessage ?? ' Something went wrong'),
+        error: response.errorMessage ?? 'Failed to add comment',
+        commentId: commentViewData.id,
+      ),
     );
   }
 }

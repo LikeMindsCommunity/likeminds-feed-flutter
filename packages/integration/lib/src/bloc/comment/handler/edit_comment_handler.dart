@@ -1,12 +1,19 @@
-part of "../lm_comment_bloc.dart";
+part of "../comment_bloc.dart";
 
-FutureOr<void> _editCommentHandler(LMEditCommentEvent event, emit) async {
-  emit(LMEditCommentLoading());
+Future<void> _editCommentHandler(LMEditCommentEvent event, emit) async {
+  // local commentViewData to add to the state
+  LMCommentViewData commentViewData = event.oldComment.copyWith(
+    text: event.editedText,
+    isEdited: true,
+  );
+  emit(LMEditCommentSuccess(
+    commentViewData: commentViewData,
+  ));
   // build edit comment request
   EditCommentRequest editCommentRequest = (EditCommentRequestBuilder()
         ..postId(event.postId)
-        ..commentId(event.commentId)
-        ..text(event.commentText))
+        ..commentId(event.oldComment.id)
+        ..text(event.editedText))
       .build();
   final EditCommentResponse response =
       await LMFeedCore.client.editComment(editCommentRequest);
@@ -36,26 +43,26 @@ FutureOr<void> _editCommentHandler(LMEditCommentEvent event, emit) async {
             ))) ??
         {});
 
-    LMCommentViewData commentViewData =
+    commentViewData =
         LMCommentViewDataConvertor.fromComment(response.reply!, users);
     emit(LMEditCommentSuccess(
       commentViewData: commentViewData,
     ));
   } else {
     emit(LMEditCommentError(
-        error: response.errorMessage ?? 'An error occurred'));
+      error: response.errorMessage ?? 'An error occurred',
+      oldComment: event.oldComment,
+    ));
   }
 }
 
-FutureOr<void> _cancelEditingCommentHandler(
-    LMEditCommentCancelEvent event, emit) {
+void _cancelEditingCommentHandler(LMEditCommentCancelEvent event, emit) {
   emit(LMEditingCommentCancelState());
 }
 
-FutureOr<void> _editingCommentHandler(LMEditingCommentEvent event, emit) {
+void _editingCommentHandler(LMEditingCommentEvent event, emit) {
   emit(LMEditingCommentState(
     postId: event.postId,
-    commentId: event.commentId,
-    comment: event.replyText,
+    oldComment: event.oldComment,
   ));
 }
