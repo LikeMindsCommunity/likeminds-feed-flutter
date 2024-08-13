@@ -1,4 +1,4 @@
-part of 'test_post_detail_screen.dart';
+part of 'post_detail_screen.dart';
 
 class LMPostDetailScreenConfig {
   const LMPostDetailScreenConfig({

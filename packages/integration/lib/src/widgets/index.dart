@@ -16,3 +16,6 @@ export 'post/delete_dialog.dart';
 // Pending Post Widgets
 export 'feed/feed_pending_post_banner.dart';
 export 'post/post_approval_dialog.dart';
+export 'post/comment/comment_list_widget.dart';
+export 'post/comment/comment_reply_widget.dart';
+export 'post/comment/default_empty_comment_widget.dart';

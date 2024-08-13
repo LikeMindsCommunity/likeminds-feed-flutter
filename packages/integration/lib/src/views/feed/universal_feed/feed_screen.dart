@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/test_post_detail_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
 
 part 'feed_screen_configuration.dart';
 

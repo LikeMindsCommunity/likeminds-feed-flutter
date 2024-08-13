@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/comment/comment_bloc.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/default_empty_comment_widget.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/tmp_comment_reply_widget.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_reply_widget.dart';
 
 class LMFeedCommentList extends StatefulWidget {
   const LMFeedCommentList({

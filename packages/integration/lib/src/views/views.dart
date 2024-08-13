@@ -1,4 +1,4 @@
-export 'post/test_post_detail_screen.dart';
+export 'post/post_detail_screen.dart';
 export 'compose/compose_screen.dart';
 export 'likes/likes_screen.dart';
 export 'feed/universal_feed/feed_screen.dart';
