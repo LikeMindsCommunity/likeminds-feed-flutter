@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-class TempLMFeedCommentReplyWidget extends StatefulWidget {
+class LMFeedCommentReplyWidget extends StatefulWidget {
   final String postId;
   final LMCommentViewData comment;
   final LMUserViewData user;
@@ -12,7 +12,7 @@ class TempLMFeedCommentReplyWidget extends StatefulWidget {
 
   final LMPostViewData post;
 
-  const TempLMFeedCommentReplyWidget({
+  const LMFeedCommentReplyWidget({
     Key? key,
     required this.comment,
     required this.user,
@@ -23,10 +23,9 @@ class TempLMFeedCommentReplyWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<TempLMFeedCommentReplyWidget> createState() =>
-      _CommentReplyWidgetState();
+  State<LMFeedCommentReplyWidget> createState() => _CommentReplyWidgetState();
 
-  TempLMFeedCommentReplyWidget copyWith({
+  LMFeedCommentReplyWidget copyWith({
     String? postId,
     LMCommentViewData? reply,
     LMUserViewData? user,
@@ -34,7 +33,7 @@ class TempLMFeedCommentReplyWidget extends StatefulWidget {
     LMFeedPostCommentBuilder? commentBuilder,
     LMPostViewData? post,
   }) {
-    return TempLMFeedCommentReplyWidget(
+    return LMFeedCommentReplyWidget(
       postId: postId ?? this.postId,
       comment: reply ?? this.comment,
       user: user ?? this.user,
@@ -45,7 +44,7 @@ class TempLMFeedCommentReplyWidget extends StatefulWidget {
   }
 }
 
-class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
+class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance();
   ValueNotifier<bool> rebuildLikeButton = ValueNotifier(false);
   ValueNotifier<bool> rebuildReplyList = ValueNotifier(false);
@@ -85,7 +84,7 @@ class _CommentReplyWidgetState extends State<TempLMFeedCommentReplyWidget> {
   }
 
   @override
-  void didUpdateWidget(TempLMFeedCommentReplyWidget oldWidget) {
+  void didUpdateWidget(LMFeedCommentReplyWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.comment != widget.comment) {
       initializeReply();

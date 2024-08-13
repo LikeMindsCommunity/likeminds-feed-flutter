@@ -1,15 +1,11 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/bloc/comment/comment_bloc.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;

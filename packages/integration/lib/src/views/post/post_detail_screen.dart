@@ -9,7 +9,6 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/post/bottom_textfield.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_count_widget.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_list_widget.dart';
 part 'post_detail_screen_configuration.dart';
 
 /// {@template post_detail_screen}
@@ -102,14 +101,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   final _commentBloc = LMFeedCommentBloc.instance();
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   LMPostViewData? postData;
-  final TextEditingController _commentController = TextEditingController();
   final FocusNode _commentFocusNode = FocusNode();
   int _commentCount = 0;
 
   @override
   void initState() {
     super.initState();
-    debugPrint("Post ID: ${widget.postId}");
     right = LMFeedUserUtils.checkCommentRights();
     if (widget.openKeyboard && right) {
       openOnScreenKeyboard();
@@ -861,45 +858,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     );
   }
 
-  void handleCreateCommentButtonAction([LMFeedCommentState? state]) {
-    closeOnScreenKeyboard();
-    bool isEditing = _commentBloc.state is LMFeedEditingCommentState;
-    // extract text from comment controller
-    String commentText = LMFeedTaggingHelper.encodeString(
-      _commentController.text,
-      userTags,
-    ).trim();
-    commentText = commentText.trim();
-    if (commentText.isEmpty) {
-      LMFeedCore.showSnackBar(
-        context,
-        "Please write something to create a $commentTitleSmallCapSingular",
-        _widgetSource,
-      );
-
-      return;
-    }
-
-    if (isEditing) {
-      // edit an existing comment
-      final currentState = _commentBloc.state as LMFeedEditingCommentState;
-      _commentBloc.add(LMFeedEditCommentEvent(
-        widget.postId,
-        currentState.oldComment,
-        commentText,
-      ));
-    } else {
-      // create new comment
-      _commentBloc.add(LMFeedAddCommentEvent(
-        postId: widget.postId,
-        commentText: commentText,
-      ));
-    }
-
-    _commentController.clear();
-    closeOnScreenKeyboard();
-  }
-
   void closeOnScreenKeyboard() {
     if (_commentFocusNode.hasFocus) {
       _commentFocusNode.unfocus();
@@ -909,10 +867,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   void openOnScreenKeyboard() {
     if (_commentFocusNode.canRequestFocus) {
       _commentFocusNode.requestFocus();
-      if (_commentController.text.isNotEmpty) {
-        _commentController.selection = TextSelection.fromPosition(
-            TextPosition(offset: _commentController.text.length));
-      }
     }
   }
 }

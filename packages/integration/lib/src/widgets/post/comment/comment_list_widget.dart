@@ -97,23 +97,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     return BlocConsumer<LMFeedCommentBloc, LMFeedCommentState>(
         bloc: _commentBloc,
         listener: _handleBlocListeners,
-        buildWhen: (previous, current) {
-          if (current is LMFeedAddCommentSuccessState ||
-              current is LMFeedAddCommentErrorState ||
-              current is LMFeedEditCommentSuccessState ||
-              current is LMFeedEditCommentErrorState ||
-              current is LMFeedDeleteCommentSuccessState ||
-              current is LMFeedDeleteCommentErrorState ||
-              current is LMFeedReplyCommentSuccessState ||
-              current is LMFeedDeleteReplySuccessState ||
-              current is LMFeedGetCommentSuccessState ||
-              current is LMFeedGetReplyCommentLoadingState ||
-              current is LMFeedCloseReplyState ||
-              current is LMFeedCommentRefreshState) {
-            return true;
-          }
-          return false;
-        },
+        buildWhen: _handleBuildWhen,
         builder: (context, state) {
           return PagedSliverList.separated(
             pagingController: _commentListPagingController,
@@ -144,7 +128,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                               ?.call(context, commentWidget, _postViewData!) ??
                           _widgetBuilder.commentBuilder
                               .call(context, commentWidget, _postViewData!),
-                      TempLMFeedCommentReplyWidget(
+                      LMFeedCommentReplyWidget(
                         commentBuilder: widget.commentBuilder ??
                             LMFeedCore.widgetUtility.commentBuilder,
                         post: _postViewData!,
@@ -165,6 +149,24 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                 ),
           );
         });
+  }
+
+  bool _handleBuildWhen(previous, current) {
+    if (current is LMFeedAddCommentSuccessState ||
+        current is LMFeedAddCommentErrorState ||
+        current is LMFeedEditCommentSuccessState ||
+        current is LMFeedEditCommentErrorState ||
+        current is LMFeedDeleteCommentSuccessState ||
+        current is LMFeedDeleteCommentErrorState ||
+        current is LMFeedReplyCommentSuccessState ||
+        current is LMFeedDeleteReplySuccessState ||
+        current is LMFeedGetCommentSuccessState ||
+        current is LMFeedGetReplyCommentLoadingState ||
+        current is LMFeedCloseReplyState ||
+        current is LMFeedCommentRefreshState) {
+      return true;
+    }
+    return false;
   }
 
   void _handleBlocListeners(context, state) {
