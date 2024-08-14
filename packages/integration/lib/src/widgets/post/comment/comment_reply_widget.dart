@@ -209,7 +209,8 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         current is LMFeedGetReplyCommentLoadingState ||
         current is LMFeedGetReplyCommentPaginationLoadingState ||
         current is LMFeedEditReplySuccessState ||
-        current is LMFeedDeleteReplySuccessState) {
+        current is LMFeedDeleteReplySuccessState ||
+        current is LMFeedReplyCommentErrorState) {
       return true;
     }
     return false;
@@ -284,6 +285,11 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     if (index != null && index != -1) {
       comment?.replies?[index] = state.oldReply;
     }
+    LMFeedCore.showSnackBar(
+      context,
+      state.error,
+      widgetSource,
+    );
   }
 
   void _handleDeleteReplySuccessState(LMFeedDeleteReplySuccessState state) {
@@ -318,6 +324,11 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   void _handleReplyCommentErrorState(LMFeedReplyCommentErrorState state) {
     if (state.commentId != widget.comment.id) return;
     comment?.replies?.removeWhere((element) => element.tempId == state.replyId);
+    LMFeedCore.showSnackBar(
+      context,
+      state.error,
+      widgetSource,
+    );
   }
 
   void _handleCloseReplyState(LMFeedCloseReplyState state) {

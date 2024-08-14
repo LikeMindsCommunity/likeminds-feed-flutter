@@ -93,11 +93,12 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                 final LMFeedCommentState state = _commentBloc.state;
                 final bool isEditing = (state is LMFeedEditingCommentState);
                 final bool isReply = (state is LMFeedReplyingCommentState);
+                final bool isReplyEditing = (state is LMFeedEditingReplyState);
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     LikeMindsTheme.kVerticalPaddingMedium,
-                    isEditing || isReply
+                    isEditing || isReply || isReplyEditing
                         ? Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
@@ -105,8 +106,10 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                               children: [
                                 LMFeedText(
                                   text: isEditing
-                                      ? "Editing ${isReply ? 'reply' : '$commentTitleSmallCapSingular'} "
-                                      : "Replying to ",
+                                      ? "Editing ${'$commentTitleSmallCapSingular'} "
+                                      : isReplyEditing
+                                          ? "Editing reply"
+                                          : "Replying to ",
                                   style: LMFeedTextStyle(
                                     textStyle: TextStyle(
                                       fontSize: 14,
@@ -115,10 +118,11 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                                     ),
                                   ),
                                 ),
-                                isEditing
+                                isEditing || isReplyEditing
                                     ? const SizedBox()
                                     : LMFeedText(
-                                        text: (state as LMFeedReplyingCommentState)
+                                        text: (state
+                                                as LMFeedReplyingCommentState)
                                             .userName,
                                         style: const LMFeedTextStyle(
                                           textStyle: TextStyle(
@@ -254,9 +258,11 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
 
   void _handleListener(context, state) {
     if (state is LMFeedEditingCommentState) {
-      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
       openOnScreenKeyboard();
-      _commentController.text = state.oldComment.text;
+      final String commentText =
+          LMFeedTaggingHelper.convertRouteToTag(state.oldComment.text);
+      _commentController.text = commentText;
+      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
     } else if (state is LMFeedEditingCommentCancelState) {
       _commentController.clear();
       closeOnScreenKeyboard();
@@ -270,12 +276,14 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       closeOnScreenKeyboard();
     } else if (state is LMFeedEditingReplyState) {
       openOnScreenKeyboard();
-      _commentController.text = state.replyText;
-      // _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+      final String replyText =
+          LMFeedTaggingHelper.convertRouteToTag(state.replyText);
+      _commentController.text = replyText;
+      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
     } else if (state is LMFeedEditReplyCancelEvent) {
       _commentController.clear();
       closeOnScreenKeyboard();
-      // _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
     } else {
       _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
     }

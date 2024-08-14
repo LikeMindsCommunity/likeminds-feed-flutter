@@ -59,7 +59,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
-  List<String> showReplyCommentIds = [];
+  Set<String> showReplyCommentIds = {};
   final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
   final LMFeedPostBloc _postBloc = LMFeedPostBloc.instance;
   final PagingController<int, LMCommentViewData> _commentListPagingController =
@@ -148,17 +148,33 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
               itemBuilder: (context, commentViewData, index) {
                 LMUserViewData userViewData;
                 userViewData = commentViewData.user;
-
-                LMFeedCommentWidget commentWidget = defCommentTile(
-                    commentViewData, index, userViewData, context);
-
                 return SizedBox(
                   child: Column(
                     children: [
-                      widget.commentBuilder
-                              ?.call(context, commentWidget, _postViewData!) ??
-                          _widgetBuilder.commentBuilder
-                              .call(context, commentWidget, _postViewData!),
+                      StatefulBuilder(
+                        builder: (context, setReplyState) {
+                          return widget.commentBuilder?.call(
+                                  context,
+                                  defCommentTile(
+                                    commentViewData,
+                                    index,
+                                    userViewData,
+                                    context,
+                                    setReplyState,
+                                  ),
+                                  _postViewData!) ??
+                              _widgetBuilder.commentBuilder.call(
+                                  context,
+                                  defCommentTile(
+                                    commentViewData,
+                                    index,
+                                    userViewData,
+                                    context,
+                                    setReplyState,
+                                  ),
+                                  _postViewData!);
+                        },
+                      ),
                       LMFeedCommentReplyWidget(
                         commentBuilder: widget.commentBuilder ??
                             LMFeedCore.widgetUtility.commentBuilder,
@@ -312,8 +328,13 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     }
   }
 
-  LMFeedCommentWidget defCommentTile(LMCommentViewData commentViewData,
-      int index, LMUserViewData userViewData, BuildContext context) {
+  LMFeedCommentWidget defCommentTile(
+    LMCommentViewData commentViewData,
+    int index,
+    LMUserViewData userViewData,
+    BuildContext context,
+    StateSetter setReplyState,
+  ) {
     return LMFeedCommentWidget(
       user: userViewData,
       comment: commentViewData,
@@ -353,7 +374,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
             _widgetSource),
         imageUrl: userViewData.imageUrl,
       ),
-      likeButton: defCommentLikeButton(commentViewData),
+      likeButton: defCommentLikeButton(commentViewData, setReplyState),
       replyButton: defCommentReplyButton(commentViewData),
       showRepliesButton: defCommentShowRepliesButton(commentViewData),
       onTagTap: (String uuid) {
@@ -368,7 +389,10 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     );
   }
 
-  LMFeedButton defCommentLikeButton(LMCommentViewData commentViewData) {
+  LMFeedButton defCommentLikeButton(
+    LMCommentViewData commentViewData,
+    StateSetter setReplyState,
+  ) {
     return LMFeedButton(
       style: feedTheme.commentStyle.likeButtonStyle?.copyWith(
               showText: commentViewData.likesCount == 0 ? false : true) ??
@@ -416,6 +440,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         commentViewData.likesCount = commentViewData.isLiked
             ? commentViewData.likesCount - 1
             : commentViewData.likesCount + 1;
+        setReplyState(() {});
         commentViewData.isLiked = !commentViewData.isLiked;
         ToggleLikeCommentRequest toggleLikeCommentRequest =
             (ToggleLikeCommentRequestBuilder()
@@ -432,6 +457,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
               ? commentViewData.likesCount - 1
               : commentViewData.likesCount + 1;
           commentViewData.isLiked = !commentViewData.isLiked;
+          setReplyState(() {});
         } else {
           LMFeedCommentUtils.handleCommentLikeTapEvent(postViewData,
               _widgetSource, commentViewData, commentViewData.isLiked);
