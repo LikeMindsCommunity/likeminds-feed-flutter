@@ -45,7 +45,7 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
 }
 
 class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
-  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance();
+  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
   ValueNotifier<bool> rebuildLikeButton = ValueNotifier(false);
   ValueNotifier<bool> rebuildReplyList = ValueNotifier(false);
   Map<String, LMUserViewData> users = {};

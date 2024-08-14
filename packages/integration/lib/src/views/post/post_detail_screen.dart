@@ -98,7 +98,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   bool isAndroid = LMFeedPlatform.instance.isAndroid();
   bool isWeb = LMFeedPlatform.instance.isWeb();
   double? screenWidth;
-  final _commentBloc = LMFeedCommentBloc.instance();
+  final _commentBloc = LMFeedCommentBloc.instance;
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   LMPostViewData? postData;
   final FocusNode _commentFocusNode = FocusNode();

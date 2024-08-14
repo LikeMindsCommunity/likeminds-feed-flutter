@@ -942,7 +942,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           LMCommentViewData commentViewData, LMPostViewData postViewData) =>
       LMFeedMenuAction(
         onCommentEdit: () {
-          LMFeedCommentBloc.instance().add(
+          LMFeedCommentBloc.instance.add(
             LMFeedEditingCommentEvent(
               postId: postViewData.id,
               oldComment: commentViewData,

@@ -60,7 +60,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
   List<String> showReplyCommentIds = [];
-  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance();
+  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
   final LMFeedPostBloc _postBloc = LMFeedPostBloc.instance;
   final PagingController<int, LMCommentViewData> _commentListPagingController =
       PagingController(firstPageKey: 1);

@@ -27,7 +27,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   final TextEditingController _commentController = TextEditingController();
   late FocusNode _commentFocusNode;
   bool right = LMFeedUserUtils.checkCommentRights();
-  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance();
+  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
   final ValueNotifier<bool> _rebuildCommentTextField = ValueNotifier(false);
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);

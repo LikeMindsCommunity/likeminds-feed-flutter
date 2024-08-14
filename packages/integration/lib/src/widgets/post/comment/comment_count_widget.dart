@@ -22,7 +22,7 @@ class LMFeedCommentCount extends StatefulWidget {
 class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
   int _commentCount = 0;
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
-  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance();
+  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
   late LMPostDetailScreenConfig config;
   late Size screenSize;
   late double screenWidth;

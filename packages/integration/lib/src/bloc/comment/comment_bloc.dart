@@ -19,9 +19,8 @@ part 'handler/delete_reply_handler.dart';
 class LMFeedCommentBloc extends Bloc<LMFeedCommentEvent, LMFeedCommentState> {
   static final LMFeedCommentBloc _instance = LMFeedCommentBloc._();
 
-  factory LMFeedCommentBloc.instance() {
-    return _instance;
-  }
+  static LMFeedCommentBloc get instance => _instance;
+
   LMFeedCommentBloc._() : super(LMFeedCommentInitialState()) {
     on<LMFeedCommentRefreshEvent>((event, emit) {
       emit(LMFeedCommentRefreshState());
@@ -49,5 +48,4 @@ class LMFeedCommentBloc extends Bloc<LMFeedCommentEvent, LMFeedCommentState> {
 
     on<LMDeleteReplyEvent>(_deleteReplyHandler);
   }
-
 }
