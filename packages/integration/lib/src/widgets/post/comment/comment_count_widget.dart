@@ -1,8 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedCommentCount extends StatefulWidget {
@@ -10,10 +12,12 @@ class LMFeedCommentCount extends StatefulWidget {
     super.key,
     this.config,
     this.countTextBuilder,
+    this.style,
   });
   final LMPostDetailScreenConfig? config;
   final Widget Function(BuildContext context, LMFeedText textWidget)?
       countTextBuilder;
+  final LMFeedCommentCountStyle? style;
 
   @override
   State<LMFeedCommentCount> createState() => _LMFeedCommentCountState();
@@ -77,14 +81,18 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
                 state is LMFeedGetCommentLoadingState
             ? const SizedBox.shrink()
             : Container(
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                    borderRadius: isDesktopWeb
-                        ? BorderRadius.vertical(top: Radius.circular(8.0))
-                        : null,
-                    color: feedTheme.container),
-                margin: const EdgeInsets.only(top: 10.0),
-                padding: feedTheme.commentStyle.padding ??
+                clipBehavior: widget.style?.clipBehavior ?? Clip.hardEdge,
+                decoration: widget.style?.decoration ??
+                    BoxDecoration(
+                        borderRadius: isDesktopWeb
+                            ? widget.style?.borderRadius ??
+                                BorderRadius.vertical(top: Radius.circular(8.0))
+                            : null,
+                        color: feedTheme.container),
+                margin:
+                    widget.style?.margin ?? const EdgeInsets.only(top: 10.0),
+                padding: widget.style?.padding ??
+                    feedTheme.commentStyle.padding ??
                     const EdgeInsets.symmetric(
                       horizontal: 16.0,
                     ),
@@ -106,6 +114,53 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
           color: feedTheme.onContainer,
         ),
       ),
+    );
+  }
+}
+
+class LMFeedCommentCountStyle {
+  final BoxDecoration? decoration;
+  final Clip? clipBehavior;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
+  final AlignmentGeometry? alignment;
+  final BorderRadiusGeometry? borderRadius;
+
+  const LMFeedCommentCountStyle({
+    this.decoration,
+    this.clipBehavior,
+    this.margin,
+    this.padding,
+    this.alignment,
+    this.borderRadius,
+  });
+
+  factory LMFeedCommentCountStyle.basic() {
+    return const LMFeedCommentCountStyle(
+      clipBehavior: Clip.none,
+      alignment: Alignment.topLeft,
+      margin: const EdgeInsets.only(top: 10.0),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+      ),
+    );
+  }
+
+  LMFeedCommentCountStyle copyWith({
+    BoxDecoration? decoration,
+    Clip? clipBehavior,
+    EdgeInsetsGeometry? margin,
+    EdgeInsetsGeometry? padding,
+    AlignmentGeometry? alignment,
+    BorderRadiusGeometry? borderRadius,
+  }) {
+    return LMFeedCommentCountStyle(
+      decoration: decoration ?? this.decoration,
+      clipBehavior: clipBehavior ?? this.clipBehavior,
+      margin: margin ?? this.margin,
+      padding: padding ?? this.padding,
+      alignment: alignment ?? this.alignment,
+      borderRadius: borderRadius ?? this.borderRadius,
     );
   }
 }

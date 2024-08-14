@@ -99,61 +99,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                   children: [
                     LikeMindsTheme.kVerticalPaddingMedium,
                     isEditing || isReply || isReplyEditing
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            child: Row(
-                              children: [
-                                LMFeedText(
-                                  text: isEditing
-                                      ? "Editing ${'$commentTitleSmallCapSingular'} "
-                                      : isReplyEditing
-                                          ? "Editing reply"
-                                          : "Replying to ",
-                                  style: LMFeedTextStyle(
-                                    textStyle: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: feedTheme.onContainer,
-                                    ),
-                                  ),
-                                ),
-                                isEditing || isReplyEditing
-                                    ? const SizedBox()
-                                    : LMFeedText(
-                                        text: (state
-                                                as LMFeedReplyingCommentState)
-                                            .userName,
-                                        style: const LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                const Spacer(),
-                                LMFeedButton(
-                                  onTap: () {
-                                    isEditing
-                                        ? _commentBloc
-                                            .add(LMFeedEditCommentCancelEvent())
-                                        : _commentBloc
-                                            .add(LMFeedReplyCancelEvent());
-                                  },
-                                  style: const LMFeedButtonStyle(
-                                    icon: LMFeedIcon(
-                                      type: LMFeedIconType.icon,
-                                      icon: Icons.close,
-                                      style: LMFeedIconStyle(
-                                        color: LikeMindsTheme.greyColor,
-                                        size: 24,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
+                        ? _defTextFieldBanner(isEditing, isReplyEditing, state)
                         : const SizedBox.shrink(),
                     Container(
                       decoration: BoxDecoration(
@@ -252,6 +198,60 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                 );
               }),
         ),
+      ),
+    );
+  }
+
+  Container _defTextFieldBanner(
+      bool isEditing, bool isReplyEditing, LMFeedCommentState state) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          LMFeedText(
+            text: isEditing
+                ? "Editing ${'$commentTitleSmallCapSingular'} "
+                : isReplyEditing
+                    ? "Editing reply"
+                    : "Replying to ",
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: feedTheme.onContainer,
+              ),
+            ),
+          ),
+          isEditing || isReplyEditing
+              ? const SizedBox()
+              : LMFeedText(
+                  text: (state as LMFeedReplyingCommentState).userName,
+                  style: const LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+          const Spacer(),
+          LMFeedButton(
+            onTap: () {
+              isEditing
+                  ? _commentBloc.add(LMFeedEditCommentCancelEvent())
+                  : _commentBloc.add(LMFeedReplyCancelEvent());
+            },
+            style: const LMFeedButtonStyle(
+              icon: LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.close,
+                style: LMFeedIconStyle(
+                  color: LikeMindsTheme.greyColor,
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
