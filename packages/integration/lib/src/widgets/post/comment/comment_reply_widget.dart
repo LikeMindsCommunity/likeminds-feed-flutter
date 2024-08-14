@@ -333,7 +333,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   void _handleCloseReplyState(LMFeedCloseReplyState state) {
     if (state.commentId != widget.comment.id) return;
-    page = 0;
+    page = 1;
     comment?.replies?.clear();
   }
 
