@@ -48,7 +48,6 @@ class LMFeedCommentList extends StatefulWidget {
 }
 
 class _LMFeedCommentListState extends State<LMFeedCommentList> {
-  // ValueNotifier<bool> _rebuildCommentList = ValueNotifier(false);
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   final LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
@@ -84,12 +83,6 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     _addPaginationListener();
   }
 
-  @override
-  void didUpdateWidget(covariant LMFeedCommentList oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _addPaginationListener();
-  }
-
   void _addPaginationListener() {
     _commentListPagingController.addPageRequestListener(
       (pageKey) {
@@ -105,15 +98,13 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   }
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(LMFeedCommentState state) {
-    if (state is LMFeedGetCommentSuccessState) {
-      _postViewData = state.post;
-      final isLastPage = state.comments.length < _pageSize;
-      if (isLastPage) {
-        _commentListPagingController.appendLastPage(state.comments);
-      } else {
-        _commentListPagingController.appendPage(state.comments, state.page + 1);
-      }
+  void updatePagingControllers(LMFeedGetCommentSuccessState state) {
+    _postViewData = state.post;
+    final isLastPage = state.comments.length < _pageSize;
+    if (isLastPage) {
+      _commentListPagingController.appendLastPage(state.comments);
+    } else {
+      _commentListPagingController.appendPage(state.comments, state.page + 1);
     }
   }
 
@@ -202,14 +193,14 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         current is LMFeedDeleteReplySuccessState ||
         current is LMFeedGetCommentSuccessState ||
         current is LMFeedGetReplyCommentLoadingState ||
-        current is LMFeedCloseReplyState ||
-        current is LMFeedCommentRefreshState) {
+        current is LMFeedCloseReplyState) {
       return true;
     }
     return false;
   }
 
   void _handleBlocListeners(context, state) {
+    debugPrint('CommentListBlocListener: $state');
     if (state is LMFeedCommentRefreshState) {
       showReplyCommentIds.clear();
       _commentListPagingController.value.itemList?.clear();
