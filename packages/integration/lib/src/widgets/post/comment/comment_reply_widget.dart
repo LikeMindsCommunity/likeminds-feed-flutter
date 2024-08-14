@@ -98,16 +98,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     replyStyle = widget.style ?? feedTheme.replyStyle;
     return BlocConsumer(
       bloc: _commentBloc,
-      buildWhen: (previous, current) {
-        if (current is LMFeedGetReplyCommentSuccessState ||
-            current is LMFeedGetReplyCommentLoadingState ||
-            current is LMFeedGetReplyCommentPaginationLoadingState ||
-            current is LMFeedEditReplySuccessState ||
-            current is LMFeedDeleteReplySuccessState) {
-          return true;
-        }
-        return false;
-      },
+      buildWhen: _handleBuildWhen,
       builder: ((context, state) {
         if (state is LMFeedGetReplyCommentLoadingState) {
           if (state.commentId == widget.comment.id) {
@@ -213,77 +204,126 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     );
   }
 
+  bool _handleBuildWhen(previous, current) {
+    if (current is LMFeedGetReplyCommentSuccessState ||
+        current is LMFeedGetReplyCommentLoadingState ||
+        current is LMFeedGetReplyCommentPaginationLoadingState ||
+        current is LMFeedEditReplySuccessState ||
+        current is LMFeedDeleteReplySuccessState) {
+      return true;
+    }
+    return false;
+  }
+
   void _handleListener(context, state) {
-    // handle comment state changes
-    // it will ignore the state changes of other comments
-    if (state is LMFeedGetReplyCommentSuccessState) {
-      if (state.commentId != widget.comment.id) {
-        return;
-      }
-      if (state.page == 1) {
-        comment?.replies = state.replies;
-      } else {
-        page = state.page;
-        comment?.replies?.addAll(state.replies);
-      }
-    } else if (state is LMFeedEditReplySuccessState) {
-      if (state.commentId != widget.comment.id) {
-        return;
-      }
+    switch (state.runtimeType) {
+      case LMFeedGetReplyCommentSuccessState:
+        _handleGetReplyCommentSuccessState(
+            state as LMFeedGetReplyCommentSuccessState);
+        break;
+
+      case LMFeedEditReplySuccessState:
+        _handleEditReplySuccessState(state as LMFeedEditReplySuccessState);
+        break;
+
+      case LMFeedEditReplyErrorState:
+        _handleEditReplyErrorState(state as LMFeedEditReplyErrorState);
+        break;
+
+      case LMFeedDeleteReplySuccessState:
+        _handleDeleteReplySuccessState(state as LMFeedDeleteReplySuccessState);
+        break;
+
+      case LMFeedDeleteReplyErrorState:
+        _handleDeleteReplyErrorState(state as LMFeedDeleteReplyErrorState);
+        break;
+
+      case LMFeedReplyCommentSuccessState:
+        _handleReplyCommentSuccessState(
+            state as LMFeedReplyCommentSuccessState);
+        break;
+
+      case LMFeedReplyCommentErrorState:
+        _handleReplyCommentErrorState(state as LMFeedReplyCommentErrorState);
+        break;
+
+      case LMFeedCloseReplyState:
+        _handleCloseReplyState(state as LMFeedCloseReplyState);
+        break;
+
+      default:
+        // Handle unexpected states or do nothing
+        break;
+    }
+  }
+
+  void _handleGetReplyCommentSuccessState(
+      LMFeedGetReplyCommentSuccessState state) {
+    if (state.commentId != widget.comment.id) return;
+    if (state.page == 1) {
+      comment?.replies = state.replies;
+    } else {
+      page = state.page;
+      comment?.replies?.addAll(state.replies);
+    }
+  }
+
+  void _handleEditReplySuccessState(LMFeedEditReplySuccessState state) {
+    if (state.commentId != widget.comment.id) return;
+    int? index =
+        comment?.replies?.indexWhere((element) => element.id == state.replyId);
+    if (index != null && index != -1) {
+      comment?.replies?[index] = state.reply;
+    }
+  }
+
+  void _handleEditReplyErrorState(LMFeedEditReplyErrorState state) {
+    if (state.commentId != widget.comment.id) return;
+    int? index = comment?.replies
+        ?.indexWhere((element) => element.id == state.oldReply.id);
+    if (index != null && index != -1) {
+      comment?.replies?[index] = state.oldReply;
+    }
+  }
+
+  void _handleDeleteReplySuccessState(LMFeedDeleteReplySuccessState state) {
+    if (state.commentId != widget.comment.id) return;
+    comment?.replies?.removeWhere((element) => element.id == state.replyId);
+  }
+
+  void _handleDeleteReplyErrorState(LMFeedDeleteReplyErrorState state) {
+    LMFeedCore.showSnackBar(
+      context,
+      state.error,
+      widgetSource,
+    );
+  }
+
+  void _handleReplyCommentSuccessState(LMFeedReplyCommentSuccessState state) {
+    if (state.reply.parentComment?.id != widget.comment.id) return;
+    if (comment?.replies?.isEmpty ?? true) {
+      page = 0;
+    }
+    if (state.reply.tempId == state.reply.id) {
+      comment?.replies?.insert(0, state.reply);
+    } else {
       int? index = comment?.replies
-          ?.indexWhere((element) => element.id == state.replyId);
+          ?.indexWhere((element) => element.tempId == state.reply.tempId);
       if (index != null && index != -1) {
         comment?.replies?[index] = state.reply;
       }
-    } else if (state is LMFeedEditReplyErrorState) {
-      if (state.commentId != widget.comment.id) {
-        return;
-      }
-      int? index = comment?.replies
-          ?.indexWhere((element) => element.id == state.oldReply.id);
-      if (index != null && index != -1) {
-        comment?.replies?[index] = state.oldReply;
-      }
-    } else if (state is LMFeedDeleteReplySuccessState) {
-      if (state.commentId != widget.comment.id) {
-        return;
-      }
-      comment?.replies?.removeWhere((element) => element.id == state.replyId);
-    } else if (state is LMFeedDeleteReplyErrorState) {
-      LMFeedCore.showSnackBar(
-        context,
-        (state as DeleteCommentResponse).errorMessage ?? "An error occurred",
-        widgetSource,
-      );
-    } else if (state is LMFeedReplyCommentSuccessState) {
-      if (state.reply.parentComment?.id != widget.comment.id) {
-        return;
-      }
-      if (comment?.replies?.isEmpty ?? true) {
-        page = 0;
-      }
-      if (state.reply.tempId == state.reply.id) {
-        comment?.replies?.insert(0, state.reply);
-      } else {
-        int? index = comment?.replies
-            ?.indexWhere((element) => element.tempId == state.reply.tempId);
-        if (index != null && index != -1) {
-          comment?.replies?[index] = state.reply;
-        }
-      }
-    } else if (state is LMFeedReplyCommentErrorState) {
-      if (state.commentId != widget.comment.id) {
-        return;
-      }
-      comment?.replies
-          ?.removeWhere((element) => element.tempId == state.replyId);
-    } else if (state is LMFeedCloseReplyState) {
-      if (state.commentId != widget.comment.id) {
-        return;
-      }
-      page = 0;
-      comment?.replies?.clear();
     }
+  }
+
+  void _handleReplyCommentErrorState(LMFeedReplyCommentErrorState state) {
+    if (state.commentId != widget.comment.id) return;
+    comment?.replies?.removeWhere((element) => element.tempId == state.replyId);
+  }
+
+  void _handleCloseReplyState(LMFeedCloseReplyState state) {
+    if (state.commentId != widget.comment.id) return;
+    page = 0;
+    comment?.replies?.clear();
   }
 
   LMFeedCommentWidget _defCommentWidget(

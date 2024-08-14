@@ -1,35 +1,47 @@
 part of '../comment_bloc.dart';
 
+/// Handles [LMFeedGetCommentsEvent] event.
+/// Fetches comments for the post.
+/// Emits [LMFeedGetCommentSuccessState] if the comments are fetched successfully.
+/// Emits [LMFeedGetCommentErrorState] if the comments are not fetched successfully.
 Future<void> _getCommentHandler(LMFeedGetCommentsEvent event, emit) async {
+  // emit loading state to show loading indicator
   if (event.page == 1) {
     emit(LMFeedGetCommentLoadingState());
   } else {
     emit(LMFeedGetCommentPaginationLoadingState());
   }
-  final (post, comments) = await fetchCommentListWithPage(
+  // fetch comments and post data
+  final (post, comments) = await _fetchCommentListWithPage(
     event.page,
     event.postId,
     event.pageSize,
   );
+  // emit success state if the comments are fetched successfully
+  // emit error state if the comments are not fetched successfully
   if (post != null && comments != null) {
-    emit(LMFeedGetCommentSuccessState(post: post, comments: comments, page: event.page));
+    emit(LMFeedGetCommentSuccessState(
+        post: post, comments: comments, page: event.page));
   } else {
     emit(LMFeedGetCommentErrorState(error: 'Failed to fetch comments'));
   }
 }
 
-Future<(LMPostViewData?, List<LMCommentViewData>?)> fetchCommentListWithPage(
+/// Fetches comments for the post.
+Future<(LMPostViewData?, List<LMCommentViewData>?)> _fetchCommentListWithPage(
     int page, String postId, int commentListPageSize) async {
+  // build post detail request
   PostDetailRequest postDetailRequest = (PostDetailRequestBuilder()
         ..postId(postId)
         ..pageSize(commentListPageSize)
         ..page(page))
       .build();
-
+// make API call to get post details
   final PostDetailResponse response =
       await LMFeedCore.client.getPostDetails(postDetailRequest);
 
   if (response.success) {
+    // parse the response and update the state
     final Map<String, LMTopicViewData> topics = {};
     final Map<String, LMPostViewData> repostedPosts = {};
     final Map<String, LMWidgetViewData> widgets = {};
@@ -88,7 +100,6 @@ Future<(LMPostViewData?, List<LMCommentViewData>?)> fetchCommentListWithPage(
       topics: topics,
       userTopics: userTopics,
     );
-
     final List<LMCommentViewData> commentList = postViewData.replies;
 
     return (postViewData, commentList);

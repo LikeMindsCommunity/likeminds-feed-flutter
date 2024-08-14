@@ -1,8 +1,14 @@
 part of '../comment_bloc.dart';
 
+/// Handles [LMFeedReplyCommentEvent] event.
+/// Replies to a comment on the post.
+/// Emits [LMFeedReplyCommentSuccessState] if the reply is added successfully.
+/// Emits [LMFeedReplyCommentErrorState] if the reply is not added successfully.
 Future<void> _replyCommentHandler(LMFeedReplyCommentEvent event, emit) async {
+  // create a temp id for the comment
   DateTime currentTime = DateTime.now();
   String tempId = '${-currentTime.millisecondsSinceEpoch}';
+  // get the current user
   final LMUserViewData currentUser =
       LMFeedLocalPreference.instance.fetchUserData()!;
   // create a local commentViewData to add to the state
@@ -22,6 +28,7 @@ Future<void> _replyCommentHandler(LMFeedReplyCommentEvent event, emit) async {
         ..user(currentUser)
         ..tempId(tempId))
       .build();
+  // Update the state with the local comment
   emit(LMFeedReplyCommentSuccessState(
     reply: commentViewData,
   ));
@@ -37,6 +44,7 @@ Future<void> _replyCommentHandler(LMFeedReplyCommentEvent event, emit) async {
   final AddCommentReplyResponse response =
       await LMFeedCore.client.addCommentReply(addReplyRequest);
   if (response.success) {
+    // Parse the response and update the state
     final Map<String, LMTopicViewData> topics = {};
     final Map<String, LMWidgetViewData> widgets = {};
     final Map<String, LMUserViewData> users = {};
@@ -60,20 +68,10 @@ Future<void> _replyCommentHandler(LMFeedReplyCommentEvent event, emit) async {
               userTopics: response.userTopics,
             ))) ??
         {});
-    LMFeedAnalyticsBloc.instance.add(
-      LMFeedFireAnalyticsEvent(
-        eventName: LMFeedAnalyticsKeys.replyPosted,
-        widgetSource: LMFeedWidgetSource.postDetailScreen,
-        eventProperties: {
-          "post_id": addReplyRequest.postId,
-          "comment_id": addReplyRequest.commentId,
-          "comment_reply_id": response.reply?.id,
-          "user_id": currentUser.id,
-        },
-      ),
-    );
     LMCommentViewData reply =
         LMCommentViewDataConvertor.fromComment(response.reply!, users);
+
+    // fire analytics event for reply posted
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.replyPosted,
@@ -86,8 +84,11 @@ Future<void> _replyCommentHandler(LMFeedReplyCommentEvent event, emit) async {
         },
       ),
     );
+
+    // update the state with the new reply
     emit(LMFeedReplyCommentSuccessState(reply: reply));
   } else {
+    // emit error state if the reply request fails and revert the state
     emit(
       LMFeedReplyCommentErrorState(
         error: response.errorMessage ?? ' Something went wrong',
@@ -98,6 +99,9 @@ Future<void> _replyCommentHandler(LMFeedReplyCommentEvent event, emit) async {
   }
 }
 
+/// Handles [LMFeedReplyingCommentEvent] event.
+/// Prepares the state to reply to a comment on the post.
+/// Emits [LMFeedReplyingCommentState] to prepare the state to reply to a comment.
 void _replyingCommentHandler(LMFeedReplyingCommentEvent event, emit) {
   emit(LMFeedReplyingCommentState(
     postId: event.postId,
@@ -106,6 +110,9 @@ void _replyingCommentHandler(LMFeedReplyingCommentEvent event, emit) {
   ));
 }
 
+/// Handles [LMFeedReplyCancelEvent] event.
+/// Cancels the reply to a comment on the post.
+/// Emits [LMFeedReplyCancelState] to cancel the reply.
 void _cancelReplyCommentHandler(event, emit) {
   emit(LMFeedReplyCancelState());
 }

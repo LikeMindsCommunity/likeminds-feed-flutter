@@ -1,6 +1,10 @@
 part of '../comment_bloc.dart';
 
+/// Handles [LMFeedAddCommentEvent] event.
+/// Adds a comment to the post.
+/// Emits [LMFeedAddCommentSuccessState] if the comment is added successfully.
 Future<void> _addCommentHandler(LMFeedAddCommentEvent event, emit) async {
+  // Get the current user and create a tempId for the comment
   DateTime currentTime = DateTime.now();
   String tempId = '${-currentTime.millisecondsSinceEpoch}';
   final LMUserViewData currentUser =
@@ -22,6 +26,7 @@ Future<void> _addCommentHandler(LMFeedAddCommentEvent event, emit) async {
         ..user(currentUser)
         ..tempId(tempId))
       .build();
+  // Update the state with the local comment
   emit(LMFeedAddCommentSuccessState(comment: commentViewData));
 
   // Make a comment request
@@ -35,6 +40,7 @@ Future<void> _addCommentHandler(LMFeedAddCommentEvent event, emit) async {
   final AddCommentResponse response =
       await LMFeedCore.client.addComment(addCommentRequest);
   if (response.success) {
+    // Parse the response and update the state
     final Map<String, LMTopicViewData> topics = {};
     final Map<String, LMWidgetViewData> widgets = {};
     final Map<String, LMUserViewData> users = {};
@@ -58,6 +64,7 @@ Future<void> _addCommentHandler(LMFeedAddCommentEvent event, emit) async {
               userTopics: response.userTopics,
             ))) ??
         {});
+    // Fire analytics event
     LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
       eventName: LMFeedAnalyticsKeys.commentPosted,
       widgetSource: LMFeedWidgetSource.postDetailScreen,
@@ -68,8 +75,11 @@ Future<void> _addCommentHandler(LMFeedAddCommentEvent event, emit) async {
     ));
     commentViewData =
         LMCommentViewDataConvertor.fromComment(response.reply!, users);
+
+    /// Update the state with the new comment
     emit(LMFeedAddCommentSuccessState(comment: commentViewData));
   } else {
+    // If the API call fails, emit an error state
     emit(
       LMFeedAddCommentErrorState(
         error: response.errorMessage ?? 'Failed to add comment',

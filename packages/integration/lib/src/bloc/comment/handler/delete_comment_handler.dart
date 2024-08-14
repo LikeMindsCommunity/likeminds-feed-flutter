@@ -1,5 +1,8 @@
 part of '../comment_bloc.dart';
 
+/// Handles [LMFeedDeleteCommentEvent] event.
+/// Deletes a comment from the post.
+/// Emits [LMFeedDeleteCommentSuccessState] if the comment is deleted successfully.
 Future<void> _deleteCommentHandler(LMFeedDeleteCommentEvent event, emit) async {
   // emit success state to remove the comment from the state locally
   emit(LMFeedDeleteCommentSuccessState(
@@ -25,6 +28,7 @@ Future<void> _deleteCommentHandler(LMFeedDeleteCommentEvent event, emit) async {
       ),
     );
   }
+  // Fire analytics event
   LMFeedAnalyticsBloc.instance.add(
     LMFeedFireAnalyticsEvent(
       eventName: LMFeedAnalyticsKeys.commentDeleted,

@@ -9,14 +9,39 @@ class LMFeedCommentList extends StatefulWidget {
     this.commentBuilder,
     this.commentSeparatorBuilder,
     this.widgetSource = LMFeedWidgetSource.postDetailScreen,
+    this.noItemsFoundIndicatorBuilder,
+    this.firstPageProgressIndicatorBuilder,
+    this.newPageProgressIndicatorBuilder,
+    this.noMoreItemsIndicatorBuilder,
+    this.newPageErrorIndicatorBuilder,
+    this.firstPageErrorIndicatorBuilder,
   });
 
   final String postId;
 
   /// {@macro post_comment_builder}
   final LMFeedPostCommentBuilder? commentBuilder;
+
+  /// Builder for comment separator
   final Widget Function(BuildContext)? commentSeparatorBuilder;
   final LMFeedWidgetSource widgetSource;
+
+  /// Builder for empty feed view
+  final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
+
+  /// Builder for first page loader when no post are there
+  final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;
+
+  /// Builder for pagination loader when more post are there
+  final LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder;
+
+  /// Builder for widget when no more post are there
+  final LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder;
+
+  /// Builder for error view while loading a new page
+  final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
+  // Builder for error view while loading the first page
+  final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
   @override
   State<LMFeedCommentList> createState() => _LMFeedCommentListState();
@@ -102,18 +127,33 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
           return PagedSliverList.separated(
             pagingController: _commentListPagingController,
             builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
-              firstPageProgressIndicatorBuilder: (context) {
-                return const Padding(
-                  padding: EdgeInsets.only(top: 150.0),
-                  child: LMFeedLoader(),
-                );
-              },
-              newPageProgressIndicatorBuilder: (context) {
-                return _widgetBuilder
-                    .newPageProgressIndicatorBuilderFeed(context);
-              },
-              noItemsFoundIndicatorBuilder: (context) =>
-                  const LMFeedEmptyCommentWidget(),
+              firstPageProgressIndicatorBuilder:
+                  widget.firstPageProgressIndicatorBuilder ??
+                      (context) {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 150.0),
+                          child: LMFeedLoader(),
+                        );
+                      },
+              newPageProgressIndicatorBuilder:
+                  widget.newPageProgressIndicatorBuilder ??
+                      (context) {
+                        return _widgetBuilder
+                            .newPageProgressIndicatorBuilderFeed(context);
+                      },
+              noItemsFoundIndicatorBuilder:
+                  widget.noItemsFoundIndicatorBuilder ??
+                      (context) => const LMFeedEmptyCommentWidget(),
+              noMoreItemsIndicatorBuilder: widget.noMoreItemsIndicatorBuilder ??
+                  (context) => SizedBox.shrink(),
+              newPageErrorIndicatorBuilder: widget
+                      .newPageErrorIndicatorBuilder ??
+                  (context) =>
+                      _widgetBuilder.newPageErrorIndicatorBuilderFeed(context),
+              firstPageErrorIndicatorBuilder:
+                  widget.firstPageErrorIndicatorBuilder ??
+                      (context) => _widgetBuilder
+                          .firstPageErrorIndicatorBuilderFeed(context),
               itemBuilder: (context, commentViewData, index) {
                 LMUserViewData userViewData;
                 userViewData = commentViewData.user;

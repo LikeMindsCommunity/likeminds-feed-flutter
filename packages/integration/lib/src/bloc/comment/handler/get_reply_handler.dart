@@ -1,6 +1,11 @@
 part of '../comment_bloc.dart';
 
+/// Handles [LMFeedGetReplyEvent] event.
+/// Fetches replies for a comment on the post.
+/// Emits [LMFeedGetReplyCommentSuccessState] if the replies are fetched successfully.
+/// Emits [LMFeedGetReplyCommentErrorState] if the replies are not fetched successfully.
 Future<void> _getReplyHandler(LMFeedGetReplyEvent event, emit) async {
+  // emit loading state to show loading indicator
   if (event.page == 1) {
     emit(LMFeedGetReplyCommentLoadingState(
       commentId: event.commentId,
@@ -10,15 +15,17 @@ Future<void> _getReplyHandler(LMFeedGetReplyEvent event, emit) async {
       commentId: event.commentId,
     ));
   }
+  // create get comment request
   final GetCommentRequest request = (GetCommentRequestBuilder()
         ..commentId(event.commentId)
         ..postId(event.postId)
         ..page(event.page)
         ..pageSize(10))
       .build();
-
+// make API call to get replies for the comment
   GetCommentResponse response = await LMFeedCore.client.getComment(request);
   if (response.success) {
+    // parse the response and update the state
     final Map<String, LMTopicViewData> topics = {};
     final Map<String, LMWidgetViewData> widgets = {};
     final Map<String, LMUserViewData> users = {};
@@ -44,6 +51,7 @@ Future<void> _getReplyHandler(LMFeedGetReplyEvent event, emit) async {
         {});
     LMCommentViewData commentViewData =
         LMCommentViewDataConvertor.fromComment(response.postReplies!, users);
+    // update the state with the fetched replies
     emit(LMFeedGetReplyCommentSuccessState(
         replies: commentViewData.replies ?? [],
         page: event.page,
@@ -51,6 +59,9 @@ Future<void> _getReplyHandler(LMFeedGetReplyEvent event, emit) async {
   }
 }
 
-void _closeReplyHandler(event, emit) {
+/// Handles [LMFeedCloseReplyEvent] event.
+/// Closes the reply section for a comment on the post.
+/// Emits [LMFeedCloseReplyState] to close the reply section.
+void _closeReplyHandler(LMFeedCloseReplyEvent event, emit) {
   emit(LMFeedCloseReplyState(commentId: event.commentId));
 }
