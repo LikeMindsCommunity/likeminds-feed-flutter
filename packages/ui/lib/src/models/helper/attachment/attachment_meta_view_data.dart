@@ -11,8 +11,8 @@ class LMAttachmentMetaViewData {
   int? duration;
   int? pageCount;
   LMOgTagsViewData? ogTags;
-  double? height;
-  double? width;
+  int? height;
+  int? width;
   double? aspectRatio;
   LMPostViewData? repost;
   Map<String, dynamic>? meta;
@@ -71,8 +71,8 @@ class LMAttachmentMetaViewData {
     int? duration,
     int? pageCount,
     LMOgTagsViewData? ogTags,
-    double? height,
-    double? width,
+    int? height,
+    int? width,
     double? aspectRatio,
     LMPostViewData? repost,
     Map<String, dynamic>? meta,
@@ -130,8 +130,8 @@ class LMAttachmentMetaViewData {
     int? duration,
     int? pageCount,
     LMOgTagsViewData? ogTags,
-    double? height,
-    double? width,
+    int? height,
+    int? width,
     double? aspectRatio,
     LMPostViewData? repost,
     Map<String, dynamic>? meta,
@@ -188,8 +188,8 @@ class LMAttachmentMetaViewData {
     int? duration,
     int? pageCount,
     LMOgTagsViewData? ogTags,
-    double? height,
-    double? width,
+    int? height,
+    int? width,
     double? aspectRatio,
     LMPostViewData? repost,
     Map<String, dynamic>? meta,
@@ -245,8 +245,8 @@ class LMAttachmentMetaViewData {
     int? duration,
     int? pageCount,
     LMOgTagsViewData? ogTags,
-    double? height,
-    double? width,
+    int? height,
+    int? width,
     double? aspectRatio,
     LMPostViewData? repost,
     Map<String, dynamic>? meta,
@@ -308,8 +308,8 @@ class LMAttachmentMetaViewDataBuilder {
   int? _duration;
   int? _pageCount;
   LMOgTagsViewData? _ogTags;
-  double? _height;
-  double? _width;
+  int? _height;
+  int? _width;
   double? _aspectRatio;
   Map<String, dynamic>? _meta;
   LMPostViewData? _repost;
@@ -352,11 +352,11 @@ class LMAttachmentMetaViewDataBuilder {
     _ogTags = ogTags;
   }
 
-  void height(double height) {
+  void height(int height) {
     _height = height;
   }
 
-  void width(double width) {
+  void width(int width) {
     _width = width;
   }
 

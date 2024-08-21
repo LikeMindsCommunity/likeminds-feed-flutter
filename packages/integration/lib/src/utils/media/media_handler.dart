@@ -1,9 +1,7 @@
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 LMFeedPlatform feedPlatform = LMFeedPlatform.instance;
 

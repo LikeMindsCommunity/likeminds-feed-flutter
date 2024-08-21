@@ -1,7 +1,6 @@
 export 'analytics/analytics_bloc.dart';
 
-export 'comment/comment_handler/comment_handler_bloc.dart';
-export 'comment/comment_replies/comment_replies_bloc.dart';
+export 'comment/comment_bloc.dart';
 
 export 'compose/compose_bloc.dart';
 

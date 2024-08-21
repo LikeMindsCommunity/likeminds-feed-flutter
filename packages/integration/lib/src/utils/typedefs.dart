@@ -50,3 +50,10 @@ typedef LMFeedTileBuilder = Widget Function(BuildContext, LMFeedTile);
 /// {@endtemplate}
 typedef LMFeedCustomWidgetBuilder = Widget Function(
     BuildContext context, LMFeedPostSomething postSomethingWidget);
+
+/// {@template lm_feed_text_builder}
+/// Text widget builder function for [LMFeedText]
+/// Takes [BuildContext] and [LMFeedText] as parameters and returns [Widget]
+/// {@endtemplate}
+typedef LMFeedTextBuilder = Widget Function(
+    BuildContext context, LMFeedText oldTextWidget);

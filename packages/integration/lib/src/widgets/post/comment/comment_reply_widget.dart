@@ -4,9 +4,8 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedCommentReplyWidget extends StatefulWidget {
   final String postId;
-  final LMCommentViewData reply;
+  final LMCommentViewData comment;
   final LMUserViewData user;
-  final Function() refresh;
   final LMFeedCommentStyle? style;
 
   final LMFeedPostCommentBuilder? commentBuilder;
@@ -15,11 +14,10 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
 
   const LMFeedCommentReplyWidget({
     Key? key,
-    required this.reply,
+    required this.comment,
     required this.user,
     required this.postId,
     this.style,
-    required this.refresh,
     this.commentBuilder,
     required this.post,
   }) : super(key: key);
@@ -34,13 +32,11 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
     LMFeedCommentStyle? style,
     LMFeedPostCommentBuilder? commentBuilder,
     LMPostViewData? post,
-    Function()? refresh,
   }) {
     return LMFeedCommentReplyWidget(
       postId: postId ?? this.postId,
-      reply: reply ?? this.reply,
+      comment: reply ?? this.comment,
       user: user ?? this.user,
-      refresh: refresh ?? this.refresh,
       style: style ?? this.style,
       commentBuilder: commentBuilder ?? this.commentBuilder,
       post: post ?? this.post,
@@ -49,13 +45,11 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
 }
 
 class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
-  LMFeedFetchCommentReplyBloc? _commentRepliesBloc;
-  LMFeedCommentBloc? _commentHandlerBloc;
+  final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
   ValueNotifier<bool> rebuildLikeButton = ValueNotifier(false);
   ValueNotifier<bool> rebuildReplyList = ValueNotifier(false);
-  List<LMCommentViewData> replies = [];
   Map<String, LMUserViewData> users = {};
-  LMFeedThemeData? feedTheme;
+  final LMFeedThemeData feedTheme = LMFeedCore.theme;
   LMFeedCommentStyle? replyStyle;
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.postDetailScreen;
 
@@ -68,22 +62,17 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  LMCommentViewData? reply;
+  LMCommentViewData? comment;
   late final LMUserViewData user;
   late final String postId;
   Function()? refresh;
-  int? likeCount;
   bool isLiked = false;
   int replyCount = 0;
 
-  void initialiseReply() {
-    reply = widget.reply;
-    isLiked = reply!.isLiked;
-    likeCount = reply!.likesCount;
-    replyCount = reply!.repliesCount;
-    refresh = widget.refresh;
-    _commentHandlerBloc = LMFeedCommentBloc.instance;
-    _commentRepliesBloc = LMFeedFetchCommentReplyBloc.instance;
+  void initializeReply() {
+    comment = widget.comment;
+    isLiked = comment!.isLiked;
+    replyCount = comment!.repliesCount;
   }
 
   @override
@@ -91,14 +80,14 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     super.initState();
     postId = widget.postId;
     user = widget.user;
-    initialiseReply();
+    initializeReply();
   }
 
   @override
-  void didUpdateWidget(covariant LMFeedCommentReplyWidget oldWidget) {
+  void didUpdateWidget(LMFeedCommentReplyWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.reply != widget.reply) {
-      initialiseReply();
+    if (oldWidget.comment != widget.comment) {
+      initializeReply();
     }
   }
 
@@ -106,33 +95,13 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    feedTheme = LMFeedCore.theme;
-    replyStyle = widget.style ?? feedTheme?.replyStyle;
+    replyStyle = widget.style ?? feedTheme.replyStyle;
     return BlocConsumer(
-      bloc: _commentRepliesBloc,
-      buildWhen: (previous, current) {
-        if (current is LMFeedCommentRepliesLoadedState &&
-            current.commentId != reply!.id) {
-          return false;
-        }
-        if (current is LMFeedPaginatedCommentRepliesLoadingState &&
-            current.commentId != reply!.id) {
-          return false;
-        }
-        if (current is LMFeedCommentRepliesLoadingState &&
-            current.commentId != widget.reply.id) {
-          return false;
-        }
-        return true;
-      },
+      bloc: _commentBloc,
+      buildWhen: _handleBuildWhen,
       builder: ((context, state) {
-        if (state is LMFeedClearedCommentRepliesState) {
-          replies = [];
-          users = {};
-          return const SizedBox();
-        }
-        if (state is LMFeedCommentRepliesLoadingState) {
-          if (state.commentId == widget.reply.id) {
+        if (state is LMFeedGetReplyCommentLoadingState) {
+          if (state.commentId == widget.comment.id) {
             return Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
@@ -140,258 +109,232 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 height: 20,
                 width: 20,
                 child: LMFeedLoader(
-                  style: feedTheme!.loaderStyle,
+                  style: feedTheme.loaderStyle,
                 ),
               ),
             );
           }
         }
-        if (state is LMFeedCommentRepliesLoadedState ||
-            state is LMFeedPaginatedCommentRepliesLoadingState) {
-          if ((state is LMFeedCommentRepliesLoadedState &&
-                  state.commentId != reply!.id) ||
-              (state is LMFeedPaginatedCommentRepliesLoadingState &&
-                  state.commentId != reply!.id)) {
-            return const SizedBox();
-          }
-        }
-        return ValueListenableBuilder(
-            valueListenable: rebuildReplyList,
-            builder: (context, _, __) {
-              return BlocConsumer<LMFeedCommentBloc, LMFeedCommentHandlerState>(
-                bloc: _commentHandlerBloc,
-                listener: (context, state) {
-                  switch (state.runtimeType) {
-                    case const (LMFeedCommentSuccessState<
-                          AddCommentReplyResponse>):
-                      {
-                        if ((state as LMFeedCommentSuccessState<
-                                        AddCommentReplyResponse>)
-                                    .commentMetaData
-                                    .commentActionType ==
-                                LMFeedCommentActionType.replying &&
-                            state.commentMetaData.commentActionEntity ==
-                                LMFeedCommentType.reply) {
-                          AddCommentReplyResponse response =
-                              state.commentActionResponse;
-                          if (response.reply!.parentComment!.tempId ==
-                              widget.reply.tempId) {
-                            replies.replaceRange(0, 1, [
-                              LMCommentViewDataConvertor.fromComment(
-                                  response.reply!, users)
-                            ]);
-                          }
-                        }
-                        break;
-                      }
-                    case const (LMFeedCommentSuccessState<
-                          EditCommentReplyResponse>):
-                      {
-                        if ((state as LMFeedCommentSuccessState<
-                                        EditCommentReplyResponse>)
-                                    .commentMetaData
-                                    .commentActionType ==
-                                LMFeedCommentActionType.edit &&
-                            state.commentMetaData.commentActionEntity ==
-                                LMFeedCommentType.reply) {
-                          EditCommentReplyResponse response =
-                              state.commentActionResponse;
-
-                          int index = replies.indexWhere(
-                              (element) => element.id == response.reply!.id);
-                          if (index != -1) {
-                            replies[index] =
-                                LMCommentViewDataConvertor.fromComment(
-                                    response.reply!, users);
-                            rebuildReplyList.value = !rebuildReplyList.value;
-                          }
-                        }
-                        break;
-                      }
-                    case const (LMFeedCommentSuccessState<
-                          DeleteCommentResponse>):
-                      {
-                        if ((state as LMFeedCommentSuccessState<
-                                        DeleteCommentResponse>)
-                                    .commentMetaData
-                                    .commentActionType ==
-                                LMFeedCommentActionType.delete &&
-                            state.commentMetaData.commentActionEntity ==
-                                LMFeedCommentType.reply) {
-                          _commentRepliesBloc!.add(LMFeedDeleteLocalReplyEvent(
-                              replyId: state.commentMetaData.replyId ?? ""));
-                          replies.removeWhere((element) =>
-                              element.id == state.commentMetaData.replyId);
-                          reply!.repliesCount -= 1;
-                          replyCount = reply!.repliesCount;
-                        }
-                        break;
-                      }
-                  }
-                },
-                buildWhen: (previous, current) {
-                  switch (current.runtimeType) {
-                    case const (LMFeedCommentSuccessState<
-                          AddCommentReplyResponse>):
-                      return true;
-                    case const (LMFeedCommentSuccessState<
-                          EditCommentReplyResponse>):
-                      return true;
-                    case const (LMFeedCommentSuccessState<
-                          DeleteCommentResponse>):
-                      return true;
-                    default:
-                      return false;
-                  }
-                },
-                builder: (context, state) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      itemCount: replies.length,
-                      itemBuilder: (context, index) {
-                        LMCommentViewData commentViewData = replies[index];
-                        return StatefulBuilder(
-                          builder: (context, setReplyState) {
-                            return widget.commentBuilder?.call(
-                                    context,
-                                    _defCommentWidget(
-                                        commentViewData, setReplyState),
-                                    widget.post) ??
-                                _defCommentWidget(
-                                    commentViewData, setReplyState);
-                          },
-                        );
-                      },
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: comment?.replies?.length ?? 0,
+              itemBuilder: (context, index) {
+                LMCommentViewData? commentViewData = comment?.replies?[index];
+                return commentViewData != null
+                    ? StatefulBuilder(
+                        builder: (context, setReplyState) {
+                          return widget.commentBuilder?.call(
+                                  context,
+                                  _defCommentWidget(
+                                      commentViewData, setReplyState),
+                                  widget.post) ??
+                              _defCommentWidget(commentViewData, setReplyState);
+                        },
+                      )
+                    : SizedBox();
+              },
+            ),
+            if (state is LMFeedGetReplyCommentPaginationLoadingState)
+              if (state.commentId == widget.comment.id)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 30.0),
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: LMFeedLoader(
+                        style: feedTheme.loaderStyle,
+                      ),
                     ),
-                    if (replies.isNotEmpty &&
-                        replies.length % 10 == 0 &&
-                        replies.length != reply!.repliesCount)
-                      Container(
-                        color: feedTheme?.container,
-                        padding: replyStyle?.padding,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            LMFeedButton(
-                              onTap: () {
-                                page++;
-                                _commentRepliesBloc!.add(
-                                    LMFeedGetCommentRepliesEvent(
-                                        commentDetailRequest:
-                                            (GetCommentRequestBuilder()
-                                                  ..commentId(reply!.id)
-                                                  ..page(page)
-                                                  ..postId(postId))
-                                                .build(),
-                                        forLoadMore: true));
-                              },
-                              text: LMFeedText(
-                                text: 'View more replies',
-                                style: LMFeedTextStyle(
-                                  textStyle: TextStyle(
-                                    color: feedTheme?.primaryColor,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            LMFeedText(
-                              text:
-                                  ' ${replies.length} of ${reply!.repliesCount}',
-                              style: const LMFeedTextStyle(
-                                textStyle: TextStyle(
-                                  fontSize: 11,
-                                  color: LikeMindsTheme.greyColor,
-                                ),
-                              ),
-                            ),
-                          ],
+                  ),
+                ),
+            if ((comment?.replies?.isNotEmpty ?? false) &&
+                (comment?.replies?.length ?? 0) < comment!.repliesCount)
+              Container(
+                color: feedTheme.container,
+                padding: replyStyle?.padding,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    LMFeedButton(
+                      onTap: () {
+                        page++;
+                        _commentBloc.add(LMFeedGetReplyEvent(
+                          commentId: comment!.id,
+                          postId: postId,
+                          page: page,
+                          pageSize: 10,
+                        ));
+                      },
+                      text: LMFeedText(
+                        text: 'View more replies',
+                        style: LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            color: feedTheme.primaryColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    // replies.add();
+                    ),
+                    LMFeedText(
+                      text:
+                          ' ${comment?.replies?.length} of ${comment!.repliesCount}',
+                      style: const LMFeedTextStyle(
+                        textStyle: TextStyle(
+                          fontSize: 11,
+                          color: LikeMindsTheme.greyColor,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              );
-            });
+              ),
+          ],
+        );
       }),
-      listener: (context, state) {
-        if (state is LMFeedAddLocalReplyState) {
-          if (replies.isEmpty) {
-            replies.add(state.comment);
-          } else {
-            int index = replies.indexWhere(
-                (element) => element.tempId == state.comment.tempId);
-            if (index == -1) {
-              replies.insert(0, state.comment);
-            } else {
-              replies[index] = state.comment;
-            }
-          }
-        }
-        if (state is LMFeedEditLocalReplyState) {
-          int index =
-              replies.indexWhere((element) => element.id == state.replyId);
-          if (index != -1) {
-            LMCommentViewData reply = replies[index];
-            reply.text = state.text;
-            reply.isEdited = true;
-          }
-        }
-        if (state is LMFeedDeleteLocalReplyState) {
-          replies.removeWhere((element) => element.id == state.replyId);
-        }
-        if (state is LMFeedCommentRepliesLoadedState) {
-          Map<String, LMWidgetViewData>? widgets = state.commentDetails.widgets
-              ?.map((key, value) => MapEntry(
-                  key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
-
-          Map<String, LMTopicViewData>? topics = state.commentDetails.topics
-              ?.map((key, value) =>
-                  MapEntry(key, LMTopicViewDataConvertor.fromTopic(value)));
-
-          users = state.commentDetails.users!.map((key, value) => MapEntry(
-              key,
-              LMUserViewDataConvertor.fromUser(value,
-                  topics: topics,
-                  userTopics: state.commentDetails.userTopics,
-                  widgets: widgets)));
-
-          users.putIfAbsent(user.uuid, () => user);
-          replies = state.commentDetails.postReplies!.replies
-                  ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
-                  .toList() ??
-              [];
-        } else if (state is LMFeedPaginatedCommentRepliesLoadingState) {
-          Map<String, LMWidgetViewData>? widgets =
-              state.prevCommentDetails.widgets?.map((key, value) => MapEntry(
-                  key, LMWidgetViewDataConvertor.fromWidgetModel(value)));
-
-          Map<String, LMTopicViewData>? topics = state.prevCommentDetails.topics
-              ?.map((key, value) => MapEntry(key,
-                  LMTopicViewDataConvertor.fromTopic(value, widgets: widgets)));
-
-          users = state.prevCommentDetails.users!.map((key, value) => MapEntry(
-              key,
-              LMUserViewDataConvertor.fromUser(value,
-                  topics: topics,
-                  userTopics: state.prevCommentDetails.userTopics,
-                  widgets: widgets)));
-
-          users.putIfAbsent(user.uuid, () => user);
-          replies = state.prevCommentDetails.postReplies!.replies
-                  ?.map((e) => LMCommentViewDataConvertor.fromComment(e, users))
-                  .toList() ??
-              [];
-        }
-        replyCount = replies.length;
-      },
+      listener: _handleListener,
     );
+  }
+
+  bool _handleBuildWhen(previous, current) {
+    if (current is LMFeedGetReplyCommentSuccessState ||
+        current is LMFeedGetReplyCommentLoadingState ||
+        current is LMFeedGetReplyCommentPaginationLoadingState ||
+        current is LMFeedEditReplySuccessState ||
+        current is LMFeedDeleteReplySuccessState ||
+        current is LMFeedReplyCommentErrorState) {
+      return true;
+    }
+    return false;
+  }
+
+  void _handleListener(context, state) {
+    switch (state.runtimeType) {
+      case LMFeedGetReplyCommentSuccessState:
+        _handleGetReplyCommentSuccessState(
+            state as LMFeedGetReplyCommentSuccessState);
+        break;
+
+      case LMFeedEditReplySuccessState:
+        _handleEditReplySuccessState(state as LMFeedEditReplySuccessState);
+        break;
+
+      case LMFeedEditReplyErrorState:
+        _handleEditReplyErrorState(state as LMFeedEditReplyErrorState);
+        break;
+
+      case LMFeedDeleteReplySuccessState:
+        _handleDeleteReplySuccessState(state as LMFeedDeleteReplySuccessState);
+        break;
+
+      case LMFeedDeleteReplyErrorState:
+        _handleDeleteReplyErrorState(state as LMFeedDeleteReplyErrorState);
+        break;
+
+      case LMFeedReplyCommentSuccessState:
+        _handleReplyCommentSuccessState(
+            state as LMFeedReplyCommentSuccessState);
+        break;
+
+      case LMFeedReplyCommentErrorState:
+        _handleReplyCommentErrorState(state as LMFeedReplyCommentErrorState);
+        break;
+
+      case LMFeedCloseReplyState:
+        _handleCloseReplyState(state as LMFeedCloseReplyState);
+        break;
+
+      default:
+        // Handle unexpected states or do nothing
+        break;
+    }
+  }
+
+  void _handleGetReplyCommentSuccessState(
+      LMFeedGetReplyCommentSuccessState state) {
+    if (state.commentId != widget.comment.id) return;
+    if (state.page == 1) {
+      comment?.replies = state.replies;
+    } else {
+      page = state.page;
+      comment?.replies?.addAll(state.replies);
+    }
+  }
+
+  void _handleEditReplySuccessState(LMFeedEditReplySuccessState state) {
+    if (state.commentId != widget.comment.id) return;
+    int? index =
+        comment?.replies?.indexWhere((element) => element.id == state.replyId);
+    if (index != null && index != -1) {
+      comment?.replies?[index] = state.reply;
+    }
+  }
+
+  void _handleEditReplyErrorState(LMFeedEditReplyErrorState state) {
+    if (state.commentId != widget.comment.id) return;
+    int? index = comment?.replies
+        ?.indexWhere((element) => element.id == state.oldReply.id);
+    if (index != null && index != -1) {
+      comment?.replies?[index] = state.oldReply;
+    }
+    LMFeedCore.showSnackBar(
+      context,
+      state.error,
+      widgetSource,
+    );
+  }
+
+  void _handleDeleteReplySuccessState(LMFeedDeleteReplySuccessState state) {
+    if (state.commentId != widget.comment.id) return;
+    comment?.replies?.removeWhere((element) => element.id == state.replyId);
+  }
+
+  void _handleDeleteReplyErrorState(LMFeedDeleteReplyErrorState state) {
+    LMFeedCore.showSnackBar(
+      context,
+      state.error,
+      widgetSource,
+    );
+  }
+
+  void _handleReplyCommentSuccessState(LMFeedReplyCommentSuccessState state) {
+    if (state.reply.parentComment?.id != widget.comment.id) return;
+    if (comment?.replies?.isEmpty ?? true) {
+      page = 0;
+    }
+    if (state.reply.tempId == state.reply.id) {
+      comment?.replies?.insert(0, state.reply);
+    } else {
+      int? index = comment?.replies
+          ?.indexWhere((element) => element.tempId == state.reply.tempId);
+      if (index != null && index != -1) {
+        comment?.replies?[index] = state.reply;
+      }
+    }
+  }
+
+  void _handleReplyCommentErrorState(LMFeedReplyCommentErrorState state) {
+    if (state.commentId != widget.comment.id) return;
+    comment?.replies?.removeWhere((element) => element.tempId == state.replyId);
+    LMFeedCore.showSnackBar(
+      context,
+      state.error,
+      widgetSource,
+    );
+  }
+
+  void _handleCloseReplyState(LMFeedCloseReplyState state) {
+    if (state.commentId != widget.comment.id) return;
+    page = 1;
+    comment?.replies?.clear();
   }
 
   LMFeedCommentWidget _defCommentWidget(
@@ -423,7 +366,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         imageUrl: commentViewData.user.imageUrl,
         style: LMFeedProfilePictureStyle(
           size: 32,
-          backgroundColor: feedTheme!.primaryColor,
+          backgroundColor: feedTheme.primaryColor,
         ),
         fallbackText: commentViewData.user.name,
         onTap: () => LMFeedCommentUtils.handleCommentProfileTap(
@@ -452,7 +395,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   LMFeedButton defCommentReplyButton(LMCommentViewData commentViewData) {
     return LMFeedButton(
-      style: feedTheme!.commentStyle.replyButtonStyle ??
+      style: feedTheme.commentStyle.replyButtonStyle ??
           const LMFeedButtonStyle(
             margin: 10,
             icon: LMFeedIcon(
@@ -466,22 +409,17 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       text: LMFeedText(
         text: "Reply",
         style: LMFeedTextStyle(
-            textStyle:
-                TextStyle(fontSize: 12, color: feedTheme!.inActiveColor)),
+            textStyle: TextStyle(fontSize: 12, color: feedTheme.inActiveColor)),
       ),
       onTap: () {
-        LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-              ..commentActionEntity(LMFeedCommentType.parent)
-              ..postId(widget.postId)
-              ..commentActionType(LMFeedCommentActionType.replying)
-              ..level(0)
-              ..user(widget.reply.user)
-              ..commentId(widget.reply.id))
-            .build();
-
-        _commentHandlerBloc!.add(LMFeedCommentOngoingEvent(
-          commentMetaData: commentMetaData,
-        ));
+        if (comment == null) return;
+        _commentBloc.add(
+          LMFeedReplyingCommentEvent(
+            postId: widget.postId,
+            parentComment: comment!,
+            userName: commentViewData.user.name,
+          ),
+        );
       },
     );
   }
@@ -489,22 +427,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedMenuAction defLMFeedMenuAction(LMCommentViewData commentViewData) {
     return LMFeedMenuAction(
       onCommentEdit: () {
-        _commentHandlerBloc!.add(LMFeedCommentCancelEvent());
-        LMCommentMetaData commentMetaData = (LMCommentMetaDataBuilder()
-              ..commentId(widget.reply.id)
-              ..commentActionEntity(LMFeedCommentType.reply)
-              ..commentActionType(LMFeedCommentActionType.edit)
-              ..level(1)
-              ..postId(widget.post.id)
-              ..replyId(commentViewData.id)
-              ..commentText(
-                  LMFeedTaggingHelper.convertRouteToTag(commentViewData.text)))
-            .build();
-        _commentHandlerBloc!
-            .add(LMFeedCommentOngoingEvent(commentMetaData: commentMetaData));
+        _commentBloc.add(LMFeedEditingReplyEvent(
+          postId: widget.post.id,
+          commentId: widget.comment.id,
+          replyText: commentViewData.text,
+          oldReply: commentViewData,
+        ));
       },
       onCommentDelete: () {
-        _commentHandlerBloc!.add(LMFeedCommentCancelEvent());
+        // _commentHandlerBloc!.add(LMFeedCommentCancelEvent());
         String commentCreatorUUID = commentViewData.user.sdkClientInfo.uuid;
 
         showDialog(
@@ -517,31 +448,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                     'Are you sure you want to delete this $commentTitleSmallCapSingular. This action can not be reversed.',
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
-                  //Implement delete post analytics tracking
-                  DeleteCommentRequest request = (DeleteCommentRequestBuilder()
-                        ..postId(postId)
-                        ..commentId(commentViewData.id)
-                        ..reason(
-                            reason.isEmpty ? "Reason for deletion" : reason))
-                      .build();
-
-                  LMCommentMetaData commentMetaData =
-                      (LMCommentMetaDataBuilder()
-                            ..commentId(widget.reply.id)
-                            ..postId(widget.post.id)
-                            ..commentActionEntity(LMFeedCommentType.reply)
-                            ..commentActionType(LMFeedCommentActionType.delete)
-                            ..level(1)
-                            ..replyId(commentViewData.id))
-                          .build();
-
-                  _commentHandlerBloc!.add(LMFeedCommentActionEvent(
-                      commentActionRequest: request,
-                      commentMetaData: commentMetaData));
-
+                  _commentBloc.add(LMDeleteReplyEvent(
+                    postId: postId,
+                    oldReply: commentViewData,
+                    reason: reason.isEmpty ? "Reason for deletion" : reason,
+                    commentId: widget.comment.id,
+                  ));
                   LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
                     postId: widget.post.id,
-                    commentId: widget.reply.id,
+                    commentId: widget.comment.id,
                     actionType: LMFeedPostActionType.replyDeleted,
                   ));
                 },
@@ -553,7 +468,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedButton defLikeButton(
           LMCommentViewData commentViewData, StateSetter setReplyState) =>
       LMFeedButton(
-        style: feedTheme?.replyStyle.likeButtonStyle?.copyWith(
+        style: feedTheme.replyStyle.likeButtonStyle?.copyWith(
               showText: commentViewData.likesCount == 0 ? false : true,
             ) ??
             LMFeedButtonStyle(
@@ -571,7 +486,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
                 icon: Icons.thumb_up_alt_rounded,
                 style: LMFeedIconStyle(
                   size: 20,
-                  color: feedTheme!.primaryColor,
+                  color: feedTheme.primaryColor,
                 ),
               ),
             ),
@@ -604,8 +519,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
           );
         },
         onTap: () async {
-          LMCommentViewData commentFromList =
-              replies.firstWhere((element) => element.id == commentViewData.id);
+          LMCommentViewData? commentFromList = comment?.replies
+              ?.firstWhere((element) => element.id == commentViewData.id);
+          if (commentFromList == null) return;
           setReplyState(() {
             if (commentFromList.isLiked) {
               commentFromList.likesCount -= 1;
