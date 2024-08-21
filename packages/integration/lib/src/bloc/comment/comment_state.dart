@@ -5,7 +5,6 @@ part of 'comment_bloc.dart';
 /// of comment operations such as loading comments, successful retrieval,
 /// and handling errors.
 /// {@endtemplate}
-@immutable
 sealed class LMFeedCommentState extends Equatable {
   /// {@macro lm_feed_comment_state}
   const LMFeedCommentState();

@@ -5,7 +5,6 @@ part of 'comment_bloc.dart';
 /// actions like fetching comments, adding comments, editing comments, deleting
 /// comments, replying to comments, editing replies, deleting replies, etc.
 /// {@endtemplate}
-@immutable
 sealed class LMFeedCommentEvent extends Equatable {
   /// {@macro lm_feed_comment_event}
   const LMFeedCommentEvent();
