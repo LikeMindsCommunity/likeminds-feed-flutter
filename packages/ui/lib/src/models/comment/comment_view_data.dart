@@ -36,6 +36,45 @@ class LMCommentViewData {
     required this.user,
     this.postId,
   });
+
+  // copyWith method
+  LMCommentViewData copyWith({
+    String? id,
+    String? uuid,
+    String? text,
+    int? level,
+    int? likesCount,
+    int? repliesCount,
+    List<LMPopUpMenuItemViewData>? menuItems,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? isLiked,
+    bool? isEdited,
+    LMCommentViewData? parentComment,
+    String? tempId,
+    List<LMCommentViewData>? replies,
+    LMUserViewData? user,
+    String? postId,
+  }) {
+    return LMCommentViewData._(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      text: text ?? this.text,
+      level: level ?? this.level,
+      likesCount: likesCount ?? this.likesCount,
+      repliesCount: repliesCount ?? this.repliesCount,
+      menuItems: menuItems ?? this.menuItems,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isLiked: isLiked ?? this.isLiked,
+      isEdited: isEdited ?? this.isEdited,
+      parentComment: parentComment ?? this.parentComment,
+      tempId: tempId ?? this.tempId,
+      replies: replies ?? this.replies,
+      user: user ?? this.user,
+      postId: postId ?? this.postId,
+    );
+  }
 }
 
 class LMCommentViewDataBuilder {

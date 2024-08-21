@@ -1,68 +1,92 @@
 # Changelog
 
+## [1.8.0]
+
+- Added `LMFeedCommentList` Widget
+
 ## [1.7.0]
+
 - Updated dependencies to migrate to Android Target SDK version 34
 
 ## [1.6.1]
+
 - Patch update for core lib
 
 ## [1.6.0]
+
 - Added support for web platform
 
 ## [1.5.0]
+
 - Added support for pending post
 - Fixed issue with media position in Media Preview Screen
 - Fixed minor UI issues
 
 ## [1.4.2]
+
 - Added customizability to poll
 
 ## [1.4.1]
+
 - Updated Data layer to v1.10.1
 
 ## [1.4.0]
+
 - Added API key security
 
 ## [1.3.0]
+
 - Added support for Polls
 
 ## [1.2.4]
+
 - Extended the scope of analytics events
 - Fixed minor UI issues
 
 ## [1.2.3]
+
 - Fixed analytics events and added function for logout
 
 ## [1.2.2]
+
 - Added SnackBar builder in Widget Utility
 
 ## [1.2.1]
+
 - Removed `open_filex` package
 
 ## [1.2.0]
+
 - Added API security
 - Added Post and Comment as variable
 - Fixed minor bugs
 
 ## [1.1.5]
+
 - Upgraded video management
 - Added Feedroom support
 - Added multiple media support
 
 ## [1.1.0]
+
 - Added topic categories and bug fixes
 
 ## [1.0.4]
+
 - Bugfix and improvements
 
 ## [1.0.3]
+
 - Added support for repost and user profile feed
 
 ## [1.0.2]
+
 - Migrated to Flutter v3.10.6
 
 ## [1.0.1]
+
 - Patch update with dependency update
 
 ## [1.0.0]
+
 - Initial release of LikeMinds Feed Flutter UI library

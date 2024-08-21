@@ -1,14 +1,11 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/comment/comment_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 
 class LMFeedActivityScreen extends StatefulWidget {
   final String uuid;
@@ -945,25 +942,12 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           LMCommentViewData commentViewData, LMPostViewData postViewData) =>
       LMFeedMenuAction(
         onCommentEdit: () {
-          LMCommentMetaDataBuilder commentMetaDataBuilder =
-              LMCommentMetaDataBuilder()
-                ..postId(postViewData.id)
-                ..commentActionType(LMFeedCommentActionType.edit)
-                ..commentText(LMFeedTaggingHelper.convertRouteToTag(
-                    commentViewData.text));
-
-          if (commentViewData.level == 0) {
-            commentMetaDataBuilder
-              ..commentActionEntity(LMFeedCommentType.parent)
-              ..level(0)
-              ..commentId(commentViewData.id);
-          } else {
-            commentMetaDataBuilder
-              ..level(1)
-              ..commentActionEntity(LMFeedCommentType.reply)
-              ..commentId(commentViewData.parentComment!.id)
-              ..replyId(commentViewData.id);
-          }
+          LMFeedCommentBloc.instance.add(
+            LMFeedEditingCommentEvent(
+              postId: postViewData.id,
+              oldComment: commentViewData,
+            ),
+          );
         },
         onCommentDelete: () {
           String commentCreatorUUID = commentViewData.user.sdkClientInfo.uuid;
