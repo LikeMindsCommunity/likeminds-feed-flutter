@@ -33,7 +33,7 @@ class LMFeedCommentWidget extends StatefulWidget {
   final LMUserViewData user;
   final LMCommentViewData comment;
 
-  final LMFeedProfilePicture? profilePicture;
+  final Widget? profilePicture;
   final LMFeedText? titleText;
   final LMFeedText? subtitleText;
   final Widget? subTextSeparator;
@@ -66,7 +66,7 @@ class LMFeedCommentWidget extends StatefulWidget {
   LMFeedCommentWidget copyWith({
     LMUserViewData? user,
     LMCommentViewData? comment,
-    LMFeedProfilePicture? profilePicture,
+    Widget? profilePicture,
     LMFeedText? titleText,
     LMFeedText? subtitleText,
     LMFeedText? editedText,
