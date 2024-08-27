@@ -1,7 +1,9 @@
 export 'post/post_detail_screen.dart';
 export 'compose/compose_screen.dart';
 export 'likes/likes_screen.dart';
-export 'feed/universal_feed/feed_screen.dart';
+export 'feed/feed_screen.dart';
+export 'feed/universal_feed/universal_feed_screen.dart';
+export 'feed/personalised_feed/personalised_feed_screen.dart';
 export 'feed/topic_select_screen.dart';
 
 export 'report/report_bottom_sheet.dart';
