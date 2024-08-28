@@ -114,7 +114,7 @@ class _LMFeedListState extends State<LMFeedList> {
 
   void refresh() => widget.pagingController.refresh();
 
-  void updatePagingControllers(LMFeedState? state) {
+  void updatePagingControllers(LMFeedUniversalState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts;
 
@@ -132,9 +132,9 @@ class _LMFeedListState extends State<LMFeedList> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LMFeedBloc, LMFeedState>(
+    return BlocListener<LMFeedBloc, LMFeedUniversalState>(
       bloc: _feedBloc,
-      listener: (context, LMFeedState state) => updatePagingControllers(state),
+      listener: (context, LMFeedUniversalState state) => updatePagingControllers(state),
       child: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+
 /// {@template feed_screen}
 /// A screen to display the feed.
 /// The feed can be customized by passing in the required parameters
@@ -318,7 +319,7 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
   void refresh() => _pagingController.refresh();
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(LMFeedState? state) {
+  void updatePagingControllers(LMFeedUniversalState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts;
 
@@ -331,11 +332,16 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
       } else {
         _pagingController.appendPage(listOfPosts, state.pageKey + 1);
       }
+    } else if (state is LMFeedUniversalRefreshState) {
+      getUserFeedMeta = getUserFeedMetaFuture();
+      _rebuildAppBar.value = !_rebuildAppBar.value;
+      clearPagingController();
+      refresh();
     }
   }
 
   // This function clears the paging controller
-  // whenever user uses pull to refresh on feedroom screen
+  // whenever user uses pull to refresh on feed screen
   void clearPagingController() {
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
@@ -421,10 +427,7 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
-              getUserFeedMeta = getUserFeedMetaFuture();
-              _rebuildAppBar.value = !_rebuildAppBar.value;
-              refresh();
-              clearPagingController();
+              _feedBloc.add(LMFeedUniversalRefreshEvent());
             },
             color: feedThemeData.primaryColor,
             backgroundColor: feedThemeData.container,
@@ -753,9 +756,9 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
                 ),
                 if (isDesktopWeb)
                   SliverPadding(padding: EdgeInsets.only(top: 12.0)),
-                BlocListener<LMFeedBloc, LMFeedState>(
+                BlocListener<LMFeedBloc, LMFeedUniversalState>(
                   bloc: _feedBloc,
-                  listener: (context, LMFeedState state) =>
+                  listener: (context, LMFeedUniversalState state) =>
                       updatePagingControllers(state),
                   child: ValueListenableBuilder(
                     valueListenable: rebuildPostWidget,

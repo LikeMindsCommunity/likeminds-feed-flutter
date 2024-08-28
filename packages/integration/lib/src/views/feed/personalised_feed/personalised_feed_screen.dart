@@ -293,7 +293,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
   }
 
   // This function clears the paging controller
-  // whenever user uses pull to refresh on feedroom screen
+  // whenever user uses pull to refresh on feed screen
   void clearPagingController() {
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
@@ -493,8 +493,6 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
                             feedRoomItemList.length > 10) {
                           feedRoomItemList.removeLast();
                         }
-                        // _feedBloc.users.addAll(curr.userData);
-                        // _feedBloc.topics.addAll(curr.topics);
                         _pagingController.itemList = feedRoomItemList;
                         postUploading.value = false;
                         rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -516,8 +514,6 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
                         if (index != -1) {
                           feedRoomItemList![index] = item;
                         }
-                        // _feedBloc.users.addAll(curr.userData);
-                        // _feedBloc.topics.addAll(curr.topics);
                         postUploading.value = false;
                         rebuildPostWidget.value = !rebuildPostWidget.value;
 
@@ -652,9 +648,6 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
                         builderDelegate:
                             PagedChildBuilderDelegate<LMPostViewData>(
                           itemBuilder: (context, item, index) {
-                            // if (_feedBloc.users[item.uuid] == null) {
-                            //   return const SizedBox();
-                            // }
                             LMFeedPostWidget postWidget =
                                 defPostWidget(context, feedThemeData, item);
                             return widget.postBuilder
@@ -870,35 +863,6 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
             );
       } else if (media.attachmentType == LMMediaType.video) {
         return const SizedBox();
-        // TODO: add video thumbnail
-        // final thumbnailFile = VideoCompress.getFileThumbnail(
-        //   media.mediaFile!.path,
-        //   quality: 50, // default(100)
-        //   position: -1, // default(-1)
-        // );
-        // return FutureBuilder(
-        //   future: thumbnailFile,
-        //   builder: (context, snapshot) {
-        //     if (snapshot.hasData) {
-        //       return Container(
-        //         height: 50,
-        //         width: 50,
-        //         clipBehavior: Clip.hardEdge,
-        //         decoration: BoxDecoration(
-        //           color: Colors.black,
-        //           borderRadius: BorderRadius.circular(6.0),
-        //         ),
-        //         child: LMFeedImage(
-        //           imageFile: snapshot.data,
-        //           style: const LMFeedPostImageStyle(
-        //             boxFit: BoxFit.contain,
-        //           ),
-        //         ),
-        //       );
-        //     }
-        //     return LMFeedLoader();
-        //   },
-        // );
       } else {
         return const SizedBox.shrink();
       }

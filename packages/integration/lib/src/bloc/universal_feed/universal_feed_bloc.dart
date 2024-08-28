@@ -7,7 +7,7 @@ part 'universal_feed_event.dart';
 
 part 'universal_feed_state.dart';
 
-class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
+class LMFeedBloc extends Bloc<LMFeedUniversalEvent, LMFeedUniversalState> {
   // list of selected topics by the user
   List<LMTopicViewData> selectedTopics = [];
   // list of all the topics
@@ -23,16 +23,17 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
 
   // final FeedApi feedApi;
   LMFeedBloc._() : super(LMFeedInitialState()) {
-    on<LMFeedEvent>((event, emit) async {
-      if (event is LMFeedGetUniversalFeedEvent) {
-        await _mapLMGetUniversalFeedToState(event: event, emit: emit);
-      }
-    });
+    on<LMFeedGetUniversalFeedEvent>(_mapLMGetUniversalFeedToState);
+    on<LMFeedUniversalRefreshEvent>(
+      (event, emit) {
+        emit(LMFeedUniversalRefreshState());
+      },
+    );
   }
 
   FutureOr<void> _mapLMGetUniversalFeedToState(
-      {required LMFeedGetUniversalFeedEvent event,
-      required Emitter<LMFeedState> emit}) async {
+      LMFeedGetUniversalFeedEvent event,
+      Emitter<LMFeedUniversalState> emit) async {
     Map<String, LMUserViewData> users = {};
     Map<String, LMTopicViewData> topics = {};
     Map<String, LMWidgetViewData> widgets = {};

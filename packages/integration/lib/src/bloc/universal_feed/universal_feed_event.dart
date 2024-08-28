@@ -1,10 +1,12 @@
 part of 'universal_feed_bloc.dart';
 
-abstract class LMFeedEvent extends Equatable {
-  const LMFeedEvent();
+abstract class LMFeedUniversalEvent extends Equatable {
+  const LMFeedUniversalEvent();
+  @override
+  List<Object?> get props => [];
 }
 
-class LMFeedGetUniversalFeedEvent extends LMFeedEvent {
+class LMFeedGetUniversalFeedEvent extends LMFeedUniversalEvent {
   final int pageKey;
   final List<String> topicsIds;
 
@@ -13,3 +15,5 @@ class LMFeedGetUniversalFeedEvent extends LMFeedEvent {
   @override
   List<Object?> get props => [pageKey, topicsIds];
 }
+
+class LMFeedUniversalRefreshEvent extends LMFeedUniversalEvent {}
