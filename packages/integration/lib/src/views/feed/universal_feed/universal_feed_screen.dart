@@ -194,7 +194,7 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
   Future<GetTopicsResponse>? getTopicsResponse;
 
   // bloc to handle universal feed
-  late final LMFeedBloc _feedBloc; // bloc to fetch the feedroom data
+  late final LMFeedUniversalBloc _feedBloc; // bloc to fetch the feedroom data
   bool isCm = LMFeedUserUtils
       .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
@@ -239,7 +239,7 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
     Bloc.observer = LMFeedBlocObserver();
 
     // Initializes the feed Bloc instance
-    _feedBloc = LMFeedBloc.instance;
+    _feedBloc = LMFeedUniversalBloc.instance;
 
     // Checks the user's posting rights using LMFeedUserUtils
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
@@ -756,7 +756,7 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
                 ),
                 if (isDesktopWeb)
                   SliverPadding(padding: EdgeInsets.only(top: 12.0)),
-                BlocListener<LMFeedBloc, LMFeedUniversalState>(
+                BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
                   bloc: _feedBloc,
                   listener: (context, LMFeedUniversalState state) =>
                       updatePagingControllers(state),

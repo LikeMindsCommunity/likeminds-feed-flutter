@@ -33,7 +33,7 @@ class _LMFeedListState extends State<LMFeedList> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   LMFeedThemeData feedThemeData = LMFeedTheme.instance.theme;
-  LMFeedBloc _feedBloc = LMFeedBloc.instance;
+  LMFeedUniversalBloc _feedBloc = LMFeedUniversalBloc.instance;
   final ValueNotifier postUploading = ValueNotifier(false);
 
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -132,7 +132,7 @@ class _LMFeedListState extends State<LMFeedList> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LMFeedBloc, LMFeedUniversalState>(
+    return BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
       bloc: _feedBloc,
       listener: (context, LMFeedUniversalState state) => updatePagingControllers(state),
       child: ValueListenableBuilder(

@@ -113,8 +113,8 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
   Future<GetTopicsResponse>? getTopicsResponse;
 
   // bloc to handle universal feed
-  final LMFeedBloc _feedBloc =
-      LMFeedBloc.instance; // bloc to fetch the feedroom data
+  final LMFeedUniversalBloc _feedBloc =
+      LMFeedUniversalBloc.instance; // bloc to fetch the feedroom data
   bool isCm = LMFeedUserUtils
       .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
@@ -459,7 +459,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                 },
               ),
             ),
-            BlocListener<LMFeedBloc, LMFeedUniversalState>(
+            BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
               bloc: _feedBloc,
               listener: (context, LMFeedUniversalState state) =>
                   updatePagingControllers(state),
