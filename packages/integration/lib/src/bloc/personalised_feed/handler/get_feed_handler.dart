@@ -9,13 +9,18 @@ Future<void> _getPersonalisedFeedHandler(
   Map<String, LMWidgetViewData> widgets = {};
 
   emit(LMFeedPersonalisedFeedLoadingState());
-
+  final GetPersonalisedFeedRequestBuilder requestBuilder =
+      GetPersonalisedFeedRequestBuilder()
+        ..page(event.pageKey)
+        ..pageSize(event.pageSize);
+  if (event.pageKey == 1) {
+    requestBuilder
+      ..shouldRecompute(true)
+      ..shouldReorder(true);
+  }
   LMResponse<GetPersonalisedFeedResponse> response =
       await LMFeedCore.instance.lmFeedClient.getPersonalisedFeed(
-    (GetPersonalisedFeedRequestBuilder()
-          ..page(event.pageKey)
-          ..pageSize(event.pageSize))
-        .build(),
+    requestBuilder.build(),
   );
 
   if (!response.success || response.data == null) {
