@@ -1,33 +1,51 @@
 part of '../personalised_feed_bloc.dart';
 
+/// Handler for getting personalised feed
 Future<void> _getPersonalisedFeedHandler(
   LMFeedPersonalisedGetEvent event,
   Emitter<LMFeedPersonalisedState> emit,
 ) async {
+  // variables to store users, topics and widgets
   Map<String, LMUserViewData> users = {};
   Map<String, LMTopicViewData> topics = {};
   Map<String, LMWidgetViewData> widgets = {};
 
   emit(LMFeedPersonalisedFeedLoadingState());
+  // create request builder
   final GetPersonalisedFeedRequestBuilder requestBuilder =
       GetPersonalisedFeedRequestBuilder()
         ..page(event.pageKey)
         ..pageSize(event.pageSize);
+  // if page is 1 then recompute and reorder the feed
   if (event.pageKey == 1) {
     requestBuilder
       ..shouldRecompute(true)
       ..shouldReorder(true);
   }
+  // get personalised feed
   LMResponse<GetPersonalisedFeedResponse> response =
       await LMFeedCore.instance.lmFeedClient.getPersonalisedFeed(
     requestBuilder.build(),
   );
+
+  // if page > 1 trigger seen post event
+  if (event.pageKey > 1) {
+    // fetch seen post ids
+    List<String> seenPostIds =
+        LMFeedPersonalisedBloc.instance.seenPost.toList();
+    // if seen post ids are not empty trigger seen post event asynchronously
+    if (seenPostIds.isNotEmpty) {
+      LMFeedPersonalisedBloc.instance
+          .add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPostIds));
+    }
+  }
 
   if (!response.success || response.data == null) {
     emit(LMFeedPersonalisedErrorState(
         message: response.errorMessage ??
             "An error occurred, please check your network connection"));
   } else {
+    // convert the response to view data models
     final GetPersonalisedFeedResponse personalisedFeedResponse = response.data!;
     widgets.addAll(personalisedFeedResponse.widgets.map((key, value) =>
         MapEntry(key, LMWidgetViewDataConvertor.fromWidgetModel(value))));
@@ -58,6 +76,7 @@ Future<void> _getPersonalisedFeedHandler(
                 filteredComments: filteredComments,
                 userTopics: personalisedFeedResponse.userTopics)));
 
+    // emit the loaded state with the posts
     emit(
       LMFeedPersonalisedFeedLoadedState(
         pageKey: event.pageKey,

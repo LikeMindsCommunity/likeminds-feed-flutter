@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 /// {@template lm_feed_personalised_screen}
 /// A screen to display the feed.
@@ -113,7 +114,8 @@ class LMFeedPersonalisedScreen extends StatefulWidget {
   }
 }
 
-class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
+class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
+    with WidgetsBindingObserver {
   late Size screenSize;
   // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
@@ -202,6 +204,9 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
   @override
   void initState() {
     super.initState();
+    // add seen event
+    _triggerPostSeenEvent();
+    WidgetsBinding.instance.addObserver(this);
     // Adds pagination listener to the feed
     _addPaginationListener();
 
@@ -249,7 +254,25 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
   void dispose() {
     _pagingController.dispose();
     _rebuildAppBar.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _triggerPostSeenEvent() {
+    LMResponse<List<String>> response =
+        LMFeedPersistence.instance.getSeenPostIDs();
+    if (response.success) {
+      List<String> seenPostIds = response.data ?? [];
+      _feedBloc.add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPostIds));
+    }
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.inactive) {
+      List<String> seenPost = _feedBloc.seenPost.toList();
+      await LMFeedPersistence.instance.insertSeenPostID(seenPost);
+    }
   }
 
   void _scrollToTop() {
@@ -650,11 +673,24 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen> {
                           itemBuilder: (context, item, index) {
                             LMFeedPostWidget postWidget =
                                 defPostWidget(context, feedThemeData, item);
-                            return widget.postBuilder
-                                    ?.call(context, postWidget, item) ??
-                                _widgetsBuilder.postWidgetBuilder.call(
-                                    context, postWidget, item,
-                                    source: _widgetSource);
+                            return VisibilityDetector(
+                              key: ObjectKey(item.id),
+                              onVisibilityChanged: (visibilityInfo) {
+                                if (mounted) {
+                                  double visiblePercentage =
+                                      visibilityInfo.visibleFraction * 100;
+                                  if (visiblePercentage > 50) {
+                                    LMFeedPersonalisedBloc.instance.seenPost
+                                        .add(item.id);
+                                  }
+                                }
+                              },
+                              child: widget.postBuilder
+                                      ?.call(context, postWidget, item) ??
+                                  _widgetsBuilder.postWidgetBuilder.call(
+                                      context, postWidget, item,
+                                      source: _widgetSource),
+                            );
                           },
                           noItemsFoundIndicatorBuilder: (context) {
                             return _widgetsBuilder
