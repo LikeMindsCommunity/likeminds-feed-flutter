@@ -298,8 +298,8 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
 
   void refresh() => _pagingController.refresh();
 
-  // This function updates the paging controller based on the state changes
-  void updatePagingControllers(LMFeedPersonalisedState? state) {
+  // This function handle the paging controller based on the state changes
+  void handleBlocListener(LMFeedPersonalisedState? state) {
     if (state is LMFeedPersonalisedFeedLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts;
       if (state.posts.length < 10) {
@@ -312,6 +312,9 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
       _rebuildAppBar.value = !_rebuildAppBar.value;
       clearPagingController();
       refresh();
+    } else if (state is LMFeedPersonalisedErrorState) {
+      _pagingController.error = state.message;
+      LMFeedCore.showSnackBar(context, state.message, _widgetSource);
     }
   }
 
@@ -662,7 +665,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                 BlocListener<LMFeedPersonalisedBloc, LMFeedPersonalisedState>(
                   bloc: _feedBloc,
                   listener: (context, LMFeedPersonalisedState state) =>
-                      updatePagingControllers(state),
+                      handleBlocListener(state),
                   child: ValueListenableBuilder(
                     valueListenable: rebuildPostWidget,
                     builder: (context, _, __) {
