@@ -132,3 +132,27 @@ typedef LMFeedRoomTileBuilder = Widget Function(
   LMFeedRoomViewData viewData,
   LMFeedTile oldWidget,
 );
+
+/// {@template lm_feed_text_builder}
+/// Builder function to build the text widget.
+/// must return a widget, takes in [BuildContext], [LMFeedText] as params
+/// {@endtemplate}
+typedef LMFeedTextBuilder = Widget Function(BuildContext, LMFeedText);
+
+/// {@template lm_feed_profile_picture_builder}
+/// Builder function to build the profile picture widget.
+/// must return a widget, takes in [BuildContext], [LMFeedProfilePicture]
+/// as params
+/// {@endtemplate}
+typedef LMFeedProfilePictureBuilder = Widget Function(
+  BuildContext context,
+  LMFeedProfilePicture profilePicture,
+);
+
+/// {@template lm_feed_context_builder}
+/// Builder function to build the feed context widget.
+/// must return a widget, takes in [BuildContext] as params
+/// {@endtemplate}
+typedef LMFeedContextBuilder = Widget Function(
+  BuildContext context,
+);

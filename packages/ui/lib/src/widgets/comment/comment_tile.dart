@@ -10,9 +10,13 @@ class LMFeedCommentWidget extends StatefulWidget {
     required this.user,
     required this.comment,
     this.profilePicture,
+    this.profilePictureBuilder,
     this.titleText,
+    this.titleTextBuilder,
     this.subtitleText,
+    this.subtitleTextBuilder,
     this.editedText,
+    this.editedTextBuilder,
     required this.lmFeedMenuAction,
     required this.onTagTap,
     this.menu,
@@ -27,18 +31,24 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.subTextSeparator,
     this.subTextStyle,
     this.customTitle,
+    this.customTitleBuilder,
     this.onProfileNameTap,
   });
 
   final LMUserViewData user;
   final LMCommentViewData comment;
 
-  final Widget? profilePicture;
+  final LMFeedProfilePicture? profilePicture;
+  final LMFeedProfilePictureBuilder? profilePictureBuilder;
   final LMFeedText? titleText;
+  final LMFeedTextBuilder? titleTextBuilder;
   final LMFeedText? subtitleText;
+  final LMFeedTextBuilder? subtitleTextBuilder;
   final Widget? subTextSeparator;
   final LMFeedText? customTitle;
+  final LMFeedContextBuilder? customTitleBuilder;
   final LMFeedText? editedText;
+  final LMFeedTextBuilder? editedTextBuilder;
 
   /// {@macro feed_on_tag_tap}
   final LMFeedOnTagTap onTagTap;
@@ -66,10 +76,14 @@ class LMFeedCommentWidget extends StatefulWidget {
   LMFeedCommentWidget copyWith({
     LMUserViewData? user,
     LMCommentViewData? comment,
-    Widget? profilePicture,
+    LMFeedProfilePicture? profilePicture,
+    LMFeedProfilePictureBuilder? profilePictureBuilder,
     LMFeedText? titleText,
+    LMFeedTextBuilder? titleTextBuilder,
     LMFeedText? subtitleText,
+    LMFeedTextBuilder? subtitleTextBuilder,
     LMFeedText? editedText,
+    LMFeedTextBuilder? editedTextBuilder,
     Function(String)? onTagTap,
     Widget Function(LMFeedMenu)? menu,
     LMFeedMenuAction? lmFeedMenuAction,
@@ -84,16 +98,22 @@ class LMFeedCommentWidget extends StatefulWidget {
     Widget? subTextSeparator,
     LMFeedTextStyle? subTextStyle,
     LMFeedText? customTitle,
+    LMFeedContextBuilder? customTitleBuilder,
     Function()? onProfileNameTap,
   }) {
     return LMFeedCommentWidget(
       user: user ?? this.user,
       comment: comment ?? this.comment,
       profilePicture: profilePicture ?? this.profilePicture,
+      profilePictureBuilder:
+          profilePictureBuilder ?? this.profilePictureBuilder,
       titleText: titleText ?? this.titleText,
+      titleTextBuilder: titleTextBuilder ?? this.titleTextBuilder,
       subTextSeparator: subTextSeparator ?? this.subTextSeparator,
       subtitleText: subtitleText ?? this.subtitleText,
+      subtitleTextBuilder: subtitleTextBuilder ?? this.subtitleTextBuilder,
       editedText: editedText ?? this.editedText,
+      editedTextBuilder: editedTextBuilder ?? this.editedTextBuilder,
       onTagTap: onTagTap ?? this.onTagTap,
       menu: menu ?? this.menu,
       lmFeedMenuAction: lmFeedMenuAction ?? this.lmFeedMenuAction,
@@ -108,6 +128,7 @@ class LMFeedCommentWidget extends StatefulWidget {
       style: style ?? this.style,
       subTextStyle: subTextStyle ?? this.subTextStyle,
       customTitle: customTitle ?? this.customTitle,
+      customTitleBuilder: customTitleBuilder ?? this.customTitleBuilder,
       onProfileNameTap: onProfileNameTap ?? this.onProfileNameTap,
     );
   }
