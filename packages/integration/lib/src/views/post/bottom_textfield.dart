@@ -9,6 +9,7 @@ class LMFeedBottomTextField extends StatefulWidget {
   const LMFeedBottomTextField({
     super.key,
     required this.postId,
+    this.controller,
     this.focusNode,
     this.style,
     this.profilePictureBuilder,
@@ -19,8 +20,14 @@ class LMFeedBottomTextField extends StatefulWidget {
   final String postId;
 
   /// [focusNode] is the focus node for the text field.
-  /// If not provided, a new focus node will be created.
+  /// If not provided, a new focus node will be created,
+  /// and used for the text field internally.
   final FocusNode? focusNode;
+
+  /// [controller] is the Text Editing Controller for the text field.
+  /// If not provided, a new controller will be created,
+  /// and used for the text field internally.
+  final TextEditingController? controller;
 
   /// [style] is the style of the bottom text field.
   final LMFeedBottomTextFieldStyle? style;
@@ -46,8 +53,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   double? screenWidth;
   LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
   late bool isDesktopWeb;
-  final TextEditingController _commentController = TextEditingController();
-  late FocusNode _commentFocusNode;
+  late final TextEditingController _commentController;
+  late final FocusNode _commentFocusNode;
   bool right = LMFeedUserUtils.checkCommentRights();
   final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
   final ValueNotifier<bool> _rebuildCommentTextField = ValueNotifier(false);
@@ -70,16 +77,11 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   void initState() {
     super.initState();
     _commentFocusNode = widget.focusNode ?? FocusNode();
+    _commentController = widget.controller ?? TextEditingController();
     // clear user tags list when the widget is initialized
     // to avoid any previous tags being present
     _commentBloc.userTags.clear();
     _style = widget.style;
-  }
-
-  @override
-  void didUpdateWidget(covariant LMFeedBottomTextField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _commentFocusNode = widget.focusNode ?? FocusNode();
   }
 
   @override
