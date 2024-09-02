@@ -287,3 +287,31 @@ final class LMDeleteReplyEvent extends LMFeedCommentEvent {
   @override
   List<Object> get props => [postId, oldReply, reason, commentId];
 }
+
+final class LMFeedSubmitCommentEvent extends LMFeedCommentEvent {
+  final String postId;
+  final TextEditingController commentController;
+  final String? emptyTextErrorMessage;
+  final FocusNode focusNode;
+  final BuildContext context;
+  final LMFeedWidgetSource widgetSource;
+
+  LMFeedSubmitCommentEvent({
+    required this.postId,
+    required this.commentController,
+    this.emptyTextErrorMessage,
+    required this.focusNode,
+    required this.context,
+    required this.widgetSource,
+  });
+
+  @override
+  List<Object> get props => [
+        postId,
+        commentController,
+        emptyTextErrorMessage ?? "Please write something to create a comment",
+        focusNode,
+        context,
+        widgetSource,
+      ];
+}
