@@ -194,17 +194,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   source: _widgetSource,
                   resizeToAvoidBottomInset: true,
                   backgroundColor: feedTheme.backgroundColor,
-                  bottomNavigationBar: Row(
-                    children: [
-                      widget.bottomTextFieldBuilder?.call(
-                            context,
-                            _defBottomTextFiled(),
-                            _commentController,
-                            _commentFocusNode,
-                          ) ??
-                          _defBottomTextFiled(),
-                    ],
-                  ),
+                  bottomNavigationBar: widget.bottomTextFieldBuilder?.call(
+                        context,
+                        _defBottomTextFiled(),
+                        _commentController,
+                        _commentFocusNode,
+                      ) ??
+                      _defBottomTextFiled(),
                   appBar: widget.appBarBuilder?.call(context, defAppBar()) ??
                       defAppBar(),
                   body: Align(
@@ -276,11 +272,6 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedBottomTextField(
       postId: widget.postId,
       focusNode: _commentFocusNode,
-      style: LMFeedBottomTextFieldStyle(
-        inputDecoration: (inputDecoration) {
-          return InputDecoration(hintText: 'Write comment here...');
-        },
-      ),
       controller: _commentController,
     );
   }

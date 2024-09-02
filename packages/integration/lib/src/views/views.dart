@@ -18,6 +18,7 @@ export 'media/media_preview_screen.dart';
 
 export 'post/edit_post_screen.dart';
 export 'post/bottom_textfield.dart';
+export 'post/bottom_textfield_banner.dart';
 
 export 'feedroom/feedroom_list_screen.dart';
 export 'feedroom/feedroom_screen.dart' hide LMFeedTopicSelectionWidgetType;

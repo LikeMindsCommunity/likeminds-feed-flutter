@@ -14,6 +14,7 @@ class LMFeedBottomTextField extends StatefulWidget {
     this.style,
     this.profilePictureBuilder,
     this.createButtonBuilder,
+    this.bannerBuilder,
   });
 
   /// [postId] is the id of the post for which the comment is to be added.
@@ -43,6 +44,12 @@ class LMFeedBottomTextField extends StatefulWidget {
   /// If [suffixIcon] is provided in the [InputDecoration] of [style], the [createButtonBuilder]
   /// will not be used.
   final LMFeedButtonBuilder? createButtonBuilder;
+
+  /// [bannerBuilder] is the builder for the banner shown above the text field.
+  /// The banner is shown when the user is editing a comment or a reply.
+  /// If not provided, the default banner will be used.
+  final Widget Function(BuildContext, LMFeedBottomTextFieldBanner)?
+      bannerBuilder;
 
   /// [copyWith] is used to create a new instance of [LMFeedBottomTextField]
   /// with the provided values.
@@ -157,7 +164,19 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     isEditing || isReply || isReplyEditing
-                        ? _defTextFieldBanner(isEditing, isReplyEditing, state)
+                        ? widget.bannerBuilder?.call(
+                              context,
+                              _defTextFieldBanner(
+                                isEditing,
+                                isReplyEditing,
+                                state,
+                              ),
+                            ) ??
+                            _defTextFieldBanner(
+                              isEditing,
+                              isReplyEditing,
+                              state,
+                            )
                         : const SizedBox.shrink(),
                     LMTaggingAheadTextField(
                       isDown: false,
@@ -263,57 +282,11 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
     );
   }
 
-  Container _defTextFieldBanner(
+  LMFeedBottomTextFieldBanner _defTextFieldBanner(
       bool isEditing, bool isReplyEditing, LMFeedCommentState state) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          LMFeedText(
-            text: isEditing
-                ? "Editing ${'$commentTitleSmallCapSingular'} "
-                : isReplyEditing
-                    ? "Editing reply"
-                    : "Replying to ",
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: feedTheme.onContainer,
-              ),
-            ),
-          ),
-          isEditing || isReplyEditing
-              ? const SizedBox()
-              : LMFeedText(
-                  text: (state as LMFeedReplyingCommentState).userName,
-                  style: const LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-          const Spacer(),
-          LMFeedButton(
-            onTap: () {
-              isEditing
-                  ? _commentBloc.add(LMFeedEditCommentCancelEvent())
-                  : _commentBloc.add(LMFeedReplyCancelEvent());
-            },
-            style: const LMFeedButtonStyle(
-              icon: LMFeedIcon(
-                type: LMFeedIconType.icon,
-                icon: Icons.close,
-                style: LMFeedIconStyle(
-                  color: LikeMindsTheme.greyColor,
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return LMFeedBottomTextFieldBanner(
+      isEditing: isEditing,
+      isReplyEditing: isReplyEditing,
     );
   }
 
@@ -323,31 +296,29 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       final String commentText =
           LMFeedTaggingHelper.convertRouteToTag(state.oldComment.text);
       _commentController.text = commentText;
-      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
     } else if (state is LMFeedEditingCommentCancelState) {
       _commentController.clear();
       closeOnScreenKeyboard();
-      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
     } else if (state is LMFeedReplyingCommentState) {
-      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
       openOnScreenKeyboard();
     } else if (state is LMFeedReplyCancelState) {
       _commentController.clear();
-      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
+
       closeOnScreenKeyboard();
     } else if (state is LMFeedEditingReplyState) {
       openOnScreenKeyboard();
       final String replyText =
           LMFeedTaggingHelper.convertRouteToTag(state.replyText);
       _commentController.text = replyText;
-      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-    } else if (state is LMFeedEditReplyCancelEvent) {
-      _commentController.clear();
-      closeOnScreenKeyboard();
-      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
-    } else {
-      _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
     }
+    // Do not rebuild the text field if the state is not related to the text field.
+    if (state is LMFeedCloseReplyState ||
+        state is LMFeedGetReplyCommentSuccessState ||
+        state is LMFeedGetReplyCommentLoadingState ||
+        state is LMFeedGetReplyCommentPaginationLoadingState) {
+      return;
+    }
+    _rebuildCommentTextField.value = !_rebuildCommentTextField.value;
   }
 
   void handleCreateCommentButtonAction() {
