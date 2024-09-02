@@ -49,8 +49,12 @@ class LMFeedPostDetailScreen extends StatefulWidget {
   /// {@macro post_comment_builder}
   final LMFeedPostCommentBuilder? commentBuilder;
 
-  final Widget Function(BuildContext, LMPostViewData, LMFeedBottomTextField)?
-      bottomTextFieldBuilder;
+  final Widget Function(
+    BuildContext,
+    LMFeedBottomTextField,
+    TextEditingController,
+    FocusNode,
+  )? bottomTextFieldBuilder;
 
   final Widget Function(BuildContext)? commentSeparatorBuilder;
 
@@ -102,6 +106,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   LMPostViewData? postData;
   final FocusNode _commentFocusNode = FocusNode();
+  final TextEditingController _commentController = TextEditingController();
   int _commentCount = 0;
 
   @override
@@ -193,8 +198,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                     children: [
                       widget.bottomTextFieldBuilder?.call(
                             context,
-                            postData!,
                             _defBottomTextFiled(),
+                            _commentController,
+                            _commentFocusNode,
                           ) ??
                           _defBottomTextFiled(),
                     ],
@@ -270,6 +276,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedBottomTextField(
       postId: widget.postId,
       focusNode: _commentFocusNode,
+      style: LMFeedBottomTextFieldStyle(
+        inputDecoration: (inputDecoration) {
+          return InputDecoration(hintText: 'Write comment here...');
+        },
+      ),
+      controller: _commentController,
     );
   }
 

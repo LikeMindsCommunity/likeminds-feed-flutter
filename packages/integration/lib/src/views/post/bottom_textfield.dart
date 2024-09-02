@@ -43,6 +43,29 @@ class LMFeedBottomTextField extends StatefulWidget {
   /// If [suffixIcon] is provided in the [InputDecoration] of [style], the [createButtonBuilder]
   /// will not be used.
   final LMFeedButtonBuilder? createButtonBuilder;
+
+  /// [copyWith] is used to create a new instance of [LMFeedBottomTextField]
+  /// with the provided values.
+  /// If a value is not provided, the value from the current instance will be used.
+  LMFeedBottomTextField copyWith({
+    String? postId,
+    FocusNode? focusNode,
+    TextEditingController? controller,
+    LMFeedBottomTextFieldStyle? style,
+    LMFeedProfilePictureBuilder? profilePictureBuilder,
+    LMFeedButtonBuilder? createButtonBuilder,
+  }) {
+    return LMFeedBottomTextField(
+      postId: postId ?? this.postId,
+      focusNode: focusNode ?? this.focusNode,
+      controller: controller ?? this.controller,
+      style: style ?? this.style,
+      profilePictureBuilder:
+          profilePictureBuilder ?? this.profilePictureBuilder,
+      createButtonBuilder: createButtonBuilder ?? this.createButtonBuilder,
+    );
+  }
+
   @override
   State<LMFeedBottomTextField> createState() => _LMFeedBottomTextFieldState();
 }
@@ -146,8 +169,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                       onSubmitted: (_) => handleCreateCommentButtonAction(),
                       controller: _commentController,
                       decoration: _style?.inputDecoration
-                              ?.call(_baseInputDecoration()) ??
-                          _baseInputDecoration(),
+                              ?.call(_defInputDecoration()) ??
+                          _defInputDecoration(),
                       onChange: (String p0) {},
                       scrollPhysics: const AlwaysScrollableScrollPhysics(),
                       focusNode: _commentFocusNode,
@@ -160,7 +183,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
     );
   }
 
-  InputDecoration? _baseInputDecoration() {
+  InputDecoration? _defInputDecoration() {
     return feedTheme.textFieldStyle.decoration?.copyWith(
       focusedBorder: OutlineInputBorder(
         borderSide: BorderSide.none,
