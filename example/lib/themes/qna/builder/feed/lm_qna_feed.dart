@@ -113,8 +113,8 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
   Future<GetTopicsResponse>? getTopicsResponse;
 
   // bloc to handle universal feed
-  final LMFeedBloc _feedBloc =
-      LMFeedBloc.instance; // bloc to fetch the feedroom data
+  final LMFeedUniversalBloc _feedBloc =
+      LMFeedUniversalBloc.instance; // bloc to fetch the feedroom data
   bool isCm = LMFeedUserUtils
       .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
@@ -200,7 +200,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
   }
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(LMFeedState? state) {
+  void updatePagingControllers(LMFeedUniversalState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts;
 
@@ -459,9 +459,9 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                 },
               ),
             ),
-            BlocListener<LMFeedBloc, LMFeedState>(
+            BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
               bloc: _feedBloc,
-              listener: (context, LMFeedState state) =>
+              listener: (context, LMFeedUniversalState state) =>
                   updatePagingControllers(state),
               child: ValueListenableBuilder(
                 valueListenable: rebuildPostWidget,

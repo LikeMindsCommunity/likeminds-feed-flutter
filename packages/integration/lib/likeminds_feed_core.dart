@@ -15,9 +15,7 @@ import 'package:likeminds_feed_flutter_core/src/utils/utils.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 
-import 'package:likeminds_feed_flutter_core/src/views/feed/universal_feed/feed_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feedroom/feedroom_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/views.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit/media_kit.dart';
 import 'dart:async';

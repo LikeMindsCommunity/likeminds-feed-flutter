@@ -21,3 +21,4 @@ export 'simple_bloc_observer.dart';
 export 'user_meta/user_meta_bloc.dart';
 export 'search/search_bloc.dart';
 export 'pending_post/pending_bloc.dart';
+export 'personalised_feed/personalised_feed_bloc.dart';

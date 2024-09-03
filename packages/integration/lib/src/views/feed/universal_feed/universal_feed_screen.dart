@@ -8,8 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-part 'feed_screen_configuration.dart';
-
 /// {@template feed_screen}
 /// A screen to display the feed.
 /// The feed can be customized by passing in the required parameters
@@ -18,8 +16,8 @@ part 'feed_screen_configuration.dart';
 /// Topic Chip Builder can be used to customize the topic chip widget
 ///
 /// {@endtemplate}
-class LMFeedScreen extends StatefulWidget {
-  const LMFeedScreen({
+class LMFeedUniversalScreen extends StatefulWidget {
+  const LMFeedUniversalScreen({
     super.key,
     this.appBar,
     this.customWidgetBuilder,
@@ -78,9 +76,9 @@ class LMFeedScreen extends StatefulWidget {
   final LMFeedScreenConfig? config;
 
   @override
-  State<LMFeedScreen> createState() => _LMFeedScreenState();
+  State<LMFeedUniversalScreen> createState() => _LMFeedUniversalScreenState();
 
-  LMFeedScreen copyWith({
+  LMFeedUniversalScreen copyWith({
     LMFeedPostAppBarBuilder? appBar,
     LMFeedCustomWidgetBuilder? customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
@@ -99,7 +97,7 @@ class LMFeedScreen extends StatefulWidget {
     FloatingActionButtonLocation? floatingActionButtonLocation,
     LMFeedScreenConfig? config,
   }) {
-    return LMFeedScreen(
+    return LMFeedUniversalScreen(
       appBar: appBar ?? this.appBar,
       customWidgetBuilder: customWidgetBuilder ?? this.customWidgetBuilder,
       topicChipBuilder: topicChipBuilder ?? this.topicChipBuilder,
@@ -128,7 +126,7 @@ class LMFeedScreen extends StatefulWidget {
   }
 }
 
-class _LMFeedScreenState extends State<LMFeedScreen> {
+class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
   late Size screenSize;
   // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
@@ -196,7 +194,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   Future<GetTopicsResponse>? getTopicsResponse;
 
   // bloc to handle universal feed
-  late final LMFeedBloc _feedBloc; // bloc to fetch the feedroom data
+  late final LMFeedUniversalBloc _feedBloc; // bloc to fetch the feedroom data
   bool isCm = LMFeedUserUtils
       .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
@@ -241,7 +239,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
     Bloc.observer = LMFeedBlocObserver();
 
     // Initializes the feed Bloc instance
-    _feedBloc = LMFeedBloc.instance;
+    _feedBloc = LMFeedUniversalBloc.instance;
 
     // Checks the user's posting rights using LMFeedUserUtils
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
@@ -321,7 +319,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   void refresh() => _pagingController.refresh();
 
   // This function updates the paging controller based on the state changes
-  void updatePagingControllers(LMFeedState? state) {
+  void updatePagingControllers(LMFeedUniversalState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts;
 
@@ -334,11 +332,16 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       } else {
         _pagingController.appendPage(listOfPosts, state.pageKey + 1);
       }
+    } else if (state is LMFeedUniversalRefreshState) {
+      getUserFeedMeta = getUserFeedMetaFuture();
+      _rebuildAppBar.value = !_rebuildAppBar.value;
+      clearPagingController();
+      refresh();
     }
   }
 
   // This function clears the paging controller
-  // whenever user uses pull to refresh on feedroom screen
+  // whenever user uses pull to refresh on feed screen
   void clearPagingController() {
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
@@ -424,10 +427,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
-              getUserFeedMeta = getUserFeedMetaFuture();
-              _rebuildAppBar.value = !_rebuildAppBar.value;
-              refresh();
-              clearPagingController();
+              _feedBloc.add(LMFeedUniversalRefreshEvent());
             },
             color: feedThemeData.primaryColor,
             backgroundColor: feedThemeData.container,
@@ -756,9 +756,9 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
                 ),
                 if (isDesktopWeb)
                   SliverPadding(padding: EdgeInsets.only(top: 12.0)),
-                BlocListener<LMFeedBloc, LMFeedState>(
+                BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
                   bloc: _feedBloc,
-                  listener: (context, LMFeedState state) =>
+                  listener: (context, LMFeedUniversalState state) =>
                       updatePagingControllers(state),
                   child: ValueListenableBuilder(
                     valueListenable: rebuildPostWidget,

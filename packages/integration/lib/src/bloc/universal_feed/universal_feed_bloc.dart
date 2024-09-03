@@ -4,10 +4,11 @@ import 'package:equatable/equatable.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 part 'universal_feed_event.dart';
-
 part 'universal_feed_state.dart';
+part 'handler/refresh_feed_handler.dart';
 
-class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
+class LMFeedUniversalBloc
+    extends Bloc<LMFeedUniversalEvent, LMFeedUniversalState> {
   // list of selected topics by the user
   List<LMTopicViewData> selectedTopics = [];
   // list of all the topics
@@ -17,22 +18,20 @@ class LMFeedBloc extends Bloc<LMFeedEvent, LMFeedState> {
   // list of all the widgets
   Map<String, LMWidgetViewData> widgets = {};
 
-  static LMFeedBloc? _instance;
+  static LMFeedUniversalBloc? _instance;
 
-  static LMFeedBloc get instance => _instance ??= LMFeedBloc._();
+  static LMFeedUniversalBloc get instance =>
+      _instance ??= LMFeedUniversalBloc._();
 
   // final FeedApi feedApi;
-  LMFeedBloc._() : super(LMFeedInitialState()) {
-    on<LMFeedEvent>((event, emit) async {
-      if (event is LMFeedGetUniversalFeedEvent) {
-        await _mapLMGetUniversalFeedToState(event: event, emit: emit);
-      }
-    });
+  LMFeedUniversalBloc._() : super(LMFeedInitialState()) {
+    on<LMFeedGetUniversalFeedEvent>(_mapLMGetUniversalFeedToState);
+    on<LMFeedUniversalRefreshEvent>(_refreshUniversalFeedHandler);
   }
 
   FutureOr<void> _mapLMGetUniversalFeedToState(
-      {required LMFeedGetUniversalFeedEvent event,
-      required Emitter<LMFeedState> emit}) async {
+      LMFeedGetUniversalFeedEvent event,
+      Emitter<LMFeedUniversalState> emit) async {
     Map<String, LMUserViewData> users = {};
     Map<String, LMTopicViewData> topics = {};
     Map<String, LMWidgetViewData> widgets = {};

@@ -23,6 +23,7 @@ enum LMFeedPostMenuType { popUp, bottomSheet }
 /// {@endtemplate}
 enum LMFeedWidgetSource {
   universalFeed,
+  personalisedFeed,
   feedroom,
   postDetailScreen,
   userFeed,
@@ -64,3 +65,5 @@ enum LMFeedPostActionType {
   addPollOption,
   addPollOptionError,
 }
+/// enum to describe which type of feed to render
+enum LMFeedType { universal, personalised }

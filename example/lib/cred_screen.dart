@@ -57,87 +57,49 @@ class _CredScreenState extends State<CredScreen> {
   Future initUniLinks(BuildContext context) async {
     // Get the initial deep link if the app was launched with one
     final initialLink = await getInitialLink();
+    if (initialLink == null) {
+      return;
+    }
+// Parse it using Uri.parse()
+    final uri = Uri.parse(initialLink);
 
-    // Handle the deep link
-    if (initialLink != null) {
-      initialURILinkHandled = true;
-      // You can extract any parameters from the initialLink object here
-      // and use them to navigate to a specific screen in your app
-      debugPrint('Received initial deep link: $initialLink');
+// Check if URI is absolute
+    if (uri.isAbsolute) {
+      // Check for LM post detail link schema
+      // It will contain a /post segment
+      // and a post id along with it
+      if (uri.path == '/post') {
+        List<String> secondPath = initialLink.split('post_id=');
+        if (secondPath.length > 1) {
+          // post_id is the secondSegment here
+          String postId = secondPath[1];
 
-      // TODO: add api key to the DeepLinkRequest
-      // TODO: add user id and user name of logged in user
-      final uriLink = Uri.parse(initialLink);
-      if (uriLink.isAbsolute) {
-        final deepLinkRequestBuilder = LMFeedDeepLinkRequestBuilder()
-          ..uuid(uuid ?? "Test-User-Id")
-          ..userName("Test User");
-        if (uriLink.path == '/post') {
-          List secondPathSegment = initialLink.split('post_id=');
-          if (secondPathSegment.length > 1 && secondPathSegment[1] != null) {
-            String postId = secondPathSegment[1];
-            LMFeedDeepLinkHandler().parseDeepLink(
-                (deepLinkRequestBuilder
-                      ..path(LMFeedDeepLinkPath.OPEN_POST)
-                      ..data({
-                        "post_id": postId,
-                      }))
-                    .build(),
-                rootNavigatorKey);
+          // Call showFeedWithoutApiKey method
+          // This will call the onboarding APIs, required for
+          // the proper functioning of the Feed SDK
+          LMResponse response =
+              await LMFeedCore.instance.showFeedWithoutApiKey();
+
+          if (response.success) {
+            navigateToPostDetailScreen(postId); // Implemented below
+          } else {
+            // Show error message
+            // response.errorMessage
           }
-        } else if (uriLink.path == '/post/create') {
-          LMFeedDeepLinkHandler().parseDeepLink(
-              (deepLinkRequestBuilder..path(LMFeedDeepLinkPath.CREATE_POST))
-                  .build(),
-              rootNavigatorKey);
         }
       }
     }
+  }
 
-    // Subscribe to link changes
-    _streamSubscription = linkStream.listen((String? link) async {
-      if (link != null) {
-        initialURILinkHandled = true;
-        // Handle the deep link
-        // You can extract any parameters from the uri object here
-        // and use them to navigate to a specific screen in your app
-        debugPrint('Received deep link: $link');
-        // TODO: add api key to the DeepLinkRequest
-        // TODO: add user id and user name of logged in user
-
-        final uriLink = Uri.parse(link);
-        if (uriLink.isAbsolute) {
-          final deepLinkRequestBuilder = LMFeedDeepLinkRequestBuilder()
-            ..uuid(uuid ?? "Test-User-Id")
-            ..userName("Test User");
-
-          if (uriLink.path == '/post') {
-            List secondPathSegment = link.split('post_id=');
-            if (secondPathSegment.length > 1 && secondPathSegment[1] != null) {
-              String postId = secondPathSegment[1];
-              LMFeedDeepLinkHandler().parseDeepLink(
-                  (deepLinkRequestBuilder
-                        ..path(LMFeedDeepLinkPath.OPEN_POST)
-                        ..data({
-                          "post_id": postId,
-                        }))
-                      .build(),
-                  rootNavigatorKey);
-            }
-          } else if (uriLink.path == '/post/create') {
-            LMFeedDeepLinkHandler().parseDeepLink(
-              (deepLinkRequestBuilder..path(LMFeedDeepLinkPath.CREATE_POST))
-                  .build(),
-              rootNavigatorKey,
-            );
-          }
-        }
-      }
-    }, onError: (err) {
-      // Handle exception by warning the user their action did not succeed
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('An error occurred')));
-    });
+  void navigateToPostDetailScreen(String postId) {
+    // Build a material route using your preferred navigation method
+    MaterialPageRoute route = MaterialPageRoute(
+      builder: (context) => LMFeedPostDetailScreen(
+        postId: postId, // Required variable
+      ),
+    );
+    // Navigate to post details screen
+    Navigator.of(context).push(route);
   }
 
   @override
