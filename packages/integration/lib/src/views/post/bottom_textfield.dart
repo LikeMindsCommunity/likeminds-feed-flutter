@@ -15,6 +15,7 @@ class LMFeedBottomTextField extends StatefulWidget {
     this.profilePictureBuilder,
     this.createButtonBuilder,
     this.bannerBuilder,
+    this.inputDecoration,
   });
 
   /// [postId] is the id of the post for which the comment is to be added.
@@ -32,6 +33,8 @@ class LMFeedBottomTextField extends StatefulWidget {
 
   /// [style] is the style of the bottom text field.
   final LMFeedBottomTextFieldStyle? style;
+
+  final InputDecoration? Function(InputDecoration?)? inputDecoration;
 
   /// [profilePictureBuilder] is the builder for the profile picture.
   /// If not provided, the default profile picture will be used.
@@ -54,14 +57,15 @@ class LMFeedBottomTextField extends StatefulWidget {
   /// [copyWith] is used to create a new instance of [LMFeedBottomTextField]
   /// with the provided values.
   /// If a value is not provided, the value from the current instance will be used.
-  LMFeedBottomTextField copyWith({
-    String? postId,
-    FocusNode? focusNode,
-    TextEditingController? controller,
-    LMFeedBottomTextFieldStyle? style,
-    LMFeedProfilePictureBuilder? profilePictureBuilder,
-    LMFeedButtonBuilder? createButtonBuilder,
-  }) {
+  LMFeedBottomTextField copyWith(
+      {String? postId,
+      FocusNode? focusNode,
+      TextEditingController? controller,
+      LMFeedBottomTextFieldStyle? style,
+      LMFeedProfilePictureBuilder? profilePictureBuilder,
+      LMFeedButtonBuilder? createButtonBuilder,
+      Widget Function(BuildContext, LMFeedBottomTextFieldBanner)? bannerBuilder,
+      InputDecoration? Function(InputDecoration?)? inputDecoration}) {
     return LMFeedBottomTextField(
       postId: postId ?? this.postId,
       focusNode: focusNode ?? this.focusNode,
@@ -70,6 +74,8 @@ class LMFeedBottomTextField extends StatefulWidget {
       profilePictureBuilder:
           profilePictureBuilder ?? this.profilePictureBuilder,
       createButtonBuilder: createButtonBuilder ?? this.createButtonBuilder,
+      bannerBuilder: bannerBuilder ?? this.bannerBuilder,
+      inputDecoration: inputDecoration ?? this.inputDecoration,
     );
   }
 
@@ -101,7 +107,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       LMFeedLocalPreference.instance.fetchUserData()!;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   LMPostDetailScreenConfig? config = LMFeedCore.config.postDetailConfig;
-  late final LMFeedBottomTextFieldStyle? _style;
+  late LMFeedBottomTextFieldStyle? _style;
 
   @override
   void initState() {
@@ -169,13 +175,13 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                               _defTextFieldBanner(
                                 isEditing,
                                 isReplyEditing,
-                                state,
+                                isReply,
                               ),
                             ) ??
                             _defTextFieldBanner(
                               isEditing,
                               isReplyEditing,
-                              state,
+                              isReply,
                             )
                         : const SizedBox.shrink(),
                     LMTaggingAheadTextField(
@@ -187,9 +193,9 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                       },
                       onSubmitted: (_) => handleCreateCommentButtonAction(),
                       controller: _commentController,
-                      decoration: _style?.inputDecoration
-                              ?.call(_defInputDecoration()) ??
-                          _defInputDecoration(),
+                      decoration:
+                          widget.inputDecoration?.call(_defInputDecoration()) ??
+                              _defInputDecoration(),
                       onChange: (String p0) {},
                       scrollPhysics: const AlwaysScrollableScrollPhysics(),
                       focusNode: _commentFocusNode,
@@ -220,8 +226,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
         vertical: 2.0,
         horizontal: 6.0,
       ),
-      prefixIcon: _defProfilePicture(),
-      suffixIcon: _defCreateButton(),
+      prefixIcon: _style?.showPrefixIcon ?? true ? _defProfilePicture() : null,
+      suffixIcon: _style?.showSuffixIcon ?? true ? _defCreateButton() : null,
       fillColor: feedTheme.primaryColor.withOpacity(0.04),
       filled: true,
       enabled: right,
@@ -283,10 +289,14 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   }
 
   LMFeedBottomTextFieldBanner _defTextFieldBanner(
-      bool isEditing, bool isReplyEditing, LMFeedCommentState state) {
+    bool isEditing,
+    bool isReplyEditing,
+    bool isReplying,
+  ) {
     return LMFeedBottomTextFieldBanner(
       isEditing: isEditing,
       isReplyEditing: isReplyEditing,
+      isReplying: isReplying,
     );
   }
 
@@ -354,14 +364,16 @@ class LMFeedBottomTextFieldStyle {
   BoxDecoration? boxDecoration;
   EdgeInsets? padding;
   EdgeInsets? margin;
-  InputDecoration Function(InputDecoration?)? inputDecoration;
+  bool? showPrefixIcon;
+  bool? showSuffixIcon;
 
   LMFeedBottomTextFieldStyle({
     this.constraints,
     this.boxDecoration,
     this.padding,
     this.margin,
-    this.inputDecoration,
+    this.showPrefixIcon,
+    this.showSuffixIcon,
   });
 
   LMFeedBottomTextFieldStyle copyWith({
@@ -369,30 +381,39 @@ class LMFeedBottomTextFieldStyle {
     BoxDecoration? decoration,
     EdgeInsets? padding,
     EdgeInsets? margin,
-    InputDecoration Function(InputDecoration?)? inputDecoration,
+    bool? showPrefixIcon,
+    bool? showSuffixIcon,
   }) {
     return LMFeedBottomTextFieldStyle(
       constraints: constraints ?? this.constraints,
       boxDecoration: decoration ?? this.boxDecoration,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,
-      inputDecoration: inputDecoration ?? this.inputDecoration,
+      showPrefixIcon: showPrefixIcon ?? this.showPrefixIcon,
+      showSuffixIcon: showSuffixIcon ?? this.showSuffixIcon,
     );
   }
 
-  LMFeedBottomTextFieldStyle basic(
-    Color containerColor,
-  ) {
+  factory LMFeedBottomTextFieldStyle.basic({
+    Color? containerColor,
+  }) {
     return LMFeedBottomTextFieldStyle(
-        boxDecoration: BoxDecoration(
-      color: containerColor,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          blurRadius: 10,
-          offset: const Offset(0, -5),
-        ),
-      ],
-    ));
+      padding: const EdgeInsets.symmetric(
+        horizontal: LikeMindsTheme.kPaddingSmall,
+        vertical: LikeMindsTheme.kPaddingMedium,
+      ),
+      boxDecoration: BoxDecoration(
+        color: containerColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      showPrefixIcon: true,
+      showSuffixIcon: true,
+    );
   }
 }

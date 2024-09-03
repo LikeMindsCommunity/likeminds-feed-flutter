@@ -6,15 +6,35 @@ class LMFeedBottomTextFieldBanner extends StatelessWidget {
     super.key,
     required this.isEditing,
     required this.isReplyEditing,
+    required this.isReplying,
     this.crossButtonBuilder,
     this.textBuilder,
     this.style,
   });
   final bool isEditing;
   final bool isReplyEditing;
+  final bool isReplying;
   final LMFeedButtonBuilder? crossButtonBuilder;
   final LMFeedTextBuilder? textBuilder;
   final LMFeedBottomTextFieldBannerStyle? style;
+
+  LMFeedBottomTextFieldBanner copyWith({
+    bool? isEditing,
+    bool? isReplyEditing,
+    bool? isReplying,
+    LMFeedButtonBuilder? crossButtonBuilder,
+    LMFeedTextBuilder? textBuilder,
+    LMFeedBottomTextFieldBannerStyle? style,
+  }) {
+    return LMFeedBottomTextFieldBanner(
+      isEditing: isEditing ?? this.isEditing,
+      isReplyEditing: isReplyEditing ?? this.isReplyEditing,
+      isReplying: isReplying ?? this.isReplying,
+      crossButtonBuilder: crossButtonBuilder ?? this.crossButtonBuilder,
+      textBuilder: textBuilder ?? this.textBuilder,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
