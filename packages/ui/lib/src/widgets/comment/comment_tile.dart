@@ -199,9 +199,8 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
               widget.menu?.call(_defCommentMenu()) ?? _defCommentMenu()
             ],
           ),
-          LikeMindsTheme.kVerticalPaddingMedium,
           Container(
-            padding: style!.actionsPadding ?? EdgeInsets.zero,
+            padding: style!.contentPadding ?? const EdgeInsets.only(top: 8),
             color: style!.contentBackgroundColor ?? Colors.white,
             child: LMFeedExpandableText(
               widget.comment.text,
@@ -224,9 +223,8 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
               style: style!.textStyle,
             ),
           ),
-          LikeMindsTheme.kVerticalPaddingSmall,
           Padding(
-            padding: style!.actionsPadding ?? EdgeInsets.zero,
+            padding: style!.actionsPadding ?? const EdgeInsets.only(top: 4),
             child: Row(
               children: [
                 widget.likeButtonBuilder?.call(_defLikeCommentButton()) ??
@@ -392,6 +390,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
 class LMFeedCommentStyle {
   final TextStyle? textStyle;
   final TextStyle? linkStyle;
+  final EdgeInsets? contentPadding;
   final EdgeInsets? actionsPadding;
   final Color? backgroundColor;
   final Color? contentBackgroundColor;
@@ -420,6 +419,7 @@ class LMFeedCommentStyle {
   const LMFeedCommentStyle({
     this.textStyle,
     this.linkStyle,
+    this.contentPadding,
     this.actionsPadding,
     this.backgroundColor,
     this.contentBackgroundColor,
@@ -445,6 +445,7 @@ class LMFeedCommentStyle {
   LMFeedCommentStyle copyWith({
     TextStyle? textStyle,
     TextStyle? linkStyle,
+    EdgeInsets? contentPadding,
     EdgeInsets? actionsPadding,
     Color? backgroundColor,
     Color? contentBackgroundColor,
@@ -469,6 +470,7 @@ class LMFeedCommentStyle {
     return LMFeedCommentStyle(
       textStyle: textStyle ?? this.textStyle,
       linkStyle: linkStyle ?? this.linkStyle,
+      contentPadding: contentPadding ?? this.contentPadding,
       actionsPadding: actionsPadding ?? this.actionsPadding,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       contentBackgroundColor:
