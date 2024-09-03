@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/bottom_textfield.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_count_widget.dart';
 part 'post_detail_screen_configuration.dart';
 
@@ -50,7 +49,12 @@ class LMFeedPostDetailScreen extends StatefulWidget {
   /// {@macro post_comment_builder}
   final LMFeedPostCommentBuilder? commentBuilder;
 
-  final Widget Function(BuildContext, LMPostViewData)? bottomTextFieldBuilder;
+  final Widget Function(
+    BuildContext,
+    LMFeedBottomTextField,
+    TextEditingController,
+    FocusNode,
+  )? bottomTextFieldBuilder;
 
   final Widget Function(BuildContext)? commentSeparatorBuilder;
 
@@ -102,6 +106,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   final ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   LMPostViewData? postData;
   final FocusNode _commentFocusNode = FocusNode();
+  final TextEditingController _commentController = TextEditingController();
   int _commentCount = 0;
 
   @override
@@ -189,10 +194,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                   source: _widgetSource,
                   resizeToAvoidBottomInset: true,
                   backgroundColor: feedTheme.backgroundColor,
-                  bottomNavigationBar: LMFeedBottomTextField(
-                    postId: widget.postId,
-                    focusNode: _commentFocusNode,
-                  ),
+                  bottomNavigationBar: widget.bottomTextFieldBuilder?.call(
+                        context,
+                        _defBottomTextFiled(),
+                        _commentController,
+                        _commentFocusNode,
+                      ) ??
+                      _defBottomTextFiled(),
                   appBar: widget.appBarBuilder?.call(context, defAppBar()) ??
                       defAppBar(),
                   body: Align(
@@ -226,7 +234,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                   }
                                   if (state is LMFeedGetCommentSuccessState) {
                                     postData = state.post;
-                                    return defPostWidget(context, state.post);
+                                    return widget.postBuilder?.call(
+                                          context,
+                                          defPostWidget(context, postData!),
+                                          postData!,
+                                        ) ??
+                                        defPostWidget(context, postData!);
                                   }
                                   return Container();
                                 },
@@ -252,6 +265,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               }),
         ),
       ),
+    );
+  }
+
+  LMFeedBottomTextField _defBottomTextFiled() {
+    return LMFeedBottomTextField(
+      postId: widget.postId,
+      focusNode: _commentFocusNode,
+      controller: _commentController,
     );
   }
 

@@ -33,6 +33,8 @@ class LMFeedProfilePicture extends StatelessWidget {
       child: Container(
         height: inStyle.size,
         width: inStyle.size,
+        padding: inStyle.padding,
+        margin: inStyle.margin,
         decoration: BoxDecoration(
           borderRadius: inStyle.boxShape == null
               ? BorderRadius.circular(inStyle.borderRadius ?? 0)
@@ -107,6 +109,8 @@ class LMFeedProfilePictureStyle {
   final double? border;
   final Color? backgroundColor;
   final BoxShape? boxShape;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
 
   const LMFeedProfilePictureStyle({
     this.size = 48,
@@ -115,6 +119,8 @@ class LMFeedProfilePictureStyle {
     this.backgroundColor,
     this.boxShape,
     this.fallbackTextStyle,
+    this.padding,
+    this.margin,
   });
 
   factory LMFeedProfilePictureStyle.basic() {
@@ -138,6 +144,8 @@ class LMFeedProfilePictureStyle {
     double? border,
     Color? backgroundColor,
     BoxShape? boxShape,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
   }) {
     return LMFeedProfilePictureStyle(
       size: size ?? this.size,
@@ -146,6 +154,8 @@ class LMFeedProfilePictureStyle {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       boxShape: boxShape ?? this.boxShape,
       fallbackTextStyle: fallbackTextStyle ?? this.fallbackTextStyle,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
     );
   }
 }

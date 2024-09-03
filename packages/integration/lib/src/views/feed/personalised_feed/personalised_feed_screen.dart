@@ -372,6 +372,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
             backgroundColor: feedThemeData.container,
             child: CustomScrollView(
               controller: _controller,
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
                   child: ValueListenableBuilder(

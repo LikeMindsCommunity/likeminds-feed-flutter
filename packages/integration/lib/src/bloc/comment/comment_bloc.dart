@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 part 'comment_event.dart';
@@ -13,11 +14,13 @@ part 'handler/reply_comment_handler.dart';
 part 'handler/get_reply_handler.dart';
 part 'handler/edit_reply_handler.dart';
 part 'handler/delete_reply_handler.dart';
+part 'handler/submit_comment_button_handler.dart';
 
 class LMFeedCommentBloc extends Bloc<LMFeedCommentEvent, LMFeedCommentState> {
   static final LMFeedCommentBloc _instance = LMFeedCommentBloc._();
 
   static LMFeedCommentBloc get instance => _instance;
+  final List<LMUserTagViewData> userTags = [];
 
   LMFeedCommentBloc._() : super(LMFeedCommentInitialState()) {
     on<LMFeedCommentRefreshEvent>((event, emit) {
@@ -45,5 +48,7 @@ class LMFeedCommentBloc extends Bloc<LMFeedCommentEvent, LMFeedCommentState> {
     on<LMFeedEditReplyCancelEvent>(_editReplyCancelHandler);
 
     on<LMDeleteReplyEvent>(_deleteReplyHandler);
+
+    on<LMFeedSubmitCommentEvent>(_handleSubmitCommentButtonAction);
   }
 }

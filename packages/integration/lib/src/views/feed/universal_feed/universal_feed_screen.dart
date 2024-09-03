@@ -432,6 +432,7 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
             color: feedThemeData.primaryColor,
             backgroundColor: feedThemeData.container,
             child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               controller: _controller,
               slivers: [
                 SliverToBoxAdapter(

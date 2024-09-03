@@ -8,37 +8,46 @@ class LMFeedPostHeader extends StatelessWidget {
     super.key,
     required this.user,
     this.titleText,
+    this.titleTextBuilder,
     this.subText,
     this.subTextBuilder,
     this.subTextSeparator,
     this.menuBuilder,
     this.editedText,
+    this.editedTextBuilder,
     this.createdAt,
+    this.createdAtBuilder,
     this.onProfileNameTap,
     this.onProfilePictureTap,
     required this.isFeed,
     this.customTitle,
+    this.customTitleBuilder,
     this.profilePicture,
+    this.profilePictureBuilder,
     this.postHeaderStyle,
     required this.postViewData,
     this.menu,
   });
 
   final LMFeedText? titleText;
+  final LMFeedTextBuilder? titleTextBuilder;
   final LMFeedText? customTitle;
+  final LMFeedContextBuilder? customTitleBuilder;
   final LMFeedText? subText;
-  final Widget? Function(BuildContext context, LMFeedText subtext)?
-      subTextBuilder;
+  final LMFeedTextBuilder? subTextBuilder;
   final Widget? subTextSeparator;
   final LMFeedText? editedText;
+  final LMFeedTextBuilder? editedTextBuilder;
 
   final Widget Function(LMFeedMenu)? menuBuilder;
   final LMFeedMenu? menu;
   final LMFeedText? createdAt;
+  final LMFeedTextBuilder? createdAtBuilder;
   final Function()? onProfileNameTap;
   final Function()? onProfilePictureTap;
 
-  final Widget? profilePicture;
+  final LMFeedProfilePicture? profilePicture;
+  final LMFeedProfilePictureBuilder? profilePictureBuilder;
 
   final bool isFeed;
 
@@ -65,16 +74,11 @@ class LMFeedPostHeader extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                profilePicture ??
-                    LMFeedProfilePicture(
-                      style: LMFeedProfilePictureStyle(
-                        fallbackTextStyle: headerStyle.fallbackTextStyle,
-                        size: headerStyle.imageSize ?? 42,
-                      ),
-                      fallbackText: user.name,
-                      imageUrl: user.imageUrl,
-                      onTap: onProfilePictureTap,
-                    ),
+                profilePictureBuilder?.call(
+                      context,
+                      _defProfilePicture(headerStyle),
+                    ) ??
+                    _defProfilePicture(headerStyle),
                 LikeMindsTheme.kHorizontalPaddingMedium,
                 IntrinsicWidth(
                   child: Container(
@@ -90,23 +94,16 @@ class LMFeedPostHeader extends StatelessWidget {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              titleText ??
-                                  LMFeedText(
-                                    text: user.name,
-                                    style: postHeaderStyle?.titleTextStyle ??
-                                        LMFeedTextStyle(
-                                          textStyle: TextStyle(
-                                            fontSize:
-                                                LikeMindsTheme.kFontMedium,
-                                            color: feedTheme.onContainer,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                  ),
+                              titleTextBuilder?.call(
+                                    context,
+                                    _defTitle(feedTheme),
+                                  ) ??
+                                  _defTitle(feedTheme),
                               LikeMindsTheme.kHorizontalPaddingMedium,
-                              Expanded(
-                                  child:
-                                      getCustomTitle(headerStyle, feedTheme)),
+                              customTitleBuilder?.call(context) ??
+                                  Expanded(
+                                      child: getCustomTitle(
+                                          headerStyle, feedTheme)),
                             ],
                           ),
                         ),
@@ -141,11 +138,11 @@ class LMFeedPostHeader extends StatelessWidget {
                                 headerStyle.showTimeStamp)
                               LikeMindsTheme.kHorizontalPaddingXSmall,
                             if (headerStyle.showTimeStamp)
-                              createdAt ??
-                                  LMFeedText(
-                                    text: LMFeedTimeAgo.instance
-                                        .format(postViewData.createdAt),
-                                  ),
+                              createdAtBuilder?.call(
+                                    context,
+                                    _defCreatedAt(),
+                                  ) ??
+                                  _defCreatedAt(),
                             LikeMindsTheme.kHorizontalPaddingSmall,
                             if (postViewData.isEdited)
                               subTextSeparator ??
@@ -159,21 +156,12 @@ class LMFeedPostHeader extends StatelessWidget {
                                     ),
                                   ),
                             LikeMindsTheme.kHorizontalPaddingSmall,
-                            postViewData.isEdited
-                                ? editedText ??
-                                    LMFeedText(
-                                      text:
-                                          postViewData.isEdited ? 'Edited' : '',
-                                      style: postHeaderStyle?.subTextStyle ??
-                                          LMFeedTextStyle(
-                                            textStyle: TextStyle(
-                                              fontSize:
-                                                  LikeMindsTheme.kFontSmall,
-                                              color: Colors.grey[700],
-                                            ),
-                                          ),
-                                    )
-                                : const SizedBox(),
+                            if (postViewData.isEdited)
+                              editedTextBuilder?.call(
+                                    context,
+                                    _defEditedText(),
+                                  ) ??
+                                  _defEditedText(),
                           ],
                         )
                       ],
@@ -200,6 +188,55 @@ class LMFeedPostHeader extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  LMFeedText _defEditedText() {
+    return editedText ??
+        LMFeedText(
+          text: postViewData.isEdited ? 'Edited' : '',
+          style: postHeaderStyle?.subTextStyle ??
+              LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: LikeMindsTheme.kFontSmall,
+                  color: Colors.grey[700],
+                ),
+              ),
+        );
+  }
+
+  LMFeedText _defCreatedAt() {
+    return createdAt ??
+        LMFeedText(
+          text: LMFeedTimeAgo.instance.format(postViewData.createdAt),
+        );
+  }
+
+  LMFeedText _defTitle(LMFeedThemeData feedTheme) {
+    return titleText ??
+        LMFeedText(
+          text: user.name,
+          style: postHeaderStyle?.titleTextStyle ??
+              LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: LikeMindsTheme.kFontMedium,
+                  color: feedTheme.onContainer,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+        );
+  }
+
+  LMFeedProfilePicture _defProfilePicture(LMFeedPostHeaderStyle headerStyle) {
+    return profilePicture ??
+        LMFeedProfilePicture(
+          style: LMFeedProfilePictureStyle(
+            fallbackTextStyle: headerStyle.fallbackTextStyle,
+            size: headerStyle.imageSize ?? 42,
+          ),
+          fallbackText: user.name,
+          imageUrl: user.imageUrl,
+          onTap: onProfilePictureTap,
+        );
   }
 
   Widget getCustomTitle(
@@ -238,17 +275,22 @@ class LMFeedPostHeader extends StatelessWidget {
   LMFeedPostHeader copyWith({
     LMUserViewData? user,
     LMFeedText? titleText,
+    LMFeedTextBuilder? titleTextBuilder,
     LMFeedText? subText,
-    Widget? Function(BuildContext context, LMFeedText subtext)? subTextBuilder,
+    LMFeedTextBuilder? subTextBuilder,
     Widget? subTextSeparator,
     LMFeedText? editedText,
+    LMFeedTextBuilder? editedTextBuilder,
     Widget Function(LMFeedMenu)? menuBuilder,
     LMFeedText? createdAt,
+    LMFeedTextBuilder? createdAtBuilder,
     Function()? onProfileNameTap,
     Function()? onProfilePictureTap,
     bool? isFeed,
     LMFeedText? customTitle,
-    Widget? profilePicture,
+    LMFeedContextBuilder? customTitleBuilder,
+    LMFeedProfilePicture? profilePicture,
+    LMFeedProfilePictureBuilder? profilePictureBuilder,
     LMFeedPostHeaderStyle? postHeaderStyle,
     LMPostViewData? postViewData,
     LMFeedMenu? menu,
@@ -256,17 +298,23 @@ class LMFeedPostHeader extends StatelessWidget {
     return LMFeedPostHeader(
       user: user ?? this.user,
       titleText: titleText ?? this.titleText,
+      titleTextBuilder: titleTextBuilder ?? this.titleTextBuilder,
       subText: subText ?? this.subText,
       subTextBuilder: subTextBuilder ?? this.subTextBuilder,
       subTextSeparator: subTextSeparator ?? this.subTextSeparator,
       editedText: editedText ?? this.editedText,
+      editedTextBuilder: editedTextBuilder ?? this.editedTextBuilder,
       menuBuilder: menuBuilder ?? this.menuBuilder,
       createdAt: createdAt ?? this.createdAt,
+      createdAtBuilder: createdAtBuilder ?? this.createdAtBuilder,
       onProfileNameTap: onProfileNameTap ?? this.onProfileNameTap,
       onProfilePictureTap: onProfilePictureTap ?? this.onProfilePictureTap,
       isFeed: isFeed ?? this.isFeed,
       customTitle: customTitle ?? this.customTitle,
+      customTitleBuilder: customTitleBuilder ?? this.customTitleBuilder,
       profilePicture: profilePicture ?? this.profilePicture,
+      profilePictureBuilder:
+          profilePictureBuilder ?? this.profilePictureBuilder,
       postHeaderStyle: postHeaderStyle ?? this.postHeaderStyle,
       postViewData: postViewData ?? this.postViewData,
       menu: menu ?? this.menu,
