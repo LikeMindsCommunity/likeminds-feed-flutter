@@ -22,11 +22,6 @@ Future<void> _getPersonalisedFeedHandler(
       ..shouldRecompute(true)
       ..shouldReorder(true);
   }
-  // get personalised feed
-  LMResponse<GetPersonalisedFeedResponse> response =
-      await LMFeedCore.instance.lmFeedClient.getPersonalisedFeed(
-    requestBuilder.build(),
-  );
 
   // if page > 1 trigger seen post event
   if (event.pageKey > 1) {
@@ -39,6 +34,11 @@ Future<void> _getPersonalisedFeedHandler(
           .add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPostIds));
     }
   }
+  // get personalised feed
+  LMResponse<GetPersonalisedFeedResponse> response =
+      await LMFeedCore.instance.lmFeedClient.getPersonalisedFeed(
+    requestBuilder.build(),
+  );
 
   if (!response.success || response.data == null) {
     emit(LMFeedPersonalisedErrorState(
