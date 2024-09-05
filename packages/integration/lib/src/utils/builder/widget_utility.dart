@@ -191,7 +191,8 @@ class LMFeedWidgetUtility {
   // Feed Screen Builder Widgets
 
   /// Builds a custom widget for the feed screen.
-  Widget customWidgetBuilder(LMFeedPostSomething postSomethingWidget,BuildContext context) {
+  Widget customWidgetBuilder(
+      LMFeedPostSomething postSomethingWidget, BuildContext context) {
     return postSomethingWidget;
   }
 
@@ -359,5 +360,15 @@ class LMFeedWidgetUtility {
       style: inStyle.copyWith(
           width: min(LMFeedCore.webConfiguration.maxWidthForSnackBars, width)),
     );
+  }
+
+  Widget bottomTextFieldBuilder(
+    BuildContext context,
+    LMFeedBottomTextField textField,
+    TextEditingController controller,
+    FocusNode focusNode,
+    LMFeedWidgetSource source,
+  ) {
+    return textField;
   }
 }

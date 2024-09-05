@@ -116,6 +116,7 @@ class LMFeedPostHeader extends StatelessWidget {
                                         subText ??
                                             const LMFeedText(
                                               text: '',
+                                              style: LMFeedTextStyle(),
                                             )) ??
                                     subText ??
                                     const SizedBox()),

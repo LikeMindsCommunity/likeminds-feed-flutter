@@ -23,17 +23,6 @@ Future<void> _getPersonalisedFeedHandler(
       ..shouldReorder(true);
   }
 
-  // if page > 1 trigger seen post event
-  if (event.pageKey > 1) {
-    // fetch seen post ids
-    List<String> seenPostIds =
-        LMFeedPersonalisedBloc.instance.seenPost.toList();
-    // if seen post ids are not empty trigger seen post event asynchronously
-    if (seenPostIds.isNotEmpty) {
-      LMFeedPersonalisedBloc.instance
-          .add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPostIds));
-    }
-  }
   // get personalised feed
   LMResponse<GetPersonalisedFeedResponse> response =
       await LMFeedCore.instance.lmFeedClient.getPersonalisedFeed(

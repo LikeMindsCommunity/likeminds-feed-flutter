@@ -200,7 +200,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         _commentController,
                         _commentFocusNode,
                       ) ??
-                      _defBottomTextFiled(),
+                      _widgetBuilder.bottomTextFieldBuilder.call(
+                        context,
+                        _defBottomTextFiled(),
+                        _commentController,
+                        _commentFocusNode,
+                        _widgetSource,
+                      ),
                   appBar: widget.appBarBuilder?.call(context, defAppBar()) ??
                       defAppBar(),
                   body: Align(
@@ -273,6 +279,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       postId: widget.postId,
       focusNode: _commentFocusNode,
       controller: _commentController,
+      style: LMFeedBottomTextFieldStyle.basic(
+        containerColor: feedTheme.container,
+      ),
     );
   }
 

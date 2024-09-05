@@ -33,20 +33,22 @@ class LMFeedCommentWidget extends StatefulWidget {
     this.customTitle,
     this.customTitleBuilder,
     this.onProfileNameTap,
+    this.contentBuilder,
   });
 
   final LMUserViewData user;
   final LMCommentViewData comment;
 
   final LMFeedProfilePicture? profilePicture;
-  final LMFeedProfilePictureBuilder? profilePictureBuilder;
+  final Widget Function(BuildContext, LMFeedProfilePicture?)?
+      profilePictureBuilder;
   final LMFeedText? titleText;
   final LMFeedTextBuilder? titleTextBuilder;
   final LMFeedText? subtitleText;
-  final LMFeedTextBuilder? subtitleTextBuilder;
+  final Widget? Function(BuildContext, LMFeedText?)? subtitleTextBuilder;
   final Widget? subTextSeparator;
   final LMFeedText? customTitle;
-  final LMFeedContextBuilder? customTitleBuilder;
+  final Widget Function(LMFeedText?)? customTitleBuilder;
   final LMFeedText? editedText;
   final LMFeedTextBuilder? editedTextBuilder;
 
@@ -69,6 +71,7 @@ class LMFeedCommentWidget extends StatefulWidget {
 
   final LMFeedCommentStyle? style;
   final LMFeedTextStyle? subTextStyle;
+  final Widget Function(BuildContext, LMFeedExpandableText)? contentBuilder;
 
   @override
   State<LMFeedCommentWidget> createState() => _LMCommentTileState();
@@ -77,11 +80,11 @@ class LMFeedCommentWidget extends StatefulWidget {
     LMUserViewData? user,
     LMCommentViewData? comment,
     LMFeedProfilePicture? profilePicture,
-    LMFeedProfilePictureBuilder? profilePictureBuilder,
+    Widget Function(BuildContext, LMFeedProfilePicture?)? profilePictureBuilder,
     LMFeedText? titleText,
     LMFeedTextBuilder? titleTextBuilder,
     LMFeedText? subtitleText,
-    LMFeedTextBuilder? subtitleTextBuilder,
+    Widget Function(BuildContext, LMFeedText?)? subtitleTextBuilder,
     LMFeedText? editedText,
     LMFeedTextBuilder? editedTextBuilder,
     Function(String)? onTagTap,
@@ -98,8 +101,9 @@ class LMFeedCommentWidget extends StatefulWidget {
     Widget? subTextSeparator,
     LMFeedTextStyle? subTextStyle,
     LMFeedText? customTitle,
-    LMFeedContextBuilder? customTitleBuilder,
+    Widget Function(LMFeedText?)? customTitleBuilder,
     Function()? onProfileNameTap,
+    Widget Function(BuildContext, LMFeedExpandableText)? contentBuilder,
   }) {
     return LMFeedCommentWidget(
       user: user ?? this.user,
@@ -130,6 +134,7 @@ class LMFeedCommentWidget extends StatefulWidget {
       customTitle: customTitle ?? this.customTitle,
       customTitleBuilder: customTitleBuilder ?? this.customTitleBuilder,
       onProfileNameTap: onProfileNameTap ?? this.onProfileNameTap,
+      contentBuilder: contentBuilder ?? this.contentBuilder,
     );
   }
 }
@@ -157,10 +162,9 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               (style?.showProfilePicture ?? true)
-                  ? Container(
-                      padding: style?.profilePicturePadding,
-                      child: widget.profilePicture ?? const SizedBox.shrink(),
-                    )
+                  ? widget.profilePictureBuilder
+                          ?.call(context, widget.profilePicture) ??
+                      const SizedBox.shrink()
                   : const SizedBox.shrink(),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,22 +178,13 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                           padding: style?.titlePadding,
                           width:
                               style!.width != null ? style!.width! * 0.6 : null,
-                          child: widget.titleText ??
-                              LMFeedText(
-                                text: widget.user.name,
-                                style: LMFeedTextStyle(
-                                  textStyle: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: style?.textStyle?.color ??
-                                        feedTheme.onContainer,
-                                  ),
-                                  maxLines: 1,
-                                ),
-                              ),
+                          child: widget.titleTextBuilder
+                                  ?.call(context, _defTitleText(feedTheme)) ??
+                              _defTitleText(feedTheme),
                         ),
                       ),
-                      widget.customTitle ?? const SizedBox.shrink(),
+                      widget.customTitleBuilder?.call(widget.customTitle) ??
+                          const SizedBox.shrink(),
                     ],
                   ),
                   getCommentSubtitleText(),
@@ -202,26 +197,11 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
           Container(
             padding: style!.contentPadding ?? const EdgeInsets.only(top: 8),
             color: style!.contentBackgroundColor ?? Colors.white,
-            child: LMFeedExpandableText(
-              widget.comment.text,
-              onTagTap: widget.onTagTap,
-              expandText: style!.expandText ?? "see more",
-              animation: true,
-              maxLines: 4,
-              prefixStyle: style!.expandTextStyle,
-              hashtagStyle: style!.linkStyle ??
-                  Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: feedTheme.hashTagColor),
-              linkStyle: style!.linkStyle ??
-                  Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: feedTheme.linkColor),
-              textAlign: TextAlign.left,
-              style: style!.textStyle,
-            ),
+            child: widget.contentBuilder?.call(
+                  context,
+                  _defContent(context, feedTheme),
+                ) ??
+                _defContent(context, feedTheme),
           ),
           Padding(
             padding: style!.actionsPadding ?? const EdgeInsets.only(top: 4),
@@ -261,17 +241,9 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                 ],
                 const Spacer(),
                 if (widget.comment.isEdited)
-                  widget.editedText ??
-                      LMFeedText(
-                        text:
-                            'Edited ${(style?.showTimestamp ?? true) ? " · " : ""}',
-                        style: LMFeedTextStyle(
-                          textStyle: TextStyle(
-                            fontSize: LikeMindsTheme.kFontSmall,
-                            color: feedTheme.inActiveColor,
-                          ),
-                        ),
-                      ),
+                  widget.editedTextBuilder
+                          ?.call(context, _defEditedText(feedTheme)) ??
+                      _defEditedText(feedTheme),
                 if (style?.showTimestamp ?? true)
                   LMFeedText(
                     text:
@@ -291,11 +263,63 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
     );
   }
 
+  LMFeedExpandableText _defContent(
+      BuildContext context, LMFeedThemeData feedTheme) {
+    return LMFeedExpandableText(
+      widget.comment.text,
+      onTagTap: widget.onTagTap,
+      expandText: style!.expandText ?? "see more",
+      animation: true,
+      maxLines: 4,
+      prefixStyle: style!.expandTextStyle,
+      hashtagStyle: style!.linkStyle ??
+          Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: feedTheme.hashTagColor),
+      linkStyle: style!.linkStyle ??
+          Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: feedTheme.linkColor),
+      textAlign: TextAlign.left,
+      style: style!.textStyle,
+    );
+  }
+
+  LMFeedText _defEditedText(LMFeedThemeData feedTheme) {
+    return widget.editedText ??
+        LMFeedText(
+          text: 'Edited ${(style?.showTimestamp ?? true) ? " · " : ""}',
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: LikeMindsTheme.kFontSmall,
+              color: feedTheme.inActiveColor,
+            ),
+          ),
+        );
+  }
+
+  LMFeedText _defTitleText(LMFeedThemeData feedTheme) {
+    return widget.titleText ??
+        LMFeedText(
+          text: widget.user.name,
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: style?.textStyle?.color ?? feedTheme.onContainer,
+            ),
+            maxLines: 1,
+          ),
+        );
+  }
+
   Widget getCommentSubtitleText() {
-    return widget.subtitleText == null
-        ? const SizedBox.shrink()
-        : Container(
-            padding: style?.subtitlePadding, child: widget.subtitleText);
+    return Container(
+      padding: style?.subtitlePadding,
+      child: widget.subtitleTextBuilder?.call(context, widget.subtitleText),
+    );
   }
 
   LMFeedMenu _defCommentMenu() {
