@@ -1,9 +1,12 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
+import 'dart:async';
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -200,10 +203,30 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
 
   int pendingPostCount = 0;
   bool isDesktopWeb = false;
+  Timer? _scrollTimer;
+
+// function to handle scroll event with debounce
+  void _handleScroll() {
+    if (_scrollTimer != null && _scrollTimer!.isActive) {
+      _scrollTimer!.cancel();
+    }
+    _scrollTimer = Timer(const Duration(seconds: 5), () {
+      _callSeenPostEvent();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    // scroll listener to handle the scroll event
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _controller.position.isScrollingNotifier.addListener(() {
+        // if the state is idle then call the seen post event
+        if (!_controller.position.isScrollingNotifier.value) {
+          _handleScroll();
+        }
+      });
+    });
     // add seen event
     _triggerPostSeenEvent();
     WidgetsBinding.instance.addObserver(this);
@@ -258,13 +281,25 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
     super.dispose();
   }
 
+  // function to trigger the post seen event
+  // when the feed is opened for the first time
+  // with the seen post ids saved in the cache
   void _triggerPostSeenEvent() {
     LMResponse<List<String>> response =
         LMFeedPersistence.instance.getSeenPostIDs();
     if (response.success) {
       List<String> seenPostIds = response.data ?? [];
-      _feedBloc.add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPostIds));
+      HashSet<String> seenPost = HashSet<String>.from(seenPostIds);
+      _feedBloc
+          .add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPost.toList()));
     }
+  }
+
+  // function to call the seen post event
+  // with the seen post ids saved in the memory
+  void _callSeenPostEvent() {
+    List<String> seenPost = _feedBloc.seenPost.toList();
+    _feedBloc.add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPost));
   }
 
   @override
@@ -301,6 +336,10 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
   // This function handle the paging controller based on the state changes
   void handleBlocListener(LMFeedPersonalisedState? state) {
     if (state is LMFeedPersonalisedFeedLoadedState) {
+      // if page is 1 then trigger the debounce event
+      if (state.pageKey == 1) {
+        _handleScroll();
+      }
       List<LMPostViewData> listOfPosts = state.posts;
       if (state.posts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
@@ -680,10 +719,12 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                             return VisibilityDetector(
                               key: ObjectKey(item.id),
                               onVisibilityChanged: (visibilityInfo) {
+                                // check if the post is visible more than 40% and is scrolling in reverse direction
+                                // then add the post to seen list
                                 if (mounted) {
                                   double visiblePercentage =
                                       visibilityInfo.visibleFraction * 100;
-                                  if (visiblePercentage > 50) {
+                                  if (visiblePercentage > 40) {
                                     LMFeedPersonalisedBloc.instance.seenPost
                                         .add(item.id);
                                   }
