@@ -86,7 +86,7 @@ class _LMCarouselState extends State<LMFeedCarousel> {
   late Size screenSize;
   final ValueNotifier<bool> rebuildCurr = ValueNotifier(false);
   LMFeedThemeData feedTheme = LMFeedTheme.instance.theme;
-  CarouselController carouselController = CarouselController();
+  CarouselSliderController carouselController = CarouselSliderController();
 
   List<Widget> mediaWidgets = [];
   int currPosition = 0;
