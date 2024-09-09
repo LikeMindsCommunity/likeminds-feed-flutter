@@ -1,6 +1,5 @@
-# melos_managed_dependency_overrides: likeminds_feed_flutter_core,likeminds_feed_flutter_ui,extended_text_field
+# melos_managed_dependency_overrides: likeminds_feed_flutter_core,likeminds_feed_flutter_ui
 dependency_overrides:
-  extended_text_field: ^14.0.0
   likeminds_feed: # 1.11.0
     path: ../../LikeMinds-Flutter-Feed-SDK
   likeminds_feed_flutter_core:

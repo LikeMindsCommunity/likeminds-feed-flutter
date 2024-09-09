@@ -39,7 +39,8 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
 
   int currPosition = 0;
   int mediaLength = 0;
-  CarouselController controller = CarouselController();
+  
+  CarouselSliderController controller = CarouselSliderController();
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
 
   @override
@@ -149,7 +150,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                               enableInfiniteScroll: false,
                               enlargeFactor: 0.0,
                               viewportFraction: 1.0,
-                              aspectRatio: 1,
+                              aspectRatio: 9/16,
                               onPageChanged: (index, reason) {
                                 currPosition = index;
                                 rebuildCurr.value = !rebuildCurr.value;
@@ -172,14 +173,13 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                               return Container(
                                 color: Colors.black,
                                 width: screenSize.width,
-                                child: Center(
-                                  child: LMFeedImage(
-                                    image: postAttachments[index],
-                                    style: LMFeedPostImageStyle(
-                                      boxFit: BoxFit.contain,
-                                    ),
-                                    position: index,
+                                child: LMFeedImage(
+                                  image: postAttachments[index],
+                                  style: LMFeedPostImageStyle(
+                                    boxFit: BoxFit.contain,
+                                    width: screenSize.width,
                                   ),
+                                  position: index,
                                 ),
                               );
                             } else {

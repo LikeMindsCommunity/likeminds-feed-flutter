@@ -3,7 +3,6 @@ import 'package:likeminds_feed_flutter_ui/src/models/models.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
-import 'package:visibility_aware_state/visibility_aware_state.dart';
 
 /// {@template post_widget}
 /// A widget that displays a feed post in the LM app.

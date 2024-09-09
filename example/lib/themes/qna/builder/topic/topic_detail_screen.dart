@@ -72,7 +72,7 @@ class _LMFeedTopicDetailsScreenState extends State<LMFeedTopicDetailsScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        LMFeedBloc.instance.selectedTopics = [];
+        LMFeedUniversalBloc.instance.selectedTopics = [];
         return Future.value(true);
       },
       child: RefreshIndicator(
