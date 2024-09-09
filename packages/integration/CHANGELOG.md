@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.0]
+
+- Added support for personalised feed
+- Fixed some customization bugs
+
 ## [1.8.0]
 
 - Added `LMFeedCommentList` Widget
