@@ -38,8 +38,14 @@ class LMFeedComposeScreen extends StatefulWidget {
   final LMFeedComposeScreenStyle? style;
 
   final Function(BuildContext context)? composeDiscardDialogBuilder;
-  final PreferredSizeWidget Function(LMFeedAppBar oldAppBar)?
-      composeAppBarBuilder;
+  final PreferredSizeWidget Function(
+    LMFeedAppBar oldAppBar,
+    // Precheck validation for text, heading and attachments
+    LMResponse<void> Function() onPostCreate,
+    LMFeedButton createPostButton,
+    LMFeedButton cancelButton,
+    void Function(String) onValidationFailed,
+  )? composeAppBarBuilder;
   final Widget Function()? composeContentBuilder;
   final Widget Function(
           BuildContext context, Widget topicSelector, List<LMTopicViewData>)?
@@ -188,7 +194,12 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             source: LMFeedWidgetSource.createPostScreen,
             backgroundColor: feedTheme.container,
             bottomSheet: _defMediaPicker(),
-            appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
+            appBar: widget.composeAppBarBuilder?.call(
+                    _defAppBar(),
+                    onPostCreate,
+                    _defPostCreateButton(),
+                    _defCancelButton(),
+                    onPostValidationFailed) ??
                 widgetUtility.composeScreenAppBar(context, _defAppBar()),
             canPop: false,
             onPopInvoked: (canPop) {
@@ -632,156 +643,174 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     );
   }
 
+  LMFeedButton _defCancelButton() {
+    return LMFeedButton(
+      text: LMFeedText(
+        text: "Cancel",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(color: feedTheme.primaryColor),
+        ),
+      ),
+      onTap: () {
+        widget.composeDiscardDialogBuilder?.call(context) ??
+            _showDefaultDiscardDialog(context);
+      },
+      style: const LMFeedButtonStyle(),
+    );
+  }
+
+  LMFeedButton _defPostCreateButton() {
+    return LMFeedButton(
+      text: LMFeedText(
+        text: "Create",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            color: feedTheme.onPrimary,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      style: LMFeedButtonStyle(
+        backgroundColor: feedTheme.primaryColor,
+        borderRadius: 6,
+        height: 34,
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      ),
+      onTap: () {
+        LMResponse response = onPostCreate.call();
+
+        if (response.success) {
+          onPostValidationSuccess();
+        } else {
+          onPostValidationFailed(
+              response.errorMessage ?? "An error occurred, please try again");
+        }
+      },
+    );
+  }
+
+  void onPostValidationSuccess() {
+    Navigator.pop(context);
+  }
+
+  void onPostValidationFailed(String errorMessage) {
+    LMFeedCore.showSnackBar(
+      context,
+      errorMessage,
+      widgetSource,
+    );
+  }
+
   LMFeedAppBar _defAppBar() {
     final theme = LMFeedCore.theme;
     return LMFeedAppBar(
-        style: LMFeedAppBarStyle(
-          backgroundColor: feedTheme.container,
-          height: 48,
-          centerTitle: true,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 18.0,
-            vertical: 8.0,
-          ),
-          shadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 1.0,
-              offset: const Offset(0.0, 1.0), // shadow direction: bottom right
-            ),
-          ],
+      style: LMFeedAppBarStyle(
+        backgroundColor: feedTheme.container,
+        height: 48,
+        centerTitle: true,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 18.0,
+          vertical: 8.0,
         ),
-        leading: LMFeedButton(
-          text: LMFeedText(
-            text: "Cancel",
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(color: theme.primaryColor),
-            ),
+        shadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 1.0,
+            offset: const Offset(0.0, 1.0), // shadow direction: bottom right
           ),
-          onTap: () {
-            widget.composeDiscardDialogBuilder?.call(context) ??
-                _showDefaultDiscardDialog(context);
-          },
-          style: const LMFeedButtonStyle(),
-        ),
-        title: LMFeedText(
-          text: "Create $postTitleFirstCap",
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: theme.onContainer,
-            ),
+        ],
+      ),
+      leading: _defCancelButton(),
+      title: LMFeedText(
+        text: "Create $postTitleFirstCap",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: theme.onContainer,
           ),
         ),
-        trailing: [
-          LMFeedButton(
-            text: LMFeedText(
-              text: "Create",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  color: theme.onPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            style: LMFeedButtonStyle(
-              backgroundColor: theme.primaryColor,
-              borderRadius: 6,
-              height: 34,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            ),
-            onTap: () {
-              _focusNode.unfocus();
+      ),
+      trailing: [
+        _defPostCreateButton(),
+      ],
+    );
+  }
 
-              String? heading = _headingController?.text;
-              heading = heading?.trim();
+  LMResponse<void> onPostCreate() {
+    _focusNode.unfocus();
 
-              String postText = _controller.text;
-              postText = postText.trim();
-              if ((heading?.isNotEmpty ?? false) ||
-                  postText.isNotEmpty ||
-                  composeBloc.postMedia.isNotEmpty) {
-                List<LMUserTagViewData> userTags = [...composeBloc.userTags];
-                List<LMTopicViewData> selectedTopics = [
-                  ...composeBloc.selectedTopics
-                ];
+    String? heading = _headingController?.text;
+    heading = heading?.trim();
 
-                if (config!.enableHeading &&
-                    config!.headingRequiredToCreatePost &&
-                    (heading == null || heading.isEmpty)) {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    "Can't create a $postTitleSmallCap without heading",
-                    widgetSource,
-                  );
-                  return;
-                }
+    String postText = _controller.text;
+    postText = postText.trim();
+    if ((heading?.isNotEmpty ?? false) ||
+        postText.isNotEmpty ||
+        composeBloc.postMedia.isNotEmpty) {
+      List<LMUserTagViewData> userTags = [...composeBloc.userTags];
+      List<LMTopicViewData> selectedTopics = [...composeBloc.selectedTopics];
 
-                if (config!.textRequiredToCreatePost && postText.isEmpty) {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    "Can't create a $postTitleSmallCap without text",
-                    widgetSource,
-                  );
-                  return;
-                }
+      if (config!.enableHeading &&
+          config!.headingRequiredToCreatePost &&
+          (heading == null || heading.isEmpty)) {
+        return LMResponse(
+          success: false,
+          errorMessage: "Can't create a $postTitleSmallCap without heading",
+        );
+      }
 
-                if (config!.topicRequiredToCreatePost &&
-                    selectedTopics.isEmpty &&
-                    config!.enableTopics) {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    "Can't create a $postTitleSmallCap without topic",
-                    widgetSource,
-                  );
-                  return;
-                }
-                userTags =
-                    LMFeedTaggingHelper.matchTags(_controller.text, userTags);
+      if (config!.textRequiredToCreatePost && postText.isEmpty) {
+        return LMResponse(
+          success: false,
+          errorMessage: "Can't create a $postTitleSmallCap without text",
+        );
+      }
 
-                result =
-                    LMFeedTaggingHelper.encodeString(_controller.text, userTags)
-                        .trim();
+      if (config!.topicRequiredToCreatePost &&
+          selectedTopics.isEmpty &&
+          config!.enableTopics) {
+        return LMResponse(
+          success: false,
+          errorMessage: "Can't create a $postTitleSmallCap without topic",
+        );
+      }
+      userTags = LMFeedTaggingHelper.matchTags(_controller.text, userTags);
 
-                if (widget.attachments != null &&
-                    widget.attachments!.isNotEmpty &&
-                    widget.attachments!.first.attachmentType ==
-                        LMMediaType.widget) {
-                  composeBloc.postMedia.add(
-                    LMAttachmentViewData.fromAttachmentMeta(
-                      attachmentType: LMMediaType.widget,
-                      attachmentMeta: (LMAttachmentMetaViewDataBuilder()
-                            ..meta(
-                                widget.attachments?.first.attachmentMeta.meta ??
-                                    {}))
-                          .build(),
-                    ),
-                  );
-                }
-                LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-                  user: user!,
-                  postText: result!,
-                  selectedTopics: selectedTopics,
-                  postMedia: [...composeBloc.postMedia],
-                  heading: _headingController?.text,
-                  feedroomId: widget.feedroomId,
-                  userTagged: userTags,
-                ));
+      result =
+          LMFeedTaggingHelper.encodeString(_controller.text, userTags).trim();
 
-                Navigator.pop(context);
-              } else {
-                LMFeedCore.showSnackBar(
-                  context,
-                  "Can't create a $postTitleSmallCap without text or attachments",
-                  widgetSource,
-                );
-              }
-            },
+      if (widget.attachments != null &&
+          widget.attachments!.isNotEmpty &&
+          widget.attachments!.first.attachmentType == LMMediaType.widget) {
+        composeBloc.postMedia.add(
+          LMAttachmentViewData.fromAttachmentMeta(
+            attachmentType: LMMediaType.widget,
+            attachmentMeta: (LMAttachmentMetaViewDataBuilder()
+                  ..meta(widget.attachments?.first.attachmentMeta.meta ?? {}))
+                .build(),
           ),
-        ]);
+        );
+      }
+      LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
+        user: user!,
+        postText: result!,
+        selectedTopics: selectedTopics,
+        postMedia: [...composeBloc.postMedia],
+        heading: _headingController?.text,
+        feedroomId: widget.feedroomId,
+        userTagged: userTags,
+      ));
+
+      return LMResponse(success: true);
+    } else {
+      return LMResponse(
+        success: false,
+        errorMessage:
+            "Can't create a $postTitleSmallCap without text or attachments",
+      );
+    }
   }
 
   Widget _defContentInput() {
