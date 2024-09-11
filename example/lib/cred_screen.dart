@@ -292,21 +292,48 @@ class _CredScreenState extends State<CredScreen> {
       return;
     }
 
-    // define the route
-    Widget? navigationWidget = _getNavigationWidget(selectedTheme, uuid);
-    if (navigationWidget == null) {
-      Navigator.pop(context);
-      return;
-    }
-    MaterialPageRoute route = MaterialPageRoute(
-      builder: (context) => navigationWidget,
-    );
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => LMFeedComposeScreen(
+              composeAppBarBuilder: (appBar, onPostCreate, postButton,
+                  cancleButton, onValidationFailed) {
+                return appBar.copyWith(trailing: [
+                  ElevatedButton(
+                      onPressed: () {
+                        LMResponse response = onPostCreate.call();
 
-    // dismiss the loader dialog
-    Navigator.of(context).pop();
+                        if (response.success) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LMFeedScreen()));
+                        } else {
+                          onValidationFailed(response.errorMessage ?? "Error");
+                          showSimpleNotification(
+                              Text(
+                                  response.errorMessage ?? "An error occurred"),
+                              background: Colors.red);
+                        }
+                      },
+                      child: const Text("Post"))
+                ]);
+              },
+            )));
 
-    // navigate to the feed screen
-    Navigator.of(context).push(route);
+    // // define the route
+    // Widget? navigationWidget = _getNavigationWidget(selectedTheme, uuid);
+    // if (navigationWidget == null) {
+    //   Navigator.pop(context);
+    //   return;
+    // }
+    // MaterialPageRoute route = MaterialPageRoute(
+    //   builder: (context) => navigationWidget,
+    // );
+
+    // // dismiss the loader dialog
+    // Navigator.of(context).pop();
+
+    // // navigate to the feed screen
+    // Navigator.of(context).push(route);
   }
 
   fetchUserData() {
