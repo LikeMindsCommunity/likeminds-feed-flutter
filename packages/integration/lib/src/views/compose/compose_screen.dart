@@ -11,6 +11,71 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// {@template feed_compose_screen}
+/// A screen widget that facilitates the creation of a new feed post.
+///
+/// The `LMFeedComposeScreen` provides a customizable interface for users
+/// to create and submit posts. It supports various content types like text,
+/// media, and topics, and offers several customization points to adapt the UI
+/// and behavior to specific requirements.
+///
+/// ### Customization Options:
+/// - [composeDiscardDialogBuilder]: A function to build a custom dialog when the discard action is triggered.
+/// - [composeAppBarBuilder]: A function to build a custom app bar for the compose screen.
+/// - [composeContentBuilder]: A function to build a custom content area for the post.
+/// - [composeTopicSelectorBuilder]: A function to build a custom topic selector widget.
+/// - [composeMediaPreviewBuilder]: A function to build a custom media preview for selected attachments.
+/// - [composeUserHeaderBuilder]: A function to build a custom user header widget displaying user information.
+///
+/// ### Configuration Options:
+/// - [config]: Configuration settings for the feed compose screen, such as whether heading and topics are required.
+/// - [style]: Style settings for customizing the visual appearance of the compose screen.
+/// - [attachments]: A list of pre-selected attachments (media) to include in the post.
+/// - [displayName]: The name to display for the user creating the post.
+/// - [displayUrl]: A URL pointing to the user's display picture.
+/// - [feedroomId]: The ID of the feed room where the post is being created.
+/// - [widgetSource]: Information about the source of the widget, for internal tracking.
+///
+/// ### Example Usage:
+/// ```dart
+/// LMFeedComposeScreen(
+///   composeAppBarBuilder: (oldAppBar, onPostCreate, createPostButton, cancelButton, onValidationFailed) {
+///     return AppBar(
+///       title: Text('Custom Compose App Bar'),
+///       actions: [
+///         IconButton(
+///           icon: Icon(Icons.cancel),
+///           onPressed: () => cancelButton.onTap(),
+///         ),
+///         IconButton(
+///           icon: Icon(Icons.check),
+///           onPressed: () {
+///             LMResponse response = onPostCreate();
+///             if (!response.success) {
+///               onValidationFailed(response.errorMessage ?? 'Validation failed');
+///             }
+///           },
+///         ),
+///       ],
+///     );
+///   },
+///   config: LMFeedComposeScreenConfig(
+///     enableHeading: true,
+///     textRequiredToCreatePost: true,
+///     topicRequiredToCreatePost: true,
+///   ),
+///   style: LMFeedComposeScreenStyle(
+///     backgroundColor: Colors.white,
+///   ),
+///   displayName: 'John Doe',
+///   displayUrl: 'https://example.com/avatar.png',
+///   feedroomId: 12345,
+/// )
+/// ```
+///
+/// This screen manages user input, validation, and submission, allowing you
+/// to build a fully customizable post creation experience.
+/// {@endtemplate}
 class LMFeedComposeScreen extends StatefulWidget {
   const LMFeedComposeScreen({
     super.key,
@@ -38,18 +103,141 @@ class LMFeedComposeScreen extends StatefulWidget {
   final LMFeedComposeScreenStyle? style;
 
   final Function(BuildContext context)? composeDiscardDialogBuilder;
-  final PreferredSizeWidget Function(LMFeedAppBar oldAppBar)?
-      composeAppBarBuilder;
+
+  /// {@template composeAppBarBuilder}
+  /// A builder function for customizing the app bar in the feed compose screen.
+  ///
+  /// This function allows you to override the default app bar with a custom
+  /// implementation. It provides various parameters related to post creation
+  /// and validation that can be used to control the behavior of the app bar.
+  ///
+  /// - [oldAppBar]: The default `LMFeedAppBar` that can be modified or replaced.
+  /// - [onPostCreate]: A function to be called when the post creation process starts.
+  ///   It validates the post content (e.g., text, heading, attachments).
+  ///   Returns an `LMResponse` indicating success or failure.
+  /// - [createPostButton]: The default button used to trigger post creation. Can be customized.
+  /// - [cancelButton]: The default cancel button used to discard the post creation process.
+  /// - [onValidationFailed]: A callback function triggered when post creation validation fails,
+  ///   taking an error message as input.
+  ///
+  /// Example:
+  /// ```dart
+  /// composeAppBarBuilder: (oldAppBar, onPostCreate, createPostButton, cancelButton, onValidationFailed) {
+  ///   return AppBar(
+  ///     title: Text('Custom Compose App Bar'),
+  ///     actions: [
+  ///       IconButton(
+  ///         icon: Icon(Icons.cancel),
+  ///         onPressed: () => cancelButton.onTap(),
+  ///       ),
+  ///       IconButton(
+  ///         icon: Icon(Icons.check),
+  ///         onPressed: () {
+  ///           LMResponse response = onPostCreate();
+  ///           if (!response.success) {
+  ///             onValidationFailed(response.errorMessage ?? 'Post creation failed');
+  ///           }
+  ///         },
+  ///       ),
+  ///     ],
+  ///   );
+  /// },
+  /// ```
+  /// {@endtemplate}
+  final PreferredSizeWidget Function(
+    LMFeedAppBar oldAppBar,
+    LMResponse<void> Function() onPostCreate,
+    LMFeedButton createPostButton,
+    LMFeedButton cancelButton,
+    void Function(String) onValidationFailed,
+  )? composeAppBarBuilder;
+
+  /// {@template composeContentBuilder}
+  /// A function to build a custom content area for the post.
+  ///
+  /// The `composeContentBuilder` allows you to override the default post content
+  /// area. You can provide a custom widget to display as the main content of
+  /// the post creation screen.
+  ///
+  /// - Returns: A custom widget to be displayed as the content area.
+  /// {@endtemplate}
   final Widget Function()? composeContentBuilder;
+
+  /// {@template composeTopicSelectorBuilder}
+  /// A function to build a custom topic selector widget.
+  ///
+  /// The `composeTopicSelectorBuilder` allows you to override the default topic
+  /// selector. This function provides a context, the default `topicSelector` widget,
+  /// and a list of selected topics (`LMTopicViewData`), which can be used to customize
+  /// how topics are selected or displayed.
+  ///
+  /// - [context]: The build context.
+  /// - [topicSelector]: The default topic selector widget, which you can modify or replace.
+  /// - [List<LMTopicViewData>]: A list of selected topics to display.
+  ///
+  /// - Returns: A custom widget that serves as the topic selector.
+  /// {@endtemplate}
   final Widget Function(
           BuildContext context, Widget topicSelector, List<LMTopicViewData>)?
       composeTopicSelectorBuilder;
+
+  /// {@template composeMediaPreviewBuilder}
+  /// A function to build a custom media preview for the selected attachments.
+  ///
+  /// The `composeMediaPreviewBuilder` allows you to customize how selected
+  /// media attachments (images, videos, etc.) are previewed in the compose screen.
+  ///
+  /// - Returns: A custom widget for displaying the media preview.
+  /// {@endtemplate}
   final Widget Function()? composeMediaPreviewBuilder;
+
+  /// {@template composeUserHeaderBuilder}
+  /// A function to build a custom user header widget displaying user information.
+  ///
+  /// The `composeUserHeaderBuilder` allows you to customize the appearance and content
+  /// of the user header at the top of the compose screen, typically showing user
+  /// information like their name and profile picture.
+  ///
+  /// - [context]: The build context.
+  /// - [user]: An instance of `LMUserViewData` representing the user.
+  ///
+  /// - Returns: A custom widget displaying the user header.
+  /// {@endtemplate}
   final Widget Function(BuildContext context, LMUserViewData user)?
       composeUserHeaderBuilder;
+
+  /// {@template lmFeedComposeScreenAttachments}
+  /// A list of attachments (media) selected for the post.
+  ///
+  /// This field contains any pre-selected media attachments (e.g., images, videos)
+  /// that will be included in the post.
+  ///
+  /// - [LMAttachmentViewData]: A list of media attachments.
+  /// {@endtemplate}
   final List<LMAttachmentViewData>? attachments;
+
+  /// {@template lmFeedComposeScreenDisplayName}
+  /// The display name of the user creating the post.
+  ///
+  /// This field represents the name that is displayed on the compose screen for
+  /// the user who is creating the post.
+  /// {@endtemplate}
   final String? displayName;
+
+  /// {@template lmFeedComposeScreenDisplayUrl}
+  /// The URL for the user's display picture.
+  ///
+  /// This field contains the URL pointing to the user's profile picture, which
+  /// can be displayed in the user header or other relevant areas of the screen.
+  /// {@endtemplate}
   final String? displayUrl;
+
+  /// {@template lmFeedComposeScreenFeedroomId}
+  /// The ID of the feed room where the post is being created.
+  ///
+  /// This field represents the unique identifier of the feed room (or group)
+  /// in which the post is being submitted.
+  /// {@endtemplate}
   final int? feedroomId;
 
   @override
@@ -188,8 +376,19 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             source: LMFeedWidgetSource.createPostScreen,
             backgroundColor: feedTheme.container,
             bottomSheet: _defMediaPicker(),
-            appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
-                widgetUtility.composeScreenAppBar(context, _defAppBar()),
+            appBar: widget.composeAppBarBuilder?.call(
+                    _defAppBar(),
+                    onPostCreate,
+                    _defPostCreateButton(),
+                    _defCancelButton(),
+                    onPostValidationFailed) ??
+                widgetUtility.composeScreenAppBar(
+                    context,
+                    _defAppBar(),
+                    onPostCreate,
+                    _defPostCreateButton(),
+                    _defCancelButton(),
+                    onPostValidationFailed),
             canPop: false,
             onPopInvoked: (canPop) {
               widget.composeDiscardDialogBuilder?.call(context) ??
@@ -632,156 +831,209 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     );
   }
 
+  // Default "Cancel" button widget creation
+  LMFeedButton _defCancelButton() {
+    return LMFeedButton(
+      // Setting the button text and style
+      text: LMFeedText(
+        text: "Cancel",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(color: feedTheme.primaryColor),
+        ),
+      ),
+      // Defining the button's tap behavior
+      onTap: () {
+        // If a custom discard dialog is provided, show it
+        // Otherwise, show the default discard dialog
+        widget.composeDiscardDialogBuilder?.call(context) ??
+            _showDefaultDiscardDialog(context);
+      },
+      // Applying additional style properties
+      style: const LMFeedButtonStyle(),
+    );
+  }
+
+// Default "Create Post" button widget creation
+  LMFeedButton _defPostCreateButton() {
+    return LMFeedButton(
+      // Setting the button text and style
+      text: LMFeedText(
+        text: "Create",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            color: feedTheme.onPrimary, // Button text color
+            fontSize: 14, // Font size
+            fontWeight: FontWeight.w500, // Font weight
+          ),
+        ),
+      ),
+      // Button style including background color and padding
+      style: LMFeedButtonStyle(
+        backgroundColor: feedTheme.primaryColor, // Button background color
+        borderRadius: 6, // Border radius
+        height: 34, // Button height
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      ),
+      // Defining the button's tap behavior
+      onTap: () {
+        // Trigger the post creation process
+        LMResponse response = onPostCreate.call();
+
+        // Check if post creation was successful
+        if (response.success) {
+          // If successful, proceed with post validation success flow
+          onPostValidationSuccess();
+        } else {
+          // If failed, handle validation failure and show an error message
+          onPostValidationFailed(
+              response.errorMessage ?? "An error occurred, please try again");
+        }
+      },
+    );
+  }
+
+// Function to handle post creation success
+  void onPostValidationSuccess() {
+    // Close the screen and return to the previous view
+    Navigator.pop(context);
+  }
+
+// Function to handle post creation failure
+  void onPostValidationFailed(String errorMessage) {
+    // Show a snackbar with the error message
+    LMFeedCore.showSnackBar(
+      context,
+      errorMessage,
+      widgetSource, // Source of the widget, useful for tracking
+    );
+  }
+
+// Function to build the default app bar
   LMFeedAppBar _defAppBar() {
     final theme = LMFeedCore.theme;
     return LMFeedAppBar(
-        style: LMFeedAppBarStyle(
-          backgroundColor: feedTheme.container,
-          height: 48,
-          centerTitle: true,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 18.0,
-            vertical: 8.0,
+      // App bar style properties
+      style: LMFeedAppBarStyle(
+        backgroundColor: feedTheme.container, // Background color of the app bar
+        height: 48, // App bar height
+        centerTitle: true, // Center the title
+        padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8.0),
+        shadow: [
+          BoxShadow(
+            color: Colors.grey.shade300, // Shadow color
+            blurRadius: 1.0, // Shadow blur radius
+            offset: const Offset(0.0, 1.0), // Shadow offset
           ),
-          shadow: [
-            BoxShadow(
-              color: Colors.grey.shade300,
-              blurRadius: 1.0,
-              offset: const Offset(0.0, 1.0), // shadow direction: bottom right
-            ),
-          ],
-        ),
-        leading: LMFeedButton(
-          text: LMFeedText(
-            text: "Cancel",
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(color: theme.primaryColor),
-            ),
-          ),
-          onTap: () {
-            widget.composeDiscardDialogBuilder?.call(context) ??
-                _showDefaultDiscardDialog(context);
-          },
-          style: const LMFeedButtonStyle(),
-        ),
-        title: LMFeedText(
-          text: "Create $postTitleFirstCap",
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: theme.onContainer,
-            ),
+        ],
+      ),
+      // Setting the leading widget (Cancel button)
+      leading: _defCancelButton(),
+      // Setting the app bar title
+      title: LMFeedText(
+        text: "Create $postTitleFirstCap",
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 18, // Title font size
+            fontWeight: FontWeight.w700, // Title font weight
+            color: theme.onContainer, // Title text color
           ),
         ),
-        trailing: [
-          LMFeedButton(
-            text: LMFeedText(
-              text: "Create",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  color: theme.onPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            style: LMFeedButtonStyle(
-              backgroundColor: theme.primaryColor,
-              borderRadius: 6,
-              height: 34,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            ),
-            onTap: () {
-              _focusNode.unfocus();
+      ),
+      // Setting the trailing widget (Post create button)
+      trailing: [
+        _defPostCreateButton(),
+      ],
+    );
+  }
 
-              String? heading = _headingController?.text;
-              heading = heading?.trim();
+// Function that handles the post creation logic and validation
+  LMResponse<void> onPostCreate() {
+    // Remove focus from text fields to dismiss the keyboard
+    _focusNode.unfocus();
 
-              String postText = _controller.text;
-              postText = postText.trim();
-              if ((heading?.isNotEmpty ?? false) ||
-                  postText.isNotEmpty ||
-                  composeBloc.postMedia.isNotEmpty) {
-                List<LMUserTagViewData> userTags = [...composeBloc.userTags];
-                List<LMTopicViewData> selectedTopics = [
-                  ...composeBloc.selectedTopics
-                ];
+    // Get the trimmed heading and post text values
+    String? heading = _headingController?.text;
+    heading = heading?.trim();
 
-                if (config!.enableHeading &&
-                    config!.headingRequiredToCreatePost &&
-                    (heading == null || heading.isEmpty)) {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    "Can't create a $postTitleSmallCap without heading",
-                    widgetSource,
-                  );
-                  return;
-                }
+    String postText = _controller.text;
+    postText = postText.trim();
 
-                if (config!.textRequiredToCreatePost && postText.isEmpty) {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    "Can't create a $postTitleSmallCap without text",
-                    widgetSource,
-                  );
-                  return;
-                }
+    // Check if there is content (heading, post text, or media) to create the post
+    if ((heading?.isNotEmpty ?? false) ||
+        postText.isNotEmpty ||
+        composeBloc.postMedia.isNotEmpty) {
+      // Collect user tags and topics for the post
+      List<LMUserTagViewData> userTags = [...composeBloc.userTags];
+      List<LMTopicViewData> selectedTopics = [...composeBloc.selectedTopics];
 
-                if (config!.topicRequiredToCreatePost &&
-                    selectedTopics.isEmpty &&
-                    config!.enableTopics) {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    "Can't create a $postTitleSmallCap without topic",
-                    widgetSource,
-                  );
-                  return;
-                }
-                userTags =
-                    LMFeedTaggingHelper.matchTags(_controller.text, userTags);
+      // Validate the heading if required
+      if (config!.enableHeading &&
+          config!.headingRequiredToCreatePost &&
+          (heading == null || heading.isEmpty)) {
+        return LMResponse(
+          success: false,
+          errorMessage: "Can't create a $postTitleSmallCap without heading",
+        );
+      }
 
-                result =
-                    LMFeedTaggingHelper.encodeString(_controller.text, userTags)
-                        .trim();
+      // Validate the text if required
+      if (config!.textRequiredToCreatePost && postText.isEmpty) {
+        return LMResponse(
+          success: false,
+          errorMessage: "Can't create a $postTitleSmallCap without text",
+        );
+      }
 
-                if (widget.attachments != null &&
-                    widget.attachments!.isNotEmpty &&
-                    widget.attachments!.first.attachmentType ==
-                        LMMediaType.widget) {
-                  composeBloc.postMedia.add(
-                    LMAttachmentViewData.fromAttachmentMeta(
-                      attachmentType: LMMediaType.widget,
-                      attachmentMeta: (LMAttachmentMetaViewDataBuilder()
-                            ..meta(
-                                widget.attachments?.first.attachmentMeta.meta ??
-                                    {}))
-                          .build(),
-                    ),
-                  );
-                }
-                LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-                  user: user!,
-                  postText: result!,
-                  selectedTopics: selectedTopics,
-                  postMedia: [...composeBloc.postMedia],
-                  heading: _headingController?.text,
-                  feedroomId: widget.feedroomId,
-                  userTagged: userTags,
-                ));
+      // Validate the topic selection if required
+      if (config!.topicRequiredToCreatePost &&
+          selectedTopics.isEmpty &&
+          config!.enableTopics) {
+        return LMResponse(
+          success: false,
+          errorMessage: "Can't create a $postTitleSmallCap without topic",
+        );
+      }
 
-                Navigator.pop(context);
-              } else {
-                LMFeedCore.showSnackBar(
-                  context,
-                  "Can't create a $postTitleSmallCap without text or attachments",
-                  widgetSource,
-                );
-              }
-            },
+      // Match user tags from the post text and prepare for encoding
+      userTags = LMFeedTaggingHelper.matchTags(_controller.text, userTags);
+      result =
+          LMFeedTaggingHelper.encodeString(_controller.text, userTags).trim();
+
+      // If there are pre-attached media widgets, add them to the post media
+      if (widget.attachments != null &&
+          widget.attachments!.isNotEmpty &&
+          widget.attachments!.first.attachmentType == LMMediaType.widget) {
+        composeBloc.postMedia.add(
+          LMAttachmentViewData.fromAttachmentMeta(
+            attachmentType: LMMediaType.widget,
+            attachmentMeta: (LMAttachmentMetaViewDataBuilder()
+                  ..meta(widget.attachments?.first.attachmentMeta.meta ?? {}))
+                .build(),
           ),
-        ]);
+        );
+      }
+
+      // Add a new post event to the post bloc
+      LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
+        user: user!,
+        postText: result!,
+        selectedTopics: selectedTopics,
+        postMedia: [...composeBloc.postMedia],
+        heading: _headingController?.text,
+        feedroomId: widget.feedroomId,
+        userTagged: userTags,
+      ));
+
+      // Return success response
+      return LMResponse(success: true);
+    } else {
+      // Return error response if no content to create the post
+      return LMResponse(
+        success: false,
+        errorMessage:
+            "Can't create a $postTitleSmallCap without text or attachments",
+      );
+    }
   }
 
   Widget _defContentInput() {
