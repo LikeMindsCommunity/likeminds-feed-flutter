@@ -318,7 +318,13 @@ class LMFeedWidgetUtility {
 
   /// Builds the app bar for the compose screen.
   PreferredSizeWidget composeScreenAppBar(
-      BuildContext context, LMFeedAppBar appBar) {
+    BuildContext context,
+    LMFeedAppBar appBar,
+    LMResponse<void> Function() onPostCreate,
+    LMFeedButton createPostButton,
+    LMFeedButton cancelButton,
+    void Function(String) onValidationFailed,
+  ) {
     return appBar;
   }
 

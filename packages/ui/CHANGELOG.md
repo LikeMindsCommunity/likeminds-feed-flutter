@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.9.1]
+
+- Added customisations in LMFeedComposeScreen's appbar builder
+
 ## [1.9.0]
 
 - Added support for personalised feed
