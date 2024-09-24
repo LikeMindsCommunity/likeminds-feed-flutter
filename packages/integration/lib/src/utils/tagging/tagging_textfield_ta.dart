@@ -9,14 +9,11 @@ class LMTaggingAheadTextField extends StatefulWidget {
   final List<LMUserTagViewData>? userTags;
   final Function(LMUserTagViewData) onTagSelected;
   final TextEditingController controller;
-  final InputDecoration? decoration;
   final Function(String)? onChange;
   final VoidCallback? onEditingComplete;
   final Function(String)? onSubmitted;
-  final int? maxLines;
-  final int minLines;
   final bool enabled;
-  final ScrollPhysics scrollPhysics;
+  final LMTaggingAheadTextFieldStyle style;
 
   const LMTaggingAheadTextField({
     super.key,
@@ -24,15 +21,12 @@ class LMTaggingAheadTextField extends StatefulWidget {
     required this.onTagSelected,
     required this.controller,
     required this.focusNode,
-    this.decoration,
     required this.onChange,
     this.onEditingComplete,
     this.onSubmitted,
-    this.maxLines,
-    this.minLines = 1,
     this.enabled = true,
     this.userTags,
-    this.scrollPhysics = const NeverScrollableScrollPhysics(),
+    this.style = const LMTaggingAheadTextFieldStyle(),
   });
 
   @override
@@ -43,12 +37,8 @@ class LMTaggingAheadTextField extends StatefulWidget {
     FocusNode? focusNode,
     Function(LMUserTagViewData)? onTagSelected,
     TextEditingController? controller,
-    InputDecoration? decoration,
     Function(String)? onChange,
-    int? maxLines,
-    int? minLines,
     bool? enabled,
-    ScrollPhysics? scrollPhysics,
     List<LMUserTagViewData>? userTags,
     VoidCallback? onEditingComplete,
     Function(String)? onSubmitted,
@@ -58,12 +48,8 @@ class LMTaggingAheadTextField extends StatefulWidget {
       focusNode: focusNode ?? this.focusNode,
       onTagSelected: onTagSelected ?? this.onTagSelected,
       controller: controller ?? this.controller,
-      decoration: decoration ?? this.decoration,
       onChange: onChange ?? this.onChange,
-      maxLines: maxLines ?? this.maxLines,
-      minLines: minLines ?? this.minLines,
       enabled: enabled ?? this.enabled,
-      scrollPhysics: scrollPhysics ?? this.scrollPhysics,
       onEditingComplete: onEditingComplete ?? this.onEditingComplete,
       onSubmitted: onSubmitted ?? this.onSubmitted,
       userTags: userTags ?? this.userTags,
@@ -172,7 +158,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       onTagTap: (p) {},
       scrollController: _scrollController,
       tagColor: feedTheme.tagColor,
-      scrollPhysics: widget.scrollPhysics,
+      scrollPhysics: widget.style.scrollPhysics,
       suggestionsBoxController: _suggestionsBoxController,
       suggestionsBoxDecoration: SuggestionsBoxDecoration(
         color: feedTheme.container,
@@ -191,10 +177,10 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         textCapitalization: TextCapitalization.sentences,
         controller: _controller,
         focusNode: _focusNode,
-        minLines: widget.minLines,
-        maxLines: widget.maxLines,
-        style: TextStyle(fontWeight: FontWeight.w400),
-        decoration: widget.decoration ??
+        minLines: widget.style.minLines,
+        maxLines: widget.style.maxLines,
+        style: widget.style.textStyle,
+        decoration: widget.style.decoration ??
             const InputDecoration(
               hintText: 'Write something here...',
               border: InputBorder.none,
@@ -312,5 +298,39 @@ extension NthOccurrenceOfSubstring on String {
 
   bool hasNthOccurrence(String stringToFind, int n) {
     return nThIndexOf(stringToFind, n) != -1;
+  }
+}
+
+class LMTaggingAheadTextFieldStyle {
+  final InputDecoration? decoration;
+  final int? maxLines;
+  final int minLines;
+  final ScrollPhysics scrollPhysics;
+  final TextStyle textStyle;
+
+  const LMTaggingAheadTextFieldStyle({
+    this.decoration,
+    this.maxLines,
+    this.minLines = 1,
+    this.scrollPhysics = const NeverScrollableScrollPhysics(),
+    this.textStyle = const TextStyle(fontWeight: FontWeight.w400),
+  });
+}
+
+extension LMTaggingAheadTextFieldStyleCopyWith on LMTaggingAheadTextFieldStyle {
+  LMTaggingAheadTextFieldStyle copyWith({
+    InputDecoration? decoration,
+    int? maxLines,
+    int? minLines,
+    ScrollPhysics? scrollPhysics,
+    TextStyle? textStyle,
+  }) {
+    return LMTaggingAheadTextFieldStyle(
+      decoration: decoration ?? this.decoration,
+      maxLines: maxLines ?? this.maxLines,
+      minLines: minLines ?? this.minLines,
+      scrollPhysics: scrollPhysics ?? this.scrollPhysics,
+      textStyle: textStyle ?? this.textStyle,
+    );
   }
 }
