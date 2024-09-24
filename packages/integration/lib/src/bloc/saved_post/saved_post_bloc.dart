@@ -12,7 +12,9 @@ class LMFeedSavedPostBloc
     extends Bloc<LMFeedSavedPostEvent, LMFeedSavedPostState> {
   static LMFeedSavedPostBloc? _instance;
   static LMFeedSavedPostBloc get instance =>
-      _instance ??= LMFeedSavedPostBloc._();
+      _instance == null || _instance!.isClosed
+          ? LMFeedSavedPostBloc._()
+          : _instance!;
   LMFeedSavedPostBloc._() : super(LMFeedSavedPostInitialState()) {
     on<LMFeedGetSavedPostEvent>(getSavedPostEventHandler);
   }

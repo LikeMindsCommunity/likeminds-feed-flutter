@@ -21,7 +21,9 @@ class LMFeedUniversalBloc
   static LMFeedUniversalBloc? _instance;
 
   static LMFeedUniversalBloc get instance =>
-      _instance ??= LMFeedUniversalBloc._();
+      _instance == null || _instance!.isClosed
+          ? LMFeedUniversalBloc._()
+          : _instance!;
 
   // final FeedApi feedApi;
   LMFeedUniversalBloc._() : super(LMFeedInitialState()) {

@@ -16,9 +16,11 @@ part 'handler/seen_post_handler.dart';
 class LMFeedPersonalisedBloc
     extends Bloc<LMFeedPersonalisedEvent, LMFeedPersonalisedState> {
   static LMFeedPersonalisedBloc? _instance;
-
   static LMFeedPersonalisedBloc get instance =>
-      _instance ??= LMFeedPersonalisedBloc._();
+      _instance == null || _instance!.isClosed
+          ? LMFeedPersonalisedBloc._()
+          : _instance!;
+
   final HashSet<String> seenPost = HashSet<String>();
   LMFeedPersonalisedBloc._() : super(LMFeedPersonalisedInitialState()) {
     on<LMFeedPersonalisedGetEvent>(_getPersonalisedFeedHandler);

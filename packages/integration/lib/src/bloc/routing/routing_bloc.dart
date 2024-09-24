@@ -12,7 +12,9 @@ class LMFeedRoutingBloc extends Bloc<LMFeedRoutingEvent, LMFeedRoutingState> {
   static LMFeedRoutingBloc? _lmRoutingBloc;
 
   static LMFeedRoutingBloc get instance =>
-      _lmRoutingBloc ??= LMFeedRoutingBloc._();
+      _lmRoutingBloc == null || _lmRoutingBloc!.isClosed
+          ? _lmRoutingBloc = LMFeedRoutingBloc._()
+          : _lmRoutingBloc!;
 
   LMFeedRoutingBloc._() : super(LMFeedRoutingStateInitState()) {
     on<LMFeedHandleSharedPostEvent>(sharePostEventHandler);

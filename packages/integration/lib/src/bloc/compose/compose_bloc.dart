@@ -27,7 +27,8 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
   static LMFeedComposeBloc? _bloc;
 
   /// {@macro lm_feed_compose_bloc}
-  static LMFeedComposeBloc get instance => _bloc ??= LMFeedComposeBloc._();
+  static LMFeedComposeBloc get instance =>
+      _bloc == null || _bloc!.isClosed ? LMFeedComposeBloc._() : _bloc!;
 
   /// Lists to maintain throughout the screen for sending/receiving data
   int imageCount = 0;

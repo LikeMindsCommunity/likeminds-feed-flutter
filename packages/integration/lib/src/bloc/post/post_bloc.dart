@@ -27,7 +27,10 @@ part 'handler/initial_event_handler.dart';
 class LMFeedPostBloc extends Bloc<LMFeedPostEvents, LMFeedPostState> {
   static LMFeedPostBloc? _lmPostBloc;
 
-  static LMFeedPostBloc get instance => _lmPostBloc ??= LMFeedPostBloc._();
+  static LMFeedPostBloc get instance =>
+      _lmPostBloc == null || _lmPostBloc!.isClosed
+          ? LMFeedPostBloc._()
+          : _lmPostBloc!;
 
   LMFeedPostBloc._() : super(LMFeedNewPostInitiateState()) {
     // Reset the bloc to initial state
