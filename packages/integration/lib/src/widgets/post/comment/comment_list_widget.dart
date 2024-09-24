@@ -2,6 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
+/// {@template lm_feed_comment_list}
+/// A widget that displays a list of comments in a feed.
+///
+/// The `LMFeedCommentList` widget takes a list of comments and displays them
+/// in a scrollable list. Each comment is represented by a `Comment` object.
+///
+/// This widget is typically used in a social media feed or any application
+/// where user comments are displayed.
+///
+/// Example usage:
+/// ```dart
+/// LMFeedCommentList(
+///   comments: [
+///     Comment(author: 'User1', content: 'This is a comment'),
+///     Comment(author: 'User2', content: 'This is another comment'),
+///   ],
+/// )
+/// ```
+///
+/// Properties:
+/// - `comments`: A list of `Comment` objects to be displayed.
+/// - `onCommentTap`: A callback function that is called when a comment is tapped.
+///
+/// The `LMFeedCommentList` widget ensures that the comments are displayed
+/// in a visually appealing manner and handles user interactions with the comments.
+/// {@endtemplate}
 class LMFeedCommentList extends StatefulWidget {
   const LMFeedCommentList({
     super.key,
@@ -15,8 +41,10 @@ class LMFeedCommentList extends StatefulWidget {
     this.noMoreItemsIndicatorBuilder,
     this.newPageErrorIndicatorBuilder,
     this.firstPageErrorIndicatorBuilder,
+    this.replyWidgetBuilder,
   });
 
+  /// The ID of the post for which the comments are being displayed.
   final String postId;
 
   /// {@macro post_comment_builder}
@@ -40,8 +68,61 @@ class LMFeedCommentList extends StatefulWidget {
 
   /// Builder for error view while loading a new page
   final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
-  // Builder for error view while loading the first page
+
+  /// Builder for error view while loading the first page
   final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
+
+  /// Builder for reply widget
+  final LMFeedReplyWidgetBuilder? replyWidgetBuilder;
+
+  /// {@template comment_list_widget_copy_with}
+  /// Creates a copy of this `LMFeedCommentList` instance with the given fields
+  /// replaced with new values.
+  ///
+  /// If a field is not provided, the current value of that field in the
+  /// instance will be used.
+  ///
+  /// Parameters:
+  /// - `comments` (optional): A new list of comments to replace the current list.
+  /// - `hasMore` (optional): A boolean indicating if there are more comments to load.
+  ///
+  /// Returns:
+  /// A new `LMFeedCommentList` instance with the updated values.
+  /// {@endtemplate}
+  LMFeedCommentList copyWith({
+    String? postId,
+    LMFeedPostCommentBuilder? commentBuilder,
+    Widget Function(BuildContext)? commentSeparatorBuilder,
+    LMFeedWidgetSource? widgetSource,
+    LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder,
+    LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder,
+    LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder,
+    LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder,
+    LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder,
+    LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder,
+    LMFeedReplyWidgetBuilder? replyWidgetBuilder,
+  }) {
+    return LMFeedCommentList(
+      postId: postId ?? this.postId,
+      commentBuilder: commentBuilder ?? this.commentBuilder,
+      commentSeparatorBuilder:
+          commentSeparatorBuilder ?? this.commentSeparatorBuilder,
+      widgetSource: widgetSource ?? this.widgetSource,
+      noItemsFoundIndicatorBuilder:
+          noItemsFoundIndicatorBuilder ?? this.noItemsFoundIndicatorBuilder,
+      firstPageProgressIndicatorBuilder: firstPageProgressIndicatorBuilder ??
+          this.firstPageProgressIndicatorBuilder,
+      newPageProgressIndicatorBuilder: newPageProgressIndicatorBuilder ??
+          this.newPageProgressIndicatorBuilder,
+      noMoreItemsIndicatorBuilder:
+          noMoreItemsIndicatorBuilder ?? this.noMoreItemsIndicatorBuilder,
+      newPageErrorIndicatorBuilder:
+          newPageErrorIndicatorBuilder ?? this.newPageErrorIndicatorBuilder,
+      firstPageErrorIndicatorBuilder:
+          firstPageErrorIndicatorBuilder ?? this.firstPageErrorIndicatorBuilder,
+      replyWidgetBuilder: replyWidgetBuilder ?? this.replyWidgetBuilder,
+    );
+  }
 
   @override
   State<LMFeedCommentList> createState() => _LMFeedCommentListState();
@@ -175,14 +256,11 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                                   _postViewData!);
                         },
                       ),
-                      LMFeedCommentReplyWidget(
-                        commentBuilder: widget.commentBuilder ??
-                            LMFeedCore.widgetUtility.commentBuilder,
-                        post: _postViewData!,
-                        postId: widget.postId,
-                        comment: commentViewData,
-                        user: userViewData,
-                      )
+                      widget.replyWidgetBuilder?.call(
+                              context,
+                              _defCommentReplyWidget(
+                                  commentViewData, userViewData)) ??
+                          _defCommentReplyWidget(commentViewData, userViewData)
                     ],
                   ),
                 );
@@ -196,6 +274,18 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                 ),
           );
         });
+  }
+
+  LMFeedCommentReplyWidget _defCommentReplyWidget(
+      LMCommentViewData commentViewData, LMUserViewData userViewData) {
+    return LMFeedCommentReplyWidget(
+      commentBuilder:
+          widget.commentBuilder ?? LMFeedCore.widgetUtility.commentBuilder,
+      post: _postViewData!,
+      postId: widget.postId,
+      comment: commentViewData,
+      user: userViewData,
+    );
   }
 
   bool _handleBuildWhen(previous, current) {
@@ -498,9 +588,9 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   }
 
   LMFeedButton defCommentShowRepliesButton(LMCommentViewData commentViewData) {
+    bool isReplyShown = showReplyCommentIds.contains(commentViewData.id);
     return LMFeedButton(
       onTap: () {
-        bool isReplyShown = showReplyCommentIds.contains(commentViewData.id);
         isReplyShown
             ? _commentBloc
                 .add(LMFeedCloseReplyEvent(commentId: commentViewData.id))
@@ -513,6 +603,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                 ),
               );
       },
+      isActive: isReplyShown,
       text: LMFeedText(
         text:
             "${commentViewData.repliesCount} ${commentViewData.repliesCount > 1 ? 'Replies' : 'Reply'}",
