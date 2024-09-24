@@ -137,19 +137,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
             ),
             if (state is LMFeedGetReplyCommentPaginationLoadingState)
               if (state.commentId == widget.comment.id)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 30.0),
-                    child: SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: LMFeedLoader(
-                        style: feedTheme.loaderStyle,
-                      ),
-                    ),
-                  ),
-                ),
+                widget.loaderBuilder?.call(context) ?? _defLoaderWidget(),
             if ((comment?.replies?.isNotEmpty ?? false) &&
                 (comment?.replies?.length ?? 0) < comment!.repliesCount)
               Container(
