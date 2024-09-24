@@ -10,6 +10,8 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
 
   final LMFeedPostCommentBuilder? commentBuilder;
 
+  final LMFeedLoaderBuilder? loaderBuilder;
+
   final LMPostViewData post;
 
   const LMFeedCommentReplyWidget({
@@ -20,6 +22,7 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
     this.style,
     this.commentBuilder,
     required this.post,
+    this.loaderBuilder,
   }) : super(key: key);
 
   @override
@@ -32,6 +35,7 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
     LMFeedCommentStyle? style,
     LMFeedPostCommentBuilder? commentBuilder,
     LMPostViewData? post,
+    LMFeedLoaderBuilder? loaderBuilder,
   }) {
     return LMFeedCommentReplyWidget(
       postId: postId ?? this.postId,
@@ -40,6 +44,7 @@ class LMFeedCommentReplyWidget extends StatefulWidget {
       style: style ?? this.style,
       commentBuilder: commentBuilder ?? this.commentBuilder,
       post: post ?? this.post,
+      loaderBuilder: loaderBuilder ?? this.loaderBuilder,
     );
   }
 }
@@ -102,17 +107,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       builder: ((context, state) {
         if (state is LMFeedGetReplyCommentLoadingState) {
           if (state.commentId == widget.comment.id) {
-            return Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 30.0),
-              child: SizedBox(
-                height: 20,
-                width: 20,
-                child: LMFeedLoader(
-                  style: feedTheme.loaderStyle,
-                ),
-              ),
-            );
+            return widget.loaderBuilder?.call(context) ?? _defLoaderWidget();
           }
         }
         return Column(
@@ -201,6 +196,15 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
         );
       }),
       listener: _handleListener,
+    );
+  }
+
+  LMFeedLoader _defLoaderWidget() {
+    return LMFeedLoader(
+      style: feedTheme.loaderStyle.copyWith(
+        height: 20,
+        width: 20,
+      ),
     );
   }
 

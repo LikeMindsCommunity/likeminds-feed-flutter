@@ -57,3 +57,10 @@ typedef LMFeedCustomWidgetBuilder = Widget Function(
 /// {@endtemplate}
 typedef LMFeedReplyWidgetBuilder = Widget Function(
     BuildContext context, LMFeedCommentReplyWidget replyWidget);
+
+/// {@template lm_feed_comment_list_builder}
+/// Comment list builder function for [LMFeedCommentList]
+/// Takes [BuildContext] and [LMFeedCommentList] as parameters and returns [Widget]
+/// {@endtemplate}
+typedef LMFeedCommentListBuilder = Widget Function(
+    BuildContext context, LMFeedCommentList commentListWidget);
