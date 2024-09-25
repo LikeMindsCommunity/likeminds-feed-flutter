@@ -17,7 +17,7 @@ class LMFeedUserMetaBloc
 
   static LMFeedUserMetaBloc get instance =>
       _instance == null || _instance!.isClosed
-          ? LMFeedUserMetaBloc._()
+          ? _instance = LMFeedUserMetaBloc._()
           : _instance!;
 
   LMFeedUserMetaBloc._() : super(LMFeedUserMetaInitialState()) {

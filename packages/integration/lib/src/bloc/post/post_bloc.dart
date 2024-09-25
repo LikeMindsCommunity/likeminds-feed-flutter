@@ -29,7 +29,7 @@ class LMFeedPostBloc extends Bloc<LMFeedPostEvents, LMFeedPostState> {
 
   static LMFeedPostBloc get instance =>
       _lmPostBloc == null || _lmPostBloc!.isClosed
-          ? LMFeedPostBloc._()
+          ? _lmPostBloc = LMFeedPostBloc._()
           : _lmPostBloc!;
 
   LMFeedPostBloc._() : super(LMFeedNewPostInitiateState()) {

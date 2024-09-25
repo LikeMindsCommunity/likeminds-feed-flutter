@@ -19,7 +19,7 @@ class LMFeedProfileBloc extends Bloc<LMFeedProfileEvent, LMFeedProfileState> {
 
   static LMFeedProfileBloc get instance =>
       _lmProfileBloc == null || _lmProfileBloc!.isClosed
-          ? LMFeedProfileBloc._()
+          ? _lmProfileBloc = LMFeedProfileBloc._()
           : _lmProfileBloc!;
 
   LMFeedProfileBloc._() : super(LMFeedProfileStateInitState()) {

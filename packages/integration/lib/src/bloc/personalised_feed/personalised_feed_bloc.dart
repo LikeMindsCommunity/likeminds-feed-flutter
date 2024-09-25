@@ -18,7 +18,7 @@ class LMFeedPersonalisedBloc
   static LMFeedPersonalisedBloc? _instance;
   static LMFeedPersonalisedBloc get instance =>
       _instance == null || _instance!.isClosed
-          ? LMFeedPersonalisedBloc._()
+          ? _instance = LMFeedPersonalisedBloc._()
           : _instance!;
 
   final HashSet<String> seenPost = HashSet<String>();

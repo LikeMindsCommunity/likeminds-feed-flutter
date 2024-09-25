@@ -17,7 +17,7 @@ class LMFeedRoomBloc extends Bloc<LMFeedRoomEvent, LMFeedRoomState> {
   static LMFeedRoomBloc? _instance;
 
   static LMFeedRoomBloc get instance => _instance == null || _instance!.isClosed
-      ? LMFeedRoomBloc._()
+      ? _instance = LMFeedRoomBloc._()
       : _instance!;
 
   LMFeedRoomBloc._() : super(LMFeedRoomInitialState()) {
