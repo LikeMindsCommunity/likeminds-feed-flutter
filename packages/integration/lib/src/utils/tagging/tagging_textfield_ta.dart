@@ -3,18 +3,40 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/flutter_typeahead.dart';
 
+/// A widget that provides a text field with tagging functionality.
+/// It allows users to tag other users by typing "@" followed by the user's name.
 class LMTaggingAheadTextField extends StatefulWidget {
+  /// Determines the direction of the suggestions box.
   final bool isDown;
+
+  /// The focus node for the text field.
   final FocusNode focusNode;
+
+  /// A list of user tags to be displayed as suggestions.
   final List<LMUserTagViewData>? userTags;
+
+  /// Callback function when a tag is selected.
   final Function(LMUserTagViewData) onTagSelected;
+
+  /// The controller for the text field.
   final TextEditingController controller;
+
+  /// Callback function when the text changes.
   final Function(String)? onChange;
+
+  /// Callback function when editing is complete.
   final VoidCallback? onEditingComplete;
+
+  /// Callback function when the text is submitted.
   final Function(String)? onSubmitted;
+
+  /// Determines if the text field is enabled.
   final bool enabled;
+
+  /// The style for the text field.
   final LMTaggingAheadTextFieldStyle style;
 
+  /// Creates an instance of [LMTaggingAheadTextField].
   const LMTaggingAheadTextField({
     super.key,
     required this.isDown,
@@ -32,6 +54,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
   @override
   State<LMTaggingAheadTextField> createState() => _TaggingAheadTextFieldState();
 
+  /// Creates a copy of this widget but with the given fields replaced with the new values.
   LMTaggingAheadTextField copyWith({
     bool? isDown,
     FocusNode? focusNode,
@@ -57,20 +80,40 @@ class LMTaggingAheadTextField extends StatefulWidget {
   }
 }
 
+/// The state for the [LMTaggingAheadTextField] widget.
 class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
+  /// The controller for the text field.
   late final TextEditingController _controller;
+
+  /// The focus node for the text field.
   FocusNode? _focusNode;
+
+  /// The scroll controller for the suggestions box.
   final ScrollController _scrollController = ScrollController();
+
+  /// The controller for the suggestions box.
   final SuggestionsBoxController _suggestionsBoxController =
       SuggestionsBoxController();
 
+  /// A list of user tags to be displayed as suggestions.
   List<LMUserTagViewData> userTags = [];
 
+  /// The current page number for pagination.
   int page = 1;
+
+  /// The current count of tags.
   int tagCount = 0;
+
+  /// Indicates if tagging is complete.
   bool tagComplete = false;
+
+  /// The current text value of the text field.
   String textValue = "";
+
+  /// The current tag value being typed.
   String tagValue = "";
+
+  /// The fixed size for pagination.
   static const fixedSize = 20;
 
   @override
@@ -87,7 +130,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
     _focusNode = widget.focusNode;
     _controller = widget.controller;
     _scrollController.addListener(() async {
-      // page++;
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         final taggingData =
@@ -105,14 +147,15 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
           userTags.addAll(taggingData.members!
               .map((e) => LMUserTagViewDataConvertor.fromUserTag(e))
               .toList());
-          // return userTags;
         }
       }
     });
   }
 
+  /// Gets the controller for the text field.
   TextEditingController? get controller => _controller;
 
+  /// Fetches suggestions based on the query.
   FutureOr<Iterable<LMUserTagViewData>> _getSuggestions(String query) async {
     String currentText = query;
     try {
@@ -263,7 +306,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         setState(() {
           tagComplete = true;
           tagCount = '@'.allMatches(_controller.text).length;
-          // _controller.text.substring(_controller.text.lastIndexOf('@'));
           if (textValue.length > 2 &&
               textValue.substring(textValue.length - 1) == '~') {
             textValue += " @${suggestion.name!}~";
@@ -284,7 +326,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
   }
 }
 
+/// Extension on [String] to find the nth occurrence of a substring.
 extension NthOccurrenceOfSubstring on String {
+  /// Finds the index of the nth occurrence of [stringToFind].
   int nThIndexOf(String stringToFind, int n) {
     if (indexOf(stringToFind) == -1) return -1;
     if (n == 1) return indexOf(stringToFind);
@@ -296,18 +340,30 @@ extension NthOccurrenceOfSubstring on String {
     return subIndex;
   }
 
+  /// Checks if the nth occurrence of [stringToFind] exists.
   bool hasNthOccurrence(String stringToFind, int n) {
     return nThIndexOf(stringToFind, n) != -1;
   }
 }
 
+/// A style class for [LMTaggingAheadTextField].
 class LMTaggingAheadTextFieldStyle {
+  /// The decoration for the text field.
   final InputDecoration? decoration;
+
+  /// The maximum number of lines for the text field.
   final int? maxLines;
+
+  /// The minimum number of lines for the text field.
   final int minLines;
+
+  /// The scroll physics for the suggestions box.
   final ScrollPhysics scrollPhysics;
+
+  /// The text style for the text field.
   final TextStyle textStyle;
 
+  /// Creates an instance of [LMTaggingAheadTextFieldStyle].
   const LMTaggingAheadTextFieldStyle({
     this.decoration,
     this.maxLines,
@@ -317,7 +373,9 @@ class LMTaggingAheadTextFieldStyle {
   });
 }
 
+/// Extension on [LMTaggingAheadTextFieldStyle] to create a copy with modified fields.
 extension LMTaggingAheadTextFieldStyleCopyWith on LMTaggingAheadTextFieldStyle {
+  /// Creates a copy of this style but with the given fields replaced with the new values.
   LMTaggingAheadTextFieldStyle copyWith({
     InputDecoration? decoration,
     int? maxLines,

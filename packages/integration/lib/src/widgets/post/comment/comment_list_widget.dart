@@ -3,30 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 /// {@template lm_feed_comment_list}
-/// A widget that displays a list of comments in a feed.
+/// A widget that displays a list of comments for a specific post.
 ///
-/// The `LMFeedCommentList` widget takes a list of comments and displays them
-/// in a scrollable list. Each comment is represented by a `Comment` object.
+/// The `LMFeedCommentList` widget is responsible for rendering comments associated
+/// with a particular post. It provides various customization options through
+/// builder functions to tailor the appearance and behavior of the comment list.
 ///
-/// This widget is typically used in a social media feed or any application
-/// where user comments are displayed.
-///
-/// Example usage:
-/// ```dart
-/// LMFeedCommentList(
-///   comments: [
-///     Comment(author: 'User1', content: 'This is a comment'),
-///     Comment(author: 'User2', content: 'This is another comment'),
-///   ],
-/// )
-/// ```
-///
-/// Properties:
-/// - `comments`: A list of `Comment` objects to be displayed.
-/// - `onCommentTap`: A callback function that is called when a comment is tapped.
-///
-/// The `LMFeedCommentList` widget ensures that the comments are displayed
-/// in a visually appealing manner and handles user interactions with the comments.
 /// {@endtemplate}
 class LMFeedCommentList extends StatefulWidget {
   const LMFeedCommentList({
@@ -52,6 +34,8 @@ class LMFeedCommentList extends StatefulWidget {
 
   /// Builder for comment separator
   final Widget Function(BuildContext)? commentSeparatorBuilder;
+
+  /// Defines the source of caller of this class
   final LMFeedWidgetSource widgetSource;
 
   /// Builder for empty feed view
@@ -81,10 +65,6 @@ class LMFeedCommentList extends StatefulWidget {
   ///
   /// If a field is not provided, the current value of that field in the
   /// instance will be used.
-  ///
-  /// Parameters:
-  /// - `comments` (optional): A new list of comments to replace the current list.
-  /// - `hasMore` (optional): A boolean indicating if there are more comments to load.
   ///
   /// Returns:
   /// A new `LMFeedCommentList` instance with the updated values.

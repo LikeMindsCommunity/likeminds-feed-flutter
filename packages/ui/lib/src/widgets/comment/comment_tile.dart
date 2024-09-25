@@ -191,7 +191,9 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
                 ],
               ),
               const Spacer(),
-              widget.menu?.call(_defCommentMenu()) ?? _defCommentMenu()
+              style!.showMenu
+                  ? widget.menu?.call(_defCommentMenu()) ?? _defCommentMenu()
+                  : const SizedBox.shrink(),
             ],
           ),
           Container(
@@ -427,6 +429,7 @@ class LMFeedCommentStyle {
   final LMFeedButtonStyle? replyButtonStyle;
   final bool showReplyButton;
   final bool showRepliesButton;
+  final bool showMenu;
   final LMFeedButtonStyle? showRepliesButtonStyle;
 
   final bool? showProfilePicture;
@@ -462,6 +465,7 @@ class LMFeedCommentStyle {
     this.titlePadding,
     this.subtitlePadding,
     this.showTimestamp = true,
+    this.showMenu = true,
     this.expandTextStyle,
     this.expandText,
   });
@@ -490,6 +494,7 @@ class LMFeedCommentStyle {
     bool? showTimestamp,
     TextStyle? expandTextStyle,
     String? expandText,
+    bool? showMenu,
   }) {
     return LMFeedCommentStyle(
       textStyle: textStyle ?? this.textStyle,
@@ -518,6 +523,7 @@ class LMFeedCommentStyle {
       showTimestamp: showTimestamp ?? this.showTimestamp,
       expandText: expandText ?? this.expandText,
       expandTextStyle: expandTextStyle ?? this.expandTextStyle,
+      showMenu: showMenu ?? this.showMenu,
     );
   }
 
