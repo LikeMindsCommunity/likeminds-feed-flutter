@@ -1093,22 +1093,25 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMTaggingAheadTextField _defContentTextField() {
     return LMTaggingAheadTextField(
       isDown: true,
-      minLines: 3,
       enabled: config!.enableTagging,
       // maxLines: 200,
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
-        hintText: config?.composeHint,
-        hintStyle: TextStyle(
-          overflow: TextOverflow.visible,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: feedTheme.onContainer.withOpacity(0.5),
+
+      style: LMTaggingAheadTextFieldStyle(
+        minLines: 3,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          hintText: config?.composeHint,
+          hintStyle: TextStyle(
+            overflow: TextOverflow.visible,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: feedTheme.onContainer.withOpacity(0.5),
+          ),
         ),
       ),
       onTagSelected: (tag) {

@@ -721,7 +721,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
       leading: isCm
           ? LMFeedButton(
               onTap: () {
-                // _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
+                _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
                 _feedBloc.selectedTopics = [];
                 Navigator.pop(context);
               },

@@ -19,7 +19,9 @@ class LMFeedAnalyticsBloc
 
   /// {@macro lm_analytics_bloc}
   static LMFeedAnalyticsBloc get instance =>
-      _lmAnalyticsBloc ??= LMFeedAnalyticsBloc._();
+      _lmAnalyticsBloc == null || _lmAnalyticsBloc!.isClosed
+          ? _lmAnalyticsBloc = LMFeedAnalyticsBloc._()
+          : _lmAnalyticsBloc!;
 
   LMFeedAnalyticsBloc._() : super(LMFeedAnalyticsInitiated()) {
     on<LMFeedFireAnalyticsEvent>(fireAnalyticsEventHandler);

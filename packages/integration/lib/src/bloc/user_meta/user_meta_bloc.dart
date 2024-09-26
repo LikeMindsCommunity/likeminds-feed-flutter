@@ -14,8 +14,12 @@ part 'handler/update_user_meta_event_handler.dart';
 class LMFeedUserMetaBloc
     extends Bloc<LMFeedUserMetaEvent, LMFeedUserMetaState> {
   static LMFeedUserMetaBloc? _instance;
+
   static LMFeedUserMetaBloc get instance =>
-      _instance ??= LMFeedUserMetaBloc._();
+      _instance == null || _instance!.isClosed
+          ? _instance = LMFeedUserMetaBloc._()
+          : _instance!;
+
   LMFeedUserMetaBloc._() : super(LMFeedUserMetaInitialState()) {
     on<LMFeedUserMetaGetEvent>(getUserMetaEventHandler);
     on<LMFeedUserMetaUpdateEvent>(updateUserMetaEventHandler);
