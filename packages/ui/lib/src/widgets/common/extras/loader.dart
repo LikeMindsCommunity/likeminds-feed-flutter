@@ -16,13 +16,17 @@ class LMFeedLoader extends StatelessWidget {
     LMFeedLoaderStyle style =
         this.style ?? LMFeedTheme.instance.theme.loaderStyle;
     return Center(
-      child: CircularProgressIndicator.adaptive(
-        backgroundColor: style.backgroundColor,
-        valueColor: AlwaysStoppedAnimation<Color>(
-          style.color ??
-              (isPrimary
-                  ? LMFeedTheme.instance.theme.primaryColor
-                  : Colors.white),
+      child: SizedBox(
+        height: style.height,
+        width: style.width,
+        child: CircularProgressIndicator.adaptive(
+          backgroundColor: style.backgroundColor,
+          valueColor: AlwaysStoppedAnimation<Color>(
+            style.color ??
+                (isPrimary
+                    ? LMFeedTheme.instance.theme.primaryColor
+                    : Colors.white),
+          ),
         ),
       ),
     );
@@ -42,19 +46,27 @@ class LMFeedLoader extends StatelessWidget {
 class LMFeedLoaderStyle {
   final Color? color;
   final Color? backgroundColor;
+  final double? height;
+  final double? width;
 
   const LMFeedLoaderStyle({
     this.color,
     this.backgroundColor,
+    this.width,
+    this.height,
   });
 
   LMFeedLoaderStyle copyWith({
     Color? color,
     Color? backgroundColor,
+    double? height,
+    double? width,
   }) {
     return LMFeedLoaderStyle(
       color: color ?? this.color,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      width: width ?? this.width,
+      height: height ?? this.height,
     );
   }
 }

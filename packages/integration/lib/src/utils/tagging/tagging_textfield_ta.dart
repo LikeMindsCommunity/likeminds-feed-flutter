@@ -3,52 +3,65 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/packages/flutter_typeahead/lib/flutter_typeahead.dart';
 
+/// A widget that provides a text field with tagging functionality.
+/// It allows users to tag other users by typing "@" followed by the user's name.
 class LMTaggingAheadTextField extends StatefulWidget {
+  /// Determines the direction of the suggestions box.
   final bool isDown;
-  final FocusNode focusNode;
-  final List<LMUserTagViewData>? userTags;
-  final Function(LMUserTagViewData) onTagSelected;
-  final TextEditingController controller;
-  final InputDecoration? decoration;
-  final Function(String)? onChange;
-  final VoidCallback? onEditingComplete;
-  final Function(String)? onSubmitted;
-  final int? maxLines;
-  final int minLines;
-  final bool enabled;
-  final ScrollPhysics scrollPhysics;
 
+  /// The focus node for the text field.
+  final FocusNode focusNode;
+
+  /// A list of user tags to be displayed as suggestions.
+  final List<LMUserTagViewData>? userTags;
+
+  /// Callback function when a tag is selected.
+  final Function(LMUserTagViewData) onTagSelected;
+
+  /// The controller for the text field.
+  final TextEditingController controller;
+
+  /// Callback function when the text changes.
+  final Function(String)? onChange;
+
+  /// Callback function when editing is complete.
+  final VoidCallback? onEditingComplete;
+
+  /// Callback function when the text is submitted.
+  final Function(String)? onSubmitted;
+
+  /// Determines if the text field is enabled.
+  final bool enabled;
+
+  /// The style for the text field.
+  final LMTaggingAheadTextFieldStyle style;
+
+  /// Creates an instance of [LMTaggingAheadTextField].
   const LMTaggingAheadTextField({
     super.key,
     required this.isDown,
     required this.onTagSelected,
     required this.controller,
     required this.focusNode,
-    this.decoration,
     required this.onChange,
     this.onEditingComplete,
     this.onSubmitted,
-    this.maxLines,
-    this.minLines = 1,
     this.enabled = true,
     this.userTags,
-    this.scrollPhysics = const NeverScrollableScrollPhysics(),
+    this.style = const LMTaggingAheadTextFieldStyle(),
   });
 
   @override
   State<LMTaggingAheadTextField> createState() => _TaggingAheadTextFieldState();
 
+  /// Creates a copy of this widget but with the given fields replaced with the new values.
   LMTaggingAheadTextField copyWith({
     bool? isDown,
     FocusNode? focusNode,
     Function(LMUserTagViewData)? onTagSelected,
     TextEditingController? controller,
-    InputDecoration? decoration,
     Function(String)? onChange,
-    int? maxLines,
-    int? minLines,
     bool? enabled,
-    ScrollPhysics? scrollPhysics,
     List<LMUserTagViewData>? userTags,
     VoidCallback? onEditingComplete,
     Function(String)? onSubmitted,
@@ -58,12 +71,8 @@ class LMTaggingAheadTextField extends StatefulWidget {
       focusNode: focusNode ?? this.focusNode,
       onTagSelected: onTagSelected ?? this.onTagSelected,
       controller: controller ?? this.controller,
-      decoration: decoration ?? this.decoration,
       onChange: onChange ?? this.onChange,
-      maxLines: maxLines ?? this.maxLines,
-      minLines: minLines ?? this.minLines,
       enabled: enabled ?? this.enabled,
-      scrollPhysics: scrollPhysics ?? this.scrollPhysics,
       onEditingComplete: onEditingComplete ?? this.onEditingComplete,
       onSubmitted: onSubmitted ?? this.onSubmitted,
       userTags: userTags ?? this.userTags,
@@ -71,20 +80,40 @@ class LMTaggingAheadTextField extends StatefulWidget {
   }
 }
 
+/// The state for the [LMTaggingAheadTextField] widget.
 class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
+  /// The controller for the text field.
   late final TextEditingController _controller;
+
+  /// The focus node for the text field.
   FocusNode? _focusNode;
+
+  /// The scroll controller for the suggestions box.
   final ScrollController _scrollController = ScrollController();
+
+  /// The controller for the suggestions box.
   final SuggestionsBoxController _suggestionsBoxController =
       SuggestionsBoxController();
 
+  /// A list of user tags to be displayed as suggestions.
   List<LMUserTagViewData> userTags = [];
 
+  /// The current page number for pagination.
   int page = 1;
+
+  /// The current count of tags.
   int tagCount = 0;
+
+  /// Indicates if tagging is complete.
   bool tagComplete = false;
+
+  /// The current text value of the text field.
   String textValue = "";
+
+  /// The current tag value being typed.
   String tagValue = "";
+
+  /// The fixed size for pagination.
   static const fixedSize = 20;
 
   @override
@@ -101,7 +130,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
     _focusNode = widget.focusNode;
     _controller = widget.controller;
     _scrollController.addListener(() async {
-      // page++;
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         final taggingData =
@@ -119,14 +147,15 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
           userTags.addAll(taggingData.members!
               .map((e) => LMUserTagViewDataConvertor.fromUserTag(e))
               .toList());
-          // return userTags;
         }
       }
     });
   }
 
+  /// Gets the controller for the text field.
   TextEditingController? get controller => _controller;
 
+  /// Fetches suggestions based on the query.
   FutureOr<Iterable<LMUserTagViewData>> _getSuggestions(String query) async {
     String currentText = query;
     try {
@@ -172,7 +201,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       onTagTap: (p) {},
       scrollController: _scrollController,
       tagColor: feedTheme.tagColor,
-      scrollPhysics: widget.scrollPhysics,
+      scrollPhysics: widget.style.scrollPhysics,
       suggestionsBoxController: _suggestionsBoxController,
       suggestionsBoxDecoration: SuggestionsBoxDecoration(
         color: feedTheme.container,
@@ -191,10 +220,10 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         textCapitalization: TextCapitalization.sentences,
         controller: _controller,
         focusNode: _focusNode,
-        minLines: widget.minLines,
-        maxLines: widget.maxLines,
-        style: TextStyle(fontWeight: FontWeight.w400),
-        decoration: widget.decoration ??
+        minLines: widget.style.minLines,
+        maxLines: widget.style.maxLines,
+        style: widget.style.textStyle,
+        decoration: widget.style.decoration ??
             const InputDecoration(
               hintText: 'Write something here...',
               border: InputBorder.none,
@@ -277,7 +306,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
         setState(() {
           tagComplete = true;
           tagCount = '@'.allMatches(_controller.text).length;
-          // _controller.text.substring(_controller.text.lastIndexOf('@'));
           if (textValue.length > 2 &&
               textValue.substring(textValue.length - 1) == '~') {
             textValue += " @${suggestion.name!}~";
@@ -298,7 +326,9 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
   }
 }
 
+/// Extension on [String] to find the nth occurrence of a substring.
 extension NthOccurrenceOfSubstring on String {
+  /// Finds the index of the nth occurrence of [stringToFind].
   int nThIndexOf(String stringToFind, int n) {
     if (indexOf(stringToFind) == -1) return -1;
     if (n == 1) return indexOf(stringToFind);
@@ -310,7 +340,55 @@ extension NthOccurrenceOfSubstring on String {
     return subIndex;
   }
 
+  /// Checks if the nth occurrence of [stringToFind] exists.
   bool hasNthOccurrence(String stringToFind, int n) {
     return nThIndexOf(stringToFind, n) != -1;
+  }
+}
+
+/// A style class for [LMTaggingAheadTextField].
+class LMTaggingAheadTextFieldStyle {
+  /// The decoration for the text field.
+  final InputDecoration? decoration;
+
+  /// The maximum number of lines for the text field.
+  final int? maxLines;
+
+  /// The minimum number of lines for the text field.
+  final int minLines;
+
+  /// The scroll physics for the suggestions box.
+  final ScrollPhysics scrollPhysics;
+
+  /// The text style for the text field.
+  final TextStyle textStyle;
+
+  /// Creates an instance of [LMTaggingAheadTextFieldStyle].
+  const LMTaggingAheadTextFieldStyle({
+    this.decoration,
+    this.maxLines,
+    this.minLines = 1,
+    this.scrollPhysics = const NeverScrollableScrollPhysics(),
+    this.textStyle = const TextStyle(fontWeight: FontWeight.w400),
+  });
+}
+
+/// Extension on [LMTaggingAheadTextFieldStyle] to create a copy with modified fields.
+extension LMTaggingAheadTextFieldStyleCopyWith on LMTaggingAheadTextFieldStyle {
+  /// Creates a copy of this style but with the given fields replaced with the new values.
+  LMTaggingAheadTextFieldStyle copyWith({
+    InputDecoration? decoration,
+    int? maxLines,
+    int? minLines,
+    ScrollPhysics? scrollPhysics,
+    TextStyle? textStyle,
+  }) {
+    return LMTaggingAheadTextFieldStyle(
+      decoration: decoration ?? this.decoration,
+      maxLines: maxLines ?? this.maxLines,
+      minLines: minLines ?? this.minLines,
+      scrollPhysics: scrollPhysics ?? this.scrollPhysics,
+      textStyle: textStyle ?? this.textStyle,
+    );
   }
 }

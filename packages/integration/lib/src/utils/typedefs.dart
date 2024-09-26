@@ -50,3 +50,17 @@ typedef LMFeedTileBuilder = Widget Function(BuildContext, LMFeedTile);
 /// {@endtemplate}
 typedef LMFeedCustomWidgetBuilder = Widget Function(
     BuildContext context, LMFeedPostSomething postSomethingWidget);
+
+/// {@template lm_feed_reply_widget_builder}
+/// Reply widget builder function for [LMFeedCommentReplyWidget]
+/// Takes [BuildContext] and [LMFeedCommentReplyWidget] as parameters and returns [Widget]
+/// {@endtemplate}
+typedef LMFeedReplyWidgetBuilder = Widget Function(
+    BuildContext context, LMFeedCommentReplyWidget replyWidget);
+
+/// {@template lm_feed_comment_list_builder}
+/// Comment list builder function for [LMFeedCommentList]
+/// Takes [BuildContext] and [LMFeedCommentList] as parameters and returns [Widget]
+/// {@endtemplate}
+typedef LMFeedCommentListBuilder = Widget Function(
+    BuildContext context, LMFeedCommentList commentListWidget);

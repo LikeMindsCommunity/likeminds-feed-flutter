@@ -5,7 +5,8 @@ import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 /// {@template post_header_builder}
 /// Builder function to build the post header.
 /// i.e. user image, name, time, menu button
-/// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
+/// must return a widget, takes in [BuildContext], [LMFeedPostHeader],
+///  and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostHeaderBuilder = Widget Function(
     BuildContext, LMFeedPostHeader, LMPostViewData);
@@ -13,7 +14,8 @@ typedef LMFeedPostHeaderBuilder = Widget Function(
 /// {@template post_footer_builder}
 /// Builder function to build the post footer.
 /// i.e. like, comment, share, save buttons
-/// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
+/// must return a widget, takes in [BuildContext], [LMFeedPostFooter],
+/// and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostFooterBuilder = Widget Function(
     BuildContext, LMFeedPostFooter, LMPostViewData);
@@ -21,43 +23,48 @@ typedef LMFeedPostFooterBuilder = Widget Function(
 /// {@template post_menu_builder}
 /// Builder function to build the post widget.
 /// i.e. edit, delete, report, pin etc.
-/// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
+/// must return a widget, takes in [BuildContext], [LMFeedMenu],
+/// and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostMenuBuilder = Widget Function(
     BuildContext, LMFeedMenu, LMPostViewData);
 
 /// {@template post_topic_builder}
 /// Builder function to build the topic widget.
-/// must return a widget, takes in [BuildContext]
-/// and [LMTopicViewData] as params
+/// must return a widget, takes in [BuildContext], [LMFeedPostTopic],
+/// and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostTopicBuilder = Widget Function(
     BuildContext, LMFeedPostTopic, LMPostViewData);
 
 /// {@template post_media_builder}
 /// Builder function to build the post widget.
-/// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
+/// must return a widget, takes in [BuildContext], [LMFeedPostMedia],
+/// and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostMediaBuilder = Widget Function(
     BuildContext, LMFeedPostMedia, LMPostViewData);
 
 /// {@template post_content_builder}
 /// Builder function to build the post widget.
-/// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
+/// must return a widget, takes in [BuildContext], [LMFeedPostContent],
+/// and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostContentBuilder = Widget Function(
     BuildContext, LMFeedPostContent, LMPostViewData);
 
 /// {@template post_review_banner_builder}
 /// Builder function to build the post widget review banner.
-/// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
+/// must return a widget, takes in [BuildContext], [LMFeedPostReviewBanner],
+/// and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostReviewBannerBuilder = Widget Function(
     BuildContext, LMFeedPostReviewBanner, LMPostViewData);
 
 /// {@template post_widget_builder}
 /// Builder function to build the post widget.
-/// must return a widget, takes in [BuildContext] and [LMPostViewData] as params
+/// must return a widget, takes in [BuildContext], [LMFeedPostWidget],
+/// and [LMPostViewData] as params
 /// {@endtemplate}
 typedef LMFeedPostWidgetBuilder = Widget Function(
     BuildContext, LMFeedPostWidget, LMPostViewData);
@@ -76,27 +83,28 @@ typedef LMFeedVideoBuilder = Widget Function(LMFeedVideo);
 
 /// {@template feed_poll_builder}
 /// Builder function to build the poll widget.
-/// must return a widget, takes in [LMFeedPoll] as params
+/// must return a widget, takes in [BuildContext] and [LMFeedPoll] as params
 /// {@endtemplate}
 typedef LMFeedPollBuilder = Widget Function(BuildContext, LMFeedPoll);
 
 /// {@template feed_carousel_indicator_builder}
 /// Builder function to build the carousel indicator widget.
-/// must return a widget, takes in [int] as params
+/// must return a widget, takes in [BuildContext], [int], [int],
+/// and [Widget] as params
 /// [int] is the current index of the carousel
 /// {@endtemplate}
 typedef LMFeedCarouselIndicatorBuilder = Widget Function(
     BuildContext, int, int, Widget);
 
-///{@template post_callback}
+/// {@template post_callback}
 /// A callback to handle interactions with the post.
 /// {@endtemplate}
 typedef LMFeedOnPostTap = void Function(BuildContext, LMPostViewData);
 
-///{@template post_appbar_builder}
+/// {@template post_appbar_builder}
 /// Builder function to build the post appbar.
 /// must return a PreferredSizeWidget,
-/// takes in [BuildContext] and [LMPostViewData] as params.
+/// takes in [BuildContext] and [LMFeedAppBar] as params.
 /// {@endtemplate}
 typedef LMFeedPostAppBarBuilder = PreferredSizeWidget Function(
     BuildContext, LMFeedAppBar);
@@ -104,11 +112,16 @@ typedef LMFeedPostAppBarBuilder = PreferredSizeWidget Function(
 /// {@template post_comment_builder}
 /// Builder function to build the post comment.
 /// must return a widget,
-/// takes in [BuildContext], [LMUserViewData] and [LMCommentViewData] as params.
+/// takes in [BuildContext], [LMFeedCommentWidget],
+/// and [LMPostViewData] as params.
 /// {@endtemplate}
 typedef LMFeedPostCommentBuilder = Widget Function(
     BuildContext, LMFeedCommentWidget, LMPostViewData);
 
+/// {@template feed_topic_bar_builder}
+/// Builder function to build the topic bar widget.
+/// must return a widget, takes in [LMFeedTopicBar] as params
+/// {@endtemplate}
 typedef LMFeedTopicBarBuilder = Widget Function(LMFeedTopicBar topicBar);
 
 /// {@template feed_error_handler}
@@ -127,6 +140,11 @@ typedef LMFeedOnTagTap = void Function(String);
 /// {@endtemplate}
 typedef LMFeedButtonBuilder = Widget Function(LMFeedButton);
 
+/// {@template feed_room_tile_builder}
+/// Builder function to build the room tile widget.
+/// must return a widget, takes in [BuildContext], [LMFeedRoomViewData],
+/// and [LMFeedTile] as params
+/// {@endtemplate}
 typedef LMFeedRoomTileBuilder = Widget Function(
   BuildContext context,
   LMFeedRoomViewData viewData,
@@ -135,14 +153,14 @@ typedef LMFeedRoomTileBuilder = Widget Function(
 
 /// {@template lm_feed_text_builder}
 /// Builder function to build the text widget.
-/// must return a widget, takes in [BuildContext], [LMFeedText] as params
+/// must return a widget, takes in [BuildContext] and [LMFeedText] as params
 /// {@endtemplate}
 typedef LMFeedTextBuilder = Widget Function(BuildContext, LMFeedText);
 
 /// {@template lm_feed_profile_picture_builder}
 /// Builder function to build the profile picture widget.
-/// must return a widget, takes in [BuildContext], [LMFeedProfilePicture]
-/// as params
+/// must return a widget, takes in [BuildContext]
+/// and [LMFeedProfilePicture] as params
 /// {@endtemplate}
 typedef LMFeedProfilePictureBuilder = Widget Function(
   BuildContext context,
@@ -156,3 +174,9 @@ typedef LMFeedProfilePictureBuilder = Widget Function(
 typedef LMFeedContextBuilder = Widget Function(
   BuildContext context,
 );
+
+/// {@template lm_feed_loader_builder}
+/// Builder function to build the loader widget.
+/// must return a widget, takes in [BuildContext] and [LMFeedLoader] as params
+/// {@endtemplate}
+typedef LMFeedLoaderBuilder = Widget Function(BuildContext context);

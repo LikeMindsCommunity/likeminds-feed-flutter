@@ -15,7 +15,6 @@ class LMFeedBottomTextField extends StatefulWidget {
     this.profilePictureBuilder,
     this.createButtonBuilder,
     this.bannerBuilder,
-    this.inputDecoration,
   });
 
   /// [postId] is the id of the post for which the comment is to be added.
@@ -33,8 +32,6 @@ class LMFeedBottomTextField extends StatefulWidget {
 
   /// [style] is the style of the bottom text field.
   final LMFeedBottomTextFieldStyle? style;
-
-  final InputDecoration? Function(InputDecoration?)? inputDecoration;
 
   /// [profilePictureBuilder] is the builder for the profile picture.
   /// If not provided, the default profile picture will be used.
@@ -64,8 +61,8 @@ class LMFeedBottomTextField extends StatefulWidget {
       LMFeedBottomTextFieldStyle? style,
       LMFeedProfilePictureBuilder? profilePictureBuilder,
       LMFeedButtonBuilder? createButtonBuilder,
-      Widget Function(BuildContext, LMFeedBottomTextFieldBanner)? bannerBuilder,
-      InputDecoration? Function(InputDecoration?)? inputDecoration}) {
+      Widget Function(BuildContext, LMFeedBottomTextFieldBanner)?
+          bannerBuilder}) {
     return LMFeedBottomTextField(
       postId: postId ?? this.postId,
       focusNode: focusNode ?? this.focusNode,
@@ -75,7 +72,6 @@ class LMFeedBottomTextField extends StatefulWidget {
           profilePictureBuilder ?? this.profilePictureBuilder,
       createButtonBuilder: createButtonBuilder ?? this.createButtonBuilder,
       bannerBuilder: bannerBuilder ?? this.bannerBuilder,
-      inputDecoration: inputDecoration ?? this.inputDecoration,
     );
   }
 
@@ -187,17 +183,22 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                     LMTaggingAheadTextField(
                       isDown: false,
                       enabled: LMFeedCore.config.composeConfig.enableTagging,
-                      maxLines: 5,
+                      style: LMTaggingAheadTextFieldStyle(
+                        maxLines: _style?.maxLines,
+                        textStyle: _style?.textStyle ??
+                            TextStyle(fontWeight: FontWeight.w400),
+                        minLines: _style?.minLines ?? 1,
+                        decoration: _style?.inputDecoration
+                                ?.call(_defInputDecoration()) ??
+                            _defInputDecoration(),
+                        scrollPhysics: const AlwaysScrollableScrollPhysics(),
+                      ),
                       onTagSelected: (tag) {
                         _commentBloc.userTags.add(tag);
                       },
                       onSubmitted: (_) => handleCreateCommentButtonAction(),
                       controller: _commentController,
-                      decoration:
-                          widget.inputDecoration?.call(_defInputDecoration()) ??
-                              _defInputDecoration(),
                       onChange: (String p0) {},
-                      scrollPhysics: const AlwaysScrollableScrollPhysics(),
                       focusNode: _commentFocusNode,
                     ),
                   ],
@@ -364,6 +365,10 @@ class LMFeedBottomTextFieldStyle {
   BoxDecoration? boxDecoration;
   EdgeInsets? padding;
   EdgeInsets? margin;
+  int maxLines;
+  int minLines;
+  TextStyle? textStyle;
+  final InputDecoration? Function(InputDecoration?)? inputDecoration;
   bool? showPrefixIcon;
   bool? showSuffixIcon;
 
@@ -372,8 +377,12 @@ class LMFeedBottomTextFieldStyle {
     this.boxDecoration,
     this.padding,
     this.margin,
+    this.textStyle,
+    this.inputDecoration,
     this.showPrefixIcon,
     this.showSuffixIcon,
+    this.maxLines = 5,
+    this.minLines = 1,
   });
 
   LMFeedBottomTextFieldStyle copyWith({
@@ -383,6 +392,10 @@ class LMFeedBottomTextFieldStyle {
     EdgeInsets? margin,
     bool? showPrefixIcon,
     bool? showSuffixIcon,
+    TextStyle? textStyle,
+    InputDecoration? Function(InputDecoration?)? inputDecoration,
+    int? maxLines,
+    int? minLines,
   }) {
     return LMFeedBottomTextFieldStyle(
       constraints: constraints ?? this.constraints,
@@ -391,6 +404,10 @@ class LMFeedBottomTextFieldStyle {
       margin: margin ?? this.margin,
       showPrefixIcon: showPrefixIcon ?? this.showPrefixIcon,
       showSuffixIcon: showSuffixIcon ?? this.showSuffixIcon,
+      textStyle: textStyle ?? this.textStyle,
+      inputDecoration: inputDecoration ?? this.inputDecoration,
+      maxLines: maxLines ?? this.maxLines,
+      minLines: minLines ?? this.minLines,
     );
   }
 

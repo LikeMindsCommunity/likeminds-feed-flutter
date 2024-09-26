@@ -959,19 +959,20 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                     ),
                     child: LMTaggingAheadTextField(
                       isDown: true,
-                      minLines: 3,
+                      style: LMTaggingAheadTextFieldStyle(
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          hintText: config?.composeHint,
+                        ),
+                        minLines: 3,
+                      ),
                       enabled: config!.enableTagging,
                       userTags: composeBloc.userTags,
-                      // maxLines: 200,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        focusedErrorBorder: InputBorder.none,
-                        hintText: config?.composeHint,
-                      ),
                       onTagSelected: (tag) {
                         composeBloc.userTags.add(tag);
                         LMFeedAnalyticsBloc.instance.add(

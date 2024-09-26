@@ -29,6 +29,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
     this.onCommentClick,
     this.openKeyboard = false,
     this.config,
+    this.commentListBuilder,
   });
   // Required variables
   final String postId;
@@ -49,6 +50,9 @@ class LMFeedPostDetailScreen extends StatefulWidget {
   /// {@macro post_comment_builder}
   final LMFeedPostCommentBuilder? commentBuilder;
 
+  /// {@macro lm_feed_comment_list_builder}
+  final LMFeedCommentListBuilder? commentListBuilder;
+
   final Widget Function(
     BuildContext,
     LMFeedBottomTextField,
@@ -61,6 +65,40 @@ class LMFeedPostDetailScreen extends StatefulWidget {
   final bool openKeyboard;
 
   final LMPostDetailScreenConfig? config;
+
+  LMFeedPostDetailScreen copyWith({
+    String? postId,
+    Function()? onPostTap,
+    Function()? onLikeClick,
+    Function()? onCommentClick,
+    LMFeedPostWidgetBuilder? postBuilder,
+    LMFeedPostAppBarBuilder? appBarBuilder,
+    LMFeedPostCommentBuilder? commentBuilder,
+    LMFeedCommentListBuilder? commentListBuilder,
+    Widget Function(BuildContext, LMFeedBottomTextField, TextEditingController,
+            FocusNode)?
+        bottomTextFieldBuilder,
+    Widget Function(BuildContext)? commentSeparatorBuilder,
+    bool? openKeyboard,
+    LMPostDetailScreenConfig? config,
+  }) {
+    return LMFeedPostDetailScreen(
+      postId: postId ?? this.postId,
+      onPostTap: onPostTap ?? this.onPostTap,
+      onLikeClick: onLikeClick ?? this.onLikeClick,
+      onCommentClick: onCommentClick ?? this.onCommentClick,
+      postBuilder: postBuilder ?? this.postBuilder,
+      appBarBuilder: appBarBuilder ?? this.appBarBuilder,
+      commentBuilder: commentBuilder ?? this.commentBuilder,
+      commentListBuilder: commentListBuilder ?? this.commentListBuilder,
+      bottomTextFieldBuilder:
+          bottomTextFieldBuilder ?? this.bottomTextFieldBuilder,
+      commentSeparatorBuilder:
+          commentSeparatorBuilder ?? this.commentSeparatorBuilder,
+      openKeyboard: openKeyboard ?? this.openKeyboard,
+      config: config ?? this.config,
+    );
+  }
 
   @override
   State<LMFeedPostDetailScreen> createState() => _LMFeedPostDetailScreenState();
@@ -252,13 +290,9 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               ),
                             ),
                             _defCommentsCount(),
-                            LMFeedCommentList(
-                              postId: widget.postId,
-                              commentBuilder: widget.commentBuilder,
-                              commentSeparatorBuilder:
-                                  widget.commentSeparatorBuilder,
-                              widgetSource: _widgetSource,
-                            ),
+                            widget.commentListBuilder
+                                    ?.call(context, _defCommentList()) ??
+                                _defCommentList(),
                             const SliverToBoxAdapter(
                               child: SizedBox(
                                 height: 100,
@@ -271,6 +305,15 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
               }),
         ),
       ),
+    );
+  }
+
+  LMFeedCommentList _defCommentList() {
+    return LMFeedCommentList(
+      postId: widget.postId,
+      commentBuilder: widget.commentBuilder,
+      commentSeparatorBuilder: widget.commentSeparatorBuilder,
+      widgetSource: _widgetSource,
     );
   }
 
