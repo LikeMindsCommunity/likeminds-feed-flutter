@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.2]
+
+- Added customisations in Bottom Text Field in LMPostDetailScreen
+- Fixing minor bugs and UI improvments
+
 ## [1.9.1]
 
 - Added customisation in LMFeedComposeScreen's appbar builder
