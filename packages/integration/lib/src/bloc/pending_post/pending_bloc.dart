@@ -11,7 +11,10 @@ class LMFeedPendingBloc extends Bloc<LMFeedPendingEvents, LMFeedPendingState> {
   static LMFeedPendingBloc? _instance;
 
   /// Returns the singleton instance of [LMFeedPendingBloc].
-  static LMFeedPendingBloc get instance => _instance ??= LMFeedPendingBloc._();
+  static LMFeedPendingBloc get instance =>
+      _instance == null || _instance!.isClosed
+          ? _instance = LMFeedPendingBloc._()
+          : _instance!;
 
   /// Private constructor for [LMFeedPendingBloc].
   /// Initializes the bloc with [LMFeedPendingInitialState] as the initial state.
