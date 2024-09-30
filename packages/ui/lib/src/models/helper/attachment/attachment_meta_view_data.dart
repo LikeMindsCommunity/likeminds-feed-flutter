@@ -2,35 +2,100 @@
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
+/// {@template lm_feed_attachment_meta_view_data}
+/// A class representing the metadata for an attachment.
+///
+/// This class contains various properties that describe the metadata
+/// of an attachment,
+/// such as its URL, path, format, size, duration, and more.
+/// It also includes information related to polls, reposts, and other metadata.
+/// {@endtemplate}
 class LMAttachmentMetaViewData {
+  /// The URL of the attachment.
   String? url;
+
+  /// The local path of the attachment.
   String? path;
+
+  /// The bytes of the attachment.
   Uint8List? bytes;
+
+  /// The URL of the thumbnail for the attachment.
+  String? thumbnailUrl;
+
+  /// The format of the attachment.
   String? format;
+
+  /// The size of the attachment in bytes.
   int? size;
+
+  /// The duration of the attachment in seconds.
   int? duration;
+
+  /// The number of pages in the attachment (if applicable).
   int? pageCount;
+
+  /// The Open Graph tags associated with the attachment.
   LMOgTagsViewData? ogTags;
+
+  /// The height of the attachment.
   int? height;
+
+  /// The width of the attachment.
   int? width;
+
+  /// The aspect ratio of the attachment.
   double? aspectRatio;
+
+  /// The repost data associated with the attachment.
   LMPostViewData? repost;
+
+  /// Additional metadata for the attachment.
   Map<String, dynamic>? meta;
+
+  /// The unique identifier for the attachment.
   String? id;
+
+  /// The unique identifier for the post associated with the attachment.
   String? postId;
+
+  /// The post data associated with the attachment.
   LMPostViewData? post;
+
+  /// The poll question associated with the attachment (if applicable).
   String? pollQuestion;
+
+  /// The expiry time of the poll (if applicable).
   int? expiryTime;
+
+  /// The options for the poll (if applicable).
   List<String>? pollOptions;
+
+  /// The multi-select state of the poll (if applicable).
   PollMultiSelectState? multiSelectState;
+
+  /// The type of the poll (if applicable).
   PollType? pollType;
+
+  /// The number of multi-select options allowed in the poll (if applicable).
   int? multiSelectNo;
+
+  /// Whether the poll is anonymous (if applicable).
   bool? isAnonymous;
+
+  /// Whether adding options to the poll is allowed (if applicable).
   bool? allowAddOption;
+
+  /// The options for the poll (if applicable).
   List<LMPollOptionViewData>? options;
+
+  /// Whether to show the poll results (if applicable).
   bool? toShowResult;
+
+  /// The text of the poll answer (if applicable).
   String? pollAnswerText;
 
+  /// Private constructor for the class.
   LMAttachmentMetaViewData._({
     this.url,
     this.path,
@@ -59,6 +124,7 @@ class LMAttachmentMetaViewData {
     this.pollAnswerText,
     this.post,
     this.postId,
+    this.thumbnailUrl,
   });
 
   /// copyWith method
@@ -90,6 +156,7 @@ class LMAttachmentMetaViewData {
     String? pollAnswerText,
     LMPostViewData? post,
     String? postId,
+    String? thumbnailUrl,
   }) {
     return LMAttachmentMetaViewData._(
       url: url ?? this.url,
@@ -119,6 +186,7 @@ class LMAttachmentMetaViewData {
       pollAnswerText: pollAnswerText ?? this.pollAnswerText,
       post: post ?? this.post,
       postId: postId ?? this.postId,
+      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
     );
   }
 
@@ -149,6 +217,7 @@ class LMAttachmentMetaViewData {
     String? pollAnswerText,
     LMPostViewData? post,
     String? postId,
+    String? thumbnailUrl,
   }) {
     return LMAttachmentMetaViewData._(
       bytes: bytes,
@@ -177,6 +246,7 @@ class LMAttachmentMetaViewData {
       pollAnswerText: pollAnswerText,
       post: post,
       postId: postId,
+      thumbnailUrl: thumbnailUrl,
     );
   }
 
@@ -207,6 +277,7 @@ class LMAttachmentMetaViewData {
     String? pollAnswerText,
     LMPostViewData? post,
     String? postId,
+    String? thumbnailUrl,
   }) {
     return LMAttachmentMetaViewData._(
       path: path,
@@ -235,6 +306,7 @@ class LMAttachmentMetaViewData {
       pollAnswerText: pollAnswerText,
       post: post,
       postId: postId,
+      thumbnailUrl: thumbnailUrl,
     );
   }
 
@@ -264,6 +336,7 @@ class LMAttachmentMetaViewData {
     String? pollAnswerText,
     LMPostViewData? post,
     String? postId,
+    String? thumbnailUrl,
   }) {
     return LMAttachmentMetaViewData._(
       url: url,
@@ -291,13 +364,14 @@ class LMAttachmentMetaViewData {
       pollAnswerText: pollAnswerText,
       post: post,
       postId: postId,
+      thumbnailUrl: thumbnailUrl,
     );
   }
 
   @override
   String toString() {
     // ignore: lines_longer_than_80_chars
-    return 'LMAttachmentMetaViewData(url: $url, format: $format, size: $size, duration: $duration, pageCount: $pageCount, ogTags: $ogTags, height: $height, width: $width, aspectRatio: $aspectRatio, meta: $meta, repost: $repost, pollQuestion: $pollQuestion, expiryTime: $expiryTime, pollOptions: $pollOptions, multiSelectState: $multiSelectState, pollType: $pollType, multiSelectNo: $multiSelectNo, isAnonymous: $isAnonymous, allowAddOption: $allowAddOption, options: $options, toShowResult: $toShowResult)';
+    return 'LMAttachmentMetaViewData(url: $url, format: $format, size: $size, duration: $duration, pageCount: $pageCount, ogTags: $ogTags, height: $height, width: $width, aspectRatio: $aspectRatio, meta: $meta, repost: $repost, pollQuestion: $pollQuestion, expiryTime: $expiryTime, pollOptions: $pollOptions, multiSelectState: $multiSelectState, pollType: $pollType, multiSelectNo: $multiSelectNo, isAnonymous: $isAnonymous, allowAddOption: $allowAddOption, options: $options, toShowResult: $toShowResult, pollAnswerText: $pollAnswerText, postId: $postId, post: $post, thumbnailUrl: $thumbnailUrl)';
   }
 }
 
@@ -327,6 +401,7 @@ class LMAttachmentMetaViewDataBuilder {
   String? _pollAnswerText;
   String? _postId;
   LMPostViewData? _post;
+  String? _thumbnailUrl;
 
   void url(String url) {
     _url = url;
@@ -428,6 +503,10 @@ class LMAttachmentMetaViewDataBuilder {
     _post = post;
   }
 
+  void thumbnailUrl(String? thumbnailUrl) {
+    _thumbnailUrl = thumbnailUrl;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -455,6 +534,7 @@ class LMAttachmentMetaViewDataBuilder {
       pollAnswerText: _pollAnswerText,
       postId: _postId,
       post: _post,
+      thumbnailUrl: _thumbnailUrl,
     );
   }
 }

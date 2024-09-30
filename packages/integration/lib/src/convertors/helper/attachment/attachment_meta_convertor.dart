@@ -35,6 +35,9 @@ class LMAttachmentMetaViewDataConvertor {
     if (attachmentMeta.aspectRatio != null) {
       attachmentMetaViewDataBuilder.aspectRatio(attachmentMeta.aspectRatio!);
     }
+    if (attachmentMeta.thumbnailUrl != null) {
+      attachmentMetaViewDataBuilder.thumbnailUrl(attachmentMeta.thumbnailUrl!);
+    }
     if (attachmentMeta.width != null) {
       attachmentMetaViewDataBuilder.width(attachmentMeta.width!);
     }
@@ -117,6 +120,8 @@ class LMAttachmentMetaViewDataConvertor {
       multiSelectNo: attachmentMetaViewData.multiSelectNo,
       isAnonymous: attachmentMetaViewData.isAnonymous,
       allowAddOption: attachmentMetaViewData.allowAddOption,
+      entityId: attachmentMetaViewData.id,
+      thumbnailUrl: attachmentMetaViewData.thumbnailUrl,
     );
   }
 
