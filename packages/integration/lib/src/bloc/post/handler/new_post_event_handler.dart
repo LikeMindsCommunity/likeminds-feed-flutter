@@ -78,6 +78,24 @@ void newPostEventHandler(
           }
 
           if (media.attachmentType == LMMediaType.video) {
+            String? thumbnailURL;
+            String? thumbnailPath = await LMFeedVideoThumbnail.thumbnailFile(
+              video: mediaFile.path,
+              quality: 8,
+            );
+
+            if (thumbnailPath != null) {
+              File thumbnailFile = File(thumbnailPath);
+              final LMResponse<String> response =
+                  await LMFeedMediaService.uploadFile(
+                      thumbnailFile.readAsBytesSync(),
+                      event.user.sdkClientInfo.uuid);
+              if (response.success) {
+                thumbnailURL = response.data;
+                media.attachmentMeta.thumbnailUrl = thumbnailURL;
+              }
+            }
+
             int originalSize = media.attachmentMeta.size!;
 
             if (!kIsWeb) {

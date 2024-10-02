@@ -8,6 +8,28 @@ import 'package:visibility_aware_state/visibility_aware_state.dart';
 import 'package:media_kit_video/media_kit_video_controls/media_kit_video_controls.dart'
     as media_kit_video_controls;
 
+/// {@template lm_feed_video}
+/// A widget that displays a video in a feed post with
+/// customizable controls and styles.
+///
+/// The [LMFeedVideo] widget is a stateful widget that provides video
+/// playback functionality with options for play, pause, and mute buttons.
+/// It also supports auto-play, custom styles, and visibility detection to
+/// pause the video when it is not visible.
+///
+/// The widget requires a [postId] and a [video] asset to be provided.
+/// Optional parameters include custom buttons for play, pause,
+/// and mute actions, a custom style, a callback for media tap events,
+/// a video controller, and an initial playback position.
+///
+/// The widget uses the [VisibilityAwareState] to manage the
+/// visibility of the video and
+/// pause playback when the video is not visible.
+///
+/// The [LMFeedPostVideoStyle] class provides various styling options for the
+/// video, including dimensions, padding, margin, border, and custom widgets
+/// for loader, error, and shimmer states.
+/// {@endtemplate}
 class LMFeedVideo extends StatefulWidget {
   const LMFeedVideo({
     super.key,
@@ -23,21 +45,26 @@ class LMFeedVideo extends StatefulWidget {
     this.autoPlay = false,
   });
 
-  //Video asset variables
+  /// Video asset variables
   final LMAttachmentViewData video;
   final VideoController? videoController;
   final int? position;
 
+  /// Post identifier
   final String postId;
 
+  /// Customizable buttons for video controls
   final LMFeedButton? playButton;
   final LMFeedButton? pauseButton;
   final LMFeedButton? muteButton;
 
+  /// Customizable style for the video widget
   final LMFeedPostVideoStyle? style;
 
+  /// Auto-play functionality
   final bool autoPlay;
 
+  /// Callback for media tap events
   final Function(int)? onMediaTap;
 
   @override
@@ -67,57 +94,108 @@ class LMFeedVideo extends StatefulWidget {
 }
 
 class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
+  // Notifier to rebuild the overlay
   ValueNotifier<bool> rebuildOverlay = ValueNotifier(false);
+
+  // Boolean to track touch state
   bool _onTouch = true;
+
+  // Boolean to track if overlay is initialized
   bool initialiseOverlay = false;
+
+  // Notifier to track mute state
   ValueNotifier<bool>? isMuted;
+
+  // Notifier to track fullscreen state
   ValueNotifier<bool>? isFullscreen;
+
+  // Notifier to rebuild the video
   ValueNotifier<bool> rebuildVideo = ValueNotifier(false);
+
+  // Video controller
   VideoController? controller;
 
+  // Timer for overlay visibility
   Timer? _timer;
 
+  // URL for the video thumbnail
+  String? thumbnailUrl;
+
+  // Style for the video post
   LMFeedPostVideoStyle? style;
 
+  // Future to initialize the video
   Future<void>? initialiseVideo;
 
   @override
   void dispose() async {
+    // Print debug message
     debugPrint("Disposing video");
+
+    // Cancel the timer
     _timer?.cancel();
+
+    // Call the superclass dispose method
     super.dispose();
   }
 
   @override
   void deactivate() async {
+    // Print debug message
     debugPrint("Deactivating video");
+
+    // Cancel the timer
     _timer?.cancel();
+
+    // Pause the video player
     controller?.player.pause();
+
+    // Call the superclass deactivate method
     super.deactivate();
   }
 
   @override
   void initState() {
     super.initState();
+
+    // Set the thumbnail URL if available
+    if (widget.video.attachmentMeta.thumbnailUrl != null) {
+      thumbnailUrl = widget.video.attachmentMeta.thumbnailUrl;
+    }
+
+    // Initialize mute and fullscreen notifiers
     isMuted = LMFeedVideoProvider.instance.isMuted;
     isFullscreen = ValueNotifier(false);
+
+    // Initialize the video controllers
     initialiseVideo = initialiseControllers();
   }
 
   @override
   void didUpdateWidget(LMFeedVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    // Update the thumbnail URL if available
+    if (widget.video.attachmentMeta.thumbnailUrl != null) {
+      thumbnailUrl = widget.video.attachmentMeta.thumbnailUrl;
+    }
+
+    // Update mute notifier
     isMuted = LMFeedVideoProvider.instance.isMuted;
+
+    // Reinitialize the video controllers
     initialiseVideo = initialiseControllers();
   }
 
   @override
   void onVisibilityChanged(WidgetVisibility visibility) {
+    // Pause the video if the widget is not visible
     if (visibility == WidgetVisibility.INVISIBLE) {
       controller?.player.pause();
     } else if (visibility == WidgetVisibility.GONE) {
       controller?.player.pause();
     } else if (visibility == WidgetVisibility.VISIBLE) {
+      // Reinitialize the video controllers if needed
       if (!(controller?.player.platform?.isVideoControllerAttached ?? false)) {
         initialiseVideo = initialiseControllers();
         rebuildVideo.value = !rebuildVideo.value;
@@ -127,16 +205,19 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   }
 
   Future<void> initialiseControllers() async {
+    // Use the provided video controller if available
     if (widget.videoController != null) {
       controller = widget.videoController;
       return;
     }
 
+    // Build the request for the video controller
     LMFeedGetPostVideoControllerRequestBuilder requestBuilder =
         LMFeedGetPostVideoControllerRequestBuilder();
 
     requestBuilder.postId(widget.postId);
 
+    // Set the video source based on the attachment metadata
     if (widget.video.attachmentMeta.url != null) {
       requestBuilder
         ..autoPlay(widget.autoPlay)
@@ -157,13 +238,19 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
         ..position(widget.position ?? 0);
     }
 
+    // Get the video controller from the provider
     controller = await LMFeedVideoProvider.instance
         .videoControllerProvider(requestBuilder.build());
 
+    // Update the current visible post position if needed
     if (widget.position != null && widget.position != 0) {
       LMFeedVideoProvider.instance.currentVisiblePostPosition =
           widget.position!;
     }
+
+    // Wait until the first frame is rendered
+    await controller?.waitUntilFirstFrameRendered;
+    return;
   }
 
   @override
@@ -200,6 +287,19 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
               future: initialiseVideo,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (thumbnailUrl != null) {
+                    return Stack(alignment: Alignment.center, children: [
+                      LMFeedImage(
+                        image: LMAttachmentViewData.fromMediaUrl(
+                          url: thumbnailUrl!,
+                          attachmentType: LMMediaType.image,
+                        ),
+                      ),
+                      const Center(
+                        child: LMFeedLoader(),
+                      ),
+                    ]);
+                  }
                   return style?.shimmerWidget ??
                       LMPostMediaShimmer(
                         style: LMPostMediaShimmerStyle(
@@ -361,7 +461,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                   alignment: Alignment.center,
                   child: TextButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all(
+                      shape: WidgetStateProperty.all(
                         const CircleBorder(
                           side: BorderSide(
                             color: Colors.white,
@@ -421,6 +521,14 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   }
 }
 
+/// {@template lm_feed_post_video_style}
+/// A class representing the style configuration for a video post
+/// in the LM feed.
+///
+/// This class is used to define various styling properties for video posts,
+/// such as dimensions, border radius, and other visual aspects.
+///
+/// {@endtemplate}
 class LMFeedPostVideoStyle {
   // Video structure variables
   final double? height;
