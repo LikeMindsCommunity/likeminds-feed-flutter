@@ -134,7 +134,8 @@ class _LMFeedListState extends State<LMFeedList> {
   Widget build(BuildContext context) {
     return BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
       bloc: _feedBloc,
-      listener: (context, LMFeedUniversalState state) => updatePagingControllers(state),
+      listener: (context, LMFeedUniversalState state) =>
+          updatePagingControllers(state),
       child: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
@@ -531,9 +532,9 @@ class _LMFeedListState extends State<LMFeedList> {
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
-                      (LMAttachmentViewDataBuilder()
+                      (LMAttachmentViewData.builder()
                             ..attachmentType(LMMediaType.repost)
-                            ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                            ..attachmentMeta((LMAttachmentMetaViewData.builder()
                                   ..repost(postViewData))
                                 .build()))
                           .build();

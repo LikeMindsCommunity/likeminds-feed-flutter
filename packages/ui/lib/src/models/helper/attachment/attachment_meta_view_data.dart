@@ -373,6 +373,11 @@ class LMAttachmentMetaViewData {
     // ignore: lines_longer_than_80_chars
     return 'LMAttachmentMetaViewData(url: $url, format: $format, size: $size, duration: $duration, pageCount: $pageCount, ogTags: $ogTags, height: $height, width: $width, aspectRatio: $aspectRatio, meta: $meta, repost: $repost, pollQuestion: $pollQuestion, expiryTime: $expiryTime, pollOptions: $pollOptions, multiSelectState: $multiSelectState, pollType: $pollType, multiSelectNo: $multiSelectNo, isAnonymous: $isAnonymous, allowAddOption: $allowAddOption, options: $options, toShowResult: $toShowResult, pollAnswerText: $pollAnswerText, postId: $postId, post: $post, thumbnailUrl: $thumbnailUrl)';
   }
+
+  /// Returns a new builder instance for [LMAttachmentMetaViewData].
+  static LMAttachmentMetaViewDataBuilder builder() {
+    return LMAttachmentMetaViewDataBuilder();
+  }
 }
 
 class LMAttachmentMetaViewDataBuilder {

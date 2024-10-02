@@ -10,7 +10,7 @@ class LMAttachmentMetaViewDataConvertor {
     required Map<String, LMUserViewData>? users,
   }) {
     LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
-        LMAttachmentMetaViewDataBuilder();
+        LMAttachmentMetaViewData.builder();
     if (attachmentMeta.url != null) {
       attachmentMetaViewDataBuilder.url(attachmentMeta.url!);
     }
@@ -130,7 +130,7 @@ class LMAttachmentMetaViewDataConvertor {
     required Map<String, LMUserViewData> users,
   }) {
     final LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
-        LMAttachmentMetaViewDataBuilder();
+        LMAttachmentMetaViewData.builder();
     attachmentMetaViewDataBuilder.id(widget.id);
     attachmentMetaViewDataBuilder.pollQuestion(widget.metadata['title']);
     attachmentMetaViewDataBuilder.expiryTime(widget.metadata['expiry_time']);

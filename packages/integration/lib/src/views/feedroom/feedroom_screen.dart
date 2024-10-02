@@ -1235,9 +1235,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
                   LMAttachmentViewData attachmentViewData =
-                      (LMAttachmentViewDataBuilder()
+                      (LMAttachmentViewData.builder()
                             ..attachmentType(LMMediaType.repost)
-                            ..attachmentMeta((LMAttachmentMetaViewDataBuilder()
+                            ..attachmentMeta((LMAttachmentMetaViewData.builder()
                                   ..repost(postViewData))
                                 .build()))
                           .build();
