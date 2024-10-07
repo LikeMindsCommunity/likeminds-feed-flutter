@@ -228,7 +228,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
               hintText: 'Write something here...',
               border: InputBorder.none,
             ),
-        textInputAction: TextInputAction.done,
+        textInputAction: TextInputAction.newline,
         onEditingComplete: () => widget.onEditingComplete?.call(),
         onSubmitted: (String value) => widget.onSubmitted?.call(value),
         onChanged: (value) {
