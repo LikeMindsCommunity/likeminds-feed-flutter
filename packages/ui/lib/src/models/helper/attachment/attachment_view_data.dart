@@ -1,17 +1,26 @@
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
+/// Enum representing different types of media attachments.
 enum LMMediaType { none, video, image, document, link, widget, repost, poll }
 
+/// {@template lm_attachment_meta_view_data}
+/// Class representing the view data for an attachment.
+/// {@endtemplate}
 class LMAttachmentViewData {
+  /// The type of the attachment.
   final LMMediaType attachmentType;
+
+  /// The metadata of the attachment.
   final LMAttachmentMetaViewData attachmentMeta;
 
+  /// Private constructor for `LMAttachmentViewData`.
   LMAttachmentViewData._({
     required this.attachmentType,
     required this.attachmentMeta,
   });
 
+  // Constants representing media type integers.
   static const int imageMediaType = 1;
   static const int videoMediaType = 2;
   static const int documentMediaType = 3;
@@ -20,6 +29,7 @@ class LMAttachmentViewData {
   static const int repostMediaType = 8;
   static const int pollMediaType = 6;
 
+  /// Maps the media type to its corresponding integer value.
   int mapMediaTypeToInt() {
     if (attachmentType == LMMediaType.image) {
       return imageMediaType;
@@ -40,6 +50,8 @@ class LMAttachmentViewData {
     }
   }
 
+  /// Factory constructor to create `LMAttachmentViewData` from
+  /// attachment metadata.
   factory LMAttachmentViewData.fromAttachmentMeta({
     required LMMediaType attachmentType,
     required LMAttachmentMetaViewData attachmentMeta,
@@ -50,6 +62,7 @@ class LMAttachmentViewData {
     );
   }
 
+  /// Factory constructor to create `LMAttachmentViewData` from a media URL.
   factory LMAttachmentViewData.fromMediaUrl({
     required String url,
     required LMMediaType attachmentType,
@@ -106,6 +119,7 @@ class LMAttachmentViewData {
     );
   }
 
+  /// Factory constructor to create `LMAttachmentViewData` from media bytes.
   factory LMAttachmentViewData.fromMediaBytes({
     Uint8List? bytes,
     required LMMediaType attachmentType,
@@ -168,6 +182,7 @@ class LMAttachmentViewData {
     );
   }
 
+  /// Factory constructor to create `LMAttachmentViewData` from a media path.
   factory LMAttachmentViewData.fromMediaPath({
     required String path,
     required LMMediaType attachmentType,
@@ -225,20 +240,29 @@ class LMAttachmentViewData {
       ),
     );
   }
+
+  /// Creates a new builder for `LMAttachmentViewData`.
+  static LMAttachmentViewDataBuilder builder() {
+    return LMAttachmentViewDataBuilder();
+  }
 }
 
+/// Builder class for `LMAttachmentViewData`.
 class LMAttachmentViewDataBuilder {
   LMMediaType? _attachmentType;
   LMAttachmentMetaViewData? _attachmentMeta;
 
+  /// Sets the attachment type.
   void attachmentType(LMMediaType attachmentType) {
     _attachmentType = attachmentType;
   }
 
+  /// Sets the attachment metadata.
   void attachmentMeta(LMAttachmentMetaViewData attachmentMeta) {
     _attachmentMeta = attachmentMeta;
   }
 
+  /// Builds and returns an `LMAttachmentViewData` instance.
   LMAttachmentViewData build() {
     return LMAttachmentViewData._(
       attachmentType: _attachmentType!,
@@ -247,6 +271,7 @@ class LMAttachmentViewDataBuilder {
   }
 }
 
+/// Maps an integer to its corresponding `LMMediaType`.
 LMMediaType mapIntToMediaType(int attachmentType) {
   if (attachmentType == 1) {
     return LMMediaType.image;

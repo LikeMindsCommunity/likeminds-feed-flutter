@@ -10,7 +10,7 @@ class LMAttachmentMetaViewDataConvertor {
     required Map<String, LMUserViewData>? users,
   }) {
     LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
-        LMAttachmentMetaViewDataBuilder();
+        LMAttachmentMetaViewData.builder();
     if (attachmentMeta.url != null) {
       attachmentMetaViewDataBuilder.url(attachmentMeta.url!);
     }
@@ -34,6 +34,9 @@ class LMAttachmentMetaViewDataConvertor {
     }
     if (attachmentMeta.aspectRatio != null) {
       attachmentMetaViewDataBuilder.aspectRatio(attachmentMeta.aspectRatio!);
+    }
+    if (attachmentMeta.thumbnailUrl != null) {
+      attachmentMetaViewDataBuilder.thumbnailUrl(attachmentMeta.thumbnailUrl!);
     }
     if (attachmentMeta.width != null) {
       attachmentMetaViewDataBuilder.width(attachmentMeta.width!);
@@ -117,6 +120,8 @@ class LMAttachmentMetaViewDataConvertor {
       multiSelectNo: attachmentMetaViewData.multiSelectNo,
       isAnonymous: attachmentMetaViewData.isAnonymous,
       allowAddOption: attachmentMetaViewData.allowAddOption,
+      entityId: attachmentMetaViewData.id,
+      thumbnailUrl: attachmentMetaViewData.thumbnailUrl,
     );
   }
 
@@ -125,7 +130,7 @@ class LMAttachmentMetaViewDataConvertor {
     required Map<String, LMUserViewData> users,
   }) {
     final LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
-        LMAttachmentMetaViewDataBuilder();
+        LMAttachmentMetaViewData.builder();
     attachmentMetaViewDataBuilder.id(widget.id);
     attachmentMetaViewDataBuilder.pollQuestion(widget.metadata['title']);
     attachmentMetaViewDataBuilder.expiryTime(widget.metadata['expiry_time']);
