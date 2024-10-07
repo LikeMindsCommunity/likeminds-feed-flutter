@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/packages/pluralize/pluralize.dart';
 
-
 PreferredSizeWidget qNaComposeAppbarBuilder(
     BuildContext context, LMFeedAppBar oldWidget) {
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(

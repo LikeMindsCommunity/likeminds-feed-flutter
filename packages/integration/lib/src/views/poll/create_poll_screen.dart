@@ -787,7 +787,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
   onPollSubmit() {
     if (validatePoll()) {
       LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
-          LMAttachmentMetaViewDataBuilder()
+          LMAttachmentMetaViewData.builder()
             ..pollQuestion(_questionController.text)
             ..expiryTime(_expiryDateBuilder.value?.millisecondsSinceEpoch)
             ..pollOptions(options)

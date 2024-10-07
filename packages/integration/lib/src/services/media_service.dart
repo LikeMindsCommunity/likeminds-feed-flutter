@@ -5,7 +5,7 @@ import 'package:likeminds_feed_flutter_core/src/services/lm_amazon_s3_service.da
 import 'package:likeminds_feed_flutter_core/src/utils/credentials/credentials.dart';
 
 /// Flutter flavour/environment manager v0.0.1
-const _prod = !bool.fromEnvironment('DEBUG');
+const _prod = !bool.fromEnvironment('LM_DEBUG');
 
 class LMFeedMediaService {
   late final String _bucketName;

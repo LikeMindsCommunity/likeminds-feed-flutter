@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-
 class LMFeedSavedPostScreen extends StatefulWidget {
   const LMFeedSavedPostScreen({
     super.key,

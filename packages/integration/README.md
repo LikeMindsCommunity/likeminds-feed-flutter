@@ -1,10 +1,9 @@
 # Core package of LikeMinds Feed Flutter SDK, provides access to screens, BLoCs, and other utilities.
 
 ## Quick Links
+
 - [LikeMinds dashboard](https://dashboard.likeminds.community/)
 - [Detailed Documentation](https://docs.likeminds.community/feed/Flutter/getting-started)
-
-
 
 # Getting Started
 
@@ -94,7 +93,7 @@ return (accessToken, refreshToken);
 
 1. **onAccessTokenExpiredAndRefreshed:** This callback is triggered when the provided `accessToken` expires and is refreshed internally using the `refreshToken`.
 2. **onRefreshTokenExpired:** This callback is triggered when the provided `refreshToken` expires. In this case, you need to provide a new `accessToken` and `refreshToken` from your backend function using our [initiate API](https://docs.likeminds.community/rest-api/#/operations/sdkInitate).
-:::
+   :::
 
 ```dart
 main(){
