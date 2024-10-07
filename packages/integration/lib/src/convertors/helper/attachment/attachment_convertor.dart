@@ -11,7 +11,7 @@ class LMAttachmentViewDataConvertor {
     required Map<String, LMUserViewData>? users,
   }) {
     LMAttachmentViewDataBuilder attachmentViewDataBuilder =
-        LMAttachmentViewDataBuilder();
+        LMAttachmentViewData.builder();
 
     attachmentViewDataBuilder
         .attachmentType(mapIntToMediaType(attachment.attachmentType));

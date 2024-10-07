@@ -216,7 +216,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           composeBloc.postMedia.add(
             LMAttachmentViewData.fromAttachmentMeta(
               attachmentType: LMMediaType.repost,
-              attachmentMeta: (LMAttachmentMetaViewDataBuilder()
+              attachmentMeta: (LMAttachmentMetaViewData.builder()
                     ..post(repost)
                     ..postId(repost?.id))
                   .build(),
@@ -867,7 +867,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   composeBloc.postMedia.add(
                     LMAttachmentViewData.fromAttachmentMeta(
                       attachmentType: LMMediaType.widget,
-                      attachmentMeta: (LMAttachmentMetaViewDataBuilder()
+                      attachmentMeta: (LMAttachmentMetaViewData.builder()
                             ..meta(postViewData!
                                     .attachments?.first.attachmentMeta.meta ??
                                 {}))
