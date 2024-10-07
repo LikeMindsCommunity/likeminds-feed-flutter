@@ -46,7 +46,9 @@ class _LMFeedQnAComposeScreenTopicSelectorState
         height: 90,
         width: 120,
         color: feedThemeData.container,
-        padding: const EdgeInsets.symmetric(horizontal: 20.0,),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20.0,
+        ),
         margin: const EdgeInsets.only(bottom: 30.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,9 +107,10 @@ class _LMFeedQnAComposeScreenTopicSelectorState
                       itemBuilder: (context, index) => LMFeedTopicChip(
                         topic: selectedTopics[index],
                         isSelected: true,
-                        style: feedThemeData.topicStyle.activeChipStyle?.copyWith(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 3.0)),
+                        style: feedThemeData.topicStyle.activeChipStyle
+                            ?.copyWith(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 3.0)),
                       ),
                     ),
                   ),

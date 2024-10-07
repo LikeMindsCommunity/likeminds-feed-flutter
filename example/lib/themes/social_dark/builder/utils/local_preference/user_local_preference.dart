@@ -72,8 +72,7 @@ class UserLocalPreference {
   Future<void> setUserDataFromInitiateUserResponse(
       InitiateUserResponse response) async {
     if (response.success) {
-      await UserLocalPreference.instance
-          .storeUserData(response.user!);
+      await UserLocalPreference.instance.storeUserData(response.user!);
     }
   }
 

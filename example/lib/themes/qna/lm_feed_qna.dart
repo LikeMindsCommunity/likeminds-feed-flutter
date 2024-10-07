@@ -74,29 +74,30 @@ class _LMFeedQnAState extends State<LMFeedQnA> {
     return Scaffold(
       body: FutureBuilder(
         future: initFeed,
-        builder: (context,snapshot) {
-          if(snapshot.connectionState == ConnectionState.done)
-          {User? user = LMFeedPersistence.instance.getUserDB().data;
-          if (user != null) {
-            List selectedTopics =
-                userFeedMetaResponse!.userTopics?[user.uuid] ?? [];
-            // If the user has not selected any topics, show onboarding screen
-            if (selectedTopics.isEmpty) {
-              return OnboardingScreen(
-                uuid: user.uuid,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            User? user = LMFeedPersistence.instance.getUserDB().data;
+            if (user != null) {
+              List selectedTopics =
+                  userFeedMetaResponse!.userTopics?[user.uuid] ?? [];
+              // If the user has not selected any topics, show onboarding screen
+              if (selectedTopics.isEmpty) {
+                return OnboardingScreen(
+                  uuid: user.uuid,
+                );
+              }
+              // else navigate to feed screen
+              return LMQnAFeedScreen(
+                newPageProgressIndicatorBuilder: LMFeedCore
+                    .widgetUtility.newPageProgressIndicatorBuilderFeed,
+                noMoreItemsIndicatorBuilder:
+                    LMFeedCore.widgetUtility.noMoreItemsIndicatorBuilderFeed,
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat,
+                floatingActionButtonBuilder: qnAFeedCreatePostFABBuilder,
               );
             }
-            // else navigate to feed screen
-            return LMQnAFeedScreen(
-              newPageProgressIndicatorBuilder:
-                  LMFeedCore.widgetUtility.newPageProgressIndicatorBuilderFeed,
-              noMoreItemsIndicatorBuilder:
-                  LMFeedCore.widgetUtility.noMoreItemsIndicatorBuilderFeed,
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerFloat,
-              floatingActionButtonBuilder: qnAFeedCreatePostFABBuilder,
-            );
-          }}
+          }
           return const SizedBox();
         },
       ),
@@ -134,11 +135,8 @@ class _LMFeedQnAState extends State<LMFeedQnA> {
         await LMQnAFeedUtils.getUserMetaForCurrentUser();
 
     // return the error message in case the api fails
-    if (!getUserFeedMeta.success) {
-     
-    }
+    if (!getUserFeedMeta.success) {}
 
     userFeedMetaResponse = getUserFeedMeta;
-
   }
 }

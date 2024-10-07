@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:likeminds_feed_sample/themes/social_feedroom/likeminds_feed_flutter_koshiqa.dart';
 
-
 const Color kPrimaryColor = Color.fromARGB(255, 6, 92, 193);
 const Color kBackgroundColor = Color(0xffF5F5F5);
 const Color kWhiteColor = Color(0xffFFFFFF);
