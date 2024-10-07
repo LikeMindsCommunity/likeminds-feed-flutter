@@ -360,12 +360,10 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                 child: Container(
                   alignment: Alignment.center,
                   child: TextButton(
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all(
-                        const CircleBorder(
-                          side: BorderSide(
-                            color: Colors.white,
-                          ),
+                    style: TextButton.styleFrom(
+                      shape: const CircleBorder(
+                        side: BorderSide(
+                          color: Colors.white,
                         ),
                       ),
                     ),
