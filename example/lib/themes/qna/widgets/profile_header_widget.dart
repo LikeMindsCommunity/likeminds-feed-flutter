@@ -50,11 +50,11 @@ class _LMQnAProfileHeaderWidgetState extends State<LMQnAProfileHeaderWidget> {
         bloc: _userMetaBloc,
         listener: (context, state) {
           if (state is LMFeedUserMetaErrorState) {
-             LMFeedCore.showSnackBar(
-            context,
-            state.message,
-            LMFeedWidgetSource.searchScreen,
-          );
+            LMFeedCore.showSnackBar(
+              context,
+              state.message,
+              LMFeedWidgetSource.searchScreen,
+            );
           }
         },
         buildWhen: (previous, current) {

@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.10.0]
+
+- Added thumbnail support in LMFeedVideo widget
+- Added thumbnail suppot in LMAttachmentViewData model
+
 ## [1.9.2]
 
 - Added customisations in Bottom Text Field in LMPostDetailScreen
