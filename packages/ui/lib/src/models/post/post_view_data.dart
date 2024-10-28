@@ -176,7 +176,7 @@ class LMPostViewDataBuilder {
     _attachments = attachments;
   }
 
-  void communityId(int communityId) {
+  void communityId(int? communityId) {
     _communityId = communityId;
   }
 

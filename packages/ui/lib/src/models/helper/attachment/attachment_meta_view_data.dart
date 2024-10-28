@@ -407,6 +407,8 @@ class LMAttachmentMetaViewDataBuilder {
   String? _postId;
   LMPostViewData? _post;
   String? _thumbnailUrl;
+  String? _path;
+  Uint8List? _bytes;
 
   void url(String url) {
     _url = url;
@@ -512,6 +514,14 @@ class LMAttachmentMetaViewDataBuilder {
     _thumbnailUrl = thumbnailUrl;
   }
 
+  void path(String? path) {
+    _path = path;
+  }
+
+  void bytes(Uint8List? bytes) {
+    _bytes = bytes;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -540,6 +550,8 @@ class LMAttachmentMetaViewDataBuilder {
       postId: _postId,
       post: _post,
       thumbnailUrl: _thumbnailUrl,
+      path: _path,
+      bytes: _bytes,
     );
   }
 }

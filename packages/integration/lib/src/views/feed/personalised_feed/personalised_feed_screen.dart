@@ -670,7 +670,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                               Spacer(),
                               LMFeedButton(
                                 onTap: () {
-                                  newPostBloc.add(state.event!);
+                                  // newPostBloc.add(state.event!);
                                 },
                                 style: LMFeedButtonStyle(
                                   icon: LMFeedIcon(

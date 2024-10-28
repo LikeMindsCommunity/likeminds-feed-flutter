@@ -149,11 +149,14 @@ class LMFeedPostErrorState extends LMFeedPostState {
 /// [errorMessage] contains the error message
 /// and is of type [String]
 class LMFeedNewPostErrorState extends LMFeedPostErrorState {
-  final LMFeedCreateNewPostEvent? event;
+  final String tempId;
   const LMFeedNewPostErrorState({
     required super.errorMessage,
-    this.event,
+    required this.tempId,
   });
+
+  @override
+  List<Object> get props => [errorMessage, tempId];
 }
 
 /// Error while editing an existing post

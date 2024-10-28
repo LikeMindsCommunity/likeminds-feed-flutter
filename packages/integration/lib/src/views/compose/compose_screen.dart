@@ -1017,7 +1017,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
         user: user!,
         postText: result!,
-        selectedTopics: selectedTopics,
+        selectedTopicIds: selectedTopics.map((topic) => topic.id).toList(),
         postMedia: [...composeBloc.postMedia],
         heading: _headingController?.text,
         feedroomId: widget.feedroomId,

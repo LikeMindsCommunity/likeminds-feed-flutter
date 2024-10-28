@@ -2,7 +2,17 @@ import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 /// Enum representing different types of media attachments.
-enum LMMediaType { none, video, image, document, link, widget, repost, poll }
+enum LMMediaType {
+  none,
+  video,
+  image,
+  document,
+  link,
+  widget,
+  repost,
+  poll,
+  reel
+}
 
 /// {@template lm_attachment_meta_view_data}
 /// Class representing the view data for an attachment.
@@ -28,6 +38,7 @@ class LMAttachmentViewData {
   static const int widgetMediaType = 5;
   static const int repostMediaType = 8;
   static const int pollMediaType = 6;
+  static const int reelMediaType = 11;
 
   /// Maps the media type to its corresponding integer value.
   int mapMediaTypeToInt() {
@@ -45,6 +56,8 @@ class LMAttachmentViewData {
       return repostMediaType;
     } else if (attachmentType == LMMediaType.poll) {
       return pollMediaType;
+    } else if (attachmentType == LMMediaType.reel) {
+      return reelMediaType;
     } else {
       throw 'no valid media type provided';
     }
@@ -287,6 +300,8 @@ LMMediaType mapIntToMediaType(int attachmentType) {
     return LMMediaType.repost;
   } else if (attachmentType == 6) {
     return LMMediaType.poll;
+  } else if (attachmentType == 11) {
+    return LMMediaType.reel;
   } else {
     return LMMediaType.none;
   }
