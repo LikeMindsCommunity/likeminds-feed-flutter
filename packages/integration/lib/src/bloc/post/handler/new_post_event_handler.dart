@@ -3,134 +3,20 @@ part of '../post_bloc.dart';
 void newPostEventHandler(
     LMFeedCreateNewPostEvent event, Emitter<LMFeedPostState> emit) async {
   try {
-    List<LMAttachmentViewData>? postMedia = event.postMedia;
     List<Attachment> attachments = [];
-    int index = 0;
+    StreamController<double> progress = StreamController<double>.broadcast();
     bool? isRepost;
 
-    StreamController<double> progress = StreamController<double>.broadcast();
-    progress.add(0);
-
-    // Upload post media to s3 and add links as Attachments
-    if (postMedia != null && postMedia.isNotEmpty) {
-      emit(
-        LMFeedNewPostUploadingState(
-          progress: progress.stream,
-          thumbnailMedia: postMedia.isEmpty
-              ? null
-              : postMedia[0].attachmentType == LMMediaType.link
-                  ? null
-                  : postMedia[0],
+    // Handle media upload if media exists
+    if (event.postMedia != null && event.postMedia!.isNotEmpty) {
+      attachments = await uploadMediaEventHandler(
+        LMFeedUploadMediaEvent(
+          postMedia: event.postMedia!,
+          user: event.user,
+          progressController: progress,
         ),
+        emit,
       );
-      for (final media in postMedia) {
-        if (media.attachmentType == LMMediaType.poll) {
-          attachments.add(
-            Attachment(
-              attachmentType: 6,
-              attachmentMeta:
-                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMeta),
-            ),
-          );
-          continue;
-        }
-        if (media.attachmentType == LMMediaType.repost) {
-          attachments.add(
-            Attachment(
-              attachmentType: 8,
-              attachmentMeta:
-                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMeta),
-            ),
-          );
-          isRepost = true;
-          break;
-        } else if (media.attachmentType == LMMediaType.link) {
-          attachments.add(
-            Attachment(
-              attachmentType: 4,
-              attachmentMeta:
-                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMeta),
-            ),
-          );
-        } else if (media.attachmentType == LMMediaType.widget) {
-          attachments.add(
-            Attachment(
-              attachmentType: 5,
-              attachmentMeta:
-                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMeta),
-            ),
-          );
-        } else {
-          late File mediaFile;
-          if (media.attachmentMeta.bytes != null) {
-            mediaFile = File.fromRawPath(media.attachmentMeta.bytes!);
-          } else if (media.attachmentMeta.path != null) {
-            mediaFile = File(media.attachmentMeta.path!);
-          } else {
-            LMFeedNewPostErrorState(
-              errorMessage: 'Attachment file not found',
-              event: event,
-            );
-          }
-
-          if (media.attachmentType == LMMediaType.video) {
-            String? thumbnailURL;
-            String? thumbnailPath = await LMFeedVideoThumbnail.thumbnailFile(
-              video: mediaFile.path,
-              quality: 8,
-            );
-
-            if (thumbnailPath != null) {
-              File thumbnailFile = File(thumbnailPath);
-              final LMResponse<String> response =
-                  await LMFeedMediaService.uploadFile(
-                      thumbnailFile.readAsBytesSync(),
-                      event.user.sdkClientInfo.uuid);
-              if (response.success) {
-                thumbnailURL = response.data;
-                media.attachmentMeta.thumbnailUrl = thumbnailURL;
-              }
-            }
-
-            int originalSize = media.attachmentMeta.size!;
-
-            if (!kIsWeb) {
-              var tempFile = await VideoCompress.compressVideo(
-                mediaFile.path,
-                deleteOrigin: false,
-                includeAudio: true,
-              );
-
-              mediaFile = tempFile!.file!;
-            }
-          }
-          final LMResponse<String> response =
-              await LMFeedMediaService.uploadFile(
-            kIsWeb ? media.attachmentMeta.bytes! : mediaFile.readAsBytesSync(),
-            event.user.sdkClientInfo.uuid,
-            fileName: media.attachmentMeta.meta?['file_name'],
-          );
-          if (response.success) {
-            media.attachmentMeta.url = response.data;
-            attachments.add(
-              Attachment(
-                attachmentType: media.mapMediaTypeToInt(),
-                attachmentMeta:
-                    LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                  media.attachmentMeta,
-                ),
-              ),
-            );
-            progress.add(index / postMedia.length);
-          } else {
-            throw ('Error uploading file');
-          }
-        }
-      }
     } else {
       emit(
         LMFeedNewPostUploadingState(
@@ -138,11 +24,15 @@ void newPostEventHandler(
         ),
       );
     }
+
+    // Continue with post creation
     List<Topic> postTopics = event.selectedTopics
         .map((e) => LMTopicViewDataConvertor.toTopic(e))
         .toList();
     String? postText = event.postText;
     String? headingText = event.heading;
+
+    isRepost = attachments.first.attachmentType == LMMediaType.repost;
 
     final requestBuilder = AddPostRequestBuilder()
       ..attachments(attachments)
@@ -161,7 +51,7 @@ void newPostEventHandler(
       requestBuilder.text(postText);
     }
 
-    if (isRepost != null) {
+    if (isRepost) {
       requestBuilder.isRepost(isRepost);
     }
     final AddPostResponse response =
@@ -225,7 +115,6 @@ void newPostEventHandler(
     LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
   } on Exception catch (err, stacktrace) {
     LMFeedPersistence.instance.handleException(err, stacktrace);
-
     emit(LMFeedNewPostErrorState(
       errorMessage: 'An error occurred',
       event: event,

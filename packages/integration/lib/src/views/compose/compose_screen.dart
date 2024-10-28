@@ -520,313 +520,341 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   Widget _defMediaPreview() {
-    return BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
-      bloc: composeBloc,
+    return BlocBuilder<LMFeedPostBloc, LMFeedPostState>(
+      bloc: LMFeedPostBloc.instance,
       builder: (context, state) {
-        if (state is LMFeedComposeMediaLoadingState) {
-          return const LMFeedLoader();
+        if (state is LMFeedNewPostUploadingState) {
+          return StreamBuilder<double>(
+            stream: state.progress,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return LinearProgressIndicator(
+                  value: snapshot.data,
+                  backgroundColor: Colors.grey[200],
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(feedTheme.primaryColor),
+                );
+              }
+              return const SizedBox();
+            },
+          );
         }
-        if (composeBloc.postMedia.isNotEmpty) {
-          if (composeBloc.isPollAdded) {
-            return LMFeedPoll(
-              style: feedTheme.composeScreenStyle.mediaStyle?.pollStyle
-                      ?.copyWith() ??
-                  LMFeedPollStyle.basic(isComposable: true).copyWith(
-                    backgroundColor: feedTheme.container,
-                  ),
-              attachmentMeta: composeBloc.postMedia.first.attachmentMeta,
-              subTextBuilder: (context) {
-                return LMFeedText(
-                  text: getFormattedDateTime(
-                      composeBloc.postMedia.first.attachmentMeta.expiryTime),
-                  style: LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      color: feedTheme.onContainer.withOpacity(0.5),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                );
-              },
-              onCancel: () {
-                composeBloc.add(LMFeedComposeCloseEvent());
-              },
-              onEdit: (attachmentMeta) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LMFeedCreatePollScreen(
-                      attachmentMeta: attachmentMeta,
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-          if (composeBloc.postMedia.first.attachmentType ==
-              LMMediaType.repost) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    clipBehavior: Clip.hardEdge,
-                    width: screenWidth,
-                    decoration: const BoxDecoration(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: LMFeedPostWidget(
-                        post: repost!,
-                        user: repost!.user,
-                        isFeed: false,
-                        topics: repost?.topics ?? [],
-                        footerBuilder: (context, footer, footerData) =>
-                            const SizedBox.shrink(),
-                        headerBuilder: (context, header, headerData) {
-                          return header.copyWith(menuBuilder: (_) {
-                            return const SizedBox.shrink();
-                          });
-                        },
-                        style: LMFeedPostStyle.basic().copyWith(
-                            borderRadius: BorderRadius.circular(8),
-                            padding: const EdgeInsets.all(8),
-                            border: Border.all(
-                              color:
-                                  LMFeedCore.theme.onContainer.withOpacity(0.1),
-                            )),
-                        onPostTap: (context, postData) {
-                          debugPrint('Post tapped');
-                        },
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 20,
-                    right: 20,
-                    child: GestureDetector(
-                      onTap: () {
-                        composeBloc.add(
-                          const LMFeedComposeRemoveAttachmentEvent(
-                            index: 0,
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(500),
-                        ),
-                        width: 24,
-                        height: 24,
-                        child: Icon(
-                          Icons.cancel,
-                          color: feedTheme.disabledColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-          return Container(
-            padding: style?.mediaPadding ?? EdgeInsets.zero,
-            width: screenWidth,
-            height: LMFeedComposeBloc.instance.documentCount > 0
-                ? null
-                : screenWidth,
-            child: ListView.builder(
-              scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
-                  ? Axis.vertical
-                  : Axis.horizontal,
-              physics: LMFeedComposeBloc.instance.documentCount > 0
-                  ? const NeverScrollableScrollPhysics()
-                  : null,
-              shrinkWrap: true,
-              itemCount: composeBloc.postMedia.length,
-              itemBuilder: (context, index) {
-                Widget mediaWidget;
-                switch (composeBloc.postMedia[index].attachmentType) {
-                  case LMMediaType.image:
-                    mediaWidget = Container(
-                      clipBehavior: Clip.hardEdge,
-                      decoration: BoxDecoration(
-                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
-                        borderRadius:
-                            style?.mediaStyle?.imageStyle?.borderRadius,
-                      ),
-                      height:
-                          style?.mediaStyle?.imageStyle?.height ?? screenWidth,
-                      width:
-                          style?.mediaStyle?.imageStyle?.width ?? screenWidth,
-                      alignment: Alignment.center,
-                      child: LMFeedImage(
-                        image: composeBloc.postMedia[index],
-                        style: style?.mediaStyle?.imageStyle,
-                        position: index,
-                      ),
-                    );
-                    break;
-                  case LMMediaType.video:
-                    mediaWidget = Container(
-                      clipBehavior: Clip.hardEdge,
-                      height:
-                          style?.mediaStyle?.videoStyle?.height ?? screenWidth,
-                      width:
-                          style?.mediaStyle?.videoStyle?.width ?? screenWidth,
-                      decoration: BoxDecoration(
-                        color: style?.mediaStyle?.imageStyle?.backgroundColor,
-                        borderRadius:
-                            style?.mediaStyle?.videoStyle?.borderRadius,
-                      ),
-                      alignment: Alignment.center,
-                      child: LMFeedVideo(
-                        video: composeBloc.postMedia[index],
-                        style: style?.mediaStyle?.videoStyle,
-                        postId:
-                            "${composeBloc.postMedia[index].attachmentMeta.path.toString()}$index",
-                      ),
-                    );
-                    break;
-                  case LMMediaType.link:
-                    mediaWidget = LMFeedLinkPreview(
-                      attachment: composeBloc.postMedia[index],
-                      style: style?.mediaStyle?.linkStyle?.copyWith(
-                            width: style?.mediaStyle?.linkStyle?.width ??
-                                screenWidth! - 84,
-                          ) ??
-                          LMFeedPostLinkPreviewStyle(
-                            height: 215,
-                            width: screenWidth! - 84,
-                            imageHeight: 138,
-                            backgroundColor: LikeMindsTheme.backgroundColor,
-                            border: Border.all(
-                              color: LikeMindsTheme.secondaryColor,
-                            ),
-                          ),
-                      onTap: () {
-                        launchUrl(
-                          Uri.parse(composeBloc.postMedia[index].attachmentMeta
-                                  .ogTags?.url ??
-                              ''),
-                          mode: LaunchMode.externalApplication,
-                        );
-                      },
-                      title: LMFeedText(
-                        text: composeBloc.postMedia[index].attachmentMeta.ogTags
-                                ?.title ??
-                            "--",
-                        style: const LMFeedTextStyle(
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textStyle: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: LikeMindsTheme.blackColor,
-                            height: 1.30,
-                          ),
-                        ),
-                      ),
-                      subtitle: LMFeedText(
-                        text: composeBloc.postMedia[index].attachmentMeta.ogTags
-                                ?.description ??
-                            "--",
-                        style: const LMFeedTextStyle(
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textStyle: TextStyle(
-                            color: LikeMindsTheme.blackColor,
-                            fontWeight: FontWeight.w400,
-                            height: 1.30,
-                          ),
-                        ),
-                      ),
-                    );
-                    break;
-                  case LMMediaType.document:
-                    {
-                      mediaWidget = LMFeedDocument(
-                        onRemove: () {
-                          composeBloc.add(
-                            LMFeedComposeRemoveAttachmentEvent(
-                              index: index,
-                            ),
-                          );
-                        },
-                        document: composeBloc.postMedia[index],
-                        style: style?.mediaStyle?.documentStyle?.copyWith(
-                              width: style?.mediaStyle?.documentStyle?.width ??
-                                  screenWidth,
-                            ) ??
-                            LMFeedPostDocumentStyle(
-                              width: screenWidth,
-                              height: 90,
-                            ),
-                        size: PostHelper.getFileSizeString(
-                            bytes: composeBloc
-                                    .postMedia[index].attachmentMeta.size ??
-                                0),
-                      );
-                      break;
-                    }
-                  default:
-                    mediaWidget = const SizedBox();
-                }
-                return Padding(
-                  padding: EdgeInsets.zero,
-                  child: Stack(
-                    alignment: Alignment.topCenter,
-                    children: <Widget>[
-                      mediaWidget,
-                      if (composeBloc.postMedia[index].attachmentType !=
-                          LMMediaType.document)
-                        Positioned(
-                          top: 7.5,
-                          right: composeBloc.postMedia.first.attachmentType ==
-                                  LMMediaType.link
-                              ? 20.0
-                              : 7.5,
-                          child: GestureDetector(
-                            onTap: () {
-                              LMAttachmentViewData removedMedia =
-                                  composeBloc.postMedia[index];
-                              if (removedMedia.attachmentType ==
-                                  LMMediaType.link) {
-                                linkCancelled = true;
-                              } else if (removedMedia.attachmentType ==
-                                  LMMediaType.video) {
-                                LMFeedVideoProvider.instance.clearPostController(
-                                    "${removedMedia.attachmentMeta.path}$index");
-                              }
 
+        // Rest of the media preview code remains the same
+        return BlocBuilder<LMFeedComposeBloc, LMFeedComposeState>(
+          bloc: composeBloc,
+          builder: (context, state) {
+            if (state is LMFeedComposeMediaLoadingState) {
+              return const LMFeedLoader();
+            }
+            if (composeBloc.postMedia.isNotEmpty) {
+              if (composeBloc.isPollAdded) {
+                return LMFeedPoll(
+                  style: feedTheme.composeScreenStyle.mediaStyle?.pollStyle
+                          ?.copyWith() ??
+                      LMFeedPollStyle.basic(isComposable: true).copyWith(
+                        backgroundColor: feedTheme.container,
+                      ),
+                  attachmentMeta: composeBloc.postMedia.first.attachmentMeta,
+                  subTextBuilder: (context) {
+                    return LMFeedText(
+                      text: getFormattedDateTime(composeBloc
+                          .postMedia.first.attachmentMeta.expiryTime),
+                      style: LMFeedTextStyle(
+                        textStyle: TextStyle(
+                          color: feedTheme.onContainer.withOpacity(0.5),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    );
+                  },
+                  onCancel: () {
+                    composeBloc.add(LMFeedComposeCloseEvent());
+                  },
+                  onEdit: (attachmentMeta) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LMFeedCreatePollScreen(
+                          attachmentMeta: attachmentMeta,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+              if (composeBloc.postMedia.first.attachmentType ==
+                  LMMediaType.repost) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        clipBehavior: Clip.hardEdge,
+                        width: screenWidth,
+                        decoration: const BoxDecoration(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: LMFeedPostWidget(
+                            post: repost!,
+                            user: repost!.user,
+                            isFeed: false,
+                            topics: repost?.topics ?? [],
+                            footerBuilder: (context, footer, footerData) =>
+                                const SizedBox.shrink(),
+                            headerBuilder: (context, header, headerData) {
+                              return header.copyWith(menuBuilder: (_) {
+                                return const SizedBox.shrink();
+                              });
+                            },
+                            style: LMFeedPostStyle.basic().copyWith(
+                                borderRadius: BorderRadius.circular(8),
+                                padding: const EdgeInsets.all(8),
+                                border: Border.all(
+                                  color: LMFeedCore.theme.onContainer
+                                      .withOpacity(0.1),
+                                )),
+                            onPostTap: (context, postData) {
+                              debugPrint('Post tapped');
+                            },
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 20,
+                        right: 20,
+                        child: GestureDetector(
+                          onTap: () {
+                            composeBloc.add(
+                              const LMFeedComposeRemoveAttachmentEvent(
+                                index: 0,
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(500),
+                            ),
+                            width: 24,
+                            height: 24,
+                            child: Icon(
+                              Icons.cancel,
+                              color: feedTheme.disabledColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return Container(
+                padding: style?.mediaPadding ?? EdgeInsets.zero,
+                width: screenWidth,
+                height: LMFeedComposeBloc.instance.documentCount > 0
+                    ? null
+                    : screenWidth,
+                child: ListView.builder(
+                  scrollDirection: LMFeedComposeBloc.instance.documentCount > 0
+                      ? Axis.vertical
+                      : Axis.horizontal,
+                  physics: LMFeedComposeBloc.instance.documentCount > 0
+                      ? const NeverScrollableScrollPhysics()
+                      : null,
+                  shrinkWrap: true,
+                  itemCount: composeBloc.postMedia.length,
+                  itemBuilder: (context, index) {
+                    Widget mediaWidget;
+                    switch (composeBloc.postMedia[index].attachmentType) {
+                      case LMMediaType.image:
+                        mediaWidget = Container(
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                            color:
+                                style?.mediaStyle?.imageStyle?.backgroundColor,
+                            borderRadius:
+                                style?.mediaStyle?.imageStyle?.borderRadius,
+                          ),
+                          height: style?.mediaStyle?.imageStyle?.height ??
+                              screenWidth,
+                          width: style?.mediaStyle?.imageStyle?.width ??
+                              screenWidth,
+                          alignment: Alignment.center,
+                          child: LMFeedImage(
+                            image: composeBloc.postMedia[index],
+                            style: style?.mediaStyle?.imageStyle,
+                            position: index,
+                          ),
+                        );
+                        break;
+                      case LMMediaType.video:
+                        mediaWidget = Container(
+                          clipBehavior: Clip.hardEdge,
+                          height: style?.mediaStyle?.videoStyle?.height ??
+                              screenWidth,
+                          width: style?.mediaStyle?.videoStyle?.width ??
+                              screenWidth,
+                          decoration: BoxDecoration(
+                            color:
+                                style?.mediaStyle?.imageStyle?.backgroundColor,
+                            borderRadius:
+                                style?.mediaStyle?.videoStyle?.borderRadius,
+                          ),
+                          alignment: Alignment.center,
+                          child: LMFeedVideo(
+                            video: composeBloc.postMedia[index],
+                            style: style?.mediaStyle?.videoStyle,
+                            postId:
+                                "${composeBloc.postMedia[index].attachmentMeta.path.toString()}$index",
+                          ),
+                        );
+                        break;
+                      case LMMediaType.link:
+                        mediaWidget = LMFeedLinkPreview(
+                          attachment: composeBloc.postMedia[index],
+                          style: style?.mediaStyle?.linkStyle?.copyWith(
+                                width: style?.mediaStyle?.linkStyle?.width ??
+                                    screenWidth! - 84,
+                              ) ??
+                              LMFeedPostLinkPreviewStyle(
+                                height: 215,
+                                width: screenWidth! - 84,
+                                imageHeight: 138,
+                                backgroundColor: LikeMindsTheme.backgroundColor,
+                                border: Border.all(
+                                  color: LikeMindsTheme.secondaryColor,
+                                ),
+                              ),
+                          onTap: () {
+                            launchUrl(
+                              Uri.parse(composeBloc.postMedia[index]
+                                      .attachmentMeta.ogTags?.url ??
+                                  ''),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          },
+                          title: LMFeedText(
+                            text: composeBloc.postMedia[index].attachmentMeta
+                                    .ogTags?.title ??
+                                "--",
+                            style: const LMFeedTextStyle(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textStyle: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: LikeMindsTheme.blackColor,
+                                height: 1.30,
+                              ),
+                            ),
+                          ),
+                          subtitle: LMFeedText(
+                            text: composeBloc.postMedia[index].attachmentMeta
+                                    .ogTags?.description ??
+                                "--",
+                            style: const LMFeedTextStyle(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textStyle: TextStyle(
+                                color: LikeMindsTheme.blackColor,
+                                fontWeight: FontWeight.w400,
+                                height: 1.30,
+                              ),
+                            ),
+                          ),
+                        );
+                        break;
+                      case LMMediaType.document:
+                        {
+                          mediaWidget = LMFeedDocument(
+                            onRemove: () {
                               composeBloc.add(
                                 LMFeedComposeRemoveAttachmentEvent(
                                   index: index,
                                 ),
                               );
                             },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(500),
-                              ),
-                              width: 24,
-                              height: 24,
-                              child: Icon(
-                                Icons.cancel,
-                                color: feedTheme.disabledColor,
+                            document: composeBloc.postMedia[index],
+                            style: style?.mediaStyle?.documentStyle?.copyWith(
+                                  width:
+                                      style?.mediaStyle?.documentStyle?.width ??
+                                          screenWidth,
+                                ) ??
+                                LMFeedPostDocumentStyle(
+                                  width: screenWidth,
+                                  height: 90,
+                                ),
+                            size: PostHelper.getFileSizeString(
+                                bytes: composeBloc
+                                        .postMedia[index].attachmentMeta.size ??
+                                    0),
+                          );
+                          break;
+                        }
+                      default:
+                        mediaWidget = const SizedBox();
+                    }
+                    return Padding(
+                      padding: EdgeInsets.zero,
+                      child: Stack(
+                        alignment: Alignment.topCenter,
+                        children: <Widget>[
+                          mediaWidget,
+                          if (composeBloc.postMedia[index].attachmentType !=
+                              LMMediaType.document)
+                            Positioned(
+                              top: 7.5,
+                              right:
+                                  composeBloc.postMedia.first.attachmentType ==
+                                          LMMediaType.link
+                                      ? 20.0
+                                      : 7.5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  LMAttachmentViewData removedMedia =
+                                      composeBloc.postMedia[index];
+                                  if (removedMedia.attachmentType ==
+                                      LMMediaType.link) {
+                                    linkCancelled = true;
+                                  } else if (removedMedia.attachmentType ==
+                                      LMMediaType.video) {
+                                    LMFeedVideoProvider.instance
+                                        .clearPostController(
+                                            "${removedMedia.attachmentMeta.path}$index");
+                                  }
+
+                                  composeBloc.add(
+                                    LMFeedComposeRemoveAttachmentEvent(
+                                      index: index,
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(500),
+                                  ),
+                                  width: 24,
+                                  height: 24,
+                                  child: Icon(
+                                    Icons.cancel,
+                                    color: feedTheme.disabledColor,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          );
-        }
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              );
+            }
 
-        return const SizedBox();
+            return const SizedBox();
+          },
+        );
       },
     );
   }
@@ -946,7 +974,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     );
   }
 
-// Function that handles the post creation logic and validation
+// Update the onPostCreate method to handle the new upload flow
   LMResponse<void> onPostCreate() {
     // Remove focus from text fields to dismiss the keyboard
     _focusNode.unfocus();
@@ -999,16 +1027,18 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       result =
           LMFeedTaggingHelper.encodeString(_controller.text, userTags).trim();
 
-      // If there are pre-attached media widgets, add them to the post media
-      if (widget.attachments != null &&
-          widget.attachments!.isNotEmpty &&
-          widget.attachments!.first.attachmentType == LMMediaType.widget) {
-        composeBloc.postMedia.add(
-          LMAttachmentViewData.fromAttachmentMeta(
-            attachmentType: LMMediaType.widget,
-            attachmentMeta: (LMAttachmentMetaViewData.builder()
-                  ..meta(widget.attachments?.first.attachmentMeta.meta ?? {}))
-                .build(),
+      // Create a StreamController for upload progress
+      StreamController<double> progressController =
+          StreamController<double>.broadcast();
+
+      // First upload the media files
+      if (composeBloc.postMedia.isNotEmpty) {
+        // Add upload media event
+        LMFeedPostBloc.instance.add(
+          LMFeedUploadMediaEvent(
+            postMedia: [...composeBloc.postMedia],
+            user: user!,
+            progressController: progressController,
           ),
         );
       }
@@ -1019,7 +1049,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         postText: result!,
         selectedTopics: selectedTopics,
         postMedia: [...composeBloc.postMedia],
-        heading: _headingController?.text,
+        heading: heading,
         feedroomId: widget.feedroomId,
         userTagged: userTags,
       ));

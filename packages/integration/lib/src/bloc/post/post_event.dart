@@ -144,3 +144,19 @@ class LMFeedUpdatePostEvent extends LMFeedPostEvents {
   @override
   List<Object> get props => [identityHashCode(this)];
 }
+
+// Add this new event class alongside other events
+class LMFeedUploadMediaEvent extends LMFeedPostEvents {
+  final List<LMAttachmentViewData> postMedia;
+  final LMUserViewData user;
+  final StreamController<double> progressController;
+
+  LMFeedUploadMediaEvent({
+    required this.postMedia,
+    required this.user,
+    required this.progressController,
+  });
+
+  @override
+  List<Object> get props => [postMedia, user];
+}

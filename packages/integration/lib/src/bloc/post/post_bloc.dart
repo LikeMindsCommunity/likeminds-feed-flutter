@@ -18,6 +18,7 @@ part 'handler/delete_post_event_handler.dart';
 part 'handler/update_post_event_handler.dart';
 part 'handler/get_post_event_handler.dart';
 part 'handler/initial_event_handler.dart';
+part 'handler/upload_media_event_handler.dart';
 
 /// {@template lm_post_bloc}
 /// [LMFeedPostBloc] handle all the post related actions
@@ -34,17 +35,11 @@ class LMFeedPostBloc extends Bloc<LMFeedPostEvents, LMFeedPostState> {
           : _lmPostBloc!;
 
   LMFeedPostBloc._() : super(LMFeedNewPostInitiateState()) {
-    // Reset the bloc to initial state
     on<LMFeedPostInitiateEvent>(initialEventHandler);
-    // Create New Post Event
     on<LMFeedCreateNewPostEvent>(newPostEventHandler);
-    // Edit Post Event
     on<LMFeedEditPostEvent>(editPostEventHandler);
-    // Delete Post Event
     on<LMFeedDeletePostEvent>(deletePostEventHandler);
-    // Update Post Event
     on<LMFeedUpdatePostEvent>(updatePostEventHandler);
-    // Get Post Event
     on<LMFeedGetPostEvent>(getPostEventHandler);
   }
 }
