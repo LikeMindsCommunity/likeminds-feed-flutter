@@ -604,7 +604,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                           ),
                           LMFeedButton(
                             onTap: () {
-                              newPostBloc.add(state.event!);
+                              // newPostBloc.add(state.event!);
                             },
                             style: LMFeedButtonStyle(
                               icon: LMFeedIcon(

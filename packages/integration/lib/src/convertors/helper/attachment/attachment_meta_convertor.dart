@@ -11,6 +11,9 @@ class LMAttachmentMetaViewDataConvertor {
   }) {
     LMAttachmentMetaViewDataBuilder attachmentMetaViewDataBuilder =
         LMAttachmentMetaViewData.builder();
+
+    attachmentMetaViewDataBuilder.path(attachmentMeta.path);
+    attachmentMetaViewDataBuilder.bytes(attachmentMeta.bytes);
     if (attachmentMeta.url != null) {
       attachmentMetaViewDataBuilder.url(attachmentMeta.url!);
     }

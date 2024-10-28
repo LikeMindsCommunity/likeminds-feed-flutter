@@ -878,12 +878,12 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
                 LMFeedPostBloc.instance.add(
                   LMFeedEditPostEvent(
-                    postId: widget.postId,
-                    pendingPostId: widget.pendingPostId,
-                    postText: result!,
-                    selectedTopics: selectedTopics,
-                    heading: _headingController?.text,
-                  ),
+                      postId: widget.postId,
+                      pendingPostId: widget.pendingPostId,
+                      postText: result!,
+                      selectedTopics: selectedTopics,
+                      heading: _headingController?.text,
+                      tempId: postViewData?.tempId ?? ''),
                 );
 
                 Navigator.pop(context);

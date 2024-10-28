@@ -2,14 +2,28 @@ part of '../post_bloc.dart';
 
 void newPostEventHandler(
     LMFeedCreateNewPostEvent event, Emitter<LMFeedPostState> emit) async {
+  final DateTime currentTime = DateTime.now();
+  final String tempId = '-${currentTime.millisecondsSinceEpoch}';
   try {
     List<LMAttachmentViewData>? postMedia = event.postMedia;
     List<Attachment> attachments = [];
     int index = 0;
-    bool? isRepost;
+    bool? isRepost = isRepostPost(postMedia ?? []);
 
     StreamController<double> progress = StreamController<double>.broadcast();
     progress.add(0);
+
+    if (isPostContainsMedia(postMedia ?? [])) {
+      final Post tempPost = createTempPostFromEvent(
+        event,
+        postMedia ?? [],
+        isRepost,
+        currentTime,
+      );
+      final SaveTemporaryPostRequestBuilder saveTempPostRequestBuilder =
+          SaveTemporaryPostRequestBuilder()..tempPost(tempPost);
+      LMFeedCore.client.saveTemporaryPost(saveTempPostRequestBuilder.build());
+    }
 
     // Upload post media to s3 and add links as Attachments
     if (postMedia != null && postMedia.isNotEmpty) {
@@ -72,9 +86,7 @@ void newPostEventHandler(
             mediaFile = File(media.attachmentMeta.path!);
           } else {
             LMFeedNewPostErrorState(
-              errorMessage: 'Attachment file not found',
-              event: event,
-            );
+                errorMessage: 'Attachment file not found', tempId: tempId);
           }
 
           if (media.attachmentType == LMMediaType.video) {
@@ -138,15 +150,12 @@ void newPostEventHandler(
         ),
       );
     }
-    List<Topic> postTopics = event.selectedTopics
-        .map((e) => LMTopicViewDataConvertor.toTopic(e))
-        .toList();
     String? postText = event.postText;
     String? headingText = event.heading;
 
     final requestBuilder = AddPostRequestBuilder()
       ..attachments(attachments)
-      ..topicIds(postTopics.map((e) => e.id).toList())
+      ..topicIds(event.selectedTopicIds)
       ..tempId('${-DateTime.now().millisecondsSinceEpoch}');
 
     if (headingText != null) {
@@ -197,7 +206,10 @@ void newPostEventHandler(
                     widgets: widgets,
                   ))) ??
               {};
-
+      final DeleteTemporaryPostRequest deleteTemporaryPostRequest =
+          (DeleteTemporaryPostRequestBuilder()..temporaryPostId(tempId))
+              .build();
+      await LMFeedCore.client.deleteTemporaryPost(deleteTemporaryPostRequest);
       emit(
         LMFeedNewPostUploadedState(
           postData: LMPostViewDataConvertor.fromPost(
@@ -213,12 +225,12 @@ void newPostEventHandler(
         ),
       );
 
-      sendPostCreationCompletedEvent(
-          event.postMedia ?? [], event.userTagged ?? [], event.selectedTopics);
+      sendPostCreationCompletedEvent(event.postMedia ?? [],
+          event.userTagged ?? [], event.selectedTopicIds);
     } else {
       emit(LMFeedNewPostErrorState(
         errorMessage: response.errorMessage!,
-        event: event,
+        tempId: tempId,
       ));
     }
 
@@ -228,7 +240,7 @@ void newPostEventHandler(
 
     emit(LMFeedNewPostErrorState(
       errorMessage: 'An error occurred',
-      event: event,
+      tempId: tempId,
     ));
     debugPrint(err.toString());
   }
@@ -237,7 +249,7 @@ void newPostEventHandler(
 void sendPostCreationCompletedEvent(
   List<LMAttachmentViewData> postMedia,
   List<LMUserTagViewData> usersTagged,
-  List<LMTopicViewData> topics,
+  List<String> topics,
 ) {
   Map<String, String> propertiesMap = {};
 
@@ -298,7 +310,7 @@ void sendPostCreationCompletedEvent(
 
   if (topics.isNotEmpty) {
     propertiesMap['topics_added'] = 'yes';
-    propertiesMap['topics'] = topics.map((e) => e.id).toList().join(',');
+    propertiesMap['topics'] = topics.join(',');
   } else {
     propertiesMap['topics_added'] = 'no';
   }
@@ -308,4 +320,63 @@ void sendPostCreationCompletedEvent(
     widgetSource: LMFeedWidgetSource.createPostScreen,
     eventProperties: propertiesMap,
   ));
+}
+
+bool isRepostPost(List<LMAttachmentViewData> postMedia) {
+  for (LMAttachmentViewData media in postMedia) {
+    if (media.attachmentType == LMMediaType.repost) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool isPostContainsMedia(List<LMAttachmentViewData> postMedia) {
+  for (LMAttachmentViewData media in postMedia) {
+    if (media.attachmentType == LMMediaType.image ||
+        media.attachmentType == LMMediaType.video ||
+        media.attachmentType == LMMediaType.document ||
+        media.attachmentType == LMMediaType.reel) {
+      return true;
+    }
+  }
+  return false;
+}
+
+Post createTempPostFromEvent(
+  LMFeedCreateNewPostEvent event,
+  List<LMAttachmentViewData> postMedia,
+  bool? isRepost,
+  DateTime currentTime,
+) {
+  String? postText = event.postText;
+  String? headingText = event.heading;
+  final attachments = postMedia
+      .map((e) => LMAttachmentViewDataConvertor.toAttachment(e))
+      .toList();
+  return Post(
+    id: '-${currentTime.millisecondsSinceEpoch}',
+    communityId: -1,
+    feedroomId: event.feedroomId,
+    isPinned: false,
+    uuid: event.user.uuid,
+    likeCount: 0,
+    isSaved: false,
+    menuItems: [],
+    createdAt: currentTime,
+    updatedAt: currentTime,
+    isLiked: false,
+    commentCount: 0,
+    isEdited: false,
+    isRepost: isRepost ?? false,
+    isRepostedByUser: false,
+    repostCount: 0,
+    isPendingPost: false,
+    postStatus: "",
+    text: postText ?? '',
+    heading: headingText,
+    attachments: attachments,
+    topicIds: event.selectedTopicIds,
+    tempId: '-${currentTime.millisecondsSinceEpoch}',
+  );
 }

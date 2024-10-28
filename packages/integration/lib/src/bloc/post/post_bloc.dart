@@ -18,6 +18,7 @@ part 'handler/delete_post_event_handler.dart';
 part 'handler/update_post_event_handler.dart';
 part 'handler/get_post_event_handler.dart';
 part 'handler/initial_event_handler.dart';
+part 'handler/retry_post_upload_event_handler.dart';
 
 /// {@template lm_post_bloc}
 /// [LMFeedPostBloc] handle all the post related actions
@@ -46,5 +47,16 @@ class LMFeedPostBloc extends Bloc<LMFeedPostEvents, LMFeedPostState> {
     on<LMFeedUpdatePostEvent>(updatePostEventHandler);
     // Get Post Event
     on<LMFeedGetPostEvent>(getPostEventHandler);
+    // retry event
+    on<LMFeedRetryPostUploadEvent>(retryPostUploadEventHandler);
+    // fetch temporary post from db
+    on<LMFeedFetchTempPostEvent>((LMFeedFetchTempPostEvent event, emit) {
+      // check if temp post is present
+      final postResponse = LMFeedCore.instance.lmFeedClient.getTemporaryPost();
+      if (postResponse.success && postResponse.data != null) {
+        emit(LMFeedNewPostErrorState(
+            errorMessage: "", tempId: postResponse.data?.tempId ?? ""));
+      }
+    });
   }
 }

@@ -216,10 +216,12 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
 
   int pendingPostCount = 0;
   bool isDesktopWeb = false;
+  bool isTempPostPresent = false;
 
   @override
   void initState() {
     super.initState();
+    newPostBloc.add(LMFeedFetchTempPostEvent());
     // Adds pagination listener to the feed
     _addPaginationListener();
 
@@ -649,75 +651,31 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
                     },
                     builder: (context, state) {
                       if (postUploading.value) {
-                        return Container(
-                          height: 72,
-                          color: feedThemeData.backgroundColor,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0,
-                            vertical: 6,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Text(
-                                      '${isPostEditing ? "Saving" : "Creating"} $postTitleSmallCap')
-                                ],
-                              ),
-                              LMFeedLoader(),
-                            ],
-                          ),
+                        return LMPostUploadingBanner(
+                          isUploading: true,
+                          uploadingMessage:
+                              '${isPostEditing ? "Saving" : "Creating"} $postTitleSmallCap',
+                          onRetry: () {},
+                          onCancel: () {},
                         );
                       }
                       if (state is LMFeedNewPostErrorState) {
-                        return Container(
-                          height: 72,
-                          color: feedThemeData.backgroundColor,
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0,
-                            vertical: 8,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              LMFeedText(
-                                text: "Post uploading failed.. try again",
-                                style: LMFeedTextStyle(
-                                  maxLines: 1,
-                                  textStyle: TextStyle(
-                                    color: Colors.red,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              Spacer(),
-                              LMFeedButton(
-                                onTap: () {
-                                  newPostBloc.add(state.event!);
-                                },
-                                style: LMFeedButtonStyle(
-                                  icon: LMFeedIcon(
-                                    type: LMFeedIconType.icon,
-                                    icon: Icons.refresh_rounded,
-                                  ),
-                                ),
-                              ),
-                              LMFeedButton(
-                                onTap: () {
-                                  newPostBloc.add(LMFeedPostInitiateEvent());
-                                },
-                                style: LMFeedButtonStyle(
-                                  icon: LMFeedIcon(
-                                    type: LMFeedIconType.icon,
-                                    icon: Icons.close,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                        return LMPostUploadingBanner(
+                          onRetry: () {
+                            newPostBloc.add(LMFeedRetryPostUploadEvent());
+                          },
+                          onCancel: () async {
+                            // delete the temporary post from db
+                            final DeleteTemporaryPostRequest
+                                deleteTemporaryPostRequest =
+                                (DeleteTemporaryPostRequestBuilder()
+                                      ..temporaryPostId(state.tempId))
+                                    .build();
+                            await LMFeedCore.instance.lmFeedClient
+                                .deleteTemporaryPost(
+                                    deleteTemporaryPostRequest);
+                            newPostBloc.add(LMFeedPostInitiateEvent());
+                          },
                         );
                       } else {
                         return const SizedBox.shrink();
@@ -1742,6 +1700,7 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
         ),
         onTap: userPostingRights
             ? () async {
+                final value = LMFeedCore.client.getTemporaryPost();
                 if (!postUploading.value) {
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
@@ -1778,6 +1737,89 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
           entityType: postEntityId,
           entityCreatorId: postViewData.user.uuid,
         ),
+      ),
+    );
+  }
+}
+
+class LMPostUploadingBanner extends StatelessWidget {
+  const LMPostUploadingBanner({
+    super.key,
+    required this.onRetry,
+    required this.onCancel,
+    this.isUploading = false,
+    this.uploadingMessage,
+  });
+
+  final VoidCallback onRetry;
+  final VoidCallback onCancel;
+  final bool isUploading;
+  final String? uploadingMessage;
+
+  @override
+  Widget build(BuildContext context) {
+    final feedThemeData = LMFeedCore.theme;
+    return Container(
+      height: 72,
+      color: feedThemeData.container,
+      margin: EdgeInsets.only(bottom: 16),
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+        vertical: 8,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          LMFeedText(
+            text: isUploading
+                ? uploadingMessage ?? "Posting"
+                : "Upload failed... try again",
+            style: LMFeedTextStyle(
+              maxLines: 1,
+              textStyle: TextStyle(
+                color: isUploading
+                    ? feedThemeData.onContainer
+                    : feedThemeData.errorColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Spacer(),
+          if (!isUploading)
+            Row(
+              children: [
+                LMFeedButton(
+                  onTap: onRetry,
+                  style: LMFeedButtonStyle(
+                    icon: LMFeedIcon(
+                      type: LMFeedIconType.icon,
+                      icon: Icons.refresh_rounded,
+                    ),
+                  ),
+                ),
+                LikeMindsTheme.kHorizontalPaddingLarge,
+                LMFeedButton(
+                  onTap: onCancel,
+                  style: LMFeedButtonStyle(
+                    icon: LMFeedIcon(
+                      type: LMFeedIconType.icon,
+                      icon: Icons.close,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          if (isUploading)
+            LMFeedLoader(
+              style: LMFeedLoaderStyle(
+                height: 26,
+                width: 26,
+              ),
+            ),
+        ],
       ),
     );
   }
