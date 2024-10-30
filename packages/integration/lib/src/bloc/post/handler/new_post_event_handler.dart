@@ -5,12 +5,9 @@ void newPostEventHandler(
   try {
     List<Attachment> attachments = [];
     StreamController<double> progress = StreamController<double>.broadcast();
-    bool? isRepost;
 
     // Handle media upload if media exists
-    if (event.postMedia != null &&
-        event.postMedia!.isNotEmpty &&
-        event.postMedia!.first.attachmentMeta.url == null) {
+    if (event.postMedia != null && event.postMedia!.isNotEmpty) {
       attachments = await uploadMediaEventHandler(
         LMFeedUploadMediaEvent(
           postMedia: event.postMedia!,
@@ -18,12 +15,6 @@ void newPostEventHandler(
           progressController: progress,
         ),
         emit,
-      );
-    } else {
-      emit(
-        LMFeedNewPostUploadingState(
-          progress: progress.stream,
-        ),
       );
     }
 
@@ -34,7 +25,8 @@ void newPostEventHandler(
     String? postText = event.postText;
     String? headingText = event.heading;
 
-    isRepost = attachments.first.attachmentType == LMMediaType.repost;
+    bool isRepost = attachments.isNotEmpty &&
+        attachments.first.attachmentType == LMMediaType.repost.index;
 
     final requestBuilder = AddPostRequestBuilder()
       ..attachments(attachments)
@@ -54,8 +46,9 @@ void newPostEventHandler(
     }
 
     if (isRepost) {
-      requestBuilder.isRepost(isRepost);
+      requestBuilder.isRepost(true);
     }
+
     final AddPostResponse response =
         await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
 

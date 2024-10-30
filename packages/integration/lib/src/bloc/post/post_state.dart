@@ -229,3 +229,17 @@ class LMFeedEditPostUploadingState extends LMFeedUploadingState {
 /// [LMFeedGetPostLoadingState] is emitted to indicate that
 /// post details is being fetched
 class LMFeedGetPostLoadingState extends LMFeedUploadingState {}
+
+// Add this new state class alongside other states
+class LMFeedMediaUploadedState extends LMFeedPostState {
+  final List<Attachment> attachments;
+  final List<LMAttachmentViewData> mediaViewData;
+
+  const LMFeedMediaUploadedState({
+    required this.attachments,
+    required this.mediaViewData,
+  });
+
+  @override
+  List<Object> get props => [attachments, mediaViewData];
+}

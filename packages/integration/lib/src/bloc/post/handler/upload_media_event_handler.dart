@@ -4,7 +4,6 @@ Future<List<Attachment>> uploadMediaEventHandler(
     LMFeedUploadMediaEvent event, Emitter<LMFeedPostState> emit) async {
   List<Attachment> attachments = [];
   int index = 0;
-  bool? isRepost;
 
   event.progressController.add(0);
 
@@ -40,7 +39,6 @@ Future<List<Attachment>> uploadMediaEventHandler(
                 media.attachmentMeta),
           ),
         );
-        isRepost = true;
         break;
       } else if (media.attachmentType == LMMediaType.link) {
         attachments.add(
@@ -98,6 +96,16 @@ Future<List<Attachment>> uploadMediaEventHandler(
     }
   }
 
+  // Emit the new state with uploaded attachments
+  emit(LMFeedMediaUploadedState(
+    attachments: attachments,
+    mediaViewData: attachments
+        .map((a) => LMAttachmentViewDataConvertor.fromAttachment(
+              attachment: a,
+              users: {},
+            ))
+        .toList(),
+  ));
   return attachments;
 }
 
