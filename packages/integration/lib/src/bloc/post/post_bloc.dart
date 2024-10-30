@@ -41,5 +41,6 @@ class LMFeedPostBloc extends Bloc<LMFeedPostEvents, LMFeedPostState> {
     on<LMFeedDeletePostEvent>(deletePostEventHandler);
     on<LMFeedUpdatePostEvent>(updatePostEventHandler);
     on<LMFeedGetPostEvent>(getPostEventHandler);
+    on<LMFeedUploadMediaEvent>(uploadMediaEventHandler);
   }
 }

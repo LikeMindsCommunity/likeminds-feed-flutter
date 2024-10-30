@@ -342,7 +342,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   .build(),
             ),
           );
-          return;
+        } else {
+          // Handle other attachment types (images/videos)
+          composeBloc.postMedia.add(
+            LMAttachmentViewData.fromAttachmentMeta(
+              attachmentType: attachment.attachmentType,
+              attachmentMeta: attachment.attachmentMeta,
+            ),
+          );
         }
       }
     }
@@ -1032,16 +1039,16 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           StreamController<double>.broadcast();
 
       // First upload the media files
-      if (composeBloc.postMedia.isNotEmpty) {
-        // Add upload media event
-        LMFeedPostBloc.instance.add(
-          LMFeedUploadMediaEvent(
-            postMedia: [...composeBloc.postMedia],
-            user: user!,
-            progressController: progressController,
-          ),
-        );
-      }
+      // if (composeBloc.postMedia.isNotEmpty) {
+      //   // Add upload media event
+      //   LMFeedPostBloc.instance.add(
+      //     LMFeedUploadMediaEvent(
+      //       postMedia: [...composeBloc.postMedia],
+      //       user: user!,
+      //       progressController: progressController,
+      //     ),
+      //   );
+      // }
 
       // Add a new post event to the post bloc
       LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
