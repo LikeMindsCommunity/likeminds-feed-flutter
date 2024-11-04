@@ -147,6 +147,7 @@ class LMFeedComposeScreen extends StatefulWidget {
   final PreferredSizeWidget Function(
     LMFeedAppBar oldAppBar,
     LMResponse<void> Function() onPostCreate,
+    LMResponse<void> Function() validatePost,
     LMFeedButton createPostButton,
     LMFeedButton cancelButton,
     void Function(String) onValidationFailed,
@@ -272,6 +273,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   String? result;
   Size? screenSize;
   double? screenWidth;
+  String? heading;
+  String postText = '';
+  List<LMTopicViewData> selectedTopics = [];
+  List<LMUserTagViewData> userTags = [];
+
   // bool to check if the user has tapped on the cancel icon
   // of link preview, in that case toggle the bool to true
   // and don't generate link preview any further
@@ -384,18 +390,22 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             backgroundColor: feedTheme.container,
             bottomSheet: _defMediaPicker(),
             appBar: widget.composeAppBarBuilder?.call(
-                    _defAppBar(),
-                    onPostCreate,
-                    _defPostCreateButton(),
-                    _defCancelButton(),
-                    onPostValidationFailed) ??
+                  _defAppBar(),
+                  onPostCreate,
+                  validatePost,
+                  _defPostCreateButton(),
+                  _defCancelButton(),
+                  onPostValidationFailed,
+                ) ??
                 widgetUtility.composeScreenAppBar(
-                    context,
-                    _defAppBar(),
-                    onPostCreate,
-                    _defPostCreateButton(),
-                    _defCancelButton(),
-                    onPostValidationFailed),
+                  context,
+                  _defAppBar(),
+                  onPostCreate,
+                  validatePost,
+                  _defPostCreateButton(),
+                  _defCancelButton(),
+                  onPostValidationFailed,
+                ),
             canPop: false,
             onPopInvoked: (canPop) {
               widget.composeDiscardDialogBuilder?.call(context) ??
@@ -981,16 +991,15 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     );
   }
 
-// Update the onPostCreate method to handle the new upload flow
-  LMResponse<void> onPostCreate() {
+  LMResponse<void> validatePost() {
     // Remove focus from text fields to dismiss the keyboard
     _focusNode.unfocus();
 
     // Get the trimmed heading and post text values
-    String? heading = _headingController?.text;
+    heading = _headingController?.text;
     heading = heading?.trim();
 
-    String postText = _controller.text;
+    postText = _controller.text;
     postText = postText.trim();
 
     // Check if there is content (heading, post text, or media) to create the post
@@ -998,13 +1007,13 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         postText.isNotEmpty ||
         composeBloc.postMedia.isNotEmpty) {
       // Collect user tags and topics for the post
-      List<LMUserTagViewData> userTags = [...composeBloc.userTags];
-      List<LMTopicViewData> selectedTopics = [...composeBloc.selectedTopics];
+      userTags = [...composeBloc.userTags];
+      selectedTopics = [...composeBloc.selectedTopics];
 
       // Validate the heading if required
       if (config!.enableHeading &&
           config!.headingRequiredToCreatePost &&
-          (heading == null || heading.isEmpty)) {
+          (heading == null || heading!.isEmpty)) {
         return LMResponse(
           success: false,
           errorMessage: "Can't create a $postTitleSmallCap without heading",
@@ -1033,35 +1042,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       userTags = LMFeedTaggingHelper.matchTags(_controller.text, userTags);
       result =
           LMFeedTaggingHelper.encodeString(_controller.text, userTags).trim();
-
-      // Create a StreamController for upload progress
-      StreamController<double> progressController =
-          StreamController<double>.broadcast();
-
-      // First upload the media files
-      // if (composeBloc.postMedia.isNotEmpty) {
-      //   // Add upload media event
-      //   LMFeedPostBloc.instance.add(
-      //     LMFeedUploadMediaEvent(
-      //       postMedia: [...composeBloc.postMedia],
-      //       user: user!,
-      //       progressController: progressController,
-      //     ),
-      //   );
-      // }
-
-      // Add a new post event to the post bloc
-      LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-        user: user!,
-        postText: result!,
-        selectedTopics: selectedTopics,
-        postMedia: [...composeBloc.postMedia],
-        heading: heading,
-        feedroomId: widget.feedroomId,
-        userTagged: userTags,
-      ));
-
-      // Return success response
       return LMResponse(success: true);
     } else {
       // Return error response if no content to create the post
@@ -1071,6 +1051,27 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             "Can't create a $postTitleSmallCap without text or attachments",
       );
     }
+  }
+
+// Update the onPostCreate method to handle the new upload flow
+  LMResponse<void> onPostCreate() {
+    // Create a StreamController for upload progress
+    StreamController<double> progressController =
+        StreamController<double>.broadcast();
+
+    // Add a new post event to the post bloc
+    LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
+      user: user!,
+      postText: result!,
+      selectedTopics: selectedTopics,
+      postMedia: [...composeBloc.postMedia],
+      heading: heading,
+      feedroomId: widget.feedroomId,
+      userTagged: userTags,
+    ));
+
+    // Return success response
+    return LMResponse(success: true);
   }
 
   Widget _defContentInput() {
