@@ -7,7 +7,9 @@ void newPostEventHandler(
     StreamController<double> progress = StreamController<double>.broadcast();
 
     // Handle media upload if media exists
-    if (event.postMedia != null && event.postMedia!.isNotEmpty) {
+    if (event.postMedia != null &&
+        event.postMedia!.isNotEmpty &&
+        event.postMedia!.first.attachmentMeta.url == null) {
       attachments = await uploadMediaEventHandler(
         LMFeedUploadMediaEvent(
           postMedia: event.postMedia!,
