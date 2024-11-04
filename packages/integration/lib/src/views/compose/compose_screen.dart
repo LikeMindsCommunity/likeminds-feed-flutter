@@ -1058,7 +1058,12 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     // Create a StreamController for upload progress
     StreamController<double> progressController =
         StreamController<double>.broadcast();
-
+    // validate post creation data
+    LMResponse response = validatePost();
+    // if validation fails return the error response
+    if(!response.success) {
+      return response;
+    }
     // Add a new post event to the post bloc
     LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
       user: user!,

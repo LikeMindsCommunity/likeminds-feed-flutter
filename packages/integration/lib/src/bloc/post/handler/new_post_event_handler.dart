@@ -19,6 +19,8 @@ void newPostEventHandler(
         emit,
       );
     }
+    // emit the uploading state
+    emit(LMFeedNewPostUploadingState(progress: progress.stream));
 
     // Continue with post creation
     List<Topic> postTopics = event.selectedTopics
