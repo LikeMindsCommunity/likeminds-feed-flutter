@@ -1,6 +1,6 @@
 part of '../post_bloc.dart';
 
-Future<List<Attachment>> uploadMediaEventHandler(
+Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
     LMFeedUploadMediaEvent event, Emitter<LMFeedPostState> emit) async {
   List<Attachment> attachments = [];
   int index = 0;
@@ -89,11 +89,13 @@ Future<List<Attachment>> uploadMediaEventHandler(
           );
           event.progressController.add(index / event.postMedia.length);
         } else {
-          emit(LMFeedMediaUploadErrorState(
-            errorMessage: response.errorMessage ?? "Media upload failed",
-            tempId: event.tempId,
-          ));
-          return [];
+          emit(
+            LMFeedMediaUploadErrorState(
+              errorMessage: "Media upload failed",
+              tempId: event.tempId,
+            ),
+          );
+          return LMResponse.error(errorMessage: "Media upload failed");
         }
       }
       index++;
@@ -117,7 +119,7 @@ Future<List<Attachment>> uploadMediaEventHandler(
           .build();
   await LMFeedCore.client.deleteTemporaryPost(deleteTemporaryPostRequest);
 
-  return attachments;
+  return LMResponse.success(data: attachments);
 }
 
 Future<void> _handleVideoUpload(

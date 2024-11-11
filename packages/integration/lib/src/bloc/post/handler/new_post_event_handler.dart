@@ -37,7 +37,7 @@ void newPostEventHandler(
     if (event.postMedia != null &&
         event.postMedia!.isNotEmpty &&
         event.postMedia!.first.attachmentMeta.url == null) {
-      attachments = await uploadMediaEventHandler(
+      final uploadAttachmentResponse = await uploadMediaEventHandler(
         LMFeedUploadMediaEvent(
           postMedia: event.postMedia!,
           user: event.user,
@@ -46,6 +46,12 @@ void newPostEventHandler(
         ),
         emit,
       );
+      if (!uploadAttachmentResponse.success ||
+          uploadAttachmentResponse.data == null) {
+        return;
+      }
+
+      attachments = uploadAttachmentResponse.data!;
     }
     // emit the uploading state
     emit(LMFeedNewPostUploadingState(progress: progress.stream));

@@ -258,7 +258,8 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
       } else if (state is LMFeedNewPostUploadedState ||
           state is LMFeedEditPostUploadedState ||
           state is LMFeedNewPostErrorState ||
-          state is LMFeedEditPostErrorState) {
+          state is LMFeedEditPostErrorState ||
+          state is LMFeedMediaUploadErrorState) {
         postUploading.value = false;
         isPostEditing = false;
       }
@@ -800,6 +801,15 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
     return LMFeedPostSomething(
       onTap: userPostingRights
           ? () async {
+              final value = LMFeedCore.client.getTemporaryPost();
+              if (value.success) {
+                LMFeedCore.showSnackBar(
+                  context,
+                  'A $postTitleSmallCap is already uploading.',
+                  _widgetSource,
+                );
+                return;
+              }
               LMFeedVideoProvider.instance.forcePauseAllControllers();
               // ignore: use_build_context_synchronously
               await Navigator.of(context).push(MaterialPageRoute(
@@ -1536,6 +1546,15 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
         ),
         onTap: userPostingRights
             ? () async {
+                final value = LMFeedCore.client.getTemporaryPost();
+                if (value.success) {
+                  LMFeedCore.showSnackBar(
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource,
+                  );
+                  return;
+                }
                 if (!postUploading.value) {
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
@@ -1639,6 +1658,15 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
       ),
       onTap: userPostingRights
           ? () async {
+              final value = LMFeedCore.client.getTemporaryPost();
+              if (value.success) {
+                LMFeedCore.showSnackBar(
+                  context,
+                  'A $postTitleSmallCap is already uploading.',
+                  _widgetSource,
+                );
+                return;
+              }
               if (!postUploading.value) {
                 LMFeedVideoProvider.instance.forcePauseAllControllers();
                 // ignore: use_build_context_synchronously
@@ -1701,6 +1729,14 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
         onTap: userPostingRights
             ? () async {
                 final value = LMFeedCore.client.getTemporaryPost();
+                if (value.success) {
+                  LMFeedCore.showSnackBar(
+                    context,
+                    'A $postTitleSmallCap is already uploading.',
+                    _widgetSource,
+                  );
+                  return;
+                }
                 if (!postUploading.value) {
                   LMFeedVideoProvider.instance.forcePauseAllControllers();
                   // ignore: use_build_context_synchronously
