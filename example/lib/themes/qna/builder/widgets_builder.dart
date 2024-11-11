@@ -10,12 +10,12 @@ import 'package:likeminds_feed_sample/themes/qna/builder/topic/compose_topic_sel
 import 'package:likeminds_feed_sample/themes/qna/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/theme/theme.dart';
 
-class LMFeedQnAWidgets extends LMFeedWidgetUtility {
-  static LMFeedQnAWidgets? _instance;
+class LMFeedQnAWidgetsExample extends LMFeedWidgetUtility {
+  static LMFeedQnAWidgetsExample? _instance;
 
-  static LMFeedQnAWidgets get instance => _instance ??= LMFeedQnAWidgets._();
+  static LMFeedQnAWidgetsExample get instance => _instance ??= LMFeedQnAWidgetsExample._();
 
-  LMFeedQnAWidgets._();
+  LMFeedQnAWidgetsExample._();
 
   @override
   Widget scaffold({
@@ -86,7 +86,7 @@ class LMFeedQnAWidgets extends LMFeedWidgetUtility {
   Widget postWidgetBuilder(
       BuildContext context, LMFeedPostWidget post, LMPostViewData postViewData,
       {LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed}) {
-    return LMQnAPostWidget(
+    return LMQnAPostWidgetExample(
       postWidget: post,
       postViewData: postViewData,
       source: source,
@@ -96,7 +96,7 @@ class LMFeedQnAWidgets extends LMFeedWidgetUtility {
   @override
   Widget commentBuilder(BuildContext context, LMFeedCommentWidget commentWidget,
       LMPostViewData postViewData) {
-    return LMQnACommentWidget(
+    return LMQnACommentWidgetExample(
       commentViewData: commentWidget.comment,
       postViewData: postViewData,
       commentWidget: commentWidget,
@@ -138,7 +138,7 @@ class LMFeedQnAWidgets extends LMFeedWidgetUtility {
       LMPostViewData postViewData) {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-    return LMQnAPostFooter(
+    return LMQnAPostFooterExample(
       feedThemeData: feedThemeData,
       footer: postFooter,
       postViewData: postViewData,

@@ -4,12 +4,12 @@ import 'package:likeminds_feed_sample/themes/qna/utils/theme/theme.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/utils.dart';
 import 'package:likeminds_feed_sample/themes/qna/widgets/report_bottomsheet.dart';
 
-class LMQnACommentWidget extends StatefulWidget {
+class LMQnACommentWidgetExample extends StatefulWidget {
   final LMCommentViewData commentViewData;
   final LMPostViewData postViewData;
   final LMFeedCommentWidget commentWidget;
 
-  const LMQnACommentWidget({
+  const LMQnACommentWidgetExample({
     super.key,
     required this.commentViewData,
     required this.postViewData,
@@ -17,10 +17,10 @@ class LMQnACommentWidget extends StatefulWidget {
   });
 
   @override
-  State<LMQnACommentWidget> createState() => _LMQnACommentWidgetState();
+  State<LMQnACommentWidgetExample> createState() => _LMQnACommentWidgetExampleState();
 }
 
-class _LMQnACommentWidgetState extends State<LMQnACommentWidget> {
+class _LMQnACommentWidgetExampleState extends State<LMQnACommentWidgetExample> {
   LMCommentViewData? commentViewData;
   LMPostViewData? postViewData;
   LMUserViewData? commentCreator;
@@ -37,7 +37,7 @@ class _LMQnACommentWidgetState extends State<LMQnACommentWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant LMQnACommentWidget oldWidget) {
+  void didUpdateWidget(covariant LMQnACommentWidgetExample oldWidget) {
     super.didUpdateWidget(oldWidget);
     commentViewData = widget.commentViewData;
     postViewData = widget.postViewData;

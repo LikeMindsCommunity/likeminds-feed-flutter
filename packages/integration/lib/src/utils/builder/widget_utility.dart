@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+part 'qna_widgets.dart';
 
 /// {@template feed_widget_utility}
 /// A utility class that provides a set of methods to build widgets for the feed.

@@ -6,12 +6,12 @@ import 'package:likeminds_feed_sample/themes/qna/utils/theme/theme.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/utils.dart';
 import 'package:likeminds_feed_sample/themes/qna/widgets/report_bottomsheet.dart';
 
-class LMQnAPostWidget extends StatefulWidget {
+class LMQnAPostWidgetExample extends StatefulWidget {
   final LMFeedPostWidget postWidget;
   final LMPostViewData postViewData;
   final LMFeedWidgetSource source;
 
-  const LMQnAPostWidget({
+  const LMQnAPostWidgetExample({
     super.key,
     required this.postWidget,
     required this.postViewData,
@@ -19,10 +19,10 @@ class LMQnAPostWidget extends StatefulWidget {
   });
 
   @override
-  State<LMQnAPostWidget> createState() => _LMQnAPostWidgetState();
+  State<LMQnAPostWidgetExample> createState() => _LMQnAPostWidgetExampleState();
 }
 
-class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
+class _LMQnAPostWidgetExampleState extends State<LMQnAPostWidgetExample> {
   LMPostViewData? postViewData;
   LMFeedPostWidget? postWidget;
   LMUserViewData userViewData = LMFeedLocalPreference.instance.fetchUserData()!;
@@ -40,7 +40,7 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant LMQnAPostWidget oldWidget) {
+  void didUpdateWidget(covariant LMQnAPostWidgetExample oldWidget) {
     super.didUpdateWidget(oldWidget);
     postViewData = widget.postViewData;
     postWidget = widget.postWidget;
@@ -156,7 +156,7 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
               ),
             //postTopics,
             if (postWidget!.footer != null)
-              LMQnAPostFooter(
+              LMQnAPostFooterExample(
                 feedThemeData: feedThemeData,
                 footer: postWidget!.footer!,
                 postViewData: postViewData!,

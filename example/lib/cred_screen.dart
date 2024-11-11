@@ -2,19 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_sample/globals.dart';
-import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
-import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
 import 'package:likeminds_feed_sample/themes/social/screens/tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/themes/social_dark/likeminds_feed_nova_fl.dart';
 import 'package:likeminds_feed_sample/themes/social_feedroom/koshiqa_theme.dart';
 import 'package:likeminds_feed_sample/themes/social_feedroom/likeminds_feed_flutter_koshiqa.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
-const _isProd = !bool.fromEnvironment('DEBUG');
 
 class CredScreen extends StatefulWidget {
   const CredScreen({super.key});
@@ -31,7 +27,7 @@ class _CredScreenState extends State<CredScreen> {
   final ValueNotifier<bool> _isFeedRoomTheme = ValueNotifier(false);
   StreamSubscription? _streamSubscription;
   String? uuid;
-  LMFeedFlavor selectedTheme = LMFeedFlavor.social;
+  LMFeedFlavor selectedTheme = LMFeedFlavor.qna;
 
   @override
   void initState() {
@@ -229,9 +225,16 @@ class _CredScreenState extends State<CredScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                  onPressed: () {
-                    LMFeedLocalPreference.instance.clearCache();
-
+                  onPressed: () async {
+                    // logout the user if already logged in
+                    // if the user is not logged in,
+                    // clear the cache manually
+                    final LogoutRequest request =
+                        LogoutRequestBuilder().build();
+                    final response = await LMFeedCore.client.logout(request);
+                    if (!response.success) {
+                      LMFeedLocalPreference.instance.clearCache();
+                    }
                     _usernameController.clear();
                     _uuidController.clear();
                     _apiKeyController.clear();
@@ -354,7 +357,7 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.qna:
         {
-          return const LMFeedQnA();
+          return const LMFeedScreen();
         }
       case LMFeedFlavor.socialDark:
         {
@@ -382,7 +385,7 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.qna:
         {
-          LMFeedCore.theme = qNaTheme;
+          LMFeedCore.theme = LMFeedThemeData.qna();
           LMFeedCore.config = LMFeedConfig(
             composeConfig: const LMFeedComposeScreenConfig(
               topicRequiredToCreatePost: true,
@@ -400,7 +403,7 @@ class _CredScreenState extends State<CredScreen> {
             postDetailConfig: const LMPostDetailScreenConfig(
                 commentTextFieldHint: "Write your response"),
           );
-          LMFeedCore.widgetUtility = LMFeedQnAWidgets.instance;
+          LMFeedCore.widgetUtility = LMFeedQnAWidgets();
           LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
         }
         break;
