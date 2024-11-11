@@ -5,158 +5,59 @@ void newPostEventHandler(
   final DateTime currentTime = DateTime.now();
   final String tempId = '-${currentTime.millisecondsSinceEpoch}';
   try {
-    List<LMAttachmentViewData>? postMedia = event.postMedia;
     List<Attachment> attachments = [];
-    int index = 0;
-    bool? isRepost = isRepostPost(postMedia ?? []);
-
     StreamController<double> progress = StreamController<double>.broadcast();
-    progress.add(0);
 
-    if (isPostContainsMedia(postMedia ?? [])) {
-      final Post tempPost = createTempPostFromEvent(
+    // check if post is repost
+    bool isRepost = isRepostPost(event.postMedia ?? []);
+
+    // check if there is any media to upload
+    bool isMediaPresent = isPostContainsMedia(event.postMedia ?? []);
+    // save temp post if media is present in db
+    // to retry post upload if media upload fails
+    if (isMediaPresent) {
+      // create temp post
+      final post = createTempPostFromEvent(
         event,
-        postMedia ?? [],
+        event.postMedia ?? [],
         isRepost,
-        currentTime,
+        DateTime.now(),
       );
-      final SaveTemporaryPostRequestBuilder saveTempPostRequestBuilder =
-          SaveTemporaryPostRequestBuilder()..tempPost(tempPost);
-      LMFeedCore.client.saveTemporaryPost(saveTempPostRequestBuilder.build());
+
+      // create save temp post request
+      final SaveTemporaryPostRequest saveTemporaryPostRequest =
+          (SaveTemporaryPostRequestBuilder()..tempPost(post)).build();
+
+      // save temp post in db
+      await LMFeedCore.instance.lmFeedClient
+          .saveTemporaryPost(saveTemporaryPostRequest);
     }
 
-    // Upload post media to s3 and add links as Attachments
-    if (postMedia != null && postMedia.isNotEmpty) {
-      emit(
-        LMFeedNewPostUploadingState(
-          progress: progress.stream,
-          thumbnailMedia: postMedia.isEmpty
-              ? null
-              : postMedia[0].attachmentType == LMMediaType.link
-                  ? null
-                  : postMedia[0],
+    // Handle media upload if media exists
+    if (event.postMedia != null &&
+        event.postMedia!.isNotEmpty &&
+        event.postMedia!.first.attachmentMeta.url == null) {
+      attachments = await uploadMediaEventHandler(
+        LMFeedUploadMediaEvent(
+          postMedia: event.postMedia!,
+          user: event.user,
+          progressController: progress,
+          tempId: tempId,
         ),
-      );
-      for (final media in postMedia) {
-        if (media.attachmentType == LMMediaType.poll) {
-          attachments.add(
-            Attachment(
-              attachmentType: 6,
-              attachmentMeta:
-                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMeta),
-            ),
-          );
-          continue;
-        }
-        if (media.attachmentType == LMMediaType.repost) {
-          attachments.add(
-            Attachment(
-              attachmentType: 8,
-              attachmentMeta:
-                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMeta),
-            ),
-          );
-          isRepost = true;
-          break;
-        } else if (media.attachmentType == LMMediaType.link) {
-          attachments.add(
-            Attachment(
-              attachmentType: 4,
-              attachmentMeta:
-                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMeta),
-            ),
-          );
-        } else if (media.attachmentType == LMMediaType.widget) {
-          attachments.add(
-            Attachment(
-              attachmentType: 5,
-              attachmentMeta:
-                  LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                      media.attachmentMeta),
-            ),
-          );
-        } else {
-          late File mediaFile;
-          if (media.attachmentMeta.bytes != null) {
-            mediaFile = File.fromRawPath(media.attachmentMeta.bytes!);
-          } else if (media.attachmentMeta.path != null) {
-            mediaFile = File(media.attachmentMeta.path!);
-          } else {
-            LMFeedNewPostErrorState(
-                errorMessage: 'Attachment file not found', tempId: tempId);
-          }
-
-          if (media.attachmentType == LMMediaType.video) {
-            String? thumbnailURL;
-            String? thumbnailPath = await LMFeedVideoThumbnail.thumbnailFile(
-              video: mediaFile.path,
-              quality: 8,
-            );
-
-            if (thumbnailPath != null) {
-              File thumbnailFile = File(thumbnailPath);
-              final LMResponse<String> response =
-                  await LMFeedMediaService.uploadFile(
-                      thumbnailFile.readAsBytesSync(),
-                      event.user.sdkClientInfo.uuid);
-              if (response.success) {
-                thumbnailURL = response.data;
-                media.attachmentMeta.thumbnailUrl = thumbnailURL;
-              }
-            }
-
-            int originalSize = media.attachmentMeta.size!;
-
-            if (!kIsWeb) {
-              var tempFile = await VideoCompress.compressVideo(
-                mediaFile.path,
-                deleteOrigin: false,
-                includeAudio: true,
-              );
-
-              mediaFile = tempFile!.file!;
-            }
-          }
-          final LMResponse<String> response =
-              await LMFeedMediaService.uploadFile(
-            kIsWeb ? media.attachmentMeta.bytes! : mediaFile.readAsBytesSync(),
-            event.user.sdkClientInfo.uuid,
-            fileName: media.attachmentMeta.meta?['file_name'],
-          );
-          if (response.success) {
-            media.attachmentMeta.url = response.data;
-            attachments.add(
-              Attachment(
-                attachmentType: media.mapMediaTypeToInt(),
-                attachmentMeta:
-                    LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
-                  media.attachmentMeta,
-                ),
-              ),
-            );
-            progress.add(index / postMedia.length);
-          } else {
-            throw ('Error uploading file');
-          }
-        }
-      }
-    } else {
-      emit(
-        LMFeedNewPostUploadingState(
-          progress: progress.stream,
-        ),
+        emit,
       );
     }
+    // emit the uploading state
+    emit(LMFeedNewPostUploadingState(progress: progress.stream));
+
+    // Continue with post creation
     String? postText = event.postText;
     String? headingText = event.heading;
 
     final requestBuilder = AddPostRequestBuilder()
       ..attachments(attachments)
       ..topicIds(event.selectedTopicIds)
-      ..tempId('${-DateTime.now().millisecondsSinceEpoch}');
+      ..tempId(tempId);
 
     if (headingText != null) {
       requestBuilder.heading(headingText);
@@ -170,9 +71,10 @@ void newPostEventHandler(
       requestBuilder.text(postText);
     }
 
-    if (isRepost != null) {
-      requestBuilder.isRepost(isRepost);
+    if (isRepost) {
+      requestBuilder.isRepost(true);
     }
+
     final AddPostResponse response =
         await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
 
@@ -206,10 +108,6 @@ void newPostEventHandler(
                     widgets: widgets,
                   ))) ??
               {};
-      final DeleteTemporaryPostRequest deleteTemporaryPostRequest =
-          (DeleteTemporaryPostRequestBuilder()..temporaryPostId(tempId))
-              .build();
-      await LMFeedCore.client.deleteTemporaryPost(deleteTemporaryPostRequest);
       emit(
         LMFeedNewPostUploadedState(
           postData: LMPostViewDataConvertor.fromPost(
@@ -237,7 +135,6 @@ void newPostEventHandler(
     LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
   } on Exception catch (err, stacktrace) {
     LMFeedPersistence.instance.handleException(err, stacktrace);
-
     emit(LMFeedNewPostErrorState(
       errorMessage: 'An error occurred',
       tempId: tempId,
@@ -322,15 +219,6 @@ void sendPostCreationCompletedEvent(
   ));
 }
 
-bool isRepostPost(List<LMAttachmentViewData> postMedia) {
-  for (LMAttachmentViewData media in postMedia) {
-    if (media.attachmentType == LMMediaType.repost) {
-      return true;
-    }
-  }
-  return false;
-}
-
 bool isPostContainsMedia(List<LMAttachmentViewData> postMedia) {
   for (LMAttachmentViewData media in postMedia) {
     if (media.attachmentType == LMMediaType.image ||
@@ -379,4 +267,13 @@ Post createTempPostFromEvent(
     topicIds: event.selectedTopicIds,
     tempId: '-${currentTime.millisecondsSinceEpoch}',
   );
+}
+
+bool isRepostPost(List<LMAttachmentViewData> postMedia) {
+  for (LMAttachmentViewData media in postMedia) {
+    if (media.attachmentType == LMMediaType.repost) {
+      return true;
+    }
+  }
+  return false;
 }

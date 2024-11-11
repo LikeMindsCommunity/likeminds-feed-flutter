@@ -196,6 +196,16 @@ class LMFeedPostDeletionErrorState extends LMFeedPostState {
   List<Object> get props => [message];
 }
 
+class LMFeedMediaUploadErrorState extends LMFeedPostErrorState {
+  final String tempId;
+  const LMFeedMediaUploadErrorState({
+    required super.errorMessage,
+    required this.tempId,
+  });
+  @override
+  List<Object> get props => [errorMessage, tempId];
+}
+
 // Loading States
 /// When an action is in progress [LMFeedUploadingState] is emitted
 class LMFeedUploadingState extends LMFeedPostState {
@@ -232,3 +242,17 @@ class LMFeedEditPostUploadingState extends LMFeedUploadingState {
 /// [LMFeedGetPostLoadingState] is emitted to indicate that
 /// post details is being fetched
 class LMFeedGetPostLoadingState extends LMFeedUploadingState {}
+
+// Add this new state class alongside other states
+class LMFeedMediaUploadedState extends LMFeedPostState {
+  final List<Attachment> attachments;
+  final List<LMAttachmentViewData> mediaViewData;
+
+  const LMFeedMediaUploadedState({
+    required this.attachments,
+    required this.mediaViewData,
+  });
+
+  @override
+  List<Object> get props => [attachments, mediaViewData];
+}

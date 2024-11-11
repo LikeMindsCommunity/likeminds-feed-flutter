@@ -278,12 +278,13 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                   }
                                   if (state is LMFeedGetCommentSuccessState) {
                                     postData = state.post;
-                                    return widget.postBuilder?.call(
-                                          context,
-                                          defPostWidget(context, postData!),
-                                          postData!,
-                                        ) ??
+                                    LMFeedPostWidget postWidget =
                                         defPostWidget(context, postData!);
+                                    return widget.postBuilder?.call(
+                                            context, postWidget, postData!) ??
+                                        _widgetBuilder.postWidgetBuilder.call(
+                                            context, postWidget, postData!,
+                                            source: _widgetSource);
                                   }
                                   return Container();
                                 },

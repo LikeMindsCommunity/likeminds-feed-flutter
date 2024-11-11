@@ -321,6 +321,7 @@ class LMFeedWidgetUtility {
     BuildContext context,
     LMFeedAppBar appBar,
     LMResponse<void> Function() onPostCreate,
+    LMResponse<void> Function() validatePost,
     LMFeedButton createPostButton,
     LMFeedButton cancelButton,
     void Function(String) onValidationFailed,

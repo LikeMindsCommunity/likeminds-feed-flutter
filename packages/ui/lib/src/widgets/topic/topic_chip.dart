@@ -24,14 +24,17 @@ class LMFeedTopicChip extends StatelessWidget {
 
   final bool isSelected;
 
+  final LMFeedTextBuilder? textBuilder;
+
   const LMFeedTopicChip({
-    Key? key,
+    super.key,
     required this.topic,
     this.style,
     this.onTap,
     this.onIconTap,
+    this.textBuilder,
     required this.isSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +45,7 @@ class LMFeedTopicChip extends StatelessWidget {
             ? feedTheme.topicStyle.activeChipStyle
             : feedTheme.topicStyle.inactiveChipStyle);
 
-    Widget topicText = LMFeedText(
+    LMFeedText topicText = LMFeedText(
       text: topic.name,
       style: LMFeedTextStyle(
         textStyle: style?.textStyle,
@@ -97,8 +100,11 @@ class LMFeedTopicChip extends StatelessWidget {
                 topic.name.isEmpty
                     ? const SizedBox()
                     : (style?.gripChip ?? false)
-                        ? Expanded(child: topicText)
-                        : topicText,
+                        ? Expanded(
+                            child: textBuilder?.call(context, topicText) ??
+                                topicText,
+                          )
+                        : textBuilder?.call(context, topicText) ?? topicText,
                 style?.icon != null &&
                         style?.iconPlacement == LMFeedIconButtonPlacement.end
                     ? LikeMindsTheme.kHorizontalPaddingSmall
@@ -127,12 +133,16 @@ class LMFeedTopicChip extends StatelessWidget {
     LMTopicViewData? topic,
     LMFeedTopicChipStyle? style,
     bool? isSelected,
+    Function(BuildContext, LMTopicViewData)? onTap,
+    LMFeedTextBuilder? textBuilder,
   }) {
     return LMFeedTopicChip(
       onIconTap: onIconTap ?? this.onIconTap,
       topic: topic ?? this.topic,
       style: style ?? this.style,
       isSelected: isSelected ?? this.isSelected,
+      onTap: onTap ?? this.onTap,
+      textBuilder: textBuilder ?? this.textBuilder,
     );
   }
 }

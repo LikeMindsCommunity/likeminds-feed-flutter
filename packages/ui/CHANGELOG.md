@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.11.0]
+
+- Segregated upload and post creation flow
+- Added customisation to compose screen
+
 ## [1.10.0]
 
 - Added thumbnail support in LMFeedVideo widget

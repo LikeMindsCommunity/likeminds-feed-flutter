@@ -659,7 +659,7 @@ class _LMFeedUniversalScreenState extends State<LMFeedUniversalScreen> {
                           onCancel: () {},
                         );
                       }
-                      if (state is LMFeedNewPostErrorState) {
+                      if (state is LMFeedMediaUploadErrorState) {
                         return LMPostUploadingBanner(
                           onRetry: () {
                             newPostBloc.add(LMFeedRetryPostUploadEvent());
