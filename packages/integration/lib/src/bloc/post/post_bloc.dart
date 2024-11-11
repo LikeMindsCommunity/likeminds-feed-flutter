@@ -50,7 +50,7 @@ class LMFeedPostBloc extends Bloc<LMFeedPostEvents, LMFeedPostState> {
       // check if temp post is present
       final postResponse = LMFeedCore.instance.lmFeedClient.getTemporaryPost();
       if (postResponse.success && postResponse.data != null) {
-        emit(LMFeedNewPostErrorState(
+        emit(LMFeedMediaUploadErrorState(
             errorMessage: "", tempId: postResponse.data?.tempId ?? ""));
       }
     });
