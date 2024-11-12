@@ -389,7 +389,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     return LMFeedButton(
       style: feedTheme.commentStyle.replyButtonStyle ??
           const LMFeedButtonStyle(
-            margin: 10,
+            gap: 10,
             icon: LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.comment_outlined,

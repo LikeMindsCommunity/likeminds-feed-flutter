@@ -1711,7 +1711,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
               ? feedThemeData.primaryColor
               : feedThemeData.inActiveColor,
           placement: LMFeedIconButtonPlacement.end,
-          margin: 5.0,
+          gap: 5.0,
         ),
         text: LMFeedText(
           text: "Create $postTitleFirstCap",

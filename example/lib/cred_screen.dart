@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_feed_sample/globals.dart';
+import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
 import 'package:likeminds_feed_sample/themes/social/screens/tab_screen.dart';
 import 'package:flutter/material.dart';
@@ -336,7 +337,7 @@ class _CredScreenState extends State<CredScreen> {
         {
           return ExampleTabScreen(
             uuid: uuid,
-            feedWidget: const LMFeedScreen(),
+            feedWidget: const LMFeedSocialScreen(),
           );
         }
       case LMFeedFlavor.socialFeedRoom:
@@ -357,7 +358,7 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.qna:
         {
-          return const LMFeedScreen();
+          return const LMFeedQnAScreen();
         }
       case LMFeedFlavor.socialDark:
         {

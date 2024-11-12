@@ -337,7 +337,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     return LMFeedAppBar(
       leading: LMFeedButton(
         style: LMFeedButtonStyle(
-          margin: 20.0,
+          gap: 20.0,
           icon: LMFeedIcon(
             type: LMFeedIconType.icon,
             icon: isAndroid ? Icons.arrow_back : CupertinoIcons.chevron_back,

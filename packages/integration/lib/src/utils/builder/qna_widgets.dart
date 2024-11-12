@@ -70,10 +70,14 @@ class LMFeedQnAWidgets extends LMFeedWidgetUtility {
   Widget postWidgetBuilder(
       BuildContext context, LMFeedPostWidget post, LMPostViewData postViewData,
       {LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed}) {
-    return LMQnAPostWidget(
-      postWidget: post,
-      postViewData: postViewData,
-      source: source,
+    return post.copyWith(
+      footerBuilder: (context, footer, postViewData) {
+        return LMQnAPostFooter(
+          footer: footer,
+          postViewData: postViewData,
+          source: source,
+        );
+      },
     );
   }
 
@@ -123,7 +127,6 @@ class LMFeedQnAWidgets extends LMFeedWidgetUtility {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
     return LMQnAPostFooter(
-      feedThemeData: feedThemeData,
       footer: postFooter,
       postViewData: postViewData,
     );
@@ -422,7 +425,6 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
             //postTopics,
             if (postWidget!.footer != null)
               LMQnAPostFooter(
-                feedThemeData: feedThemeData,
                 footer: postWidget!.footer!,
                 postViewData: postViewData!,
                 source: widget.source,
@@ -470,12 +472,10 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
 class LMQnAPostFooter extends StatelessWidget {
   final LMFeedPostFooter footer;
   final LMPostViewData postViewData;
-  final LMFeedThemeData feedThemeData;
   final LMFeedWidgetSource? source;
 
   const LMQnAPostFooter({
     super.key,
-    required this.feedThemeData,
     required this.footer,
     required this.postViewData,
     this.source,
@@ -483,19 +483,35 @@ class LMQnAPostFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final LMFeedThemeData themeData = LMFeedCore.theme;
     LMFeedButton? likeButton = footer.likeButton?.copyWith(
-        text: footer.likeButton?.text?.copyWith(
-          text: postViewData.likeCount.toString(),
+      text: footer.likeButton?.text?.copyWith(
+        text: postViewData.likeCount.toString(),
+      ),
+      onTap: () {
+        footer.likeButton?.onTap.call();
+      },
+      onTextTap: () {
+        footer.likeButton?.onTextTap?.call();
+      },
+      style: footer.likeButton?.style?.copyWith(
+        icon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmUpvoteSvg,
         ),
-        onTap: () {
-          footer.likeButton?.onTap.call();
-        },
-        onTextTap: () {
-          // LMQnAFeedUtils.showLikesBottomSheet(
-          //   context,
-          //   postViewData.id,
-          // );
-        });
+        activeIcon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmUpvoteFilledSvg,
+        ),
+        border: Border.all(
+          color: themeData.inActiveColor,
+        ),
+        borderRadius: 100,
+        padding: EdgeInsets.all(16),
+        margin: EdgeInsets.only(left: 20),
+      ),
+    );
+
     LMFeedButton? commentButton = footer.commentButton?.copyWith(
       text: footer.commentButton?.text?.copyWith(
         text: postViewData.commentCount.toString(),
@@ -517,7 +533,6 @@ class LMQnAPostFooter extends StatelessWidget {
           LMQnATopResponseWidget(
             topResponses: postViewData.topComments!,
             postViewData: postViewData,
-            feedThemeData: feedThemeData,
           ),
         if (source != null && source != LMFeedWidgetSource.postDetailScreen)
           QnAAddResponse(
@@ -623,13 +638,9 @@ class QnAAddResponse extends StatelessWidget {
 class LMQnATopResponseWidget extends StatefulWidget {
   final List<LMCommentViewData> topResponses;
   final LMPostViewData postViewData;
-  final LMFeedThemeData feedThemeData;
 
   const LMQnATopResponseWidget(
-      {super.key,
-      required this.feedThemeData,
-      required this.postViewData,
-      required this.topResponses});
+      {super.key, required this.postViewData, required this.topResponses});
 
   @override
   State<LMQnATopResponseWidget> createState() => _LMQnATopResponseWidgetState();
@@ -695,7 +706,7 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
                           textStyle: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: widget.feedThemeData.onPrimary,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -716,7 +727,7 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
                     child: Container(
                       padding: const EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
-                        color: widget.feedThemeData.backgroundColor,
+                        color: Colors.white,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.zero,
                           topRight: Radius.circular(10.0),

@@ -467,7 +467,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       style: feedTheme.commentStyle.likeButtonStyle?.copyWith(
               showText: commentViewData.likesCount == 0 ? false : true) ??
           LMFeedButtonStyle(
-            margin: 10.0,
+            gap: 10.0,
             showText: commentViewData.likesCount == 0 ? false : true,
             icon: const LMFeedIcon(
               type: LMFeedIconType.icon,
@@ -541,7 +541,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     return LMFeedButton(
       style: feedTheme.commentStyle.replyButtonStyle ??
           const LMFeedButtonStyle(
-            margin: 10,
+            gap: 10,
             icon: LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.comment_outlined,

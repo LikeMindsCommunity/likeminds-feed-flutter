@@ -1384,7 +1384,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           backgroundColor:
               right ? feedThemeData.primaryColor : feedThemeData.disabledColor,
           placement: LMFeedIconButtonPlacement.end,
-          margin: 5.0,
+          gap: 5.0,
         ),
         text: LMFeedText(
           text: "Create Post",

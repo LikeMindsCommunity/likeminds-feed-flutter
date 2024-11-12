@@ -93,7 +93,7 @@ class LMFeedPostReviewBanner extends StatelessWidget {
             style: LMFeedButtonStyle(
               padding: EdgeInsets.zero,
               backgroundColor: Colors.transparent,
-              margin: 0,
+              gap: 0,
               icon: infoIcon ??
                   LMFeedIcon(
                     type: LMFeedIconType.svg,
