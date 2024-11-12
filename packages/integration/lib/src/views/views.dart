@@ -1,9 +1,19 @@
 export 'post/post_detail_screen.dart';
 export 'compose/compose_screen.dart';
 export 'likes/likes_screen.dart';
+
+// social feed
+export 'feed/social/social_feed_screen.dart';
+export 'feed/social/social_universal_feed.dart';
+export 'feed/social/social_personalised_feed.dart';
+// qna feed
+export 'feed/qna/qna_feed_screen.dart';
+export 'feed/qna/qna_universal_feed.dart';
+export 'feed/qna/qna_personalised_feed.dart';
+
+// legacy feed
 export 'feed/feed_screen.dart';
-export 'feed/universal_feed/universal_feed_screen.dart';
-export 'feed/personalised_feed/personalised_feed_screen.dart';
+
 export 'feed/topic_select_screen.dart';
 
 export 'report/report_bottom_sheet.dart';

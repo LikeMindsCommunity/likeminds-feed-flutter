@@ -31,7 +31,7 @@ class _LMFeedNovaState extends State<LMFeedNova> {
   Widget build(BuildContext context) {
     LMFeedThemeData feedTheme = LMFeedCore.theme;
     return Scaffold(
-      body: LMFeedScreen(
+      body: LMFeedSocialScreen(
         topicBarBuilder: (topicBar) {
           return topicBar.copyWith(
             style: topicBar.style?.copyWith(

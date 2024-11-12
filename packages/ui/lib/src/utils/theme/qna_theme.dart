@@ -62,8 +62,21 @@ LMFeedThemeData qnaTheme({
           backgroundColor: container ?? LikeMindsTheme.container,
           onContainer: onContainer ?? LikeMindsTheme.onContainer,
         ),
-    footerStyle:
-        footerStyle ?? LMFeedPostFooterStyle.basic(primaryColor: primaryColor),
+    footerStyle: footerStyle ??
+        LMFeedPostFooterStyle.basic(primaryColor: primaryColor).copyWith(
+          likeButtonStyle: LMFeedButtonStyle.basic().copyWith(
+            icon: LMFeedIcon(
+              type: LMFeedIconType.svg,
+              assetPath: lmUpvoteSvg,
+              style: LMFeedIconStyle.basic(),
+            ),
+            activeIcon: LMFeedIcon(
+              type: LMFeedIconType.svg,
+              assetPath: lmUpvoteFilledSvg,
+              style: LMFeedIconStyle.basic(),
+            ),
+          ),
+        ),
     headerStyle: headerStyle ?? LMFeedPostHeaderStyle.basic(),
     hashTagColor: hashTagColor ?? LikeMindsTheme.hashTagColor,
     linkColor: linkColor ?? LikeMindsTheme.linkColor,

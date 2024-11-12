@@ -1,16 +1,14 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
-import 'dart:async';
-import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
-/// {@template lm_feed_personalised_screen}
+/// {@template lm_feed_social_universal_screen}
 /// A screen to display the feed.
 /// The feed can be customized by passing in the required parameters
 /// Post creation can be enabled or disabled
@@ -18,14 +16,16 @@ import 'package:visibility_detector/visibility_detector.dart';
 /// Topic Chip Builder can be used to customize the topic chip widget
 ///
 /// {@endtemplate}
-class LMFeedPersonalisedScreen extends StatefulWidget {
-  const LMFeedPersonalisedScreen({
+class LMFeedSocialUniversalScreen extends StatefulWidget {
+  const LMFeedSocialUniversalScreen({
     super.key,
     this.appBar,
     this.customWidgetBuilder,
+    this.topicChipBuilder,
     this.postBuilder,
     this.floatingActionButtonBuilder,
     this.config,
+    this.topicBarBuilder,
     this.floatingActionButtonLocation,
     this.noItemsFoundIndicatorBuilder,
     this.firstPageProgressIndicatorBuilder,
@@ -41,6 +41,10 @@ class LMFeedPersonalisedScreen extends StatefulWidget {
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
+  // Builder for topic chip [Button]
+  final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
+      topicChipBuilder;
+
   // Builder for post item
   // {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
@@ -65,17 +69,20 @@ class LMFeedPersonalisedScreen extends StatefulWidget {
   final Widget Function(BuildContext context, int noOfPendingPost)?
       pendingPostBannerBuilder;
 
+  final LMFeedTopicBarBuilder? topicBarBuilder;
+
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
   final LMFeedScreenConfig? config;
 
   @override
-  State<LMFeedPersonalisedScreen> createState() =>
-      _LMFeedPersonalisedScreenState();
+  State<LMFeedSocialUniversalScreen> createState() => _LMFeedSocialUniversalScreenState();
 
-  LMFeedPersonalisedScreen copyWith({
+  LMFeedSocialUniversalScreen copyWith({
     LMFeedPostAppBarBuilder? appBar,
     LMFeedCustomWidgetBuilder? customWidgetBuilder,
+    Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
+        topicChipBuilder,
     LMFeedPostWidgetBuilder? postBuilder,
     LMFeedContextButtonBuilder? floatingActionButtonBuilder,
     LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder,
@@ -86,12 +93,14 @@ class LMFeedPersonalisedScreen extends StatefulWidget {
     LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder,
     Widget Function(BuildContext context, int noOfPendingPost)?
         pendingPostBannerBuilder,
+    LMFeedTopicBarBuilder? topicBarBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
     LMFeedScreenConfig? config,
   }) {
-    return LMFeedPersonalisedScreen(
+    return LMFeedSocialUniversalScreen(
       appBar: appBar ?? this.appBar,
       customWidgetBuilder: customWidgetBuilder ?? this.customWidgetBuilder,
+      topicChipBuilder: topicChipBuilder ?? this.topicChipBuilder,
       postBuilder: postBuilder ?? this.postBuilder,
       floatingActionButtonBuilder:
           floatingActionButtonBuilder ?? this.floatingActionButtonBuilder,
@@ -109,6 +118,7 @@ class LMFeedPersonalisedScreen extends StatefulWidget {
           newPageErrorIndicatorBuilder ?? this.newPageErrorIndicatorBuilder,
       pendingPostBannerBuilder:
           pendingPostBannerBuilder ?? this.pendingPostBannerBuilder,
+      topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
       config: config ?? this.config,
@@ -116,8 +126,7 @@ class LMFeedPersonalisedScreen extends StatefulWidget {
   }
 }
 
-class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
-    with WidgetsBindingObserver {
+class _LMFeedSocialUniversalScreenState extends State<LMFeedSocialUniversalScreen> {
   late Size screenSize;
   // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
@@ -159,8 +168,8 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
   // Create an instance of LMFeedWidgetUtility
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
 
-  // Set the widget source to personalised feed
-  LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.personalisedFeed;
+  // Set the widget source to universal feed
+  LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.universalFeed;
 
   // Create a ValueNotifier to rebuild the post widget
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -178,9 +187,14 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
   */
   final ScrollController _controller = ScrollController();
 
-  // bloc to handle personalised feed
-  final LMFeedPersonalisedBloc _feedBloc =
-      LMFeedPersonalisedBloc.instance; // bloc to fetch the feedroom data
+  // notifies value listenable builder to rebuild the topic feed
+  ValueNotifier<bool> rebuildTopicFeed = ValueNotifier(false);
+
+  // future to get the topics
+  Future<GetTopicsResponse>? getTopicsResponse;
+
+  // bloc to handle universal feed
+  late final LMFeedUniversalBloc _feedBloc; // bloc to fetch the feedroom data
   bool isCm = LMFeedUserUtils
       .checkIfCurrentUserIsCM(); // whether the logged in user is a community manager or not
 
@@ -202,42 +216,32 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
 
   int pendingPostCount = 0;
   bool isDesktopWeb = false;
-  Timer? _scrollTimer;
-
-// function to handle scroll event with debounce
-  void _handleScroll() {
-    if (_scrollTimer != null && _scrollTimer!.isActive) {
-      _scrollTimer!.cancel();
-    }
-    _scrollTimer = Timer(const Duration(seconds: 5), () {
-      _callSeenPostEvent();
-    });
-  }
+  bool isTempPostPresent = false;
 
   @override
   void initState() {
     super.initState();
-    // scroll listener to handle the scroll event
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _controller.position.isScrollingNotifier.addListener(() {
-        // if the state is idle then call the seen post event
-        if (!_controller.position.isScrollingNotifier.value) {
-          _handleScroll();
-        }
-      });
-    });
-    // add seen event
-    _triggerPostSeenEvent();
-    WidgetsBinding.instance.addObserver(this);
+    newPostBloc.add(LMFeedFetchTempPostEvent());
     // Adds pagination listener to the feed
     _addPaginationListener();
 
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
 
+    // Retrieves topics from the LMFeedCore client
+    getTopicsResponse = LMFeedCore.client.getTopics(
+      (GetTopicsRequestBuilder()
+            ..page(1)
+            ..pageSize(20))
+          .build(),
+    );
+
     getUserFeedMeta = getUserFeedMetaFuture();
 
     // Sets the Bloc observer to LMFeedBlocObserver
     Bloc.observer = LMFeedBlocObserver();
+
+    // Initializes the feed Bloc instance
+    _feedBloc = LMFeedUniversalBloc.instance;
 
     // Checks the user's posting rights using LMFeedUserUtils
     userPostingRights = LMFeedUserUtils.checkPostCreationRights();
@@ -265,10 +269,24 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
     LMFeedAnalyticsBloc.instance.add(
       LMFeedFireAnalyticsEvent(
         eventName: LMFeedAnalyticsKeys.feedOpened,
-        widgetSource: LMFeedWidgetSource.personalisedFeed,
+        widgetSource: LMFeedWidgetSource.universalFeed,
         eventProperties: {
-          'feed_type': 'personalised_feed',
+          'feed_type': 'universal_feed',
         },
+      ),
+    );
+  }
+
+  // This function updates the selected topics and fetches the universal
+  // feed based on the selected topics
+  void updateSelectedTopics(List<LMTopicViewData> topics) {
+    _feedBloc.selectedTopics = topics;
+    rebuildTopicFeed.value = !rebuildTopicFeed.value;
+    clearPagingController();
+    _feedBloc.add(
+      LMFeedGetUniversalFeedEvent(
+        pageKey: 1,
+        topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
       ),
     );
   }
@@ -277,37 +295,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
   void dispose() {
     _pagingController.dispose();
     _rebuildAppBar.dispose();
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  // function to trigger the post seen event
-  // when the feed is opened for the first time
-  // with the seen post ids saved in the cache
-  void _triggerPostSeenEvent() {
-    LMResponse<List<String>> response =
-        LMFeedPersistence.instance.getSeenPostIDs();
-    if (response.success) {
-      List<String> seenPostIds = response.data ?? [];
-      HashSet<String> seenPost = HashSet<String>.from(seenPostIds);
-      _feedBloc
-          .add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPost.toList()));
-    }
-  }
-
-  // function to call the seen post event
-  // with the seen post ids saved in the memory
-  void _callSeenPostEvent() {
-    List<String> seenPost = _feedBloc.seenPost.toList();
-    _feedBloc.add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPost));
-  }
-
-  @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.inactive) {
-      List<String> seenPost = _feedBloc.seenPost.toList();
-      await LMFeedPersistence.instance.insertSeenPostID(seenPost);
-    }
   }
 
   void _scrollToTop() {
@@ -322,9 +310,9 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
     _pagingController.addPageRequestListener(
       (pageKey) {
         _feedBloc.add(
-          LMFeedPersonalisedGetEvent(
+          LMFeedGetUniversalFeedEvent(
             pageKey: pageKey,
-            pageSize: 10,
+            topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
           ),
         );
       },
@@ -333,27 +321,25 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
 
   void refresh() => _pagingController.refresh();
 
-  // This function handle the paging controller based on the state changes
-  void handleBlocListener(LMFeedPersonalisedState? state) {
-    if (state is LMFeedPersonalisedFeedLoadedState) {
-      // if page is 1 then trigger the debounce event
-      if (state.pageKey == 1) {
-        _handleScroll();
-      }
+  // This function updates the paging controller based on the state changes
+  void updatePagingControllers(LMFeedUniversalState? state) {
+    if (state is LMFeedUniversalFeedLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts;
+
+      _feedBloc.users.addAll(state.users);
+      _feedBloc.topics.addAll(state.topics);
+      _feedBloc.widgets.addAll(state.widgets);
+
       if (state.posts.length < 10) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
         _pagingController.appendPage(listOfPosts, state.pageKey + 1);
       }
-    } else if (state is LMFeedPersonalisedRefreshState) {
+    } else if (state is LMFeedUniversalRefreshState) {
       getUserFeedMeta = getUserFeedMetaFuture();
       _rebuildAppBar.value = !_rebuildAppBar.value;
       clearPagingController();
       refresh();
-    } else if (state is LMFeedPersonalisedErrorState) {
-      _pagingController.error = state.message;
-      LMFeedCore.showSnackBar(context, state.message, _widgetSource);
     }
   }
 
@@ -362,7 +348,46 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
   void clearPagingController() {
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
-    _pagingController.itemList?.clear();
+    if (_pagingController.itemList != null) _pagingController.itemList?.clear();
+  }
+
+  void showTopicSelectSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      elevation: 5,
+      isDismissible: true,
+      useRootNavigator: true,
+      backgroundColor: feedThemeData.container,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(28.0),
+          topRight: Radius.circular(28.0),
+        ),
+      ),
+      enableDrag: true,
+      clipBehavior: Clip.hardEdge,
+      builder: (context) => LMFeedTopicBottomSheet(
+        key: GlobalKey(),
+        selectedTopics: _feedBloc.selectedTopics,
+        onTopicSelected: (updatedTopics, tappedTopic) {
+          updateSelectedTopics(updatedTopics);
+        },
+      ),
+    );
+  }
+
+  void navigateToTopicSelectScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LMFeedTopicSelectScreen(
+          onTopicSelected: (updatedTopics) {
+            updateSelectedTopics(updatedTopics);
+          },
+          selectedTopics: _feedBloc.selectedTopics,
+        ),
+      ),
+    );
   }
 
   Future<GetUserFeedMetaResponse> getUserFeedMetaFuture() {
@@ -405,13 +430,13 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
-              _feedBloc.add(LMFeedPersonalisedRefreshEvent());
+              _feedBloc.add(LMFeedUniversalRefreshEvent());
             },
             color: feedThemeData.primaryColor,
             backgroundColor: feedThemeData.container,
             child: CustomScrollView(
-              controller: _controller,
               physics: const AlwaysScrollableScrollPhysics(),
+              controller: _controller,
               slivers: [
                 SliverToBoxAdapter(
                   child: ValueListenableBuilder(
@@ -463,8 +488,8 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                 SliverToBoxAdapter(
                   child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
                     bloc: newPostBloc,
-                    listener: (previous, current) {
-                      if (current is LMFeedPostDeletedState) {
+                    listener: (prev, curr) {
+                      if (curr is LMFeedPostDeletedState) {
                         // show a snackbar when post is deleted
                         // will only be shown if a messenger key is provided
                         LMFeedCore.showSnackBar(
@@ -473,7 +498,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                           _widgetSource,
                         );
 
-                        if (current.pendingPostId != null) {
+                        if (curr.pendingPostId != null) {
                           if (pendingPostCount > 0) {
                             pendingPostCount--;
                             rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -484,16 +509,16 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                         List<LMPostViewData>? feedRoomItemList =
                             _pagingController.itemList;
                         feedRoomItemList
-                            ?.removeWhere((item) => item.id == current.postId);
+                            ?.removeWhere((item) => item.id == curr.postId);
                         _pagingController.itemList = feedRoomItemList;
                         rebuildPostWidget.value = !rebuildPostWidget.value;
                       }
-                      if (current is LMFeedNewPostUploadedState) {
+                      if (curr is LMFeedNewPostUploadedState) {
                         if (LMFeedPostUtils.doPostNeedsApproval) {
                           _pendingPostScreenBuilderDelegate
                               .showPostApprovalDialog(
                             context,
-                            current.postData,
+                            curr.postData,
                             LMFeedPendingPostDialog(
                               dialogStyle: feedThemeData.dialogStyle.copyWith(
                                   insetPadding: EdgeInsets.all(40.0),
@@ -517,7 +542,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              pendingPostId: current.postData.id,
+                              pendingPostId: curr.postData.id,
                               onCancelButtonClicked: () {
                                 Navigator.of(context).pop();
                               },
@@ -526,7 +551,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => LMFeedEditPostScreen(
-                                      pendingPostId: current.postData.id,
+                                      pendingPostId: curr.postData.id,
                                     ),
                                   ),
                                 );
@@ -542,7 +567,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                           _rebuildAppBar.value = !_rebuildAppBar.value;
                           return;
                         }
-                        LMPostViewData? item = current.postData;
+                        LMPostViewData? item = curr.postData;
                         int length = _pagingController.itemList?.length ?? 0;
                         List<LMPostViewData> feedRoomItemList =
                             _pagingController.itemList ?? [];
@@ -559,6 +584,8 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                             feedRoomItemList.length > 10) {
                           feedRoomItemList.removeLast();
                         }
+                        _feedBloc.users.addAll(curr.userData);
+                        _feedBloc.topics.addAll(curr.topics);
                         _pagingController.itemList = feedRoomItemList;
                         postUploading.value = false;
                         rebuildPostWidget.value = !rebuildPostWidget.value;
@@ -570,8 +597,8 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                         );
                         _scrollToTop();
                       }
-                      if (current is LMFeedEditPostUploadedState) {
-                        LMPostViewData? item = current.postData.copyWith();
+                      if (curr is LMFeedEditPostUploadedState) {
+                        LMPostViewData? item = curr.postData.copyWith();
                         List<LMPostViewData>? feedRoomItemList =
                             _pagingController.itemList;
                         int index = feedRoomItemList?.indexWhere(
@@ -580,44 +607,45 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                         if (index != -1) {
                           feedRoomItemList![index] = item;
                         }
+                        _feedBloc.users.addAll(curr.userData);
+                        _feedBloc.topics.addAll(curr.topics);
                         postUploading.value = false;
                         rebuildPostWidget.value = !rebuildPostWidget.value;
 
                         LMFeedCore.showSnackBar(context,
                             '$postTitleFirstCap Edited', _widgetSource);
                       }
-                      if (current is LMFeedNewPostErrorState) {
+                      if (curr is LMFeedNewPostErrorState) {
                         postUploading.value = false;
                         isPostEditing = false;
                         LMFeedCore.showSnackBar(
                           context,
-                          current.errorMessage,
+                          curr.errorMessage,
                           _widgetSource,
                         );
                       }
-                      if (current is LMFeedPostUpdateState) {
+                      if (curr is LMFeedPostUpdateState) {
                         List<LMPostViewData>? feedRoomItemList =
                             _pagingController.itemList;
                         int index = feedRoomItemList?.indexWhere(
-                                (element) => element.id == current.postId) ??
+                                (element) => element.id == curr.postId) ??
                             -1;
 
                         if (index != -1) {
                           feedRoomItemList![index] =
                               LMFeedPostUtils.updatePostData(
-                            postViewData:
-                                current.post ?? feedRoomItemList[index],
-                            actionType: current.actionType,
-                            commentId: current.commentId,
-                            pollOptions: current.pollOptions,
+                            postViewData: curr.post ?? feedRoomItemList[index],
+                            actionType: curr.actionType,
+                            commentId: curr.commentId,
+                            pollOptions: curr.pollOptions,
                           );
                         }
                         rebuildPostWidget.value = !rebuildPostWidget.value;
                       }
-                      if (current is LMFeedPostDeletionErrorState) {
+                      if (curr is LMFeedPostDeletionErrorState) {
                         LMFeedCore.showSnackBar(
                           context,
-                          current.message,
+                          curr.message,
                           _widgetSource,
                         );
                       }
@@ -658,10 +686,40 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                 ),
                 if (isDesktopWeb)
                   SliverPadding(padding: EdgeInsets.only(top: 12.0)),
-                BlocListener<LMFeedPersonalisedBloc, LMFeedPersonalisedState>(
+                SliverToBoxAdapter(
+                  child: config!.enableTopicFiltering
+                      ? ValueListenableBuilder(
+                          valueListenable: rebuildTopicFeed,
+                          builder: (context, _, __) {
+                            return FutureBuilder<GetTopicsResponse>(
+                              future: getTopicsResponse,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const SizedBox.shrink();
+                                } else if (snapshot.hasData &&
+                                    snapshot.data != null &&
+                                    snapshot.data!.success == true) {
+                                  if (snapshot.data!.topics!.isNotEmpty) {
+                                    return widget.topicBarBuilder
+                                            ?.call(_defTopicBar()) ??
+                                        _defTopicBar();
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
+                                }
+                                return const SizedBox();
+                              },
+                            );
+                          })
+                      : const SizedBox(),
+                ),
+                if (isDesktopWeb)
+                  SliverPadding(padding: EdgeInsets.only(top: 12.0)),
+                BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
                   bloc: _feedBloc,
-                  listener: (context, LMFeedPersonalisedState state) =>
-                      handleBlocListener(state),
+                  listener: (context, LMFeedUniversalState state) =>
+                      updatePagingControllers(state),
                   child: ValueListenableBuilder(
                     valueListenable: rebuildPostWidget,
                     builder: (context, _, __) {
@@ -670,30 +728,28 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                         builderDelegate:
                             PagedChildBuilderDelegate<LMPostViewData>(
                           itemBuilder: (context, item, index) {
+                            if (_feedBloc.users[item.uuid] == null) {
+                              return const SizedBox();
+                            }
                             LMFeedPostWidget postWidget =
                                 defPostWidget(context, feedThemeData, item);
-                            return VisibilityDetector(
-                              key: ObjectKey(item.id),
-                              onVisibilityChanged: (visibilityInfo) {
-                                // check if the post is visible more than 40% and is scrolling in reverse direction
-                                // then add the post to seen list
-                                if (mounted) {
-                                  double visiblePercentage =
-                                      visibilityInfo.visibleFraction * 100;
-                                  if (visiblePercentage > 40) {
-                                    LMFeedPersonalisedBloc.instance.seenPost
-                                        .add(item.id);
-                                  }
-                                }
-                              },
-                              child: widget.postBuilder
-                                      ?.call(context, postWidget, item) ??
-                                  _widgetsBuilder.postWidgetBuilder.call(
-                                      context, postWidget, item,
-                                      source: _widgetSource),
-                            );
+                            return widget.postBuilder
+                                    ?.call(context, postWidget, item) ??
+                                _widgetsBuilder.postWidgetBuilder.call(
+                                    context, postWidget, item,
+                                    source: _widgetSource);
                           },
                           noItemsFoundIndicatorBuilder: (context) {
+                            if (_feedBloc.state
+                                    is LMFeedUniversalFeedLoadedState &&
+                                (_feedBloc.state
+                                        as LMFeedUniversalFeedLoadedState)
+                                    .topics
+                                    .isNotEmpty) {
+                              return _widgetsBuilder.noPostUnderTopicFeed(
+                                  context,
+                                  actionable: changeFilter(context));
+                            }
                             return _widgetsBuilder
                                 .noItemsFoundIndicatorBuilderFeed(context,
                                     createPostButton:
@@ -758,7 +814,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
               // ignore: use_build_context_synchronously
               await Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => const LMFeedComposeScreen(
-                        widgetSource: LMFeedWidgetSource.personalisedFeed,
+                        widgetSource: LMFeedWidgetSource.universalFeed,
                       )));
             }
           : () {
@@ -877,6 +933,45 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
     );
   }
 
+  LMFeedTopicBar _defTopicBar() {
+    return LMFeedTopicBar(
+      isDesktopWeb: isDesktopWeb,
+      selectedTopics: _feedBloc.selectedTopics,
+      openTopicSelector: openTopicSelector,
+      clearAllSelection: () {
+        updateSelectedTopics([]);
+      },
+      removeTopicFromSelection: (topic) {
+        List<LMTopicViewData> updatedTopics = [..._feedBloc.selectedTopics];
+        updatedTopics.removeWhere((element) => element.id == topic.id);
+        updateSelectedTopics(updatedTopics);
+      },
+      style: LMFeedTopicBarStyle(
+          height: 60,
+          padding: EdgeInsets.symmetric(vertical: isDesktopWeb ? 0.0 : 8.0),
+          border: isDesktopWeb
+              ? null
+              : Border.symmetric(
+                  horizontal: BorderSide(
+                    color: LMFeedCore.theme.onContainer,
+                    width: 0.1,
+                  ),
+                )),
+    );
+  }
+
+  void openTopicSelector(BuildContext context) {
+    LMFeedTopicSelectionWidgetType topicSelectionWidgetType =
+        config!.topicSelectionWidgetType;
+    if (topicSelectionWidgetType ==
+        LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet) {
+      showTopicSelectSheet(context);
+    } else if (topicSelectionWidgetType ==
+        LMFeedTopicSelectionWidgetType.showTopicSelectionScreen) {
+      navigateToTopicSelectScreen(context);
+    }
+  }
+
   Widget getLoaderThumbnail(LMAttachmentViewData? media) {
     if (media != null) {
       if (media.attachmentType == LMMediaType.image) {
@@ -909,6 +1004,35 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
             );
       } else if (media.attachmentType == LMMediaType.video) {
         return const SizedBox();
+        // TODO: add video thumbnail
+        // final thumbnailFile = VideoCompress.getFileThumbnail(
+        //   media.mediaFile!.path,
+        //   quality: 50, // default(100)
+        //   position: -1, // default(-1)
+        // );
+        // return FutureBuilder(
+        //   future: thumbnailFile,
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasData) {
+        //       return Container(
+        //         height: 50,
+        //         width: 50,
+        //         clipBehavior: Clip.hardEdge,
+        //         decoration: BoxDecoration(
+        //           color: Colors.black,
+        //           borderRadius: BorderRadius.circular(6.0),
+        //         ),
+        //         child: LMFeedImage(
+        //           imageFile: snapshot.data,
+        //           style: const LMFeedPostImageStyle(
+        //             boxFit: BoxFit.contain,
+        //           ),
+        //         ),
+        //       );
+        //     }
+        //     return LMFeedLoader();
+        //   },
+        // );
       } else {
         return const SizedBox.shrink();
       }
@@ -922,7 +1046,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: post.user,
+      user: _feedBloc.users[post.uuid]!,
       isFeed: false,
       onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
@@ -945,7 +1069,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: post.user,
+              user: _feedBloc.users[post.uuid]!,
               position: index,
             ),
           ),
@@ -1016,7 +1140,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
   LMFeedPostHeader _defPostHeader(
       BuildContext context, LMPostViewData postViewData) {
     return LMFeedPostHeader(
-      user: postViewData.user,
+      user: _feedBloc.users[postViewData.uuid]!,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData.headerStyle,
@@ -1120,7 +1244,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: post.user,
+              user: _feedBloc.users[post.uuid]!,
               position: index,
             ),
           ),
@@ -1174,7 +1298,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
           LMFeedCore.showSnackBar(
             context,
             "Poll ended. Vote can not be submitted now.",
-            LMFeedWidgetSource.personalisedFeed,
+            LMFeedWidgetSource.universalFeed,
           );
           return;
         }
@@ -1190,7 +1314,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
             isVoteEditing,
             previousValue,
             rebuildPollWidget,
-            LMFeedWidgetSource.personalisedFeed,
+            LMFeedWidgetSource.universalFeed,
           );
         } else if (selectedOptions.contains(optionData.id)) {
           selectedOptions.remove(optionData.id);
@@ -1218,7 +1342,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
         LMFeedCore.showSnackBar(
           context,
           "Option already exists",
-          LMFeedWidgetSource.personalisedFeed,
+          LMFeedWidgetSource.universalFeed,
         );
       },
       onAddOptionSubmit: (option) async {
@@ -1229,7 +1353,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
           postViewData.id,
           currentUser,
           rebuildPollWidget,
-          LMFeedWidgetSource.personalisedFeed,
+          LMFeedWidgetSource.universalFeed,
         );
         selectedOptions.clear();
         rebuildPollWidget.value = !rebuildPollWidget.value;
@@ -1238,14 +1362,14 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
         onVoteTextTap(
           context,
           pollValue,
-          LMFeedWidgetSource.personalisedFeed,
+          LMFeedWidgetSource.universalFeed,
         );
       },
       onVoteClick: (option) {
         onVoteTextTap(
           context,
           pollValue,
-          LMFeedWidgetSource.personalisedFeed,
+          LMFeedWidgetSource.universalFeed,
           option: option,
         );
       },
@@ -1258,7 +1382,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
           isVoteEditing,
           previousValue,
           rebuildPollWidget,
-          LMFeedWidgetSource.personalisedFeed,
+          LMFeedWidgetSource.universalFeed,
         );
       },
     );
@@ -1446,7 +1570,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
                         attachments: [attachmentViewData],
-                        widgetSource: LMFeedWidgetSource.personalisedFeed,
+                        widgetSource: LMFeedWidgetSource.universalFeed,
                       ),
                     ),
                   );
@@ -1481,6 +1605,29 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                           ? feedThemeData.primaryColor
                           : null),
             )),
+      );
+
+  LMFeedButton changeFilter(BuildContext context) => LMFeedButton(
+        style: LMFeedButtonStyle(
+          borderRadius: 48,
+          border: Border.all(
+            color: feedThemeData.primaryColor,
+            width: 2,
+          ),
+          height: 40,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        ),
+        text: LMFeedText(
+          text: "Change Filter",
+          style: LMFeedTextStyle(
+            textAlign: TextAlign.center,
+            textStyle: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: feedThemeData.primaryColor),
+          ),
+        ),
+        onTap: () => openTopicSelector(context),
       );
 
   LMFeedButton createPostButton(BuildContext context) {
@@ -1527,7 +1674,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                   context,
                   MaterialPageRoute(
                     builder: (context) => const LMFeedComposeScreen(
-                      widgetSource: LMFeedWidgetSource.personalisedFeed,
+                      widgetSource: LMFeedWidgetSource.universalFeed,
                     ),
                   ),
                 );
@@ -1597,7 +1744,7 @@ class _LMFeedPersonalisedScreenState extends State<LMFeedPersonalisedScreen>
                     context,
                     MaterialPageRoute(
                       builder: (context) => LMFeedComposeScreen(
-                        widgetSource: LMFeedWidgetSource.personalisedFeed,
+                        widgetSource: LMFeedWidgetSource.universalFeed,
                       ),
                     ),
                   );

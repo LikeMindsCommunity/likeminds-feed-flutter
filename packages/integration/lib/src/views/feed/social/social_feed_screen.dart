@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+part '../feed_screen_configuration.dart';
 
-@Deprecated('Use [LMFeedSocialScreen()] instead for default feed screen')
-class LMFeedScreen extends StatefulWidget {
-  const LMFeedScreen({
+class LMFeedSocialScreen extends StatefulWidget {
+  const LMFeedSocialScreen({
     super.key,
     this.feedType = LMFeedType.universal,
     this.appBar,
@@ -68,10 +69,10 @@ class LMFeedScreen extends StatefulWidget {
   final LMFeedScreenConfig? config;
 
   @override
-  State<LMFeedScreen> createState() => _LMFeedScreenState();
+  State<LMFeedSocialScreen> createState() => _LMFeedSocialScreenState();
 }
 
-class _LMFeedScreenState extends State<LMFeedScreen> {
+class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
   @override
   Widget build(BuildContext context) {
     return _buildFeed();
