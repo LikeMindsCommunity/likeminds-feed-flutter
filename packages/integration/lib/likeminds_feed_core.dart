@@ -34,6 +34,7 @@ export 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/index.dart';
 export 'package:likeminds_feed_flutter_core/src/builder/feed_builder_delegate.dart';
 export 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
+export 'package:likeminds_feed_flutter_core/src/widgets/default/default_widgets.dart';
 
 /// {@template lm_feed_core}
 /// This class is the core of the feed.
