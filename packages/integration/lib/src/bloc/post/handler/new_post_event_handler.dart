@@ -21,7 +21,7 @@ void newPostEventHandler(
         event,
         event.postMedia ?? [],
         isRepost,
-        DateTime.now(),
+        currentTime,
       );
 
       // create save temp post request
