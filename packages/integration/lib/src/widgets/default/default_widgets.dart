@@ -7,7 +7,6 @@ class LMFeedDefaultWidgets {
   static final instance = LMFeedDefaultWidgets._();
 
   final feedThemeData = LMFeedCore.theme;
-  final _widgetSource = LMFeedWidgetSource.universalFeed;
   final _feedBloc = LMFeedUniversalBloc.instance;
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
   final _widgetsBuilder = LMFeedCore.widgetUtility;
@@ -57,8 +56,12 @@ class LMFeedDefaultWidgets {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  LMFeedPostWidget defPostWidget(BuildContext context,
-      LMFeedThemeData? feedThemeData, LMPostViewData post) {
+  LMFeedPostWidget defPostWidget(
+    BuildContext context,
+    LMFeedThemeData? feedThemeData,
+    LMPostViewData post,
+    LMFeedWidgetSource source,
+  ) {
     final LMFeedPostWidget postWidget = LMFeedPostWidget(
       post: post,
       topics: post.topics,
@@ -105,11 +108,11 @@ class LMFeedDefaultWidgets {
         );
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
-      footer: _defFooterWidget(context, post),
-      header: _defPostHeader(context, post),
+      footer: _defFooterWidget(context, post, source),
+      header: _defPostHeader(context, post, source),
       content: _defContentWidget(post, context),
       media: _defPostMedia(context, post),
-      topicWidget: _defTopicWidget(post),
+      topicWidget: _defTopicWidget(post, source),
     );
 
     return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
@@ -124,14 +127,15 @@ class LMFeedDefaultWidgets {
         : postWidget;
   }
 
-  LMFeedPostTopic _defTopicWidget(LMPostViewData postViewData) {
+  LMFeedPostTopic _defTopicWidget(
+      LMPostViewData postViewData, LMFeedWidgetSource source) {
     return LMFeedPostTopic(
       topics: postViewData.topics,
       post: postViewData,
       style: feedThemeData.topicStyle,
       onTopicTap: (context, topicViewData) =>
           LMFeedPostUtils.handlePostTopicTap(
-              context, postViewData, topicViewData, _widgetSource),
+              context, postViewData, topicViewData, source),
     );
   }
 
@@ -152,20 +156,21 @@ class LMFeedDefaultWidgets {
     );
   }
 
-  LMFeedPostFooter _defFooterWidget(BuildContext context, LMPostViewData post) {
+  LMFeedPostFooter _defFooterWidget(
+      BuildContext context, LMPostViewData post, LMFeedWidgetSource source) {
     return LMFeedPostFooter(
-      likeButton: defLikeButton(context, post),
-      commentButton: defCommentButton(context, post),
-      saveButton: defSaveButton(post, context),
-      shareButton: defShareButton(post),
-      repostButton: defRepostButton(context, post),
+      likeButton: defLikeButton(context, post, source),
+      commentButton: defCommentButton(context, post, source),
+      saveButton: defSaveButton(post, context, source),
+      shareButton: defShareButton(post, source),
+      repostButton: defRepostButton(context, post, source),
       postFooterStyle: feedThemeData.footerStyle,
       showRepostButton: !post.isRepost,
     );
   }
 
-  LMFeedPostHeader _defPostHeader(
-      BuildContext context, LMPostViewData postViewData) {
+  LMFeedPostHeader _defPostHeader(BuildContext context,
+      LMPostViewData postViewData, LMFeedWidgetSource source) {
     return LMFeedPostHeader(
       user: _feedBloc.users[postViewData.uuid]!,
       isFeed: true,
@@ -175,9 +180,9 @@ class LMFeedDefaultWidgets {
         text: LMFeedTimeAgo.instance.format(postViewData.createdAt),
       ),
       onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
-          postViewData, LMFeedAnalyticsKeys.postProfilePicture, _widgetSource),
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, source),
       onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
-          postViewData, LMFeedAnalyticsKeys.postProfilePicture, _widgetSource),
+          postViewData, LMFeedAnalyticsKeys.postProfilePicture, source),
       menu: LMFeedMenu(
         menuItems: postViewData.menuItems,
         removeItemIds: {},
@@ -219,7 +224,7 @@ class LMFeedDefaultWidgets {
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
                 title: 'Delete $postTitleFirstCap',
                 uuid: postCreatorUUID,
-                widgetSource: _widgetSource,
+                widgetSource: source,
                 content:
                     'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
@@ -416,8 +421,8 @@ class LMFeedDefaultWidgets {
     );
   }
 
-  LMFeedButton defLikeButton(
-          BuildContext context, LMPostViewData postViewData) =>
+  LMFeedButton defLikeButton(BuildContext context, LMPostViewData postViewData,
+          LMFeedWidgetSource source) =>
       LMFeedButton(
         isActive: postViewData.isLiked,
         text: LMFeedText(
@@ -434,7 +439,7 @@ class LMFeedDefaultWidgets {
             MaterialPageRoute(
               builder: (context) => LMFeedLikesScreen(
                 postId: postViewData.id,
-                widgetSource: _widgetSource,
+                widgetSource: source,
               ),
             ),
           )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
@@ -462,13 +467,13 @@ class LMFeedDefaultWidgets {
             ));
           } else {
             LMFeedPostUtils.handlePostLikeTapEvent(
-                postViewData, _widgetSource, postViewData.isLiked);
+                postViewData, source, postViewData.isLiked);
           }
         },
       );
 
-  LMFeedButton defCommentButton(
-          BuildContext context, LMPostViewData postViewData) =>
+  LMFeedButton defCommentButton(BuildContext context,
+          LMPostViewData postViewData, LMFeedWidgetSource source) =>
       LMFeedButton(
         text: LMFeedText(
           text: LMFeedPostUtils.getCommentCountTextWithCount(
@@ -476,8 +481,10 @@ class LMFeedDefaultWidgets {
         ),
         style: feedThemeData.footerStyle.commentButtonStyle,
         onTap: () async {
-          LMFeedPostUtils.handlePostCommentButtonTap(
-              postViewData, _widgetSource);
+          LMFeedPostUtils.handlePostCommentButtonTap(postViewData, source);
+          if (source == LMFeedWidgetSource.postDetailScreen) {
+            return;
+          }
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
@@ -491,6 +498,9 @@ class LMFeedDefaultWidgets {
           LMFeedVideoProvider.instance.playCurrentVideo();
         },
         onTextTap: () async {
+          if (source == LMFeedWidgetSource.postDetailScreen) {
+            return;
+          }
           LMFeedVideoProvider.instance.pauseCurrentVideo();
           // ignore: use_build_context_synchronously
           await Navigator.of(context, rootNavigator: true).push(
@@ -506,8 +516,8 @@ class LMFeedDefaultWidgets {
         },
       );
 
-  LMFeedButton defSaveButton(
-          LMPostViewData postViewData, BuildContext context) =>
+  LMFeedButton defSaveButton(LMPostViewData postViewData, BuildContext context,
+          LMFeedWidgetSource source) =>
       LMFeedButton(
         isActive: postViewData.isSaved,
         onTap: () async {
@@ -531,32 +541,34 @@ class LMFeedDefaultWidgets {
                     : LMFeedPostActionType.unsaved));
           } else {
             LMFeedPostUtils.handlePostSaveTapEvent(
-                postViewData, postViewData.isSaved, _widgetSource);
+                postViewData, postViewData.isSaved, source);
             LMFeedCore.showSnackBar(
               context,
               postViewData.isSaved
                   ? "$postTitleFirstCap Saved"
                   : "$postTitleFirstCap Unsaved",
-              _widgetSource,
+              source,
             );
           }
         },
         style: feedThemeData.footerStyle.saveButtonStyle,
       );
 
-  LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
+  LMFeedButton defShareButton(
+          LMPostViewData postViewData, LMFeedWidgetSource source) =>
+      LMFeedButton(
         text: const LMFeedText(text: "Share"),
         onTap: () {
           // Fire analytics event for share button tap
-          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, _widgetSource);
+          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, source);
 
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
         style: feedThemeData.footerStyle.shareButtonStyle,
       );
 
-  LMFeedButton defRepostButton(
-          BuildContext context, LMPostViewData postViewData) =>
+  LMFeedButton defRepostButton(BuildContext context,
+          LMPostViewData postViewData, LMFeedWidgetSource source) =>
       LMFeedButton(
         text: LMFeedText(
           style: LMFeedTextStyle(
@@ -579,7 +591,7 @@ class LMFeedDefaultWidgets {
                   LMFeedCore.showSnackBar(
                     context,
                     'A $postTitleSmallCap is already uploading.',
-                    _widgetSource,
+                    source,
                   );
                   return;
                 }
@@ -606,7 +618,7 @@ class LMFeedDefaultWidgets {
                   LMFeedCore.showSnackBar(
                     context,
                     'A $postTitleSmallCap is already uploading.',
-                    _widgetSource,
+                    source,
                   );
                 }
               }
@@ -614,7 +626,7 @@ class LMFeedDefaultWidgets {
                 LMFeedCore.showSnackBar(
                   context,
                   'You do not have permission to create a $postTitleSmallCap',
-                  _widgetSource,
+                  source,
                 );
               },
         style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(

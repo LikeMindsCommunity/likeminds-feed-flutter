@@ -728,9 +728,13 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                             if (_feedBloc.users[item.uuid] == null) {
                               return const SizedBox();
                             }
-                            LMFeedPostWidget postWidget = LMFeedDefaultWidgets
-                                .instance
-                                .defPostWidget(context, feedThemeData, item);
+                            LMFeedPostWidget postWidget =
+                                LMFeedDefaultWidgets.instance.defPostWidget(
+                              context,
+                              feedThemeData,
+                              item,
+                              _widgetSource,
+                            );
                             return widget.postBuilder
                                     ?.call(context, postWidget, item) ??
                                 _widgetsBuilder.postWidgetBuilder.call(
