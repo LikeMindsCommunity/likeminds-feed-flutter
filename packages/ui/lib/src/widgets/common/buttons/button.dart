@@ -83,6 +83,7 @@ class _LMButtonState extends State<LMFeedButton> {
       child: Container(
         height: inStyle.height,
         width: inStyle.width,
+        margin: inStyle.margin ?? EdgeInsets.zero,
         padding: inStyle.padding ?? EdgeInsets.zero,
         decoration: BoxDecoration(
           color: inStyle.backgroundColor ?? Colors.transparent,
