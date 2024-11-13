@@ -25,7 +25,7 @@ class LMFeedComposeScreenConfig {
   const LMFeedComposeScreenConfig({
     this.composeSystemOverlayStyle = SystemUiOverlayStyle.dark,
     this.composeHint = "Write something here..",
-    this.headingHint = "Add a heading",
+    this.headingHint = "Add your question here",
     this.enableDocuments = true,
     this.enableImages = true,
     this.enableLinkPreviews = true,

@@ -382,6 +382,11 @@ class LMFeedCore {
   }
 }
 
+enum LMFeedThemeType {
+  social,
+  qna,
+}
+
 /// {@template lm_feed_config}
 /// This class is used to configure the feed screens.
 /// {@endtemplate}
@@ -392,6 +397,7 @@ class LMFeedConfig {
   final LMFeedRoomScreenConfig feedRoomScreenConfig;
   final SystemUiOverlayStyle? globalSystemOverlayStyle;
   final LMFeedWebConfiguration webConfiguration;
+  final LMFeedThemeType feedThemeType;
 
   /// {@macro lm_feed_config}
   LMFeedConfig({
@@ -401,6 +407,7 @@ class LMFeedConfig {
     this.feedRoomScreenConfig = const LMFeedRoomScreenConfig(),
     this.webConfiguration = const LMFeedWebConfiguration(),
     this.globalSystemOverlayStyle,
+    this.feedThemeType = LMFeedThemeType.social,
   });
 
   /// {@template lm_feed_config_copywith}
@@ -414,6 +421,7 @@ class LMFeedConfig {
     LMFeedRoomScreenConfig? feedRoomScreenConfig,
     SystemUiOverlayStyle? globalSystemOverlayStyle,
     LMFeedWebConfiguration? webConfiguration,
+    LMFeedThemeType? feedThemeType,
   }) {
     return LMFeedConfig(
       feedScreenConfig: config ?? feedScreenConfig,
@@ -423,6 +431,7 @@ class LMFeedConfig {
       globalSystemOverlayStyle:
           globalSystemOverlayStyle ?? this.globalSystemOverlayStyle,
       webConfiguration: webConfiguration ?? this.webConfiguration,
+      feedThemeType: feedThemeType ?? this.feedThemeType,
     );
   }
 }

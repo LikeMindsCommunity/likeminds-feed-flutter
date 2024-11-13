@@ -1,247 +1,18 @@
-part of 'widget_utility.dart';
+part of './widget_utility.dart';
 
 class LMFeedQnAWidgets extends LMFeedWidgetUtility {
   @override
-  Widget scaffold({
-    Key? key,
-    bool extendBody = false,
-    bool extendBodyBehindAppBar = false,
-    PreferredSizeWidget? appBar,
-    Widget? body,
-    Widget? floatingActionButton,
-    FloatingActionButtonLocation? floatingActionButtonLocation,
-    FloatingActionButtonAnimator? floatingActionButtonAnimator,
-    List<Widget>? persistentFooterButtons,
-    AlignmentDirectional persistentFooterAlignment =
-        AlignmentDirectional.centerEnd,
-    Widget? drawer,
-    DrawerCallback? onDrawerChanged,
-    Widget? endDrawer,
-    DrawerCallback? onEndDrawerChanged,
-    Color? drawerScrimColor,
-    Color? backgroundColor,
-    Widget? bottomNavigationBar,
-    Widget? bottomSheet,
-    bool? resizeToAvoidBottomInset,
-    bool primary = true,
-    DragStartBehavior drawerDragStartBehavior = DragStartBehavior.start,
-    double? drawerEdgeDragWidth,
-    bool drawerEnableOpenDragGesture = true,
-    bool endDrawerEnableOpenDragGesture = true,
-    String? restorationId,
-    LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed,
-    bool canPop = true,
-    Function(bool)? onPopInvoked,
-  }) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: LMFeedCore.config.globalSystemOverlayStyle ??
-          SystemUiOverlayStyle.dark,
-      child: Scaffold(
-        key: key,
-        extendBody: extendBody,
-        extendBodyBehindAppBar: extendBodyBehindAppBar,
-        appBar: appBar,
-        body: body,
-        floatingActionButton: floatingActionButton,
-        floatingActionButtonLocation: floatingActionButtonLocation,
-        floatingActionButtonAnimator: floatingActionButtonAnimator,
-        persistentFooterButtons: persistentFooterButtons,
-        persistentFooterAlignment: persistentFooterAlignment,
-        drawer: drawer,
-        onDrawerChanged: onDrawerChanged,
-        endDrawer: endDrawer,
-        onEndDrawerChanged: onEndDrawerChanged,
-        drawerScrimColor: drawerScrimColor,
-        backgroundColor: backgroundColor,
-        bottomNavigationBar: bottomNavigationBar,
-        bottomSheet: bottomSheet,
-        resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-        primary: primary,
-        drawerDragStartBehavior: drawerDragStartBehavior,
-        drawerEdgeDragWidth: drawerEdgeDragWidth,
-        drawerEnableOpenDragGesture: drawerEnableOpenDragGesture,
-        endDrawerEnableOpenDragGesture: endDrawerEnableOpenDragGesture,
-        restorationId: restorationId,
-      ),
-    );
-  }
-
-  @override
-  Widget postWidgetBuilder(
+  LMFeedPostWidget postWidgetBuilder(
       BuildContext context, LMFeedPostWidget post, LMPostViewData postViewData,
       {LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed}) {
     return post.copyWith(
       footerBuilder: (context, footer, postViewData) {
-        return LMQnAPostFooter(
+        return LMFeedQnAPostFooter(
           footer: footer,
           postViewData: postViewData,
           source: source,
         );
       },
-    );
-  }
-
-  @override
-  Widget commentBuilder(BuildContext context, LMFeedCommentWidget commentWidget,
-      LMPostViewData postViewData) {
-    return LMQnACommentWidget(
-      commentViewData: commentWidget.comment,
-      postViewData: postViewData,
-      commentWidget: commentWidget,
-    );
-  }
-
-  @override
-  Widget headerBuilder(BuildContext context, LMFeedPostHeader postHeader,
-      LMPostViewData postViewData) {
-    return postHeader;
-  }
-
-  @override
-  Widget menuBuilder(
-      BuildContext context, LMFeedMenu menu, LMPostViewData postViewData) {
-    return menu;
-  }
-
-  @override
-  Widget topicBuilder(BuildContext context, LMFeedPostTopic postTopic,
-      LMPostViewData postViewData) {
-    return postTopic;
-  }
-
-  @override
-  Widget postContentBuilder(BuildContext context, LMFeedPostContent postContent,
-      LMPostViewData postViewData) {
-    return postContent;
-  }
-
-  @override
-  Widget postMediaBuilder(BuildContext context, LMFeedPostMedia postMedia,
-      LMPostViewData postViewData) {
-    return postMedia;
-  }
-
-  @override
-  Widget postFooterBuilder(BuildContext context, LMFeedPostFooter postFooter,
-      LMPostViewData postViewData) {
-    LMFeedThemeData feedThemeData = LMFeedCore.theme;
-
-    return LMQnAPostFooter(
-      footer: postFooter,
-      postViewData: postViewData,
-    );
-  }
-
-  @override
-  Widget postMediaCarouselIndicatorBuilder(
-      context, int currIndex, int mediaLength, carouselIndicator) {
-    LMFeedThemeData feedThemeData = LMFeedCore.theme;
-
-    return mediaLength == 0
-        ? const SizedBox()
-        : Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(mediaLength, (index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 2.5),
-                  decoration: BoxDecoration(
-                    // color: textTertiary,
-                    borderRadius:
-                        BorderRadius.circular(currIndex == index ? 100.0 : 6.0),
-                  ),
-                  height: index == currIndex ? null : 5,
-                  width: index == currIndex ? null : 5,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 5.0,
-                  ),
-                  child: currIndex == index
-                      ? LMFeedText(
-                          text: "${currIndex + 1}/$mediaLength",
-                          style: LMFeedTextStyle(
-                            textStyle: TextStyle(
-                              fontSize: 10.0,
-                              color: feedThemeData.container,
-                            ),
-                          ),
-                        )
-                      : null,
-                );
-              }),
-            ),
-          );
-  }
-
-  @override
-  Widget newPageProgressIndicatorBuilderFeed(BuildContext context) {
-    LMFeedThemeData feedThemeData = LMFeedCore.theme;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 100),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: feedThemeData.container,
-      ),
-      child: Center(
-        child: LMFeedLoader(
-          style: feedThemeData.loaderStyle.copyWith(
-              // backgroundColor: dividerDark,
-              ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget noMoreItemsIndicatorBuilderFeed(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        SizedBox(
-          height: 35,
-        ),
-        LMFeedIcon(
-          type: LMFeedIconType.icon,
-          icon: Icons.check_circle,
-          // assetPath: qNaAssetTickCircleIcon,
-          style: LMFeedIconStyle(
-            size: 80,
-            boxPadding: 10,
-          ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        LMFeedText(
-          text: "That's a wrap!",
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontFamily: "Inter",
-              fontSize: 16,
-              // color: textSecondary,
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        LMFeedText(
-          text: "You have reached the end of the page",
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontFamily: "Inter",
-              fontSize: 16,
-              // color: textSecondary,
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 100,
-        ),
-      ],
     );
   }
 
@@ -341,7 +112,6 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
     postViewData = widget.postViewData;
     postWidget = widget.postWidget;
     postCreator = postViewData?.user;
-    userSubText = generateUserSubText(userSubText);
   }
 
   @override
@@ -351,7 +121,6 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
     postWidget = widget.postWidget;
     postCreator = postViewData?.user;
     userSubText = "";
-    userSubText = generateUserSubText(userSubText);
   }
 
   @override
@@ -424,7 +193,7 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
             if (postWidget!.topicWidget != null) postWidget!.topicWidget!,
             //postTopics,
             if (postWidget!.footer != null)
-              LMQnAPostFooter(
+              LMFeedQnAPostFooter(
                 footer: postWidget!.footer!,
                 postViewData: postViewData!,
                 source: widget.source,
@@ -434,47 +203,14 @@ class _LMQnAPostWidgetState extends State<LMQnAPostWidget> {
       ),
     );
   }
-
-  // This functions calculates the no of countries followed by the user
-  // and the tag that they are given
-  String generateUserSubText(String subText) {
-    if (postCreator != null) {
-      // calculate the no of countries followed by the user
-      // and add it in the subtext string
-      // userSubText = LMQnAFeedUtils.calculateNoCountriesFollowedByUser(
-      //     userSubText, postCreator!.topics ?? []);
-
-      // parse the tag given to user from
-      // widgets and append it in the subtext string
-      LMWidgetViewData? widgetViewData =
-          postViewData!.widgets?[postCreator!.sdkClientInfo.widgetId];
-
-      if (widgetViewData != null) {
-        // userSubText =
-        //     LMQnAFeedUtils.getUserTagFromWidget(userSubText, widgetViewData);
-      }
-
-      if (userViewData.uuid == postCreator!.uuid) {
-        LMCache cache = (LMCacheBuilder()
-              ..key("user_sub_text")
-              ..value(userSubText))
-            .build();
-        LMFeedCore.client.insertOrUpdateCache(cache);
-      }
-
-      return userSubText;
-    } else {
-      return "";
-    }
-  }
 }
 
-class LMQnAPostFooter extends StatelessWidget {
+class LMFeedQnAPostFooter extends StatelessWidget {
   final LMFeedPostFooter footer;
   final LMPostViewData postViewData;
   final LMFeedWidgetSource? source;
 
-  const LMQnAPostFooter({
+  const LMFeedQnAPostFooter({
     super.key,
     required this.footer,
     required this.postViewData,
@@ -486,8 +222,14 @@ class LMQnAPostFooter extends StatelessWidget {
     final LMFeedThemeData themeData = LMFeedCore.theme;
     LMFeedButton? likeButton = footer.likeButton?.copyWith(
       text: footer.likeButton?.text?.copyWith(
-        text: postViewData.likeCount.toString(),
-      ),
+          text: "Upvote • " + postViewData.likeCount.toString(),
+          style: LMFeedTextStyle.basic().copyWith(
+            textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: LikeMindsTheme.greyColor,
+            ),
+          )),
       onTap: () {
         footer.likeButton?.onTap.call();
       },
@@ -495,26 +237,38 @@ class LMQnAPostFooter extends StatelessWidget {
         footer.likeButton?.onTextTap?.call();
       },
       style: footer.likeButton?.style?.copyWith(
+        backgroundColor: LikeMindsTheme.unSelectedColor.withOpacity(0.5),
         icon: LMFeedIcon(
           type: LMFeedIconType.svg,
           assetPath: lmUpvoteSvg,
+          style: LMFeedIconStyle.basic().copyWith(
+            size: 24,
+          ),
         ),
         activeIcon: LMFeedIcon(
           type: LMFeedIconType.svg,
           assetPath: lmUpvoteFilledSvg,
+          style: LMFeedIconStyle.basic().copyWith(
+            size: 24,
+          ),
         ),
         border: Border.all(
-          color: themeData.inActiveColor,
+          color: themeData.backgroundColor,
         ),
         borderRadius: 100,
-        padding: EdgeInsets.all(16),
-        margin: EdgeInsets.only(left: 20),
+        padding: EdgeInsets.symmetric(
+          horizontal: 10,
+        ),
+        margin: EdgeInsets.only(left: 16),
       ),
     );
 
+    final String answerText = postViewData.commentCount == 0
+        ? "Answer "
+        : postViewData.commentCount.toString();
     LMFeedButton? commentButton = footer.commentButton?.copyWith(
       text: footer.commentButton?.text?.copyWith(
-        text: postViewData.commentCount.toString(),
+        text: answerText,
       ),
     );
     LMFeedButton? shareButton = footer.shareButton
@@ -534,33 +288,49 @@ class LMQnAPostFooter extends StatelessWidget {
             topResponses: postViewData.topComments!,
             postViewData: postViewData,
           ),
-        if (source != null && source != LMFeedWidgetSource.postDetailScreen)
-          QnAAddResponse(
-            postCreatorUUID: postViewData.uuid,
-            onTap: () {
-              commentButton?.onTap.call();
-            },
-          ),
         const Divider(
-          // color: dividerDark,
           thickness: 1,
           height: 1,
         ),
-        const SizedBox(
-          height: 15,
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Row(
+            children: [
+              likeButton ?? const SizedBox(),
+              const Spacer(),
+              commentButton ?? const SizedBox(),
+              const SizedBox(width: 20),
+              if (footer.saveButton != null) footer.saveButton!,
+              const SizedBox(width: 10),
+              shareButton ?? const SizedBox(),
+            ],
+          ),
         ),
-        SizedBox(
-          height: 20,
-          child: Row(children: [
-            likeButton ?? const SizedBox(),
-            const SizedBox(width: 20),
-            commentButton ?? const SizedBox(),
-            const Spacer(),
-            if (footer.saveButton != null) footer.saveButton!,
-            const SizedBox(width: 10),
-            shareButton ?? const SizedBox(),
-          ]),
-        ),
+        if (postViewData.commentCount == 0 &&
+            source != null &&
+            source != LMFeedWidgetSource.postDetailScreen)
+          Column(
+            children: [
+              const Divider(
+                thickness: 1,
+                height: 1,
+              ),
+              QnAAddResponse(
+                onTap: () {
+                  // navigate to post detail screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LMFeedPostDetailScreen(
+                        postId: postViewData.id,
+                        openKeyboard: true,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
       ],
     );
   }
@@ -568,9 +338,11 @@ class LMQnAPostFooter extends StatelessWidget {
 
 class QnAAddResponse extends StatelessWidget {
   final void Function()? onTap;
-  final String postCreatorUUID;
 
-  const QnAAddResponse({super.key, this.onTap, required this.postCreatorUUID});
+  const QnAAddResponse({
+    super.key,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -579,59 +351,49 @@ class QnAAddResponse extends StatelessWidget {
         LMFeedPluralizeWordAction.allSmallSingular);
     LMUserViewData currentUser =
         LMFeedLocalPreference.instance.fetchUserData()!;
-    return postCreatorUUID == currentUser.uuid
-        ? const SizedBox()
-        : GestureDetector(
-            onTap: onTap,
-            behavior: HitTestBehavior.translucent,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 15.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  LMFeedProfilePicture(
-                    fallbackText: currentUser.name,
-                    imageUrl: currentUser.imageUrl,
-                    onTap: () {},
-                    style: LMFeedProfilePictureStyle(
-                      size: 35,
-                      fallbackTextStyle: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: theme.onPrimary,
-                        ),
-                      ),
-                    ),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.translucent,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 12.0,
+          horizontal: 16,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            LMFeedProfilePicture(
+              fallbackText: currentUser.name,
+              imageUrl: currentUser.imageUrl,
+              onTap: () {},
+              style: LMFeedProfilePictureStyle(
+                size: 35,
+                fallbackTextStyle: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: theme.onPrimary,
                   ),
-                  const SizedBox(width: 7),
-                  Expanded(
-                    child: Container(
-                      height: 40,
-                      alignment: Alignment.bottomLeft,
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: theme.backgroundColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: LMFeedText(
-                        text: "+ Add your $commentTitleSmallCapSingular",
-                        style: const LMFeedTextStyle(
-                          textStyle: TextStyle(
-                            fontFamily: "Inter",
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            letterSpacing: 0.2,
-                            // color: textSecondary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
+                ),
               ),
             ),
-          );
+            const SizedBox(width: 7),
+            Expanded(
+              child: LMFeedText(
+                text: "Be the first one to answer",
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                    color: LikeMindsTheme.greyColor,
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -676,28 +438,27 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
   Widget build(BuildContext context) {
     return widget.topResponses.isEmpty
         ? const SizedBox.shrink()
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LMFeedText(
-                text: "Top $commentTitle",
-                style: const LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    fontFamily: "Inter",
-                    fontWeight: FontWeight.w600,
-                    // color: textTertiary,
+        : Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LMFeedText(
+                  text: "Top Response",
+                  style: const LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      // color: textTertiary,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
-                    child: LMFeedProfilePicture(
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    LMFeedProfilePicture(
                       fallbackText: widget.topResponses.first.user.name,
                       imageUrl: widget.topResponses.first.user.imageUrl ?? "",
                       style: LMFeedProfilePictureStyle(
@@ -719,102 +480,96 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
                         );
                       },
                     ),
-                  ),
-                  const SizedBox(
-                    width: 7,
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.zero,
-                          topRight: Radius.circular(10.0),
-                          bottomLeft: Radius.circular(10.0),
-                          bottomRight: Radius.circular(10.0),
+                    const SizedBox(
+                      width: 7,
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(10.0),
+                        decoration: BoxDecoration(
+                          color:
+                              LikeMindsTheme.unSelectedColor.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              LMFeedProfileBloc.instance.add(
-                                LMFeedRouteToUserProfileEvent(
-                                  uuid: widget.topResponses.first.user.uuid,
-                                  context: context,
-                                ),
-                              );
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                LMFeedText(
-                                  text: widget.topResponses.first.user.name,
-                                  style: const LMFeedTextStyle(
-                                    textStyle: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      // color: textSecondary,
-                                    ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                LMFeedProfileBloc.instance.add(
+                                  LMFeedRouteToUserProfileEvent(
+                                    uuid: widget.topResponses.first.user.uuid,
+                                    context: context,
                                   ),
-                                ),
-                                if (userSubText.isNotEmpty)
+                                );
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   LMFeedText(
-                                    text: userSubText,
-                                    style: LMFeedTextStyle(
+                                    text: widget.topResponses.first.user.name,
+                                    style: const LMFeedTextStyle(
                                       textStyle: TextStyle(
-                                        color: LMFeedCore.theme.onContainer,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w400,
-                                        height: 1.75,
-                                        letterSpacing: 0.15,
+                                        fontWeight: FontWeight.w600,
+                                        // color: textSecondary,
                                       ),
                                     ),
                                   ),
-                              ],
+                                  LMFeedText(
+                                    text:
+                                        "${LMFeedTimeAgo.instance.format(postViewData!.createdAt)}",
+                                    style: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        color: LMFeedCore.theme.inActiveColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 10.0,
-                          ),
-                          LMFeedExpandableText(
-                            LMFeedTaggingHelper.convertRouteToTag(
-                                widget.topResponses.first.text),
-                            expandText: "Read More",
-                            prefixStyle: const TextStyle(
-                              // color: textSecondary,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              height: 1.66,
+                            const SizedBox(
+                              height: 4.0,
                             ),
-                            expandOnTextTap: true,
-                            onTagTap: (String uuid) {
-                              LMFeedProfileBloc.instance.add(
-                                LMFeedRouteToUserProfileEvent(
-                                  uuid: uuid,
-                                  context: context,
-                                ),
-                              );
-                            },
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w400,
-                              // color: textSecondary,
-                              height: 1.66,
+                            LMFeedExpandableText(
+                              LMFeedTaggingHelper.convertRouteToTag(
+                                  widget.topResponses.first.text),
+                              expandText: "Read More",
+                              prefixStyle: const TextStyle(
+                                // color: textSecondary,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                                height: 1.66,
+                              ),
+                              expandOnTextTap: true,
+                              onTagTap: (String uuid) {
+                                LMFeedProfileBloc.instance.add(
+                                  LMFeedRouteToUserProfileEvent(
+                                    uuid: uuid,
+                                    context: context,
+                                  ),
+                                );
+                              },
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w400,
+                                // color: textSecondary,
+                                height: 1.66,
+                              ),
+                              maxLines: 4,
                             ),
-                            maxLines: 4,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-            ],
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+              ],
+            ),
           );
   }
 
@@ -836,134 +591,6 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
         // userSubText =
         //     LMQnAFeedUtils.getUserTagFromWidget(userSubText, widgetViewData);
       }
-      return userSubText;
-    } else {
-      return "";
-    }
-  }
-}
-
-class LMQnACommentWidget extends StatefulWidget {
-  final LMCommentViewData commentViewData;
-  final LMPostViewData postViewData;
-  final LMFeedCommentWidget commentWidget;
-
-  const LMQnACommentWidget({
-    super.key,
-    required this.commentViewData,
-    required this.postViewData,
-    required this.commentWidget,
-  });
-
-  @override
-  State<LMQnACommentWidget> createState() => _LMQnACommentWidgetState();
-}
-
-class _LMQnACommentWidgetState extends State<LMQnACommentWidget> {
-  LMCommentViewData? commentViewData;
-  LMPostViewData? postViewData;
-  LMUserViewData? commentCreator;
-  String userSubText = "";
-  LMFeedThemeData feedThemeData = LMFeedCore.theme;
-
-  @override
-  void initState() {
-    super.initState();
-    commentViewData = widget.commentViewData;
-    postViewData = widget.postViewData;
-    commentCreator = commentViewData?.user;
-    userSubText = generateUserSubText(userSubText);
-  }
-
-  @override
-  void didUpdateWidget(covariant LMQnACommentWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    commentViewData = widget.commentViewData;
-    postViewData = widget.postViewData;
-    commentCreator = commentViewData?.user;
-    userSubText = "";
-    userSubText = generateUserSubText(userSubText);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.commentWidget.copyWith(
-      customTitle: LMFeedText(
-        text: " • ${LMFeedTimeAgo.instance.format(commentViewData!.createdAt)}",
-        style: const LMFeedTextStyle(
-          textStyle: TextStyle(
-            // color: textSecondary,
-            fontSize: 10,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 0.15,
-          ),
-        ),
-      ),
-      menu: (menu) {
-        return menu.copyWith(
-          removeItemIds: {},
-          action: menu.action?.copyWith(),
-        );
-      },
-      likeButtonBuilder: (button) {
-        return button.copyWith(
-          activeText: LMFeedText(
-            text: commentViewData!.likesCount.toString(),
-            style: const LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontWeight: FontWeight.w400,
-                // color: textSecondary,
-                fontFamily: 'Inter',
-                height: 1.25,
-              ),
-            ),
-          ),
-          text: LMFeedText(
-            text: commentViewData!.likesCount.toString(),
-            style: const LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontWeight: FontWeight.w400,
-                // color: textSecondary,
-                fontFamily: 'Inter',
-                height: 1.25,
-              ),
-            ),
-          ),
-        );
-      },
-      subtitleText: LMFeedText(
-        text: userSubText,
-        style: const LMFeedTextStyle(
-          textStyle: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            // color: kSecondaryColor700,
-            fontFamily: 'Inter',
-          ),
-        ),
-      ),
-    );
-  }
-
-  // This functions calculates the no of countries followed by the user
-  // and the tag that they are given
-  String generateUserSubText(String subText) {
-    if (commentCreator != null) {
-      // calculate the no of countries followed by the user
-      // and add it in the subtext string
-      // userSubText = LMQnAFeedUtils.calculateNoCountriesFollowedByUser(
-      //     userSubText, commentCreator!.topics ?? []);
-
-      // parse the tag given to user from
-      // widgets and append it in the subtext string
-      LMWidgetViewData? widgetViewData =
-          postViewData!.widgets?[commentCreator!.sdkClientInfo.widgetId];
-
-      if (widgetViewData != null) {
-        // userSubText =
-        //     LMQnAFeedUtils.getUserTagFromWidget(userSubText, widgetViewData);
-      }
-
       return userSubText;
     } else {
       return "";

@@ -104,19 +104,7 @@ class LMFeedWidgetUtility {
       isDesktopWeb = false;
     }
 
-    return post.copyWith(
-      headerBuilder: this.headerBuilder,
-      contentBuilder: this.postContentBuilder,
-      mediaBuilder: this.postMediaBuilder,
-      footerBuilder: this.postFooterBuilder,
-      menuBuilder: this.menuBuilder,
-      topicBuilder: this.topicBuilder,
-      reviewBannerBuilder: this.postReviewBannerBuilder,
-      style: post.style?.copyWith(
-          borderRadius: isDesktopWeb
-              ? BorderRadius.circular(8.0)
-              : post.style?.borderRadius),
-    );
+    return post;
   }
 
   /// Builds a post review banner widget.

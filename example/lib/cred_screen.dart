@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:likeminds_feed_sample/builder/example_widget_utility.dart';
 import 'package:likeminds_feed_sample/globals.dart';
 import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
@@ -388,21 +389,17 @@ class _CredScreenState extends State<CredScreen> {
         {
           LMFeedCore.theme = LMFeedThemeData.qna();
           LMFeedCore.config = LMFeedConfig(
+            feedThemeType: LMFeedThemeType.qna,
             composeConfig: const LMFeedComposeScreenConfig(
-              topicRequiredToCreatePost: true,
-              showMediaCount: false,
-              enableTagging: false,
-              enableDocuments: false,
               enableHeading: true,
               headingRequiredToCreatePost: true,
-              userDisplayType: LMFeedComposeUserDisplayType.tile,
-              composeHint: "Mention details here to make the post rich",
             ),
             feedScreenConfig: const LMFeedScreenConfig(
               enableTopicFiltering: false,
             ),
             postDetailConfig: const LMPostDetailScreenConfig(
-                commentTextFieldHint: "Write your response"),
+              commentTextFieldHint: "Write your answer",
+            ),
           );
           LMFeedCore.widgetUtility = LMFeedQnAWidgets();
           LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
@@ -412,7 +409,6 @@ class _CredScreenState extends State<CredScreen> {
         {
           LMFeedCore.theme = darkTheme;
           LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
-          LMFeedCore.config = LMFeedConfig();
           break;
         }
     }

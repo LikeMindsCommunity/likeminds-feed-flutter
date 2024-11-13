@@ -733,8 +733,11 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                             return widget.postBuilder
                                     ?.call(context, postWidget, item) ??
                                 _widgetsBuilder.postWidgetBuilder.call(
-                                    context, postWidget, item,
-                                    source: _widgetSource);
+                                  context,
+                                  postWidget,
+                                  item,
+                                  source: _widgetSource,
+                                );
                           },
                           noItemsFoundIndicatorBuilder: (context) {
                             if (_feedBloc.state
@@ -1645,7 +1648,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
         placement: LMFeedIconButtonPlacement.end,
       ),
       text: LMFeedText(
-        text: "Create $postTitleFirstCap",
+        text: "ASK QUESTION",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontWeight: FontWeight.bold,
@@ -1695,8 +1698,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   LMFeedButton defFloatingActionButton(BuildContext context) => LMFeedButton(
         style: LMFeedButtonStyle(
           icon: LMFeedIcon(
-            type: LMFeedIconType.icon,
-            icon: Icons.add,
+            type: LMFeedIconType.svg,
+            assetPath: lmAddQuestionSvg,
             style: LMFeedIconStyle(
               fit: BoxFit.cover,
               size: 18,
@@ -1710,11 +1713,10 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
           backgroundColor: userPostingRights
               ? feedThemeData.primaryColor
               : feedThemeData.inActiveColor,
-          placement: LMFeedIconButtonPlacement.end,
-          gap: 5.0,
+          gap: 8.0,
         ),
         text: LMFeedText(
-          text: "Create $postTitleFirstCap",
+          text: "ASK QUESTION",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: feedThemeData.onPrimary,

@@ -76,7 +76,8 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
   final LMFeedScreenConfig? config;
 
   @override
-  State<LMFeedSocialUniversalScreen> createState() => _LMFeedSocialUniversalScreenState();
+  State<LMFeedSocialUniversalScreen> createState() =>
+      _LMFeedSocialUniversalScreenState();
 
   LMFeedSocialUniversalScreen copyWith({
     LMFeedPostAppBarBuilder? appBar,
@@ -126,7 +127,8 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
   }
 }
 
-class _LMFeedSocialUniversalScreenState extends State<LMFeedSocialUniversalScreen> {
+class _LMFeedSocialUniversalScreenState
+    extends State<LMFeedSocialUniversalScreen> {
   late Size screenSize;
   // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(

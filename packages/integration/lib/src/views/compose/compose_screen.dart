@@ -1088,12 +1088,15 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       ),
       child: Column(
         children: [
-          (config?.enableHeading ?? false)
-              ? LMFeedCore.widgetUtility.composeScreenHeadingTextfieldBuilder(
+          if (config?.enableHeading ?? false)
+            Column(
+              children: [
+                LMFeedCore.widgetUtility.composeScreenHeadingTextfieldBuilder(
                   context,
                   _defHeadingTextfield(theme),
                 )
-              : const SizedBox.shrink(),
+              ],
+            ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1181,13 +1184,40 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       focusNode: _headingFocusNode,
       controller: _headingController,
       textCapitalization: TextCapitalization.sentences,
+      maxLength: 200,
+      maxLines: 4,
+      minLines: 1,
       decoration: InputDecoration(
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        errorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        disabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        focusedErrorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
         hintText: config?.headingHint,
         hintStyle: TextStyle(
           color: theme.onContainer.withOpacity(0.5),

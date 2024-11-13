@@ -83,7 +83,7 @@ class _LMFeedQnAScreenState extends State<LMFeedQnAScreen> {
   }
 
   Widget _buildUniversalFeed() {
-    return LMFeedSocialUniversalScreen(
+    return LMFeedQnAUniversalScreen(
       appBar: widget.appBar,
       customWidgetBuilder: widget.customWidgetBuilder,
       topicChipBuilder: widget.topicChipBuilder,
@@ -104,7 +104,7 @@ class _LMFeedQnAScreenState extends State<LMFeedQnAScreen> {
   }
 
   Widget _buildPersonalisedFeed() {
-    return LMFeedSocialPersonalisedScreen(
+    return LMFeedQnAPersonalisedScreen(
       appBar: widget.appBar,
       customWidgetBuilder: widget.customWidgetBuilder,
       postBuilder: widget.postBuilder,

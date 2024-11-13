@@ -88,7 +88,8 @@ class LMFeedLocalPreference {
   }
 
   String getPostVariable() {
-    String postVar = "Post";
+    LMFeedThemeType themeType = LMFeedCore.config.feedThemeType;
+    String postVar = themeType == LMFeedThemeType.qna ? "Question" : "Post";
 
     LMCache? postCache = fetchCache("lm-feed-post-var");
 
@@ -110,12 +111,13 @@ class LMFeedLocalPreference {
   }
 
   String getCommentVariable() {
-    String postVar = "Comment";
+    LMFeedThemeType themeType = LMFeedCore.config.feedThemeType;
+    String commentVar = themeType == LMFeedThemeType.qna ? "Answer" : "Comment";
 
-    LMCache? postCache = fetchCache("lm-feed-comment-var");
+    LMCache? commentCache = fetchCache("lm-feed-comment-var");
 
-    if (postCache != null) {
-      postVar = postCache.value as String;
+    if (commentCache != null) {
+      commentVar = commentCache.value as String;
     } else {
       CommunityConfigurations? communityConfigurations =
           fetchCommunityConfiguration("feed_metadata");
@@ -123,12 +125,12 @@ class LMFeedLocalPreference {
       if (communityConfigurations != null &&
           communityConfigurations.value != null &&
           communityConfigurations.value!.containsKey('comment')) {
-        postVar = communityConfigurations.value?['comment'] ?? "Comment";
-        storeCommentVariable(postVar);
+        commentVar = communityConfigurations.value?['comment'] ?? "Comment";
+        storeCommentVariable(commentVar);
       }
     }
 
-    return postVar;
+    return commentVar;
   }
 
   Future<LMResponse> storePostVariable(String postVar) {
