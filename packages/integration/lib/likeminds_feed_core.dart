@@ -278,7 +278,7 @@ class LMFeedCore {
     required String uuid,
     required String userName,
     String? imageUrl,
-    String? isGuest,
+    bool? isGuest = false,
   }) async {
     String? newAccessToken;
     String? newRefreshToken;
@@ -292,14 +292,25 @@ class LMFeedCore {
         ?.value;
 
     if (newAccessToken == null || newRefreshToken == null) {
-      InitiateUserRequest initiateUserRequest = (InitiateUserRequestBuilder()
+      InitiateUserRequestBuilder initiateUserRequestBuilder =
+          (InitiateUserRequestBuilder()
             ..apiKey(apiKey)
             ..userName(userName)
-            ..uuid(uuid))
-          .build();
+            ..uuid(uuid));
+
+      // if imageUrl is not null, then set imageUrl
+      if (imageUrl != null) {
+        initiateUserRequestBuilder.imageUrl(imageUrl);
+      }
+      // if isGuest is not null and true, then set isGuest to true
+      if (isGuest != null && isGuest) {
+        initiateUserRequestBuilder.isGuest(isGuest);
+      }
 
       LMResponse<InitiateUserResponse> initiateUserResponse =
-          await initiateUser(initiateUserRequest: initiateUserRequest);
+          await initiateUser(
+        initiateUserRequest: initiateUserRequestBuilder.build(),
+      );
       if (initiateUserResponse.success) {
         LMNotificationHandler.instance.registerDevice(
           initiateUserResponse.data!.user!.sdkClientInfo.uuid,
