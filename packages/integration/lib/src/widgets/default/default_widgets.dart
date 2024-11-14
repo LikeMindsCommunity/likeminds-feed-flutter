@@ -126,6 +126,7 @@ class LMFeedDefaultWidgets {
               return LMFeedQnAPostFooter(
                 footer: footer,
                 postViewData: postViewData,
+                source: source,
               );
             },
           )
