@@ -61,6 +61,7 @@ class LMFeedDefaultWidgets {
     LMFeedThemeData? feedThemeData,
     LMPostViewData post,
     LMFeedWidgetSource source,
+    ValueNotifier<bool> postUploading,
   ) {
     final LMFeedPostWidget postWidget = LMFeedPostWidget(
       post: post,
@@ -97,6 +98,10 @@ class LMFeedDefaultWidgets {
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
       onPostTap: (context, post) async {
+        // check if the source is post detail screen
+        if (source == LMFeedWidgetSource.postDetailScreen) {
+          return;
+        }
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
         await Navigator.of(context, rootNavigator: true).push(
@@ -108,7 +113,7 @@ class LMFeedDefaultWidgets {
         );
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
-      footer: _defFooterWidget(context, post, source),
+      footer: _defFooterWidget(context, post, source, postUploading),
       header: _defPostHeader(context, post, source),
       content: _defContentWidget(post, context),
       media: _defPostMedia(context, post),
@@ -156,14 +161,19 @@ class LMFeedDefaultWidgets {
     );
   }
 
-  LMFeedPostFooter _defFooterWidget(
-      BuildContext context, LMPostViewData post, LMFeedWidgetSource source) {
+  LMFeedPostFooter _defFooterWidget(BuildContext context, LMPostViewData post,
+      LMFeedWidgetSource source, ValueNotifier<bool> postUploading) {
     return LMFeedPostFooter(
       likeButton: defLikeButton(context, post, source),
       commentButton: defCommentButton(context, post, source),
       saveButton: defSaveButton(post, context, source),
       shareButton: defShareButton(post, source),
-      repostButton: defRepostButton(context, post, source),
+      repostButton: defRepostButton(
+        context,
+        post,
+        source,
+        postUploading,
+      ),
       postFooterStyle: feedThemeData.footerStyle,
       showRepostButton: !post.isRepost,
     );
@@ -327,6 +337,11 @@ class LMFeedDefaultWidgets {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
+        // check if the user is a guest user
+        if (LMFeedUserUtils.isGuestUser()) {
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          return;
+        }
         if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
@@ -424,6 +439,7 @@ class LMFeedDefaultWidgets {
   LMFeedButton defLikeButton(BuildContext context, LMPostViewData postViewData,
           LMFeedWidgetSource source) =>
       LMFeedButton(
+        isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
         isActive: postViewData.isLiked,
         text: LMFeedText(
             text: LMFeedPostUtils.getLikeCountTextWithCount(
@@ -445,6 +461,11 @@ class LMFeedDefaultWidgets {
           )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
         },
         onTap: () async {
+          // check if the user is a guest user
+          if (LMFeedUserUtils.isGuestUser()) {
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+            return;
+          }
           newPostBloc.add(LMFeedUpdatePostEvent(
             actionType: postViewData.isLiked
                 ? LMFeedPostActionType.unlike
@@ -519,8 +540,14 @@ class LMFeedDefaultWidgets {
   LMFeedButton defSaveButton(LMPostViewData postViewData, BuildContext context,
           LMFeedWidgetSource source) =>
       LMFeedButton(
+        isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
         isActive: postViewData.isSaved,
         onTap: () async {
+          // check if the user is a guest user
+          if (LMFeedUserUtils.isGuestUser()) {
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+            return;
+          }
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
               postId: postViewData.id,
               actionType: postViewData.isSaved
@@ -567,8 +594,11 @@ class LMFeedDefaultWidgets {
         style: feedThemeData.footerStyle.shareButtonStyle,
       );
 
-  LMFeedButton defRepostButton(BuildContext context,
-          LMPostViewData postViewData, LMFeedWidgetSource source) =>
+  LMFeedButton defRepostButton(
+          BuildContext context,
+          LMPostViewData postViewData,
+          LMFeedWidgetSource source,
+          ValueNotifier<bool> postUploading) =>
       LMFeedButton(
         text: LMFeedText(
           style: LMFeedTextStyle(
@@ -584,51 +614,9 @@ class LMFeedDefaultWidgets {
               ? ''
               : postViewData.repostCount.toString(),
         ),
-        onTap: userPostingRights
-            ? () async {
-                final value = LMFeedCore.client.getTemporaryPost();
-                if (value.success) {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    'A $postTitleSmallCap is already uploading.',
-                    source,
-                  );
-                  return;
-                }
-                if (!postUploading) {
-                  LMFeedVideoProvider.instance.forcePauseAllControllers();
-                  // ignore: use_build_context_synchronously
-                  LMAttachmentViewData attachmentViewData =
-                      (LMAttachmentViewData.builder()
-                            ..attachmentType(LMMediaType.repost)
-                            ..attachmentMeta((LMAttachmentMetaViewData.builder()
-                                  ..repost(postViewData))
-                                .build()))
-                          .build();
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(
-                        attachments: [attachmentViewData],
-                        widgetSource: LMFeedWidgetSource.universalFeed,
-                      ),
-                    ),
-                  );
-                } else {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    'A $postTitleSmallCap is already uploading.',
-                    source,
-                  );
-                }
-              }
-            : () {
-                LMFeedCore.showSnackBar(
-                  context,
-                  'You do not have permission to create a $postTitleSmallCap',
-                  source,
-                );
-              },
+        onTap: () {
+          handleCreatePost(context, source, postUploading);
+        },
         style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
             icon: feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
               style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
@@ -647,8 +635,67 @@ class LMFeedDefaultWidgets {
             )),
       );
 
+  // function to handle the create post button
+  Future<void> handleCreatePost(
+    BuildContext context,
+    LMFeedWidgetSource source,
+    ValueNotifier<bool> postUploading, {
+    int? feedRoomId,
+  }) async {
+    // check if the user have posting rights
+    if (userPostingRights) {
+      // check if the user is a guest user
+      if (LMFeedUserUtils.isGuestUser()) {
+        LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+        return;
+      }
+      // check if a post failed to upload
+      // and stored in the cache as temporary post
+      final value = LMFeedCore.client.getTemporaryPost();
+      if (value.success) {
+        LMFeedCore.showSnackBar(
+          context,
+          'A $postTitleSmallCap is already uploading.',
+          source,
+        );
+        return;
+      }
+      // if no post is uploading then navigate to the compose screen
+      if (!postUploading.value) {
+        LMFeedVideoProvider.instance.forcePauseAllControllers();
+        // ignore: use_build_context_synchronously
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LMFeedComposeScreen(
+              widgetSource: LMFeedWidgetSource.personalisedFeed,
+              feedroomId: feedRoomId,
+            ),
+          ),
+        );
+      } else {
+        LMFeedCore.showSnackBar(
+          context,
+          'A $postTitleSmallCap is already uploading.',
+          source,
+        );
+      }
+    } else {
+      LMFeedCore.showSnackBar(
+        context,
+        "You do not have permission to create a $postTitleSmallCap",
+        source,
+      );
+    }
+  }
+
   void handlePostReportAction(
       LMPostViewData postViewData, BuildContext context) {
+    // check if the user is a guest user
+    if (LMFeedUserUtils.isGuestUser()) {
+      LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+      return;
+    }
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => LMFeedReportScreen(

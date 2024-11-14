@@ -166,7 +166,7 @@ class _LMFeedSocialPersonalisedScreenState
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
 
   // Create a ValueNotifier to track if a post is uploading
-  final ValueNotifier postUploading = ValueNotifier(false);
+  final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
   LMFeedScreenConfig? config;
@@ -676,6 +676,7 @@ class _LMFeedSocialPersonalisedScreenState
                               feedThemeData,
                               item,
                               _widgetSource,
+                              postUploading,
                             );
                             return VisibilityDetector(
                               key: ObjectKey(item.id),
@@ -748,32 +749,13 @@ class _LMFeedSocialPersonalisedScreenState
 
   LMFeedPostSomething _defPostSomeThingWidget(BuildContext context) {
     return LMFeedPostSomething(
-      onTap: userPostingRights
-          ? () async {
-              final value = LMFeedCore.client.getTemporaryPost();
-              if (value.success) {
-                LMFeedCore.showSnackBar(
-                  context,
-                  'A $postTitleSmallCap is already uploading.',
-                  _widgetSource,
-                );
-                return;
-              }
-              LMFeedVideoProvider.instance.forcePauseAllControllers();
-              // ignore: use_build_context_synchronously
-              await Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const LMFeedComposeScreen(
-                        widgetSource: LMFeedWidgetSource.personalisedFeed,
-                      )));
-            }
-          : () {
-              LMFeedCore.showSnackBar(
-                context,
-                "You do not have permission to create a $postTitleSmallCap",
-                _widgetSource,
-                style: LMFeedCore.theme.snackBarTheme,
-              );
-            },
+      onTap: () {
+        LMFeedDefaultWidgets.instance.handleCreatePost(
+          context,
+          _widgetSource,
+          postUploading,
+        );
+      },
       style: LMFeedPostSomethingStyle.basic(
         theme: feedThemeData,
       ),
@@ -808,6 +790,11 @@ class _LMFeedSocialPersonalisedScreenState
       trailing: [
         LMFeedButton(
           onTap: () {
+            // check if the user is a guest user
+            if (LMFeedUserUtils.isGuestUser()) {
+              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+              return;
+            }
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -838,6 +825,11 @@ class _LMFeedSocialPersonalisedScreenState
         if (config?.showNotificationFeedIcon ?? true)
           LMFeedButton(
             onTap: () {
+              // check if the user is a guest user
+              if (LMFeedUserUtils.isGuestUser()) {
+                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+                return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -948,42 +940,13 @@ class _LMFeedSocialPersonalisedScreenState
           ),
         ),
       ),
-      onTap: userPostingRights
-          ? () async {
-              final value = LMFeedCore.client.getTemporaryPost();
-              if (value.success) {
-                LMFeedCore.showSnackBar(
-                  context,
-                  'A $postTitleSmallCap is already uploading.',
-                  _widgetSource,
-                );
-                return;
-              }
-              if (!postUploading.value) {
-                LMFeedVideoProvider.instance.forcePauseAllControllers();
-                // ignore: use_build_context_synchronously
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LMFeedComposeScreen(
-                      widgetSource: LMFeedWidgetSource.personalisedFeed,
-                    ),
-                  ),
-                );
-              } else {
-                LMFeedCore.showSnackBar(
-                    context,
-                    'A $postTitleSmallCap is already uploading.',
-                    _widgetSource);
-              }
-            }
-          : () {
-              LMFeedCore.showSnackBar(
-                context,
-                "You do not have permission to create a $postTitleSmallCap",
-                _widgetSource,
-              );
-            },
+      onTap: () {
+        LMFeedDefaultWidgets.instance.handleCreatePost(
+          context,
+          _widgetSource,
+          postUploading,
+        );
+      },
     );
   }
 
@@ -1018,54 +981,12 @@ class _LMFeedSocialPersonalisedScreenState
             ),
           ),
         ),
-        onTap: userPostingRights
-            ? () async {
-                final value = LMFeedCore.client.getTemporaryPost();
-                if (value.success) {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    'A $postTitleSmallCap is already uploading.',
-                    _widgetSource,
-                  );
-                  return;
-                }
-                if (!postUploading.value) {
-                  LMFeedVideoProvider.instance.forcePauseAllControllers();
-                  // ignore: use_build_context_synchronously
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(
-                        widgetSource: LMFeedWidgetSource.personalisedFeed,
-                      ),
-                    ),
-                  );
-                } else {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    'A $postTitleSmallCap is already uploading.',
-                    _widgetSource,
-                  );
-                }
-              }
-            : () {
-                LMFeedCore.showSnackBar(
-                  context,
-                  "You do not have permission to create a $postTitleSmallCap",
-                  _widgetSource,
-                );
-              },
+        onTap: () {
+          LMFeedDefaultWidgets.instance.handleCreatePost(
+            context,
+            _widgetSource,
+            postUploading,
+          );
+        },
       );
-
-  void handlePostReportAction(LMPostViewData postViewData) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LMFeedReportScreen(
-          entityId: postViewData.id,
-          entityType: postEntityId,
-          entityCreatorId: postViewData.user.uuid,
-        ),
-      ),
-    );
-  }
 }

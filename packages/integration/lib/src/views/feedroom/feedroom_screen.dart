@@ -159,9 +159,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.feedroom;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
-  final ValueNotifier postUploading = ValueNotifier(false);
+  final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
-  bool right = true;
 
   LMFeedRoomScreenConfig? config;
   final ScrollController _controller = ScrollController();
@@ -639,6 +638,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                           feedThemeData,
                           item,
                           _widgetSource,
+                          postUploading,
                         );
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
@@ -696,25 +696,13 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   LMFeedPostSomething _defPostSomethingWidget(BuildContext context) {
     return LMFeedPostSomething(
-      onTap: userPostingRights
-          ? () async {
-              LMFeedVideoProvider.instance.forcePauseAllControllers();
-              // ignore: use_build_context_synchronously
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                    builder: (context) => LMFeedComposeScreen(
-                          feedroomId: widget.feedroomId,
-                          widgetSource: LMFeedWidgetSource.universalFeed,
-                        )),
-              );
-            }
-          : () {
-              LMFeedCore.showSnackBar(
-                context,
-                "You do not have permission to create a post",
-                _widgetSource,
-              );
-            },
+      onTap: () {
+        LMFeedDefaultWidgets.instance.handleCreatePost(
+          context,
+          _widgetSource,
+          postUploading,
+        );
+      },
       style: LMFeedPostSomethingStyle.basic(
         theme: feedThemeData,
       ),
@@ -918,36 +906,13 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           ),
         ),
       ),
-      onTap: right
-          ? () async {
-              if (!postUploading.value &&
-                  LMFeedPostBloc.instance.state != LMFeedUploadingState()) {
-                LMFeedVideoProvider.instance.forcePauseAllControllers();
-                // ignore: use_build_context_synchronously
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LMFeedComposeScreen(
-                      feedroomId: widget.feedroomId,
-                      widgetSource: LMFeedWidgetSource.feedroom,
-                    ),
-                  ),
-                );
-              } else {
-                LMFeedCore.showSnackBar(
-                  context,
-                  "A post is already uploading.",
-                  _widgetSource,
-                );
-              }
-            }
-          : () {
-              LMFeedCore.showSnackBar(
-                context,
-                "You do not have permission to create a post",
-                _widgetSource,
-              );
-            },
+      onTap: () {
+        LMFeedDefaultWidgets.instance.handleCreatePost(
+          context,
+          _widgetSource,
+          postUploading,
+        );
+      },
     );
   }
 
@@ -966,8 +931,9 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           height: 44,
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           borderRadius: 28,
-          backgroundColor:
-              right ? feedThemeData.primaryColor : feedThemeData.disabledColor,
+          backgroundColor: userPostingRights
+              ? feedThemeData.primaryColor
+              : feedThemeData.disabledColor,
           placement: LMFeedIconButtonPlacement.end,
           gap: 5.0,
         ),
@@ -981,46 +947,12 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             ),
           ),
         ),
-        onTap: right
-            ? () async {
-                if (!postUploading.value) {
-                  LMFeedVideoProvider.instance.forcePauseAllControllers();
-                  // ignore: use_build_context_synchronously
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(
-                        feedroomId: widget.feedroomId,
-                        widgetSource: LMFeedWidgetSource.feedroom,
-                      ),
-                    ),
-                  );
-                } else {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    "A post is already uploading.",
-                    _widgetSource,
-                  );
-                }
-              }
-            : () {
-                LMFeedCore.showSnackBar(
-                  context,
-                  "You do not have permission to create a post",
-                  _widgetSource,
-                );
-              },
+        onTap: () {
+          LMFeedDefaultWidgets.instance.handleCreatePost(
+            context,
+            _widgetSource,
+            postUploading,
+          );
+        },
       );
-
-  void handlePostReportAction(LMPostViewData postViewData) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LMFeedReportScreen(
-          entityId: postViewData.id,
-          entityType: postEntityId,
-          entityCreatorId: postViewData.user.uuid,
-        ),
-      ),
-    );
-  }
 }

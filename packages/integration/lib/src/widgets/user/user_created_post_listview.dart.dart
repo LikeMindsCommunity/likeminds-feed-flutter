@@ -63,7 +63,7 @@ class _LMFeedUserCreatedPostListViewState
       PagingController(firstPageKey: 1);
   bool userPostingRights = true;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  final ValueNotifier postUploading = ValueNotifier(false);
+  final ValueNotifier<bool> postUploading = ValueNotifier(false);
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -270,6 +270,7 @@ class _LMFeedUserCreatedPostListViewState
                     feedThemeData,
                     item,
                     _widgetSource,
+                    postUploading,
                   );
 
                   return Column(
@@ -372,47 +373,13 @@ class _LMFeedUserCreatedPostListViewState
           ),
         ),
       ),
-      onTap: userPostingRights
-          ? () async {
-              if (!postUploading.value) {
-                LMFeedVideoProvider.instance.pauseCurrentVideo();
-                // ignore: use_build_context_synchronously
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LMFeedComposeScreen(
-                      widgetSource: LMFeedWidgetSource.userFeed,
-                    ),
-                  ),
-                );
-                LMFeedVideoProvider.instance.playCurrentVideo();
-              } else {
-                LMFeedCore.showSnackBar(
-                  context,
-                  'A $postTitleSmallCap is already uploading.',
-                  _widgetSource,
-                );
-              }
-            }
-          : () {
-              LMFeedCore.showSnackBar(
-                context,
-                'You do not have permission to create a $postTitleSmallCap',
-                _widgetSource,
-              );
-            },
-    );
-  }
-
-  void handlePostReportAction(LMPostViewData postViewData) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LMFeedReportScreen(
-          entityId: postViewData.id,
-          entityType: postEntityId,
-          entityCreatorId: postViewData.user.uuid,
-        ),
-      ),
+      onTap: () {
+        LMFeedDefaultWidgets.instance.handleCreatePost(
+          context,
+          _widgetSource,
+          postUploading,
+        );
+      },
     );
   }
 }

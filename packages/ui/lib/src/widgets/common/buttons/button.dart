@@ -13,6 +13,7 @@ class LMFeedButton extends StatefulWidget {
     this.isActive = false,
     this.style,
     this.onTextTap,
+    this.isToggleEnabled = true,
   });
 
   /// Required parameter, defines whether the button is active or disabled
@@ -32,6 +33,11 @@ class LMFeedButton extends StatefulWidget {
 
   final VoidCallback? onTextTap;
 
+  /// [bool] to determine if the button should toogle
+  /// between active and inactive states
+  /// defaults to true
+  final bool isToggleEnabled;
+
   @override
   State<LMFeedButton> createState() => _LMButtonState();
 
@@ -42,6 +48,7 @@ class LMFeedButton extends StatefulWidget {
     Function()? onTap,
     LMFeedText? activeText,
     VoidCallback? onTextTap,
+    bool? isToggleEnabled,
   }) {
     return LMFeedButton(
       isActive: isActive ?? this.isActive,
@@ -50,6 +57,7 @@ class LMFeedButton extends StatefulWidget {
       onTap: onTap ?? this.onTap,
       activeText: activeText ?? this.activeText,
       onTextTap: onTextTap ?? this.onTextTap,
+      isToggleEnabled: isToggleEnabled ?? this.isToggleEnabled,
     );
   }
 }
@@ -74,9 +82,11 @@ class _LMButtonState extends State<LMFeedButton> {
     final inStyle = widget.style ?? const LMFeedButtonStyle.basic();
     return InkWell(
       onTap: () {
-        setState(() {
-          _active = !_active;
-        });
+        if (widget.isToggleEnabled) {
+          setState(() {
+            _active = !_active;
+          });
+        }
         widget.onTap();
       },
       splashFactory: InkRipple.splashFactory,

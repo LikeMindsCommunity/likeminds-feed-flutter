@@ -505,6 +505,11 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         );
       },
       onTap: () async {
+        // check if the user is a guest user
+        if (LMFeedUserUtils.isGuestUser()) {
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          return;
+        }
         LMPostViewData postViewData = _postViewData!;
 
         commentViewData.likesCount = commentViewData.isLiked
@@ -602,6 +607,11 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
           LMCommentViewData commentViewData, int index) =>
       LMFeedMenuAction(
         onCommentReport: () {
+          // check if the user is a guest user
+          if (LMFeedUserUtils.isGuestUser()) {
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+            return;
+          }
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => LMFeedReportScreen(

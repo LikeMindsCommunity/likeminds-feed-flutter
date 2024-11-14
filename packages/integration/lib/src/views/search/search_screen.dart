@@ -358,6 +358,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                                 theme,
                                 item,
                                 _widgetSource,
+                                postUploading,
                               );
                               return Column(
                                 children: [
@@ -490,47 +491,15 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                   ),
                 ),
               ),
-              onTap: userPostingRights
-                  ? () async {
-                      if (!postUploading.value) {
-                        LMFeedVideoProvider.instance.pauseCurrentVideo();
-                        // ignore: use_build_context_synchronously
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LMFeedComposeScreen(
-                              widgetSource: LMFeedWidgetSource.searchScreen,
-                            ),
-                          ),
-                        );
-                        LMFeedVideoProvider.instance.playCurrentVideo();
-                      } else {
-                        LMFeedCore.showSnackBar(
-                          context,
-                          'A $postTitleSmallCap is already uploading.',
-                          _widgetSource,
-                        );
-                      }
-                    }
-                  : () => LMFeedCore.showSnackBar(
-                        context,
-                        "You do not have permission to create a $postTitleSmallCap",
-                        _widgetSource,
-                      ),
+              onTap: () {
+                LMFeedDefaultWidgets.instance.handleCreatePost(
+                  context,
+                  _widgetSource,
+                  postUploading,
+                );
+              },
             ),
           ],
         ),
       );
-
-  void handlePostReportAction(LMPostViewData postViewData) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LMFeedReportScreen(
-          entityId: postViewData.id,
-          entityType: postEntityId,
-          entityCreatorId: postViewData.user.uuid,
-        ),
-      ),
-    );
-  }
 }

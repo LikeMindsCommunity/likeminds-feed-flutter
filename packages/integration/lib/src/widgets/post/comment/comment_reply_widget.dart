@@ -460,6 +460,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedButton defLikeButton(
           LMCommentViewData commentViewData, StateSetter setReplyState) =>
       LMFeedButton(
+        isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
         style: feedTheme.replyStyle.likeButtonStyle?.copyWith(
               showText: commentViewData.likesCount == 0 ? false : true,
             ) ??
@@ -511,6 +512,11 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
           );
         },
         onTap: () async {
+          // check if the user is a guest user
+          if (LMFeedUserUtils.isGuestUser()) {
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+            return;
+          }
           LMCommentViewData? commentFromList = comment?.replies
               ?.firstWhere((element) => element.id == commentViewData.id);
           if (commentFromList == null) return;

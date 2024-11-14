@@ -47,7 +47,8 @@ export 'package:likeminds_feed_flutter_core/src/widgets/default/default_widgets.
 /// {@endtemplate}
 class LMFeedCore {
   late final LMFeedClient lmFeedClient;
-  LMSDKCallbackImplementation? sdkCallback;
+  LMSDKCallbackImplementation? lmFeedSdkCallback;
+  LMFeedCoreCallback? lmFeedCoreCallback;
   late LMFeedBuilderDelegate _feedBuilderDelegate;
   LMFeedWidgetUtility _widgetUtility = LMFeedWidgetUtility.instance;
 
@@ -118,9 +119,10 @@ class LMFeedCore {
       LMFeedMediaService.instance;
 
       LMFeedClientBuilder clientBuilder = LMFeedClientBuilder();
-      this.sdkCallback =
+      this.lmFeedCoreCallback = lmFeedCallback;
+      this.lmFeedSdkCallback =
           LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
-      clientBuilder.sdkCallback(this.sdkCallback);
+      clientBuilder.sdkCallback(this.lmFeedSdkCallback);
 
       this.lmFeedClient = clientBuilder.build();
 

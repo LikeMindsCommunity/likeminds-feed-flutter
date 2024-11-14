@@ -57,7 +57,7 @@ class _LMFeedUserCreatedCommentListViewState
   LMUserViewData? userViewData = LMFeedLocalPreference.instance.fetchUserData();
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  final ValueNotifier postUploading = ValueNotifier(false);
+  final ValueNotifier<bool> postUploading = ValueNotifier(false);
   final LMFeedUserCreatedCommentBloc _userCreatedCommentBloc =
       LMFeedUserCreatedCommentBloc();
   final Map<String, LMPostViewData> _posts = {};
@@ -150,11 +150,22 @@ class _LMFeedUserCreatedCommentListViewState
                       _posts[item.postId]?.topComments = [item];
 
                       LMFeedPostWidget postWidget =
-                          LMFeedDefaultWidgets.instance.defPostWidget(
+                          LMFeedDefaultWidgets.instance
+                              .defPostWidget(
                         context,
                         feedThemeData,
                         _posts[item.postId]!,
                         _widgetSource,
+                        postUploading,
+                      )
+                              .copyWith(
+                        contentBuilder: (p0, p1, p2) {
+                          return LMFeedPostCustomContent(
+                            comment: item,
+                            post: _posts[item.postId]!,
+                            feedThemeData: feedThemeData,
+                          );
+                        },
                       );
                       return Column(
                         children: [
@@ -249,18 +260,6 @@ class _LMFeedUserCreatedCommentListViewState
           ],
         ),
       );
-
-  void handlePostReportAction(LMPostViewData postViewData) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LMFeedReportScreen(
-          entityId: postViewData.id,
-          entityType: postEntityId,
-          entityCreatorId: postViewData.user.uuid,
-        ),
-      ),
-    );
-  }
 }
 
 class LMFeedPostCustomContent extends LMFeedPostContent {

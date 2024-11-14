@@ -216,6 +216,19 @@ class _CredScreenState extends State<CredScreen> {
               ),
               const SizedBox(height: 36),
               ElevatedButton(
+                onPressed: () {
+                  _onSubmit(true);
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  fixedSize: const Size(200, 45),
+                ),
+                child: const Text('Guest Login'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
                 onPressed: _onSubmit,
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -266,7 +279,7 @@ class _CredScreenState extends State<CredScreen> {
     );
   }
 
-  void _onSubmit() async {
+  void _onSubmit([bool? isGuest]) async {
     String uuid = _uuidController.text;
     String userName = _usernameController.text;
     String apiKey = _apiKeyController.text;
@@ -291,6 +304,7 @@ class _CredScreenState extends State<CredScreen> {
       apiKey: apiKey,
       uuid: uuid,
       userName: userName,
+      isGuest: isGuest,
     );
     if (!response.success) {
       _showSnackBar(response.errorMessage ?? "An error occurred");

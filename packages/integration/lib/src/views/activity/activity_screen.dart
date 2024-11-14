@@ -555,6 +555,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         rebuildPollWidget.value = !rebuildPollWidget.value;
       },
       onOptionSelect: (optionData) async {
+        // check if the user is a guest user
+        if (LMFeedUserUtils.isGuestUser()) {
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          return;
+        }
         if (hasPollEnded(pollValue.expiryTime)) {
           LMFeedCore.showSnackBar(
             context,
@@ -652,6 +657,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   LMFeedButton defLikeButton(
           LMFeedThemeData? feedTheme, LMPostViewData postViewData) =>
       LMFeedButton(
+        isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
         isActive: postViewData.isLiked,
         text: LMFeedText(
             text: LMFeedPostUtils.getLikeCountTextWithCount(
@@ -672,6 +678,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
           );
         },
         onTap: () async {
+          // check if the user is a guest user
+          if (LMFeedUserUtils.isGuestUser()) {
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+            return;
+          }
           if (postViewData.isLiked) {
             postViewData.isLiked = false;
             postViewData.likeCount -= 1;
@@ -716,8 +727,14 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   LMFeedButton defSaveButton(
           LMFeedThemeData? feedTheme, LMPostViewData postViewData) =>
       LMFeedButton(
+        isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
         isActive: postViewData.isSaved,
         onTap: () async {
+          // check if the user is a guest user
+          if (LMFeedUserUtils.isGuestUser()) {
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+            return;
+          }
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
               postId: postViewData.id,
               actionType: postViewData.isSaved
@@ -998,6 +1015,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   }
 
   void handlePostReportAction(LMPostViewData postViewData) {
+    // check if the user is a guest user
+    if (LMFeedUserUtils.isGuestUser()) {
+      LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+      return;
+    }
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => LMFeedReportScreen(

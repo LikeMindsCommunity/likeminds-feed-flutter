@@ -56,7 +56,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   LMFeedSavedPostBloc _savePostBloc = LMFeedSavedPostBloc.instance;
 
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
-  final ValueNotifier postUploading = ValueNotifier(false);
+  final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedScreenConfig? config;
   LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
@@ -227,6 +227,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                           _theme,
                           item,
                           _widgetSource,
+                          postUploading,
                         );
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
@@ -306,45 +307,15 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                   ),
                 ),
               ),
-              onTap: userPostingRights
-                  ? () async {
-                      if (!postUploading.value) {
-                        LMFeedVideoProvider.instance.forcePauseAllControllers();
-                        // ignore: use_build_context_synchronously
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LMFeedComposeScreen(
-                              widgetSource: LMFeedWidgetSource.savedPostScreen,
-                            ),
-                          ),
-                        );
-                      } else {
-                        LMFeedCore.showSnackBar(
-                            context,
-                            "A $postTitleSmallCap is already uploading.",
-                            _widgetSource);
-                      }
-                    }
-                  : () => LMFeedCore.showSnackBar(
-                        context,
-                        "You do not have permission to create a $postTitleSmallCap.",
-                        _widgetSource,
-                      ),
+              onTap: () {
+                LMFeedDefaultWidgets.instance.handleCreatePost(
+                  context,
+                  _widgetSource,
+                  postUploading,
+                );
+              },
             ),
           ],
         ),
       );
-
-  void handlePostReportAction(LMPostViewData postViewData) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LMFeedReportScreen(
-          entityId: postViewData.id,
-          entityType: postEntityId,
-          entityCreatorId: postViewData.user.uuid,
-        ),
-      ),
-    );
-  }
 }

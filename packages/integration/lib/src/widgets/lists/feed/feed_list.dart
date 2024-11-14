@@ -34,7 +34,7 @@ class _LMFeedListState extends State<LMFeedList> {
 
   LMFeedThemeData feedThemeData = LMFeedTheme.instance.theme;
   LMFeedUniversalBloc _feedBloc = LMFeedUniversalBloc.instance;
-  final ValueNotifier postUploading = ValueNotifier(false);
+  final ValueNotifier<bool> postUploading = ValueNotifier(false);
 
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   bool right = true;
@@ -148,6 +148,7 @@ class _LMFeedListState extends State<LMFeedList> {
                   feedThemeData,
                   item,
                   widget.widgetSource,
+                  postUploading,
                 );
                 return LMFeedCore.widgetUtility
                     .postWidgetBuilder(context, postWidget, item);

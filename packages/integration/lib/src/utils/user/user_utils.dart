@@ -1,6 +1,12 @@
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedUserUtils {
+  // util function to check if the current user is a guest user
+  static bool isGuestUser() {
+    final currentUser = LMFeedLocalPreference.instance.fetchUserData();
+    return currentUser?.isGuest ?? false;
+  }
+
   static bool checkIfCurrentUserIsCM() {
     MemberStateResponse? response =
         LMFeedLocalPreference.instance.fetchMemberState();

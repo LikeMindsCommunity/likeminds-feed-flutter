@@ -285,6 +285,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       feedTheme,
                                       postData!,
                                       _widgetSource,
+                                      ValueNotifier(false),
                                     );
                                     return widget.postBuilder?.call(
                                             context, postWidget, postData!) ??

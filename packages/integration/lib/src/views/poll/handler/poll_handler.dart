@@ -12,6 +12,11 @@ Future<void> submitVote(
   ValueNotifier<bool> rebuildPostWidget,
   LMFeedWidgetSource source,
 ) async {
+  // check if the user is a guest user
+  if (LMFeedUserUtils.isGuestUser()) {
+    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+    return;
+  }
   try {
     if (hasPollEnded(attachmentMeta.expiryTime)) {
       LMFeedCore.showSnackBar(
@@ -279,6 +284,11 @@ Future<void> addOption(
     LMUserViewData? currentUser,
     ValueNotifier<bool> rebuildPostWidget,
     LMFeedWidgetSource source) async {
+  // check if the user is a guest user
+  if (LMFeedUserUtils.isGuestUser()) {
+    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+    return;
+  }
   if ((attachmentMeta.options?.length ?? 0) > 10) {
     LMFeedCore.showSnackBar(
       context,
