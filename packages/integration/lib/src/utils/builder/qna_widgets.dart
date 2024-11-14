@@ -219,10 +219,17 @@ class LMFeedQnAPostFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+        LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+    String upVoteText = LMFeedPostUtils.getLikeTitle(
+        LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+    if (postViewData.likeCount > 0) {
+      upVoteText = "$upVoteText • " + postViewData.likeCount.toString();
+    }
     final LMFeedThemeData themeData = LMFeedCore.theme;
     LMFeedButton? likeButton = footer.likeButton?.copyWith(
       text: footer.likeButton?.text?.copyWith(
-          text: "Upvote • " + postViewData.likeCount.toString(),
+          text: upVoteText,
           style: LMFeedTextStyle.basic().copyWith(
             textStyle: TextStyle(
               fontSize: 14,
@@ -264,7 +271,7 @@ class LMFeedQnAPostFooter extends StatelessWidget {
     );
 
     final String answerText = postViewData.commentCount == 0
-        ? "Answer "
+        ? "$commentTitleFirstCapSingular "
         : postViewData.commentCount.toString();
     LMFeedButton? commentButton = footer.commentButton?.copyWith(
       text: footer.commentButton?.text?.copyWith(
@@ -380,7 +387,7 @@ class QnAAddResponse extends StatelessWidget {
             const SizedBox(width: 7),
             Expanded(
               child: LMFeedText(
-                text: "Be the first one to answer",
+                text: "Be the first one to $commentTitleSmallCapSingular",
                 style: LMFeedTextStyle(
                   textStyle: TextStyle(
                     fontWeight: FontWeight.w400,
@@ -412,7 +419,6 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
   LMCommentViewData? commentViewData;
   LMPostViewData? postViewData;
   LMUserViewData? commentCreator;
-  String userSubText = "";
 
   String commentTitle = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
@@ -423,7 +429,6 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
     commentViewData = widget.topResponses.first;
     postViewData = widget.postViewData;
     commentCreator = commentViewData?.user;
-    userSubText = generateUserSubText(userSubText);
   }
 
   @override
@@ -571,29 +576,5 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
               ],
             ),
           );
-  }
-
-  // This functions calculates the no of countries followed by the user
-  // and the tag that they are given
-  String generateUserSubText(String subText) {
-    if (commentCreator != null) {
-      // calculate the no of countries followed by the user
-      // and add it in the subtext string
-      // userSubText = LMQnAFeedUtils.calculateNoCountriesFollowedByUser(
-      //     userSubText, commentCreator!.topics ?? []);
-
-      // parse the tag given to user from
-      // widgets and append it in the subtext string
-      LMWidgetViewData? widgetViewData =
-          postViewData!.widgets?[commentCreator!.sdkClientInfo.widgetId];
-
-      if (widgetViewData != null) {
-        // userSubText =
-        //     LMQnAFeedUtils.getUserTagFromWidget(userSubText, widgetViewData);
-      }
-      return userSubText;
-    } else {
-      return "";
-    }
   }
 }

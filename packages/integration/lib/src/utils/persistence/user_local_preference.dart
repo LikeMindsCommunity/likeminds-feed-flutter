@@ -133,6 +133,24 @@ class LMFeedLocalPreference {
     return commentVar;
   }
 
+  // get like variable
+  String getLikeVariable() {
+    LMFeedThemeType themeType = LMFeedCore.config.feedThemeType;
+    String likeVar = themeType == LMFeedThemeType.qna ? "Upvote" : "Like";
+
+    CommunityConfigurations? communityConfigurations =
+        fetchCommunityConfiguration("feed_metadata");
+
+    if (communityConfigurations != null &&
+        communityConfigurations.value != null &&
+        communityConfigurations.value!.containsKey('like')) {
+      likeVar = communityConfigurations.value?['like'] ?? "Like";
+      storeLikeVariable(likeVar);
+    }
+
+    return likeVar;
+  }
+
   Future<LMResponse> storePostVariable(String postVar) {
     LMCache cache = (LMCacheBuilder()
           ..key("lm-feed-post-var")
@@ -146,6 +164,15 @@ class LMFeedLocalPreference {
     LMCache cache = (LMCacheBuilder()
           ..key("lm-feed-comment-var")
           ..value(commentVar))
+        .build();
+
+    return storeCache(cache);
+  }
+
+  Future<LMResponse> storeLikeVariable(String likeVar) async {
+    LMCache cache = (LMCacheBuilder()
+          ..key("lm-feed-like-var")
+          ..value(likeVar))
         .build();
 
     return storeCache(cache);

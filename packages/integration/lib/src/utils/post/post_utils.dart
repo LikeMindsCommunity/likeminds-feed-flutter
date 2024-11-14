@@ -18,6 +18,12 @@ class LMFeedPostUtils {
     return LMFeedPluralize.instance.pluralizeOrCapitalize(commentTitle, action);
   }
 
+  static String getLikeTitle(LMFeedPluralizeWordAction action) {
+    String likeTitle = LMFeedLocalPreference.instance.getLikeVariable();
+
+    return LMFeedPluralize.instance.pluralizeOrCapitalize(likeTitle, action);
+  }
+
   static void handlePostPinAction(LMPostViewData postViewData) async {
     LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
       postId: postViewData.id,

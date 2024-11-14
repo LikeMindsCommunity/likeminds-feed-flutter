@@ -125,6 +125,10 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
 
 class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   late Size screenSize;
+
+  // Get the post title in all caps
+  String postTitleAllCaps = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.allCapitalSingular);
   // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
@@ -132,7 +136,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
-  // Get the post title in all small singular form
+  // Get the post title in all small plural form
   String postTitleSmallCapPlural =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
 
@@ -1079,7 +1083,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
         placement: LMFeedIconButtonPlacement.end,
       ),
       text: LMFeedText(
-        text: "ASK QUESTION",
+        text: "ASK $postTitleAllCaps",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontWeight: FontWeight.bold,
@@ -1118,7 +1122,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
           gap: 8.0,
         ),
         text: LMFeedText(
-          text: "ASK QUESTION",
+          text: "ASK $postTitleAllCaps",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: feedThemeData.onPrimary,
