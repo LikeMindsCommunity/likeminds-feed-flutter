@@ -39,6 +39,7 @@ class LMFeedQnAPostFooter extends LMFeedPostFooter {
             LMFeedTopResponseWidget(
               comment: postViewData.topComments!.first,
               postViewData: postViewData,
+              style: LMFeedTopResponseWidgetStyle.basic(),
             ),
             postViewData.topComments!.first,
             postViewData,
@@ -92,6 +93,7 @@ class LMFeedQnAPostFooter extends LMFeedPostFooter {
           ),
         );
       },
+      style: LMFeedAddResponseStyle.basic(),
     );
   }
 }

@@ -5,7 +5,7 @@ class LMFeedAddResponse extends StatelessWidget {
   final void Function()? onTap;
   final LMFeedProfilePictureBuilder? profilePictureBuilder;
   final LMFeedTextBuilder? textBuilder;
-  final LMFeedQnAAddResponseStyle? style;
+  final LMFeedAddResponseStyle? style;
 
   const LMFeedAddResponse({
     super.key,
@@ -20,7 +20,7 @@ class LMFeedAddResponse extends StatelessWidget {
     void Function()? onTap,
     LMFeedProfilePictureBuilder? profilePictureBuilder,
     LMFeedTextBuilder? textBuilder,
-    LMFeedQnAAddResponseStyle? style,
+    LMFeedAddResponseStyle? style,
   }) {
     return LMFeedAddResponse(
       onTap: onTap ?? this.onTap,
@@ -45,29 +45,23 @@ class LMFeedAddResponse extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.translucent,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 12.0,
-            horizontal: 16,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              profilePictureBuilder?.call(
-                    context,
-                    _defProfilePicture(currentUser, theme),
-                  ) ??
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            profilePictureBuilder?.call(
+                  context,
                   _defProfilePicture(currentUser, theme),
-              const SizedBox(width: 7),
-              Expanded(
-                child: textBuilder?.call(
-                      context,
-                      _defText(commentTitleSmallCapSingular),
-                    ) ??
+                ) ??
+                _defProfilePicture(currentUser, theme),
+            const SizedBox(width: 7),
+            Expanded(
+              child: textBuilder?.call(
+                    context,
                     _defText(commentTitleSmallCapSingular),
-              )
-            ],
-          ),
+                  ) ??
+                  _defText(commentTitleSmallCapSingular),
+            )
+          ],
         ),
       ),
     );
@@ -106,27 +100,37 @@ class LMFeedAddResponse extends StatelessWidget {
   }
 }
 
-class LMFeedQnAAddResponseStyle {
-  final EdgeInsets margin;
-  final EdgeInsets padding;
-  final BoxDecoration decoration;
+class LMFeedAddResponseStyle {
+  final EdgeInsets? margin;
+  final EdgeInsets? padding;
+  final BoxDecoration? decoration;
 
-  const LMFeedQnAAddResponseStyle({
-    required this.margin,
-    required this.padding,
-    required this.decoration,
+  const LMFeedAddResponseStyle({
+    this.margin,
+    this.padding,
+    this.decoration,
   });
 
   /// copyWith method for updating the style with provided values.
-  LMFeedQnAAddResponseStyle copyWith({
+  LMFeedAddResponseStyle copyWith({
     EdgeInsets? margin,
     EdgeInsets? padding,
     BoxDecoration? decoration,
   }) {
-    return LMFeedQnAAddResponseStyle(
+    return LMFeedAddResponseStyle(
       margin: margin ?? this.margin,
       padding: padding ?? this.padding,
       decoration: decoration ?? this.decoration,
+    );
+  }
+
+  /// Default style for LMFeedQnAAddResponseStyle.
+  factory LMFeedAddResponseStyle.basic() {
+    return LMFeedAddResponseStyle(
+      padding: const EdgeInsets.symmetric(
+        vertical: 12.0,
+        horizontal: 16,
+      ),
     );
   }
 }

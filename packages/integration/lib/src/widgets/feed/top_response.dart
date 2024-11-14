@@ -27,7 +27,7 @@ class LMFeedTopResponseWidget extends StatefulWidget {
   )? commentTextBuilder;
 
   /// style for the widget
-  final LMFeedQnATopResponseWidgetStyle? style;
+  final LMFeedTopResponseWidgetStyle? style;
 
   const LMFeedTopResponseWidget({
     super.key,
@@ -41,13 +41,39 @@ class LMFeedTopResponseWidget extends StatefulWidget {
     this.style,
   });
 
+  /// copyWith method for updating the style with provided values.
+  LMFeedTopResponseWidget copyWith({
+    LMCommentViewData? comment,
+    LMPostViewData? postViewData,
+    LMFeedTextBuilder? headerTextBuilder,
+    LMFeedTextBuilder? titleTextBuilder,
+    LMFeedTextBuilder? subTitleTextBuilder,
+    LMFeedProfilePictureBuilder? profilePictureBuilder,
+    Widget Function(
+      BuildContext context,
+      LMFeedExpandableText text,
+    )? commentTextBuilder,
+    LMFeedTopResponseWidgetStyle? style,
+  }) {
+    return LMFeedTopResponseWidget(
+      comment: comment ?? this.comment,
+      postViewData: postViewData ?? this.postViewData,
+      headerTextBuilder: headerTextBuilder ?? this.headerTextBuilder,
+      titleTextBuilder: titleTextBuilder ?? this.titleTextBuilder,
+      subTitleTextBuilder: subTitleTextBuilder ?? this.subTitleTextBuilder,
+      profilePictureBuilder:
+          profilePictureBuilder ?? this.profilePictureBuilder,
+      commentTextBuilder: commentTextBuilder ?? this.commentTextBuilder,
+      style: style ?? this.style,
+    );
+  }
+
   @override
   State<LMFeedTopResponseWidget> createState() =>
       _LMFeedTopResponseWidgetState();
 }
 
-class _LMFeedTopResponseWidgetState
-    extends State<LMFeedTopResponseWidget> {
+class _LMFeedTopResponseWidgetState extends State<LMFeedTopResponseWidget> {
   LMCommentViewData? commentViewData;
   LMPostViewData? postViewData;
   LMUserViewData? commentCreator;
@@ -245,7 +271,7 @@ class _LMFeedTopResponseWidgetState
   }
 }
 
-class LMFeedQnATopResponseWidgetStyle {
+class LMFeedTopResponseWidgetStyle {
   final EdgeInsets? margin;
   final EdgeInsets? padding;
   final BoxDecoration? decoration;
@@ -253,7 +279,7 @@ class LMFeedQnATopResponseWidgetStyle {
   final EdgeInsets? containerMargin;
   final BoxDecoration? containerDecoration;
 
-  const LMFeedQnATopResponseWidgetStyle({
+  const LMFeedTopResponseWidgetStyle({
     this.margin,
     this.padding,
     this.decoration,
@@ -262,7 +288,7 @@ class LMFeedQnATopResponseWidgetStyle {
     this.containerDecoration,
   });
 
-  LMFeedQnATopResponseWidgetStyle copyWith({
+  LMFeedTopResponseWidgetStyle copyWith({
     EdgeInsets? margin,
     EdgeInsets? padding,
     BoxDecoration? decoration,
@@ -270,13 +296,25 @@ class LMFeedQnATopResponseWidgetStyle {
     EdgeInsets? containerMargin,
     BoxDecoration? containerDecoration,
   }) {
-    return LMFeedQnATopResponseWidgetStyle(
+    return LMFeedTopResponseWidgetStyle(
       margin: margin ?? this.margin,
       padding: padding ?? this.padding,
       decoration: decoration ?? this.decoration,
       containerPadding: containerPadding ?? this.containerPadding,
       containerMargin: containerMargin ?? this.containerMargin,
       containerDecoration: containerDecoration ?? this.containerDecoration,
+    );
+  }
+
+  /// default style for the widget
+  factory LMFeedTopResponseWidgetStyle.basic() {
+    return LMFeedTopResponseWidgetStyle(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      containerPadding: const EdgeInsets.all(10.0),
+      containerDecoration: BoxDecoration(
+        color: LikeMindsTheme.unSelectedColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8),
+      ),
     );
   }
 }
