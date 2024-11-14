@@ -37,6 +37,7 @@ export 'package:likeminds_feed_flutter_core/src/services/media_service.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/default/default_widgets.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/feed/top_response.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/feed/add_comment.dart';
+export 'package:likeminds_feed_flutter_core/src/widgets/feed/qna_footer.dart';
 
 /// {@template lm_feed_core}
 /// This class is the core of the feed.

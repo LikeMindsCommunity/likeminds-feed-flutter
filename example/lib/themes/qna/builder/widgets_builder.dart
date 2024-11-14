@@ -257,70 +257,70 @@ class LMFeedQnAWidgetsExample extends LMFeedWidgetUtility {
     );
   }
 
-  @override
-  Widget composeScreenUserHeaderBuilder(
-      BuildContext context, LMUserViewData user) {
-    LMFeedThemeData feedThemeData = LMFeedCore.theme;
-    LMResponse userSubTextResponse =
-        LMFeedCore.client.getCache('user_sub_text');
+  // @override
+  // Widget composeScreenUserHeaderBuilder(
+  //     BuildContext context, LMUserViewData user) {
+  //   LMFeedThemeData feedThemeData = LMFeedCore.theme;
+  //   LMResponse userSubTextResponse =
+  //       LMFeedCore.client.getCache('user_sub_text');
 
-    String userSubText = "";
+  //   String userSubText = "";
 
-    if (userSubTextResponse.success) {
-      userSubText = userSubTextResponse.data!.value;
-    }
+  //   if (userSubTextResponse.success) {
+  //     userSubText = userSubTextResponse.data!.value;
+  //   }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Row(
-        children: [
-          LMFeedProfilePicture(
-            fallbackText: user.name,
-            imageUrl: user.imageUrl,
-            style: LMFeedProfilePictureStyle(
-              size: 35,
-              fallbackTextStyle: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 14,
-                  color: feedThemeData.onPrimary,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              LMFeedText(
-                text: user.name,
-                style: const LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    color: textPrimary,
-                    fontSize: 14,
-                    height: 1.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              if (userSubText.isNotEmpty)
-                LMFeedText(
-                  text: userSubText,
-                  style: const LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      color: textSecondary,
-                      fontSize: 10,
-                      height: 1.5,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0.15,
-                    ),
-                  ),
-                ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 12.0),
+  //     child: Row(
+  //       children: [
+  //         LMFeedProfilePicture(
+  //           fallbackText: user.name,
+  //           imageUrl: user.imageUrl,
+  //           style: LMFeedProfilePictureStyle(
+  //             size: 35,
+  //             fallbackTextStyle: LMFeedTextStyle(
+  //               textStyle: TextStyle(
+  //                 fontSize: 14,
+  //                 color: feedThemeData.onPrimary,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //         const SizedBox(width: 10),
+  //         Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: <Widget>[
+  //             LMFeedText(
+  //               text: user.name,
+  //               style: const LMFeedTextStyle(
+  //                 textStyle: TextStyle(
+  //                   color: textPrimary,
+  //                   fontSize: 14,
+  //                   height: 1.5,
+  //                   fontWeight: FontWeight.w600,
+  //                 ),
+  //               ),
+  //             ),
+  //             if (userSubText.isNotEmpty)
+  //               LMFeedText(
+  //                 text: userSubText,
+  //                 style: const LMFeedTextStyle(
+  //                   textStyle: TextStyle(
+  //                     color: textSecondary,
+  //                     fontSize: 10,
+  //                     height: 1.5,
+  //                     fontWeight: FontWeight.w400,
+  //                     letterSpacing: 0.15,
+  //                   ),
+  //                 ),
+  //               ),
+  //           ],
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget composeScreenTopicSelectorBuilder(BuildContext context,

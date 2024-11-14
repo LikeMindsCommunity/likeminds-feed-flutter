@@ -404,13 +404,6 @@ class _CredScreenState extends State<CredScreen> {
           LMFeedCore.theme = LMFeedThemeData.qna();
           LMFeedCore.config = LMFeedConfig(
             feedThemeType: LMFeedThemeType.qna,
-            composeConfig: const LMFeedComposeScreenConfig(
-              enableHeading: true,
-              headingRequiredToCreatePost: true,
-            ),
-            feedScreenConfig: const LMFeedScreenConfig(
-              enableTopicFiltering: false,
-            ),
             postDetailConfig: const LMPostDetailScreenConfig(
               commentTextFieldHint: "Write your answer",
             ),

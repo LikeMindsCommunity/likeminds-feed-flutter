@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-class LMFeedQnATopResponseWidget extends StatefulWidget {
+class LMFeedTopResponseWidget extends StatefulWidget {
   /// The comment data to be displayed.
   final LMCommentViewData comment;
 
@@ -29,7 +29,7 @@ class LMFeedQnATopResponseWidget extends StatefulWidget {
   /// style for the widget
   final LMFeedQnATopResponseWidgetStyle? style;
 
-  const LMFeedQnATopResponseWidget({
+  const LMFeedTopResponseWidget({
     super.key,
     required this.postViewData,
     required this.comment,
@@ -42,12 +42,12 @@ class LMFeedQnATopResponseWidget extends StatefulWidget {
   });
 
   @override
-  State<LMFeedQnATopResponseWidget> createState() =>
-      _LMFeedQnATopResponseWidgetState();
+  State<LMFeedTopResponseWidget> createState() =>
+      _LMFeedTopResponseWidgetState();
 }
 
-class _LMFeedQnATopResponseWidgetState
-    extends State<LMFeedQnATopResponseWidget> {
+class _LMFeedTopResponseWidgetState
+    extends State<LMFeedTopResponseWidget> {
   LMCommentViewData? commentViewData;
   LMPostViewData? postViewData;
   LMUserViewData? commentCreator;
@@ -64,7 +64,7 @@ class _LMFeedQnATopResponseWidgetState
   }
 
   @override
-  void didUpdateWidget(covariant LMFeedQnATopResponseWidget oldWidget) {
+  void didUpdateWidget(covariant LMFeedTopResponseWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     commentViewData = widget.comment;
     postViewData = widget.postViewData;

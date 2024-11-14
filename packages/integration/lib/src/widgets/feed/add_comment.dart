@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-class LMFeedQnAAddResponse extends StatelessWidget {
+class LMFeedAddResponse extends StatelessWidget {
   final void Function()? onTap;
   final LMFeedProfilePictureBuilder? profilePictureBuilder;
   final LMFeedTextBuilder? textBuilder;
   final LMFeedQnAAddResponseStyle? style;
 
-  const LMFeedQnAAddResponse({
+  const LMFeedAddResponse({
     super.key,
     this.onTap,
     this.profilePictureBuilder,
@@ -16,13 +16,13 @@ class LMFeedQnAAddResponse extends StatelessWidget {
   });
 
   /// copyWith method for updating the style with provided values.
-  LMFeedQnAAddResponse copyWith({
+  LMFeedAddResponse copyWith({
     void Function()? onTap,
     LMFeedProfilePictureBuilder? profilePictureBuilder,
     LMFeedTextBuilder? textBuilder,
     LMFeedQnAAddResponseStyle? style,
   }) {
-    return LMFeedQnAAddResponse(
+    return LMFeedAddResponse(
       onTap: onTap ?? this.onTap,
       profilePictureBuilder:
           profilePictureBuilder ?? this.profilePictureBuilder,

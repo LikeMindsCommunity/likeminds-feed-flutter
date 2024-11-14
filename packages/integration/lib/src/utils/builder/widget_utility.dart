@@ -5,7 +5,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-part 'qna_widgets.dart';
 
 /// {@template feed_widget_utility}
 /// A utility class that provides a set of methods to build widgets for the feed.
@@ -320,8 +319,8 @@ class LMFeedWidgetUtility {
 
   /// Builds the user header for the compose screen.
   Widget composeScreenUserHeaderBuilder(
-      BuildContext context, LMUserViewData user) {
-    return const SizedBox.shrink();
+      BuildContext context, LMUserViewData user, LMFeedUserTile userTile) {
+    return userTile;
   }
 
   /// Builds the topic selector for the compose screen.
@@ -366,5 +365,22 @@ class LMFeedWidgetUtility {
     LMFeedWidgetSource source,
   ) {
     return textField;
+  }
+
+  Widget topResponseBuilder(
+    BuildContext context,
+    LMFeedTopResponseWidget topResponseWidget,
+    LMCommentViewData commentViewData,
+    LMPostViewData postViewData,
+  ) {
+    return topResponseWidget;
+  }
+
+  Widget addACommentBuilder(
+    BuildContext context,
+    LMFeedAddResponse addACommentWidget,
+    LMPostViewData postViewData,
+  ) {
+    return addACommentWidget;
   }
 }

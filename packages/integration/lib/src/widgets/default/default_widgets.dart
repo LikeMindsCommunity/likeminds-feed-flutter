@@ -15,23 +15,6 @@ class LMFeedDefaultWidgets {
   final userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   bool postUploading = false;
 
-  void listenPostUploading() {
-    newPostBloc.stream.listen((state) {
-      if (state is LMFeedNewPostUploadingState ||
-          state is LMFeedEditPostUploadingState) {
-        postUploading = true;
-      } else if (state is LMFeedNewPostUploadedState ||
-          state is LMFeedEditPostUploadedState ||
-          state is LMFeedNewPostErrorState ||
-          state is LMFeedEditPostErrorState ||
-          state is LMFeedMediaUploadErrorState) {
-        postUploading = false;
-      }
-    });
-  }
-//TODO: find a workaround to listen for state
-// final listen = listenPostUploading();
-
 // Get the post title in first letter capital singular form
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
@@ -63,7 +46,7 @@ class LMFeedDefaultWidgets {
     LMFeedWidgetSource source,
     ValueNotifier<bool> postUploading,
   ) {
-    final LMFeedPostWidget postWidget = LMFeedPostWidget(
+    return LMFeedPostWidget(
       post: post,
       topics: post.topics,
       user: _feedBloc.users[post.uuid]!,
@@ -119,18 +102,6 @@ class LMFeedDefaultWidgets {
       media: _defPostMedia(context, post),
       topicWidget: _defTopicWidget(post, source),
     );
-
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
-        ? postWidget.copyWith(
-            footerBuilder: (context, footer, postViewData) {
-              return LMFeedQnAPostFooter(
-                footer: footer,
-                postViewData: postViewData,
-                source: source,
-              );
-            },
-          )
-        : postWidget;
   }
 
   LMFeedPostTopic _defTopicWidget(
@@ -164,7 +135,7 @@ class LMFeedDefaultWidgets {
 
   LMFeedPostFooter _defFooterWidget(BuildContext context, LMPostViewData post,
       LMFeedWidgetSource source, ValueNotifier<bool> postUploading) {
-    return LMFeedPostFooter(
+    final LMFeedPostFooter socialFeedFooter = LMFeedPostFooter(
       likeButton: defLikeButton(context, post, source),
       commentButton: defCommentButton(context, post, source),
       saveButton: defSaveButton(post, context, source),
@@ -178,6 +149,24 @@ class LMFeedDefaultWidgets {
       postFooterStyle: feedThemeData.footerStyle,
       showRepostButton: !post.isRepost,
     );
+    final qnaFeedFooter = LMFeedQnAPostFooter(
+      postViewData: post,
+      source: source,
+      likeButton: defLikeButton(context, post, source),
+      commentButton: defCommentButton(context, post, source),
+      saveButton: defSaveButton(post, context, source),
+      shareButton: defShareButton(post, source),
+      repostButton: defRepostButton(
+        context,
+        post,
+        source,
+        postUploading,
+      ),
+    );
+
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? qnaFeedFooter
+        : socialFeedFooter;
   }
 
   LMFeedPostHeader _defPostHeader(BuildContext context,
@@ -438,105 +427,167 @@ class LMFeedDefaultWidgets {
   }
 
   LMFeedButton defLikeButton(BuildContext context, LMPostViewData postViewData,
-          LMFeedWidgetSource source) =>
-      LMFeedButton(
-        isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
-        isActive: postViewData.isLiked,
-        text: LMFeedText(
-            text: LMFeedPostUtils.getLikeCountTextWithCount(
-                postViewData.likeCount)),
-        style: feedThemeData.footerStyle.likeButtonStyle,
-        onTextTap: () {
-          if (postViewData.likeCount == 0) {
-            return;
-          }
-          LMFeedVideoProvider.instance.pauseCurrentVideo();
+      LMFeedWidgetSource source) {
+    final LMFeedButton socialLikeButton = LMFeedButton(
+      isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
+      isActive: postViewData.isLiked,
+      text: LMFeedText(
+          text: LMFeedPostUtils.getLikeCountTextWithCount(
+              postViewData.likeCount)),
+      style: feedThemeData.footerStyle.likeButtonStyle,
+      onTextTap: () {
+        if (postViewData.likeCount == 0) {
+          return;
+        }
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
 
-          Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedLikesScreen(
-                postId: postViewData.id,
-                widgetSource: source,
-              ),
+        Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+            builder: (context) => LMFeedLikesScreen(
+              postId: postViewData.id,
+              widgetSource: source,
             ),
-          )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
-        },
-        onTap: () async {
-          // check if the user is a guest user
-          if (LMFeedUserUtils.isGuestUser()) {
-            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
-            return;
-          }
+          ),
+        )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
+      },
+      onTap: () async {
+        // check if the user is a guest user
+        if (LMFeedUserUtils.isGuestUser()) {
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          return;
+        }
+        newPostBloc.add(LMFeedUpdatePostEvent(
+          actionType: postViewData.isLiked
+              ? LMFeedPostActionType.unlike
+              : LMFeedPostActionType.like,
+          postId: postViewData.id,
+        ));
+
+        final likePostRequest =
+            (LikePostRequestBuilder()..postId(postViewData.id)).build();
+
+        final LikePostResponse response =
+            await LMFeedCore.client.likePost(likePostRequest);
+
+        if (!response.success) {
           newPostBloc.add(LMFeedUpdatePostEvent(
             actionType: postViewData.isLiked
                 ? LMFeedPostActionType.unlike
                 : LMFeedPostActionType.like,
             postId: postViewData.id,
           ));
+        } else {
+          LMFeedPostUtils.handlePostLikeTapEvent(
+              postViewData, source, postViewData.isLiked);
+        }
+      },
+    );
 
-          final likePostRequest =
-              (LikePostRequestBuilder()..postId(postViewData.id)).build();
+    String upVoteText = LMFeedPostUtils.getLikeTitle(
+        LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+    if (postViewData.likeCount > 0) {
+      upVoteText = "$upVoteText • " + postViewData.likeCount.toString();
+    }
+    LMFeedButton? qnaLikeButton = socialLikeButton.copyWith(
+      text: socialLikeButton.text?.copyWith(
+          text: upVoteText,
+          style: LMFeedTextStyle.basic().copyWith(
+            textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: LikeMindsTheme.greyColor,
+            ),
+          )),
+      style: socialLikeButton.style?.copyWith(
+        backgroundColor: LikeMindsTheme.unSelectedColor.withOpacity(0.5),
+        icon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmUpvoteSvg,
+          style: LMFeedIconStyle.basic().copyWith(
+            size: 24,
+          ),
+        ),
+        activeIcon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmUpvoteFilledSvg,
+          style: LMFeedIconStyle.basic().copyWith(
+            size: 24,
+          ),
+        ),
+        border: Border.all(
+          color: feedThemeData.backgroundColor,
+        ),
+        borderRadius: 100,
+        padding: EdgeInsets.symmetric(
+          horizontal: 10,
+        ),
+        margin: EdgeInsets.only(left: 16),
+      ),
+    );
 
-          final LikePostResponse response =
-              await LMFeedCore.client.likePost(likePostRequest);
-
-          if (!response.success) {
-            newPostBloc.add(LMFeedUpdatePostEvent(
-              actionType: postViewData.isLiked
-                  ? LMFeedPostActionType.unlike
-                  : LMFeedPostActionType.like,
-              postId: postViewData.id,
-            ));
-          } else {
-            LMFeedPostUtils.handlePostLikeTapEvent(
-                postViewData, source, postViewData.isLiked);
-          }
-        },
-      );
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? qnaLikeButton
+        : socialLikeButton;
+  }
 
   LMFeedButton defCommentButton(BuildContext context,
-          LMPostViewData postViewData, LMFeedWidgetSource source) =>
-      LMFeedButton(
-        text: LMFeedText(
-          text: LMFeedPostUtils.getCommentCountTextWithCount(
-              postViewData.commentCount),
-        ),
-        style: feedThemeData.footerStyle.commentButtonStyle,
-        onTap: () async {
-          LMFeedPostUtils.handlePostCommentButtonTap(postViewData, source);
-          if (source == LMFeedWidgetSource.postDetailScreen) {
-            return;
-          }
-          LMFeedVideoProvider.instance.pauseCurrentVideo();
-          // ignore: use_build_context_synchronously
-          await Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedPostDetailScreen(
-                postId: postViewData.id,
-                openKeyboard: true,
-              ),
+      LMPostViewData postViewData, LMFeedWidgetSource source) {
+    final LMFeedButton commentButton = LMFeedButton(
+      text: LMFeedText(
+        text: LMFeedPostUtils.getCommentCountTextWithCount(
+            postViewData.commentCount),
+      ),
+      style: feedThemeData.footerStyle.commentButtonStyle,
+      onTap: () async {
+        LMFeedPostUtils.handlePostCommentButtonTap(postViewData, source);
+        if (source == LMFeedWidgetSource.postDetailScreen) {
+          return;
+        }
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
+        // ignore: use_build_context_synchronously
+        await Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+            builder: (context) => LMFeedPostDetailScreen(
+              postId: postViewData.id,
+              openKeyboard: true,
             ),
-          );
-          LMFeedVideoProvider.instance.playCurrentVideo();
-        },
-        onTextTap: () async {
-          if (source == LMFeedWidgetSource.postDetailScreen) {
-            return;
-          }
-          LMFeedVideoProvider.instance.pauseCurrentVideo();
-          // ignore: use_build_context_synchronously
-          await Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedPostDetailScreen(
-                postId: postViewData.id,
-                openKeyboard: true,
-              ),
+          ),
+        );
+        LMFeedVideoProvider.instance.playCurrentVideo();
+      },
+      onTextTap: () async {
+        if (source == LMFeedWidgetSource.postDetailScreen) {
+          return;
+        }
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
+        // ignore: use_build_context_synchronously
+        await Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+            builder: (context) => LMFeedPostDetailScreen(
+              postId: postViewData.id,
+              openKeyboard: true,
             ),
-          );
-          // await postVideoController.player.play();
-          LMFeedVideoProvider.instance.playCurrentVideo();
-        },
-      );
+          ),
+        );
+        // await postVideoController.player.play();
+        LMFeedVideoProvider.instance.playCurrentVideo();
+      },
+    );
+    final String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+        LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+    final String answerText = postViewData.commentCount == 0
+        ? "$commentTitleFirstCapSingular "
+        : postViewData.commentCount.toString();
+    LMFeedButton? qnaCommentButton = commentButton.copyWith(
+      text: commentButton.text?.copyWith(
+        text: answerText,
+      ),
+    );
+
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? qnaCommentButton
+        : commentButton;
+  }
 
   LMFeedButton defSaveButton(LMPostViewData postViewData, BuildContext context,
           LMFeedWidgetSource source) =>
