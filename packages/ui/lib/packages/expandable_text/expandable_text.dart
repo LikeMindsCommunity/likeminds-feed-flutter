@@ -46,6 +46,7 @@ class LMFeedExpandableText extends StatefulWidget {
     this.animationCurve,
     this.semanticsLabel,
     required this.onTagTap,
+    this.onTextTap,
   })  : assert(maxLines > 0),
         super(key: key);
 
@@ -79,6 +80,7 @@ class LMFeedExpandableText extends StatefulWidget {
   final Curve? animationCurve;
   final String? semanticsLabel;
   final Function(String) onTagTap;
+  final VoidCallback? onTextTap;
 
   LMFeedExpandableText copyWith({
     String? text,
@@ -111,6 +113,7 @@ class LMFeedExpandableText extends StatefulWidget {
     Curve? animationCurve,
     String? semanticsLabel,
     Function(String)? onTagTap,
+    VoidCallback? onTextTap,
   }) {
     return LMFeedExpandableText(
       text ?? this.text,
@@ -143,6 +146,7 @@ class LMFeedExpandableText extends StatefulWidget {
       animationCurve: animationCurve ?? this.animationCurve,
       semanticsLabel: semanticsLabel ?? this.semanticsLabel,
       onTagTap: onTagTap ?? this.onTagTap,
+      onTextTap: onTextTap ?? this.onTextTap,
     );
   }
 
@@ -466,23 +470,31 @@ class LMFeedExpandableTextState extends State<LMFeedExpandableText>
       String? link = match.group(0);
 
       if (lastIndex != startIndex) {
-        // Add a TextSpan for the preceding text
-        textSpans.add(TextSpan(
-          text: text.substring(lastIndex, startIndex),
-          style: widget.style,
-        ));
+        textSpans.add(
+          TextSpan(
+            text: text.substring(lastIndex, startIndex),
+            style: widget.style,
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => widget.onTextTap?.call(),
+          ),
+        );
       }
+
       if (link != null && link.isNotEmpty && link[0] == '#') {
+        // Handle hashtags with its own recognizer if provided
         textSpans.add(TextSpan(
           text: link,
           style: widget.hashtagStyle ?? const TextStyle(color: Colors.blue),
+          recognizer: widget.onHashtagTap != null
+              ? (TapGestureRecognizer()
+                ..onTap = () => widget.onHashtagTap!(link))
+              : null,
         ));
       } else {
         bool isTag = link != null && link[0] == '<';
 
-        // if it is a valid link using linkify and
-        // if that is not then add normal TextSpan
         if (!isTag && extractLinkAndEmailFromString(link ?? '') == null) {
+          // Add a TextSpan for non-link text with no recognizer
           textSpans.add(TextSpan(
             text: text.substring(startIndex, endIndex),
             style: widget.style,
@@ -490,7 +502,8 @@ class LMFeedExpandableTextState extends State<LMFeedExpandableText>
           lastIndex = endIndex;
           continue;
         }
-        // Add a TextSpan for the URL
+
+        // Add a TextSpan for the URL or tag with a recognizer
         textSpans.add(TextSpan(
           text:
               isTag ? LMFeedTaggingHelper.decodeString(link).keys.first : link,
@@ -499,14 +512,12 @@ class LMFeedExpandableTextState extends State<LMFeedExpandableText>
             ..onTap = () async {
               if (!isTag) {
                 final checkLink = extractLinkAndEmailFromString(link ?? '');
-                debugPrint('checkLink: $checkLink');
-                if (checkLink is UrlElement) {
-                  if (Uri.parse(checkLink.url).isAbsolute) {
-                    launchUrl(
-                      Uri.parse(checkLink.url),
-                      mode: LaunchMode.externalApplication,
-                    );
-                  }
+                if (checkLink is UrlElement &&
+                    Uri.parse(checkLink.url).isAbsolute) {
+                  launchUrl(
+                    Uri.parse(checkLink.url),
+                    mode: LaunchMode.externalApplication,
+                  );
                 } else if (checkLink is EmailElement) {
                   launchUrl(
                     Uri.parse('mailto:${checkLink.emailAddress}'),
@@ -517,9 +528,6 @@ class LMFeedExpandableTextState extends State<LMFeedExpandableText>
                 widget.onTagTap(
                   LMFeedTaggingHelper.decodeString(link).values.first,
                 );
-                // LMFeedTaggingHelper.routeToProfile(
-                //   LMFeedTaggingHelper.decodeString(link).values.first,
-                // );
               }
             },
         ));
@@ -529,10 +537,12 @@ class LMFeedExpandableTextState extends State<LMFeedExpandableText>
     }
 
     if (lastIndex != text.length) {
-      // Add a TextSpan for the remaining text
+      // Add remaining normal text with no recognizer
       textSpans.add(TextSpan(
         text: text.substring(lastIndex),
         style: widget.style,
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => widget.onTextTap?.call(),
       ));
     }
 

@@ -181,18 +181,15 @@ class LMFeedPostUtils {
 
   static String getLikeCountText(int likes) {
     if (likes == 1) {
-      return 'Like';
+      return getLikeTitle(LMFeedPluralizeWordAction.firstLetterCapitalSingular);
     } else {
-      return 'Likes';
+      return getLikeTitle(LMFeedPluralizeWordAction.firstLetterCapitalPlural);
     }
   }
 
   static String getLikeCountTextWithCount(int likes) {
-    if (likes == 1) {
-      return '$likes Like';
-    } else {
-      return '$likes Likes';
-    }
+    String likeText = getLikeCountText(likes);
+    return '$likes $likeText';
   }
 
   static String getCommentCountText(int comment) {

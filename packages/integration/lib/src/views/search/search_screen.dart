@@ -176,7 +176,9 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         query: value,
         page: page,
         pageSize: pageSize,
-        type: 'text',
+        type: LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+            ? 'heading'
+            : 'text',
       ),
     );
   }
@@ -437,68 +439,22 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.post_add,
-              style: LMFeedIconStyle(
-                size: 48,
-              ),
+            LMFeedIcon(
+              style: LMFeedIconStyle(size: 100),
+              type: LMFeedIconType.png,
+              assetPath: lmNoResponsePng,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 8),
             LMFeedText(
-              text:
-                  'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
+              text: 'No results found',
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            LMFeedText(
-              text: "Be the first one to create a $postTitleSmallCap here",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
+                  fontSize: 14,
                   color: LikeMindsTheme.greyColor,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
-            const SizedBox(height: 28),
-            LMFeedButton(
-              style: LMFeedButtonStyle(
-                icon: const LMFeedIcon(
-                  type: LMFeedIconType.icon,
-                  icon: Icons.add,
-                  style: LMFeedIconStyle(
-                    size: 18,
-                  ),
-                ),
-                borderRadius: 28,
-                backgroundColor: theme.primaryColor,
-                height: 44,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                placement: LMFeedIconButtonPlacement.end,
-              ),
-              text: LMFeedText(
-                text: "Create $postTitleFirstCap",
-                style: LMFeedTextStyle(
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              onTap: () {
-                LMFeedDefaultWidgets.instance.handleCreatePost(
-                  context,
-                  _widgetSource,
-                  postUploading,
-                );
-              },
-            ),
+            )
           ],
         ),
       );

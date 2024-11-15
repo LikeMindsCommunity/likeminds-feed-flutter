@@ -926,29 +926,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
       child: Column(
         children: [
           (enableHeading)
-              ? TextField(
-                  focusNode: _headingFocusNode,
-                  controller: _headingController,
-                  textCapitalization: TextCapitalization.sentences,
-                  cursorColor: feedTheme.primaryColor,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    hintText: config?.headingHint,
-                    hintStyle: TextStyle(
-                      color: theme.onContainer.withOpacity(0.5),
-                    ),
-                  ),
-                  style: TextStyle(
-                    color: theme.onContainer,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                )
+              ? _defHeadingTextfield(theme)
               : const SizedBox.shrink(),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1016,6 +994,59 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  TextField _defHeadingTextfield(LMFeedThemeData theme) {
+    return TextField(
+      focusNode: _headingFocusNode,
+      controller: _headingController,
+      textCapitalization: TextCapitalization.sentences,
+      maxLength: 200,
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        errorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        disabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        focusedErrorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        hintText: config?.headingHint,
+        hintStyle: TextStyle(
+          color: theme.onContainer.withOpacity(0.5),
+          overflow: TextOverflow.visible,
+        ),
+      ),
+      cursorColor: theme.primaryColor,
+      style: TextStyle(
+        color: theme.onContainer,
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
       ),
     );
   }

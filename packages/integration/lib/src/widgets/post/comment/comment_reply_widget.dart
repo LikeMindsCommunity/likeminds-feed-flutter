@@ -336,11 +336,19 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
     return LMFeedCommentWidget(
       style: replyStyle,
       comment: commentViewData,
-      menu: (menu) => menu.copyWith(
+      menu: (menu) => LMFeedMenu(
+        menuItems: commentViewData.menuItems,
         removeItemIds: {},
+        action: defLMFeedMenuAction(commentViewData),
         onMenuOpen: () {
-          LMFeedCommentUtils.handleCommentMenuOpenTap(widget.post,
-              commentViewData, widgetSource, LMFeedAnalyticsKeys.replyMenu);
+          LMFeedCommentUtils.handleCommentMenuOpenTap(
+            widget.post,
+            commentViewData,
+            widgetSource,
+            commentViewData.level == 0
+                ? LMFeedAnalyticsKeys.commentMenu
+                : LMFeedAnalyticsKeys.replyMenu,
+          );
         },
       ),
       onTagTap: (String uuid) {
@@ -418,6 +426,22 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
   LMFeedMenuAction defLMFeedMenuAction(LMCommentViewData commentViewData) {
     return LMFeedMenuAction(
+      onCommentReport: () {
+        // check if the user is a guest user
+        if (LMFeedUserUtils.isGuestUser()) {
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          return;
+        }
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => LMFeedReportScreen(
+              entityId: commentViewData.id,
+              entityType: commentEntityId,
+              entityCreatorId: commentViewData.user.uuid,
+            ),
+          ),
+        );
+      },
       onCommentEdit: () {
         _commentBloc.add(LMFeedEditingReplyEvent(
           postId: widget.post.id,
@@ -484,11 +508,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
               ),
             ),
         text: LMFeedText(
-          text: commentViewData.likesCount == 0
-              ? "Like"
-              : commentViewData.likesCount == 1
-                  ? "1 Like"
-                  : "${commentViewData.likesCount} Likes",
+          text: LMFeedPostUtils.getLikeCountTextWithCount(
+            commentViewData.likesCount,
+          ),
           style: const LMFeedTextStyle(
             textStyle: TextStyle(
               fontSize: 12,

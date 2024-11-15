@@ -49,7 +49,7 @@ class LMFeedDefaultWidgets {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
-      user: _feedBloc.users[post.uuid]!,
+      user: post.user,
       isFeed: false,
       onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
@@ -98,7 +98,7 @@ class LMFeedDefaultWidgets {
       },
       footer: _defFooterWidget(context, post, source, postUploading),
       header: _defPostHeader(context, post, source),
-      content: _defContentWidget(post, context),
+      content: _defContentWidget(post, context, source),
       media: _defPostMedia(context, post),
       topicWidget: _defTopicWidget(post, source),
     );
@@ -117,8 +117,24 @@ class LMFeedDefaultWidgets {
   }
 
   LMFeedPostContent _defContentWidget(
-      LMPostViewData post, BuildContext context) {
+      LMPostViewData post, BuildContext context, LMFeedWidgetSource source) {
     return LMFeedPostContent(
+      onHeadingTap: () async {
+        // check if the source is post detail screen
+        if (source == LMFeedWidgetSource.postDetailScreen) {
+          return;
+        }
+        LMFeedVideoProvider.instance.pauseCurrentVideo();
+        // ignore: use_build_context_synchronously
+        await Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+            builder: (context) => LMFeedPostDetailScreen(
+              postId: post.id,
+            ),
+          ),
+        );
+        LMFeedVideoProvider.instance.playCurrentVideo();
+      },
       onTagTap: (String? uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
@@ -172,7 +188,7 @@ class LMFeedDefaultWidgets {
   LMFeedPostHeader _defPostHeader(BuildContext context,
       LMPostViewData postViewData, LMFeedWidgetSource source) {
     return LMFeedPostHeader(
-      user: _feedBloc.users[postViewData.uuid]!,
+      user: postViewData.user,
       isFeed: true,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData.headerStyle,

@@ -1185,9 +1185,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       controller: _headingController,
       textCapitalization: TextCapitalization.sentences,
       maxLength: 200,
-      maxLines: 4,
-      minLines: 1,
-      decoration: InputDecoration(
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(    
         border: UnderlineInputBorder(
           borderSide: BorderSide(
             color: theme.inActiveColor,

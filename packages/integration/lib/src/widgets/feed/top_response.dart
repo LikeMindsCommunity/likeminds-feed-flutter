@@ -182,7 +182,7 @@ class _LMFeedTopResponseWidgetState extends State<LMFeedTopResponseWidget> {
 
   LMFeedExpandableText _defCommentText(BuildContext context) {
     return LMFeedExpandableText(
-      LMFeedTaggingHelper.convertRouteToTag(widget.comment.text),
+     widget.comment.text,
       expandText: "Read More",
       prefixStyle: const TextStyle(
         // color: textSecondary,
