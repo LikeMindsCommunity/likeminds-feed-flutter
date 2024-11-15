@@ -190,8 +190,9 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   LMFeedLoader _defLoaderWidget() {
     return LMFeedLoader(
       style: feedTheme.loaderStyle.copyWith(
-        height: 20,
-        width: 20,
+        height: 24,
+        width: 24,
+        padding: EdgeInsets.symmetric(vertical: 16),
       ),
     );
   }
@@ -482,99 +483,122 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
   }
 
   LMFeedButton defLikeButton(
-          LMCommentViewData commentViewData, StateSetter setReplyState) =>
-      LMFeedButton(
-        isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
-        style: feedTheme.replyStyle.likeButtonStyle?.copyWith(
-              showText: commentViewData.likesCount == 0 ? false : true,
-            ) ??
-            LMFeedButtonStyle(
-              showText: commentViewData.likesCount == 0 ? false : true,
-              icon: const LMFeedIcon(
-                type: LMFeedIconType.icon,
-                icon: Icons.thumb_up_alt_outlined,
-                style: LMFeedIconStyle(
-                  color: LikeMindsTheme.blackColor,
-                  size: 20,
+      LMCommentViewData commentViewData, StateSetter setReplyState) {
+    LMFeedButton likeButton = LMFeedButton(
+      isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
+      style: feedTheme.replyStyle.likeButtonStyle?.copyWith(
+            showText: commentViewData.likesCount == 0 ? false : true,
+          ) ??
+          LMFeedButtonStyle(
+            showText: commentViewData.likesCount == 0 ? false : true,
+            icon: const LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.thumb_up_alt_outlined,
+              style: LMFeedIconStyle(
+                color: LikeMindsTheme.blackColor,
+                size: 20,
+              ),
+            ),
+            activeIcon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.thumb_up_alt_rounded,
+              style: LMFeedIconStyle(
+                size: 20,
+                color: feedTheme.primaryColor,
+              ),
+            ),
+          ),
+      text: LMFeedText(
+        text: LMFeedPostUtils.getLikeCountTextWithCount(
+          commentViewData.likesCount,
+        ),
+        style: const LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 12,
+            color: LikeMindsTheme.greyColor,
+          ),
+        ),
+      ),
+      onTextTap: () {
+        if (commentViewData.likesCount == 0) {
+          return;
+        }
+
+        Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+            builder: (context) => LMFeedLikesScreen(
+              postId: widget.postId,
+              commentId: commentViewData.id,
+              widgetSource: widgetSource,
+            ),
+          ),
+        );
+      },
+      onTap: () async {
+        // check if the user is a guest user
+        if (LMFeedUserUtils.isGuestUser()) {
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          return;
+        }
+        LMCommentViewData? commentFromList = comment?.replies
+            ?.firstWhere((element) => element.id == commentViewData.id);
+        if (commentFromList == null) return;
+        setReplyState(() {
+          if (commentFromList.isLiked) {
+            commentFromList.likesCount -= 1;
+          } else {
+            commentFromList.likesCount += 1;
+          }
+          commentFromList.isLiked = !commentFromList.isLiked;
+        });
+
+        ToggleLikeCommentRequest request = (ToggleLikeCommentRequestBuilder()
+              ..commentId(commentViewData.id)
+              ..postId(widget.postId))
+            .build();
+
+        ToggleLikeCommentResponse response =
+            await LMFeedCore.instance.lmFeedClient.toggleLikeComment(request);
+
+        if (!response.success) {
+          setReplyState(
+            () {
+              if (commentFromList.isLiked) {
+                commentFromList.likesCount -= 1;
+              } else {
+                commentFromList.likesCount += 1;
+              }
+              commentFromList.isLiked = !commentFromList.isLiked;
+            },
+          );
+        } else {
+          LMFeedCommentUtils.handleCommentLikeTapEvent(widget.post,
+              widgetSource, commentViewData, commentViewData.isLiked);
+        }
+      },
+      isActive: commentViewData.isLiked,
+    );
+
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? likeButton.copyWith(
+            style: likeButton.style?.copyWith(
+              gap: likeButton.style?.showText == true ? 4 : 0,
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmUpvoteSvg,
+                style: LMFeedIconStyle.basic().copyWith(
+                  size: 24,
                 ),
               ),
               activeIcon: LMFeedIcon(
-                type: LMFeedIconType.icon,
-                icon: Icons.thumb_up_alt_rounded,
-                style: LMFeedIconStyle(
-                  size: 20,
-                  color: feedTheme.primaryColor,
+                type: LMFeedIconType.svg,
+                assetPath: lmUpvoteFilledSvg,
+                style: LMFeedIconStyle.basic().copyWith(
+                  size: 24,
                 ),
               ),
             ),
-        text: LMFeedText(
-          text: LMFeedPostUtils.getLikeCountTextWithCount(
-            commentViewData.likesCount,
-          ),
-          style: const LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontSize: 12,
-              color: LikeMindsTheme.greyColor,
-            ),
-          ),
-        ),
-        onTextTap: () {
-          if (commentViewData.likesCount == 0) {
-            return;
-          }
-
-          Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedLikesScreen(
-                postId: widget.postId,
-                commentId: commentViewData.id,
-                widgetSource: widgetSource,
-              ),
-            ),
-          );
-        },
-        onTap: () async {
-          // check if the user is a guest user
-          if (LMFeedUserUtils.isGuestUser()) {
-            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
-            return;
-          }
-          LMCommentViewData? commentFromList = comment?.replies
-              ?.firstWhere((element) => element.id == commentViewData.id);
-          if (commentFromList == null) return;
-          setReplyState(() {
-            if (commentFromList.isLiked) {
-              commentFromList.likesCount -= 1;
-            } else {
-              commentFromList.likesCount += 1;
-            }
-            commentFromList.isLiked = !commentFromList.isLiked;
-          });
-
-          ToggleLikeCommentRequest request = (ToggleLikeCommentRequestBuilder()
-                ..commentId(commentViewData.id)
-                ..postId(widget.postId))
-              .build();
-
-          ToggleLikeCommentResponse response =
-              await LMFeedCore.instance.lmFeedClient.toggleLikeComment(request);
-
-          if (!response.success) {
-            setReplyState(
-              () {
-                if (commentFromList.isLiked) {
-                  commentFromList.likesCount -= 1;
-                } else {
-                  commentFromList.likesCount += 1;
-                }
-                commentFromList.isLiked = !commentFromList.isLiked;
-              },
-            );
-          } else {
-            LMFeedCommentUtils.handleCommentLikeTapEvent(widget.post,
-                widgetSource, commentViewData, commentViewData.isLiked);
-          }
-        },
-        isActive: commentViewData.isLiked,
-      );
+          )
+        : likeButton;
+  }
 }

@@ -463,12 +463,15 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
     LMCommentViewData commentViewData,
     StateSetter setReplyState,
   ) {
-    return LMFeedButton(
+    bool showText = commentViewData.likesCount == 0 ? false : true;
+    final LMFeedButton likeButton = LMFeedButton(
       style: feedTheme.commentStyle.likeButtonStyle?.copyWith(
-              showText: commentViewData.likesCount == 0 ? false : true) ??
+            showText: showText,
+            gap: showText ? feedTheme.commentStyle.likeButtonStyle?.gap : 0,
+          ) ??
           LMFeedButtonStyle(
-            gap: 10.0,
-            showText: commentViewData.likesCount == 0 ? false : true,
+            gap: showText ? 4 : 0,
+            showText: showText,
             icon: const LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.thumb_up_alt_outlined,
@@ -540,6 +543,28 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       },
       isActive: commentViewData.isLiked,
     );
+
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? likeButton.copyWith(
+            style: likeButton.style?.copyWith(
+              gap: likeButton.style?.showText == true ? 4 : 0,
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmUpvoteSvg,
+                style: LMFeedIconStyle.basic().copyWith(
+                  size: 24,
+                ),
+              ),
+              activeIcon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmUpvoteFilledSvg,
+                style: LMFeedIconStyle.basic().copyWith(
+                  size: 24,
+                ),
+              ),
+            ),
+          )
+        : likeButton;
   }
 
   LMFeedButton defCommentReplyButton(LMCommentViewData commentViewData) {

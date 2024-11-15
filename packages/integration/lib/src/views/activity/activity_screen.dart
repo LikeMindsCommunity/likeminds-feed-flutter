@@ -1001,7 +1001,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   LMFeedButton defCommentLikeButton(LMFeedThemeData? feedTheme,
       LMCommentViewData commentViewData, LMPostViewData postViewData) {
-    return LMFeedButton(
+    LMFeedButton likeButton = LMFeedButton(
       style: feedTheme?.commentStyle.likeButtonStyle?.copyWith(
               showText: commentViewData.likesCount == 0 ? false : true) ??
           LMFeedButtonStyle(
@@ -1065,6 +1065,27 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       },
       isActive: commentViewData.isLiked,
     );
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? likeButton.copyWith(
+            style: likeButton.style?.copyWith(
+              gap: likeButton.style?.showText == true ? 4 : 0,
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmUpvoteSvg,
+                style: LMFeedIconStyle.basic().copyWith(
+                  size: 24,
+                ),
+              ),
+              activeIcon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmUpvoteFilledSvg,
+                style: LMFeedIconStyle.basic().copyWith(
+                  size: 24,
+                ),
+              ),
+            ),
+          )
+        : likeButton;
   }
 
   LMFeedButton defCommentReplyButton(LMFeedThemeData? feedTheme,
