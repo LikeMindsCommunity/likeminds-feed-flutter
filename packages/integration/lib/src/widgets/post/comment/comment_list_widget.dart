@@ -497,6 +497,14 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         ),
       ),
       onTextTap: () {
+        if (commentViewData.likesCount == 0) {
+          return;
+        }
+        // check if the user is a guest user
+        if (LMFeedUserUtils.isGuestUser()) {
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          return;
+        }
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(

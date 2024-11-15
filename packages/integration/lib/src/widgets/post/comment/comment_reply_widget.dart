@@ -524,6 +524,12 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
           return;
         }
 
+        // check if the user is a guest user
+        if (LMFeedUserUtils.isGuestUser()) {
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          return;
+        }
+
         Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) => LMFeedLikesScreen(
