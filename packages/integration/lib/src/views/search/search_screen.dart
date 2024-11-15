@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:async/async.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 
 class LMFeedSearchScreen extends StatefulWidget {
   const LMFeedSearchScreen({
@@ -169,7 +168,11 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   }
 
   Future<void> _fetchSearchResults(String value) async {
-    if (value.isEmpty) return;
+    if (value.isEmpty) {
+      clearPagingController();
+      refresh();
+      return;
+    };
     clearPagingController();
     searchBloc.add(
       LMFeedGetSearchEvent(

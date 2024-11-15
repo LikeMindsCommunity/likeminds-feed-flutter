@@ -99,7 +99,7 @@ class LMFeedDefaultWidgets {
       footer: _defFooterWidget(context, post, source, postUploading),
       header: _defPostHeader(context, post, source),
       content: _defContentWidget(post, context, source),
-      media: _defPostMedia(context, post),
+      media: _defPostMedia(context, post, source),
       topicWidget: _defTopicWidget(post, source),
     );
   }
@@ -272,6 +272,7 @@ class LMFeedDefaultWidgets {
   LMFeedPostMedia _defPostMedia(
     BuildContext context,
     LMPostViewData post,
+    LMFeedWidgetSource source,
   ) {
     return LMFeedPostMedia(
       attachments: post.attachments!,
@@ -282,7 +283,7 @@ class LMFeedDefaultWidgets {
       imageBuilder: _widgetsBuilder.imageBuilder,
       videoBuilder: _widgetsBuilder.videoBuilder,
       pollBuilder: _widgetsBuilder.pollWidgetBuilder,
-      poll: _defPollWidget(post, context),
+      poll: _defPollWidget(post, context, source),
       onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         // ignore: use_build_context_synchronously
@@ -302,8 +303,8 @@ class LMFeedDefaultWidgets {
     );
   }
 
-  LMFeedPoll? _defPollWidget(
-      LMPostViewData postViewData, BuildContext context) {
+  LMFeedPoll? _defPollWidget(LMPostViewData postViewData, BuildContext context,
+      LMFeedWidgetSource source) {
     Map<String, bool> isVoteEditing = {"value": false};
     if (postViewData.attachments == null || postViewData.attachments!.isEmpty) {
       return null;
@@ -368,7 +369,7 @@ class LMFeedDefaultWidgets {
             isVoteEditing,
             previousValue,
             rebuildPollWidget,
-            LMFeedWidgetSource.universalFeed,
+            source,
           );
         } else if (selectedOptions.contains(optionData.id)) {
           selectedOptions.remove(optionData.id);

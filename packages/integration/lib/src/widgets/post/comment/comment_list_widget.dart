@@ -488,6 +488,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
               icon: Icons.thumb_up_alt_rounded,
             ),
           ),
+      isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
       text: LMFeedText(
         text: LMFeedPostUtils.getLikeCountTextWithCount(
             commentViewData.likesCount),

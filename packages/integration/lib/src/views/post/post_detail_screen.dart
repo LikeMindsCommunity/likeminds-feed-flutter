@@ -257,9 +257,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                               SliverPadding(
                                   padding: EdgeInsets.only(top: 20.0)),
                             SliverToBoxAdapter(
-                              child: BlocBuilder<LMFeedCommentBloc,
+                              child: BlocConsumer<LMFeedCommentBloc,
                                   LMFeedCommentState>(
                                 bloc: _commentBloc,
+                                listener: (context, state) {
+                                  if (state is LMFeedGetCommentSuccessState) {
+                                    postData = state.post;
+                                  }
+                                },
                                 buildWhen: (previous, current) {
                                   if (current is LMFeedGetCommentSuccessState) {
                                     return true;
@@ -277,7 +282,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     return SizedBox.shrink();
                                   }
                                   if (state is LMFeedGetCommentSuccessState) {
-                                    postData = state.post;
+                                    postData ??= state.post;
                                     LMFeedPostWidget postWidget =
                                         LMFeedDefaultWidgets.instance
                                             .defPostWidget(
@@ -285,7 +290,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                       feedTheme,
                                       postData!,
                                       _widgetSource,
-                                      rebuildPostWidget,
+                                      ValueNotifier(false),
                                     );
                                     return widget.postBuilder?.call(
                                             context, postWidget, postData!) ??

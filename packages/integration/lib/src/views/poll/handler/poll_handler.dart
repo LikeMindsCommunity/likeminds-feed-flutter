@@ -190,6 +190,7 @@ Future<void> submitVote(
           actionType: LMFeedPostActionType.pollSubmit,
           postId: postId,
         ));
+        rebuildPostWidget.value = !rebuildPostWidget.value;
       }
     }
   } on Exception catch (e) {
