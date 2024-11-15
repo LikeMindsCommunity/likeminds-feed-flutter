@@ -288,7 +288,7 @@ class _CredScreenState extends State<CredScreen> {
       _showSnackBar("API Key cannot be empty");
       return;
     }
-    if ((userName.isEmpty && uuid.isEmpty)) {
+    if ((userName.isEmpty && uuid.isEmpty && !(isGuest ?? false))) {
       _showSnackBar("Username and User ID both cannot be empty");
       return;
     }
@@ -401,13 +401,14 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.qna:
         {
-          LMFeedCore.theme = LMFeedThemeData.qna();
+          // LMFeedCore.theme = LMFeedTphemeData.qna();
           LMFeedCore.config = LMFeedConfig(
             feedThemeType: LMFeedThemeType.qna,
             postDetailConfig: const LMPostDetailScreenConfig(
               commentTextFieldHint: "Write your answer",
             ),
           );
+          LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
         }
         break;
       case LMFeedFlavor.socialDark:

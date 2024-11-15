@@ -38,7 +38,6 @@ class LMFeedQnAPostFooter extends LMFeedPostFooter {
             context,
             LMFeedTopResponseWidget(
               comment: postViewData.topComments!.first,
-              postViewData: postViewData,
               style: LMFeedTopResponseWidgetStyle.basic(),
             ),
             postViewData.topComments!.first,

@@ -5,9 +5,6 @@ class LMFeedTopResponseWidget extends StatefulWidget {
   /// The comment data to be displayed.
   final LMCommentViewData comment;
 
-  /// The post data to be displayed.
-  final LMPostViewData postViewData;
-
   /// The builder for the header text.
   final LMFeedTextBuilder? headerTextBuilder;
 
@@ -31,7 +28,6 @@ class LMFeedTopResponseWidget extends StatefulWidget {
 
   const LMFeedTopResponseWidget({
     super.key,
-    required this.postViewData,
     required this.comment,
     this.headerTextBuilder,
     this.titleTextBuilder,
@@ -44,7 +40,6 @@ class LMFeedTopResponseWidget extends StatefulWidget {
   /// copyWith method for updating the style with provided values.
   LMFeedTopResponseWidget copyWith({
     LMCommentViewData? comment,
-    LMPostViewData? postViewData,
     LMFeedTextBuilder? headerTextBuilder,
     LMFeedTextBuilder? titleTextBuilder,
     LMFeedTextBuilder? subTitleTextBuilder,
@@ -57,7 +52,6 @@ class LMFeedTopResponseWidget extends StatefulWidget {
   }) {
     return LMFeedTopResponseWidget(
       comment: comment ?? this.comment,
-      postViewData: postViewData ?? this.postViewData,
       headerTextBuilder: headerTextBuilder ?? this.headerTextBuilder,
       titleTextBuilder: titleTextBuilder ?? this.titleTextBuilder,
       subTitleTextBuilder: subTitleTextBuilder ?? this.subTitleTextBuilder,
@@ -75,7 +69,6 @@ class LMFeedTopResponseWidget extends StatefulWidget {
 
 class _LMFeedTopResponseWidgetState extends State<LMFeedTopResponseWidget> {
   LMCommentViewData? commentViewData;
-  LMPostViewData? postViewData;
   LMUserViewData? commentCreator;
 
   String commentTitle = LMFeedPostUtils.getCommentTitle(
@@ -85,7 +78,6 @@ class _LMFeedTopResponseWidgetState extends State<LMFeedTopResponseWidget> {
   void initState() {
     super.initState();
     commentViewData = widget.comment;
-    postViewData = widget.postViewData;
     commentCreator = commentViewData?.user;
   }
 
@@ -93,7 +85,6 @@ class _LMFeedTopResponseWidgetState extends State<LMFeedTopResponseWidget> {
   void didUpdateWidget(covariant LMFeedTopResponseWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     commentViewData = widget.comment;
-    postViewData = widget.postViewData;
     commentCreator = commentViewData?.user;
   }
 
@@ -209,7 +200,7 @@ class _LMFeedTopResponseWidgetState extends State<LMFeedTopResponseWidget> {
 
   LMFeedText _defTimeStamp() {
     return LMFeedText(
-      text: "${LMFeedTimeAgo.instance.format(postViewData!.createdAt)}",
+      text: "${LMFeedTimeAgo.instance.format(commentViewData!.createdAt)}",
       style: LMFeedTextStyle(
         textStyle: TextStyle(
           color: LMFeedCore.theme.inActiveColor,
