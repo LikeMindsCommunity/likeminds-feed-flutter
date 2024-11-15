@@ -408,7 +408,6 @@ class _CredScreenState extends State<CredScreen> {
               commentTextFieldHint: "Write your answer",
             ),
           );
-          LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
         }
         break;
       case LMFeedFlavor.socialDark:

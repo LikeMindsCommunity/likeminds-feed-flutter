@@ -6,7 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedList extends StatefulWidget {
-  final List<String> selectedTopicIds;
+  final List<String>? selectedTopicIds;
+  final List<String>? widgetIds;
   final PagingController<int, LMPostViewData> pagingController;
   final int pageSize;
   final LMFeedWidgetSource widgetSource;
@@ -15,7 +16,8 @@ class LMFeedList extends StatefulWidget {
 
   const LMFeedList({
     super.key,
-    required this.selectedTopicIds,
+    this.selectedTopicIds,
+    this.widgetIds,
     required this.pagingController,
     this.pageSize = 20,
     this.postBuilder,
@@ -105,7 +107,8 @@ class _LMFeedListState extends State<LMFeedList> {
         _feedBloc.add(
           LMFeedGetUniversalFeedEvent(
             pageKey: pageKey,
-            topicsIds: widget.selectedTopicIds,
+            topicsIds: widget.selectedTopicIds ?? [],
+            widgetIds: widget.widgetIds,
           ),
         );
       },
