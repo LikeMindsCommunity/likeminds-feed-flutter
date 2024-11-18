@@ -304,7 +304,7 @@ class _CredScreenState extends State<CredScreen> {
       apiKey: apiKey,
       uuid: uuid,
       userName: userName,
-      isGuest: isGuest,
+      isGuest: isGuest ?? false,
     );
     if (!response.success) {
       _showSnackBar(response.errorMessage ?? "An error occurred");
@@ -403,9 +403,6 @@ class _CredScreenState extends State<CredScreen> {
         {
           LMFeedCore.config = LMFeedConfig(
             feedThemeType: LMFeedThemeType.qna,
-            postDetailConfig: const LMPostDetailScreenConfig(
-              commentTextFieldHint: "Write your answer",
-            ),
           );
         }
         break;
