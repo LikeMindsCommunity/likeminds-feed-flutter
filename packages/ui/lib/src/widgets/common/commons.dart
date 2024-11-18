@@ -4,6 +4,7 @@ export 'profile/user_tile.dart';
 export 'buttons/button.dart';
 export 'dialogs/dialog.dart';
 export 'extras/loader.dart';
+export 'extras/post_uploading_banner.dart';
 export 'text/text.dart';
 export 'icon/icon.dart';
 export 'sheets/bottom_sheet.dart';

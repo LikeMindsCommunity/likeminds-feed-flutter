@@ -1061,14 +1061,14 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     // validate post creation data
     LMResponse response = validatePost();
     // if validation fails return the error response
-    if(!response.success) {
+    if (!response.success) {
       return response;
     }
     // Add a new post event to the post bloc
     LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
       user: user!,
       postText: result!,
-      selectedTopics: selectedTopics,
+      selectedTopicIds: selectedTopics.map((e) => e.id).toList(),
       postMedia: [...composeBloc.postMedia],
       heading: heading,
       feedroomId: widget.feedroomId,

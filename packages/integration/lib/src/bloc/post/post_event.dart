@@ -42,7 +42,7 @@ class LMFeedGetPostEvent extends LMFeedPostEvents {
 /// One of [postMedia], [postText] or [heading] should not be
 /// null to create a new post
 /// [user] contains the user details and is of type [LMUserViewData]
-/// [selectedTopics] contains the selected topics
+/// [selectedTopicIds] contains the selected topics
 /// and is of type [List<LMTopicViewData>]
 /// {@endtemplate}
 class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
@@ -50,7 +50,7 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
   final String? postText;
   final String? heading;
   final LMUserViewData user;
-  final List<LMTopicViewData> selectedTopics;
+  final List<String> selectedTopicIds;
   final int? feedroomId;
   final List<LMUserTagViewData>? userTagged;
 
@@ -59,7 +59,7 @@ class LMFeedCreateNewPostEvent extends LMFeedPostEvents {
     this.postMedia,
     required this.user,
     this.postText,
-    required this.selectedTopics,
+    required this.selectedTopicIds,
     this.heading,
     this.feedroomId,
     this.userTagged,
@@ -84,6 +84,7 @@ class LMFeedEditPostEvent extends LMFeedPostEvents {
   final String? pendingPostId;
   final String? heading;
   final List<LMTopicViewData> selectedTopics;
+  final String tempId;
 
   ///{@macro lm_feed_edit_post_event}
   LMFeedEditPostEvent({
@@ -92,6 +93,7 @@ class LMFeedEditPostEvent extends LMFeedPostEvents {
     this.pendingPostId,
     required this.selectedTopics,
     this.heading,
+    required this.tempId,
   }) : assert(postText != null ||
             heading != null && (pendingPostId != null || postId != null));
 }
@@ -150,13 +152,19 @@ class LMFeedUploadMediaEvent extends LMFeedPostEvents {
   final List<LMAttachmentViewData> postMedia;
   final LMUserViewData user;
   final StreamController<double> progressController;
+  final String tempId;
 
   LMFeedUploadMediaEvent({
     required this.postMedia,
     required this.user,
     required this.progressController,
+    required this.tempId,
   });
 
   @override
-  List<Object> get props => [postMedia, user];
+  List<Object> get props => [postMedia, user, progressController, tempId];
 }
+
+class LMFeedRetryPostUploadEvent extends LMFeedPostEvents {}
+
+class LMFeedFetchTempPostEvent extends LMFeedPostEvents {}

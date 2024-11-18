@@ -540,81 +540,32 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                     );
                   }
                   if (state is LMFeedNewPostUploadingState) {
-                    return Container(
-                      height: 72,
-                      color: feedThemeData.container,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0,
-                        vertical: 6,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              getLoaderThumbnail(state.thumbnailMedia),
-                              LikeMindsTheme.kHorizontalPaddingMedium,
-                              const Text('Uploading Post')
-                            ],
-                          ),
-                          StreamBuilder<num>(
-                              initialData: 0,
-                              stream: state.progress,
-                              builder: (context, snapshot) {
-                                return SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    value: (snapshot.data == null ||
-                                            snapshot.data == 0.0
-                                        ? null
-                                        : snapshot.data?.toDouble()),
-                                    valueColor: AlwaysStoppedAnimation(
-                                        feedThemeData.primaryColor),
-                                    strokeWidth: 3,
-                                  ),
-                                );
-                              }),
-                        ],
-                      ),
-                    );
+                    if (postUploading.value) {
+                      return LMPostUploadingBanner(
+                        isUploading: true,
+                        uploadingMessage:
+                            '${isPostEditing ? "Saving" : "Creating"} $postTitleSmallCap',
+                        onRetry: () {},
+                        onCancel: () {},
+                      );
+                    }
                   }
-                  if (state is LMFeedNewPostErrorState) {
-                    return Container(
-                      height: 72,
-                      color: feedThemeData.backgroundColor,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0,
-                        vertical: 8,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          LMFeedText(
-                            text: "Post uploading failed.. try again",
-                            style: LMFeedTextStyle(
-                              maxLines: 1,
-                              textStyle: TextStyle(
-                                color: Colors.red,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          LMFeedButton(
-                            onTap: () {
-                              newPostBloc.add(state.event!);
-                            },
-                            style: LMFeedButtonStyle(
-                              icon: LMFeedIcon(
-                                type: LMFeedIconType.icon,
-                                icon: Icons.refresh_rounded,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
+                  if (state is LMFeedMediaUploadErrorState) {
+                    return LMPostUploadingBanner(
+                      onRetry: () {
+                        newPostBloc.add(LMFeedRetryPostUploadEvent());
+                      },
+                      onCancel: () async {
+                        // delete the temporary post from db
+                        final DeleteTemporaryPostRequest
+                            deleteTemporaryPostRequest =
+                            (DeleteTemporaryPostRequestBuilder()
+                                  ..temporaryPostId(state.tempId))
+                                .build();
+                        await LMFeedCore.instance.lmFeedClient
+                            .deleteTemporaryPost(deleteTemporaryPostRequest);
+                        newPostBloc.add(LMFeedPostInitiateEvent());
+                      },
                     );
                   } else {
                     return const SizedBox.shrink();
