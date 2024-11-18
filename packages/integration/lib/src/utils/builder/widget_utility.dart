@@ -107,12 +107,7 @@ class LMFeedWidgetUtility {
       headerBuilder: this.headerBuilder,
       contentBuilder: this.postContentBuilder,
       mediaBuilder: this.postMediaBuilder,
-      footerBuilder: (context, postFooter, postViewData) {
-        return postFooter.copyWith(
-          // commentBuilder: this.commentBuilder,
-          // pollWidgetBuilder: this.pollWidgetBuilder,
-        );
-      },
+      footerBuilder: this.postFooterBuilder,
       menuBuilder: this.menuBuilder,
       topicBuilder: this.topicBuilder,
       reviewBannerBuilder: this.postReviewBannerBuilder,
