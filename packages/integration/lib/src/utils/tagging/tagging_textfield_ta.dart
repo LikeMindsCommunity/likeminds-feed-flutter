@@ -30,6 +30,9 @@ class LMTaggingAheadTextField extends StatefulWidget {
   /// Callback function when the text is submitted.
   final Function(String)? onSubmitted;
 
+  /// Determines if the tagging is enabled in the text field.
+  final bool taggingEnabled;
+
   /// Determines if the text field is enabled.
   final bool enabled;
 
@@ -46,6 +49,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
     required this.onChange,
     this.onEditingComplete,
     this.onSubmitted,
+    this.taggingEnabled = true,
     this.enabled = true,
     this.userTags,
     this.style = const LMTaggingAheadTextFieldStyle(),
@@ -61,6 +65,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
     Function(LMUserTagViewData)? onTagSelected,
     TextEditingController? controller,
     Function(String)? onChange,
+    bool? taggingEnabled,
     bool? enabled,
     List<LMUserTagViewData>? userTags,
     VoidCallback? onEditingComplete,
@@ -72,6 +77,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
       onTagSelected: onTagSelected ?? this.onTagSelected,
       controller: controller ?? this.controller,
       onChange: onChange ?? this.onChange,
+      taggingEnabled: taggingEnabled ?? this.taggingEnabled,
       enabled: enabled ?? this.enabled,
       onEditingComplete: onEditingComplete ?? this.onEditingComplete,
       onSubmitted: onSubmitted ?? this.onSubmitted,
@@ -215,6 +221,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       hideOnLoading: true,
       debounceDuration: const Duration(milliseconds: 500),
       textFieldConfiguration: TextFieldConfiguration(
+        enabled: widget.enabled,
         keyboardType: TextInputType.multiline,
         cursorColor: feedTheme.primaryColor,
         textCapitalization: TextCapitalization.sentences,
@@ -249,7 +256,7 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
       ),
       direction: widget.isDown ? AxisDirection.down : AxisDirection.up,
       suggestionsCallback: (suggestion) async {
-        if (!widget.enabled) {
+        if (!widget.taggingEnabled) {
           return Future.value(const Iterable.empty());
         }
         return await _getSuggestions(suggestion);

@@ -1139,7 +1139,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMTaggingAheadTextField _defContentTextField() {
     return LMTaggingAheadTextField(
       isDown: true,
-      enabled: config!.enableTagging,
+      taggingEnabled: config!.enableTagging,
       // maxLines: 200,
 
       style: LMTaggingAheadTextFieldStyle(
