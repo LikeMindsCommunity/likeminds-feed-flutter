@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 export 'styles/styles.dart';
-part 'social_theme.dart';
-part 'qna_theme.dart';
 
 class LMFeedTheme {
   static LMFeedTheme? _instance;
@@ -13,7 +11,7 @@ class LMFeedTheme {
   late LMFeedThemeData theme;
 
   void initialise({LMFeedThemeData? theme}) {
-    this.theme = theme ?? LMFeedThemeData.social();
+    this.theme = theme ?? LMFeedThemeData.light();
   }
 }
 
@@ -88,7 +86,7 @@ class LMFeedThemeData {
   });
 
   factory LMFeedThemeData.fromThemeData(ThemeData theme) {
-    return LMFeedThemeData.social(
+    return LMFeedThemeData.light(
       backgroundColor: theme.colorScheme.background,
       primaryColor: theme.primaryColor,
       secondaryColor: theme.colorScheme.secondary,
@@ -102,10 +100,6 @@ class LMFeedThemeData {
     );
   }
 
-  @Deprecated(
-    '[LMFeedThemeData.light()] is deprecated, use [LMFeedThemeData.social()] for default social theme.'
-    'this method will be removed in future releases',
-  )
   factory LMFeedThemeData.light({
     Color? primaryColor,
     Color? backgroundColor,
@@ -203,150 +197,6 @@ class LMFeedThemeData {
             behavior: SnackBarBehavior.floating,
             backgroundColor: primaryColor ?? LikeMindsTheme.primaryColor,
           ),
-    );
-  }
-
-  /// factory constructor for social theme
-  /// it provides a default theme for social feed
-  factory LMFeedThemeData.social({
-    Color? primaryColor,
-    Color? backgroundColor,
-    Color? secondaryColor,
-    Color? shadowColor,
-    Color? disabledColor,
-    Color? errorColor,
-    Color? inActiveColor,
-    Color? tagColor,
-    Color? hashTagColor,
-    Color? linkColor,
-    LMFeedPostStyle? postStyle,
-    LMFeedPostReviewBannerStyle? reviewBannerStyle,
-    LMFeedPostHeaderStyle? headerStyle,
-    LMFeedPostTopicStyle? topicStyle,
-    LMFeedPostContentStyle? contentStyle,
-    LMFeedPostMediaStyle? mediaStyle,
-    LMFeedPostFooterStyle? footerStyle,
-    LMFeedCommentStyle? commentStyle,
-    LMFeedCommentStyle? replyStyle,
-    LMFeedButtonStyle? feedButtonStyle,
-    LMFeedIconStyle? feedIconStyle,
-    LMFeedTextFieldStyle? textFieldStyle,
-    LMFeedDialogStyle? dialogStyle,
-    LMFeedPopUpMenuStyle? popUpMenuStyle,
-    LMFeedComposeScreenStyle? composeScreenStyle,
-    Color? container,
-    Color? onContainer,
-    Color? onPrimary,
-    LMFeedLoaderStyle? loaderStyle,
-    LMFeedBottomSheetStyle? bottomSheetStyle,
-    LMFeedSnackBarStyle? snackBarTheme,
-    Color? textSecondary,
-  }) {
-    return socialTheme(
-      primaryColor: primaryColor,
-      backgroundColor: backgroundColor,
-      secondaryColor: secondaryColor,
-      shadowColor: shadowColor,
-      disabledColor: disabledColor,
-      errorColor: errorColor,
-      inActiveColor: inActiveColor,
-      tagColor: tagColor,
-      hashTagColor: hashTagColor,
-      linkColor: linkColor,
-      postStyle: postStyle,
-      reviewBannerStyle: reviewBannerStyle,
-      headerStyle: headerStyle,
-      topicStyle: topicStyle,
-      contentStyle: contentStyle,
-      mediaStyle: mediaStyle,
-      footerStyle: footerStyle,
-      commentStyle: commentStyle,
-      replyStyle: replyStyle,
-      feedButtonStyle: feedButtonStyle,
-      feedIconStyle: feedIconStyle,
-      container: container,
-      onContainer: onContainer,
-      onPrimary: onPrimary,
-      textFieldStyle: textFieldStyle,
-      dialogStyle: dialogStyle,
-      popUpMenuStyle: popUpMenuStyle,
-      composeScreenStyle: composeScreenStyle,
-      loaderStyle: loaderStyle,
-      bottomSheetStyle: bottomSheetStyle,
-      snackBarTheme: snackBarTheme,
-      textSecondary: textSecondary,
-    );
-  }
-
-  /// factory constructor for qna theme
-  /// it provides a default theme for qna feed
-  factory LMFeedThemeData.qna({
-    Color? primaryColor,
-    Color? backgroundColor,
-    Color? secondaryColor,
-    Color? shadowColor,
-    Color? disabledColor,
-    Color? errorColor,
-    Color? inActiveColor,
-    Color? tagColor,
-    Color? hashTagColor,
-    Color? linkColor,
-    LMFeedPostStyle? postStyle,
-    LMFeedPostReviewBannerStyle? reviewBannerStyle,
-    LMFeedPostHeaderStyle? headerStyle,
-    LMFeedPostTopicStyle? topicStyle,
-    LMFeedPostContentStyle? contentStyle,
-    LMFeedPostMediaStyle? mediaStyle,
-    LMFeedPostFooterStyle? footerStyle,
-    LMFeedCommentStyle? commentStyle,
-    LMFeedCommentStyle? replyStyle,
-    LMFeedButtonStyle? feedButtonStyle,
-    LMFeedIconStyle? feedIconStyle,
-    LMFeedTextFieldStyle? textFieldStyle,
-    LMFeedDialogStyle? dialogStyle,
-    LMFeedPopUpMenuStyle? popUpMenuStyle,
-    LMFeedComposeScreenStyle? composeScreenStyle,
-    Color? container,
-    Color? onContainer,
-    Color? onPrimary,
-    LMFeedLoaderStyle? loaderStyle,
-    LMFeedBottomSheetStyle? bottomSheetStyle,
-    LMFeedSnackBarStyle? snackBarTheme,
-    Color? textSecondary,
-  }) {
-    return qnaTheme(
-      primaryColor: primaryColor,
-      backgroundColor: backgroundColor,
-      secondaryColor: secondaryColor,
-      shadowColor: shadowColor,
-      disabledColor: disabledColor,
-      errorColor: errorColor,
-      inActiveColor: inActiveColor,
-      tagColor: tagColor,
-      hashTagColor: hashTagColor,
-      linkColor: linkColor,
-      postStyle: postStyle,
-      reviewBannerStyle: reviewBannerStyle,
-      headerStyle: headerStyle,
-      topicStyle: topicStyle,
-      contentStyle: contentStyle,
-      mediaStyle: mediaStyle,
-      footerStyle: footerStyle,
-      commentStyle: commentStyle,
-      replyStyle: replyStyle,
-      feedButtonStyle: feedButtonStyle,
-      feedIconStyle: feedIconStyle,
-      container: container,
-      onContainer: onContainer,
-      onPrimary: onPrimary,
-      textFieldStyle: textFieldStyle,
-      dialogStyle: dialogStyle,
-      popUpMenuStyle: popUpMenuStyle,
-      composeScreenStyle: composeScreenStyle,
-      loaderStyle: loaderStyle,
-      bottomSheetStyle: bottomSheetStyle,
-      snackBarTheme: snackBarTheme,
-      textSecondary: textSecondary,
     );
   }
 

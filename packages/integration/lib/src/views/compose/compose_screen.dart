@@ -1151,7 +1151,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           errorBorder: InputBorder.none,
           disabledBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
-          hintText: config?.composeHint,
+          hintText: config?.composeHint ??
+              (LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+                  ? "Add description"
+                  : "Write something here..."),
           hintStyle: TextStyle(
             overflow: TextOverflow.visible,
             fontSize: 14,
@@ -1186,7 +1189,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       textCapitalization: TextCapitalization.sentences,
       maxLength: 200,
       textInputAction: TextInputAction.next,
-      decoration: InputDecoration(    
+      decoration: InputDecoration(
         border: UnderlineInputBorder(
           borderSide: BorderSide(
             color: theme.inActiveColor,
@@ -1217,7 +1220,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             color: theme.inActiveColor,
           ),
         ),
-        hintText: config?.headingHint,
+        hintText: config?.headingHint ?? "Add your question here",
         hintStyle: TextStyle(
           color: theme.onContainer.withOpacity(0.5),
           overflow: TextOverflow.visible,

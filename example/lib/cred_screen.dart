@@ -401,14 +401,12 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.qna:
         {
-          // LMFeedCore.theme = LMFeedTphemeData.qna();
           LMFeedCore.config = LMFeedConfig(
             feedThemeType: LMFeedThemeType.qna,
             postDetailConfig: const LMPostDetailScreenConfig(
               commentTextFieldHint: "Write your answer",
             ),
           );
-          LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
         }
         break;
       case LMFeedFlavor.socialDark:

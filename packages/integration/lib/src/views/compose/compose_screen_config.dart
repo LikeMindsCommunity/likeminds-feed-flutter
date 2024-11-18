@@ -24,8 +24,8 @@ enum LMFeedComposeUserDisplayType {
 class LMFeedComposeScreenConfig {
   const LMFeedComposeScreenConfig({
     this.composeSystemOverlayStyle = SystemUiOverlayStyle.dark,
-    this.composeHint = "Write something here..",
-    this.headingHint = "Add your question here",
+    this.composeHint,
+    this.headingHint,
     this.enableDocuments = true,
     this.enableImages = true,
     this.enableLinkPreviews = true,
@@ -53,10 +53,10 @@ class LMFeedComposeScreenConfig {
   final LMFeedComposeUserDisplayType userDisplayType;
 
   /// The hint text shown to a user while inputting text for post
-  final String composeHint;
+  final String? composeHint;
 
   /// The hint text shown to a user while inputting heading for post
-  final String headingHint;
+  final String? headingHint;
 
   ///@{template}
   /// Feature booleans to enable/disable features on the fly

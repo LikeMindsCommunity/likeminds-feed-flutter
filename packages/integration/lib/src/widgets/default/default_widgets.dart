@@ -259,6 +259,11 @@ class LMFeedDefaultWidgets {
                       userState: isCm ? "CM" : "member",
                     ),
                   );
+                  // navigate back to the previous screen
+                  // if the source is post detail screen
+                  if (source == LMFeedWidgetSource.postDetailScreen) {
+                    Navigator.of(context).pop();
+                  }
                 },
                 actionText: 'Delete',
               ),
