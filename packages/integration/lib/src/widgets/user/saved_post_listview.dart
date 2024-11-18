@@ -46,7 +46,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
-  LMFeedWidgetSource widgetSource = LMFeedWidgetSource.savedPostScreen;
+  LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.savedPostScreen;
   LMFeedThemeData _theme = LMFeedCore.theme;
   Size? screenSize;
   PagingController<int, LMPostViewData> _pagingController =
@@ -56,7 +56,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   LMFeedSavedPostBloc _savePostBloc = LMFeedSavedPostBloc.instance;
 
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
-  final ValueNotifier postUploading = ValueNotifier(false);
+  final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedScreenConfig? config;
   LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
@@ -115,7 +115,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       listener: (context, state) {
         if (state is LMFeedNewPostErrorState) {
           postUploading.value = false;
-          LMFeedCore.showSnackBar(context, state.errorMessage, widgetSource);
+          LMFeedCore.showSnackBar(context, state.errorMessage, _widgetSource);
         }
         if (state is LMFeedNewPostUploadedState) {
           LMPostViewData? item = state.postData;
@@ -222,12 +222,18 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                       },
                       itemBuilder: (context, item, index) {
                         LMFeedPostWidget postWidget =
-                            defPostWidget(_theme, item);
+                            LMFeedDefaultWidgets.instance.defPostWidget(
+                          context,
+                          _theme,
+                          item,
+                          _widgetSource,
+                          postUploading,
+                        );
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
                             _widgetUtility.postWidgetBuilder.call(
                                 context, postWidget, item,
-                                source: widgetSource);
+                                source: _widgetSource);
                       },
                     ),
                   ),
@@ -237,542 +243,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
       },
     );
   }
-
-  LMFeedPostWidget defPostWidget(
-      LMFeedThemeData? feedThemeData, LMPostViewData post) {
-    return LMFeedPostWidget(
-      post: post,
-      topics: post.topics,
-      user: post.user,
-      isFeed: false,
-      onTagTap: (String uuid) {
-        LMFeedProfileBloc.instance.add(
-          LMFeedRouteToUserProfileEvent(
-            uuid: uuid,
-            context: context,
-          ),
-        );
-      },
-      disposeVideoPlayerOnInActive: () {
-        LMFeedVideoProvider.instance.clearPostController(post.id);
-      },
-      style: feedThemeData?.postStyle,
-      onMediaTap: (int index) async {
-        LMFeedVideoProvider.instance.pauseCurrentVideo();
-        // ignore: use_build_context_synchronously
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LMFeedMediaPreviewScreen(
-              postAttachments: post.attachments ?? [],
-              post: post,
-              user: post.user,
-              position: index,
-            ),
-          ),
-        );
-        LMFeedVideoProvider.instance.playCurrentVideo();
-      },
-      onPostTap: (context, post) async {
-        LMFeedVideoProvider.instance.pauseCurrentVideo();
-        // ignore: use_build_context_synchronously
-        await Navigator.of(context, rootNavigator: true).push(
-          MaterialPageRoute(
-            builder: (context) => LMFeedPostDetailScreen(
-              postId: post.id,
-              postBuilder:
-                  widget.postBuilder ?? _widgetUtility.postWidgetBuilder,
-            ),
-          ),
-        );
-        LMFeedVideoProvider.instance.playCurrentVideo();
-      },
-      footer: _defFooterWidget(post),
-      header: _defPostHeader(post),
-      content: _defContentWidget(post),
-      media: _defPostMedia(post),
-      topicWidget: _defTopicWidget(post),
-    );
-  }
-
-  LMFeedPostTopic _defTopicWidget(LMPostViewData postViewData) {
-    return LMFeedPostTopic(
-      topics: postViewData.topics,
-      post: postViewData,
-      style: _theme.topicStyle,
-      onTopicTap: (context, topicViewData) =>
-          LMFeedPostUtils.handlePostTopicTap(
-              context, postViewData, topicViewData, widgetSource),
-    );
-  }
-
-  LMFeedPostContent _defContentWidget(LMPostViewData post) {
-    return LMFeedPostContent(
-      onTagTap: (String? uuid) {
-        LMFeedProfileBloc.instance.add(
-          LMFeedRouteToUserProfileEvent(
-            uuid: uuid ?? post.uuid,
-            context: context,
-          ),
-        );
-      },
-      style: _theme.contentStyle,
-      text: post.text,
-      heading: post.heading,
-    );
-  }
-
-  LMFeedPostFooter _defFooterWidget(LMPostViewData post) {
-    return LMFeedPostFooter(
-      likeButton: defLikeButton(post),
-      commentButton: defCommentButton(post),
-      saveButton: defSaveButton(post),
-      shareButton: defShareButton(post),
-      repostButton: defRepostButton(post),
-      postFooterStyle: _theme.footerStyle,
-      showRepostButton: !post.isRepost,
-    );
-  }
-
-  LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
-    return LMFeedPostHeader(
-      user: postViewData.user,
-      isFeed: true,
-      postViewData: postViewData,
-      postHeaderStyle: _theme.headerStyle,
-      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(context,
-          postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
-      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(context,
-          postViewData, LMFeedAnalyticsKeys.postProfilePicture, widgetSource),
-      menu: LMFeedMenu(
-        menuItems: postViewData.menuItems,
-        removeItemIds: {postReportId, postEditId},
-        onMenuOpen: () {
-          LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
-            eventName: LMFeedAnalyticsKeys.postMenu,
-            eventProperties: {
-              'uuid': postViewData.user.sdkClientInfo.uuid,
-              'post_id': postViewData.id,
-              'topics': postViewData.topics.map((e) => e.name).toList(),
-              'post_type':
-                  LMFeedPostUtils.getPostType(postViewData.attachments),
-            },
-          ));
-        },
-        action: LMFeedMenuAction(
-          onPostReport: () => handlePostReportAction(postViewData),
-          onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
-          onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
-          onPostEdit: () {
-            // Mute all video controllers
-            // to prevent video from playing in background
-            // while editing the post
-            LMFeedVideoProvider.instance.forcePauseAllControllers();
-
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => LMFeedEditPostScreen(
-                  postId: postViewData.id,
-                ),
-              ),
-            );
-          },
-          onPostDelete: () {
-            showDialog(
-              context: context,
-              builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete $postTitleFirstCap',
-                uuid: postViewData.uuid,
-                widgetSource: widgetSource,
-                content:
-                    'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
-                action: (String reason) async {
-                  Navigator.of(childContext).pop();
-
-                  String postType =
-                      LMFeedPostUtils.getPostType(postViewData.attachments);
-
-                  LMFeedPostBloc.instance.add(
-                    LMFeedDeletePostEvent(
-                      postId: postViewData.id,
-                      reason: reason,
-                      isRepost: postViewData.isRepost,
-                      postType: postType,
-                      userId: postViewData.user.sdkClientInfo.uuid,
-                      userState: isCm ? "CM" : "member",
-                    ),
-                  );
-                },
-                actionText: 'Delete',
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  LMFeedPostMedia _defPostMedia(
-    LMPostViewData post,
-  ) {
-    return LMFeedPostMedia(
-      attachments: post.attachments!,
-      postId: post.id,
-      style: _theme.mediaStyle,
-      pollBuilder: _widgetUtility.pollWidgetBuilder,
-      poll: _defPollWidget(post),
-      carouselIndicatorBuilder:
-          _widgetUtility.postMediaCarouselIndicatorBuilder,
-      onMediaTap: (int index) async {
-        LMFeedVideoProvider.instance.pauseCurrentVideo();
-        // ignore: use_build_context_synchronously
-        await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LMFeedMediaPreviewScreen(
-              postAttachments: post.attachments ?? [],
-              post: post,
-              user: post.user,
-              position: index,
-            ),
-          ),
-        );
-        LMFeedVideoProvider.instance.playCurrentVideo();
-      },
-    );
-  }
-
-  LMFeedPoll? _defPollWidget(LMPostViewData postViewData) {
-    Map<String, bool> isVoteEditing = {"value": false};
-    if (postViewData.attachments == null || postViewData.attachments!.isEmpty) {
-      return null;
-    }
-    bool isPoll = false;
-    postViewData.attachments?.forEach((element) {
-      if (element.attachmentType == LMMediaType.poll) {
-        isPoll = true;
-      }
-    });
-
-    if (!isPoll) {
-      return null;
-    }
-
-    LMAttachmentMetaViewData pollValue =
-        postViewData.attachments!.first.attachmentMeta;
-    LMAttachmentMetaViewData previousValue = pollValue.copyWith();
-    List<String> selectedOptions = [];
-    final ValueNotifier<bool> rebuildPollWidget = ValueNotifier(false);
-    return LMFeedPoll(
-      rebuildPollWidget: rebuildPollWidget,
-      isVoteEditing: isVoteEditing["value"]!,
-      selectedOption: selectedOptions,
-      attachmentMeta: pollValue,
-      style: _theme.mediaStyle.pollStyle ??
-          LMFeedPollStyle.basic(
-              primaryColor: _theme.primaryColor,
-              containerColor: _theme.container),
-      onEditVote: (pollData) {
-        isVoteEditing["value"] = true;
-        selectedOptions.clear();
-        selectedOptions.addAll(pollData.options!
-            .where((element) => element.isSelected)
-            .map((e) => e.id)
-            .toList());
-        rebuildPollWidget.value = !rebuildPollWidget.value;
-      },
-      onOptionSelect: (optionData) async {
-        if (hasPollEnded(pollValue.expiryTime)) {
-          LMFeedCore.showSnackBar(
-            context,
-            "Poll ended. Vote can not be submitted now.",
-            LMFeedWidgetSource.universalFeed,
-          );
-          return;
-        }
-        if ((isPollSubmitted(pollValue.options ?? [])) &&
-            !isVoteEditing["value"]!) return;
-        if (!isMultiChoicePoll(
-            pollValue.multiSelectNo, pollValue.multiSelectState)) {
-          submitVote(
-            context,
-            pollValue,
-            [optionData.id],
-            postViewData.id,
-            isVoteEditing,
-            previousValue,
-            rebuildPostWidget,
-            LMFeedWidgetSource.universalFeed,
-          );
-        } else if (selectedOptions.contains(optionData.id)) {
-          selectedOptions.remove(optionData.id);
-        } else {
-          selectedOptions.add(optionData.id);
-        }
-        rebuildPollWidget.value = !rebuildPollWidget.value;
-      },
-      showSubmitButton: isVoteEditing["value"]! || showSubmitButton(pollValue),
-      showEditVoteButton: !isVoteEditing["value"]! &&
-          !isInstantPoll(pollValue.pollType) &&
-          !hasPollEnded(pollValue.expiryTime) &&
-          isPollSubmitted(pollValue.options ?? []),
-      showAddOptionButton: showAddOptionButton(pollValue),
-      showTick: (option) {
-        return showTick(
-            pollValue, option, selectedOptions, isVoteEditing["value"]!);
-      },
-      isMultiChoicePoll: isMultiChoicePoll(
-          pollValue.multiSelectNo, pollValue.multiSelectState),
-      pollSelectionText: getPollSelectionText(
-          pollValue.multiSelectState, pollValue.multiSelectNo),
-      timeLeft: getTimeLeftInPoll(pollValue.expiryTime),
-      onSameOptionAdded: () {
-        LMFeedCore.showSnackBar(
-          context,
-          "Option already exists",
-          LMFeedWidgetSource.universalFeed,
-        );
-      },
-      onAddOptionSubmit: (option) async {
-        await addOption(
-          context,
-          pollValue,
-          option,
-          postViewData.id,
-          currentUser,
-          rebuildPollWidget,
-          LMFeedWidgetSource.universalFeed,
-        );
-        selectedOptions.clear();
-        rebuildPollWidget.value = !rebuildPollWidget.value;
-      },
-      onSubtextTap: () {
-        onVoteTextTap(
-          context,
-          pollValue,
-          LMFeedWidgetSource.universalFeed,
-        );
-      },
-      onVoteClick: (option) {
-        onVoteTextTap(
-          context,
-          pollValue,
-          LMFeedWidgetSource.universalFeed,
-          option: option,
-        );
-      },
-      onSubmit: (options) {
-        submitVote(
-          context,
-          pollValue,
-          options,
-          postViewData.id,
-          isVoteEditing,
-          previousValue,
-          rebuildPostWidget,
-          LMFeedWidgetSource.universalFeed,
-        );
-      },
-    );
-  }
-
-  LMFeedButton defLikeButton(LMPostViewData postViewData) => LMFeedButton(
-        isActive: postViewData.isLiked,
-        text: LMFeedText(
-            text: LMFeedPostUtils.getLikeCountTextWithCount(
-                postViewData.likeCount)),
-        style: _theme.footerStyle.likeButtonStyle,
-        onTextTap: () {
-          if (postViewData.likeCount == 0) {
-            return;
-          }
-          Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedLikesScreen(
-                postId: postViewData.id,
-                widgetSource: widgetSource,
-              ),
-            ),
-          );
-        },
-        onTap: () async {
-          postBloc.add(LMFeedUpdatePostEvent(
-            actionType: postViewData.isLiked
-                ? LMFeedPostActionType.unlike
-                : LMFeedPostActionType.like,
-            postId: postViewData.id,
-          ));
-
-          final likePostRequest =
-              (LikePostRequestBuilder()..postId(postViewData.id)).build();
-
-          final LikePostResponse response =
-              await LMFeedCore.client.likePost(likePostRequest);
-
-          if (!response.success) {
-            postBloc.add(LMFeedUpdatePostEvent(
-              actionType: postViewData.isLiked
-                  ? LMFeedPostActionType.unlike
-                  : LMFeedPostActionType.like,
-              postId: postViewData.id,
-            ));
-          } else {
-            LMFeedPostUtils.handlePostLikeTapEvent(
-                postViewData, widgetSource, postViewData.isLiked);
-          }
-        },
-      );
-
-  LMFeedButton defCommentButton(LMPostViewData post) => LMFeedButton(
-        text: LMFeedText(
-          text: LMFeedPostUtils.getCommentCountTextWithCount(post.commentCount),
-        ),
-        style: _theme.footerStyle.commentButtonStyle,
-        onTap: () async {
-          // Handle analytics event for comment button tap
-          LMFeedPostUtils.handlePostCommentButtonTap(post, widgetSource);
-
-          LMFeedVideoProvider.instance.pauseCurrentVideo();
-          // ignore: use_build_context_synchronously
-          await Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedPostDetailScreen(
-                postId: post.id,
-                openKeyboard: true,
-                postBuilder:
-                    widget.postBuilder ?? _widgetUtility.postWidgetBuilder,
-              ),
-            ),
-          );
-          LMFeedVideoProvider.instance.playCurrentVideo();
-        },
-        onTextTap: () async {
-          LMFeedVideoProvider.instance.pauseCurrentVideo();
-          // ignore: use_build_context_synchronously
-          await Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedPostDetailScreen(
-                postId: post.id,
-                openKeyboard: true,
-                postBuilder:
-                    widget.postBuilder ?? _widgetUtility.postWidgetBuilder,
-              ),
-            ),
-          );
-          LMFeedVideoProvider.instance.playCurrentVideo();
-        },
-      );
-
-  LMFeedButton defSaveButton(LMPostViewData postViewData) => LMFeedButton(
-        isActive: postViewData.isSaved,
-        onTap: () async {
-          LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-              postId: postViewData.id,
-              actionType: postViewData.isSaved
-                  ? LMFeedPostActionType.saved
-                  : LMFeedPostActionType.unsaved));
-
-          final savePostRequest =
-              (SavePostRequestBuilder()..postId(postViewData.id)).build();
-
-          final SavePostResponse response =
-              await LMFeedCore.client.savePost(savePostRequest);
-
-          if (!response.success) {
-            LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
-                postId: postViewData.id,
-                actionType: postViewData.isSaved
-                    ? LMFeedPostActionType.saved
-                    : LMFeedPostActionType.unsaved));
-          } else {
-            LMFeedPostUtils.handlePostSaveTapEvent(
-                postViewData, postViewData.isSaved, widgetSource);
-            LMFeedCore.showSnackBar(
-              context,
-              postViewData.isSaved
-                  ? "$postTitleFirstCap Saved"
-                  : "$postTitleFirstCap Unsaved",
-              widgetSource,
-            );
-          }
-        },
-        style: _theme.footerStyle.saveButtonStyle,
-      );
-
-  LMFeedButton defShareButton(LMPostViewData postViewData) => LMFeedButton(
-        text: const LMFeedText(text: "Share"),
-        onTap: () {
-          // Fire analytics event for share button tap
-          LMFeedPostUtils.handlerPostShareTapEvent(postViewData, widgetSource);
-
-          LMFeedDeepLinkHandler().sharePost(postViewData.id);
-        },
-        style: _theme.footerStyle.shareButtonStyle,
-      );
-
-  LMFeedButton defRepostButton(LMPostViewData postViewData) => LMFeedButton(
-        text: LMFeedText(
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              color: postViewData.isRepostedByUser ? _theme.primaryColor : null,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          text: postViewData.repostCount == 0
-              ? ''
-              : postViewData.repostCount.toString(),
-        ),
-        onTap: userPostingRights
-            ? () async {
-                if (!postUploading.value) {
-                  LMFeedVideoProvider.instance.forcePauseAllControllers();
-                  // ignore: use_build_context_synchronously
-                  LMAttachmentViewData attachmentViewData =
-                      (LMAttachmentViewData.builder()
-                            ..attachmentType(LMMediaType.repost)
-                            ..attachmentMeta((LMAttachmentMetaViewData.builder()
-                                  ..repost(postViewData))
-                                .build()))
-                          .build();
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LMFeedComposeScreen(
-                        attachments: [attachmentViewData],
-                        widgetSource: LMFeedWidgetSource.savedPostScreen,
-                      ),
-                    ),
-                  );
-                } else {
-                  LMFeedCore.showSnackBar(
-                    context,
-                    "A $postTitleSmallCap is already uploading.",
-                    widgetSource,
-                  );
-                }
-              }
-            : () => LMFeedCore.showSnackBar(
-                  context,
-                  "You do not have permission to create a $postTitleSmallCap.",
-                  widgetSource,
-                ),
-        style: _theme.footerStyle.repostButtonStyle?.copyWith(
-            icon: _theme.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: _theme.footerStyle.repostButtonStyle?.icon?.style
-                  ?.copyWith(
-                      color: postViewData.isRepostedByUser
-                          ? _theme.primaryColor
-                          : null),
-            ),
-            activeIcon: _theme.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: _theme.footerStyle.repostButtonStyle?.icon?.style
-                  ?.copyWith(
-                      color: postViewData.isRepostedByUser
-                          ? _theme.primaryColor
-                          : null),
-            )),
-      );
 
   Widget noPostInFeedWidget(LMFeedThemeData? feedThemeData) => Center(
         child: Column(
@@ -837,45 +307,15 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                   ),
                 ),
               ),
-              onTap: userPostingRights
-                  ? () async {
-                      if (!postUploading.value) {
-                        LMFeedVideoProvider.instance.forcePauseAllControllers();
-                        // ignore: use_build_context_synchronously
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LMFeedComposeScreen(
-                              widgetSource: LMFeedWidgetSource.savedPostScreen,
-                            ),
-                          ),
-                        );
-                      } else {
-                        LMFeedCore.showSnackBar(
-                            context,
-                            "A $postTitleSmallCap is already uploading.",
-                            widgetSource);
-                      }
-                    }
-                  : () => LMFeedCore.showSnackBar(
-                        context,
-                        "You do not have permission to create a $postTitleSmallCap.",
-                        widgetSource,
-                      ),
+              onTap: () {
+                LMFeedDefaultWidgets.instance.handleCreatePost(
+                  context,
+                  _widgetSource,
+                  postUploading,
+                );
+              },
             ),
           ],
         ),
       );
-
-  void handlePostReportAction(LMPostViewData postViewData) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => LMFeedReportScreen(
-          entityId: postViewData.id,
-          entityType: postEntityId,
-          entityCreatorId: postViewData.user.uuid,
-        ),
-      ),
-    );
-  }
 }

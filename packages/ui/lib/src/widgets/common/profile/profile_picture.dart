@@ -87,12 +87,12 @@ class LMFeedProfilePicture extends StatelessWidget {
     );
   }
 
-  LMFeedProfilePicture copyWith(
+  LMFeedProfilePicture copyWith({
     String? imageUrl,
     String? fallbackText,
     Function()? onTap,
     LMFeedProfilePictureStyle? style,
-  ) {
+  }) {
     return LMFeedProfilePicture(
       fallbackText: fallbackText ?? this.fallbackText,
       imageUrl: imageUrl ?? this.imageUrl,

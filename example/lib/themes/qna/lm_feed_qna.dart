@@ -51,7 +51,7 @@ class LMFeedQnA extends StatefulWidget {
         postDetailConfig: const LMPostDetailScreenConfig(
             commentTextFieldHint: "Write your response"),
       ),
-      widgets: LMFeedQnAWidgets.instance,
+      widgets: LMFeedQnAWidgetsExample.instance,
     );
     LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
   }

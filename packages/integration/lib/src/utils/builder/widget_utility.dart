@@ -331,8 +331,8 @@ class LMFeedWidgetUtility {
 
   /// Builds the user header for the compose screen.
   Widget composeScreenUserHeaderBuilder(
-      BuildContext context, LMUserViewData user) {
-    return const SizedBox.shrink();
+      BuildContext context, LMUserViewData user, LMFeedUserTile userTile) {
+    return userTile;
   }
 
   /// Builds the topic selector for the compose screen.
@@ -377,5 +377,22 @@ class LMFeedWidgetUtility {
     LMFeedWidgetSource source,
   ) {
     return textField;
+  }
+
+  Widget topResponseBuilder(
+    BuildContext context,
+    LMFeedTopResponseWidget topResponseWidget,
+    LMCommentViewData commentViewData,
+    LMPostViewData postViewData,
+  ) {
+    return topResponseWidget;
+  }
+
+  Widget addACommentBuilder(
+    BuildContext context,
+    LMFeedAddResponse addACommentWidget,
+    LMPostViewData postViewData,
+  ) {
+    return addACommentWidget;
   }
 }

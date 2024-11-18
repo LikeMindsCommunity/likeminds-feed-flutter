@@ -13,6 +13,7 @@ class LMFeedButton extends StatefulWidget {
     this.isActive = false,
     this.style,
     this.onTextTap,
+    this.isToggleEnabled = true,
   });
 
   /// Required parameter, defines whether the button is active or disabled
@@ -32,6 +33,11 @@ class LMFeedButton extends StatefulWidget {
 
   final VoidCallback? onTextTap;
 
+  /// [bool] to determine if the button should toogle
+  /// between active and inactive states
+  /// defaults to true
+  final bool isToggleEnabled;
+
   @override
   State<LMFeedButton> createState() => _LMButtonState();
 
@@ -42,6 +48,7 @@ class LMFeedButton extends StatefulWidget {
     Function()? onTap,
     LMFeedText? activeText,
     VoidCallback? onTextTap,
+    bool? isToggleEnabled,
   }) {
     return LMFeedButton(
       isActive: isActive ?? this.isActive,
@@ -50,6 +57,7 @@ class LMFeedButton extends StatefulWidget {
       onTap: onTap ?? this.onTap,
       activeText: activeText ?? this.activeText,
       onTextTap: onTextTap ?? this.onTextTap,
+      isToggleEnabled: isToggleEnabled ?? this.isToggleEnabled,
     );
   }
 }
@@ -74,15 +82,18 @@ class _LMButtonState extends State<LMFeedButton> {
     final inStyle = widget.style ?? const LMFeedButtonStyle.basic();
     return InkWell(
       onTap: () {
-        setState(() {
-          _active = !_active;
-        });
+        if (widget.isToggleEnabled) {
+          setState(() {
+            _active = !_active;
+          });
+        }
         widget.onTap();
       },
       splashFactory: InkRipple.splashFactory,
       child: Container(
         height: inStyle.height,
         width: inStyle.width,
+        margin: inStyle.margin ?? EdgeInsets.zero,
         padding: inStyle.padding ?? EdgeInsets.zero,
         decoration: BoxDecoration(
           color: inStyle.backgroundColor ?? Colors.transparent,
@@ -107,7 +118,7 @@ class _LMButtonState extends State<LMFeedButton> {
                 children: [
                   inStyle.placement == LMFeedIconButtonPlacement.start
                       ? (inStyle.icon != null || inStyle.activeIcon != null)
-                          ? SizedBox(width: inStyle.margin ?? 8)
+                          ? SizedBox(width: inStyle.gap ?? 8)
                           : const SizedBox.shrink()
                       : const SizedBox.shrink(),
                   inStyle.showText
@@ -121,7 +132,7 @@ class _LMButtonState extends State<LMFeedButton> {
                       : const SizedBox.shrink(),
                   inStyle.placement == LMFeedIconButtonPlacement.end
                       ? (inStyle.icon != null || inStyle.activeIcon != null)
-                          ? SizedBox(width: inStyle.margin ?? 8)
+                          ? SizedBox(width: inStyle.gap ?? 8)
                           : const SizedBox.shrink()
                       : const SizedBox.shrink(),
                 ],
@@ -166,8 +177,11 @@ class LMFeedButtonStyle {
   /// axis alignment for setting button's icon and text spacing
   final MainAxisAlignment? mainAxisAlignment;
 
-  /// margin between the text and icon
-  final double? margin;
+  /// gap between the text and icon
+  final double? gap;
+
+  /// margin of the button
+  final EdgeInsets? margin;
 
   final bool showText;
 
@@ -181,13 +195,14 @@ class LMFeedButtonStyle {
 
   const LMFeedButtonStyle({
     this.padding,
+    this.margin,
     this.backgroundColor,
     this.border,
     this.borderRadius,
     this.height,
     this.width,
     this.placement = LMFeedIconButtonPlacement.start,
-    this.margin,
+    this.gap,
     this.mainAxisAlignment,
     this.showText = true,
     this.icon,
@@ -199,6 +214,7 @@ class LMFeedButtonStyle {
 
   const LMFeedButtonStyle._({
     this.padding = const EdgeInsets.all(4.0),
+    this.margin,
     this.backgroundColor = Colors.transparent,
     this.border,
     this.borderRadius = 8.0,
@@ -206,7 +222,7 @@ class LMFeedButtonStyle {
     this.width,
     this.placement = LMFeedIconButtonPlacement.start,
     this.mainAxisAlignment,
-    this.margin = 4.0,
+    this.gap = 4.0,
     this.showText = true,
     this.icon,
     this.activeIcon,
@@ -215,6 +231,7 @@ class LMFeedButtonStyle {
 
   LMFeedButtonStyle copyWith({
     EdgeInsets? padding,
+    EdgeInsets? margin,
     Color? backgroundColor,
     Border? border,
     double? borderRadius,
@@ -222,7 +239,7 @@ class LMFeedButtonStyle {
     double? width,
     LMFeedIconButtonPlacement? placement,
     MainAxisAlignment? mainAxisAlignment,
-    double? margin,
+    double? gap,
     bool? showText,
     LMFeedIcon? icon,
     LMFeedIcon? activeIcon,
@@ -230,6 +247,7 @@ class LMFeedButtonStyle {
   }) {
     return LMFeedButtonStyle(
       padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
@@ -237,7 +255,7 @@ class LMFeedButtonStyle {
       width: width ?? this.width,
       placement: placement ?? this.placement,
       mainAxisAlignment: mainAxisAlignment ?? this.mainAxisAlignment,
-      margin: margin ?? this.margin,
+      gap: gap ?? this.gap,
       showText: showText ?? this.showText,
       icon: icon ?? this.icon,
       activeIcon: activeIcon ?? this.activeIcon,

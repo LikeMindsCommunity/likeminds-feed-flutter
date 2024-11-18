@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/widgets.dart';
 
 part 'handler/likes_screen_handler.dart';
@@ -29,6 +30,9 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
   LMLikesScreenHandler? handler;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
   LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  String likeText = LMFeedPostUtils.getLikeTitle(
+    LMFeedPluralizeWordAction.firstLetterCapitalPlural,
+  );
 
   @override
   void initState() {
@@ -84,19 +88,14 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
         backgroundColor: feedTheme.container,
         height: 60,
       ),
-      leading: IconButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        icon: const Icon(Icons.arrow_back_ios),
-      ),
+      leading: BackButton(),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const LMFeedText(
-            text: 'Likes',
+          LMFeedText(
+            text: likeText,
             style: LMFeedTextStyle(
               textStyle: TextStyle(
                 color: Color(0xFF333333),
@@ -110,7 +109,9 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
             valueListenable: handler!.totalLikesCountNotifier,
             builder: (context, likesCount, __) {
               return Text(
-                "$likesCount ${likesCount == 1 ? 'Like' : 'Likes'}",
+                LMFeedPostUtils.getLikeCountTextWithCount(
+                  likesCount,
+                ),
                 style: const TextStyle(
                   color: Color(0xFF666666),
                   fontSize: 13,
