@@ -4,10 +4,12 @@ class LMFeedCoreCallback {
   Function(String accessToken, String refreshToken)?
       onAccessTokenExpiredAndRefreshed;
   Future<LMAuthToken> Function()? onRefreshTokenExpired;
+  void Function()? loginRequired;
 
   LMFeedCoreCallback({
     this.onAccessTokenExpiredAndRefreshed,
     this.onRefreshTokenExpired,
+    this.loginRequired,
   });
 }
 

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/theme/theme.dart';
 
-class QnAAddResponse extends StatelessWidget {
+class QnAAddResponseExample extends StatelessWidget {
   final void Function()? onTap;
   final String postCreatorUUID;
 
-  const QnAAddResponse({super.key, this.onTap, required this.postCreatorUUID});
+  const QnAAddResponseExample({super.key, this.onTap, required this.postCreatorUUID});
 
   @override
   Widget build(BuildContext context) {

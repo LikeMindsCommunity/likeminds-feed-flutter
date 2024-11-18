@@ -16,7 +16,7 @@ enum LMFeedTopicSelectionWidgetType {
 }
 
 /// {@template feed_screen_config}
-/// Configuration for the [LMFeedUniversalScreen]
+/// Configuration for the [LMFeedSocialUniversalScreen]
 /// to support changing light and dark style of overall system
 /// elements in accordance to the screen's background
 /// to enable/disable features on the fly

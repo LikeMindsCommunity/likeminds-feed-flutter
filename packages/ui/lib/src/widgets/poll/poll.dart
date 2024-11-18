@@ -494,7 +494,7 @@ class _LMFeedPollState extends State<LMFeedPoll> {
       ),
       style: LMFeedButtonStyle(
         width: double.infinity,
-        margin: 8,
+        gap: 8,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         borderRadius: 8,
         border: Border.all(

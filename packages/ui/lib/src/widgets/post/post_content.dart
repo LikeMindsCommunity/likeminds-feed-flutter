@@ -7,13 +7,20 @@ class LMFeedPostContent extends StatelessWidget {
     super.key,
     this.text,
     this.onTagTap,
+    this.onHeadingTap,
     this.expanded = false,
     this.style,
     this.heading,
+    this.headingBuilder,
   });
 
   final String? text;
   final String? heading;
+  final VoidCallback? onHeadingTap;
+
+  /// A builder that returns a widget to build heading
+  final Widget Function(BuildContext context, LMFeedExpandableText heading,
+      String headingText)? headingBuilder;
 
   final LMFeedOnTagTap? onTagTap;
   final bool expanded;
@@ -35,28 +42,26 @@ class LMFeedPostContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (heading != null && heading!.isNotEmpty)
-                  LMFeedExpandableText(
-                    heading!,
-                    expandText: "",
-                    collapseText: "",
-                    expanded: expanded,
-                    maxLines: contentStyle.headingVisibleLines ?? 2,
-                    hashtagStyle: contentStyle.linkStyle ??
-                        Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: feedTheme.primaryColor),
-                    prefixStyle: contentStyle.expandTextStyle,
-                    linkStyle: contentStyle.linkStyle ??
-                        Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: feedTheme.primaryColor),
-                    onTagTap: (String uuid) {
-                      onTagTap?.call(uuid);
-                    },
-                    style: contentStyle.headingStyle,
-                  ),
+                  headingBuilder?.call(
+                        context,
+                        _defHeading(
+                          heading: heading,
+                          contentStyle: contentStyle,
+                          expanded: expanded,
+                          feedTheme: feedTheme,
+                          onTagTap: onTagTap,
+                          context: context,
+                        ),
+                        heading!,
+                      ) ??
+                      _defHeading(
+                        heading: heading,
+                        contentStyle: contentStyle,
+                        expanded: expanded,
+                        feedTheme: feedTheme,
+                        onTagTap: onTagTap,
+                        context: context,
+                      ),
                 if ((heading != null && heading!.isNotEmpty) &&
                     (text != null && text!.isNotEmpty))
                   contentStyle.headingSeparator,
@@ -66,6 +71,7 @@ class LMFeedPostContent extends StatelessWidget {
                     onTagTap: (String uuid) {
                       onTagTap?.call(uuid);
                     },
+                    onTextTap: onHeadingTap,
                     expandText: contentStyle.expandText ?? "see more",
                     animation: contentStyle.animation ?? true,
                     maxLines: contentStyle.visibleLines ?? 4,
@@ -95,12 +101,48 @@ class LMFeedPostContent extends StatelessWidget {
     Function(String)? onTagTap,
     bool? expanded,
     LMFeedPostContentStyle? style,
+    Widget Function(BuildContext context, LMFeedExpandableText heading,
+            String headingText)?
+        headingBuilder,
   }) {
     return LMFeedPostContent(
       text: text ?? this.text,
       onTagTap: onTagTap ?? this.onTagTap,
       expanded: expanded ?? this.expanded,
       style: style ?? this.style,
+      headingBuilder: headingBuilder ?? this.headingBuilder,
+    );
+  }
+
+  LMFeedExpandableText _defHeading({
+    required String? heading,
+    required LMFeedPostContentStyle contentStyle,
+    required bool expanded,
+    required LMFeedThemeData feedTheme,
+    required LMFeedOnTagTap? onTagTap,
+    required BuildContext context,
+  }) {
+    return LMFeedExpandableText(
+      heading!,
+      expandText: contentStyle.expandText ?? "see more",
+      expanded: expanded,
+      maxLines: contentStyle.headingVisibleLines ?? 3,
+      hashtagStyle: contentStyle.linkStyle ??
+          Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: feedTheme.primaryColor),
+      prefixStyle: contentStyle.expandTextStyle,
+      linkStyle: contentStyle.linkStyle ??
+          Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: feedTheme.primaryColor),
+      onTagTap: (String uuid) {
+        onTagTap?.call(uuid);
+      },
+      onTextTap: onHeadingTap,
+      style: contentStyle.headingStyle,
     );
   }
 }
@@ -177,15 +219,13 @@ class LMFeedPostContentStyle {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         headingSeparator: const SizedBox(height: 0.0),
         headingStyle: TextStyle(
-          color: onContainer ?? LikeMindsTheme.greyColor,
-          fontSize: 18,
-          fontFamily: 'Roboto',
-          fontWeight: FontWeight.w700,
+          color: onContainer ?? LikeMindsTheme.headingColor,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
         ),
         textStyle: TextStyle(
           color: onContainer ?? LikeMindsTheme.greyColor,
           fontSize: 16,
-          fontFamily: 'Roboto',
           fontWeight: FontWeight.w400,
         ),
       );

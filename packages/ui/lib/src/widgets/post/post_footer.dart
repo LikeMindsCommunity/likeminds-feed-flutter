@@ -125,7 +125,7 @@ class LMFeedPostFooter extends StatelessWidget {
         text: const LMFeedText(text: "Like"),
         style: postFooterStyle.likeButtonStyle ??
             const LMFeedButtonStyle(
-              margin: 0,
+              gap: 0,
               icon: LMFeedIcon(
                 type: LMFeedIconType.svg,
                 assetPath: lmLikeInActiveSvg,
@@ -150,7 +150,7 @@ class LMFeedPostFooter extends StatelessWidget {
                 type: LMFeedIconType.svg,
                 assetPath: lmCommentSvg,
               ),
-              margin: 0,
+              gap: 0,
             ),
         onTap: () {},
       );
@@ -167,7 +167,7 @@ class LMFeedPostFooter extends StatelessWidget {
         text: const LMFeedText(text: "Share"),
         style: postFooterStyle.shareButtonStyle ??
             const LMFeedButtonStyle(
-              margin: 0,
+              gap: 0,
               icon: LMFeedIcon(
                 type: LMFeedIconType.svg,
                 assetPath: lmShareSvg,
@@ -182,7 +182,7 @@ class LMFeedPostFooter extends StatelessWidget {
         text: const LMFeedText(text: "Repost"),
         style: postFooterStyle.repostButtonStyle ??
             const LMFeedButtonStyle(
-              margin: 0,
+              gap: 0,
               icon: LMFeedIcon(
                 type: LMFeedIconType.svg,
                 assetPath: lmRepostSvg,

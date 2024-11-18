@@ -200,6 +200,7 @@ class LMFeedThemeData {
     );
   }
 
+  /// copyWith method to update the theme
   LMFeedThemeData copyWith({
     LMFeedPostStyle? postStyle,
     Color? primaryColor,

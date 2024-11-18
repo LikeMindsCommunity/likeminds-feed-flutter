@@ -53,14 +53,16 @@ class LMFeedUniversalBloc
     } else {
       emit(LMFeedUniversalFeedLoadingState());
     }
-
+    final universalFeedRequestBuilder = GetFeedRequestBuilder()
+      ..page(event.pageKey)
+      ..topicIds(event.topicsIds)
+      ..pageSize(10);
+    if (event.widgetIds != null) {
+      universalFeedRequestBuilder.widgetIds(event.widgetIds!);
+    }
     GetFeedResponse response =
         await LMFeedCore.instance.lmFeedClient.getUniversalFeed(
-      (GetFeedRequestBuilder()
-            ..page(event.pageKey)
-            ..topicIds(event.topicsIds)
-            ..pageSize(10))
-          .build(),
+      universalFeedRequestBuilder.build(),
     );
 
     if (!response.success) {

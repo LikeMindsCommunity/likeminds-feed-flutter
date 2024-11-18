@@ -5,13 +5,13 @@ import 'package:likeminds_feed_sample/themes/qna/builder/post/lm_qna_top_respons
 import 'package:likeminds_feed_sample/themes/qna/utils/theme/theme.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/utils.dart';
 
-class LMQnAPostFooter extends StatelessWidget {
+class LMQnAPostFooterExample extends StatelessWidget {
   final LMFeedPostFooter footer;
   final LMPostViewData postViewData;
   final LMFeedThemeData feedThemeData;
   final LMFeedWidgetSource? source;
 
-  const LMQnAPostFooter({
+  const LMQnAPostFooterExample({
     super.key,
     required this.feedThemeData,
     required this.footer,
@@ -52,13 +52,13 @@ class LMQnAPostFooter extends StatelessWidget {
         if (postViewData.commentCount >= 1 &&
             postViewData.topComments != null &&
             postViewData.topComments!.isNotEmpty)
-          LMQnATopResponseWidget(
+          LMQnATopResponseWidgetExample(
             topResponses: postViewData.topComments!,
             postViewData: postViewData,
             feedThemeData: feedThemeData,
           ),
         if (source != null && source != LMFeedWidgetSource.postDetailScreen)
-          QnAAddResponse(
+          QnAAddResponseExample(
             postCreatorUUID: postViewData.uuid,
             onTap: () {
               commentButton?.onTap.call();

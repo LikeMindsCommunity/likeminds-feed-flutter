@@ -32,6 +32,8 @@ class LMFeedText extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.translucent,
       child: Container(
+        margin: inStyle.margin,
+        padding: inStyle.padding,
         color: Colors.transparent,
         child: Text(
           text,
@@ -78,12 +80,20 @@ class LMFeedTextStyle {
   /// default Flutter styling class for changing look of the text [TextStyle]
   final TextStyle? textStyle;
 
+  /// margin for the text [EdgeInsets]
+  final EdgeInsets? margin;
+
+  /// padding for the text [EdgeInsets]
+  final EdgeInsets? padding;
+
   const LMFeedTextStyle({
     this.selectable = false,
     this.textStyle,
     this.maxLines,
     this.overflow,
     this.textAlign,
+    this.margin,
+    this.padding,
   });
 
   factory LMFeedTextStyle.basic() {
@@ -103,6 +113,8 @@ class LMFeedTextStyle {
     int? maxLines,
     TextOverflow? overflow,
     TextAlign? textAlign,
+    EdgeInsets? margin,
+    EdgeInsets? padding,
   }) {
     return LMFeedTextStyle(
       selectable: selectable ?? this.selectable,
@@ -110,6 +122,8 @@ class LMFeedTextStyle {
       maxLines: maxLines ?? this.maxLines,
       overflow: overflow ?? this.overflow,
       textAlign: textAlign ?? this.textAlign,
+      margin: margin ?? this.margin,
+      padding: padding ?? this.padding,
     );
   }
 }

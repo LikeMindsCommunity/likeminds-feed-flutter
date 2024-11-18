@@ -204,7 +204,8 @@ class LMFeedComposeScreen extends StatefulWidget {
   ///
   /// - Returns: A custom widget displaying the user header.
   /// {@endtemplate}
-  final Widget Function(BuildContext context, LMUserViewData user)?
+  final Widget Function(
+          BuildContext context, LMUserViewData user, LMFeedUserTile userTile)?
       composeUserHeaderBuilder;
 
   /// {@template lmFeedComposeScreenAttachments}
@@ -277,6 +278,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   String postText = '';
   List<LMTopicViewData> selectedTopics = [];
   List<LMUserTagViewData> userTags = [];
+  bool enableHeading = false;
+  bool headingRequired = false;
 
   // bool to check if the user has tapped on the cancel icon
   // of link preview, in that case toggle the bool to true
@@ -300,8 +303,13 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     style = widget.style ?? feedTheme.composeScreenStyle;
     _checkForRepost();
     config = widget.config ?? LMFeedCore.config.composeConfig;
-    _headingController =
-        (config?.enableHeading ?? false) ? TextEditingController() : null;
+    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? true
+        : config?.enableHeading ?? false;
+    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? true
+        : config?.headingRequiredToCreatePost ?? false;
+    _headingController = enableHeading ? TextEditingController() : null;
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     if (_headingController != null) {
       _headingFocusNode = FocusNode();
@@ -318,8 +326,13 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     style = widget.style ?? feedTheme.composeScreenStyle;
     _checkForRepost();
     config = widget.config ?? LMFeedCore.config.composeConfig;
-    _headingController =
-        (config?.enableHeading ?? false) ? TextEditingController() : null;
+    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? true
+        : config?.enableHeading ?? false;
+    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? true
+        : config?.headingRequiredToCreatePost ?? false;
+    _headingController = enableHeading ? TextEditingController() : null;
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
   }
 
@@ -444,6 +457,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   width: screenWidth,
                   margin: EdgeInsets.only(
                     bottom: 100,
@@ -452,10 +466,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     child: Column(
                       children: [
                         const SizedBox(height: 18),
-                        widget.composeUserHeaderBuilder?.call(context, user!) ??
+                        widget.composeUserHeaderBuilder?.call(
+                                context, user!, LMFeedUserTile(user: user!)) ??
                             widgetUtility.composeScreenUserHeaderBuilder(
-                                context, user!),
-                        const SizedBox(height: 18),
+                                context, user!, LMFeedUserTile(user: user!)),
                         widget.composeContentBuilder?.call() ??
                             _defContentInput(),
                         const SizedBox(height: 18),
@@ -879,13 +893,6 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   // Default "Cancel" button widget creation
   LMFeedButton _defCancelButton() {
     return LMFeedButton(
-      // Setting the button text and style
-      text: LMFeedText(
-        text: "Cancel",
-        style: LMFeedTextStyle(
-          textStyle: TextStyle(color: feedTheme.primaryColor),
-        ),
-      ),
       // Defining the button's tap behavior
       onTap: () {
         // If a custom discard dialog is provided, show it
@@ -894,7 +901,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             _showDefaultDiscardDialog(context);
       },
       // Applying additional style properties
-      style: const LMFeedButtonStyle(),
+      style: LMFeedButtonStyle(
+        gap: 20.0,
+        icon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.arrow_back,
+          style: LMFeedIconStyle(
+            size: 28,
+            color: feedTheme.onContainer,
+          ),
+        ),
+      ),
     );
   }
 
@@ -903,19 +920,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     return LMFeedButton(
       // Setting the button text and style
       text: LMFeedText(
-        text: "Create",
+        text: "POST",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
-            color: feedTheme.onPrimary, // Button text color
-            fontSize: 14, // Font size
+            color: feedTheme.primaryColor, // Button text color
+            fontSize: 16, // Font size
             fontWeight: FontWeight.w500, // Font weight
           ),
         ),
       ),
       // Button style including background color and padding
       style: LMFeedButtonStyle(
-        backgroundColor: feedTheme.primaryColor, // Button background color
-        borderRadius: 6, // Border radius
         height: 34, // Button height
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       ),
@@ -955,13 +970,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 
 // Function to build the default app bar
   LMFeedAppBar _defAppBar() {
+    final String postPrefix =
+        LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+            ? "Ask"
+            : "Create";
     final theme = LMFeedCore.theme;
     return LMFeedAppBar(
       // App bar style properties
       style: LMFeedAppBarStyle(
         backgroundColor: feedTheme.container, // Background color of the app bar
-        height: 48, // App bar height
-        centerTitle: true, // Center the title
+        height: 60, // App bar height
+        centerTitle: false, // Center the title
         padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8.0),
         shadow: [
           BoxShadow(
@@ -975,11 +994,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       leading: _defCancelButton(),
       // Setting the app bar title
       title: LMFeedText(
-        text: "Create $postTitleFirstCap",
+        text: "$postPrefix $postTitleFirstCap",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
-            fontSize: 18, // Title font size
-            fontWeight: FontWeight.w700, // Title font weight
+            fontSize: 20, // Title font size
+            fontWeight: FontWeight.w500, // Title font weight
             color: theme.onContainer, // Title text color
           ),
         ),
@@ -1011,8 +1030,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       selectedTopics = [...composeBloc.selectedTopics];
 
       // Validate the heading if required
-      if (config!.enableHeading &&
-          config!.headingRequiredToCreatePost &&
+      if (enableHeading &&
+          headingRequired &&
           (heading == null || heading!.isEmpty)) {
         return LMResponse(
           success: false,
@@ -1088,44 +1107,28 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       ),
       child: Column(
         children: [
-          (config?.enableHeading ?? false)
-              ? LMFeedCore.widgetUtility.composeScreenHeadingTextfieldBuilder(
+          if (enableHeading)
+            Column(
+              children: [
+                LMFeedCore.widgetUtility.composeScreenHeadingTextfieldBuilder(
                   context,
                   _defHeadingTextfield(theme),
                 )
-              : const SizedBox.shrink(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+              ],
+            ),
+          Column(
             children: [
-              !(config?.enableHeading ?? false)
-                  ? Container(
-                      padding: const EdgeInsets.only(top: 4.0),
-                      margin: const EdgeInsets.only(right: 12),
-                      child: LMFeedProfilePicture(
-                        fallbackText: widget.displayName ?? user!.name,
-                        imageUrl: widget.displayUrl ?? user!.imageUrl,
-                        style: LMFeedProfilePictureStyle(
-                          backgroundColor: theme.primaryColor,
-                          size: 36,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-              Column(
-                children: [
-                  Container(
-                      width: screenWidth! - 82,
-                      decoration: BoxDecoration(
-                        color: theme.container,
-                      ),
-                      child: LMFeedCore.widgetUtility
-                          .composeScreenContentTextfieldBuilder(
-                        context,
-                        _defContentTextField(),
-                      )),
-                  const SizedBox(height: 24),
-                ],
-              ),
+              Container(
+                  width: screenWidth!,
+                  decoration: BoxDecoration(
+                    color: theme.container,
+                  ),
+                  child: LMFeedCore.widgetUtility
+                      .composeScreenContentTextfieldBuilder(
+                    context,
+                    _defContentTextField(),
+                  )),
+              const SizedBox(height: 24),
             ],
           ),
         ],
@@ -1148,7 +1151,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           errorBorder: InputBorder.none,
           disabledBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
-          hintText: config?.composeHint,
+          hintText: config?.composeHint ??
+              (LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+                  ? "Add description"
+                  : "Write something here..."),
           hintStyle: TextStyle(
             overflow: TextOverflow.visible,
             fontSize: 14,
@@ -1181,14 +1187,40 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       focusNode: _headingFocusNode,
       controller: _headingController,
       textCapitalization: TextCapitalization.sentences,
+      maxLength: 200,
+      textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
-        hintText: config?.headingHint,
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        errorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        disabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        focusedErrorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        hintText: config?.headingHint ?? "Add your question here",
         hintStyle: TextStyle(
           color: theme.onContainer.withOpacity(0.5),
           overflow: TextOverflow.visible,

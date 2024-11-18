@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
-@Deprecated('Use [LMFeedSocialScreen()] instead for default feed screen')
-class LMFeedScreen extends StatefulWidget {
-  const LMFeedScreen({
+class LMFeedQnAScreen extends StatefulWidget {
+  const LMFeedQnAScreen({
     super.key,
     this.feedType = LMFeedType.universal,
     this.appBar,
@@ -68,10 +67,10 @@ class LMFeedScreen extends StatefulWidget {
   final LMFeedScreenConfig? config;
 
   @override
-  State<LMFeedScreen> createState() => _LMFeedScreenState();
+  State<LMFeedQnAScreen> createState() => _LMFeedQnAScreenState();
 }
 
-class _LMFeedScreenState extends State<LMFeedScreen> {
+class _LMFeedQnAScreenState extends State<LMFeedQnAScreen> {
   @override
   Widget build(BuildContext context) {
     return _buildFeed();
@@ -84,7 +83,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   }
 
   Widget _buildUniversalFeed() {
-    return LMFeedSocialUniversalScreen(
+    return LMFeedQnAUniversalScreen(
       appBar: widget.appBar,
       customWidgetBuilder: widget.customWidgetBuilder,
       topicChipBuilder: widget.topicChipBuilder,
@@ -105,7 +104,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
   }
 
   Widget _buildPersonalisedFeed() {
-    return LMFeedSocialPersonalisedScreen(
+    return LMFeedQnAPersonalisedScreen(
       appBar: widget.appBar,
       customWidgetBuilder: widget.customWidgetBuilder,
       postBuilder: widget.postBuilder,

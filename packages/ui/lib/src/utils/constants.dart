@@ -35,3 +35,9 @@ const String lmWarningPendingPostSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/warning_pending_post.svg";
 const String lmNotificationBellSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/notification_bell.svg";
+const String lmUpvoteSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/upvote.svg";
+const String lmUpvoteFilledSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/upvote_filled.svg";
+const String lmAddQuestionSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/add_question.svg";

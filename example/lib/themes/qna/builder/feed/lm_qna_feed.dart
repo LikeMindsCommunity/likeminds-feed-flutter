@@ -228,7 +228,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
   Widget build(BuildContext context) {
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
     config = widget.config ?? LMFeedCore.config.feedScreenConfig;
-    return LMFeedQnAWidgets.instance.scaffold(
+    return LMFeedQnAWidgetsExample.instance.scaffold(
       backgroundColor: feedThemeData.backgroundColor,
       appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
       floatingActionButton: ValueListenableBuilder(
@@ -858,7 +858,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
           LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
       imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
       videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
-      pollBuilder: LMFeedQnAWidgets.instance.pollWidgetBuilder,
+      pollBuilder: LMFeedQnAWidgetsExample.instance.pollWidgetBuilder,
       poll: _defPollWidget(post),
       onMediaTap: (position) {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
@@ -1317,7 +1317,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
           backgroundColor:
               right ? feedThemeData.primaryColor : feedThemeData.disabledColor,
           placement: LMFeedIconButtonPlacement.end,
-          margin: 5.0,
+          gap: 5.0,
         ),
         text: LMFeedText(
           text: "Create $postTitleFirstCap",
