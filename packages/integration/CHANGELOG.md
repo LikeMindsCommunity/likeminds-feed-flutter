@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.12.0]
+- Added support for QnA Feed theme
+- Added support for Guest Flow
+- Added support for Retry mechanism
+
 ## [1.11.0]
 
 - Segregated upload and post creation flow
