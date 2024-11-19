@@ -4,7 +4,7 @@ void markReadNotificationEventHandler(
     LMFeedMarkNotificationAsReadEvent event, emit) {
   // check if the user is a guest user
   if (LMFeedUserUtils.isGuestUser()) {
-    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(event.context);
     return;
   }
   MarkReadNotificationRequest request = (MarkReadNotificationRequestBuilder()

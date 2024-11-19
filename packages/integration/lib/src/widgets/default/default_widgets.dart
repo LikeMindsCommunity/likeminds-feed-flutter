@@ -351,7 +351,7 @@ class LMFeedDefaultWidgets {
       onOptionSelect: (optionData) async {
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         if (hasPollEnded(pollValue.expiryTime)) {
@@ -463,7 +463,7 @@ class LMFeedDefaultWidgets {
         }
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         LMFeedVideoProvider.instance.pauseCurrentVideo();
@@ -480,7 +480,7 @@ class LMFeedDefaultWidgets {
       onTap: () async {
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         newPostBloc.add(LMFeedUpdatePostEvent(
@@ -624,7 +624,7 @@ class LMFeedDefaultWidgets {
         onTap: () async {
           // check if the user is a guest user
           if (LMFeedUserUtils.isGuestUser()) {
-            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
             return;
           }
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
@@ -725,7 +725,7 @@ class LMFeedDefaultWidgets {
     if (userPostingRights) {
       // check if the user is a guest user
       if (LMFeedUserUtils.isGuestUser()) {
-        LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+        LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
         return;
       }
       // check if a post failed to upload
@@ -772,7 +772,7 @@ class LMFeedDefaultWidgets {
       LMPostViewData postViewData, BuildContext context) {
     // check if the user is a guest user
     if (LMFeedUserUtils.isGuestUser()) {
-      LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+      LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
       return;
     }
     Navigator.of(context).push(

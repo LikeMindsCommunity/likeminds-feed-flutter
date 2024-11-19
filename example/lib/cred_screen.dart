@@ -29,7 +29,7 @@ class _CredScreenState extends State<CredScreen> {
   final ValueNotifier<bool> _isFeedRoomTheme = ValueNotifier(false);
   StreamSubscription? _streamSubscription;
   String? uuid;
-  LMFeedFlavor selectedTheme = LMFeedFlavor.qna;
+  LMFeedFlavor selectedTheme = LMFeedFlavor.social;
 
   @override
   void initState() {
@@ -244,9 +244,7 @@ class _CredScreenState extends State<CredScreen> {
                     // logout the user if already logged in
                     // if the user is not logged in,
                     // clear the cache manually
-                    final LogoutRequest request =
-                        LogoutRequestBuilder().build();
-                    final response = await LMFeedCore.client.logout(request);
+                    final response = await LMFeedCore.instance.logout();
                     if (!response.success) {
                       LMFeedLocalPreference.instance.clearCache();
                     }

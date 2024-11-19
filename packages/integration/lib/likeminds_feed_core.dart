@@ -171,8 +171,23 @@ class LMFeedCore {
   /// It will clear the user data from the local preference.
   /// It will also clear the member state and community configurations from the local preference.
   Future<LMResponse> logout() async {
-    LogoutResponse response =
-        await lmFeedClient.logout(LogoutRequestBuilder().build());
+    // create a logout request builder
+    final LogoutRequestBuilder requestBuilder = LogoutRequestBuilder();
+    // get the refresh token from the local preference
+    final String? refreshToken = LMFeedLocalPreference.instance
+        .fetchCache(LMFeedStringConstants.refreshToken)
+        ?.value;
+    // get the device id from the notification handler
+    final String? deviceId = LMNotificationHandler.instance.deviceId;
+    // set the refresh token and device id in the request builder
+    if (refreshToken != null) {
+      requestBuilder.refreshToken(refreshToken);
+    }
+    if (deviceId != null) {
+      requestBuilder.deviceId(deviceId);
+    }
+    // call the logout function from the client
+    LogoutResponse response = await lmFeedClient.logout(requestBuilder.build());
     return LMResponse(
         success: response.success, errorMessage: response.errorMessage);
   }

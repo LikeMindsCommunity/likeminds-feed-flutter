@@ -1,10 +1,13 @@
+import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedCoreCallback {
   Function(String accessToken, String refreshToken)?
       onAccessTokenExpiredAndRefreshed;
   Future<LMAuthToken> Function()? onRefreshTokenExpired;
-  void Function()? loginRequired;
+
+  /// callback to be triggered when a guest user tries to access a restricted route
+  void Function(BuildContext context)? loginRequired;
 
   LMFeedCoreCallback({
     this.onAccessTokenExpiredAndRefreshed,

@@ -22,9 +22,11 @@ class LMFeedGetNotificationsEvent extends LMFeedNotificationsEvent {
 
 class LMFeedMarkNotificationAsReadEvent extends LMFeedNotificationsEvent {
   final String activityId;
+  final BuildContext context;
 
   const LMFeedMarkNotificationAsReadEvent({
     required this.activityId,
+    required this.context,
   });
 
   @override

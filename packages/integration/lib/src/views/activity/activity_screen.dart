@@ -597,7 +597,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       onOptionSelect: (optionData) async {
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         if (hasPollEnded(pollValue.expiryTime)) {
@@ -711,7 +711,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         }
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         LMFeedVideoProvider.instance.pauseCurrentVideo();
@@ -728,7 +728,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       onTap: () async {
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
@@ -874,7 +874,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         onTap: () async {
           // check if the user is a guest user
           if (LMFeedUserUtils.isGuestUser()) {
-            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
             return;
           }
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
@@ -1220,7 +1220,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   void handlePostReportAction(LMPostViewData postViewData) {
     // check if the user is a guest user
     if (LMFeedUserUtils.isGuestUser()) {
-      LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+      LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
       return;
     }
     Navigator.of(context).push(
