@@ -792,7 +792,7 @@ class _LMFeedSocialPersonalisedScreenState
           onTap: () {
             // check if the user is a guest user
             if (LMFeedUserUtils.isGuestUser()) {
-              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
               return;
             }
             Navigator.push(
@@ -827,7 +827,7 @@ class _LMFeedSocialPersonalisedScreenState
             onTap: () {
               // check if the user is a guest user
               if (LMFeedUserUtils.isGuestUser()) {
-                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
                 return;
               }
               Navigator.push(

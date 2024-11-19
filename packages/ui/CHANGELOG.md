@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.12.0]
+- Added support for QnA Feed theme
+
 ## [1.11.0]
 
 - Segregated upload and post creation flow

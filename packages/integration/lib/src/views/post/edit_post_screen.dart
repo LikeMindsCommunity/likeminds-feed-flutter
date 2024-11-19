@@ -966,7 +966,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         ),
                         minLines: 3,
                       ),
-                      enabled: config!.enableTagging,
+                      taggingEnabled: config!.enableTagging,
                       userTags: composeBloc.userTags,
                       onTagSelected: (tag) {
                         composeBloc.userTags.add(tag);

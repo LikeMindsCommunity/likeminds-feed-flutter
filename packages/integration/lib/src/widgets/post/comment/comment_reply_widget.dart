@@ -430,7 +430,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       onCommentReport: () {
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         Navigator.of(context).push(
@@ -526,7 +526,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
 
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
 
@@ -543,7 +543,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       onTap: () async {
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
-          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+          LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         LMCommentViewData? commentFromList = comment?.replies

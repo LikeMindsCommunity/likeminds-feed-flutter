@@ -26,14 +26,8 @@ void main() async {
   // Loading .env file
   await dotenv.load(fileName: ".env");
   LMResponse response = await LMFeedCore.instance.initialize(
-      domain: "feedsx://www.feedsx.com/",
-      lmFeedCallback: LMFeedCoreCallback(loginRequired: () {
-        rootScaffoldMessengerKey.currentState?.showSnackBar(
-          LMFeedSnackBar(
-            content: const Text('Login required'),
-          ),
-        );
-      }));
+    domain: "feedsx://www.feedsx.com/",
+  );
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

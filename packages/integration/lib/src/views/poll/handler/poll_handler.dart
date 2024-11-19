@@ -14,7 +14,7 @@ Future<void> submitVote(
 ) async {
   // check if the user is a guest user
   if (LMFeedUserUtils.isGuestUser()) {
-    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
     return;
   }
   try {
@@ -287,7 +287,7 @@ Future<void> addOption(
     LMFeedWidgetSource source) async {
   // check if the user is a guest user
   if (LMFeedUserUtils.isGuestUser()) {
-    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
     return;
   }
   if ((attachmentMeta.options?.length ?? 0) > 10) {

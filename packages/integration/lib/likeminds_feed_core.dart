@@ -171,8 +171,23 @@ class LMFeedCore {
   /// It will clear the user data from the local preference.
   /// It will also clear the member state and community configurations from the local preference.
   Future<LMResponse> logout() async {
-    LogoutResponse response =
-        await lmFeedClient.logout(LogoutRequestBuilder().build());
+    // create a logout request builder
+    final LogoutRequestBuilder requestBuilder = LogoutRequestBuilder();
+    // get the refresh token from the local preference
+    final String? refreshToken = LMFeedLocalPreference.instance
+        .fetchCache(LMFeedStringConstants.refreshToken)
+        ?.value;
+    // get the device id from the notification handler
+    final String? deviceId = LMNotificationHandler.instance.deviceId;
+    // set the refresh token and device id in the request builder
+    if (refreshToken != null) {
+      requestBuilder.refreshToken(refreshToken);
+    }
+    if (deviceId != null) {
+      requestBuilder.deviceId(deviceId);
+    }
+    // call the logout function from the client
+    LogoutResponse response = await lmFeedClient.logout(requestBuilder.build());
     return LMResponse(
         success: response.success, errorMessage: response.errorMessage);
   }
@@ -280,10 +295,10 @@ class LMFeedCore {
   /// It must be executed before displaying the feed screen or accessing any other [LMFeedCore] widgets or screens.
   Future<LMResponse> showFeedWithApiKey({
     required String apiKey,
-    required String uuid,
-    required String userName,
+    String? uuid,
+    String? userName,
     String? imageUrl,
-    bool? isGuest = false,
+    bool isGuest = false,
   }) async {
     String? newAccessToken;
     String? newRefreshToken;
@@ -297,18 +312,29 @@ class LMFeedCore {
         ?.value;
 
     if (newAccessToken == null || newRefreshToken == null) {
+      // check if not a guest user and uuid or username is not provided
+      if (!isGuest && (uuid == null || userName == null)) {
+        return LMResponse(
+            success: false,
+            errorMessage: "UUID and Username are required for non-guest user");
+      }
       InitiateUserRequestBuilder initiateUserRequestBuilder =
-          (InitiateUserRequestBuilder()
-            ..apiKey(apiKey)
-            ..userName(userName)
-            ..uuid(uuid));
+          (InitiateUserRequestBuilder()..apiKey(apiKey));
 
+      // if uuid is not null, then set uuid
+      if (uuid != null) {
+        initiateUserRequestBuilder.uuid(uuid);
+      }
+      // if userName is not null, then set userName
+      if (userName != null) {
+        initiateUserRequestBuilder.userName(userName);
+      }
       // if imageUrl is not null, then set imageUrl
       if (imageUrl != null) {
         initiateUserRequestBuilder.imageUrl(imageUrl);
       }
       // if isGuest is not null and true, then set isGuest to true
-      if (isGuest != null && isGuest) {
+      if (isGuest) {
         initiateUserRequestBuilder.isGuest(isGuest);
       }
 

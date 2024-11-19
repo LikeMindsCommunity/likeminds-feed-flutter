@@ -104,6 +104,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   LMPostDetailScreenConfig? config = LMFeedCore.config.postDetailConfig;
   late LMFeedBottomTextFieldStyle? _style;
+  final bool isGuestUser = LMFeedUserUtils.isGuestUser();
 
   @override
   void initState() {
@@ -182,7 +183,9 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                         : const SizedBox.shrink(),
                     LMTaggingAheadTextField(
                       isDown: false,
-                      enabled: LMFeedCore.config.composeConfig.enableTagging,
+                      taggingEnabled:
+                          LMFeedCore.config.composeConfig.enableTagging,
+                      enabled: !isGuestUser && right,
                       style: LMTaggingAheadTextFieldStyle(
                         maxLines: _style?.maxLines,
                         textStyle: _style?.textStyle ??
@@ -240,6 +243,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   }
 
   LMFeedButton? _defCreateButton() {
+    final bool isGuestUser = LMFeedUserUtils.isGuestUser();
     return !right
         ? null
         : LMFeedButton(
@@ -256,7 +260,9 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                   fontSize: feedTheme
                           .textFieldStyle.decoration?.hintStyle?.fontSize ??
                       13,
-                  color: feedTheme.primaryColor,
+                  color: isGuestUser
+                      ? feedTheme.inActiveColor
+                      : feedTheme.primaryColor,
                 ),
               ),
             ),

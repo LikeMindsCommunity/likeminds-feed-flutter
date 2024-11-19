@@ -4,7 +4,7 @@ void _handleSubmitCommentButtonAction(LMFeedSubmitCommentEvent event, emit) {
   // check if the user is a guest user
   if (LMFeedUserUtils.isGuestUser()) {
     event.commentController.clear();
-    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call();
+    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(event.context);
     return;
   }
   final commentBloc = LMFeedCommentBloc.instance;
