@@ -201,7 +201,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
     likeButtonStyle: LMFeedButtonStyle.like(
       primaryColor: qNaPrimaryColor,
     ).copyWith(
-      margin: 4.0,
+      gap: 4.0,
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
         assetPath: qNaAssetLikeIcon,
@@ -221,7 +221,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
       padding: EdgeInsets.zero,
     ),
     commentButtonStyle: LMFeedButtonStyle.comment().copyWith(
-      margin: 4.0,
+      gap: 4.0,
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
         assetPath: qNaAssetCommentIcon,
@@ -234,7 +234,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
       padding: EdgeInsets.zero,
     ),
     shareButtonStyle: LMFeedButtonStyle.share().copyWith(
-      margin: 4.0,
+      gap: 4.0,
       showText: true,
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
@@ -248,7 +248,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
     ),
     saveButtonStyle: LMFeedButtonStyle.save().copyWith(
       showText: false,
-      margin: 4.0,
+      gap: 4.0,
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
         assetPath: qNaAssetSaveIcon,
@@ -332,7 +332,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
     likeButtonStyle: LMFeedButtonStyle.like(
       primaryColor: qNaPrimaryColor,
     ).copyWith(
-      margin: 4.0,
+      gap: 4.0,
       textPadding: const EdgeInsets.only(right: 10),
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
@@ -354,7 +354,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
       padding: EdgeInsets.zero,
     ),
     replyButtonStyle: LMFeedButtonStyle.comment().copyWith(
-      margin: 4.0,
+      gap: 4.0,
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
         assetPath: qNaAssetCommentIcon,
@@ -386,7 +386,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
     likeButtonStyle: LMFeedButtonStyle.like(
       primaryColor: qNaPrimaryColor,
     ).copyWith(
-      margin: 4,
+      gap: 4,
       textPadding: const EdgeInsets.only(right: 10),
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
@@ -408,7 +408,7 @@ LMFeedThemeData qNaTheme = LMFeedThemeData.light(
       padding: EdgeInsets.zero,
     ),
     replyButtonStyle: LMFeedButtonStyle.comment().copyWith(
-      margin: 4,
+      gap: 4,
       icon: LMFeedIcon(
         type: LMFeedIconType.svg,
         assetPath: qNaAssetCommentIcon,

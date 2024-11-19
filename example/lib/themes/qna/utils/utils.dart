@@ -17,7 +17,7 @@ Either context or navigator key must be
     }
     LMFeedVideoProvider.instance.pauseCurrentVideo();
 
-    LMFeedQnAWidgets qNaFeedWidgets = LMFeedQnAWidgets.instance;
+    LMFeedQnAWidgetsExample qNaFeedWidgets = LMFeedQnAWidgetsExample.instance;
 
     MaterialPageRoute route = MaterialPageRoute(
       builder: (context) => LMFeedPostDetailScreen(

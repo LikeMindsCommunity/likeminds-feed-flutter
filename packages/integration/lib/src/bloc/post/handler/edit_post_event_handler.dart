@@ -130,6 +130,7 @@ Future<void> editPost(
       emit(
         LMFeedNewPostErrorState(
           errorMessage: response.errorMessage!,
+          tempId: event.tempId,
         ),
       );
     }
@@ -138,8 +139,9 @@ Future<void> editPost(
     LMFeedPersistence.instance.handleException(err, stacktrace);
     // Emit [LMFeedNewPostErrorState] with the error message
     emit(
-      const LMFeedNewPostErrorState(
+      LMFeedNewPostErrorState(
         errorMessage: 'An error occurred while saving the post',
+        tempId: event.tempId,
       ),
     );
   }
@@ -260,6 +262,7 @@ Future<void> editPendingPost(
       emit(
         LMFeedNewPostErrorState(
           errorMessage: response.errorMessage!,
+          tempId: event.tempId,
         ),
       );
     }
@@ -268,8 +271,9 @@ Future<void> editPendingPost(
     LMFeedPersistence.instance.handleException(err, stacktrace);
     // Emit [LMFeedNewPostErrorState] with the error message
     emit(
-      const LMFeedNewPostErrorState(
+      LMFeedNewPostErrorState(
         errorMessage: 'An error occurred while saving the post',
+        tempId: event.tempId,
       ),
     );
   }

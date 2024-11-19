@@ -18,6 +18,12 @@ class LMFeedPostUtils {
     return LMFeedPluralize.instance.pluralizeOrCapitalize(commentTitle, action);
   }
 
+  static String getLikeTitle(LMFeedPluralizeWordAction action) {
+    String likeTitle = LMFeedLocalPreference.instance.getLikeVariable();
+
+    return LMFeedPluralize.instance.pluralizeOrCapitalize(likeTitle, action);
+  }
+
   static void handlePostPinAction(LMPostViewData postViewData) async {
     LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(
       postId: postViewData.id,
@@ -175,18 +181,15 @@ class LMFeedPostUtils {
 
   static String getLikeCountText(int likes) {
     if (likes == 1) {
-      return 'Like';
+      return getLikeTitle(LMFeedPluralizeWordAction.firstLetterCapitalSingular);
     } else {
-      return 'Likes';
+      return getLikeTitle(LMFeedPluralizeWordAction.firstLetterCapitalPlural);
     }
   }
 
   static String getLikeCountTextWithCount(int likes) {
-    if (likes == 1) {
-      return '$likes Like';
-    } else {
-      return '$likes Likes';
-    }
+    String likeText = getLikeCountText(likes);
+    return '$likes $likeText';
   }
 
   static String getCommentCountText(int comment) {

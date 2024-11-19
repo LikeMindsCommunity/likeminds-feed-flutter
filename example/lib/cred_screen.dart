@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:likeminds_feed_sample/builder/example_widget_utility.dart';
 import 'package:likeminds_feed_sample/globals.dart';
-import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
 import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
 import 'package:likeminds_feed_sample/themes/social/screens/tab_screen.dart';
@@ -10,11 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/themes/social_dark/likeminds_feed_nova_fl.dart';
 import 'package:likeminds_feed_sample/themes/social_feedroom/koshiqa_theme.dart';
 import 'package:likeminds_feed_sample/themes/social_feedroom/likeminds_feed_flutter_koshiqa.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
-const _isProd = !bool.fromEnvironment('DEBUG');
 
 class CredScreen extends StatefulWidget {
   const CredScreen({super.key});
@@ -218,6 +216,19 @@ class _CredScreenState extends State<CredScreen> {
               ),
               const SizedBox(height: 36),
               ElevatedButton(
+                onPressed: () {
+                  _onSubmit(true);
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  fixedSize: const Size(200, 45),
+                ),
+                child: const Text('Guest Login'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
                 onPressed: _onSubmit,
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -229,9 +240,14 @@ class _CredScreenState extends State<CredScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                  onPressed: () {
-                    LMFeedLocalPreference.instance.clearCache();
-
+                  onPressed: () async {
+                    // logout the user if already logged in
+                    // if the user is not logged in,
+                    // clear the cache manually
+                    final response = await LMFeedCore.instance.logout();
+                    if (!response.success) {
+                      LMFeedLocalPreference.instance.clearCache();
+                    }
                     _usernameController.clear();
                     _uuidController.clear();
                     _apiKeyController.clear();
@@ -261,7 +277,7 @@ class _CredScreenState extends State<CredScreen> {
     );
   }
 
-  void _onSubmit() async {
+  void _onSubmit([bool? isGuest]) async {
     String uuid = _uuidController.text;
     String userName = _usernameController.text;
     String apiKey = _apiKeyController.text;
@@ -270,7 +286,7 @@ class _CredScreenState extends State<CredScreen> {
       _showSnackBar("API Key cannot be empty");
       return;
     }
-    if ((userName.isEmpty && uuid.isEmpty)) {
+    if ((userName.isEmpty && uuid.isEmpty && !(isGuest ?? false))) {
       _showSnackBar("Username and User ID both cannot be empty");
       return;
     }
@@ -286,6 +302,7 @@ class _CredScreenState extends State<CredScreen> {
       apiKey: apiKey,
       uuid: uuid,
       userName: userName,
+      isGuest: isGuest ?? false,
     );
     if (!response.success) {
       _showSnackBar(response.errorMessage ?? "An error occurred");
@@ -333,7 +350,7 @@ class _CredScreenState extends State<CredScreen> {
         {
           return ExampleTabScreen(
             uuid: uuid,
-            feedWidget: const LMFeedScreen(),
+            feedWidget: const LMFeedSocialScreen(),
           );
         }
       case LMFeedFlavor.socialFeedRoom:
@@ -354,7 +371,7 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.qna:
         {
-          return const LMFeedQnA();
+          return const LMFeedQnAScreen();
         }
       case LMFeedFlavor.socialDark:
         {
@@ -382,33 +399,15 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.qna:
         {
-          LMFeedCore.theme = qNaTheme;
           LMFeedCore.config = LMFeedConfig(
-            composeConfig: const LMFeedComposeScreenConfig(
-              topicRequiredToCreatePost: true,
-              showMediaCount: false,
-              enableTagging: false,
-              enableDocuments: false,
-              enableHeading: true,
-              headingRequiredToCreatePost: true,
-              userDisplayType: LMFeedComposeUserDisplayType.tile,
-              composeHint: "Mention details here to make the post rich",
-            ),
-            feedScreenConfig: const LMFeedScreenConfig(
-              enableTopicFiltering: false,
-            ),
-            postDetailConfig: const LMPostDetailScreenConfig(
-                commentTextFieldHint: "Write your response"),
+            feedThemeType: LMFeedThemeType.qna,
           );
-          LMFeedCore.widgetUtility = LMFeedQnAWidgets.instance;
-          LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
         }
         break;
       case LMFeedFlavor.socialDark:
         {
           LMFeedCore.theme = darkTheme;
           LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
-          LMFeedCore.config = LMFeedConfig();
           break;
         }
     }

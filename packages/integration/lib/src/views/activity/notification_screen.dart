@@ -263,6 +263,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
           _notificationsBloc?.add(
             LMFeedMarkNotificationAsReadEvent(
               activityId: item.id,
+              context: context,
             ),
           );
         }

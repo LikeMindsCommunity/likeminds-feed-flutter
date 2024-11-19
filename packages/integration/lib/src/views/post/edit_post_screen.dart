@@ -52,7 +52,8 @@ class LMFeedEditPostScreen extends StatefulWidget {
           BuildContext context, Widget topicSelector, List<LMTopicViewData>)?
       composeTopicSelectorBuilder;
   final Widget Function()? composeMediaPreviewBuilder;
-  final Widget Function(BuildContext context, LMUserViewData user)?
+  final Widget Function(
+          BuildContext context, LMUserViewData user, LMFeedUserTile userTile)?
       composeUserHeaderBuilder;
   final String? postId;
   final String? pendingPostId;
@@ -90,6 +91,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   String? result;
   Size? screenSize;
   double? screenWidth;
+  bool enableHeading = false;
+  bool headingRequired = false;
   // bool to check if the user has tapped on the cancel icon
   // of link preview, in that case toggle the bool to true
   // and don't generate link preview any further
@@ -113,9 +116,13 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     // If the widget does not have a config, then set the config
     // from the core
     config = widget.config ?? LMFeedCore.config.composeConfig;
-    // Set the heading controller if the config allows it
-    _headingController =
-        (config?.enableHeading ?? false) ? TextEditingController() : null;
+    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? true
+        : config?.enableHeading ?? false;
+    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        ? true
+        : config?.headingRequiredToCreatePost ?? false;
+    _headingController = enableHeading ? TextEditingController() : null;
     // Populate the screen with the post details
     // heading controller with heading
     // text controller with post text
@@ -141,7 +148,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
     composeBloc.selectedTopics = postViewData.topics;
     // Open the on screen keyboard
-    if (_headingController != null && config?.enableHeading == true) {
+    if (_headingController != null && enableHeading == true) {
       _headingFocusNode = FocusNode();
       _headingFocusNode?.requestFocus();
     } else if (_focusNode.canRequestFocus) {
@@ -387,6 +394,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         child: Align(
                           alignment: Alignment.topCenter,
                           child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                             color: kIsWeb ? feedTheme.container : null,
                             width: screenWidth,
                             margin: EdgeInsets.only(
@@ -396,12 +405,14 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                               child: Column(
                                 children: [
                                   const SizedBox(height: 18),
-                                  widget.composeUserHeaderBuilder
-                                          ?.call(context, user!) ??
+                                  widget.composeUserHeaderBuilder?.call(context,
+                                          user!, LMFeedUserTile(user: user!)) ??
                                       widgetUtility
                                           .composeScreenUserHeaderBuilder(
-                                              context, user!),
-                                  const SizedBox(height: 18),
+                                        context,
+                                        user!,
+                                        LMFeedUserTile(user: user!),
+                                      ),
                                   widget.composeContentBuilder?.call() ??
                                       _defContentInput(),
                                   const SizedBox(height: 18),
@@ -746,8 +757,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     return LMFeedAppBar(
         style: LMFeedAppBarStyle(
           backgroundColor: feedTheme.container,
-          height: 72,
-          centerTitle: true,
+          height: 60,
           padding: const EdgeInsets.symmetric(
             horizontal: 18.0,
             vertical: 8.0,
@@ -761,24 +771,32 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           ],
         ),
         leading: LMFeedButton(
-          text: LMFeedText(
-            text: "Cancel",
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(color: theme.primaryColor),
-            ),
-          ),
+          // Defining the button's tap behavior
           onTap: () {
+            // If a custom discard dialog is provided, show it
+            // Otherwise, show the default discard dialog
             widget.composeDiscardDialogBuilder?.call(context) ??
                 _showDefaultDiscardDialog(context);
           },
-          style: const LMFeedButtonStyle(),
+          // Applying additional style properties
+          style: LMFeedButtonStyle(
+            gap: 20.0,
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.arrow_back,
+              style: LMFeedIconStyle(
+                size: 28,
+                color: feedTheme.onContainer,
+              ),
+            ),
+          ),
         ),
         title: LMFeedText(
           text: "Edit $postTitleFirstCap",
           style: LMFeedTextStyle(
             textStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
               color: theme.onContainer,
             ),
           ),
@@ -786,20 +804,19 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
         trailing: [
           LMFeedButton(
             text: LMFeedText(
-              text: "Save",
+              text: "SAVE",
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
-                  color: theme.onPrimary,
-                  fontSize: 14,
+                  color: theme.primaryColor,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             style: LMFeedButtonStyle(
-              backgroundColor: theme.primaryColor,
-              width: 48,
-              borderRadius: 6,
-              height: 34,
+              height: 34, // Button height
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
             ),
             onTap: () async {
               // Close the on screen keyboard if it is open
@@ -819,8 +836,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   ...composeBloc.selectedTopics
                 ];
 
-                if (config!.enableHeading &&
-                    config!.headingRequiredToCreatePost &&
+                if (enableHeading &&
+                    headingRequired &&
                     (heading == null || heading.isEmpty)) {
                   LMFeedCore.showSnackBar(
                     context,
@@ -878,12 +895,12 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
                 LMFeedPostBloc.instance.add(
                   LMFeedEditPostEvent(
-                    postId: widget.postId,
-                    pendingPostId: widget.pendingPostId,
-                    postText: result!,
-                    selectedTopics: selectedTopics,
-                    heading: _headingController?.text,
-                  ),
+                      postId: widget.postId,
+                      pendingPostId: widget.pendingPostId,
+                      postText: result!,
+                      selectedTopics: selectedTopics,
+                      heading: _headingController?.text,
+                      tempId: postViewData?.tempId ?? ''),
                 );
 
                 Navigator.pop(context);
@@ -908,35 +925,13 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
       ),
       child: Column(
         children: [
-          (config?.enableHeading ?? false)
-              ? TextField(
-                  focusNode: _headingFocusNode,
-                  controller: _headingController,
-                  textCapitalization: TextCapitalization.sentences,
-                  cursorColor: feedTheme.primaryColor,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    hintText: config?.headingHint,
-                    hintStyle: TextStyle(
-                      color: theme.onContainer.withOpacity(0.5),
-                    ),
-                  ),
-                  style: TextStyle(
-                    color: theme.onContainer,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                )
+          (enableHeading)
+              ? _defHeadingTextfield(theme)
               : const SizedBox.shrink(),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              !(config?.enableHeading ?? false)
+              !(enableHeading)
                   ? Container(
                       padding: const EdgeInsets.only(top: 4.0),
                       margin: const EdgeInsets.only(right: 12),
@@ -971,7 +966,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                         ),
                         minLines: 3,
                       ),
-                      enabled: config!.enableTagging,
+                      taggingEnabled: config!.enableTagging,
                       userTags: composeBloc.userTags,
                       onTagSelected: (tag) {
                         composeBloc.userTags.add(tag);
@@ -999,6 +994,59 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  TextField _defHeadingTextfield(LMFeedThemeData theme) {
+    return TextField(
+      focusNode: _headingFocusNode,
+      controller: _headingController,
+      textCapitalization: TextCapitalization.sentences,
+      maxLength: 200,
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        border: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        errorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        disabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        focusedErrorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(
+            color: theme.inActiveColor,
+          ),
+        ),
+        hintText: config?.headingHint,
+        hintStyle: TextStyle(
+          color: theme.onContainer.withOpacity(0.5),
+          overflow: TextOverflow.visible,
+        ),
+      ),
+      cursorColor: theme.primaryColor,
+      style: TextStyle(
+        color: theme.onContainer,
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
       ),
     );
   }
@@ -1134,7 +1182,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   }
 
   Widget _defTopicSelector(List<LMTopicViewData> topics) {
-    if (!config!.enableTopics) {
+    if (!config!.enableTopics || topics.isEmpty) {
       return const SizedBox.shrink();
     }
 

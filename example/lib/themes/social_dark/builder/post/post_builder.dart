@@ -55,7 +55,7 @@ Widget novaPostBuilder(BuildContext context, LMFeedPostWidget postWidget,
           children: [
             footerWidget.likeButton!.copyWith(
                 style: footerWidget.likeButton!.style?.copyWith(
-                  margin: 8,
+                  gap: 8,
                 ),
                 text: LMFeedText(
                   text: footerData.likeCount.toString(),
@@ -66,7 +66,7 @@ Widget novaPostBuilder(BuildContext context, LMFeedPostWidget postWidget,
             const SizedBox(width: 8),
             footerWidget.commentButton!.copyWith(
                 style: footerWidget.commentButton!.style?.copyWith(
-                  margin: 8,
+                  gap: 8,
                 ),
                 text: LMFeedText(
                   text: footerData.commentCount.toString(),

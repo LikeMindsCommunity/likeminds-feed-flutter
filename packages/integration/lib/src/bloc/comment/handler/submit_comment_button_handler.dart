@@ -1,6 +1,12 @@
 part of '../comment_bloc.dart';
 
 void _handleSubmitCommentButtonAction(LMFeedSubmitCommentEvent event, emit) {
+  // check if the user is a guest user
+  if (LMFeedUserUtils.isGuestUser()) {
+    event.commentController.clear();
+    LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(event.context);
+    return;
+  }
   final commentBloc = LMFeedCommentBloc.instance;
   final userTags = commentBloc.userTags;
   bool isEditing = commentBloc.state is LMFeedEditingCommentState;

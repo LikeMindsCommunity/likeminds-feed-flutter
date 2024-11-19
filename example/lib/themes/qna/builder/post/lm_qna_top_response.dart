@@ -3,22 +3,22 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/theme/theme.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/utils.dart';
 
-class LMQnATopResponseWidget extends StatefulWidget {
+class LMQnATopResponseWidgetExample extends StatefulWidget {
   final List<LMCommentViewData> topResponses;
   final LMPostViewData postViewData;
   final LMFeedThemeData feedThemeData;
 
-  const LMQnATopResponseWidget(
+  const LMQnATopResponseWidgetExample(
       {super.key,
       required this.feedThemeData,
       required this.postViewData,
       required this.topResponses});
 
   @override
-  State<LMQnATopResponseWidget> createState() => _LMQnATopResponseWidgetState();
+  State<LMQnATopResponseWidgetExample> createState() => _LMQnATopResponseWidgetExampleState();
 }
 
-class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
+class _LMQnATopResponseWidgetExampleState extends State<LMQnATopResponseWidgetExample> {
   LMCommentViewData? commentViewData;
   LMPostViewData? postViewData;
   LMUserViewData? commentCreator;
@@ -37,7 +37,7 @@ class _LMQnATopResponseWidgetState extends State<LMQnATopResponseWidget> {
   }
 
   @override
-  void didUpdateWidget(covariant LMQnATopResponseWidget oldWidget) {
+  void didUpdateWidget(covariant LMQnATopResponseWidgetExample oldWidget) {
     super.didUpdateWidget(oldWidget);
     commentViewData = widget.topResponses.first;
     postViewData = widget.postViewData;
