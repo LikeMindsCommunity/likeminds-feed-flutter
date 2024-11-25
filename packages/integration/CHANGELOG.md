@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.12.1]
+- Added support for flutter version 3.24.5
+
 ## [1.12.0]
 - Added support for QnA Feed theme
 - Added support for Guest Flow
