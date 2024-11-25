@@ -1,7 +1,7 @@
 # Changelog
 
 ## [1.12.1]
-- Patch update for `likeminds_feed_flutter_core`
+- Added support for flutter version 3.24.5
 
 ## [1.12.0]
 - Added support for QnA Feed theme
