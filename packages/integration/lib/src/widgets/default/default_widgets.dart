@@ -50,7 +50,7 @@ class LMFeedDefaultWidgets {
       post: post,
       topics: post.topics,
       user: post.user,
-      isFeed: false,
+      isFeed: source != LMFeedWidgetSource.postDetailScreen,
       onTagTap: (String uuid) {
         LMFeedProfileBloc.instance.add(
           LMFeedRouteToUserProfileEvent(
@@ -146,6 +146,9 @@ class LMFeedDefaultWidgets {
       style: feedThemeData.contentStyle,
       text: post.text,
       heading: post.heading,
+      // check if the source is post detail screen
+      // to show the full content
+      expanded: source == LMFeedWidgetSource.postDetailScreen,
     );
   }
 
@@ -189,7 +192,8 @@ class LMFeedDefaultWidgets {
       LMPostViewData postViewData, LMFeedWidgetSource source) {
     return LMFeedPostHeader(
       user: postViewData.user,
-      isFeed: true,
+      // check if the source is not the post detail screen
+      isFeed: source != LMFeedWidgetSource.postDetailScreen,
       postViewData: postViewData,
       postHeaderStyle: feedThemeData.headerStyle,
       createdAt: LMFeedText(
@@ -624,7 +628,8 @@ class LMFeedDefaultWidgets {
         onTap: () async {
           // check if the user is a guest user
           if (LMFeedUserUtils.isGuestUser()) {
-            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                ?.call(context);
             return;
           }
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(

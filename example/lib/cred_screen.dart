@@ -1,16 +1,13 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
-import 'package:likeminds_feed_sample/builder/example_widget_utility.dart';
 import 'package:likeminds_feed_sample/globals.dart';
-import 'package:likeminds_feed_sample/themes/qna/lm_feed_qna.dart';
-import 'package:likeminds_feed_sample/themes/qna/utils/index.dart';
 import 'package:likeminds_feed_sample/themes/social/screens/tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_sample/themes/social_dark/likeminds_feed_nova_fl.dart';
 import 'package:likeminds_feed_sample/themes/social_feedroom/koshiqa_theme.dart';
 import 'package:likeminds_feed_sample/themes/social_feedroom/likeminds_feed_flutter_koshiqa.dart';
-import 'package:uni_links/uni_links.dart';
 
 bool initialURILinkHandled = false;
 
@@ -54,7 +51,7 @@ class _CredScreenState extends State<CredScreen> {
 
   Future initUniLinks(BuildContext context) async {
     // Get the initial deep link if the app was launched with one
-    final initialLink = await getInitialLink();
+    final initialLink = await AppLinks().getInitialLinkString();
     if (initialLink == null) {
       return;
     }
