@@ -9,12 +9,31 @@ class LMFeedActivityWidget extends StatefulWidget {
     this.postWidgetBuilder,
     this.commentWidgetBuilder,
     this.appBarBuilder,
+    this.maxActivityCount = 3,
   });
   final String uuid;
-
   final LMFeedPostWidgetBuilder? postWidgetBuilder;
   final LMFeedPostCommentBuilder? commentWidgetBuilder;
   final LMFeedPostAppBarBuilder? appBarBuilder;
+  final int maxActivityCount;
+
+  LMFeedActivityWidget copyWith({
+    Key? key,
+    String? uuid,
+    LMFeedPostWidgetBuilder? postWidgetBuilder,
+    LMFeedPostCommentBuilder? commentWidgetBuilder,
+    LMFeedPostAppBarBuilder? appBarBuilder,
+    int? maxActivityCount,
+  }) {
+    return LMFeedActivityWidget(
+      key: key ?? this.key,
+      uuid: uuid ?? this.uuid,
+      postWidgetBuilder: postWidgetBuilder ?? this.postWidgetBuilder,
+      commentWidgetBuilder: commentWidgetBuilder ?? this.commentWidgetBuilder,
+      appBarBuilder: appBarBuilder ?? this.appBarBuilder,
+      maxActivityCount: maxActivityCount ?? this.maxActivityCount,
+    );
+  }
 
   @override
   State<LMFeedActivityWidget> createState() => _LMFeedActivityWidgetState();
@@ -34,7 +53,7 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
     final activityRequest = (GetUserActivityRequestBuilder()
           ..uuid(widget.uuid)
           ..page(1)
-          ..pageSize(10))
+          ..pageSize(widget.maxActivityCount))
         .build();
     _activityResponse = LMFeedCore.client.getUserActivity(activityRequest);
   }
@@ -67,9 +86,7 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
                             shrinkWrap: true,
                             padding: EdgeInsets.zero,
                             physics: const NeverScrollableScrollPhysics(),
-                            itemCount: activityResponse.activities!.length <= 3
-                                ? activityResponse.activities?.length
-                                : 3,
+                            itemCount: activityResponse.activities?.length ?? 0,
                             itemBuilder: (context, index) {
                               final activity =
                                   activityResponse.activities![index];

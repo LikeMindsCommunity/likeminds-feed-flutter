@@ -19,8 +19,7 @@ export 'report/report_bottom_sheet.dart';
 export 'report/report_screen.dart';
 
 export 'activity/activity_screen.dart';
-export 'activity/user_activity_screen.dart';
-export 'activity/notification_screen.dart';
+export 'notification/notification_screen.dart';
 
 export 'search/search_screen.dart';
 export 'media/media_preview_screen.dart';
