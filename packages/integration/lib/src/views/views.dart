@@ -13,7 +13,6 @@ export 'feed/qna/qna_personalised_feed.dart';
 
 // legacy feed
 export 'feed/feed_screen.dart';
-
 export 'feed/topic_select_screen.dart';
 
 export 'report/report_bottom_sheet.dart';
