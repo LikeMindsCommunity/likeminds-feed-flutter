@@ -19,6 +19,7 @@ import 'package:likeminds_feed_flutter_core/src/views/views.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:media_kit/media_kit.dart';
 import 'dart:async';
+import 'package:likeminds_feed_flutter_core/src/core/core.dart';
 
 export 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 export 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
@@ -38,6 +39,7 @@ export 'package:likeminds_feed_flutter_core/src/widgets/default/default_widgets.
 export 'package:likeminds_feed_flutter_core/src/widgets/feed/top_response.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/feed/add_comment.dart';
 export 'package:likeminds_feed_flutter_core/src/widgets/feed/qna_footer.dart';
+export 'package:likeminds_feed_flutter_core/src/core/core.dart';
 
 /// {@template lm_feed_core}
 /// This class is the core of the feed.
