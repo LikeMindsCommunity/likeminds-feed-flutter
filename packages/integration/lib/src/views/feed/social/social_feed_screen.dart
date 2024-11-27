@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-part '../feed_screen_configuration.dart';
 
 class LMFeedSocialScreen extends StatefulWidget {
   const LMFeedSocialScreen({
@@ -66,7 +64,7 @@ class LMFeedSocialScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? config;
 
   @override
   State<LMFeedSocialScreen> createState() => _LMFeedSocialScreenState();
@@ -101,7 +99,7 @@ class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       topicBarBuilder: widget.topicBarBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      config: widget.config,
+      feedSettings: widget.config,
     );
   }
 
@@ -120,7 +118,7 @@ class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
       firstPageErrorIndicatorBuilder: widget.firstPageErrorIndicatorBuilder,
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      config: widget.config,
+      feedScreenSettings: widget.config,
     );
   }
 }

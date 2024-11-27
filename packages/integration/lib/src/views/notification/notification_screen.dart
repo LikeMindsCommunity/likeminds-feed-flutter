@@ -46,7 +46,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
 
   int _page = 1;
   LMFeedThemeData _theme = LMFeedCore.theme;
-  LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate _widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.notificationScreen;
   LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
 
@@ -97,7 +97,7 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(screenSize!.width, LMFeedCore.webConfiguration.maxWidth);
+    screenWidth = min(screenSize!.width, LMFeedCore.config.webConfiguration.maxWidth);
     return _widgetUtility.scaffold(
       source: _widgetSource,
       backgroundColor: _theme.container,

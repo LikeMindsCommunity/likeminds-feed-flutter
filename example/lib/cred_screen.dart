@@ -382,16 +382,12 @@ class _CredScreenState extends State<CredScreen> {
       case LMFeedFlavor.social:
         {
           LMFeedCore.theme = LMFeedThemeData.light();
-          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
-          LMFeedCore.config = LMFeedConfig();
           break;
         }
 
       case LMFeedFlavor.socialFeedRoom:
         {
           LMFeedCore.theme = koshiqaTheme;
-          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
-          LMFeedCore.config = LMFeedConfig();
           break;
         }
       case LMFeedFlavor.qna:
@@ -404,7 +400,6 @@ class _CredScreenState extends State<CredScreen> {
       case LMFeedFlavor.socialDark:
         {
           LMFeedCore.theme = darkTheme;
-          LMFeedCore.widgetUtility = LMFeedWidgetUtility.instance;
           break;
         }
     }

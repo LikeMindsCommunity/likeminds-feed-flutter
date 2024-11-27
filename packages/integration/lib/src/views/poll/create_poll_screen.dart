@@ -43,7 +43,7 @@ class LMFeedCreatePollScreen extends StatefulWidget {
 class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
   late Size screenSize;
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
   LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   List<String> options = ["", ""];
   final ValueNotifier<bool> _optionBuilder = ValueNotifier(false);
@@ -219,7 +219,7 @@ class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+          width: min(screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
           child: SingleChildScrollView(
             child: Column(
               children: [

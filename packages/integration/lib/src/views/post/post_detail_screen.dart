@@ -108,7 +108,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   late Size screenSize;
   late bool isDesktopWeb;
 
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
   String postTitleSmallCap =
@@ -124,7 +124,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       LMFeedPluralizeWordAction.allSmallSingular);
 
   final LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
-  final LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
+  final LMFeedWidgetBuilderDelegate _widgetBuilder = LMFeedCore.config.widgetBuilderDelegate;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
   String? commentIdReplyId;

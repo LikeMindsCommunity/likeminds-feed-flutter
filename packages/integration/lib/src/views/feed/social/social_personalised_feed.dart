@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/pending_post/pending_posts_screen.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 /// {@template lm_feed_social_personalised_screen}
@@ -25,7 +26,7 @@ class LMFeedSocialPersonalisedScreen extends StatefulWidget {
     this.customWidgetBuilder,
     this.postBuilder,
     this.floatingActionButtonBuilder,
-    this.config,
+    this.feedScreenSettings,
     this.floatingActionButtonLocation,
     this.noItemsFoundIndicatorBuilder,
     this.firstPageProgressIndicatorBuilder,
@@ -67,7 +68,7 @@ class LMFeedSocialPersonalisedScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? feedScreenSettings;
 
   @override
   State<LMFeedSocialPersonalisedScreen> createState() =>
@@ -87,7 +88,7 @@ class LMFeedSocialPersonalisedScreen extends StatefulWidget {
     Widget Function(BuildContext context, int noOfPendingPost)?
         pendingPostBannerBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenConfig? config,
+    LMFeedScreenSetting? config,
   }) {
     return LMFeedSocialPersonalisedScreen(
       appBar: appBar ?? this.appBar,
@@ -111,7 +112,7 @@ class LMFeedSocialPersonalisedScreen extends StatefulWidget {
           pendingPostBannerBuilder ?? this.pendingPostBannerBuilder,
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
-      config: config ?? this.config,
+      feedScreenSettings: config ?? this.feedScreenSettings,
     );
   }
 }
@@ -145,10 +146,10 @@ class _LMFeedSocialPersonalisedScreenState
 
   // Create an instance of LMFeedScreenBuilderDelegate
   LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
+      LMFeedCore.config.feedScreenConfig.builder;
 
   LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+     LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -156,8 +157,8 @@ class _LMFeedSocialPersonalisedScreenState
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetUtility
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  // Create an instance of LMFeedWidgetBuilderDelegate
+  LMFeedWidgetBuilderDelegate _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
 
   // Set the widget source to personalised feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.personalisedFeed;
@@ -169,8 +170,8 @@ class _LMFeedSocialPersonalisedScreenState
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenConfig? config;
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedScreenSetting? feedScreenSettings;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
@@ -232,7 +233,7 @@ class _LMFeedSocialPersonalisedScreenState
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
+    feedScreenSettings = widget.feedScreenSettings ?? LMFeedCore.config.feedScreenConfig.setting;
 
     getUserFeedMeta = getUserFeedMetaFuture();
 
@@ -401,7 +402,7 @@ class _LMFeedSocialPersonalisedScreenState
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(LMFeedCore.webConfiguration.maxWidth,
+          width: min(LMFeedCore.config.webConfiguration.maxWidth,
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
@@ -454,7 +455,7 @@ class _LMFeedSocialPersonalisedScreenState
                       }),
                 ),
                 SliverToBoxAdapter(
-                  child: config!.showCustomWidget
+                  child: feedScreenSettings!.showCustomWidget
                       ? widget.customWidgetBuilder?.call(
                               context, _defPostSomeThingWidget(context)) ??
                           _defPostSomeThingWidget(context)
@@ -822,7 +823,7 @@ class _LMFeedSocialPersonalisedScreenState
             ),
           ),
         ),
-        if (config?.showNotificationFeedIcon ?? true)
+        if (feedScreenSettings?.showNotificationFeedIcon ?? true)
           LMFeedButton(
             onTap: () {
               // check if the user is a guest user

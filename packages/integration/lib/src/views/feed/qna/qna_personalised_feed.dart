@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/pending_post/pending_posts_screen.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 /// {@template lm_feed_qna_personalised_screen}
@@ -67,7 +68,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? config;
 
   @override
   State<LMFeedQnAPersonalisedScreen> createState() =>
@@ -87,7 +88,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
     Widget Function(BuildContext context, int noOfPendingPost)?
         pendingPostBannerBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenConfig? config,
+    LMFeedScreenSetting? config,
   }) {
     return LMFeedQnAPersonalisedScreen(
       appBar: appBar ?? this.appBar,
@@ -145,10 +146,10 @@ class _LMFeedQnAPersonalisedScreenState
 
   // Create an instance of LMFeedScreenBuilderDelegate
   LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
+      LMFeedCore.config.feedScreenConfig.builder;
 
   LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+      LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -156,8 +157,9 @@ class _LMFeedQnAPersonalisedScreenState
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetUtility
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  // Create an instance of LMFeedWidgetBuilderDelegate
+  LMFeedWidgetBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.widgetBuilderDelegate;
 
   // Set the widget source to personalised feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.personalisedFeed;
@@ -169,8 +171,8 @@ class _LMFeedQnAPersonalisedScreenState
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenConfig? config;
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedScreenSetting? feedScreenSettings;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
@@ -232,7 +234,8 @@ class _LMFeedQnAPersonalisedScreenState
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
+    feedScreenSettings =
+        widget.config ?? LMFeedCore.config.feedScreenConfig.setting;
 
     getUserFeedMeta = getUserFeedMetaFuture();
 
@@ -401,7 +404,7 @@ class _LMFeedQnAPersonalisedScreenState
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(LMFeedCore.webConfiguration.maxWidth,
+          width: min(LMFeedCore.config.webConfiguration.maxWidth,
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
@@ -454,7 +457,7 @@ class _LMFeedQnAPersonalisedScreenState
                       }),
                 ),
                 SliverToBoxAdapter(
-                  child: config!.showCustomWidget
+                  child: feedScreenSettings!.showCustomWidget
                       ? widget.customWidgetBuilder?.call(
                               context, _defPostSomeThingWidget(context)) ??
                           _defPostSomeThingWidget(context)
@@ -791,7 +794,8 @@ class _LMFeedQnAPersonalisedScreenState
           onTap: () {
             // check if the user is a guest user
             if (LMFeedUserUtils.isGuestUser()) {
-              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                  ?.call(context);
               return;
             }
             Navigator.push(
@@ -821,12 +825,13 @@ class _LMFeedQnAPersonalisedScreenState
             ),
           ),
         ),
-        if (config?.showNotificationFeedIcon ?? true)
+        if (feedScreenSettings?.showNotificationFeedIcon ?? true)
           LMFeedButton(
             onTap: () {
               // check if the user is a guest user
               if (LMFeedUserUtils.isGuestUser()) {
-                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                    ?.call(context);
                 return;
               }
               Navigator.push(

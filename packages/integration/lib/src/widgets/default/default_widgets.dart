@@ -9,7 +9,7 @@ class LMFeedDefaultWidgets {
   final feedThemeData = LMFeedCore.theme;
   final _feedBloc = LMFeedUniversalBloc.instance;
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
-  final _widgetsBuilder = LMFeedCore.widgetUtility;
+  final _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
   final newPostBloc = LMFeedPostBloc.instance;
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
   final userPostingRights = LMFeedUserUtils.checkPostCreationRights();
@@ -288,7 +288,7 @@ class LMFeedDefaultWidgets {
       postId: post.id,
       style: feedThemeData.mediaStyle,
       carouselIndicatorBuilder:
-          LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
+          LMFeedCore.config.widgetBuilderDelegate.postMediaCarouselIndicatorBuilder,
       imageBuilder: _widgetsBuilder.imageBuilder,
       videoBuilder: _widgetsBuilder.videoBuilder,
       pollBuilder: _widgetsBuilder.pollWidgetBuilder,

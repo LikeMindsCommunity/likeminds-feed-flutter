@@ -257,7 +257,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
-  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate widgetBuilder =
+      LMFeedCore.config.widgetBuilderDelegate;
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.createPostScreen;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
@@ -389,7 +390,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
+    screenWidth =
+        min(LMFeedCore.config.webConfiguration.maxWidth, screenSize!.width);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: config!.composeSystemOverlayStyle,
@@ -398,7 +400,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
         child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
           bloc: composeBloc,
           listener: _composeBlocListener,
-          child: widgetUtility.scaffold(
+          child: widgetBuilder.scaffold(
             source: LMFeedWidgetSource.createPostScreen,
             backgroundColor: feedTheme.container,
             bottomSheet: _defMediaPicker(),
@@ -410,7 +412,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   _defCancelButton(),
                   onPostValidationFailed,
                 ) ??
-                widgetUtility.composeScreenAppBar(
+                widgetBuilder.composeScreenAppBar(
                   context,
                   _defAppBar(),
                   onPostCreate,
@@ -443,11 +445,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                             context,
                             _defTopicSelector(state.topics),
                             composeBloc.selectedTopics) ??
-                        LMFeedCore.widgetUtility
-                            .composeScreenTopicSelectorBuilder(
-                                context,
-                                _defTopicSelector(state.topics),
-                                composeBloc.selectedTopics);
+                        widgetBuilder.composeScreenTopicSelectorBuilder(
+                            context,
+                            _defTopicSelector(state.topics),
+                            composeBloc.selectedTopics);
                   }
                   return const SizedBox.shrink();
                 },
@@ -468,7 +469,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         const SizedBox(height: 18),
                         widget.composeUserHeaderBuilder?.call(
                                 context, user!, LMFeedUserTile(user: user!)) ??
-                            widgetUtility.composeScreenUserHeaderBuilder(
+                            widgetBuilder.composeScreenUserHeaderBuilder(
                                 context, user!, LMFeedUserTile(user: user!)),
                         widget.composeContentBuilder?.call() ??
                             _defContentInput(),
@@ -1110,7 +1111,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           if (enableHeading)
             Column(
               children: [
-                LMFeedCore.widgetUtility.composeScreenHeadingTextfieldBuilder(
+                widgetBuilder.composeScreenHeadingTextfieldBuilder(
                   context,
                   _defHeadingTextfield(theme),
                 )
@@ -1123,8 +1124,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   decoration: BoxDecoration(
                     color: theme.container,
                   ),
-                  child: LMFeedCore.widgetUtility
-                      .composeScreenContentTextfieldBuilder(
+                  child: widgetBuilder.composeScreenContentTextfieldBuilder(
                     context,
                     _defContentTextField(),
                   )),

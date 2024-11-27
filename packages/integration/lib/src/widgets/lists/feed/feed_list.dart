@@ -153,7 +153,7 @@ class _LMFeedListState extends State<LMFeedList> {
                   widget.widgetSource,
                   postUploading,
                 );
-                return LMFeedCore.widgetUtility
+                return LMFeedCore.config.widgetBuilderDelegate
                     .postWidgetBuilder(context, postWidget, item);
               },
             ),

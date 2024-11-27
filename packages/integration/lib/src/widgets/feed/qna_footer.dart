@@ -23,7 +23,7 @@ class LMFeedQnAPostFooter extends LMFeedPostFooter {
 
   @override
   Widget build(BuildContext context) {
-    final _widgetUtility = LMFeedCore.widgetUtility;
+    final _widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,

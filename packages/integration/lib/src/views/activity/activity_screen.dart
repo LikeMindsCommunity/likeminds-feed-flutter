@@ -40,7 +40,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate _widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
   final PagingController<int, UserActivityItem> _pagingController =
       PagingController(firstPageKey: 1);
   Map<String, LMUserViewData> users = {};
@@ -59,7 +59,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.activityScreen;
 
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   bool isDesktopWeb = false;
   LMFeedWidgetSource source = LMFeedWidgetSource.activityScreen;
 
@@ -168,7 +168,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+          width: min(screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
           height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.only(top: isDesktopWeb ? 10 : 0),
           child: PagedListView<int, UserActivityItem>(

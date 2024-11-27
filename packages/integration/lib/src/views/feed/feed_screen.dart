@@ -65,7 +65,7 @@ class LMFeedScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? config;
 
   @override
   State<LMFeedScreen> createState() => _LMFeedScreenState();
@@ -100,7 +100,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       topicBarBuilder: widget.topicBarBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      config: widget.config,
+      feedSettings: widget.config,
     );
   }
 
@@ -119,7 +119,7 @@ class _LMFeedScreenState extends State<LMFeedScreen> {
       firstPageErrorIndicatorBuilder: widget.firstPageErrorIndicatorBuilder,
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      config: widget.config,
+      feedScreenSettings: widget.config,
     );
   }
 }

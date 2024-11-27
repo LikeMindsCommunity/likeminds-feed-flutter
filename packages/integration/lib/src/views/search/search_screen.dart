@@ -44,7 +44,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.searchScreen;
   ValueNotifier<bool> showCancelIcon = ValueNotifier<bool>(false);
   TextEditingController searchController = TextEditingController();
@@ -66,7 +66,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
   double? screenWidth;
   bool isWeb = LMFeedPlatform.instance.isWeb();
 
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   bool isDesktopWeb = false;
   @override
   void didChangeDependencies() {
@@ -188,7 +188,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize.width);
+    screenWidth = min(LMFeedCore.config.webConfiguration.maxWidth, screenSize.width);
     return widgetUtility.scaffold(
       source: _widgetSource,
       resizeToAvoidBottomInset: false,

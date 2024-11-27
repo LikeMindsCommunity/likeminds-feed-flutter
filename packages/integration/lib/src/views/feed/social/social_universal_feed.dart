@@ -24,7 +24,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
     this.topicChipBuilder,
     this.postBuilder,
     this.floatingActionButtonBuilder,
-    this.config,
+    this.feedSettings,
     this.topicBarBuilder,
     this.floatingActionButtonLocation,
     this.noItemsFoundIndicatorBuilder,
@@ -73,7 +73,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? feedSettings;
 
   @override
   State<LMFeedSocialUniversalScreen> createState() =>
@@ -96,7 +96,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
         pendingPostBannerBuilder,
     LMFeedTopicBarBuilder? topicBarBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenConfig? config,
+    LMFeedScreenSetting? config,
   }) {
     return LMFeedSocialUniversalScreen(
       appBar: appBar ?? this.appBar,
@@ -122,7 +122,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
       topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
-      config: config ?? this.config,
+      feedSettings: config ?? this.feedSettings,
     );
   }
 }
@@ -156,10 +156,10 @@ class _LMFeedSocialUniversalScreenState
 
   // Create an instance of LMFeedScreenBuilderDelegate
   LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
+      LMFeedCore.config.feedScreenConfig.builder;
 
   LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+      LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -167,8 +167,9 @@ class _LMFeedSocialUniversalScreenState
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetUtility
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  // Create an instance of LMFeedWidgetBuilderDelegate
+  LMFeedWidgetBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.widgetBuilderDelegate;
 
   // Set the widget source to universal feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.universalFeed;
@@ -180,8 +181,8 @@ class _LMFeedSocialUniversalScreenState
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenConfig? config;
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedScreenSetting? feedSettings;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
@@ -227,7 +228,8 @@ class _LMFeedSocialUniversalScreenState
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
+    feedSettings =
+        widget.feedSettings ?? LMFeedCore.config.feedScreenConfig.setting;
 
     // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(
@@ -428,7 +430,7 @@ class _LMFeedSocialUniversalScreenState
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(LMFeedCore.webConfiguration.maxWidth,
+          width: min(LMFeedCore.config.webConfiguration.maxWidth,
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
@@ -481,7 +483,7 @@ class _LMFeedSocialUniversalScreenState
                       }),
                 ),
                 SliverToBoxAdapter(
-                  child: config!.showCustomWidget
+                  child: feedSettings!.showCustomWidget
                       ? widget.customWidgetBuilder?.call(
                               context, _defPostSomeThingWidget(context)) ??
                           _defPostSomeThingWidget(context)
@@ -689,7 +691,7 @@ class _LMFeedSocialUniversalScreenState
                 if (isDesktopWeb)
                   SliverPadding(padding: EdgeInsets.only(top: 12.0)),
                 SliverToBoxAdapter(
-                  child: config!.enableTopicFiltering
+                  child: feedSettings!.enableTopicFiltering
                       ? ValueListenableBuilder(
                           valueListenable: rebuildTopicFeed,
                           builder: (context, _, __) {
@@ -850,7 +852,8 @@ class _LMFeedSocialUniversalScreenState
           onTap: () {
             // check if the user is a guest user
             if (LMFeedUserUtils.isGuestUser()) {
-              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                  ?.call(context);
               return;
             }
             Navigator.push(
@@ -880,12 +883,13 @@ class _LMFeedSocialUniversalScreenState
             ),
           ),
         ),
-        if (config?.showNotificationFeedIcon ?? true)
+        if (feedSettings?.showNotificationFeedIcon ?? true)
           LMFeedButton(
             onTap: () {
               // check if the user is a guest user
               if (LMFeedUserUtils.isGuestUser()) {
-                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                    ?.call(context);
                 return;
               }
               Navigator.push(
@@ -961,7 +965,7 @@ class _LMFeedSocialUniversalScreenState
 
   void openTopicSelector(BuildContext context) {
     LMFeedTopicSelectionWidgetType topicSelectionWidgetType =
-        config!.topicSelectionWidgetType;
+        feedSettings!.topicSelectionWidgetType;
     if (topicSelectionWidgetType ==
         LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet) {
       showTopicSelectSheet(context);

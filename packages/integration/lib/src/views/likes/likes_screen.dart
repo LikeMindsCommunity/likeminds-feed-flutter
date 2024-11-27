@@ -29,7 +29,7 @@ class LMFeedLikesScreen extends StatefulWidget {
 class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
   LMLikesScreenHandler? handler;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
-  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
   String likeText = LMFeedPostUtils.getLikeTitle(
     LMFeedPluralizeWordAction.firstLetterCapitalPlural,
   );

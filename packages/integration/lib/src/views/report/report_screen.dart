@@ -57,7 +57,7 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate _widgetBuilder = LMFeedCore.config.widgetBuilderDelegate;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.reportScreen;
   LMFeedThemeData theme = LMFeedCore.theme;
 
@@ -149,7 +149,7 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
         child: Align(
           alignment: Alignment.topCenter,
           child: Container(
-            width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+            width: min(screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,

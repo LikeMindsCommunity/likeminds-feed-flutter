@@ -3,6 +3,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/themes/qna/builder/compose/fab_button.dart';
 import 'package:likeminds_feed_sample/themes/qna/builder/feed/lm_qna_feed.dart';
 import 'package:likeminds_feed_sample/themes/qna/builder/topic/topic_search_bottom_sheet.dart';
+import 'package:likeminds_feed_sample/themes/qna/builder/widgets_builder.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/theme/theme.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/utils.dart';
@@ -25,6 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   Future<GetTopicsResponse>? getParentTopics;
   Future<GetTopicsResponse>? getChildTopics;
   Size? screenSize;
+  final LMFeedWidgetBuilderDelegate _widget = LMFeedQnAWidgetsExample.instance;
 
   @override
   void initState() {
@@ -499,12 +501,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => LMQnAFeedScreen(
-                              newPageProgressIndicatorBuilder: LMFeedCore
-                                  .widgetUtility
-                                  .newPageProgressIndicatorBuilderFeed,
-                              noMoreItemsIndicatorBuilder: LMFeedCore
-                                  .widgetUtility
-                                  .noMoreItemsIndicatorBuilderFeed,
+                              newPageProgressIndicatorBuilder:
+                                  _widget.newPageProgressIndicatorBuilderFeed,
+                              noMoreItemsIndicatorBuilder:
+                                  _widget.noMoreItemsIndicatorBuilderFeed,
                               floatingActionButtonLocation:
                                   FloatingActionButtonLocation.centerFloat,
                               floatingActionButtonBuilder:

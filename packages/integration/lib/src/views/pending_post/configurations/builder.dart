@@ -1,4 +1,6 @@
-part of './pending_posts_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_core/src/widgets/post/post_approval_dialog.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedPendingPostScreenBuilderDeletegate {
   const LMFeedPendingPostScreenBuilderDeletegate();

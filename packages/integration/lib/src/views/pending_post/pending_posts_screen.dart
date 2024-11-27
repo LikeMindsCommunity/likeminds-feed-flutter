@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
-
-part './pending_post_screen_builder_delegate.dart';
 
 class LMFeedPendingPostsScreen extends StatefulWidget {
   // Builder for appbar
@@ -62,7 +59,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
 
   LMFeedPendingPostScreenBuilderDeletegate _postScreenBuilderDeletegate =
-      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+      LMFeedCore.config.pendingPostScreenConfig.builder;
 
   LMFeedPendingBloc pendingBloc = LMFeedPendingBloc.instance;
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -80,7 +77,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   String _appBarTitle = '';
   String _appBarSubtitle = '';
 
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.widgetBuilderDelegate;
 
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.pendingPostsScreen;
 
@@ -104,7 +102,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
 
   int pendingPostCount = 0;
 
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
 
   bool isDesktopWeb = false;
   @override
@@ -157,7 +155,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize.width);
+    screenWidth =
+        min(LMFeedCore.config.webConfiguration.maxWidth, screenSize.width);
     return _widgetsBuilder.scaffold(
       appBar: _postScreenBuilderDeletegate.appBarBuilder(
           context, defAppBar(), pendingPostCount),
@@ -534,8 +533,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData.mediaStyle,
-      carouselIndicatorBuilder:
-          LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
+      carouselIndicatorBuilder: LMFeedCore
+          .config.widgetBuilderDelegate.postMediaCarouselIndicatorBuilder,
       imageBuilder: _widgetsBuilder.imageBuilder,
       videoBuilder: _widgetsBuilder.videoBuilder,
       pollBuilder: _widgetsBuilder.pollWidgetBuilder,

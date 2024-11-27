@@ -83,7 +83,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   LMFeedThemeData feedTheme = LMFeedCore.theme;
   late Size screenSize;
   double? screenWidth;
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   late bool isDesktopWeb;
   late final TextEditingController _commentController;
   late final FocusNode _commentFocusNode;

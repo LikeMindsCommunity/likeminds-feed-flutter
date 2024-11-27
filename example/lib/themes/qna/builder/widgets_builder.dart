@@ -10,7 +10,7 @@ import 'package:likeminds_feed_sample/themes/qna/builder/topic/compose_topic_sel
 import 'package:likeminds_feed_sample/themes/qna/utils/constants/assets_constants.dart';
 import 'package:likeminds_feed_sample/themes/qna/utils/theme/theme.dart';
 
-class LMFeedQnAWidgetsExample extends LMFeedWidgetUtility {
+class LMFeedQnAWidgetsExample extends LMFeedWidgetBuilderDelegate {
   static LMFeedQnAWidgetsExample? _instance;
 
   static LMFeedQnAWidgetsExample get instance => _instance ??= LMFeedQnAWidgetsExample._();

@@ -70,7 +70,7 @@ class LMQnAFeedScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? config;
 
   @override
   State<LMQnAFeedScreen> createState() => _LMQnAFeedScreenState();
@@ -93,12 +93,13 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  final LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  final LMFeedWidgetBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.widgetBuilderDelegate;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier postUploading = ValueNotifier(false);
   bool right = true;
 
-  LMFeedScreenConfig? config;
+  LMFeedScreenSetting? config;
   /* 
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
@@ -227,7 +228,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
   @override
   Widget build(BuildContext context) {
     LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
+    config = widget.config ?? LMFeedCore.config.feedScreenConfig.setting;
     return LMFeedQnAWidgetsExample.instance.scaffold(
       backgroundColor: feedThemeData.backgroundColor,
       appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
@@ -477,7 +478,7 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
                             defPostWidget(context, feedThemeData, item);
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
-                            LMFeedCore.widgetUtility.postWidgetBuilder
+                            _widgetsBuilder.postWidgetBuilder
                                 .call(context, postWidget, item);
                       },
                       noItemsFoundIndicatorBuilder: (context) {
@@ -855,10 +856,10 @@ class _LMQnAFeedScreenState extends State<LMQnAFeedScreen> {
       postId: post.id,
       style: feedThemeData.mediaStyle,
       carouselIndicatorBuilder:
-          LMFeedCore.widgetUtility.postMediaCarouselIndicatorBuilder,
-      imageBuilder: LMFeedCore.widgetUtility.imageBuilder,
-      videoBuilder: LMFeedCore.widgetUtility.videoBuilder,
-      pollBuilder: LMFeedQnAWidgetsExample.instance.pollWidgetBuilder,
+          _widgetsBuilder.postMediaCarouselIndicatorBuilder,
+      imageBuilder: _widgetsBuilder.imageBuilder,
+      videoBuilder: _widgetsBuilder.videoBuilder,
+      pollBuilder: _widgetsBuilder.pollWidgetBuilder,
       poll: _defPollWidget(post),
       onMediaTap: (position) {
         LMFeedVideoProvider.instance.pauseCurrentVideo();

@@ -1,4 +1,6 @@
-part of 'social/social_feed_screen.dart';
+
+
+import 'package:flutter/services.dart';
 
 /// {@template topic_selection_widget_type}
 /// [LMFeedTopicSelectionWidgetType] to select the type of topic selection widget
@@ -25,8 +27,9 @@ enum LMFeedTopicSelectionWidgetType {
 /// to select the type of topic selection widget
 /// to be shown
 /// {@endtemplate}
-class LMFeedScreenConfig {
-  const LMFeedScreenConfig({
+class LMFeedScreenSetting {
+  /// {@macro feed_screen_config}
+  const LMFeedScreenSetting({
     this.feedSystemOverlayStyle = SystemUiOverlayStyle.light,
     this.enableTopicFiltering = true,
     this.topicSelectionWidgetType =
@@ -64,7 +67,8 @@ class LMFeedScreenConfig {
   /// on feed screen
   final bool showNotificationFeedIcon;
 
-  LMFeedScreenConfig copyWith({
+  /// CopyWith method to create a new instance of [LMFeedScreenSetting]
+  LMFeedScreenSetting copyWith({
     SystemUiOverlayStyle? composeSystemOverlayStyle,
     bool? enableTopicFiltering,
     bool? allowMultipleTopicsSelection,
@@ -73,7 +77,7 @@ class LMFeedScreenConfig {
     bool? showPendingPostHeader,
     bool? showNotificationFeedIcon,
   }) {
-    return LMFeedScreenConfig(
+    return LMFeedScreenSetting(
       feedSystemOverlayStyle:
           composeSystemOverlayStyle ?? this.feedSystemOverlayStyle,
       enableTopicFiltering: enableTopicFiltering ?? this.enableTopicFiltering,

@@ -111,7 +111,7 @@ class LMFeedCommentList extends StatefulWidget {
 class _LMFeedCommentListState extends State<LMFeedCommentList> {
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
-  final LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
+  final LMFeedWidgetBuilderDelegate _widgetBuilder = LMFeedCore.config.widgetBuilderDelegate;
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
   String commentTitleSmallCapPlural =
@@ -260,7 +260,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       LMCommentViewData commentViewData, LMUserViewData userViewData) {
     return LMFeedCommentReplyWidget(
       commentBuilder:
-          widget.commentBuilder ?? LMFeedCore.widgetUtility.commentBuilder,
+          widget.commentBuilder ?? LMFeedCore.config.widgetBuilderDelegate.commentBuilder,
       post: _postViewData!,
       postId: widget.postId,
       comment: commentViewData,

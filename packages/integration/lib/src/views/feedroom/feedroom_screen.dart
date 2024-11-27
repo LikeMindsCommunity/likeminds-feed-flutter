@@ -156,7 +156,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.feedroom;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
@@ -348,7 +348,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   @override
   Widget build(BuildContext context) {
     config = widget.config ?? LMFeedCore.config.feedRoomScreenConfig;
-    return LMFeedCore.widgetUtility.scaffold(
+    return LMFeedCore.config.widgetBuilderDelegate.scaffold(
       onPopInvoked: (p0) {
         if (p0) {
           _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));
@@ -593,7 +593,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                         );
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
-                            LMFeedCore.widgetUtility.postWidgetBuilder
+                            LMFeedCore.config.widgetBuilderDelegate.postWidgetBuilder
                                 .call(context, postWidget, item);
                       },
                       noItemsFoundIndicatorBuilder: (context) {

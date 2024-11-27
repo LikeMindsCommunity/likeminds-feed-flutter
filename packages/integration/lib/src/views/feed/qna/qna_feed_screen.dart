@@ -64,7 +64,7 @@ class LMFeedQnAScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? config;
 
   @override
   State<LMFeedQnAScreen> createState() => _LMFeedQnAScreenState();
@@ -99,7 +99,7 @@ class _LMFeedQnAScreenState extends State<LMFeedQnAScreen> {
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       topicBarBuilder: widget.topicBarBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      config: widget.config,
+      feedScreenSettings: widget.config,
     );
   }
 

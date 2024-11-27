@@ -77,7 +77,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
-  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.editPostScreen;
 
   /// Controllers and other helper classes' objects
@@ -327,7 +327,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     config = widget.config ?? LMFeedCore.config.composeConfig;
     style = widget.style ?? feedTheme.composeScreenStyle;
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
+    screenWidth = min(LMFeedCore.config.webConfiguration.maxWidth, screenSize!.width);
 
     return WillPopScope(
       onWillPop: () {
@@ -380,7 +380,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                                       context,
                                       _defTopicSelector(state.topics),
                                       composeBloc.selectedTopics) ??
-                                  LMFeedCore.widgetUtility
+                                  LMFeedCore.config.widgetBuilderDelegate
                                       .composeScreenTopicSelectorBuilder(
                                           context,
                                           _defTopicSelector(state.topics),

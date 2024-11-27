@@ -6,7 +6,7 @@ import 'package:likeminds_feed_flutter_core/src/bloc/saved_post/saved_post_bloc.
 class LMFeedSavedPostListView extends StatefulWidget {
   const LMFeedSavedPostListView({
     super.key,
-    this.config,
+    this.settings,
     this.postBuilder,
     this.noItemsFoundIndicatorBuilder,
     this.firstPageProgressIndicatorBuilder,
@@ -16,7 +16,7 @@ class LMFeedSavedPostListView extends StatefulWidget {
     this.firstPageErrorIndicatorBuilder,
   });
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? settings;
   // Builder for post item
   // {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
@@ -58,15 +58,16 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
-  LMFeedScreenConfig? config;
+  LMFeedScreenSetting? settings;
   LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
-  final LMFeedWidgetUtility _widgetUtility = LMFeedCore.widgetUtility;
+  final LMFeedWidgetBuilderDelegate _widgetUtility =
+      LMFeedCore.config.widgetBuilderDelegate;
 
   @override
   void initState() {
     super.initState();
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
+    settings = widget.settings ?? LMFeedCore.config.feedScreenConfig.setting;
     addPageRequestListener();
   }
 

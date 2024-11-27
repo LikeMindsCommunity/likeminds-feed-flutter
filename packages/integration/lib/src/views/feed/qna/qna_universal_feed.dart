@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/pending_post/pending_posts_screen.dart';
 
 /// {@template lm_feed_qna_universal_screen}
 /// A screen to display the feed.
@@ -20,7 +21,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
     this.topicChipBuilder,
     this.postBuilder,
     this.floatingActionButtonBuilder,
-    this.config,
+    this.feedScreenSettings,
     this.topicBarBuilder,
     this.floatingActionButtonLocation,
     this.noItemsFoundIndicatorBuilder,
@@ -69,7 +70,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedScreenSetting? feedScreenSettings;
 
   @override
   State<LMFeedQnAUniversalScreen> createState() =>
@@ -92,7 +93,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
         pendingPostBannerBuilder,
     LMFeedTopicBarBuilder? topicBarBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenConfig? config,
+    LMFeedScreenSetting? config,
   }) {
     return LMFeedQnAUniversalScreen(
       appBar: appBar ?? this.appBar,
@@ -118,7 +119,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
       topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
-      config: config ?? this.config,
+      feedScreenSettings: config ?? this.feedScreenSettings,
     );
   }
 }
@@ -155,10 +156,10 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
 
   // Create an instance of LMFeedScreenBuilderDelegate
   LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
+      LMFeedCore.config.feedScreenConfig.builder;
 
   LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+      LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -166,8 +167,9 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetUtility
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  // Create an instance of LMFeedWidgetBuilderDelegate
+  LMFeedWidgetBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.widgetBuilderDelegate;
 
   // Set the widget source to universal feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.universalFeed;
@@ -179,8 +181,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenConfig? config;
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedScreenSetting? feedScreenSetting;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
@@ -226,7 +228,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
+    feedScreenSetting =
+        widget.feedScreenSettings ?? LMFeedCore.config.feedScreenConfig.setting;
 
     // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(
@@ -427,7 +430,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(LMFeedCore.webConfiguration.maxWidth,
+          width: min(LMFeedCore.config.webConfiguration.maxWidth,
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
@@ -480,7 +483,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                       }),
                 ),
                 SliverToBoxAdapter(
-                  child: config!.showCustomWidget
+                  child: feedScreenSetting!.showCustomWidget
                       ? widget.customWidgetBuilder?.call(
                               context, _defPostSomeThingWidget(context)) ??
                           _defPostSomeThingWidget(context)
@@ -688,7 +691,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                 if (isDesktopWeb)
                   SliverPadding(padding: EdgeInsets.only(top: 12.0)),
                 SliverToBoxAdapter(
-                  child: config!.enableTopicFiltering
+                  child: feedScreenSetting!.enableTopicFiltering
                       ? ValueListenableBuilder(
                           valueListenable: rebuildTopicFeed,
                           builder: (context, _, __) {
@@ -852,7 +855,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
           onTap: () {
             // check if the user is a guest user
             if (LMFeedUserUtils.isGuestUser()) {
-              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                  ?.call(context);
               return;
             }
             Navigator.push(
@@ -882,12 +886,13 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
             ),
           ),
         ),
-        if (config?.showNotificationFeedIcon ?? true)
+        if (feedScreenSetting?.showNotificationFeedIcon ?? true)
           LMFeedButton(
             onTap: () {
               // check if the user is a guest user
               if (LMFeedUserUtils.isGuestUser()) {
-                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                    ?.call(context);
                 return;
               }
               Navigator.push(
@@ -963,7 +968,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
 
   void openTopicSelector(BuildContext context) {
     LMFeedTopicSelectionWidgetType topicSelectionWidgetType =
-        config!.topicSelectionWidgetType;
+        feedScreenSetting!.topicSelectionWidgetType;
     if (topicSelectionWidgetType ==
         LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet) {
       showTopicSelectSheet(context);

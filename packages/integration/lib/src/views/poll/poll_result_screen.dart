@@ -43,13 +43,13 @@ class LMFeedPollResultScreen extends StatefulWidget {
 class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
     with SingleTickerProviderStateMixin {
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
   LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   int initialIndex = 0;
   late TabController _tabController;
   late PageController _pagingController;
   int pageSize = 10;
-  final _widgetUtility = LMFeedCore.widgetUtility;
+  final _widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
 
   @override
   initState() {

@@ -28,7 +28,7 @@ class LMFeedTopicSelectScreen extends StatefulWidget {
 class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
   late Size screenSize;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
   List<LMTopicViewData> selectedTopics = [];
   FocusNode keyboardNode = FocusNode();
   Set<String> selectedTopicId = {};
@@ -263,7 +263,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+          width: min(screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
           child: BlocListener<LMFeedTopicBloc, LMFeedTopicState>(
             bloc: topicBloc,
             listener: (context, state) {

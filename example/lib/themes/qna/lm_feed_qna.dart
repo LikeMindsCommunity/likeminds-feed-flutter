@@ -45,13 +45,13 @@ class LMFeedQnA extends StatefulWidget {
           userDisplayType: LMFeedComposeUserDisplayType.tile,
           composeHint: "Mention details here to make the post rich",
         ),
-        feedScreenConfig: const LMFeedScreenConfig(
-          enableTopicFiltering: false,
+        feedScreenConfig: LMFeedScreenConfig(
+          
         ),
         postDetailConfig: const LMPostDetailScreenConfig(
             commentTextFieldHint: "Write your response"),
+        widgetBuilderDelegate: LMFeedQnAWidgetsExample.instance,
       ),
-      widgets: LMFeedQnAWidgetsExample.instance,
     );
     LMFeedTimeAgo.instance.setDefaultTimeFormat(LMQnACustomTimeStamps());
   }
@@ -62,6 +62,7 @@ class _LMFeedQnAState extends State<LMFeedQnA> {
   ValidateUserResponse? validateUserResponse;
   GetUserFeedMetaResponse? userFeedMetaResponse;
   Future<void>? initFeed;
+  LMFeedWidgetBuilderDelegate _widget = LMFeedQnAWidgetsExample.instance;
 
   @override
   void initState() {
@@ -88,10 +89,10 @@ class _LMFeedQnAState extends State<LMFeedQnA> {
               }
               // else navigate to feed screen
               return LMQnAFeedScreen(
-                newPageProgressIndicatorBuilder: LMFeedCore
-                    .widgetUtility.newPageProgressIndicatorBuilderFeed,
+                newPageProgressIndicatorBuilder:
+                    _widget.newPageProgressIndicatorBuilderFeed,
                 noMoreItemsIndicatorBuilder:
-                    LMFeedCore.widgetUtility.noMoreItemsIndicatorBuilderFeed,
+                    _widget.noMoreItemsIndicatorBuilderFeed,
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerFloat,
                 floatingActionButtonBuilder: qnAFeedCreatePostFABBuilder,

@@ -98,7 +98,7 @@ class LMFeedWidgetBuilderDelegate {
       {LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed}) {
     Size screenSize = MediaQuery.sizeOf(context);
     bool isDesktopWeb;
-    if (screenSize.width > LMFeedCore.webConfiguration.maxWidth && kIsWeb) {
+    if (screenSize.width > LMFeedCore.config.webConfiguration.maxWidth && kIsWeb) {
       isDesktopWeb = true;
     } else {
       isDesktopWeb = false;
@@ -366,7 +366,7 @@ class LMFeedWidgetBuilderDelegate {
     return LMFeedSnackBar(
       content: LMFeedText(text: snackBarMessage),
       style: inStyle.copyWith(
-          width: min(LMFeedCore.webConfiguration.maxWidthForSnackBars, width)),
+          width: min(LMFeedCore.config.webConfiguration.maxWidthForSnackBars, width)),
     );
   }
 
