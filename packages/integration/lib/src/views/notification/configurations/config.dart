@@ -23,7 +23,7 @@ class LMFeedNotificationScreenConfig {
   final LMFeedNotificationScreenStyle style;
 
   /// {@macro lm_feed_notification_screen_config}
-  LMFeedNotificationScreenConfig({
+  const LMFeedNotificationScreenConfig({
     this.builder = const LMFeedNotificationScreenBuilderDelegate(),
     this.setting = const LMFeedNotificationScreenSetting(),
     this.style = const LMFeedNotificationScreenStyle(),

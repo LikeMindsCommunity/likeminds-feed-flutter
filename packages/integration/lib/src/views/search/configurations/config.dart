@@ -23,7 +23,7 @@ class LMFeedSearchScreenConfig {
   final LMFeedSearchScreenStyle style;
 
   /// {@macro lm_feed_search_screen_config}
-  LMFeedSearchScreenConfig({
+  const LMFeedSearchScreenConfig({
     this.builder = const LMFeedSearchScreenBuilderDelegate(),
     this.setting = const LMFeedSearchScreenSetting(),
     this.style = const LMFeedSearchScreenStyle(),

@@ -23,7 +23,7 @@ class LMFeedPollScreenConfig {
   final LMFeedPollScreenStyle style;
 
   /// {@macro lm_feed_poll_screen_config}
-  LMFeedPollScreenConfig({
+  const LMFeedPollScreenConfig({
     this.builder = const LMFeedPollScreenBuilderDelegate(),
     this.setting = const LMFeedPollScreenSetting(),
     this.style = const LMFeedPollScreenStyle(),

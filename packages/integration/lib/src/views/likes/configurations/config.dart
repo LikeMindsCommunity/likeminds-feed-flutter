@@ -23,7 +23,7 @@ class LMFeedLikeScreenConfig {
   final LMFeedLikeScreenStyle style;
 
   /// {@macro lm_feed_like_screen_config}
-  LMFeedLikeScreenConfig({
+  const LMFeedLikeScreenConfig({
     this.builder = const LMFeedLikeScreenBuilderDelegate(),
     this.setting = const LMFeedLikeScreenSetting(),
     this.style = const LMFeedLikeScreenStyle(),

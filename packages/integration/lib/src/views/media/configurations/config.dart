@@ -23,7 +23,7 @@ class LMFeedMediaPreviewScreenConfig {
   final LMFeedMediaPreviewScreenStyle style;
 
   /// {@macro lm_feed_media_preview_screen_config}
-  LMFeedMediaPreviewScreenConfig({
+  const LMFeedMediaPreviewScreenConfig({
     this.builder = const LMFeedMediaPreviewScreenBuilderDelegate(),
     this.setting = const LMFeedMediaPreviewScreenSetting(),
     this.style = const LMFeedMediaPreviewScreenStyle(),

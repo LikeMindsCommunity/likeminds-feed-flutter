@@ -23,7 +23,7 @@ class LMFeedReportScreenConfig {
   final LMFeedReportScreenStyle style;
 
   /// {@macro lm_feed_report_screen_config}
-  LMFeedReportScreenConfig({
+  const LMFeedReportScreenConfig({
     this.builder = const LMFeedReportScreenBuilderDelegate(),
     this.setting = const LMFeedReportScreenSetting(),
     this.style = const LMFeedReportScreenStyle(),

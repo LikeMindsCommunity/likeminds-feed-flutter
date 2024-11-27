@@ -7,25 +7,25 @@ export 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/bu
 export 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/settings.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/style.dart';
 
-/// {@template lm_feed_feedroom_screen_config}
+/// {@template lm_feedroom_screen_config}
 /// Configuration class for Feedroom Screen
 /// Holds configuration classes for Feedroom Screen
 /// i.e: Builder, Setting and Style
 /// {@endtemplate}
-class LMFeedFeedroomScreenConfig {
-  /// {@macro lm_feed_feedroom_screen_builder_delegate}
-  final LMFeedFeedroomScreenBuilderDelegate builder;
+class LMFeedroomScreenConfig {
+  /// {@macro lm_feedroom_screen_builder_delegate}
+  final LMFeedroomScreenBuilderDelegate builder;
 
-  /// {@macro lm_feed_feedroom_screen_setting}
-  final LMFeedFeedroomScreenSetting setting;
+  /// {@macro lm_feedroom_screen_setting}
+  final LMFeedroomScreenSetting setting;
 
-  /// {@macro lm_feed_feedroom_screen_style}
-  final LMFeedFeedroomScreenStyle style;
+  /// {@macro lm_feedroom_screen_style}
+  final LMFeedroomScreenStyle style;
 
-  /// {@macro lm_feed_feedroom_screen_config}
-  LMFeedFeedroomScreenConfig({
-    this.builder = const LMFeedFeedroomScreenBuilderDelegate(),
-    this.setting = const LMFeedFeedroomScreenSetting(),
-    this.style = const LMFeedFeedroomScreenStyle(),
+  /// {@macro lm_feedroom_screen_config}
+  const LMFeedroomScreenConfig({
+    this.builder = const LMFeedroomScreenBuilderDelegate(),
+    this.setting = const LMFeedroomScreenSetting(),
+    this.style = const LMFeedroomScreenStyle(),
   });
 }
