@@ -1,3 +1,0 @@
-class LMFeedScreenStyle {
-  const LMFeedScreenStyle();
-}

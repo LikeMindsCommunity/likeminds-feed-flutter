@@ -49,7 +49,7 @@ class _LMFeedNovaState extends State<LMFeedNova> {
           postViewData,
           true,
         ),
-        config: const LMFeedScreenSetting(
+        settings: const LMFeedSocialScreenSetting(
           topicSelectionWidgetType:
               LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet,
           showCustomWidget: true,

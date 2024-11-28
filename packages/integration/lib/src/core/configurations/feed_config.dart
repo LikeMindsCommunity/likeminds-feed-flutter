@@ -3,7 +3,8 @@ import 'package:likeminds_feed_flutter_core/src/core/configurations/feed_builder
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 import 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feedroom/feedroom_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
@@ -22,7 +23,8 @@ export 'package:likeminds_feed_flutter_core/src/views/feed/social/social_feed_sc
 export 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
 // export new configurations
 export 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
-export 'package:likeminds_feed_flutter_core/src/views/feed/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
@@ -69,8 +71,9 @@ class LMFeedConfig {
   /// {@macro lm_compose_screen_config}
   final LMFeedComposeScreenConfig composeScreenConfig;
 
-  /// check for this, will change in future
-  final LMFeedScreenConfig feedScreenConfig;
+  final LMFeedSocialScreenConfig socialFeedScreenConfig;
+
+  final LMFeedQnaScreenConfig qnaFeedScreenConfig;
 
   /// {@macro lm_feedroom_screen_config}
   final LMFeedroomScreenConfig feedroomScreenConfig;
@@ -109,7 +112,8 @@ class LMFeedConfig {
 
   /// {@macro lm_feed_config}
   LMFeedConfig({
-    this.feedScreenConfig = const LMFeedScreenConfig(),
+    this.socialFeedScreenConfig = const LMFeedSocialScreenConfig(),
+    this.qnaFeedScreenConfig = const LMFeedQnaScreenConfig(),
     this.composeConfig = const LMFeedComposeScreenConfig(),
     this.postDetailConfig = const LMPostDetailScreenConfig(),
     this.pendingPostScreenConfig = const LMFeedPendingPostsScreenConfig(),

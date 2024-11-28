@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/pending_post/pending_posts_screen.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -68,7 +69,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenSetting? config;
+  final LMFeedQnaScreenSetting? config;
 
   @override
   State<LMFeedQnAPersonalisedScreen> createState() =>
@@ -88,7 +89,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
     Widget Function(BuildContext context, int noOfPendingPost)?
         pendingPostBannerBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenSetting? config,
+    LMFeedQnaScreenSetting? config,
   }) {
     return LMFeedQnAPersonalisedScreen(
       appBar: appBar ?? this.appBar,
@@ -145,8 +146,8 @@ class _LMFeedQnAPersonalisedScreenState
       LMFeedPluralizeWordAction.allSmallSingular);
 
   // Create an instance of LMFeedScreenBuilderDelegate
-  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.config.feedScreenConfig.builder;
+  LMFeedQnaScreenBuilderDelegate _screenBuilderDelegate =
+      LMFeedCore.config.qnaFeedScreenConfig.builder;
 
   LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
       LMFeedCore.config.pendingPostScreenConfig.builder;
@@ -171,7 +172,7 @@ class _LMFeedQnAPersonalisedScreenState
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenSetting? feedScreenSettings;
+  LMFeedQnaScreenSetting? feedScreenSettings;
   LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
@@ -235,7 +236,7 @@ class _LMFeedQnAPersonalisedScreenState
     _addPaginationListener();
 
     feedScreenSettings =
-        widget.config ?? LMFeedCore.config.feedScreenConfig.setting;
+        widget.config ?? LMFeedCore.config.qnaFeedScreenConfig.setting;
 
     getUserFeedMeta = getUserFeedMetaFuture();
 

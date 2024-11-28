@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 
 class LMFeedQnAScreen extends StatefulWidget {
   const LMFeedQnAScreen({
@@ -64,7 +65,7 @@ class LMFeedQnAScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenSetting? config;
+  final LMFeedQnaScreenSetting? config;
 
   @override
   State<LMFeedQnAScreen> createState() => _LMFeedQnAScreenState();

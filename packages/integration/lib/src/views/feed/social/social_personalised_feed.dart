@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/pending_post/pending_posts_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 /// {@template lm_feed_social_personalised_screen}
@@ -68,7 +68,7 @@ class LMFeedSocialPersonalisedScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenSetting? feedScreenSettings;
+  final LMFeedSocialScreenSetting? feedScreenSettings;
 
   @override
   State<LMFeedSocialPersonalisedScreen> createState() =>
@@ -88,7 +88,7 @@ class LMFeedSocialPersonalisedScreen extends StatefulWidget {
     Widget Function(BuildContext context, int noOfPendingPost)?
         pendingPostBannerBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenSetting? config,
+    LMFeedSocialScreenSetting? config,
   }) {
     return LMFeedSocialPersonalisedScreen(
       appBar: appBar ?? this.appBar,
@@ -145,8 +145,8 @@ class _LMFeedSocialPersonalisedScreenState
       LMFeedPluralizeWordAction.allSmallSingular);
 
   // Create an instance of LMFeedScreenBuilderDelegate
-  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.config.feedScreenConfig.builder;
+  LMFeedSocialScreenBuilderDelegate _screenBuilderDelegate =
+      LMFeedCore.config.socialFeedScreenConfig.builder;
 
   LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
      LMFeedCore.config.pendingPostScreenConfig.builder;
@@ -170,7 +170,7 @@ class _LMFeedSocialPersonalisedScreenState
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenSetting? feedScreenSettings;
+  LMFeedSocialScreenSetting? feedScreenSettings;
   LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
@@ -233,7 +233,7 @@ class _LMFeedSocialPersonalisedScreenState
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    feedScreenSettings = widget.feedScreenSettings ?? LMFeedCore.config.feedScreenConfig.setting;
+    feedScreenSettings = widget.feedScreenSettings ?? LMFeedCore.config.socialFeedScreenConfig.setting;
 
     getUserFeedMeta = getUserFeedMetaFuture();
 

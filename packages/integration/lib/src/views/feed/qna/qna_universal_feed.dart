@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/pending_post/pending_posts_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 
 /// {@template lm_feed_qna_universal_screen}
 /// A screen to display the feed.
@@ -70,7 +70,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenSetting? feedScreenSettings;
+  final LMFeedQnaScreenSetting? feedScreenSettings;
 
   @override
   State<LMFeedQnAUniversalScreen> createState() =>
@@ -93,7 +93,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
         pendingPostBannerBuilder,
     LMFeedTopicBarBuilder? topicBarBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenSetting? config,
+    LMFeedQnaScreenSetting? settings,
   }) {
     return LMFeedQnAUniversalScreen(
       appBar: appBar ?? this.appBar,
@@ -119,7 +119,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
       topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
-      feedScreenSettings: config ?? this.feedScreenSettings,
+      feedScreenSettings: settings ?? this.feedScreenSettings,
     );
   }
 }
@@ -155,8 +155,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
       LMFeedPluralizeWordAction.allSmallSingular);
 
   // Create an instance of LMFeedScreenBuilderDelegate
-  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.config.feedScreenConfig.builder;
+  LMFeedQnaScreenBuilderDelegate _screenBuilderDelegate =
+      LMFeedCore.config.qnaFeedScreenConfig.builder;
 
   LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
       LMFeedCore.config.pendingPostScreenConfig.builder;
@@ -181,7 +181,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenSetting? feedScreenSetting;
+  LMFeedQnaScreenSetting? feedScreenSetting;
   LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
@@ -229,7 +229,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
     _addPaginationListener();
 
     feedScreenSetting =
-        widget.feedScreenSettings ?? LMFeedCore.config.feedScreenConfig.setting;
+        widget.feedScreenSettings ?? LMFeedCore.config.qnaFeedScreenConfig.setting;
 
     // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(

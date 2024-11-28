@@ -1,0 +1,3 @@
+class LMFeedSocialScreenStyle {
+  const LMFeedSocialScreenStyle();
+}

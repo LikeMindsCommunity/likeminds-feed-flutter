@@ -1,22 +1,7 @@
 
 
 import 'package:flutter/services.dart';
-
-/// {@template topic_selection_widget_type}
-/// [LMFeedTopicSelectionWidgetType] to select the type of topic selection widget
-/// to be shown
-/// [LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet] to show a
-/// bottom sheet with a list of topics
-/// [LMFeedTopicSelectionWidgetType.showTopicSelectionScreen] to show a
-/// screen with a list of topics
-/// defaults to [LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet]
-/// if not provided
-/// {@endtemplate}
-enum LMFeedTopicSelectionWidgetType {
-  showTopicSelectionBottomSheet,
-  showTopicSelectionScreen,
-}
-
+import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
 /// {@template feed_screen_config}
 /// Configuration for the [LMFeedSocialUniversalScreen]
 /// to support changing light and dark style of overall system
@@ -27,9 +12,9 @@ enum LMFeedTopicSelectionWidgetType {
 /// to select the type of topic selection widget
 /// to be shown
 /// {@endtemplate}
-class LMFeedScreenSetting {
+class LMFeedSocialScreenSetting {
   /// {@macro feed_screen_config}
-  const LMFeedScreenSetting({
+  const LMFeedSocialScreenSetting({
     this.feedSystemOverlayStyle = SystemUiOverlayStyle.light,
     this.enableTopicFiltering = true,
     this.topicSelectionWidgetType =
@@ -67,8 +52,8 @@ class LMFeedScreenSetting {
   /// on feed screen
   final bool showNotificationFeedIcon;
 
-  /// CopyWith method to create a new instance of [LMFeedScreenSetting]
-  LMFeedScreenSetting copyWith({
+  /// CopyWith method to create a new instance of [LMFeedSocialScreenSetting]
+  LMFeedSocialScreenSetting copyWith({
     SystemUiOverlayStyle? composeSystemOverlayStyle,
     bool? enableTopicFiltering,
     bool? allowMultipleTopicsSelection,
@@ -77,7 +62,7 @@ class LMFeedScreenSetting {
     bool? showPendingPostHeader,
     bool? showNotificationFeedIcon,
   }) {
-    return LMFeedScreenSetting(
+    return LMFeedSocialScreenSetting(
       feedSystemOverlayStyle:
           composeSystemOverlayStyle ?? this.feedSystemOverlayStyle,
       enableTopicFiltering: enableTopicFiltering ?? this.enableTopicFiltering,

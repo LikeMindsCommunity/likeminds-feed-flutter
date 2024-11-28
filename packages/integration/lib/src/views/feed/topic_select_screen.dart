@@ -6,6 +6,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
+/// {@template topic_selection_widget_type}
+/// [LMFeedTopicSelectionWidgetType] to select the type of topic selection widget
+/// to be shown
+/// [LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet] to show a
+/// bottom sheet with a list of topics
+/// [LMFeedTopicSelectionWidgetType.showTopicSelectionScreen] to show a
+/// screen with a list of topics
+/// defaults to [LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet]
+/// if not provided
+/// {@endtemplate}
+enum LMFeedTopicSelectionWidgetType {
+  showTopicSelectionBottomSheet,
+  showTopicSelectionScreen,
+}
+
 class LMFeedTopicSelectScreen extends StatefulWidget {
   static const String route = "/topicSelectScreen";
 
@@ -28,7 +43,8 @@ class LMFeedTopicSelectScreen extends StatefulWidget {
 class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
   late Size screenSize;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedWidgetBuilderDelegate widgetUtility =
+      LMFeedCore.config.widgetBuilderDelegate;
   List<LMTopicViewData> selectedTopics = [];
   FocusNode keyboardNode = FocusNode();
   Set<String> selectedTopicId = {};
@@ -263,7 +279,8 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
+          width: min(
+              screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
           child: BlocListener<LMFeedTopicBloc, LMFeedTopicState>(
             bloc: topicBloc,
             listener: (context, state) {

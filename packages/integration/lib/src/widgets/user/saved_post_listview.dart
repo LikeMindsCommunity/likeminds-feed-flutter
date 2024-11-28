@@ -6,7 +6,6 @@ import 'package:likeminds_feed_flutter_core/src/bloc/saved_post/saved_post_bloc.
 class LMFeedSavedPostListView extends StatefulWidget {
   const LMFeedSavedPostListView({
     super.key,
-    this.settings,
     this.postBuilder,
     this.noItemsFoundIndicatorBuilder,
     this.firstPageProgressIndicatorBuilder,
@@ -16,7 +15,6 @@ class LMFeedSavedPostListView extends StatefulWidget {
     this.firstPageErrorIndicatorBuilder,
   });
 
-  final LMFeedScreenSetting? settings;
   // Builder for post item
   // {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
@@ -58,7 +56,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
-  LMFeedScreenSetting? settings;
   LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
   final LMFeedWidgetBuilderDelegate _widgetUtility =
@@ -67,7 +64,6 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   @override
   void initState() {
     super.initState();
-    settings = widget.settings ?? LMFeedCore.config.feedScreenConfig.setting;
     addPageRequestListener();
   }
 

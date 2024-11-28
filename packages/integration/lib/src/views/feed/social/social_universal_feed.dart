@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
@@ -73,7 +72,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenSetting? feedSettings;
+  final LMFeedSocialScreenSetting? feedSettings;
 
   @override
   State<LMFeedSocialUniversalScreen> createState() =>
@@ -96,7 +95,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
         pendingPostBannerBuilder,
     LMFeedTopicBarBuilder? topicBarBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenSetting? config,
+    LMFeedSocialScreenSetting? config,
   }) {
     return LMFeedSocialUniversalScreen(
       appBar: appBar ?? this.appBar,
@@ -155,8 +154,8 @@ class _LMFeedSocialUniversalScreenState
       LMFeedPluralizeWordAction.allSmallSingular);
 
   // Create an instance of LMFeedScreenBuilderDelegate
-  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.config.feedScreenConfig.builder;
+  LMFeedSocialScreenBuilderDelegate _screenBuilderDelegate =
+      LMFeedCore.config.socialFeedScreenConfig.builder;
 
   LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
       LMFeedCore.config.pendingPostScreenConfig.builder;
@@ -181,7 +180,7 @@ class _LMFeedSocialUniversalScreenState
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenSetting? feedSettings;
+  LMFeedSocialScreenSetting? feedSettings;
   LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
@@ -229,7 +228,7 @@ class _LMFeedSocialUniversalScreenState
     _addPaginationListener();
 
     feedSettings =
-        widget.feedSettings ?? LMFeedCore.config.feedScreenConfig.setting;
+        widget.feedSettings ?? LMFeedCore.config.socialFeedScreenConfig.setting;
 
     // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(
