@@ -227,7 +227,6 @@ class LMFeedTopicChipStyle {
         textStyle: TextStyle(
           color: primaryColor ?? LikeMindsTheme.primaryColor,
           fontSize: 14,
-          fontFamily: 'Roboto',
           fontWeight: FontWeight.w400,
         ),
         borderRadius: BorderRadius.circular(4.0),
@@ -239,7 +238,6 @@ class LMFeedTopicChipStyle {
         textStyle: TextStyle(
           color: primaryColor ?? LikeMindsTheme.primaryColor,
           fontSize: 14,
-          fontFamily: 'Roboto',
           fontWeight: FontWeight.w400,
         ),
         borderRadius: BorderRadius.circular(4.0),

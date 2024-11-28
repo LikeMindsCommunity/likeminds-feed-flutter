@@ -100,7 +100,6 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
               textStyle: TextStyle(
                 color: Color(0xFF333333),
                 fontSize: 20,
-                fontFamily: 'Roboto',
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -115,7 +114,6 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
                 style: const TextStyle(
                   color: Color(0xFF666666),
                   fontSize: 13,
-                  fontFamily: 'Roboto',
                   fontWeight: FontWeight.w400,
                 ),
               );

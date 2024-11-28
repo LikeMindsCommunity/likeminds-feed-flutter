@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/cred_screen.dart';
 import 'package:likeminds_feed_sample/globals.dart';
-import 'package:likeminds_feed_sample/main.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class LMSampleApp extends StatelessWidget {

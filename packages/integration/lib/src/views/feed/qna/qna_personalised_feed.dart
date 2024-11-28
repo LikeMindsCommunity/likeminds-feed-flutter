@@ -879,45 +879,6 @@ class _LMFeedQnAPersonalisedScreenState
     );
   }
 
-  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
-    if (media != null) {
-      if (media.attachmentType == LMMediaType.image) {
-        return Container(
-          height: 50,
-          width: 50,
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(6.0),
-          ),
-          child: LMFeedImage(
-            image: media,
-            style: const LMFeedPostImageStyle(
-              boxFit: BoxFit.contain,
-            ),
-          ),
-        );
-      } else if (media.attachmentType == LMMediaType.document) {
-        return LMFeedTheme
-                .instance.theme.mediaStyle.documentStyle.documentIcon ??
-            LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.picture_as_pdf,
-              style: LMFeedIconStyle(
-                color: Colors.red,
-                size: 35,
-                boxPadding: 0,
-              ),
-            );
-      } else if (media.attachmentType == LMMediaType.video) {
-        return const SizedBox();
-      } else {
-        return const SizedBox.shrink();
-      }
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
 
   LMFeedButton createPostButton(BuildContext context) {
     return LMFeedButton(

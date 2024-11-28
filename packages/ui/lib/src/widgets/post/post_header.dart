@@ -407,7 +407,6 @@ class LMFeedPostHeaderStyle {
           textStyle: TextStyle(
             color: onPrimary ?? LikeMindsTheme.onPrimary,
             fontSize: 16,
-            fontFamily: 'Roboto',
             fontWeight: FontWeight.w500,
           ),
         ),

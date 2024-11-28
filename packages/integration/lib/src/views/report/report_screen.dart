@@ -218,7 +218,6 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                                                         textStyle:
                                                             const TextStyle(
                                                           fontSize: 16,
-                                                          fontFamily: 'Inter',
                                                           fontWeight:
                                                               FontWeight.w400,
                                                         ).copyWith(

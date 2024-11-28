@@ -291,7 +291,6 @@ class LMFeedPostLinkPreviewStyle {
           textStyle: TextStyle(
             color: LikeMindsTheme.headingColor,
             fontSize: 16,
-            fontFamily: 'Roboto',
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -300,7 +299,6 @@ class LMFeedPostLinkPreviewStyle {
           textStyle: TextStyle(
             color: LikeMindsTheme.greyColor,
             fontSize: 14,
-            fontFamily: 'Roboto',
             fontWeight: FontWeight.w400,
           ),
         ),
@@ -309,7 +307,6 @@ class LMFeedPostLinkPreviewStyle {
           textStyle: TextStyle(
             color: LikeMindsTheme.greyColor,
             fontSize: 12,
-            fontFamily: 'Roboto',
             fontWeight: FontWeight.w400,
           ),
         ),
