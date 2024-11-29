@@ -23,7 +23,7 @@ class LMFeedPostDetailScreenConfig {
   final LMFeedPostDetailScreenStyle style;
 
   /// {@macro lm_feed_post_detail_screen_config}
-  LMFeedPostDetailScreenConfig({
+  const LMFeedPostDetailScreenConfig({
     this.builder = const LMFeedPostDetailScreenBuilderDelegate(),
     this.setting = const LMFeedPostDetailScreenSetting(),
     this.style = const LMFeedPostDetailScreenStyle(),

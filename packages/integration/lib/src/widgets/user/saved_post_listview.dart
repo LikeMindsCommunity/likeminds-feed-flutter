@@ -58,7 +58,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
   bool userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
-  final LMFeedWidgetBuilderDelegate _widgetUtility =
+  final LMFeedWidgetBuilderDelegate _widgetBuilder =
       LMFeedCore.config.widgetBuilderDelegate;
 
   @override
@@ -228,7 +228,7 @@ class _LMFeedSavedPostListViewState extends State<LMFeedSavedPostListView> {
                         );
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
-                            _widgetUtility.postWidgetBuilder.call(
+                            _widgetBuilder.postWidgetBuilder.call(
                                 context, postWidget, item,
                                 source: _widgetSource);
                       },

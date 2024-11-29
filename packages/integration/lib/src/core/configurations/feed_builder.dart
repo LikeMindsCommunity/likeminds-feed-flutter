@@ -92,24 +92,34 @@ class LMFeedWidgetBuilderDelegate {
     );
   }
 
+  /// Builds app bar widget.
+  PreferredSizeWidget appBar(
+    BuildContext context,
+    LMFeedAppBar appBar, [
+    LMFeedWidgetSource? source,
+  ]) {
+    return appBar;
+  }
+
   /// Builds a post widget with customized builders.
   Widget postWidgetBuilder(
       BuildContext context, LMFeedPostWidget post, LMPostViewData postViewData,
       {LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed}) {
     Size screenSize = MediaQuery.sizeOf(context);
     bool isDesktopWeb;
-    if (screenSize.width > LMFeedCore.config.webConfiguration.maxWidth && kIsWeb) {
+    if (screenSize.width > LMFeedCore.config.webConfiguration.maxWidth &&
+        kIsWeb) {
       isDesktopWeb = true;
     } else {
       isDesktopWeb = false;
     }
 
     return post.copyWith(
-      headerBuilder: this.headerBuilder,
+      headerBuilder: this.postHeaderBuilder,
       contentBuilder: this.postContentBuilder,
       mediaBuilder: this.postMediaBuilder,
       footerBuilder: this.postFooterBuilder,
-      menuBuilder: this.menuBuilder,
+      menuBuilder: this.postMenuBuilder,
       topicBuilder: this.topicBuilder,
       reviewBannerBuilder: this.postReviewBannerBuilder,
       style: post.style?.copyWith(
@@ -119,6 +129,7 @@ class LMFeedWidgetBuilderDelegate {
     );
   }
 
+  //TODO: remove from here
   /// Builds a post review banner widget.
   Widget postReviewBannerBuilder(BuildContext context,
       LMFeedPostReviewBanner postReviewBanner, LMPostViewData postViewData) {
@@ -132,13 +143,13 @@ class LMFeedWidgetBuilderDelegate {
   }
 
   /// Builds a post header widget.
-  Widget headerBuilder(BuildContext context, LMFeedPostHeader postHeader,
+  Widget postHeaderBuilder(BuildContext context, LMFeedPostHeader postHeader,
       LMPostViewData postViewData) {
     return postHeader;
   }
 
   /// Builds a menu widget.
-  Widget menuBuilder(
+  Widget postMenuBuilder(
       BuildContext context, LMFeedMenu menu, LMPostViewData postViewData) {
     return menu;
   }
@@ -190,13 +201,14 @@ class LMFeedWidgetBuilderDelegate {
   }
 
   // Feed Screen Builder Widgets
-
+  //TODO: remove from here add to feed screen builder
   /// Builds a custom widget for the feed screen.
   Widget customWidgetBuilder(
       LMFeedPostSomething postSomethingWidget, BuildContext context) {
     return postSomethingWidget;
   }
 
+  //TODO: remove from here add to feed screen builder
   /// Builds a floating action button for the feed screen.
   Widget floatingActionButtonBuilder(
       BuildContext context, LMFeedButton floatingActionButton) {
@@ -317,6 +329,7 @@ class LMFeedWidgetBuilderDelegate {
     return const SizedBox();
   }
 
+  //TODO: remove from here add to compose screen builder
   /// Builds the app bar for the compose screen.
   PreferredSizeWidget composeScreenAppBar(
     BuildContext context,
@@ -330,24 +343,28 @@ class LMFeedWidgetBuilderDelegate {
     return appBar;
   }
 
+  //TODO: remove from here add to feed screen builder
   /// Builds the user header for the compose screen.
   Widget composeScreenUserHeaderBuilder(
       BuildContext context, LMUserViewData user, LMFeedUserTile userTile) {
     return userTile;
   }
 
+  //TODO: remove from here add to feed screen builder
   /// Builds the topic selector for the compose screen.
   Widget composeScreenTopicSelectorBuilder(BuildContext context,
       Widget topicSelector, List<LMTopicViewData> selectedTopics) {
     return topicSelector;
   }
 
+  //TODO: remove from here add to feed screen builder
   /// Builds the heading text field for the compose screen.
   Widget composeScreenHeadingTextfieldBuilder(
       BuildContext context, TextField headingTextField) {
     return headingTextField;
   }
 
+  //TODO: remove from here add to feed screen builder
   /// Builds the content text field for the compose screen.
   Widget composeScreenContentTextfieldBuilder(
       BuildContext context, LMTaggingAheadTextField contentTextField) {
@@ -366,12 +383,14 @@ class LMFeedWidgetBuilderDelegate {
     return LMFeedSnackBar(
       content: LMFeedText(text: snackBarMessage),
       style: inStyle.copyWith(
-          width: min(LMFeedCore.config.webConfiguration.maxWidthForSnackBars, width)),
+          width: min(
+              LMFeedCore.config.webConfiguration.maxWidthForSnackBars, width)),
     );
   }
 
   /// Builds a bottom text field for the feed screen.
   /// This is used to add a comment to a post.
+  ///   //TODO: remove from here add to post detail screen builder
   Widget bottomTextFieldBuilder(
     BuildContext context,
     LMFeedBottomTextField textField,

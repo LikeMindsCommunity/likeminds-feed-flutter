@@ -31,7 +31,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
   late Size screenSize;
   final DateFormat formatter = DateFormat('MMMM d, hh:mm');
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
-  final LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
+  final LMFeedMediaPreviewScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.mediaPreviewScreenConfig.builder;
   late List<LMAttachmentViewData> postAttachments;
   late LMPostViewData post;
   late LMUserViewData user;
@@ -78,7 +78,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
     final String formatted = formatter.format(post.createdAt);
-    return widgetUtility.scaffold(
+    return _widgetBuilder.scaffold(
       source: LMFeedWidgetSource.mediaPreviewScreen,
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -256,7 +256,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                   ValueListenableBuilder(
                     valueListenable: rebuildCurr,
                     builder: (context, _, __) {
-                      return widgetUtility.postMediaCarouselIndicatorBuilder(
+                      return _widgetBuilder.postMediaCarouselIndicatorBuilder(
                           context,
                           currPosition,
                           postAttachments.length,

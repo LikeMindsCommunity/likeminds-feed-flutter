@@ -58,7 +58,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   String postTitleSmallCapPlural =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
 
-  LMFeedPendingPostScreenBuilderDeletegate _postScreenBuilderDeletegate =
+  LMFeedPendingPostScreenBuilderDeletegate _postScreenBuilderDelegate =
       LMFeedCore.config.pendingPostScreenConfig.builder;
 
   LMFeedPendingBloc pendingBloc = LMFeedPendingBloc.instance;
@@ -77,8 +77,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   String _appBarTitle = '';
   String _appBarSubtitle = '';
 
-  LMFeedWidgetBuilderDelegate _widgetsBuilder =
-      LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedPendingPostScreenBuilderDeletegate _widgetsBuilder =
+      LMFeedCore.config.pendingPostScreenConfig.builder;
 
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.pendingPostsScreen;
 
@@ -158,7 +158,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
     screenWidth =
         min(LMFeedCore.config.webConfiguration.maxWidth, screenSize.width);
     return _widgetsBuilder.scaffold(
-      appBar: _postScreenBuilderDeletegate.appBarBuilder(
+      appBar: _postScreenBuilderDelegate.appBarBuilder(
           context, defAppBar(), pendingPostCount),
       backgroundColor: feedThemeData.backgroundColor,
       body: Align(
@@ -465,10 +465,10 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
         _defPendingPostDialog(postViewData);
 
     if (postViewData.postStatus == LMPostReviewStatus.rejected) {
-      _postScreenBuilderDeletegate.showPostRejectionDialog(
+      _postScreenBuilderDelegate.showPostRejectionDialog(
           context, postViewData, pendingPostDialog);
     } else if (postViewData.postStatus == LMPostReviewStatus.pending) {
-      _postScreenBuilderDeletegate.showPostApprovalDialog(
+      _postScreenBuilderDelegate.showPostApprovalDialog(
           context, postViewData, pendingPostDialog);
     }
   }

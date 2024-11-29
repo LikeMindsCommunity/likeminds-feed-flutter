@@ -23,7 +23,7 @@ class LMFeedComposeScreenConfig {
   final LMFeedComposeScreenStyle style;
 
   /// {@macro lm_feed_compose_screen_config}
-  LMFeedComposeScreenConfig({
+  const LMFeedComposeScreenConfig({
     this.builder = const LMFeedComposeScreenBuilderDelegate(),
     this.setting = const LMFeedComposeScreenSetting(),
     this.style = const LMFeedComposeScreenStyle(),

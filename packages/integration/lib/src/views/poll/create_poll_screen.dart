@@ -43,7 +43,7 @@ class LMFeedCreatePollScreen extends StatefulWidget {
 class _LMFeedCreatePollScreenState extends State<LMFeedCreatePollScreen> {
   late Size screenSize;
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedWidgetBuilderDelegate _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedPollScreenBuilderDelegate _widgetsBuilder = LMFeedCore.config.pollScreenConfig.builder;
   LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   List<String> options = ["", ""];
   final ValueNotifier<bool> _optionBuilder = ValueNotifier(false);

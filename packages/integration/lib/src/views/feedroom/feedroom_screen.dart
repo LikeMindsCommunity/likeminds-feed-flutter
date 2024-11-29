@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart';
 
-part 'feedroom_screen_configuration.dart';
 
 /// {@template feed_screen}
 /// A screen to display the feed.
@@ -23,7 +22,7 @@ class LMFeedRoomScreen extends StatefulWidget {
     this.topicChipBuilder,
     this.postBuilder,
     this.floatingActionButtonBuilder,
-    this.config,
+    this.settings,
     this.topicBarBuilder,
     this.floatingActionButtonLocation,
     this.noItemsFoundIndicatorBuilder,
@@ -74,7 +73,7 @@ class LMFeedRoomScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedRoomScreenConfig? config;
+  final LMFeedroomScreenSetting? settings;
 
   @override
   State<LMFeedRoomScreen> createState() => _LMFeedRoomScreenState();
@@ -97,7 +96,7 @@ class LMFeedRoomScreen extends StatefulWidget {
         pendingPostBannerBuilder,
     LMFeedTopicBarBuilder? topicBarBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedRoomScreenConfig? config,
+    LMFeedroomScreenSetting? settings,
   }) {
     return LMFeedRoomScreen(
       feedroomId: feedroomId ?? this.feedroomId,
@@ -124,7 +123,7 @@ class LMFeedRoomScreen extends StatefulWidget {
       topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
-      config: config ?? this.config,
+      settings: settings ?? this.settings,
     );
   }
 }
@@ -156,13 +155,13 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  LMFeedWidgetBuilderDelegate _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedroomScreenBuilderDelegate _widgetsBuilder = LMFeedCore.config.feedroomScreenConfig.builder;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.feedroom;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedRoomScreenConfig? config;
+  LMFeedroomScreenSetting? settings;
   final ScrollController _controller = ScrollController();
 
   // notifies value listenable builder to rebuild the topic feed
@@ -347,7 +346,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    config = widget.config ?? LMFeedCore.config.feedRoomScreenConfig;
+    settings = widget.settings ?? LMFeedCore.config.feedroomScreenConfig.setting;
     return LMFeedCore.config.widgetBuilderDelegate.scaffold(
       onPopInvoked: (p0) {
         if (p0) {
@@ -379,14 +378,14 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           controller: _controller,
           slivers: [
             SliverToBoxAdapter(
-              child: config!.showCustomWidget
+              child: settings!.showCustomWidget
                   ? widget.customWidgetBuilder
                           ?.call(context, _defPostSomethingWidget(context)) ??
                       _defPostSomethingWidget(context)
                   : const SizedBox(),
             ),
             SliverToBoxAdapter(
-              child: config!.enableTopicFiltering
+              child: settings!.enableTopicFiltering
                   ? ValueListenableBuilder(
                       valueListenable: rebuildTopicFeed,
                       builder: (context, _, __) {
@@ -721,7 +720,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   void openTopicSelector(BuildContext context) {
     LMFeedTopicSelectionWidgetType topicSelectionWidgetType =
-        config!.topicSelectionWidgetType;
+        settings!.topicSelectionWidgetType;
     if (topicSelectionWidgetType ==
         LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet) {
       showTopicSelectSheet(context);

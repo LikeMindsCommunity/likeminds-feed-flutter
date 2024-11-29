@@ -77,7 +77,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
-  LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedComposeScreenBuilderDelegate widgetUtility = LMFeedCore.config.composeScreenConfig.builder;
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.editPostScreen;
 
   /// Controllers and other helper classes' objects
@@ -115,13 +115,13 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     // Set the config from the widget
     // If the widget does not have a config, then set the config
     // from the core
-    config = widget.config ?? LMFeedCore.config.composeConfig;
+    config = widget.config ?? LMFeedCore.config.composeScreenConfig;
     enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
         ? true
-        : config?.enableHeading ?? false;
+        : config?.setting.enableHeading ?? false;
     headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
         ? true
-        : config?.headingRequiredToCreatePost ?? false;
+        : config?.setting.headingRequiredToCreatePost ?? false;
     _headingController = enableHeading ? TextEditingController() : null;
     // Populate the screen with the post details
     // heading controller with heading
@@ -309,9 +309,9 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   // If topics are required and not selected
   // then show a snackbar and return false
   bool checkIfTopicAreRequiredAndSelected() {
-    if (config!.topicRequiredToCreatePost &&
+    if (config!.setting.topicRequiredToCreatePost &&
         composeBloc.selectedTopics.isEmpty &&
-        config!.enableTopics) {
+        config!.setting.enableTopics) {
       LMFeedCore.showSnackBar(
         context,
         "Can't create a $postTitleSmallCap without topic",
@@ -324,8 +324,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    config = widget.config ?? LMFeedCore.config.composeConfig;
-    style = widget.style ?? feedTheme.composeScreenStyle;
+    config = widget.config ?? LMFeedCore.config.composeScreenConfig;
+    style = widget.style ?? LMFeedCore.config.composeScreenConfig.style;
     screenSize = MediaQuery.sizeOf(context);
     screenWidth = min(LMFeedCore.config.webConfiguration.maxWidth, screenSize!.width);
 
@@ -352,7 +352,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               );
             } else if (state is LMFeedGetPostSuccessState) {
               return AnnotatedRegion<SystemUiOverlayStyle>(
-                value: config!.composeSystemOverlayStyle,
+                value: config!.setting.composeSystemOverlayStyle,
                 child: GestureDetector(
                   onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                   child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
@@ -847,7 +847,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   return;
                 }
 
-                if (config!.textRequiredToCreatePost && postText.isEmpty) {
+                if (config!.setting.textRequiredToCreatePost && postText.isEmpty) {
                   LMFeedCore.showSnackBar(
                     context,
                     "Can't create a $postTitleSmallCap without text",
@@ -962,11 +962,11 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
                           focusedErrorBorder: InputBorder.none,
-                          hintText: config?.composeHint,
+                          hintText: config?.setting.composeHint,
                         ),
                         minLines: 3,
                       ),
-                      taggingEnabled: config!.enableTagging,
+                      taggingEnabled: config!.setting.enableTagging,
                       userTags: composeBloc.userTags,
                       onTagSelected: (tag) {
                         composeBloc.userTags.add(tag);
@@ -1036,7 +1036,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
             color: theme.inActiveColor,
           ),
         ),
-        hintText: config?.headingHint,
+        hintText: config?.setting.headingHint,
         hintStyle: TextStyle(
           color: theme.onContainer.withOpacity(0.5),
           overflow: TextOverflow.visible,
@@ -1052,7 +1052,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   }
 
   void _onTextChanged(String p0) {
-    if (!config!.enableLinkPreviews) {
+    if (!config!.setting.enableLinkPreviews) {
       return;
     }
     if (_debounce?.isActive ?? false) {
@@ -1103,7 +1103,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           height: 72,
           child: Row(
             children: [
-              if (composeBloc.documentCount == 0 && config!.enableImages)
+              if (composeBloc.documentCount == 0 && config!.setting.enableImages)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
@@ -1128,7 +1128,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
               if (composeBloc.documentCount == 0 &&
                   composeBloc.imageCount == 0 &&
                   composeBloc.videoCount == 0 &&
-                  config!.enableVideos)
+                  config!.setting.enableVideos)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
@@ -1152,7 +1152,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 ),
               if (composeBloc.videoCount == 0 &&
                   composeBloc.imageCount == 0 &&
-                  config!.enableDocuments)
+                  config!.setting.enableDocuments)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
@@ -1182,7 +1182,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   }
 
   Widget _defTopicSelector(List<LMTopicViewData> topics) {
-    if (!config!.enableTopics || topics.isEmpty) {
+    if (!config!.setting.enableTopics || topics.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -1213,7 +1213,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                           selectedTopics: composeBloc.selectedTopics,
                           isEnabled: true,
                           onTopicSelected: (updatedTopics, tappedTopic) {
-                            if (config!.multipleTopicsSelectable) {
+                            if (config!.setting.multipleTopicsSelectable) {
                               int index = composeBloc.selectedTopics.indexWhere(
                                   (element) => element.id == tappedTopic.id);
                               if (index == -1) {
@@ -1226,7 +1226,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                               composeBloc.selectedTopics.add(tappedTopic);
                             }
 
-                            if (!config!.multipleTopicsSelectable) {
+                            if (!config!.setting.multipleTopicsSelectable) {
                               _controllerPopUp.hideMenu();
                             }
                             rebuildTopicFloatingButton.value =

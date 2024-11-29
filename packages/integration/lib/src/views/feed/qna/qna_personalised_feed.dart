@@ -8,8 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
-import 'package:likeminds_feed_flutter_core/src/views/pending_post/pending_posts_screen.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 /// {@template lm_feed_qna_personalised_screen}
@@ -158,9 +156,9 @@ class _LMFeedQnAPersonalisedScreenState
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetBuilderDelegate
-  LMFeedWidgetBuilderDelegate _widgetsBuilder =
-      LMFeedCore.config.widgetBuilderDelegate;
+  // Create an instance of LMFeedQnaScreenWidgetBuilderDelegate
+  LMFeedQnaScreenBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.qnaFeedScreenConfig.builder;
 
   // Set the widget source to personalised feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.personalisedFeed;

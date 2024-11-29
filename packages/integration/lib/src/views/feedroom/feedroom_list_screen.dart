@@ -42,7 +42,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
   final PagingController<int, LMFeedRoomViewData>
       _pagingControllerFeedRoomList = PagingController(firstPageKey: 1);
 
-  LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedroomScreenBuilderDelegate widgetBuilder = LMFeedCore.config.feedroomScreenConfig.builder;
 
   void _addPaginationListener() {
     _pagingControllerFeedRoomList.addPageRequestListener((pageKey) {
@@ -86,7 +86,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return widgetUtility.scaffold(
+    return widgetBuilder.scaffold(
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
@@ -119,7 +119,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
             } else if (state is LMFeedRoomListEmptyState) {
               return getFeedRoomListEmptyView();
             }
-            return widgetUtility.scaffold(
+            return widgetBuilder.scaffold(
               backgroundColor: LMFeedCore.theme.backgroundColor,
               body: LMFeedLoader(),
             );

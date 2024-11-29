@@ -40,7 +40,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  LMFeedWidgetBuilderDelegate _widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedActivityScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.activityScreenConfig.builder;
   final PagingController<int, UserActivityItem> _pagingController =
       PagingController(firstPageKey: 1);
   Map<String, LMUserViewData> users = {};
@@ -146,7 +147,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _widgetUtility.scaffold(
+    return _widgetBuilder.scaffold(
       source: widgetSource,
       backgroundColor: feedTheme.backgroundColor,
       appBar: LMFeedAppBar(
@@ -168,7 +169,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
+          width: min(
+              screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
           height: MediaQuery.of(context).size.height,
           padding: EdgeInsets.only(top: isDesktopWeb ? 10 : 0),
           child: PagedListView<int, UserActivityItem>(
@@ -222,7 +224,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                     children: [
                       widget.postBuilder
                               ?.call(context, postWidget, postViewData) ??
-                          _widgetUtility.postWidgetBuilder(
+                          _widgetBuilder.postWidgetBuilder(
                               context, postWidget, postViewData,
                               source: widgetSource),
                       if (item.action == 7)
@@ -266,7 +268,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
                                   return widget.commentBuilder?.call(context,
                                           commentWidget, postViewData) ??
-                                      _widgetUtility.commentBuilder(
+                                      _widgetBuilder.commentBuilder(
                                           context, commentWidget, postViewData);
                                 },
                               ),
@@ -533,7 +535,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       attachments: post.attachments!,
       style: feedTheme?.mediaStyle,
       postId: post.id,
-      pollBuilder: _widgetUtility.pollWidgetBuilder,
+      pollBuilder: _widgetBuilder.pollWidgetBuilder,
       poll: _defPollWidget(post),
       onMediaTap: (int index) async {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
@@ -874,7 +876,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
         onTap: () async {
           // check if the user is a guest user
           if (LMFeedUserUtils.isGuestUser()) {
-            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                ?.call(context);
             return;
           }
           LMFeedPostBloc.instance.add(LMFeedUpdatePostEvent(

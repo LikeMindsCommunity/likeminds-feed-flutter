@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 
 class LMFeedBottomTextField extends StatefulWidget {
   const LMFeedBottomTextField({
@@ -102,7 +103,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   final LMUserViewData currentUser =
       LMFeedLocalPreference.instance.fetchUserData()!;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
-  LMPostDetailScreenConfig? config = LMFeedCore.config.postDetailConfig;
+  LMFeedPostDetailScreenSetting? settings = LMFeedCore.config.postDetailScreenConfig.setting;
   late LMFeedBottomTextFieldStyle? _style;
   final bool isGuestUser = LMFeedUserUtils.isGuestUser();
 
@@ -184,7 +185,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                     LMTaggingAheadTextField(
                       isDown: false,
                       taggingEnabled:
-                          LMFeedCore.config.composeConfig.enableTagging,
+                          LMFeedCore.config.composeScreenConfig.setting.enableTagging,
                       enabled: !isGuestUser && right,
                       style: LMTaggingAheadTextFieldStyle(
                         maxLines: _style?.maxLines,
@@ -236,7 +237,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
       filled: true,
       enabled: right,
       hintText: right
-          ? config?.commentTextFieldHint ??
+          ? settings?.commentTextFieldHint ??
               'Write a $commentTitleSmallCapSingular'
           : "You do not have permission to create a $commentTitleSmallCapSingular.",
     );

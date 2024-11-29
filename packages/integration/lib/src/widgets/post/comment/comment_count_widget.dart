@@ -6,15 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 
 class LMFeedCommentCount extends StatefulWidget {
   const LMFeedCommentCount({
     super.key,
-    this.config,
+    this.settings,
     this.countTextBuilder,
     this.style,
   });
-  final LMPostDetailScreenConfig? config;
+  final LMFeedPostDetailScreenSetting? settings;
   final Widget Function(BuildContext context, LMFeedText textWidget)?
       countTextBuilder;
   final LMFeedCommentCountStyle? style;
@@ -27,7 +28,7 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
   int _commentCount = 0;
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
-  late LMPostDetailScreenConfig config;
+  late LMFeedPostDetailScreenSetting settings;
   late Size screenSize;
   late double screenWidth;
   bool isDesktopWeb = false;
@@ -36,7 +37,7 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
   @override
   void initState() {
     super.initState();
-    config = widget.config ?? LMFeedCore.config.postDetailConfig;
+    settings = widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
   }
 
   @override
@@ -77,7 +78,7 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
           current is LMFeedDeleteCommentSuccessState,
       builder: (context, state) {
         return _commentCount == 0 ||
-                !config.showCommentCountOnList ||
+                !settings.showCommentCountOnList ||
                 state is LMFeedGetCommentLoadingState
             ? const SizedBox.shrink()
             : Container(

@@ -30,7 +30,7 @@ class LMFeedThemeData {
   final LMFeedTextFieldStyle textFieldStyle;
   final LMFeedDialogStyle dialogStyle;
   final LMFeedPopUpMenuStyle popUpMenuStyle;
-  final LMFeedComposeScreenStyle composeScreenStyle;
+  // final LMFeedComposeScreenStyle composeScreenStyle;
   final LMFeedLoaderStyle loaderStyle;
   final LMFeedBottomSheetStyle bottomSheetStyle;
   final LMFeedSnackBarStyle snackBarTheme;
@@ -78,7 +78,7 @@ class LMFeedThemeData {
     required this.textFieldStyle,
     required this.dialogStyle,
     required this.popUpMenuStyle,
-    required this.composeScreenStyle,
+    // required this.composeScreenStyle,
     required this.loaderStyle,
     required this.bottomSheetStyle,
     required this.snackBarTheme,
@@ -125,7 +125,7 @@ class LMFeedThemeData {
     LMFeedTextFieldStyle? textFieldStyle,
     LMFeedDialogStyle? dialogStyle,
     LMFeedPopUpMenuStyle? popUpMenuStyle,
-    LMFeedComposeScreenStyle? composeScreenStyle,
+    // LMFeedComposeScreenStyle? composeScreenStyle,
     Color? container,
     Color? onContainer,
     Color? onPrimary,
@@ -183,10 +183,10 @@ class LMFeedThemeData {
             insetPadding: const EdgeInsets.all(24.0),
           ),
       popUpMenuStyle: popUpMenuStyle ?? const LMFeedPopUpMenuStyle(),
-      composeScreenStyle: composeScreenStyle ??
-          LMFeedComposeScreenStyle.basic(
-            primaryColor: primaryColor,
-          ),
+      // composeScreenStyle: composeScreenStyle ??
+      //     LMFeedComposeScreenStyle.basic(
+      //       primaryColor: primaryColor,
+      //     ),
       loaderStyle: loaderStyle ??
           LMFeedLoaderStyle(
             color: primaryColor ?? LikeMindsTheme.primaryColor,
@@ -230,7 +230,7 @@ class LMFeedThemeData {
     LMFeedPostContentStyle? contentStyle,
     LMFeedPostMediaStyle? mediaStyle,
     LMFeedPostFooterStyle? footerStyle,
-    LMFeedComposeScreenStyle? composeScreenStyle,
+    // LMFeedComposeScreenStyle? composeScreenStyle,
     LMFeedLoaderStyle? loaderStyle,
     LMFeedBottomSheetStyle? bottomSheetStyle,
     LMFeedSnackBarStyle? snackBarTheme,
@@ -262,7 +262,7 @@ class LMFeedThemeData {
       contentStyle: contentStyle ?? this.contentStyle,
       mediaStyle: mediaStyle ?? this.mediaStyle,
       footerStyle: footerStyle ?? this.footerStyle,
-      composeScreenStyle: composeScreenStyle ?? this.composeScreenStyle,
+      // composeScreenStyle: composeScreenStyle ?? this.composeScreenStyle,
       loaderStyle: loaderStyle ?? this.loaderStyle,
       bottomSheetStyle: bottomSheetStyle ?? this.bottomSheetStyle,
       snackBarTheme: snackBarTheme ?? this.snackBarTheme,

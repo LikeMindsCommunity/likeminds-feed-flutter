@@ -10,7 +10,7 @@ class LMFeedMediaHandler {
       int currentMediaLength) async {
     try {
       LMFeedComposeScreenConfig composeScreenConfig =
-          LMFeedCore.config.composeConfig;
+          LMFeedCore.config.composeScreenConfig;
       // final XFile? pickedFile =
       List<LMAttachmentViewData> videoFiles = [];
       final FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
@@ -41,11 +41,11 @@ class LMFeedMediaHandler {
         sizeLimit = 100;
       }
 
-      if (currentMediaLength >= composeScreenConfig.mediaLimit) {
+      if (currentMediaLength >= composeScreenConfig.setting.mediaLimit) {
         return LMResponse(
             success: false,
             errorMessage:
-                'A total of ${composeScreenConfig.mediaLimit} attachments can be added to a post');
+                'A total of ${composeScreenConfig.setting.mediaLimit} attachments can be added to a post');
       } else {
         for (PlatformFile pFile in pickedFiles.files) {
           double fileSize = getFileSizeInDouble(pFile.size);
@@ -91,7 +91,7 @@ class LMFeedMediaHandler {
       int currentMediaLength) async {
     try {
       LMFeedComposeScreenConfig composeScreenConfig =
-          LMFeedCore.config.composeConfig;
+          LMFeedCore.config.composeScreenConfig;
 
       final pickedFiles = await FilePicker.platform.pickFiles(
         allowMultiple: true,
@@ -103,11 +103,11 @@ class LMFeedMediaHandler {
       );
       if (pickedFiles != null) {
         if (currentMediaLength + pickedFiles.files.length >
-            composeScreenConfig.documentLimit) {
+            composeScreenConfig.setting.documentLimit) {
           return LMResponse(
               success: false,
               errorMessage:
-                  'A total of ${composeScreenConfig.documentLimit} documents can be added to a post');
+                  'A total of ${composeScreenConfig.setting.documentLimit} documents can be added to a post');
         }
         List<LMAttachmentViewData> attachedFiles = [];
         for (var pickedFile in pickedFiles.files) {
@@ -146,7 +146,7 @@ class LMFeedMediaHandler {
   static Future<LMResponse<List<LMAttachmentViewData>>> pickImages(
       int mediaCount) async {
     LMFeedComposeScreenConfig composeScreenConfig =
-        LMFeedCore.config.composeConfig;
+        LMFeedCore.config.composeScreenConfig;
     // onUploading();
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: true,
@@ -173,11 +173,11 @@ class LMFeedMediaHandler {
     }
 
     if (list != null && list.files.isNotEmpty) {
-      if (mediaCount + list.files.length > composeScreenConfig.mediaLimit) {
+      if (mediaCount + list.files.length > composeScreenConfig.setting.mediaLimit) {
         return LMResponse(
             success: false,
             errorMessage:
-                'A total of ${composeScreenConfig.mediaLimit} attachments can be added to a post');
+                'A total of ${composeScreenConfig.setting.mediaLimit} attachments can be added to a post');
       }
       for (PlatformFile image in list.files) {
         int fileBytes = image.size;

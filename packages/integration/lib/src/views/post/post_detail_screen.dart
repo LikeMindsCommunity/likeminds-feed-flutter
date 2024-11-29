@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/comment/comment_count_widget.dart';
-part 'post_detail_screen_configuration.dart';
 
 /// {@template post_detail_screen}
 /// A screen that displays a post in detail
@@ -28,7 +28,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
     this.onLikeClick,
     this.onCommentClick,
     this.openKeyboard = false,
-    this.config,
+    this.settings,
     this.commentListBuilder,
   });
   // Required variables
@@ -64,7 +64,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
 
   final bool openKeyboard;
 
-  final LMPostDetailScreenConfig? config;
+  final LMFeedPostDetailScreenSetting? settings;
 
   LMFeedPostDetailScreen copyWith({
     String? postId,
@@ -80,7 +80,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
         bottomTextFieldBuilder,
     Widget Function(BuildContext)? commentSeparatorBuilder,
     bool? openKeyboard,
-    LMPostDetailScreenConfig? config,
+    LMFeedPostDetailScreenSetting? settings,
   }) {
     return LMFeedPostDetailScreen(
       postId: postId ?? this.postId,
@@ -96,7 +96,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
       commentSeparatorBuilder:
           commentSeparatorBuilder ?? this.commentSeparatorBuilder,
       openKeyboard: openKeyboard ?? this.openKeyboard,
-      config: config ?? this.config,
+      settings: settings ?? this.settings,
     );
   }
 
@@ -124,7 +124,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       LMFeedPluralizeWordAction.allSmallSingular);
 
   final LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
-  final LMFeedWidgetBuilderDelegate _widgetBuilder = LMFeedCore.config.widgetBuilderDelegate;
+  final LMFeedPostDetailScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.postDetailScreenConfig.builder;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
   String? commentIdReplyId;
@@ -135,7 +135,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
 
   bool right = true;
   List<LMUserTagViewData> userTags = [];
-  LMPostDetailScreenConfig? config;
+  LMFeedPostDetailScreenSetting? settings;
 
   bool isAndroid = LMFeedPlatform.instance.isAndroid();
   bool isWeb = LMFeedPlatform.instance.isWeb();
@@ -154,14 +154,14 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     if (widget.openKeyboard && right) {
       openOnScreenKeyboard();
     }
-    config = widget.config ?? LMFeedCore.config.postDetailConfig;
+    settings = widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
   }
 
   @override
   void didUpdateWidget(covariant LMFeedPostDetailScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.postId != widget.postId) {}
-    config = widget.config ?? LMFeedCore.config.postDetailConfig;
+    settings = widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
   }
 
   @override
@@ -401,7 +401,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                 current is LMFeedDeleteCommentSuccessState,
             builder: (context, state) {
               return _commentCount == 0 ||
-                      !config!.showCommentCountOnList ||
+                      !settings!.showCommentCountOnList ||
                       state is LMFeedGetCommentLoadingState
                   ? const SizedBox.shrink()
                   : LMFeedText(

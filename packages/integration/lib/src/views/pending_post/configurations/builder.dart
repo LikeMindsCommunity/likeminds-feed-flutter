@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_core/src/core/configurations/feed_builder.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/post/post_approval_dialog.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
-class LMFeedPendingPostScreenBuilderDeletegate {
+class LMFeedPendingPostScreenBuilderDeletegate
+    extends LMFeedWidgetBuilderDelegate {
   const LMFeedPendingPostScreenBuilderDeletegate();
 
   Future<void> showPostApprovalDialog(BuildContext context,

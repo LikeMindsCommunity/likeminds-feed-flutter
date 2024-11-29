@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
@@ -57,7 +55,7 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  LMFeedWidgetBuilderDelegate _widgetBuilder = LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedReportScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.reportScreenConfig.builder;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.reportScreen;
   LMFeedThemeData theme = LMFeedCore.theme;
 

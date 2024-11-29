@@ -2,30 +2,28 @@ import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/src/core/configurations/feed_builder.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 import 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
-import 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/compose/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feedroom/feedroom_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/notification/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/pending_post/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/poll/configurations/config.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/report/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/search/configurations/config.dart';
 
 // export all the configurations
 export 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
-export 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen_config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/social/social_feed_screen.dart';
 export 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
 // export new configurations
 export 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
-export 'package:likeminds_feed_flutter_core/src/views/compose/compose_screen.dart';
+export 'package:likeminds_feed_flutter_core/src/views/compose/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/media/configurations/config.dart';
@@ -58,9 +56,6 @@ enum LMFeedThemeType {
 /// Holds configurations classes for each screen
 /// {@endtemplate}
 class LMFeedConfig {
-  final LMFeedComposeScreenConfig composeConfig;
-  final LMPostDetailScreenConfig postDetailConfig;
-  final LMFeedRoomScreenConfig feedRoomScreenConfig;
 
   // TODO: remove new flag
   // Flag: new configs
@@ -92,6 +87,8 @@ class LMFeedConfig {
 
   final LMFeedPendingPostsScreenConfig pendingPostScreenConfig;
 
+  final LMFeedPostDetailScreenConfig postDetailScreenConfig;
+
   /// {@macro lm_feed_report_screen_config}
   final LMFeedReportScreenConfig reportScreenConfig;
 
@@ -114,13 +111,11 @@ class LMFeedConfig {
   LMFeedConfig({
     this.socialFeedScreenConfig = const LMFeedSocialScreenConfig(),
     this.qnaFeedScreenConfig = const LMFeedQnaScreenConfig(),
-    this.composeConfig = const LMFeedComposeScreenConfig(),
-    this.postDetailConfig = const LMPostDetailScreenConfig(),
+    this.postDetailScreenConfig = const LMFeedPostDetailScreenConfig(),
     this.pendingPostScreenConfig = const LMFeedPendingPostsScreenConfig(),
-    this.feedRoomScreenConfig = const LMFeedRoomScreenConfig(),
+    this.feedroomScreenConfig = const LMFeedroomScreenConfig(),
     this.activityScreenConfig = const LMFeedActivityScreenConfig(),
     this.composeScreenConfig = const LMFeedComposeScreenConfig(),
-    this.feedroomScreenConfig = const LMFeedroomScreenConfig(),
     this.likeScreenConfig = const LMFeedLikeScreenConfig(),
     this.mediaPreviewScreenConfig = const LMFeedMediaPreviewScreenConfig(),
     this.notificationScreenConfig = const LMFeedNotificationScreenConfig(),

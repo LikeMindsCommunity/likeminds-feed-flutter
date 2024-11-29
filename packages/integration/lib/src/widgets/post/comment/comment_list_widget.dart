@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/configurations/builder.dart';
 
 /// {@template lm_feed_comment_list}
 /// A widget that displays a list of comments for a specific post.
@@ -111,7 +112,7 @@ class LMFeedCommentList extends StatefulWidget {
 class _LMFeedCommentListState extends State<LMFeedCommentList> {
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
-  final LMFeedWidgetBuilderDelegate _widgetBuilder = LMFeedCore.config.widgetBuilderDelegate;
+  final LMFeedPostDetailScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.postDetailScreenConfig.builder;
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
   String commentTitleSmallCapPlural =

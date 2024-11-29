@@ -157,8 +157,8 @@ class _LMFeedSocialPersonalisedScreenState
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetBuilderDelegate
-  LMFeedWidgetBuilderDelegate _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
+  // Create an instance of LMFeedScreenBuilderDelegate
+  LMFeedSocialScreenBuilderDelegate _widgetsBuilder = LMFeedCore.config.socialFeedScreenConfig.builder;
 
   // Set the widget source to personalised feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.personalisedFeed;

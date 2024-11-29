@@ -167,9 +167,9 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetBuilderDelegate
-  LMFeedWidgetBuilderDelegate _widgetsBuilder =
-      LMFeedCore.config.widgetBuilderDelegate;
+  // Create an instance of LMFeedQnaScreenBuilderDelegate
+  LMFeedQnaScreenBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.qnaFeedScreenConfig.builder;
 
   // Set the widget source to universal feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.universalFeed;

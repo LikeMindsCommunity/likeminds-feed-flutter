@@ -44,7 +44,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedWidgetBuilderDelegate widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
+  LMFeedSearchScreenBuilderDelegate widgetUtility = LMFeedCore.config.searchScreenConfig.builder;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.searchScreen;
   ValueNotifier<bool> showCancelIcon = ValueNotifier<bool>(false);
   TextEditingController searchController = TextEditingController();
