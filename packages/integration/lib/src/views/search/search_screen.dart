@@ -381,26 +381,30 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           BoxShadow(
             color: theme.shadowColor,
             offset: const Offset(0, 2),
-            blurRadius: 4,
+            blurRadius: 8,
           ),
         ],
         backgroundColor: theme.container,
+        height: 60,
       ),
-      title: TextField(
-        controller: searchController,
-        focusNode: focusNode,
-        onChanged: _onTextChanged,
-        cursorColor: theme.primaryColor,
-        decoration: InputDecoration(
-          hintText: 'Search...',
-          hintStyle: TextStyle(color: theme.onContainer.withOpacity(0.5)),
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
+      title: SizedBox(
+        width: screenWidth! - 120,
+        child: TextField(
+          controller: searchController,
+          focusNode: focusNode,
+          onChanged: _onTextChanged,
+          cursorColor: theme.primaryColor,
+          decoration: InputDecoration(
+            hintText: 'Search...',
+            hintStyle: TextStyle(color: theme.onContainer.withOpacity(0.5)),
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+          ),
+          style: TextStyle(color: theme.onContainer),
         ),
-        style: TextStyle(color: theme.onContainer),
       ),
       trailing: [
         ValueListenableBuilder(

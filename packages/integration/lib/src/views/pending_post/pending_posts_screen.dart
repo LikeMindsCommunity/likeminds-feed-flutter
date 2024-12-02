@@ -530,8 +530,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData.mediaStyle,
-      carouselIndicatorBuilder: LMFeedCore
-          .config.widgetBuilderDelegate.postMediaCarouselIndicatorBuilder,
+      carouselIndicatorBuilder: _widgetsBuilder.postMediaCarouselIndicatorBuilder,
       imageBuilder: _widgetsBuilder.imageBuilder,
       videoBuilder: _widgetsBuilder.videoBuilder,
       pollBuilder: _widgetsBuilder.pollWidgetBuilder,

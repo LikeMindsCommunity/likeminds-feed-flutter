@@ -211,10 +211,11 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                     valueListenable: rebuildCurr,
                     builder: (context, _, __) {
                       return _widgetBuilder.postMediaCarouselIndicatorBuilder(
-                          context,
-                          currPosition,
-                          postAttachments.length,
-                          carouselIndexIndicatorWidget());
+                        context,
+                        currPosition,
+                        postAttachments.length,
+                        carouselIndexIndicatorWidget(),
+                      );
                     },
                   ),
               ],
@@ -227,6 +228,10 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
 
   LMFeedAppBar _defAppBar(BuildContext context, String formatted) {
     return LMFeedAppBar(
+      style: LMFeedAppBarStyle(
+        backgroundColor: Colors.transparent,
+        height: 60,
+      ),
       leading: LMFeedButton(
         onTap: () {
           Navigator.of(context).pop();
@@ -284,18 +289,29 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: postAttachments.map((url) {
               int index = postAttachments.indexOf(url);
-              return Container(
-                width: 8.0,
-                height: 8.0,
-                margin:
-                    const EdgeInsets.symmetric(vertical: 7.0, horizontal: 2.0),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: currPosition == index
-                      ? feedTheme.primaryColor
-                      : feedTheme.container,
-                ),
-              );
+              return currPosition == index
+                  ? Container(
+                      width: 16.0,
+                      height: 8.0,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 7.0, horizontal: 2.0),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: feedTheme.primaryColor,
+                          borderRadius: BorderRadius.circular(4.0)),
+                    )
+                  : Container(
+                      width: 8.0,
+                      height: 8.0,
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 7.0, horizontal: 2.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: currPosition == index
+                            ? feedTheme.primaryColor
+                            : feedTheme.container,
+                      ),
+                    );
             }).toList())
       ],
     );
