@@ -112,7 +112,8 @@ class LMFeedCommentList extends StatefulWidget {
 class _LMFeedCommentListState extends State<LMFeedCommentList> {
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
-  final LMFeedPostDetailScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.postDetailScreenConfig.builder;
+  final LMFeedPostDetailScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.postDetailScreenConfig.builder;
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
   String commentTitleSmallCapPlural =
@@ -260,8 +261,8 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   LMFeedCommentReplyWidget _defCommentReplyWidget(
       LMCommentViewData commentViewData, LMUserViewData userViewData) {
     return LMFeedCommentReplyWidget(
-      commentBuilder:
-          widget.commentBuilder ?? LMFeedCore.config.widgetBuilderDelegate.commentBuilder,
+      commentBuilder: widget.commentBuilder ??
+          LMFeedCore.config.widgetBuilderDelegate.commentBuilder,
       post: _postViewData!,
       postId: widget.postId,
       comment: commentViewData,
@@ -644,7 +645,8 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         onCommentReport: () {
           // check if the user is a guest user
           if (LMFeedUserUtils.isGuestUser()) {
-            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                ?.call(context);
             return;
           }
           Navigator.of(context).push(

@@ -1028,9 +1028,12 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
 
   LMFeedButton defCommentLikeButton(LMFeedThemeData? feedTheme,
       LMCommentViewData commentViewData, LMPostViewData postViewData) {
+    bool showText = commentViewData.likesCount == 0 ? false : true;
     LMFeedButton likeButton = LMFeedButton(
       style: feedTheme?.commentStyle.likeButtonStyle?.copyWith(
-              showText: commentViewData.likesCount == 0 ? false : true) ??
+            showText: showText,
+            gap: showText ? feedTheme.commentStyle.likeButtonStyle?.gap : 0,
+          ) ??
           LMFeedButtonStyle(
             gap: 10.0,
             showText: commentViewData.likesCount == 0 ? false : true,
@@ -1050,6 +1053,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               icon: Icons.thumb_up_alt_rounded,
             ),
           ),
+      isToggleEnabled: !LMFeedUserUtils.isGuestUser(),
       text: LMFeedText(
         text: LMFeedPostUtils.getLikeCountTextWithCount(
             commentViewData.likesCount),
