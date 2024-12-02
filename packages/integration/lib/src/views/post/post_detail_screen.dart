@@ -289,12 +289,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                                     LMFeedPostWidget postWidget =
                                         LMFeedDefaultWidgets.instance
                                             .defPostWidget(
-                                      context,
-                                      feedTheme,
-                                      postData!,
-                                      _widgetSource,
-                                      ValueNotifier(false),
-                                    );
+                                                context,
+                                                feedTheme,
+                                                postData!,
+                                                _widgetSource,
+                                                ValueNotifier(false),
+                                                onCommentTap: () {
+                                      if (right) {
+                                        openOnScreenKeyboard();
+                                      }
+                                    });
                                     return widget.postBuilder?.call(
                                             context, postWidget, postData!) ??
                                         _widgetBuilder.postWidgetBuilder.call(

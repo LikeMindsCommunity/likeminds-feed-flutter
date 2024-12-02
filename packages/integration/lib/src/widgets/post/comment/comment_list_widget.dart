@@ -327,7 +327,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       }
       LMFeedCore.showSnackBar(
         context,
-        '$commentTitleSmallCapSingular Deleted',
+        '$commentTitleFirstCapSingular Deleted',
         _widgetSource,
       );
     } else if (state is LMFeedDeleteCommentErrorState) {
@@ -390,7 +390,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       ));
       LMFeedCore.showSnackBar(
         context,
-        '$commentTitleSmallCapSingular Deleted',
+        '$commentTitleFirstCapSingular Deleted',
         _widgetSource,
       );
     } else if (state is LMFeedGetReplyCommentLoadingState) {

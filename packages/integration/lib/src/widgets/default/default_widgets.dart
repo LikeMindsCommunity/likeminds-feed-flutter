@@ -27,31 +27,15 @@ class LMFeedDefaultWidgets {
   String _postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
-// Get the post title in all small singular form
-  String _postTitleSmallCapPlural =
-      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
-
-// Get the comment title in first letter capital plural form
-  String _commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
-      LMFeedPluralizeWordAction.firstLetterCapitalPlural);
-// Get the comment title in all small plural form
-  String _commentTitleSmallCapPlural =
-      LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
-// Get the comment title in first letter capital singular form
-  String _commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
-      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
-// Get the comment title in all small singular form
-  String _commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
-      LMFeedPluralizeWordAction.allSmallSingular);
-
   /// Function to create the default post widget
   LMFeedPostWidget defPostWidget(
     BuildContext context,
     LMFeedThemeData? feedThemeData,
     LMPostViewData post,
     LMFeedWidgetSource source,
-    ValueNotifier<bool> postUploading,
-  ) {
+    ValueNotifier<bool> postUploading, {
+    VoidCallback? onCommentTap,
+  }) {
     return LMFeedPostWidget(
       post: post,
       topics: post.topics,
@@ -102,7 +86,13 @@ class LMFeedDefaultWidgets {
         );
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
-      footer: _defFooterWidget(context, post, source, postUploading),
+      footer: _defFooterWidget(
+        context,
+        post,
+        source,
+        postUploading,
+        onCommentTap: onCommentTap,
+      ),
       header: _defPostHeader(context, post, source),
       content: _defContentWidget(post, context, source),
       media: _defPostMedia(context, post, source),
@@ -159,10 +149,12 @@ class LMFeedDefaultWidgets {
   }
 
   LMFeedPostFooter _defFooterWidget(BuildContext context, LMPostViewData post,
-      LMFeedWidgetSource source, ValueNotifier<bool> postUploading) {
+      LMFeedWidgetSource source, ValueNotifier<bool> postUploading,
+      {VoidCallback? onCommentTap}) {
     final LMFeedPostFooter socialFeedFooter = LMFeedPostFooter(
       likeButton: defLikeButton(context, post, source),
-      commentButton: defCommentButton(context, post, source),
+      commentButton:
+          defCommentButton(context, post, source, onTap: onCommentTap),
       saveButton: defSaveButton(post, context, source),
       shareButton: defShareButton(post, source),
       repostButton: defRepostButton(
@@ -178,7 +170,8 @@ class LMFeedDefaultWidgets {
       postViewData: post,
       source: source,
       likeButton: defLikeButton(context, post, source),
-      commentButton: defCommentButton(context, post, source),
+      commentButton:
+          defCommentButton(context, post, source, onTap: onCommentTap),
       saveButton: defSaveButton(post, context, source),
       shareButton: defShareButton(post, source),
       repostButton: defRepostButton(
@@ -570,7 +563,8 @@ class LMFeedDefaultWidgets {
 
   /// Function to create the default comment button
   LMFeedButton defCommentButton(BuildContext context,
-      LMPostViewData postViewData, LMFeedWidgetSource source) {
+      LMPostViewData postViewData, LMFeedWidgetSource source,
+      {VoidCallback? onTap}) {
     final LMFeedButton commentButton = LMFeedButton(
       text: LMFeedText(
         text: LMFeedPostUtils.getCommentCountTextWithCount(
@@ -578,6 +572,7 @@ class LMFeedDefaultWidgets {
       ),
       style: _feedThemeData.footerStyle.commentButtonStyle,
       onTap: () async {
+        onTap?.call();
         LMFeedPostUtils.handlePostCommentButtonTap(postViewData, source);
         if (source == LMFeedWidgetSource.postDetailScreen) {
           return;
@@ -595,6 +590,7 @@ class LMFeedDefaultWidgets {
         LMFeedVideoProvider.instance.playCurrentVideo();
       },
       onTextTap: () async {
+        onTap?.call();
         if (source == LMFeedWidgetSource.postDetailScreen) {
           return;
         }
