@@ -1,44 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
+/// {@template lm_feed_default_widgets}
+/// Default Widgets for the Feed
+/// used to create the default widgets for the feed
+/// {@endtemplate}
 class LMFeedDefaultWidgets {
   // create a singleton class
   LMFeedDefaultWidgets._();
+
+  /// The instance of the [LMFeedDefaultWidgets]
   static final instance = LMFeedDefaultWidgets._();
 
-  final feedThemeData = LMFeedCore.theme;
+  final _feedThemeData = LMFeedCore.theme;
   final _feedBloc = LMFeedUniversalBloc.instance;
-  bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
+  bool _isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
   final _widgetsBuilder = LMFeedCore.config.widgetBuilderDelegate;
-  final newPostBloc = LMFeedPostBloc.instance;
-  LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
-  final userPostingRights = LMFeedUserUtils.checkPostCreationRights();
-  bool postUploading = false;
+  final _newPostBloc = LMFeedPostBloc.instance;
+  LMUserViewData? _currentUser = LMFeedLocalPreference.instance.fetchUserData();
+  final _userPostingRights = LMFeedUserUtils.checkPostCreationRights();
 
 // Get the post title in first letter capital singular form
-  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+  String _postTitleFirstCap = LMFeedPostUtils.getPostTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
 // Get the post title in all small singular form
-  String postTitleSmallCap =
+  String _postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
 // Get the post title in all small singular form
-  String postTitleSmallCapPlural =
+  String _postTitleSmallCapPlural =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
 
 // Get the comment title in first letter capital plural form
-  String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
+  String _commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
 // Get the comment title in all small plural form
-  String commentTitleSmallCapPlural =
+  String _commentTitleSmallCapPlural =
       LMFeedPostUtils.getCommentTitle(LMFeedPluralizeWordAction.allSmallPlural);
 // Get the comment title in first letter capital singular form
-  String commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
+  String _commentTitleFirstCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalSingular);
 // Get the comment title in all small singular form
-  String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
+  String _commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
+  /// Function to create the default post widget
   LMFeedPostWidget defPostWidget(
     BuildContext context,
     LMFeedThemeData? feedThemeData,
@@ -109,7 +115,7 @@ class LMFeedDefaultWidgets {
     return LMFeedPostTopic(
       topics: postViewData.topics,
       post: postViewData,
-      style: feedThemeData.topicStyle,
+      style: _feedThemeData.topicStyle,
       onTopicTap: (context, topicViewData) =>
           LMFeedPostUtils.handlePostTopicTap(
               context, postViewData, topicViewData, source),
@@ -143,7 +149,7 @@ class LMFeedDefaultWidgets {
           ),
         );
       },
-      style: feedThemeData.contentStyle,
+      style: _feedThemeData.contentStyle,
       text: post.text,
       heading: post.heading,
       // check if the source is post detail screen
@@ -165,7 +171,7 @@ class LMFeedDefaultWidgets {
         source,
         postUploading,
       ),
-      postFooterStyle: feedThemeData.footerStyle,
+      postFooterStyle: _feedThemeData.footerStyle,
       showRepostButton: !post.isRepost,
     );
     final qnaFeedFooter = LMFeedQnAPostFooter(
@@ -195,7 +201,7 @@ class LMFeedDefaultWidgets {
       // check if the source is not the post detail screen
       isFeed: source != LMFeedWidgetSource.postDetailScreen,
       postViewData: postViewData,
-      postHeaderStyle: feedThemeData.headerStyle,
+      postHeaderStyle: _feedThemeData.headerStyle,
       createdAt: LMFeedText(
         text: LMFeedTimeAgo.instance.format(postViewData.createdAt),
       ),
@@ -242,11 +248,11 @@ class LMFeedDefaultWidgets {
             showDialog(
               context: context,
               builder: (childContext) => LMFeedDeleteConfirmationDialog(
-                title: 'Delete $postTitleFirstCap',
+                title: 'Delete $_postTitleFirstCap',
                 uuid: postCreatorUUID,
                 widgetSource: source,
                 content:
-                    'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
+                    'Are you sure you want to delete this $_postTitleSmallCap. This action can not be reversed.',
                 action: (String reason) async {
                   Navigator.of(childContext).pop();
 
@@ -260,7 +266,7 @@ class LMFeedDefaultWidgets {
                       isRepost: postViewData.isRepost,
                       postType: postType,
                       userId: postCreatorUUID,
-                      userState: isCm ? "CM" : "member",
+                      userState: _isCm ? "CM" : "member",
                     ),
                   );
                   // navigate back to the previous screen
@@ -286,9 +292,9 @@ class LMFeedDefaultWidgets {
     return LMFeedPostMedia(
       attachments: post.attachments!,
       postId: post.id,
-      style: feedThemeData.mediaStyle,
-      carouselIndicatorBuilder:
-          LMFeedCore.config.widgetBuilderDelegate.postMediaCarouselIndicatorBuilder,
+      style: _feedThemeData.mediaStyle,
+      carouselIndicatorBuilder: LMFeedCore
+          .config.widgetBuilderDelegate.postMediaCarouselIndicatorBuilder,
       imageBuilder: _widgetsBuilder.imageBuilder,
       videoBuilder: _widgetsBuilder.videoBuilder,
       pollBuilder: _widgetsBuilder.pollWidgetBuilder,
@@ -339,10 +345,10 @@ class LMFeedDefaultWidgets {
       isVoteEditing: isVoteEditing["value"]!,
       selectedOption: selectedOptions,
       attachmentMeta: pollValue,
-      style: feedThemeData.mediaStyle.pollStyle ??
+      style: _feedThemeData.mediaStyle.pollStyle ??
           LMFeedPollStyle.basic(
-              primaryColor: feedThemeData.primaryColor,
-              containerColor: feedThemeData.container),
+              primaryColor: _feedThemeData.primaryColor,
+              containerColor: _feedThemeData.container),
       onEditVote: (pollData) {
         isVoteEditing["value"] = true;
         selectedOptions.clear();
@@ -415,7 +421,7 @@ class LMFeedDefaultWidgets {
           pollValue,
           option,
           postViewData.id,
-          currentUser,
+          _currentUser,
           rebuildPollWidget,
           LMFeedWidgetSource.universalFeed,
         );
@@ -452,6 +458,7 @@ class LMFeedDefaultWidgets {
     );
   }
 
+  /// Function to create the default like button
   LMFeedButton defLikeButton(BuildContext context, LMPostViewData postViewData,
       LMFeedWidgetSource source) {
     final LMFeedButton socialLikeButton = LMFeedButton(
@@ -460,7 +467,7 @@ class LMFeedDefaultWidgets {
       text: LMFeedText(
           text: LMFeedPostUtils.getLikeCountTextWithCount(
               postViewData.likeCount)),
-      style: feedThemeData.footerStyle.likeButtonStyle,
+      style: _feedThemeData.footerStyle.likeButtonStyle,
       onTextTap: () {
         if (postViewData.likeCount == 0) {
           return;
@@ -487,7 +494,7 @@ class LMFeedDefaultWidgets {
           LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
-        newPostBloc.add(LMFeedUpdatePostEvent(
+        _newPostBloc.add(LMFeedUpdatePostEvent(
           actionType: postViewData.isLiked
               ? LMFeedPostActionType.unlike
               : LMFeedPostActionType.like,
@@ -501,7 +508,7 @@ class LMFeedDefaultWidgets {
             await LMFeedCore.client.likePost(likePostRequest);
 
         if (!response.success) {
-          newPostBloc.add(LMFeedUpdatePostEvent(
+          _newPostBloc.add(LMFeedUpdatePostEvent(
             actionType: postViewData.isLiked
                 ? LMFeedPostActionType.unlike
                 : LMFeedPostActionType.like,
@@ -546,7 +553,7 @@ class LMFeedDefaultWidgets {
           ),
         ),
         border: Border.all(
-          color: feedThemeData.backgroundColor,
+          color: _feedThemeData.backgroundColor,
         ),
         borderRadius: 100,
         padding: EdgeInsets.symmetric(
@@ -561,6 +568,7 @@ class LMFeedDefaultWidgets {
         : socialLikeButton;
   }
 
+  /// Function to create the default comment button
   LMFeedButton defCommentButton(BuildContext context,
       LMPostViewData postViewData, LMFeedWidgetSource source) {
     final LMFeedButton commentButton = LMFeedButton(
@@ -568,7 +576,7 @@ class LMFeedDefaultWidgets {
         text: LMFeedPostUtils.getCommentCountTextWithCount(
             postViewData.commentCount),
       ),
-      style: feedThemeData.footerStyle.commentButtonStyle,
+      style: _feedThemeData.footerStyle.commentButtonStyle,
       onTap: () async {
         LMFeedPostUtils.handlePostCommentButtonTap(postViewData, source);
         if (source == LMFeedWidgetSource.postDetailScreen) {
@@ -620,6 +628,7 @@ class LMFeedDefaultWidgets {
         : commentButton;
   }
 
+  /// Function to create the default save button
   LMFeedButton defSaveButton(LMPostViewData postViewData, BuildContext context,
           LMFeedWidgetSource source) =>
       LMFeedButton(
@@ -656,15 +665,16 @@ class LMFeedDefaultWidgets {
             LMFeedCore.showSnackBar(
               context,
               postViewData.isSaved
-                  ? "$postTitleFirstCap Saved"
-                  : "$postTitleFirstCap Unsaved",
+                  ? "$_postTitleFirstCap Saved"
+                  : "$_postTitleFirstCap Unsaved",
               source,
             );
           }
         },
-        style: feedThemeData.footerStyle.saveButtonStyle,
+        style: _feedThemeData.footerStyle.saveButtonStyle,
       );
 
+  /// Function to create the default share button
   LMFeedButton defShareButton(
           LMPostViewData postViewData, LMFeedWidgetSource source) =>
       LMFeedButton(
@@ -675,7 +685,7 @@ class LMFeedDefaultWidgets {
 
           LMFeedDeepLinkHandler().sharePost(postViewData.id);
         },
-        style: feedThemeData.footerStyle.shareButtonStyle,
+        style: _feedThemeData.footerStyle.shareButtonStyle,
       );
 
   LMFeedButton defRepostButton(
@@ -688,7 +698,7 @@ class LMFeedDefaultWidgets {
           style: LMFeedTextStyle(
             textStyle: TextStyle(
               color: postViewData.isRepostedByUser
-                  ? feedThemeData.primaryColor
+                  ? _feedThemeData.primaryColor
                   : null,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -701,25 +711,25 @@ class LMFeedDefaultWidgets {
         onTap: () {
           handleCreatePost(context, source, postUploading);
         },
-        style: feedThemeData.footerStyle.repostButtonStyle?.copyWith(
-            icon: feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
+        style: _feedThemeData.footerStyle.repostButtonStyle?.copyWith(
+            icon: _feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: _feedThemeData.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color: postViewData.isRepostedByUser
-                          ? feedThemeData.primaryColor
+                          ? _feedThemeData.primaryColor
                           : null),
             ),
             activeIcon:
-                feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
-              style: feedThemeData.footerStyle.repostButtonStyle?.icon?.style
+                _feedThemeData.footerStyle.repostButtonStyle?.icon?.copyWith(
+              style: _feedThemeData.footerStyle.repostButtonStyle?.icon?.style
                   ?.copyWith(
                       color: postViewData.isRepostedByUser
-                          ? feedThemeData.primaryColor
+                          ? _feedThemeData.primaryColor
                           : null),
             )),
       );
 
-  // function to handle the create post button
+  /// function to handle the create post button
   Future<void> handleCreatePost(
     BuildContext context,
     LMFeedWidgetSource source,
@@ -727,7 +737,7 @@ class LMFeedDefaultWidgets {
     int? feedRoomId,
   }) async {
     // check if the user have posting rights
-    if (userPostingRights) {
+    if (_userPostingRights) {
       // check if the user is a guest user
       if (LMFeedUserUtils.isGuestUser()) {
         LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
@@ -739,7 +749,7 @@ class LMFeedDefaultWidgets {
       if (value.success) {
         LMFeedCore.showSnackBar(
           context,
-          'A $postTitleSmallCap is already uploading.',
+          'A $_postTitleSmallCap is already uploading.',
           source,
         );
         return;
@@ -760,19 +770,20 @@ class LMFeedDefaultWidgets {
       } else {
         LMFeedCore.showSnackBar(
           context,
-          'A $postTitleSmallCap is already uploading.',
+          'A $_postTitleSmallCap is already uploading.',
           source,
         );
       }
     } else {
       LMFeedCore.showSnackBar(
         context,
-        "You do not have permission to create a $postTitleSmallCap",
+        "You do not have permission to create a $_postTitleSmallCap",
         source,
       );
     }
   }
 
+  /// Function to handle the post report action
   void handlePostReportAction(
       LMPostViewData postViewData, BuildContext context) {
     // check if the user is a guest user

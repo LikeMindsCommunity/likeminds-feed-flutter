@@ -1,5 +1,5 @@
-
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+
 class LMFeedComposeMediaStyle {
   final LMFeedPostImageStyle? imageStyle;
   final LMFeedPostVideoStyle? videoStyle;

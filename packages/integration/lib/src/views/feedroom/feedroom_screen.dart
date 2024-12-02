@@ -348,7 +348,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   Widget build(BuildContext context) {
     settings =
         widget.settings ?? LMFeedCore.config.feedroomScreenConfig.setting;
-    return LMFeedCore.config.widgetBuilderDelegate.scaffold(
+    return _widgetsBuilder.scaffold(
       onPopInvoked: (p0) {
         if (p0) {
           _feedBloc.add(LMFeedGetFeedRoomListEvent(offset: 1));

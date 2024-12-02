@@ -174,7 +174,6 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       refresh();
       return;
     }
-    ;
     clearPagingController();
     searchBloc.add(
       LMFeedGetSearchEvent(

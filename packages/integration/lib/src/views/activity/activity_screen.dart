@@ -185,7 +185,8 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               pagingController: _pagingController,
               builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(
                 noItemsFoundIndicatorBuilder: (context) {
-                  return _defNoPostWidget();
+                  return _widgetBuilder
+                      .noItemsFoundIndicatorBuilderFeed(context);
                 },
                 firstPageErrorIndicatorBuilder: (context) =>
                     _widgetBuilder.firstPageErrorIndicatorBuilderFeed(context),
@@ -283,33 +284,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Center _defNoPostWidget() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          LMFeedIcon(
-            type: LMFeedIconType.svg,
-            assetPath: kAssetNoPostsIcon,
-            style: LMFeedIconStyle(
-              size: 130,
-            ),
-          ),
-          LMFeedText(
-              text:
-                  'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
-              )),
-          SizedBox(height: 20),
-        ],
       ),
     );
   }

@@ -49,7 +49,7 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
   late TabController _tabController;
   late PageController _pagingController;
   int pageSize = 10;
-  final _widgetUtility = LMFeedCore.config.widgetBuilderDelegate;
+  final _widgetBuilder = LMFeedCore.config.pollScreenConfig.builder;
 
   @override
   initState() {
@@ -239,15 +239,15 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
           return UserTile(user: item);
         },
         noItemsFoundIndicatorBuilder: widget.noItemsFoundIndicatorBuilder ??
-            _widgetUtility.noItemsFoundIndicatorBuilderFeed,
+            _widgetBuilder.noItemsFoundIndicatorBuilderFeed,
         firstPageProgressIndicatorBuilder:
             widget.firstPageProgressIndicatorBuilder ??
-                _widgetUtility.firstPageProgressIndicatorBuilderFeed,
+                _widgetBuilder.firstPageProgressIndicatorBuilderFeed,
         newPageProgressIndicatorBuilder:
             widget.newPageProgressIndicatorBuilder ??
-                _widgetUtility.newPageProgressIndicatorBuilderFeed,
+                _widgetBuilder.newPageProgressIndicatorBuilderFeed,
         noMoreItemsIndicatorBuilder: widget.noMoreItemsIndicatorBuilder ??
-            _widgetUtility.noMoreItemsIndicatorBuilderFeed,
+            _widgetBuilder.noMoreItemsIndicatorBuilderFeed,
       ),
     );
   }

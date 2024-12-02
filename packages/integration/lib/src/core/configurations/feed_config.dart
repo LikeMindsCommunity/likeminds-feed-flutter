@@ -17,9 +17,6 @@ import 'package:likeminds_feed_flutter_core/src/views/search/configurations/conf
 
 // export all the configurations
 export 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
-export 'package:likeminds_feed_flutter_core/src/views/feed/social/social_feed_screen.dart';
-export 'package:likeminds_feed_flutter_core/src/views/post/post_detail_screen.dart';
-// export new configurations
 export 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
@@ -56,7 +53,6 @@ enum LMFeedThemeType {
 /// Holds configurations classes for each screen
 /// {@endtemplate}
 class LMFeedConfig {
-
   // TODO: remove new flag
   // Flag: new configs
   /// {@macro lm_feed_activity_screen_config}
