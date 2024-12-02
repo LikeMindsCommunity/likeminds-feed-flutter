@@ -8,7 +8,7 @@ import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
 class LMFeedPendingPostsScreen extends StatefulWidget {
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  final LMFeedAppBarBuilder? appBar;
   // Builder for post item
   /// {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
@@ -58,9 +58,6 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   String postTitleSmallCapPlural =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural);
 
-  LMFeedPendingPostScreenBuilderDeletegate _postScreenBuilderDelegate =
-      LMFeedCore.config.pendingPostScreenConfig.builder;
-
   LMFeedPendingBloc pendingBloc = LMFeedPendingBloc.instance;
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -77,7 +74,7 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
   String _appBarTitle = '';
   String _appBarSubtitle = '';
 
-  LMFeedPendingPostScreenBuilderDeletegate _widgetsBuilder =
+  LMFeedPendingPostScreenBuilderDelegate _widgetsBuilder =
       LMFeedCore.config.pendingPostScreenConfig.builder;
 
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.pendingPostsScreen;
@@ -158,8 +155,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
     screenWidth =
         min(LMFeedCore.config.webConfiguration.maxWidth, screenSize.width);
     return _widgetsBuilder.scaffold(
-      appBar: _postScreenBuilderDelegate.appBarBuilder(
-          context, defAppBar(), pendingPostCount),
+      appBar:
+          _widgetsBuilder.appBarBuilder(context, defAppBar(), pendingPostCount),
       backgroundColor: feedThemeData.backgroundColor,
       body: Align(
         alignment: Alignment.topCenter,
@@ -465,10 +462,10 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
         _defPendingPostDialog(postViewData);
 
     if (postViewData.postStatus == LMPostReviewStatus.rejected) {
-      _postScreenBuilderDelegate.showPostRejectionDialog(
+      _widgetsBuilder.showPostRejectionDialog(
           context, postViewData, pendingPostDialog);
     } else if (postViewData.postStatus == LMPostReviewStatus.pending) {
-      _postScreenBuilderDelegate.showPostApprovalDialog(
+      _widgetsBuilder.showPostApprovalDialog(
           context, postViewData, pendingPostDialog);
     }
   }
@@ -608,12 +605,19 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
     );
   }
 
-  AppBar defAppBar() {
-    return AppBar(
-      backgroundColor: feedThemeData.container,
-      elevation: 4,
-      shadowColor: feedThemeData.shadowColor,
-      centerTitle: iSiOS,
+  LMFeedAppBar defAppBar() {
+    return LMFeedAppBar(
+      style: LMFeedAppBarStyle(
+        backgroundColor: feedThemeData.container,
+        shadow: [
+          BoxShadow(
+            color: feedThemeData.shadowColor,
+            offset: Offset(0, 2),
+            blurRadius: 4,
+          ),
+        ],
+        centerTitle: iSiOS,
+      ),
       leading: InkWell(
         onTap: () => Navigator.of(context).pop(),
         child: LMFeedIcon(

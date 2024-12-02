@@ -44,7 +44,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedSearchScreenBuilderDelegate widgetUtility = LMFeedCore.config.searchScreenConfig.builder;
+  LMFeedSearchScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.searchScreenConfig.builder;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.searchScreen;
   ValueNotifier<bool> showCancelIcon = ValueNotifier<bool>(false);
   TextEditingController searchController = TextEditingController();
@@ -172,7 +173,8 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
       clearPagingController();
       refresh();
       return;
-    };
+    }
+    ;
     clearPagingController();
     searchBloc.add(
       LMFeedGetSearchEvent(
@@ -188,48 +190,18 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = min(LMFeedCore.config.webConfiguration.maxWidth, screenSize.width);
-    return widgetUtility.scaffold(
+    screenWidth =
+        min(LMFeedCore.config.webConfiguration.maxWidth, screenSize.width);
+    return _widgetBuilder.scaffold(
       source: _widgetSource,
       resizeToAvoidBottomInset: false,
       backgroundColor: theme.backgroundColor,
-      appBar: AppBar(
-        elevation: 2,
-        backgroundColor: theme.container,
-        foregroundColor: theme.onContainer,
-        title: TextField(
-          controller: searchController,
-          focusNode: focusNode,
-          onChanged: _onTextChanged,
-          cursorColor: theme.primaryColor,
-          decoration: InputDecoration(
-            hintText: 'Search...',
-            hintStyle: TextStyle(color: theme.onContainer.withOpacity(0.5)),
-            border: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            errorBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-          ),
-          style: TextStyle(color: theme.onContainer),
-        ),
-        actions: [
-          ValueListenableBuilder(
-              valueListenable: showCancelIcon,
-              builder: (context, value, child) {
-                return value
-                    ? IconButton(
-                        icon: Icon(Icons.close),
-                        onPressed: () {
-                          searchController.clear();
-                          clearPagingController();
-                          refresh();
-                          showCancelIcon.value = false;
-                        },
-                      )
-                    : SizedBox();
-              }),
-        ],
+      appBar: _widgetBuilder.appBarBuilder(
+        context,
+        _defAppBar(),
+        searchController,
+        showCancelIcon,
+        _onTextChanged,
       ),
       body: Align(
         alignment: Alignment.topCenter,
@@ -373,7 +345,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
                                         postWidget,
                                         item,
                                       ) ??
-                                      widgetUtility.postWidgetBuilder(
+                                      _widgetBuilder.postWidgetBuilder(
                                         context,
                                         postWidget,
                                         item,
@@ -399,6 +371,54 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  LMFeedAppBar _defAppBar() {
+    return LMFeedAppBar(
+      style: LMFeedAppBarStyle(
+        shadow: [
+          BoxShadow(
+            color: theme.shadowColor,
+            offset: const Offset(0, 2),
+            blurRadius: 4,
+          ),
+        ],
+        backgroundColor: theme.container,
+      ),
+      title: TextField(
+        controller: searchController,
+        focusNode: focusNode,
+        onChanged: _onTextChanged,
+        cursorColor: theme.primaryColor,
+        decoration: InputDecoration(
+          hintText: 'Search...',
+          hintStyle: TextStyle(color: theme.onContainer.withOpacity(0.5)),
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+        ),
+        style: TextStyle(color: theme.onContainer),
+      ),
+      trailing: [
+        ValueListenableBuilder(
+            valueListenable: showCancelIcon,
+            builder: (context, value, child) {
+              return value
+                  ? IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: () {
+                        searchController.clear();
+                        clearPagingController();
+                        refresh();
+                        showCancelIcon.value = false;
+                      },
+                    )
+                  : SizedBox();
+            }),
+      ],
     );
   }
 

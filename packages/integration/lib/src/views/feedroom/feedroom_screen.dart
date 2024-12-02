@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart';
 
-
 /// {@template feed_screen}
 /// A screen to display the feed.
 /// The feed can be customized by passing in the required parameters
@@ -37,7 +36,7 @@ class LMFeedRoomScreen extends StatefulWidget {
   final int feedroomId;
 
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
 
   /// Builder for custom widget
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
@@ -80,7 +79,7 @@ class LMFeedRoomScreen extends StatefulWidget {
 
   LMFeedRoomScreen copyWith({
     int? feedroomId,
-    LMFeedPostAppBarBuilder? appBarBuilder,
+    LMFeedAppBarBuilder? appBarBuilder,
     final LMFeedCustomWidgetBuilder? customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
         topicChipBuilder,
@@ -155,7 +154,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  LMFeedroomScreenBuilderDelegate _widgetsBuilder = LMFeedCore.config.feedroomScreenConfig.builder;
+  LMFeedroomScreenBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.feedroomScreenConfig.builder;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.feedroom;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
@@ -346,7 +346,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    settings = widget.settings ?? LMFeedCore.config.feedroomScreenConfig.setting;
+    settings =
+        widget.settings ?? LMFeedCore.config.feedroomScreenConfig.setting;
     return LMFeedCore.config.widgetBuilderDelegate.scaffold(
       onPopInvoked: (p0) {
         if (p0) {
@@ -356,7 +357,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
         }
       },
       backgroundColor: feedThemeData.backgroundColor,
-      appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
+      appBar: widget.appBarBuilder?.call(context, _defAppBar()) ??
+          _widgetsBuilder.appBarBuilder(context, _defAppBar()),
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
@@ -592,7 +594,8 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                         );
                         return widget.postBuilder
                                 ?.call(context, postWidget, item) ??
-                            LMFeedCore.config.widgetBuilderDelegate.postWidgetBuilder
+                            LMFeedCore
+                                .config.widgetBuilderDelegate.postWidgetBuilder
                                 .call(context, postWidget, item);
                       },
                       noItemsFoundIndicatorBuilder: (context) {

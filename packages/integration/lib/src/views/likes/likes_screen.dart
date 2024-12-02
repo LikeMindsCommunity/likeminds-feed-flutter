@@ -29,7 +29,8 @@ class LMFeedLikesScreen extends StatefulWidget {
 class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
   LMLikesScreenHandler? handler;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
-  LMFeedLikeScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.likeScreenConfig.builder;
+  LMFeedLikeScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.likeScreenConfig.builder;
   String likeText = LMFeedPostUtils.getLikeTitle(
     LMFeedPluralizeWordAction.firstLetterCapitalPlural,
   );
@@ -77,7 +78,10 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
       child: _widgetBuilder.scaffold(
           source: LMFeedWidgetSource.likesScreen,
           backgroundColor: feedTheme.container,
-          appBar: getAppBar(),
+          appBar: _widgetBuilder.appBarBuilder(
+            context,
+            getAppBar(),
+          ),
           body: getLikesLoadedView()),
     );
   }

@@ -45,7 +45,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
   final LMFeedPostWidgetBuilder? postBuilder;
 
   /// {@macro post_appbar_builder}
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
 
   /// {@macro post_comment_builder}
   final LMFeedPostCommentBuilder? commentBuilder;
@@ -72,7 +72,7 @@ class LMFeedPostDetailScreen extends StatefulWidget {
     Function()? onLikeClick,
     Function()? onCommentClick,
     LMFeedPostWidgetBuilder? postBuilder,
-    LMFeedPostAppBarBuilder? appBarBuilder,
+    LMFeedAppBarBuilder? appBarBuilder,
     LMFeedPostCommentBuilder? commentBuilder,
     LMFeedCommentListBuilder? commentListBuilder,
     Widget Function(BuildContext, LMFeedBottomTextField, TextEditingController,
@@ -124,7 +124,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
       LMFeedPluralizeWordAction.allSmallSingular);
 
   final LMFeedPostBloc postBloc = LMFeedPostBloc.instance;
-  final LMFeedPostDetailScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.postDetailScreenConfig.builder;
+  final LMFeedPostDetailScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.postDetailScreenConfig.builder;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
   LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
   String? commentIdReplyId;
@@ -154,14 +155,16 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
     if (widget.openKeyboard && right) {
       openOnScreenKeyboard();
     }
-    settings = widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
+    settings =
+        widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
   }
 
   @override
   void didUpdateWidget(covariant LMFeedPostDetailScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.postId != widget.postId) {}
-    settings = widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
+    settings =
+        widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
   }
 
   @override
@@ -246,7 +249,7 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                         _widgetSource,
                       ),
                   appBar: widget.appBarBuilder?.call(context, defAppBar()) ??
-                      defAppBar(),
+                      _widgetBuilder.appBarBuilder.call(context, defAppBar()),
                   body: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
@@ -305,7 +308,8 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
                             _defCommentsCount(),
                             widget.commentListBuilder
                                     ?.call(context, _defCommentList()) ??
-                                _defCommentList(),
+                                _widgetBuilder.commentListBuilder
+                                    .call(context, _defCommentList()),
                             const SliverToBoxAdapter(
                               child: SizedBox(
                                 height: 100,
@@ -342,7 +346,12 @@ class _LMFeedPostDetailScreenState extends State<LMFeedPostDetailScreen> {
   }
 
   SliverToBoxAdapter _defCommentsCount() {
-    return SliverToBoxAdapter(child: LMFeedCommentCount());
+    return SliverToBoxAdapter(
+        child: _widgetBuilder.commentCountBuilder(
+      context,
+      _commentCount,
+      LMFeedCommentCount(),
+    ));
   }
 
   LMFeedAppBar defAppBar() {

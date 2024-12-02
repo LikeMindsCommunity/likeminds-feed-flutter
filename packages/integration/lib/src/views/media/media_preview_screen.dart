@@ -31,7 +31,8 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
   late Size screenSize;
   final DateFormat formatter = DateFormat('MMMM d, hh:mm');
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
-  final LMFeedMediaPreviewScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.mediaPreviewScreenConfig.builder;
+  final LMFeedMediaPreviewScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.mediaPreviewScreenConfig.builder;
   late List<LMAttachmentViewData> postAttachments;
   late LMPostViewData post;
   late LMUserViewData user;
@@ -39,7 +40,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
 
   int currPosition = 0;
   int mediaLength = 0;
-  
+
   CarouselSliderController controller = CarouselSliderController();
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
 
@@ -77,60 +78,13 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    final String formatted = formatter.format(post.createdAt);
+    final String formattedTimeStamp = formatter.format(post.createdAt);
     return _widgetBuilder.scaffold(
       source: LMFeedWidgetSource.mediaPreviewScreen,
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        centerTitle: false,
-        leading: LMFeedButton(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          style: LMFeedButtonStyle(
-            icon: LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: CupertinoIcons.xmark,
-              style: LMFeedIconStyle(
-                color: feedTheme.container,
-                size: 24,
-                boxPadding: 12,
-              ),
-            ),
-          ),
-        ),
-        elevation: 0,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            LMFeedText(
-              text: user.name,
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: feedTheme.container,
-                ),
-              ),
-            ),
-            ValueListenableBuilder(
-              valueListenable: rebuildCurr,
-              builder: (context, value, child) {
-                return LMFeedText(
-                  text:
-                      '${currPosition + 1} of ${postAttachments.length} media • $formatted',
-                  style: LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: 12,
-                      color: feedTheme.container,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+      appBar: _widgetBuilder.appBarBuilder(
+        context,
+        _defAppBar(context, formattedTimeStamp),
       ),
       body: SafeArea(
         top: false,
@@ -150,7 +104,7 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
                               enableInfiniteScroll: false,
                               enlargeFactor: 0.0,
                               viewportFraction: 1.0,
-                              aspectRatio: 9/16,
+                              aspectRatio: 9 / 16,
                               onPageChanged: (index, reason) {
                                 currPosition = index;
                                 rebuildCurr.value = !rebuildCurr.value;
@@ -267,6 +221,57 @@ class _LMFeedMediaPreviewScreenState extends State<LMFeedMediaPreviewScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  LMFeedAppBar _defAppBar(BuildContext context, String formatted) {
+    return LMFeedAppBar(
+      leading: LMFeedButton(
+        onTap: () {
+          Navigator.of(context).pop();
+        },
+        style: LMFeedButtonStyle(
+          icon: LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: CupertinoIcons.xmark,
+            style: LMFeedIconStyle(
+              color: feedTheme.container,
+              size: 24,
+              boxPadding: 12,
+            ),
+          ),
+        ),
+      ),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          LMFeedText(
+            text: user.name,
+            style: LMFeedTextStyle(
+              textStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: feedTheme.container,
+              ),
+            ),
+          ),
+          ValueListenableBuilder(
+            valueListenable: rebuildCurr,
+            builder: (context, value, child) {
+              return LMFeedText(
+                text:
+                    '${currPosition + 1} of ${postAttachments.length} media • $formatted',
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    fontSize: 12,
+                    color: feedTheme.container,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

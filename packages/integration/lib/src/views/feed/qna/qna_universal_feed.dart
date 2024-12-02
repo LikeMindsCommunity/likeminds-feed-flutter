@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 
 /// {@template lm_feed_qna_universal_screen}
 /// A screen to display the feed.
@@ -14,6 +13,7 @@ import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/co
 ///
 /// {@endtemplate}
 class LMFeedQnAUniversalScreen extends StatefulWidget {
+  /// {@macro lm_feed_qna_universal_screen}
   const LMFeedQnAUniversalScreen({
     super.key,
     this.appBar,
@@ -33,51 +33,63 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
     this.pendingPostBannerBuilder,
   });
 
-  // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  /// Builder for appbar
+  final LMFeedAppBarBuilder? appBar;
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
-  // Builder for topic chip [Button]
+
+  /// Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
 
   // Builder for post item
-  // {@macro post_widget_builder}
+  /// {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
-  // Floating action button
-  // i.e. new post button
+  // /Floating action button builder
+  /// i.e. new post button
   final LMFeedContextButtonBuilder? floatingActionButtonBuilder;
-  // {@macro context_widget_builder}
-  // Builder for empty feed view
+
+  /// {@macro context_widget_builder}
+  /// Builder for empty feed view
   final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
-  // Builder for first page loader when no post are there
+
+  /// Builder for first page loader when no post are there
   final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;
-  // Builder for pagination loader when more post are there
+
+  /// Builder for pagination loader when more post are there
   final LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder;
-  // Builder for widget when no more post are there
+
+  /// Builder for widget when no more post are there
   final LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder;
-  // Builder for error view while loading a new page
+
+  /// Builder for error view while loading a new page
   final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
-  // Builder for error view while loading the first page
+
+  /// Builder for error view while loading the first page
   final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
-  // Builder for pending post banner on feed screen above post list
+  /// Builder for pending post banner on feed screen above post list
   final Widget Function(BuildContext context, int noOfPendingPost)?
       pendingPostBannerBuilder;
 
+  /// Builder for topic bar
   final LMFeedTopicBarBuilder? topicBarBuilder;
 
+  /// Floating action button location
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
+  /// Settings for the feed screen
   final LMFeedQnaScreenSetting? feedScreenSettings;
 
   @override
   State<LMFeedQnAUniversalScreen> createState() =>
       _LMFeedQnAUniversalScreenState();
 
+  /// copyWith method to update the properties of the LMFeedQnAUniversalScreen
+  /// with new values
   LMFeedQnAUniversalScreen copyWith({
-    LMFeedPostAppBarBuilder? appBar,
+    LMFeedAppBarBuilder? appBar,
     LMFeedCustomWidgetBuilder? customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
         topicChipBuilder,
@@ -158,7 +170,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   LMFeedQnaScreenBuilderDelegate _screenBuilderDelegate =
       LMFeedCore.config.qnaFeedScreenConfig.builder;
 
-  LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
+  LMFeedPendingPostScreenBuilderDelegate _pendingPostScreenBuilderDelegate =
       LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
@@ -228,8 +240,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    feedScreenSetting =
-        widget.feedScreenSettings ?? LMFeedCore.config.qnaFeedScreenConfig.setting;
+    feedScreenSetting = widget.feedScreenSettings ??
+        LMFeedCore.config.qnaFeedScreenConfig.setting;
 
     // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(
@@ -416,13 +428,15 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
     return _widgetsBuilder.scaffold(
       source: _widgetSource,
       backgroundColor: feedThemeData.backgroundColor,
-      appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
+      appBar: widget.appBar?.call(context, _defAppBar()) ??
+          _widgetsBuilder.appBarBuilder.call(context, _defAppBar()),
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
           return widget.floatingActionButtonBuilder
                   ?.call(context, defFloatingActionButton(context)) ??
-              defFloatingActionButton(context);
+              _widgetsBuilder.floatingActionButtonBuilder(
+                  context, defFloatingActionButton(context));
         },
       ),
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
@@ -482,13 +496,13 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                             });
                       }),
                 ),
-                SliverToBoxAdapter(
-                  child: feedScreenSetting!.showCustomWidget
-                      ? widget.customWidgetBuilder?.call(
-                              context, _defPostSomeThingWidget(context)) ??
-                          _defPostSomeThingWidget(context)
-                      : const SizedBox(),
-                ),
+                if (feedScreenSetting?.showCustomWidget ?? false)
+                  SliverToBoxAdapter(
+                    child: widget.customWidgetBuilder
+                            ?.call(context, _defPostSomeThingWidget(context)) ??
+                        _widgetsBuilder.customWidgetBuilder(
+                            _defPostSomeThingWidget(context), context),
+                  ),
                 SliverToBoxAdapter(
                   child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
                     bloc: newPostBloc,
@@ -977,7 +991,6 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
       navigateToTopicSelectScreen(context);
     }
   }
-
 
   LMFeedButton changeFilter(BuildContext context) => LMFeedButton(
         style: LMFeedButtonStyle(

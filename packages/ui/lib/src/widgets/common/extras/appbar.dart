@@ -97,7 +97,7 @@ class LMFeedAppBar extends StatelessWidget implements PreferredSizeWidget {
                           style: LMFeedButtonStyle(
                             icon: LMFeedIcon(
                               type: LMFeedIconType.icon,
-                              icon: Icons.chevron_left,
+                              icon: Icons.arrow_back,
                               style: LMFeedIconStyle(
                                 color: theme.onContainer,
                                 size: 24,

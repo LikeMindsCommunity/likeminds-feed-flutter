@@ -77,7 +77,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
   LMPostViewData? repost;
-  LMFeedComposeScreenBuilderDelegate widgetUtility = LMFeedCore.config.composeScreenConfig.builder;
+  LMFeedComposeScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.composeScreenConfig.builder;
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.editPostScreen;
 
   /// Controllers and other helper classes' objects
@@ -327,7 +328,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     config = widget.config ?? LMFeedCore.config.composeScreenConfig;
     style = widget.style ?? LMFeedCore.config.composeScreenConfig.style;
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(LMFeedCore.config.webConfiguration.maxWidth, screenSize!.width);
+    screenWidth =
+        min(LMFeedCore.config.webConfiguration.maxWidth, screenSize!.width);
 
     return WillPopScope(
       onWillPop: () {
@@ -346,7 +348,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           bloc: LMFeedPostBloc.instance,
           builder: (context, state) {
             if (state is LMFeedGetPostLoadingState) {
-              return widgetUtility.scaffold(
+              return _widgetBuilder.scaffold(
                 backgroundColor: feedTheme.container,
                 body: Center(child: LMFeedLoader()),
               );
@@ -358,7 +360,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
                     bloc: composeBloc,
                     listener: _composeBlocListener,
-                    child: widgetUtility.scaffold(
+                    child: _widgetBuilder.scaffold(
                       source: widgetSource,
                       backgroundColor: feedTheme.container,
                       appBar: widget.composeAppBarBuilder?.call(_defAppBar()) ??
@@ -380,7 +382,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                                       context,
                                       _defTopicSelector(state.topics),
                                       composeBloc.selectedTopics) ??
-                                  LMFeedCore.config.widgetBuilderDelegate
+                                  _widgetBuilder
                                       .composeScreenTopicSelectorBuilder(
                                           context,
                                           _defTopicSelector(state.topics),
@@ -407,7 +409,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                                   const SizedBox(height: 18),
                                   widget.composeUserHeaderBuilder?.call(context,
                                           user!, LMFeedUserTile(user: user!)) ??
-                                      widgetUtility
+                                      _widgetBuilder
                                           .composeScreenUserHeaderBuilder(
                                         context,
                                         user!,
@@ -430,7 +432,7 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                 ),
               );
             } else {
-              return widgetUtility.scaffold(
+              return _widgetBuilder.scaffold(
                 backgroundColor: feedTheme.container,
                 body: const SizedBox(),
               );
@@ -847,7 +849,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
                   return;
                 }
 
-                if (config!.setting.textRequiredToCreatePost && postText.isEmpty) {
+                if (config!.setting.textRequiredToCreatePost &&
+                    postText.isEmpty) {
                   LMFeedCore.showSnackBar(
                     context,
                     "Can't create a $postTitleSmallCap without text",
@@ -925,76 +928,63 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
       ),
       child: Column(
         children: [
-          (enableHeading)
-              ? _defHeadingTextfield(theme)
-              : const SizedBox.shrink(),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          if (enableHeading)
+            _widgetBuilder.composeScreenHeadingTextfieldBuilder(
+                context, _defHeadingTextfield(theme)),
+          Column(
             children: [
-              !(enableHeading)
-                  ? Container(
-                      padding: const EdgeInsets.only(top: 4.0),
-                      margin: const EdgeInsets.only(right: 12),
-                      child: LMFeedProfilePicture(
-                        fallbackText: widget.displayName ?? user!.name,
-                        imageUrl: widget.displayUrl ?? user!.imageUrl,
-                        style: LMFeedProfilePictureStyle(
-                          backgroundColor: theme.primaryColor,
-                          size: 36,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-              Column(
-                children: [
-                  Container(
-                    width: screenWidth == null ? null : screenWidth! - 82,
-                    decoration: BoxDecoration(
-                      color: theme.container,
+              Container(
+                width: screenWidth == null ? null : screenWidth! - 82,
+                decoration: BoxDecoration(
+                  color: theme.container,
+                ),
+                child: widget.composeContentBuilder?.call() ??
+                    _widgetBuilder.composeScreenContentTextfieldBuilder(
+                      context,
+                      _defContentTextFiled(),
                     ),
-                    child: LMTaggingAheadTextField(
-                      isDown: true,
-                      style: LMTaggingAheadTextFieldStyle(
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          focusedErrorBorder: InputBorder.none,
-                          hintText: config?.setting.composeHint,
-                        ),
-                        minLines: 3,
-                      ),
-                      taggingEnabled: config!.setting.enableTagging,
-                      userTags: composeBloc.userTags,
-                      onTagSelected: (tag) {
-                        composeBloc.userTags.add(tag);
-                        LMFeedAnalyticsBloc.instance.add(
-                          LMFeedFireAnalyticsEvent(
-                            eventName: LMFeedAnalyticsKeys.userTaggedInPost,
-                            widgetSource: LMFeedWidgetSource.editPostScreen,
-                            eventProperties: {
-                              'tagged_user_id':
-                                  tag.sdkClientInfo?.uuid ?? tag.uuid,
-                              'tagged_user_count':
-                                  composeBloc.userTags.length.toString(),
-                            },
-                          ),
-                        );
-                      },
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      onChange: _onTextChanged,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
               ),
+              const SizedBox(height: 24),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  LMTaggingAheadTextField _defContentTextFiled() {
+    return LMTaggingAheadTextField(
+      isDown: true,
+      style: LMTaggingAheadTextFieldStyle(
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          hintText: config?.setting.composeHint,
+        ),
+        minLines: 3,
+      ),
+      taggingEnabled: config!.setting.enableTagging,
+      userTags: composeBloc.userTags,
+      onTagSelected: (tag) {
+        composeBloc.userTags.add(tag);
+        LMFeedAnalyticsBloc.instance.add(
+          LMFeedFireAnalyticsEvent(
+            eventName: LMFeedAnalyticsKeys.userTaggedInPost,
+            widgetSource: LMFeedWidgetSource.editPostScreen,
+            eventProperties: {
+              'tagged_user_id': tag.sdkClientInfo?.uuid ?? tag.uuid,
+              'tagged_user_count': composeBloc.userTags.length.toString(),
+            },
+          ),
+        );
+      },
+      controller: _controller,
+      focusNode: _focusNode,
+      onChange: _onTextChanged,
     );
   }
 
@@ -1103,7 +1093,8 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
           height: 72,
           child: Row(
             children: [
-              if (composeBloc.documentCount == 0 && config!.setting.enableImages)
+              if (composeBloc.documentCount == 0 &&
+                  config!.setting.enableImages)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(

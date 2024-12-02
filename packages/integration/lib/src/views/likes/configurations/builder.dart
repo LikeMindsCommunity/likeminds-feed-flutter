@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 /// {@template lm_feed_like_screen_builder_delegate}
@@ -7,4 +8,12 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 class LMFeedLikeScreenBuilderDelegate extends LMFeedWidgetBuilderDelegate {
   /// {@macro lm_feed_like_screen_builder_delegate}
   const LMFeedLikeScreenBuilderDelegate();
+
+  /// AppBar builder for the Like Screen
+  PreferredSizeWidget appBarBuilder(
+    BuildContext context,
+    LMFeedAppBar appBar,
+  ) {
+    return appBar;
+  }
 }

@@ -413,7 +413,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   _defCancelButton(),
                   onPostValidationFailed,
                 ) ??
-                widgetBuilder.composeScreenAppBar(
+                widgetBuilder.appBarBuilder(
                   context,
                   _defAppBar(),
                   onPostCreate,
@@ -1124,10 +1124,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   decoration: BoxDecoration(
                     color: theme.container,
                   ),
-                  child: widgetBuilder.composeScreenContentTextfieldBuilder(
-                    context,
-                    _defContentTextField(),
-                  )),
+                  child: widget.composeContentBuilder?.call() ??
+                      widgetBuilder.composeScreenContentTextfieldBuilder(
+                        context,
+                        _defContentTextField(),
+                      )),
               const SizedBox(height: 24),
             ],
           ),

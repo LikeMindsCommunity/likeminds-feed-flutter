@@ -8,12 +8,12 @@ export 'package:likeminds_feed_flutter_core/src/views/pending_post/configuration
 export 'package:likeminds_feed_flutter_core/src/views/pending_post/configurations/style.dart';
 
 class LMFeedPendingPostsScreenConfig {
-  final LMFeedPendingPostScreenBuilderDeletegate builder;
+  final LMFeedPendingPostScreenBuilderDelegate builder;
   final LMFeedPendingPostsScreenSetting setting;
   final LMFeedPendingPostsScreenStyle style;
 
   const LMFeedPendingPostsScreenConfig({
-    this.builder = const LMFeedPendingPostScreenBuilderDeletegate(),
+    this.builder = const LMFeedPendingPostScreenBuilderDelegate(),
     this.setting = const LMFeedPendingPostsScreenSetting(),
     this.style = const LMFeedPendingPostsScreenStyle(),
   });

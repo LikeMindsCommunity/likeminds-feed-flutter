@@ -36,7 +36,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
   });
 
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  final LMFeedAppBarBuilder? appBar;
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
@@ -79,7 +79,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
       _LMFeedSocialUniversalScreenState();
 
   LMFeedSocialUniversalScreen copyWith({
-    LMFeedPostAppBarBuilder? appBar,
+    LMFeedAppBarBuilder? appBar,
     LMFeedCustomWidgetBuilder? customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
         topicChipBuilder,
@@ -157,7 +157,7 @@ class _LMFeedSocialUniversalScreenState
   LMFeedSocialScreenBuilderDelegate _screenBuilderDelegate =
       LMFeedCore.config.socialFeedScreenConfig.builder;
 
-  LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
+  LMFeedPendingPostScreenBuilderDelegate _pendingPostScreenBuilderDelegate =
       LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
@@ -415,13 +415,15 @@ class _LMFeedSocialUniversalScreenState
     return _widgetsBuilder.scaffold(
       source: _widgetSource,
       backgroundColor: feedThemeData.backgroundColor,
-      appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
+      appBar: widget.appBar?.call(context, _defAppBar()) ??
+          _widgetsBuilder.appBarBuilder(context, _defAppBar()),
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
           return widget.floatingActionButtonBuilder
                   ?.call(context, defFloatingActionButton(context)) ??
-              defFloatingActionButton(context);
+              _widgetsBuilder.floatingActionButtonBuilder(
+                  context, defFloatingActionButton(context));
         },
       ),
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
@@ -481,13 +483,13 @@ class _LMFeedSocialUniversalScreenState
                             });
                       }),
                 ),
-                SliverToBoxAdapter(
-                  child: feedSettings!.showCustomWidget
-                      ? widget.customWidgetBuilder?.call(
-                              context, _defPostSomeThingWidget(context)) ??
-                          _defPostSomeThingWidget(context)
-                      : const SizedBox(),
-                ),
+                if (feedSettings?.showCustomWidget ?? false)
+                  SliverToBoxAdapter(
+                    child: widget.customWidgetBuilder
+                            ?.call(context, _defPostSomeThingWidget(context)) ??
+                        _widgetsBuilder.customWidgetBuilder(
+                            _defPostSomeThingWidget(context), context),
+                  ),
                 SliverToBoxAdapter(
                   child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
                     bloc: newPostBloc,

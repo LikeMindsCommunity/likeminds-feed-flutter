@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/core/core.dart';
 
@@ -15,4 +16,9 @@ class LMFeedActivityScreenBuilderDelegate extends LMFeedWidgetBuilderDelegate {
   // feedWidgetBuilder
   static final LMFeedWidgetBuilderDelegate _widgetBuilderDelegate =
       LMFeedWidgetBuilderDelegate();
+
+  /// builder for the app bar
+  PreferredSizeWidget appBarBuilder(BuildContext context, LMFeedAppBar appBar) {
+    return appBar;
+  }
 }

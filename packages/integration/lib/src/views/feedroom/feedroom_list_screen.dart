@@ -6,7 +6,7 @@ import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart
 
 class LMFeedRoomListScreen extends StatefulWidget {
   final Widget Function()? feedroomTileBuilder;
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
   // Builder for empty feed view
   final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
   // Builder for first page loader when no post are there
@@ -184,7 +184,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
 class LMFeedRoomList extends StatelessWidget {
   final LMFeedRoomBloc feedRoomBloc;
   final LMFeedRoomTileBuilder? feedroomTileBuilder;
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
   final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
   // Builder for first page loader when no post are there
   final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;

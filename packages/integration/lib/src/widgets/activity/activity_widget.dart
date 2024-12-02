@@ -14,7 +14,7 @@ class LMFeedActivityWidget extends StatefulWidget {
   final String uuid;
   final LMFeedPostWidgetBuilder? postWidgetBuilder;
   final LMFeedPostCommentBuilder? commentWidgetBuilder;
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
   final int maxActivityCount;
 
   LMFeedActivityWidget copyWith({
@@ -22,7 +22,7 @@ class LMFeedActivityWidget extends StatefulWidget {
     String? uuid,
     LMFeedPostWidgetBuilder? postWidgetBuilder,
     LMFeedPostCommentBuilder? commentWidgetBuilder,
-    LMFeedPostAppBarBuilder? appBarBuilder,
+    LMFeedAppBarBuilder? appBarBuilder,
     int? maxActivityCount,
   }) {
     return LMFeedActivityWidget(

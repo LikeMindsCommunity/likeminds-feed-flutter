@@ -18,7 +18,7 @@ class LMFeedNotificationScreen extends StatefulWidget {
     this.timeStampBuilder,
   });
 
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
   final LMFeedContextWidgetBuilder? customWidgetBuilder;
   final LMFeedContextWidgetBuilder? emptyNotificationFeedViewBuilder;
   final Widget Function(BuildContext, String)? errorViewBuilder;
@@ -46,7 +46,8 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
 
   int _page = 1;
   LMFeedThemeData _theme = LMFeedCore.theme;
-  LMFeedNotificationScreenBuilderDelegate _widgetBuilder = LMFeedCore.config.notificationScreenConfig.builder;
+  LMFeedNotificationScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.notificationScreenConfig.builder;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.notificationScreen;
   LMUserViewData currentUser = LMFeedLocalPreference.instance.fetchUserData()!;
 
@@ -97,11 +98,13 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(screenSize!.width, LMFeedCore.config.webConfiguration.maxWidth);
+    screenWidth =
+        min(screenSize!.width, LMFeedCore.config.webConfiguration.maxWidth);
     return _widgetBuilder.scaffold(
       source: _widgetSource,
       backgroundColor: _theme.container,
-      appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
+      appBar: widget.appBarBuilder?.call(context, _defAppBar()) ??
+          _widgetBuilder.appBarBuilder(context, _defAppBar()),
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(

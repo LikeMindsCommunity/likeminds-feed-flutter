@@ -38,7 +38,7 @@ class LMFeedSocialPersonalisedScreen extends StatefulWidget {
   });
 
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  final LMFeedAppBarBuilder? appBar;
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
@@ -75,7 +75,7 @@ class LMFeedSocialPersonalisedScreen extends StatefulWidget {
       _LMFeedSocialPersonalisedScreenState();
 
   LMFeedSocialPersonalisedScreen copyWith({
-    LMFeedPostAppBarBuilder? appBar,
+    LMFeedAppBarBuilder? appBar,
     LMFeedCustomWidgetBuilder? customWidgetBuilder,
     LMFeedPostWidgetBuilder? postBuilder,
     LMFeedContextButtonBuilder? floatingActionButtonBuilder,
@@ -148,8 +148,8 @@ class _LMFeedSocialPersonalisedScreenState
   LMFeedSocialScreenBuilderDelegate _screenBuilderDelegate =
       LMFeedCore.config.socialFeedScreenConfig.builder;
 
-  LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
-     LMFeedCore.config.pendingPostScreenConfig.builder;
+  LMFeedPendingPostScreenBuilderDelegate _pendingPostScreenBuilderDelegate =
+      LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -158,7 +158,8 @@ class _LMFeedSocialPersonalisedScreenState
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
   // Create an instance of LMFeedScreenBuilderDelegate
-  LMFeedSocialScreenBuilderDelegate _widgetsBuilder = LMFeedCore.config.socialFeedScreenConfig.builder;
+  LMFeedSocialScreenBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.socialFeedScreenConfig.builder;
 
   // Set the widget source to personalised feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.personalisedFeed;
@@ -233,7 +234,8 @@ class _LMFeedSocialPersonalisedScreenState
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    feedScreenSettings = widget.feedScreenSettings ?? LMFeedCore.config.socialFeedScreenConfig.setting;
+    feedScreenSettings = widget.feedScreenSettings ??
+        LMFeedCore.config.socialFeedScreenConfig.setting;
 
     getUserFeedMeta = getUserFeedMetaFuture();
 
@@ -388,13 +390,15 @@ class _LMFeedSocialPersonalisedScreenState
     return _widgetsBuilder.scaffold(
       source: _widgetSource,
       backgroundColor: feedThemeData.backgroundColor,
-      appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
+      appBar: widget.appBar?.call(context, _defAppBar()) ??
+          _widgetsBuilder.appBarBuilder(context, _defAppBar()),
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
           return widget.floatingActionButtonBuilder
                   ?.call(context, defFloatingActionButton(context)) ??
-              defFloatingActionButton(context);
+              _widgetsBuilder.floatingActionButtonBuilder(
+                  context, defFloatingActionButton(context));
         },
       ),
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
@@ -454,13 +458,13 @@ class _LMFeedSocialPersonalisedScreenState
                             });
                       }),
                 ),
-                SliverToBoxAdapter(
-                  child: feedScreenSettings!.showCustomWidget
-                      ? widget.customWidgetBuilder?.call(
-                              context, _defPostSomeThingWidget(context)) ??
-                          _defPostSomeThingWidget(context)
-                      : const SizedBox(),
-                ),
+                if (feedScreenSettings?.showCustomWidget ?? false)
+                  SliverToBoxAdapter(
+                    child: widget.customWidgetBuilder
+                            ?.call(context, _defPostSomeThingWidget(context)) ??
+                        _widgetsBuilder.customWidgetBuilder(
+                            _defPostSomeThingWidget(context), context),
+                  ),
                 SliverToBoxAdapter(
                   child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
                     bloc: newPostBloc,
@@ -793,7 +797,8 @@ class _LMFeedSocialPersonalisedScreenState
           onTap: () {
             // check if the user is a guest user
             if (LMFeedUserUtils.isGuestUser()) {
-              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                  ?.call(context);
               return;
             }
             Navigator.push(
@@ -828,7 +833,8 @@ class _LMFeedSocialPersonalisedScreenState
             onTap: () {
               // check if the user is a guest user
               if (LMFeedUserUtils.isGuestUser()) {
-                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                    ?.call(context);
                 return;
               }
               Navigator.push(

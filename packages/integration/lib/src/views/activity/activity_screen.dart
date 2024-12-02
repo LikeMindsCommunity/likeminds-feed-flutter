@@ -5,19 +5,31 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
+/// {@template lm_feed_activity_screen}
+/// A screen that displays the activity feed.
+/// {@endtemplate}
 class LMFeedActivityScreen extends StatefulWidget {
+  /// uuid of the user whose activity feed is to be displayed.
+  /// should be fetched from the user's sdkClientInfo.
   final String uuid;
 
+  /// Builder for the post widget.
   final LMFeedPostWidgetBuilder? postBuilder;
+
+  /// Builder for the comment widget.
   final LMFeedPostCommentBuilder? commentBuilder;
 
+  /// Builder for app bar.
+  final LMFeedAppBarBuilder? appBarBuilder;
+
+  /// {@macro lm_feed_activity_screen}
   const LMFeedActivityScreen({
     super.key,
     required this.uuid,
     this.postBuilder,
     this.commentBuilder,
+    this.appBarBuilder,
   });
 
   @override
@@ -51,8 +63,6 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
   Map<String, Comment> filteredComments = {};
 
   bool isCm = LMFeedUserUtils.checkIfCurrentUserIsCM();
-
-  bool isAndroid = LMFeedPlatform.instance.isAndroid();
 
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
@@ -150,22 +160,14 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
     return _widgetBuilder.scaffold(
       source: widgetSource,
       backgroundColor: feedTheme.backgroundColor,
-      appBar: LMFeedAppBar(
-        style: LMFeedAppBarStyle(
-          backgroundColor: feedTheme.container,
-          centerTitle: !isAndroid,
-          height: 50,
-        ),
-        title: const LMFeedText(
-          text: 'Activity',
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
+      appBar: widget.appBarBuilder?.call(
+            context,
+            _defAppBar(),
+          ) ??
+          _widgetBuilder.appBarBuilder(
+            context,
+            _defAppBar(),
           ),
-        ),
-      ),
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
@@ -177,30 +179,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
             pagingController: _pagingController,
             builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(
               noItemsFoundIndicatorBuilder: (context) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      LMFeedIcon(
-                        type: LMFeedIconType.svg,
-                        assetPath: kAssetNoPostsIcon,
-                        style: LMFeedIconStyle(
-                          size: 130,
-                        ),
-                      ),
-                      LMFeedText(
-                          text:
-                              'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
-                          style: LMFeedTextStyle(
-                            textStyle: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          )),
-                      SizedBox(height: 20),
-                    ],
-                  ),
-                );
+                return _defNoPostWidget();
               },
               itemBuilder: (context, item, index) {
                 final LMPostViewData postViewData =
@@ -225,8 +204,11 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                       widget.postBuilder
                               ?.call(context, postWidget, postViewData) ??
                           _widgetBuilder.postWidgetBuilder(
-                              context, postWidget, postViewData,
-                              source: widgetSource),
+                            context,
+                            postWidget,
+                            postViewData,
+                            source: widgetSource,
+                          ),
                       if (item.action == 7)
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -281,6 +263,51 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
                 );
               },
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Center _defNoPostWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          LMFeedIcon(
+            type: LMFeedIconType.svg,
+            assetPath: kAssetNoPostsIcon,
+            style: LMFeedIconStyle(
+              size: 130,
+            ),
+          ),
+          LMFeedText(
+              text:
+                  'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+              )),
+          SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  LMFeedAppBar _defAppBar() {
+    return LMFeedAppBar(
+      style: LMFeedAppBarStyle(
+        backgroundColor: feedTheme.container,
+        height: 50,
+      ),
+      title: const LMFeedText(
+        text: 'Activity',
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),

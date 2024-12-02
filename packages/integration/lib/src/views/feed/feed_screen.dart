@@ -30,7 +30,7 @@ class LMFeedScreen extends StatefulWidget {
   final LMFeedType feedType;
 
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  final LMFeedAppBarBuilder? appBar;
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
