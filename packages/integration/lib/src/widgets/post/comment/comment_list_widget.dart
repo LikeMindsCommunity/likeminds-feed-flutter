@@ -193,21 +193,21 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                   widget.newPageProgressIndicatorBuilder ??
                       (context) {
                         return _widgetBuilder
-                            .newPageProgressIndicatorBuilderFeed(context);
+                            .newPageProgressIndicatorBuilder(context);
                       },
               noItemsFoundIndicatorBuilder:
                   widget.noItemsFoundIndicatorBuilder ??
                       (context) => const LMFeedEmptyCommentWidget(),
               noMoreItemsIndicatorBuilder: widget.noMoreItemsIndicatorBuilder ??
                   (context) => SizedBox.shrink(),
-              newPageErrorIndicatorBuilder: widget
-                      .newPageErrorIndicatorBuilder ??
+              newPageErrorIndicatorBuilder:
+                  widget.newPageErrorIndicatorBuilder ??
+                      (context) =>
+                          _widgetBuilder.newPageErrorIndicatorBuilder(context),
+              firstPageErrorIndicatorBuilder: widget
+                      .firstPageErrorIndicatorBuilder ??
                   (context) =>
-                      _widgetBuilder.newPageErrorIndicatorBuilderFeed(context),
-              firstPageErrorIndicatorBuilder:
-                  widget.firstPageErrorIndicatorBuilder ??
-                      (context) => _widgetBuilder
-                          .firstPageErrorIndicatorBuilderFeed(context),
+                      _widgetBuilder.firstPageErrorIndicatorBuilder(context),
               itemBuilder: (context, commentViewData, index) {
                 LMUserViewData userViewData;
                 userViewData = commentViewData.user;

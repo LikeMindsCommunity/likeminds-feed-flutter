@@ -103,7 +103,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   final LMUserViewData currentUser =
       LMFeedLocalPreference.instance.fetchUserData()!;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
-  LMFeedPostDetailScreenSetting? settings = LMFeedCore.config.postDetailScreenConfig.setting;
+  LMFeedPostDetailScreenSetting? settings =
+      LMFeedCore.config.postDetailScreenConfig.setting;
   late LMFeedBottomTextFieldStyle? _style;
   final bool isGuestUser = LMFeedUserUtils.isGuestUser();
 
@@ -184,8 +185,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                         : const SizedBox.shrink(),
                     LMTaggingAheadTextField(
                       isDown: false,
-                      taggingEnabled:
-                          LMFeedCore.config.composeScreenConfig.setting.enableTagging,
+                      taggingEnabled: LMFeedCore
+                          .config.composeScreenConfig.setting.enableTagging,
                       enabled: !isGuestUser && right,
                       style: LMTaggingAheadTextFieldStyle(
                         maxLines: _style?.maxLines,

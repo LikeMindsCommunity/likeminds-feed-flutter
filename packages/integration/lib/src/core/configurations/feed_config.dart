@@ -29,6 +29,7 @@ export 'package:likeminds_feed_flutter_core/src/views/poll/configurations/config
 export 'package:likeminds_feed_flutter_core/src/views/report/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/search/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/pending_post/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 
 /// enum to describe which type of feed to render
 enum LMFeedType {

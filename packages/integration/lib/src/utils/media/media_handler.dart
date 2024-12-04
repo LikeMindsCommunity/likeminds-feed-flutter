@@ -173,7 +173,8 @@ class LMFeedMediaHandler {
     }
 
     if (list != null && list.files.isNotEmpty) {
-      if (mediaCount + list.files.length > composeScreenConfig.setting.mediaLimit) {
+      if (mediaCount + list.files.length >
+          composeScreenConfig.setting.mediaLimit) {
         return LMResponse(
             success: false,
             errorMessage:

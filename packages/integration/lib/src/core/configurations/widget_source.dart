@@ -1,4 +1,3 @@
-
 /// {@template lm_feed_widget_source}
 /// enum to describe the source of widget
 /// {@endtemplate}

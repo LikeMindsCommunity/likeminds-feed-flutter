@@ -43,7 +43,8 @@ class LMFeedPollResultScreen extends StatefulWidget {
 class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
     with SingleTickerProviderStateMixin {
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedPollScreenBuilderDelegate _widgetsBuilder = LMFeedCore.config.pollScreenConfig.builder;
+  LMFeedPollScreenBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.pollScreenConfig.builder;
   LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   int initialIndex = 0;
   late TabController _tabController;
@@ -239,15 +240,15 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
           return UserTile(user: item);
         },
         noItemsFoundIndicatorBuilder: widget.noItemsFoundIndicatorBuilder ??
-            _widgetBuilder.noItemsFoundIndicatorBuilderFeed,
+            _widgetBuilder.noItemsFoundIndicatorBuilder,
         firstPageProgressIndicatorBuilder:
             widget.firstPageProgressIndicatorBuilder ??
-                _widgetBuilder.firstPageProgressIndicatorBuilderFeed,
+                _widgetBuilder.firstPageProgressIndicatorBuilder,
         newPageProgressIndicatorBuilder:
             widget.newPageProgressIndicatorBuilder ??
-                _widgetBuilder.newPageProgressIndicatorBuilderFeed,
+                _widgetBuilder.newPageProgressIndicatorBuilder,
         noMoreItemsIndicatorBuilder: widget.noMoreItemsIndicatorBuilder ??
-            _widgetBuilder.noMoreItemsIndicatorBuilderFeed,
+            _widgetBuilder.noMoreItemsIndicatorBuilder,
       ),
     );
   }

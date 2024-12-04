@@ -23,7 +23,7 @@ class LMFeedActivityScreenConfig {
   final LMFeedActivityScreenStyle style;
 
   /// {@macro lm_feed_activity_screen_config}
- const LMFeedActivityScreenConfig({
+  const LMFeedActivityScreenConfig({
     this.builder = const LMFeedActivityScreenBuilderDelegate(),
     this.setting = const LMFeedActivityScreenSetting(),
     this.style = const LMFeedActivityScreenStyle(),

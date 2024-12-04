@@ -1,7 +1,6 @@
-
-
 import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
+
 /// {@template feed_screen_config}
 /// Configuration for the [LMFeedSocialUniversalScreen]
 /// to support changing light and dark style of overall system

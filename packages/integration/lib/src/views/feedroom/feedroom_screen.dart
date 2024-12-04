@@ -606,7 +606,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                           return _widgetsBuilder.noPostUnderTopicFeed(context,
                               actionable: changeFilter(context));
                         }
-                        return _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(
+                        return _widgetsBuilder.noItemsFoundIndicatorBuilder(
                             context,
                             createPostButton: createPostButton(context));
                       },
@@ -614,28 +614,27 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
                         return widget.noMoreItemsIndicatorBuilder
                                 ?.call(context) ??
                             _widgetsBuilder
-                                .noMoreItemsIndicatorBuilderFeed(context);
+                                .noMoreItemsIndicatorBuilder(context);
                       },
                       newPageProgressIndicatorBuilder: (context) {
                         return widget.newPageProgressIndicatorBuilder
                                 ?.call(context) ??
                             _widgetsBuilder
-                                .newPageProgressIndicatorBuilderFeed(context);
+                                .newPageProgressIndicatorBuilder(context);
                       },
                       firstPageProgressIndicatorBuilder: (context) =>
                           widget.firstPageProgressIndicatorBuilder
                               ?.call(context) ??
                           _widgetsBuilder
-                              .firstPageProgressIndicatorBuilderFeed(context),
+                              .firstPageProgressIndicatorBuilder(context),
                       firstPageErrorIndicatorBuilder: (context) =>
                           widget.firstPageErrorIndicatorBuilder
                               ?.call(context) ??
                           _widgetsBuilder
-                              .firstPageErrorIndicatorBuilderFeed(context),
+                              .firstPageErrorIndicatorBuilder(context),
                       newPageErrorIndicatorBuilder: (context) =>
                           widget.newPageErrorIndicatorBuilder?.call(context) ??
-                          _widgetsBuilder
-                              .newPageErrorIndicatorBuilderFeed(context),
+                          _widgetsBuilder.newPageErrorIndicatorBuilder(context),
                     ),
                   );
                 },

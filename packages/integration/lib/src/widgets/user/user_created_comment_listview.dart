@@ -172,9 +172,11 @@ class _LMFeedUserCreatedCommentListViewState
                           const SizedBox(height: 2),
                           widget.postBuilder?.call(
                                   context, postWidget, _posts[item.postId]!) ??
-                              LMFeedCore.config.widgetBuilderDelegate.postWidgetBuilder.call(
-                                  context, postWidget, _posts[item.postId]!,
-                                  source: _widgetSource),
+                              LMFeedCore.config.widgetBuilderDelegate
+                                  .postWidgetBuilder
+                                  .call(
+                                      context, postWidget, _posts[item.postId]!,
+                                      source: _widgetSource),
                           const Divider(),
                         ],
                       );

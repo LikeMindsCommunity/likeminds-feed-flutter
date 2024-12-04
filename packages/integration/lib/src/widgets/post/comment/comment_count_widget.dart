@@ -37,7 +37,8 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
   @override
   void initState() {
     super.initState();
-    settings = widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
+    settings =
+        widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
   }
 
   @override

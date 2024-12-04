@@ -190,54 +190,6 @@ class LMFeedWidgetBuilderDelegate {
     return carouselIndicator;
   }
 
-  /// Builds an indicator when no items are found in the feed.
-  Widget noItemsFoundIndicatorBuilderFeed(BuildContext context,
-      {LMFeedButton? createPostButton, bool isSelfPost = true}) {
-    LMFeedThemeData feedThemeData = LMFeedCore.theme;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          LMFeedIcon(
-            type: LMFeedIconType.icon,
-            icon: Icons.post_add,
-            style: LMFeedIconStyle(
-              size: 48,
-              color: feedThemeData.onContainer,
-            ),
-          ),
-          const SizedBox(height: 12),
-          LMFeedText(
-            text:
-                'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: feedThemeData.onContainer,
-              ),
-            ),
-          ),
-          if (isSelfPost) const SizedBox(height: 12),
-          if (isSelfPost)
-            LMFeedText(
-              text:
-                  "Be the first one to create a ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)} here",
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: feedThemeData.onContainer,
-                ),
-              ),
-            ),
-          if (isSelfPost) const SizedBox(height: 28),
-          if (createPostButton != null && isSelfPost) createPostButton,
-        ],
-      ),
-    );
-  }
-
   /// Builds an indicator when there are no posts under a topic in the feed.
   Widget noPostUnderTopicFeed(BuildContext context,
       {LMFeedButton? actionable}) {
@@ -268,35 +220,88 @@ class LMFeedWidgetBuilderDelegate {
     );
   }
 
-  /// Builds a progress indicator for the first page of the feed.
-  Widget firstPageProgressIndicatorBuilderFeed(BuildContext context) {
+  /// Builds an indicator when no items are found in the feed.
+  Widget noItemsFoundIndicatorBuilder(BuildContext context,
+      {LMFeedButton? createPostButton, bool isSelfPost = true, Widget? child}) {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
-    return LMFeedLoader(
-      style: feedThemeData.loaderStyle,
-    );
+    return child ??
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              LMFeedIcon(
+                type: LMFeedIconType.icon,
+                icon: Icons.post_add,
+                style: LMFeedIconStyle(
+                  size: 48,
+                  color: feedThemeData.onContainer,
+                ),
+              ),
+              const SizedBox(height: 12),
+              LMFeedText(
+                text:
+                    'No ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallPlural)} to show',
+                style: LMFeedTextStyle(
+                  textStyle: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: feedThemeData.onContainer,
+                  ),
+                ),
+              ),
+              if (isSelfPost) const SizedBox(height: 12),
+              if (isSelfPost)
+                LMFeedText(
+                  text:
+                      "Be the first one to create a ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)} here",
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w300,
+                      color: feedThemeData.onContainer,
+                    ),
+                  ),
+                ),
+              if (isSelfPost) const SizedBox(height: 28),
+              if (createPostButton != null && isSelfPost) createPostButton,
+            ],
+          ),
+        );
+  }
+
+  /// Builds a progress indicator for the first page of the feed.
+  Widget firstPageProgressIndicatorBuilder(BuildContext context,
+      {Widget? child}) {
+    LMFeedThemeData feedThemeData = LMFeedCore.theme;
+    return child ??
+        LMFeedLoader(
+          style: feedThemeData.loaderStyle,
+        );
   }
 
   /// Builds a progress indicator for subsequent pages of the feed.
-  Widget newPageProgressIndicatorBuilderFeed(BuildContext context) {
+  Widget newPageProgressIndicatorBuilder(BuildContext context,
+      {Widget? child}) {
     LMFeedThemeData feedThemeData = LMFeedCore.theme;
-    return LMFeedLoader(
-      style: feedThemeData.loaderStyle,
-    );
+    return child ??
+        LMFeedLoader(
+          style: feedThemeData.loaderStyle,
+        );
   }
 
   /// Builds an error indicator for the first page of the feed.
-  Widget firstPageErrorIndicatorBuilderFeed(BuildContext context) {
-    return const SizedBox();
+  Widget firstPageErrorIndicatorBuilder(BuildContext context, {Widget? child}) {
+    return child ?? const SizedBox();
   }
 
   /// Builds an error indicator for subsequent pages of the feed.
-  Widget newPageErrorIndicatorBuilderFeed(BuildContext context) {
-    return const SizedBox();
+  Widget newPageErrorIndicatorBuilder(BuildContext context, {Widget? child}) {
+    return child ?? const SizedBox();
   }
 
   /// Builds an indicator when there are no more items to load in the feed.
-  Widget noMoreItemsIndicatorBuilderFeed(BuildContext context) {
-    return const SizedBox.shrink();
+  Widget noMoreItemsIndicatorBuilder(BuildContext context, {Widget? child}) {
+    return child ?? const SizedBox.shrink();
   }
 
   /// Builds a topic bar widget.

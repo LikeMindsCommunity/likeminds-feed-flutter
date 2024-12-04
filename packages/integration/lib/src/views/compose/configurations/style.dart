@@ -33,5 +33,4 @@ class LMFeedComposeScreenStyle {
   final LMFeedIcon? addVideoIcon;
   final LMFeedIcon? addDocumentIcon;
   final LMFeedIcon? addPollIcon;
-
 }

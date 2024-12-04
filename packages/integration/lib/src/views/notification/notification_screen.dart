@@ -184,19 +184,23 @@ class _LMFeedNotificationScreenState extends State<LMFeedNotificationScreen> {
             pagingController: pagingController,
             builderDelegate:
                 PagedChildBuilderDelegate<LMNotificationFeedItemViewData>(
-              noMoreItemsIndicatorBuilder: (context) => const SizedBox(
-                height: 20,
-              ),
+              noMoreItemsIndicatorBuilder: (context) =>
+                  _widgetBuilder.noMoreItemsIndicatorBuilder(context),
               newPageProgressIndicatorBuilder: (context) =>
-                  widget.loaderBuilder?.call(context) ?? _defLoader(),
-              noItemsFoundIndicatorBuilder: (context) => Center(
-                child: widget.emptyNotificationFeedViewBuilder?.call(context) ??
-                    _defEmptyNotificationFeedView(),
-              ),
+                  widget.loaderBuilder?.call(context) ??
+                  _widgetBuilder.newPageProgressIndicatorBuilder(context,
+                      child: _defLoader()),
+              noItemsFoundIndicatorBuilder: (context) =>
+                  widget.emptyNotificationFeedViewBuilder?.call(context) ??
+                  _widgetBuilder.noItemsFoundIndicatorBuilder(
+                    context,
+                    child: _defEmptyNotificationFeedView(),
+                  ),
               itemBuilder: (context, item, index) {
                 return widget.notificationTileBuilder
                         ?.call(context, item, _defNotificationTile(item)) ??
-                    _defNotificationTile(item);
+                    _widgetBuilder.notificationTileBuilder(
+                        context, item, _defNotificationTile(item));
               },
             ),
           ),

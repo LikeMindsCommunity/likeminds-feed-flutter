@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/post/post_utils.dart';
 import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/widgets.dart';
 
 part 'handler/likes_screen_handler.dart';
@@ -134,34 +133,62 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
         padding: EdgeInsets.zero,
         pagingController: handler!.pagingController,
         builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
-          noMoreItemsIndicatorBuilder: (context) => const SizedBox(
-            height: 20,
+          noMoreItemsIndicatorBuilder: (context) =>
+              _widgetBuilder.noMoreItemsIndicatorBuilder(
+            context,
+            child: const SizedBox(
+              height: 20,
+            ),
           ),
-          noItemsFoundIndicatorBuilder: (context) => Scaffold(
-            backgroundColor: LikeMindsTheme.whiteColor,
-            body: noItemLikesView(),
+          noItemsFoundIndicatorBuilder: (context) =>
+              _widgetBuilder.noItemsFoundIndicatorBuilder(
+            context,
+            child: Scaffold(
+              backgroundColor: LikeMindsTheme.whiteColor,
+              body: noItemLikesView(),
+            ),
           ),
-          itemBuilder: (context, item, index) =>
-              LikesTile(user: handler!.userData[item.uuid]),
-          firstPageProgressIndicatorBuilder: (context) => Padding(
-            padding: const EdgeInsets.only(top: 50.0),
-            child: Column(
-              children: List.generate(5, (index) => LMFeedUserTileShimmer()),
+          itemBuilder: (context, item, index) => _widgetBuilder.likeTileBuilder(
+            context,
+            index,
+            handler!.userData[item.uuid]!,
+            LMFeedLikeTile(user: handler!.userData[item.uuid]),
+          ),
+          firstPageProgressIndicatorBuilder: (context) =>
+              _widgetBuilder.firstPageProgressIndicatorBuilder(
+            context,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 50.0),
+              child: Column(
+                children: List.generate(5, (index) => LMFeedUserTileShimmer()),
+              ),
             ),
           ),
           newPageProgressIndicatorBuilder: (context) =>
-              newPageProgressLikesView(),
+              _widgetBuilder.newPageProgressIndicatorBuilder(
+            context,
+            child: newPageProgressLikesView(),
+          ),
         ),
       ),
     );
   }
 }
 
-class LikesTile extends StatelessWidget {
+class LMFeedLikeTile extends StatelessWidget {
   final LMUserViewData? user;
-  const LikesTile({
+  final LMFeedTileStyle? style;
+
+  const LMFeedLikeTile({
     super.key,
     required this.user,
+    this.style = const LMFeedTileStyle(
+      padding: EdgeInsets.only(
+        left: 16.0,
+        top: 16.0,
+        right: 8.0,
+      ),
+    ),
   });
 
   @override
@@ -173,13 +200,14 @@ class LikesTile extends StatelessWidget {
             ? const DeletedLikesTile()
             : LMFeedUserTile(
                 user: user!,
-                style: const LMFeedTileStyle(
-                  padding: EdgeInsets.only(
-                    left: 16.0,
-                    top: 16.0,
-                    right: 8.0,
-                  ),
-                ),
+                style: style ??
+                    const LMFeedTileStyle(
+                      padding: EdgeInsets.only(
+                        left: 16.0,
+                        top: 16.0,
+                        right: 8.0,
+                      ),
+                    ),
                 onTap: () {
                   LMFeedProfileBloc.instance.add(
                     LMFeedRouteToUserProfileEvent(

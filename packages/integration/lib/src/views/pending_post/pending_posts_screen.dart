@@ -234,35 +234,35 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
                         },
                         noItemsFoundIndicatorBuilder: (context) {
                           return _widgetsBuilder
-                              .noItemsFoundIndicatorBuilderFeed(context);
+                              .noItemsFoundIndicatorBuilder(context,);
                         },
                         noMoreItemsIndicatorBuilder: (context) {
                           return widget.noMoreItemsIndicatorBuilder
                                   ?.call(context) ??
                               _widgetsBuilder
-                                  .noMoreItemsIndicatorBuilderFeed(context);
+                                  .noMoreItemsIndicatorBuilder(context);
                         },
                         newPageProgressIndicatorBuilder: (context) {
                           return widget.newPageProgressIndicatorBuilder
                                   ?.call(context) ??
                               _widgetsBuilder
-                                  .newPageProgressIndicatorBuilderFeed(context);
+                                  .newPageProgressIndicatorBuilder(context);
                         },
                         firstPageProgressIndicatorBuilder: (context) =>
                             widget.firstPageProgressIndicatorBuilder
                                 ?.call(context) ??
                             _widgetsBuilder
-                                .firstPageProgressIndicatorBuilderFeed(context),
+                                .firstPageProgressIndicatorBuilder(context),
                         firstPageErrorIndicatorBuilder: (context) =>
                             widget.firstPageErrorIndicatorBuilder
                                 ?.call(context) ??
                             _widgetsBuilder
-                                .firstPageErrorIndicatorBuilderFeed(context),
+                                .firstPageErrorIndicatorBuilder(context),
                         newPageErrorIndicatorBuilder: (context) =>
                             widget.newPageErrorIndicatorBuilder
                                 ?.call(context) ??
                             _widgetsBuilder
-                                .newPageErrorIndicatorBuilderFeed(context),
+                                .newPageErrorIndicatorBuilder(context),
                       ),
                     );
                   }),
@@ -530,7 +530,8 @@ class _LMFeedPendingPostsScreenState extends State<LMFeedPendingPostsScreen> {
       attachments: post.attachments!,
       postId: post.id,
       style: feedThemeData.mediaStyle,
-      carouselIndicatorBuilder: _widgetsBuilder.postMediaCarouselIndicatorBuilder,
+      carouselIndicatorBuilder:
+          _widgetsBuilder.postMediaCarouselIndicatorBuilder,
       imageBuilder: _widgetsBuilder.imageBuilder,
       videoBuilder: _widgetsBuilder.videoBuilder,
       pollBuilder: _widgetsBuilder.pollWidgetBuilder,

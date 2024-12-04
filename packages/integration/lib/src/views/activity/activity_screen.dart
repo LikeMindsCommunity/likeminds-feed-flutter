@@ -185,17 +185,16 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
               pagingController: _pagingController,
               builderDelegate: PagedChildBuilderDelegate<UserActivityItem>(
                 noItemsFoundIndicatorBuilder: (context) {
-                  return _widgetBuilder
-                      .noItemsFoundIndicatorBuilderFeed(context);
+                  return _widgetBuilder.noItemsFoundIndicatorBuilder(context);
                 },
                 firstPageErrorIndicatorBuilder: (context) =>
-                    _widgetBuilder.firstPageErrorIndicatorBuilderFeed(context),
+                    _widgetBuilder.firstPageErrorIndicatorBuilder(context),
                 newPageErrorIndicatorBuilder: (context) =>
-                    _widgetBuilder.newPageErrorIndicatorBuilderFeed(context),
-                firstPageProgressIndicatorBuilder: (context) => _widgetBuilder
-                    .firstPageProgressIndicatorBuilderFeed(context),
+                    _widgetBuilder.newPageErrorIndicatorBuilder(context),
+                firstPageProgressIndicatorBuilder: (context) =>
+                    _widgetBuilder.firstPageProgressIndicatorBuilder(context),
                 newPageProgressIndicatorBuilder: (context) =>
-                    _widgetBuilder.newPageProgressIndicatorBuilderFeed(context),
+                    _widgetBuilder.newPageProgressIndicatorBuilder(context),
                 itemBuilder: (context, item, index) {
                   final LMPostViewData postViewData =
                       LMFeedPostUtils.postViewDataFromActivity(

@@ -42,7 +42,8 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
   final PagingController<int, LMFeedRoomViewData>
       _pagingControllerFeedRoomList = PagingController(firstPageKey: 1);
 
-  LMFeedroomScreenBuilderDelegate widgetBuilder = LMFeedCore.config.feedroomScreenConfig.builder;
+  LMFeedroomScreenBuilderDelegate widgetBuilder =
+      LMFeedCore.config.feedroomScreenConfig.builder;
 
   void _addPaginationListener() {
     _pagingControllerFeedRoomList.addPageRequestListener((pageKey) {
