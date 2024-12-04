@@ -232,8 +232,14 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
         vertical: 2.0,
         horizontal: 6.0,
       ),
-      prefixIcon: _style?.showPrefixIcon ?? true ? _defProfilePicture() : null,
-      suffixIcon: _style?.showSuffixIcon ?? true ? _defCreateButton() : null,
+      prefixIcon: _style?.showPrefixIcon ?? true
+          ? widget.profilePictureBuilder?.call(context, _defProfilePicture()) ??
+              _defProfilePicture()
+          : null,
+      suffixIcon: _style?.showSuffixIcon ?? true
+          ? widget.createButtonBuilder?.call(_defCreateButton()!) ??
+              _defCreateButton()
+          : null,
       fillColor: feedTheme.primaryColor.withOpacity(0.04),
       filled: true,
       enabled: right,

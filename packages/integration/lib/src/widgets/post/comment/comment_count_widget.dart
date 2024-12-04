@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs,
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 
 class LMFeedCommentCount extends StatefulWidget {
   const LMFeedCommentCount({
@@ -19,6 +18,19 @@ class LMFeedCommentCount extends StatefulWidget {
   final Widget Function(BuildContext context, LMFeedText textWidget)?
       countTextBuilder;
   final LMFeedCommentCountStyle? style;
+
+  LMFeedCommentCount copyWith({
+    LMFeedPostDetailScreenSetting? settings,
+    Widget Function(BuildContext context, LMFeedText textWidget)?
+        countTextBuilder,
+    LMFeedCommentCountStyle? style,
+  }) {
+    return LMFeedCommentCount(
+      settings: settings ?? this.settings,
+      countTextBuilder: countTextBuilder ?? this.countTextBuilder,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   State<LMFeedCommentCount> createState() => _LMFeedCommentCountState();

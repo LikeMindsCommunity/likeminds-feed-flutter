@@ -1,18 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
+/// {@template lm_feed_notification_tile}
+/// Notification Tile Widget,
+/// Used to display the notification item in the notification feed.
+/// {@endtemplate}
 class LMFeedNotificationTile extends StatelessWidget {
+  /// Notification Item View Data
   final LMNotificationFeedItemViewData notificationItemViewData;
+
+  /// Style for the Notification Tile
   final LMFeedNotificationTileStyle? style;
+
+  /// OnTap callback for the Notification Tile
   final VoidCallback? onTap;
+
+  /// Rebuild notifier
   final ValueNotifier<bool> _rebuild = ValueNotifier(false);
 
+  /// Profile Picture Builder
+  final LMFeedProfilePictureBuilder? profilePictureBuilder;
+
+  /// copyWith method for LMFeedNotificationTile
+  LMFeedNotificationTile copyWith({
+    LMNotificationFeedItemViewData? notificationItemViewData,
+    LMFeedNotificationTileStyle? style,
+    VoidCallback? onTap,
+    LMFeedProfilePictureBuilder? profilePictureBuilder,
+  }) {
+    return LMFeedNotificationTile(
+      notificationItemViewData:
+          notificationItemViewData ?? this.notificationItemViewData,
+      style: style ?? this.style,
+      onTap: onTap ?? this.onTap,
+      profilePictureBuilder:
+          profilePictureBuilder ?? this.profilePictureBuilder,
+    );
+  }
+
+  /// {@macro lm_feed_notification_tile}
   LMFeedNotificationTile({
-    Key? key,
+    super.key,
     required this.notificationItemViewData,
     this.style,
     this.onTap,
-  }) : super(key: key);
+    this.profilePictureBuilder,
+  });
   @override
   Widget build(BuildContext context) {
     final _theme = LMFeedCore.theme;
@@ -31,12 +64,7 @@ class LMFeedNotificationTile extends StatelessWidget {
               notificationItemViewData.isRead = true;
               _rebuild.value = !_rebuild.value;
             },
-            leading: LMFeedProfilePicture(
-                imageUrl: notificationItemViewData.actionBy.last.imageUrl,
-                fallbackText: notificationItemViewData.actionBy.last.name,
-                style: LMFeedProfilePictureStyle(
-                  size: 35,
-                )),
+            leading: _defProfilePicture(),
             title: RichText(
               text: TextSpan(
                 children: LMFeedTaggingHelper.extractNotificationTags(
@@ -78,11 +106,25 @@ class LMFeedNotificationTile extends StatelessWidget {
       },
     );
   }
+
+  LMFeedProfilePicture _defProfilePicture() {
+    return LMFeedProfilePicture(
+        imageUrl: notificationItemViewData.actionBy.last.imageUrl,
+        fallbackText: notificationItemViewData.actionBy.last.name,
+        style: LMFeedProfilePictureStyle(
+          size: 35,
+        ));
+  }
 }
 
+/// {@template lm_feed_notification_tile_style}
+/// Style for the Notification Tile
+/// {@endtemplate}
 class LMFeedNotificationTileStyle extends LMFeedTileStyle {
+  /// Background Color for the active notification
   final Color? activeBackgroundColor;
 
+  /// {@macro lm_feed_notification_tile_style}
   const LMFeedNotificationTileStyle({
     this.activeBackgroundColor,
     super.backgroundColor,
@@ -96,6 +138,7 @@ class LMFeedNotificationTileStyle extends LMFeedTileStyle {
     super.margin,
   });
 
+  /// Basic Style for the Notification Tile
   factory LMFeedNotificationTileStyle.basic() {
     final baseStyle = LMFeedTileStyle.basic();
     return LMFeedNotificationTileStyle(

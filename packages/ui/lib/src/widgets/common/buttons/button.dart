@@ -264,13 +264,12 @@ class LMFeedButtonStyle {
   }
 
   factory LMFeedButtonStyle.like({Color? primaryColor}) => LMFeedButtonStyle(
-        padding: const EdgeInsets.only(right: 16.0),
+        padding: const EdgeInsets.only(right: 16.0, top: 8.0, bottom: 8.0),
         icon: LMFeedIcon(
           type: LMFeedIconType.svg,
           assetPath: lmLikeInActiveSvg,
           style: LMFeedIconStyle.basic(),
         ),
-        height: 44,
         activeIcon: LMFeedIcon(
           type: LMFeedIconType.svg,
           assetPath: lmLikeActiveSvg,
@@ -281,6 +280,7 @@ class LMFeedButtonStyle {
       );
 
   factory LMFeedButtonStyle.comment() => LMFeedButtonStyle(
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
         icon: LMFeedIcon(
           type: LMFeedIconType.svg,
           assetPath: lmCommentSvg,
@@ -289,6 +289,7 @@ class LMFeedButtonStyle {
       );
 
   factory LMFeedButtonStyle.share() => LMFeedButtonStyle(
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
         showText: false,
         icon: LMFeedIcon(
           type: LMFeedIconType.svg,
@@ -311,11 +312,11 @@ class LMFeedButtonStyle {
             color: primaryColor,
           ),
         ),
-        padding: const EdgeInsets.only(right: 8.0),
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
       );
 
   factory LMFeedButtonStyle.repost({Color? primaryColor}) => LMFeedButtonStyle(
-        padding: const EdgeInsets.only(right: 16.0),
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 16.0),
         icon: LMFeedIcon(
           type: LMFeedIconType.svg,
           assetPath: lmRepostSvg,
