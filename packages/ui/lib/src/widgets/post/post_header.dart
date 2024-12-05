@@ -67,6 +67,7 @@ class LMFeedPostHeader extends StatelessWidget {
       width: headerStyle.width ?? screenSize.width,
       height: headerStyle.height,
       padding: headerStyle.padding ?? const EdgeInsets.only(bottom: 8),
+      decoration: headerStyle.decoration,
       margin: headerStyle.margin,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -345,8 +346,8 @@ class LMFeedPostHeaderStyle {
   final LMFeedTextStyle? customTitleTextStyle;
   final LMFeedMenuStyle? menuStyle;
   final bool showTimeStamp;
-
   final bool showPinnedIcon;
+  final BoxDecoration? decoration;
 
   const LMFeedPostHeaderStyle({
     this.padding,
@@ -362,6 +363,7 @@ class LMFeedPostHeaderStyle {
     this.customTitleTextStyle,
     this.menuStyle,
     this.showTimeStamp = true,
+    this.decoration,
   });
 
   LMFeedPostHeaderStyle copyWith({
@@ -378,6 +380,7 @@ class LMFeedPostHeaderStyle {
     LMFeedTextStyle? customTitleTextStyle,
     LMFeedMenuStyle? menuStyle,
     bool? showTimeStamp,
+    BoxDecoration? decoration,
   }) {
     return LMFeedPostHeaderStyle(
       padding: padding ?? this.padding,
@@ -393,6 +396,7 @@ class LMFeedPostHeaderStyle {
       customTitleTextStyle: customTitleTextStyle ?? this.customTitleTextStyle,
       menuStyle: menuStyle ?? this.menuStyle,
       showTimeStamp: showTimeStamp ?? this.showTimeStamp,
+      decoration: decoration ?? this.decoration,
     );
   }
 
@@ -407,7 +411,6 @@ class LMFeedPostHeaderStyle {
           textStyle: TextStyle(
             color: onPrimary ?? LikeMindsTheme.onPrimary,
             fontSize: 16,
-            fontFamily: 'Roboto',
             fontWeight: FontWeight.w500,
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 
 class LMFeedQnAScreen extends StatefulWidget {
   const LMFeedQnAScreen({
@@ -28,7 +29,7 @@ class LMFeedQnAScreen extends StatefulWidget {
   final LMFeedType feedType;
 
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  final LMFeedAppBarBuilder? appBar;
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
@@ -64,7 +65,7 @@ class LMFeedQnAScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedQnaScreenSetting? config;
 
   @override
   State<LMFeedQnAScreen> createState() => _LMFeedQnAScreenState();
@@ -99,7 +100,7 @@ class _LMFeedQnAScreenState extends State<LMFeedQnAScreen> {
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       topicBarBuilder: widget.topicBarBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      config: widget.config,
+      feedScreenSettings: widget.config,
     );
   }
 

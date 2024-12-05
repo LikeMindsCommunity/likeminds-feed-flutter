@@ -26,7 +26,6 @@ void main() async {
   // Loading .env file
   await dotenv.load(fileName: ".env");
   LMResponse response = await LMFeedCore.instance.initialize(
-    domain: "feedsx://www.feedsx.com/",
   );
 
   SystemChrome.setPreferredOrientations([

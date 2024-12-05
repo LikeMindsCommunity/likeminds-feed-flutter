@@ -1,9 +1,20 @@
 # Changelog
 
+## [1.13.0]
+
+- Add builders, style, settings and config to each screen
+
+### Breaking Changes
+
+- Replaced `LMFeedWidgetUtility` class with `LMFeedWidgetBuilderDelegate` to provide more control over customization.
+- Replaced configurations classes with settings class.
+
 ## [1.12.1]
+
 - Added support for flutter version 3.24.5
 
 ## [1.12.0]
+
 - Added support for QnA Feed theme
 - Added support for Guest Flow
 - Added support for Retry mechanism

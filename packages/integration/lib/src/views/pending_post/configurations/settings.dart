@@ -1,0 +1,3 @@
+class LMFeedPendingPostsScreenSetting {
+  const LMFeedPendingPostsScreenSetting();
+}

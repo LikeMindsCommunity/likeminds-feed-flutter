@@ -106,7 +106,7 @@ typedef LMFeedOnPostTap = void Function(BuildContext, LMPostViewData);
 /// must return a PreferredSizeWidget,
 /// takes in [BuildContext] and [LMFeedAppBar] as params.
 /// {@endtemplate}
-typedef LMFeedPostAppBarBuilder = PreferredSizeWidget Function(
+typedef LMFeedAppBarBuilder = PreferredSizeWidget Function(
     BuildContext, LMFeedAppBar);
 
 /// {@template post_comment_builder}

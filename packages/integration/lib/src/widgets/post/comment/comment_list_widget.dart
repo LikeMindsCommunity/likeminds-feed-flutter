@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/configurations/builder.dart';
 
 /// {@template lm_feed_comment_list}
 /// A widget that displays a list of comments for a specific post.
@@ -111,7 +112,8 @@ class LMFeedCommentList extends StatefulWidget {
 class _LMFeedCommentListState extends State<LMFeedCommentList> {
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
-  final LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
+  final LMFeedPostDetailScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.postDetailScreenConfig.builder;
   String commentTitleFirstCapPlural = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.firstLetterCapitalPlural);
   String commentTitleSmallCapPlural =
@@ -191,21 +193,21 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                   widget.newPageProgressIndicatorBuilder ??
                       (context) {
                         return _widgetBuilder
-                            .newPageProgressIndicatorBuilderFeed(context);
+                            .newPageProgressIndicatorBuilder(context);
                       },
               noItemsFoundIndicatorBuilder:
                   widget.noItemsFoundIndicatorBuilder ??
                       (context) => const LMFeedEmptyCommentWidget(),
               noMoreItemsIndicatorBuilder: widget.noMoreItemsIndicatorBuilder ??
                   (context) => SizedBox.shrink(),
-              newPageErrorIndicatorBuilder: widget
-                      .newPageErrorIndicatorBuilder ??
+              newPageErrorIndicatorBuilder:
+                  widget.newPageErrorIndicatorBuilder ??
+                      (context) =>
+                          _widgetBuilder.newPageErrorIndicatorBuilder(context),
+              firstPageErrorIndicatorBuilder: widget
+                      .firstPageErrorIndicatorBuilder ??
                   (context) =>
-                      _widgetBuilder.newPageErrorIndicatorBuilderFeed(context),
-              firstPageErrorIndicatorBuilder:
-                  widget.firstPageErrorIndicatorBuilder ??
-                      (context) => _widgetBuilder
-                          .firstPageErrorIndicatorBuilderFeed(context),
+                      _widgetBuilder.firstPageErrorIndicatorBuilder(context),
               itemBuilder: (context, commentViewData, index) {
                 LMUserViewData userViewData;
                 userViewData = commentViewData.user;
@@ -259,8 +261,8 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
   LMFeedCommentReplyWidget _defCommentReplyWidget(
       LMCommentViewData commentViewData, LMUserViewData userViewData) {
     return LMFeedCommentReplyWidget(
-      commentBuilder:
-          widget.commentBuilder ?? LMFeedCore.widgetUtility.commentBuilder,
+      commentBuilder: widget.commentBuilder ??
+          LMFeedCore.config.widgetBuilderDelegate.commentBuilder,
       post: _postViewData!,
       postId: widget.postId,
       comment: commentViewData,
@@ -325,7 +327,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       }
       LMFeedCore.showSnackBar(
         context,
-        '$commentTitleSmallCapSingular Deleted',
+        '$commentTitleFirstCapSingular Deleted',
         _widgetSource,
       );
     } else if (state is LMFeedDeleteCommentErrorState) {
@@ -388,7 +390,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
       ));
       LMFeedCore.showSnackBar(
         context,
-        '$commentTitleSmallCapSingular Deleted',
+        '$commentTitleFirstCapSingular Deleted',
         _widgetSource,
       );
     } else if (state is LMFeedGetReplyCommentLoadingState) {
@@ -643,7 +645,8 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         onCommentReport: () {
           // check if the user is a guest user
           if (LMFeedUserUtils.isGuestUser()) {
-            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                ?.call(context);
             return;
           }
           Navigator.of(context).push(

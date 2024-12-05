@@ -10,7 +10,7 @@ class LMFeedVideoThumbnail {
   static Future<String?> thumbnailFile({
     required String path,
     int position = 0,
-    int quality = 10,
+    int quality = 40,
   }) async {
     try {
       final thumbnail = await VideoCompress.getFileThumbnail(

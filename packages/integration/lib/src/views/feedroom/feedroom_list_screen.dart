@@ -6,7 +6,7 @@ import 'package:likeminds_feed_flutter_core/src/bloc/feedroom/feedroom_bloc.dart
 
 class LMFeedRoomListScreen extends StatefulWidget {
   final Widget Function()? feedroomTileBuilder;
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
   // Builder for empty feed view
   final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
   // Builder for first page loader when no post are there
@@ -42,7 +42,8 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
   final PagingController<int, LMFeedRoomViewData>
       _pagingControllerFeedRoomList = PagingController(firstPageKey: 1);
 
-  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedroomScreenBuilderDelegate widgetBuilder =
+      LMFeedCore.config.feedroomScreenConfig.builder;
 
   void _addPaginationListener() {
     _pagingControllerFeedRoomList.addPageRequestListener((pageKey) {
@@ -86,7 +87,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return widgetUtility.scaffold(
+    return widgetBuilder.scaffold(
       appBar: widget.appBarBuilder?.call(context, _defAppBar()) ?? _defAppBar(),
       body: RefreshIndicator.adaptive(
         onRefresh: () async {
@@ -119,7 +120,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
             } else if (state is LMFeedRoomListEmptyState) {
               return getFeedRoomListEmptyView();
             }
-            return widgetUtility.scaffold(
+            return widgetBuilder.scaffold(
               backgroundColor: LMFeedCore.theme.backgroundColor,
               body: LMFeedLoader(),
             );
@@ -184,7 +185,7 @@ class _LMFeedRoomListScreenState extends State<LMFeedRoomListScreen> {
 class LMFeedRoomList extends StatelessWidget {
   final LMFeedRoomBloc feedRoomBloc;
   final LMFeedRoomTileBuilder? feedroomTileBuilder;
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
   final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
   // Builder for first page loader when no post are there
   final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;

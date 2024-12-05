@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 
 class LMFeedBottomTextField extends StatefulWidget {
   const LMFeedBottomTextField({
@@ -83,7 +84,7 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   LMFeedThemeData feedTheme = LMFeedCore.theme;
   late Size screenSize;
   double? screenWidth;
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   late bool isDesktopWeb;
   late final TextEditingController _commentController;
   late final FocusNode _commentFocusNode;
@@ -102,7 +103,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
   final LMUserViewData currentUser =
       LMFeedLocalPreference.instance.fetchUserData()!;
   final LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.postDetailScreen;
-  LMPostDetailScreenConfig? config = LMFeedCore.config.postDetailConfig;
+  LMFeedPostDetailScreenSetting? settings =
+      LMFeedCore.config.postDetailScreenConfig.setting;
   late LMFeedBottomTextFieldStyle? _style;
   final bool isGuestUser = LMFeedUserUtils.isGuestUser();
 
@@ -183,8 +185,8 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
                         : const SizedBox.shrink(),
                     LMTaggingAheadTextField(
                       isDown: false,
-                      taggingEnabled:
-                          LMFeedCore.config.composeConfig.enableTagging,
+                      taggingEnabled: LMFeedCore
+                          .config.composeScreenConfig.setting.enableTagging,
                       enabled: !isGuestUser && right,
                       style: LMTaggingAheadTextFieldStyle(
                         maxLines: _style?.maxLines,
@@ -230,13 +232,19 @@ class _LMFeedBottomTextFieldState extends State<LMFeedBottomTextField> {
         vertical: 2.0,
         horizontal: 6.0,
       ),
-      prefixIcon: _style?.showPrefixIcon ?? true ? _defProfilePicture() : null,
-      suffixIcon: _style?.showSuffixIcon ?? true ? _defCreateButton() : null,
+      prefixIcon: _style?.showPrefixIcon ?? true
+          ? widget.profilePictureBuilder?.call(context, _defProfilePicture()) ??
+              _defProfilePicture()
+          : null,
+      suffixIcon: _style?.showSuffixIcon ?? true
+          ? widget.createButtonBuilder?.call(_defCreateButton()!) ??
+              _defCreateButton()
+          : null,
       fillColor: feedTheme.primaryColor.withOpacity(0.04),
       filled: true,
       enabled: right,
       hintText: right
-          ? config?.commentTextFieldHint ??
+          ? settings?.commentTextFieldHint ??
               'Write a $commentTitleSmallCapSingular'
           : "You do not have permission to create a $commentTitleSmallCapSingular.",
     );

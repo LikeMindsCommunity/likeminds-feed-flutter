@@ -37,7 +37,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
   });
 
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  final LMFeedAppBarBuilder? appBar;
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
@@ -67,14 +67,14 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedQnaScreenSetting? config;
 
   @override
   State<LMFeedQnAPersonalisedScreen> createState() =>
       _LMFeedQnAPersonalisedScreenState();
 
   LMFeedQnAPersonalisedScreen copyWith({
-    LMFeedPostAppBarBuilder? appBar,
+    LMFeedAppBarBuilder? appBar,
     LMFeedCustomWidgetBuilder? customWidgetBuilder,
     LMFeedPostWidgetBuilder? postBuilder,
     LMFeedContextButtonBuilder? floatingActionButtonBuilder,
@@ -87,7 +87,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
     Widget Function(BuildContext context, int noOfPendingPost)?
         pendingPostBannerBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenConfig? config,
+    LMFeedQnaScreenSetting? config,
   }) {
     return LMFeedQnAPersonalisedScreen(
       appBar: appBar ?? this.appBar,
@@ -144,11 +144,11 @@ class _LMFeedQnAPersonalisedScreenState
       LMFeedPluralizeWordAction.allSmallSingular);
 
   // Create an instance of LMFeedScreenBuilderDelegate
-  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
+  LMFeedQnaScreenBuilderDelegate _screenBuilderDelegate =
+      LMFeedCore.config.qnaFeedScreenConfig.builder;
 
-  LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+  LMFeedPendingPostScreenBuilderDelegate _pendingPostScreenBuilderDelegate =
+      LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -156,8 +156,9 @@ class _LMFeedQnAPersonalisedScreenState
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetUtility
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  // Create an instance of LMFeedQnaScreenWidgetBuilderDelegate
+  LMFeedQnaScreenBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.qnaFeedScreenConfig.builder;
 
   // Set the widget source to personalised feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.personalisedFeed;
@@ -169,8 +170,8 @@ class _LMFeedQnAPersonalisedScreenState
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenConfig? config;
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedQnaScreenSetting? feedScreenSettings;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
@@ -232,7 +233,8 @@ class _LMFeedQnAPersonalisedScreenState
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
+    feedScreenSettings =
+        widget.config ?? LMFeedCore.config.qnaFeedScreenConfig.setting;
 
     getUserFeedMeta = getUserFeedMetaFuture();
 
@@ -387,13 +389,15 @@ class _LMFeedQnAPersonalisedScreenState
     return _widgetsBuilder.scaffold(
       source: _widgetSource,
       backgroundColor: feedThemeData.backgroundColor,
-      appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
+      appBar: widget.appBar?.call(context, _defAppBar()) ??
+          _widgetsBuilder.appBarBuilder(context, _defAppBar()),
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
           return widget.floatingActionButtonBuilder
                   ?.call(context, defFloatingActionButton(context)) ??
-              defFloatingActionButton(context);
+              _widgetsBuilder.floatingActionButtonBuilder(
+                  context, defFloatingActionButton(context));
         },
       ),
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
@@ -401,7 +405,7 @@ class _LMFeedQnAPersonalisedScreenState
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(LMFeedCore.webConfiguration.maxWidth,
+          width: min(LMFeedCore.config.webConfiguration.maxWidth,
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
@@ -453,13 +457,13 @@ class _LMFeedQnAPersonalisedScreenState
                             });
                       }),
                 ),
-                SliverToBoxAdapter(
-                  child: config!.showCustomWidget
-                      ? widget.customWidgetBuilder?.call(
-                              context, _defPostSomeThingWidget(context)) ??
-                          _defPostSomeThingWidget(context)
-                      : const SizedBox(),
-                ),
+                if (feedScreenSettings?.showCustomWidget ?? false)
+                  SliverToBoxAdapter(
+                    child: widget.customWidgetBuilder
+                            ?.call(context, _defPostSomeThingWidget(context)) ??
+                        _widgetsBuilder.customWidgetBuilder(
+                            _defPostSomeThingWidget(context), context),
+                  ),
                 SliverToBoxAdapter(
                   child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
                     bloc: newPostBloc,
@@ -699,40 +703,37 @@ class _LMFeedQnAPersonalisedScreenState
                             );
                           },
                           noItemsFoundIndicatorBuilder: (context) {
-                            return _widgetsBuilder
-                                .noItemsFoundIndicatorBuilderFeed(context,
-                                    createPostButton:
-                                        createPostButton(context));
+                            return _widgetsBuilder.noItemsFoundIndicatorBuilder(
+                                context,
+                                createPostButton: createPostButton(context));
                           },
                           noMoreItemsIndicatorBuilder: (context) {
                             return widget.noMoreItemsIndicatorBuilder
                                     ?.call(context) ??
                                 _widgetsBuilder
-                                    .noMoreItemsIndicatorBuilderFeed(context);
+                                    .noMoreItemsIndicatorBuilder(context);
                           },
                           newPageProgressIndicatorBuilder: (context) {
                             return widget.newPageProgressIndicatorBuilder
                                     ?.call(context) ??
                                 _widgetsBuilder
-                                    .newPageProgressIndicatorBuilderFeed(
-                                        context);
+                                    .newPageProgressIndicatorBuilder(context);
                           },
                           firstPageProgressIndicatorBuilder: (context) =>
                               widget.firstPageProgressIndicatorBuilder
                                   ?.call(context) ??
                               _widgetsBuilder
-                                  .firstPageProgressIndicatorBuilderFeed(
-                                      context),
+                                  .firstPageProgressIndicatorBuilder(context),
                           firstPageErrorIndicatorBuilder: (context) =>
                               widget.firstPageErrorIndicatorBuilder
                                   ?.call(context) ??
                               _widgetsBuilder
-                                  .firstPageErrorIndicatorBuilderFeed(context),
+                                  .firstPageErrorIndicatorBuilder(context),
                           newPageErrorIndicatorBuilder: (context) =>
                               widget.newPageErrorIndicatorBuilder
                                   ?.call(context) ??
                               _widgetsBuilder
-                                  .newPageErrorIndicatorBuilderFeed(context),
+                                  .newPageErrorIndicatorBuilder(context),
                         ),
                       );
                     },
@@ -791,7 +792,8 @@ class _LMFeedQnAPersonalisedScreenState
           onTap: () {
             // check if the user is a guest user
             if (LMFeedUserUtils.isGuestUser()) {
-              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                  ?.call(context);
               return;
             }
             Navigator.push(
@@ -821,12 +823,13 @@ class _LMFeedQnAPersonalisedScreenState
             ),
           ),
         ),
-        if (config?.showNotificationFeedIcon ?? true)
+        if (feedScreenSettings?.showNotificationFeedIcon ?? true)
           LMFeedButton(
             onTap: () {
               // check if the user is a guest user
               if (LMFeedUserUtils.isGuestUser()) {
-                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                    ?.call(context);
                 return;
               }
               Navigator.push(
@@ -871,46 +874,6 @@ class _LMFeedQnAPersonalisedScreenState
         )
       ],
     );
-  }
-
-  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
-    if (media != null) {
-      if (media.attachmentType == LMMediaType.image) {
-        return Container(
-          height: 50,
-          width: 50,
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(6.0),
-          ),
-          child: LMFeedImage(
-            image: media,
-            style: const LMFeedPostImageStyle(
-              boxFit: BoxFit.contain,
-            ),
-          ),
-        );
-      } else if (media.attachmentType == LMMediaType.document) {
-        return LMFeedTheme
-                .instance.theme.mediaStyle.documentStyle.documentIcon ??
-            LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.picture_as_pdf,
-              style: LMFeedIconStyle(
-                color: Colors.red,
-                size: 35,
-                boxPadding: 0,
-              ),
-            );
-      } else if (media.attachmentType == LMMediaType.video) {
-        return const SizedBox();
-      } else {
-        return const SizedBox.shrink();
-      }
-    } else {
-      return const SizedBox.shrink();
-    }
   }
 
   LMFeedButton createPostButton(BuildContext context) {

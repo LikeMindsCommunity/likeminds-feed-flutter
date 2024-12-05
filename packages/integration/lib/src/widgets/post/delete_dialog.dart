@@ -43,7 +43,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
       ),
       elevation: 5,
       child: Container(
-        width: min(LMFeedCore.webConfiguration.maxWidgetForDialog,
+        width: min(LMFeedCore.config.webConfiguration.maxWidgetForDialog,
             screenSize.width * 0.7),
         padding: const EdgeInsets.symmetric(
           horizontal: 20.0,
@@ -102,6 +102,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                 constraints: BoxConstraints(
                                                     maxWidth: min(
                                                         LMFeedCore
+                                                            .config
                                                             .webConfiguration
                                                             .maxWidth,
                                                         screenSize.width)),
@@ -124,6 +125,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                                                         vertical: 30.0),
                                                     width: min(
                                                         LMFeedCore
+                                                            .config
                                                             .webConfiguration
                                                             .maxWidth,
                                                         screenSize.width),

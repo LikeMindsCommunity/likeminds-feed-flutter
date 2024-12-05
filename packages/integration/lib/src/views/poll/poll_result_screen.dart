@@ -43,13 +43,14 @@ class LMFeedPollResultScreen extends StatefulWidget {
 class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
     with SingleTickerProviderStateMixin {
   LMFeedThemeData theme = LMFeedCore.theme;
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedPollScreenBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.pollScreenConfig.builder;
   LMUserViewData? user = LMFeedLocalPreference.instance.fetchUserData();
   int initialIndex = 0;
   late TabController _tabController;
   late PageController _pagingController;
   int pageSize = 10;
-  final _widgetUtility = LMFeedCore.widgetUtility;
+  final _widgetBuilder = LMFeedCore.config.pollScreenConfig.builder;
 
   @override
   initState() {
@@ -239,15 +240,15 @@ class _LMFeedPollResultScreenState extends State<LMFeedPollResultScreen>
           return UserTile(user: item);
         },
         noItemsFoundIndicatorBuilder: widget.noItemsFoundIndicatorBuilder ??
-            _widgetUtility.noItemsFoundIndicatorBuilderFeed,
+            _widgetBuilder.noItemsFoundIndicatorBuilder,
         firstPageProgressIndicatorBuilder:
             widget.firstPageProgressIndicatorBuilder ??
-                _widgetUtility.firstPageProgressIndicatorBuilderFeed,
+                _widgetBuilder.firstPageProgressIndicatorBuilder,
         newPageProgressIndicatorBuilder:
             widget.newPageProgressIndicatorBuilder ??
-                _widgetUtility.newPageProgressIndicatorBuilderFeed,
+                _widgetBuilder.newPageProgressIndicatorBuilder,
         noMoreItemsIndicatorBuilder: widget.noMoreItemsIndicatorBuilder ??
-            _widgetUtility.noMoreItemsIndicatorBuilderFeed,
+            _widgetBuilder.noMoreItemsIndicatorBuilder,
       ),
     );
   }

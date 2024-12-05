@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs,
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -10,14 +10,27 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 class LMFeedCommentCount extends StatefulWidget {
   const LMFeedCommentCount({
     super.key,
-    this.config,
+    this.settings,
     this.countTextBuilder,
     this.style,
   });
-  final LMPostDetailScreenConfig? config;
+  final LMFeedPostDetailScreenSetting? settings;
   final Widget Function(BuildContext context, LMFeedText textWidget)?
       countTextBuilder;
   final LMFeedCommentCountStyle? style;
+
+  LMFeedCommentCount copyWith({
+    LMFeedPostDetailScreenSetting? settings,
+    Widget Function(BuildContext context, LMFeedText textWidget)?
+        countTextBuilder,
+    LMFeedCommentCountStyle? style,
+  }) {
+    return LMFeedCommentCount(
+      settings: settings ?? this.settings,
+      countTextBuilder: countTextBuilder ?? this.countTextBuilder,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   State<LMFeedCommentCount> createState() => _LMFeedCommentCountState();
@@ -27,7 +40,7 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
   int _commentCount = 0;
   final LMFeedThemeData feedTheme = LMFeedCore.theme;
   final LMFeedCommentBloc _commentBloc = LMFeedCommentBloc.instance;
-  late LMPostDetailScreenConfig config;
+  late LMFeedPostDetailScreenSetting settings;
   late Size screenSize;
   late double screenWidth;
   bool isDesktopWeb = false;
@@ -36,7 +49,8 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
   @override
   void initState() {
     super.initState();
-    config = widget.config ?? LMFeedCore.config.postDetailConfig;
+    settings =
+        widget.settings ?? LMFeedCore.config.postDetailScreenConfig.setting;
   }
 
   @override
@@ -77,7 +91,7 @@ class _LMFeedCommentCountState extends State<LMFeedCommentCount> {
           current is LMFeedDeleteCommentSuccessState,
       builder: (context, state) {
         return _commentCount == 0 ||
-                !config.showCommentCountOnList ||
+                !settings.showCommentCountOnList ||
                 state is LMFeedGetCommentLoadingState
             ? const SizedBox.shrink()
             : Container(
