@@ -6,7 +6,7 @@ class LMFeedActivityWidgetScreen extends StatelessWidget {
 
   final LMFeedPostWidgetBuilder? postWidgetBuilder;
   final LMFeedPostCommentBuilder? commentWidgetBuilder;
-  final LMFeedPostAppBarBuilder? appBarBuilder;
+  final LMFeedAppBarBuilder? appBarBuilder;
 
   const LMFeedActivityWidgetScreen({
     super.key,

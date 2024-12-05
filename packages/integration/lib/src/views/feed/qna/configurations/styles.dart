@@ -1,0 +1,3 @@
+class LMFeedQnaScreenStyle {
+  const LMFeedQnaScreenStyle();
+}

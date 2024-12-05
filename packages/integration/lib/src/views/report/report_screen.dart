@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
@@ -57,7 +55,8 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
-  LMFeedWidgetUtility _widgetBuilder = LMFeedCore.widgetUtility;
+  LMFeedReportScreenBuilderDelegate _widgetBuilder =
+      LMFeedCore.config.reportScreenConfig.builder;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.reportScreen;
   LMFeedThemeData theme = LMFeedCore.theme;
 
@@ -110,46 +109,17 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
     return _widgetBuilder.scaffold(
       backgroundColor: theme.container,
       source: _widgetSource,
-      appBar: AppBar(
-        backgroundColor: theme.container,
-        elevation: 2,
-        surfaceTintColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        centerTitle: isIos,
-        actions: [
-          LMFeedButton(
-            onTap: () {
-              Navigator.of(context).pop();
-            },
-            style: LMFeedButtonStyle(
-              height: 48,
-              backgroundColor: Colors.transparent,
-              borderRadius: 0,
-              icon: LMFeedIcon(
-                type: LMFeedIconType.icon,
-                icon: Icons.close,
-                style: LMFeedIconStyle(color: theme.disabledColor),
-              ),
-            ),
-          )
-        ],
-        title: LMFeedText(
-          text: 'Report Abuse',
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontSize: 18,
-              color: theme.errorColor,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
+      appBar: _widgetBuilder.appBarBuilder(
+        context,
+        _defAppBar(context),
       ),
       body: SafeArea(
         top: false,
         child: Align(
           alignment: Alignment.topCenter,
           child: Container(
-            width: min(screenSize.width, LMFeedCore.webConfiguration.maxWidth),
+            width: min(
+                screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -218,7 +188,6 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                                                         textStyle:
                                                             const TextStyle(
                                                           fontSize: 16,
-                                                          fontFamily: 'Inter',
                                                           fontWeight:
                                                               FontWeight.w400,
                                                         ).copyWith(
@@ -381,6 +350,50 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  LMFeedAppBar _defAppBar(BuildContext context) {
+    return LMFeedAppBar(
+      style: LMFeedAppBarStyle(
+        backgroundColor: theme.container,
+        shadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 0,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        centerTitle: isIos,
+      ),
+      trailing: [
+        LMFeedButton(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          style: LMFeedButtonStyle(
+            height: 48,
+            backgroundColor: Colors.transparent,
+            borderRadius: 0,
+            icon: LMFeedIcon(
+              type: LMFeedIconType.icon,
+              icon: Icons.close,
+              style: LMFeedIconStyle(color: theme.disabledColor),
+            ),
+          ),
+        )
+      ],
+      title: LMFeedText(
+        text: 'Report Abuse',
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 18,
+            color: theme.errorColor,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),

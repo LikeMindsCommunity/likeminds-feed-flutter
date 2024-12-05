@@ -48,7 +48,8 @@ class _LMFeedUserCreatedPostListViewState
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
 
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  LMFeedWidgetBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.widgetBuilderDelegate;
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.userFeed;
   static const int pageSize = 10;
   ValueNotifier<bool> rebuildPostWidget = ValueNotifier(false);
@@ -288,7 +289,7 @@ class _LMFeedUserCreatedPostListViewState
                 },
                 noItemsFoundIndicatorBuilder: (context) {
                   return widget.noItemsFoundIndicatorBuilder?.call(context) ??
-                      _widgetsBuilder.noItemsFoundIndicatorBuilderFeed(context,
+                      _widgetsBuilder.noItemsFoundIndicatorBuilder(context,
                           isSelfPost:
                               widget.uuid == currentUser?.sdkClientInfo.uuid ||
                                   widget.uuid == currentUser?.uuid,

@@ -147,35 +147,7 @@ LMFeedThemeData darkTheme = LMFeedThemeData.light(
       left: 44.0,
     ),
   ),
-  composeScreenStyle: LMFeedComposeScreenStyle.basic().copyWith(
-    addImageIcon: LMFeedIcon(
-      type: LMFeedIconType.svg,
-      assetPath: kAssetGalleryIcon,
-      style: LMFeedIconStyle.basic().copyWith(
-        color: ColorTheme.novaTheme.colorScheme.primary,
-        boxPadding: 0,
-        size: 28,
-      ),
-    ),
-    addVideoIcon: LMFeedIcon(
-      type: LMFeedIconType.svg,
-      assetPath: kAssetVideoIcon,
-      style: LMFeedIconStyle.basic().copyWith(
-        color: ColorTheme.novaTheme.colorScheme.primary,
-        boxPadding: 0,
-        size: 28,
-      ),
-    ),
-    addDocumentIcon: LMFeedIcon(
-      type: LMFeedIconType.svg,
-      assetPath: kAssetDocPDFIcon,
-      style: LMFeedIconStyle.basic().copyWith(
-        color: ColorTheme.novaTheme.colorScheme.primary,
-        boxPadding: 0,
-        size: 28,
-      ),
-    ),
-  ),
+
   footerStyle: LMFeedPostFooterStyle.basic().copyWith(
     showSaveButton: false,
     likeButtonStyle: const LMFeedButtonStyle.basic().copyWith(

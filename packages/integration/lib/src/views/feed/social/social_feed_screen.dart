@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-part '../feed_screen_configuration.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 
 class LMFeedSocialScreen extends StatefulWidget {
   const LMFeedSocialScreen({
@@ -21,7 +20,7 @@ class LMFeedSocialScreen extends StatefulWidget {
     this.pendingPostBannerBuilder,
     this.topicBarBuilder,
     this.floatingActionButtonLocation,
-    this.config,
+    this.settings,
   });
 
   /// [LMFeedType] for the feed.
@@ -30,7 +29,7 @@ class LMFeedSocialScreen extends StatefulWidget {
   final LMFeedType feedType;
 
   // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  final LMFeedAppBarBuilder? appBar;
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
@@ -66,7 +65,7 @@ class LMFeedSocialScreen extends StatefulWidget {
 
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  final LMFeedSocialScreenSetting? settings;
 
   @override
   State<LMFeedSocialScreen> createState() => _LMFeedSocialScreenState();
@@ -101,7 +100,7 @@ class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       topicBarBuilder: widget.topicBarBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      config: widget.config,
+      feedSettings: widget.settings,
     );
   }
 
@@ -120,7 +119,7 @@ class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
       firstPageErrorIndicatorBuilder: widget.firstPageErrorIndicatorBuilder,
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      config: widget.config,
+      feedScreenSettings: widget.settings,
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/compose/configurations/builder.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// {@template feed_compose_screen}
@@ -257,7 +258,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   final LMFeedPostBloc bloc = LMFeedPostBloc.instance;
   final LMFeedComposeBloc composeBloc = LMFeedComposeBloc.instance;
   LMFeedThemeData feedTheme = LMFeedCore.theme;
-  LMFeedWidgetUtility widgetUtility = LMFeedCore.widgetUtility;
+  LMFeedComposeScreenBuilderDelegate widgetBuilder =
+      LMFeedCore.config.composeScreenConfig.builder;
   LMFeedWidgetSource widgetSource = LMFeedWidgetSource.createPostScreen;
   LMFeedComposeScreenStyle? style;
   LMFeedComposeScreenConfig? config;
@@ -300,15 +302,15 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           eventName: LMFeedAnalyticsKeys.postCreationStarted,
           eventProperties: {}),
     );
-    style = widget.style ?? feedTheme.composeScreenStyle;
+    config = widget.config ?? LMFeedCore.config.composeScreenConfig;
+    style = widget.style ?? config?.style;
     _checkForRepost();
-    config = widget.config ?? LMFeedCore.config.composeConfig;
     enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
         ? true
-        : config?.enableHeading ?? false;
+        : config?.setting.enableHeading ?? false;
     headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
         ? true
-        : config?.headingRequiredToCreatePost ?? false;
+        : config?.setting.headingRequiredToCreatePost ?? false;
     _headingController = enableHeading ? TextEditingController() : null;
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
     if (_headingController != null) {
@@ -323,15 +325,15 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   void didUpdateWidget(LMFeedComposeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     _checkForRepost();
-    style = widget.style ?? feedTheme.composeScreenStyle;
+    config = widget.config ?? LMFeedCore.config.composeScreenConfig;
+    style = widget.style ?? config?.style;
     _checkForRepost();
-    config = widget.config ?? LMFeedCore.config.composeConfig;
     enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
         ? true
-        : config?.enableHeading ?? false;
+        : config?.setting.enableHeading ?? false;
     headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
         ? true
-        : config?.headingRequiredToCreatePost ?? false;
+        : config?.setting.headingRequiredToCreatePost ?? false;
     _headingController = enableHeading ? TextEditingController() : null;
     composeBloc.add(LMFeedComposeFetchTopicsEvent());
   }
@@ -389,16 +391,17 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    screenWidth = min(LMFeedCore.webConfiguration.maxWidth, screenSize!.width);
+    screenWidth =
+        min(LMFeedCore.config.webConfiguration.maxWidth, screenSize!.width);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: config!.composeSystemOverlayStyle,
+      value: config!.setting.composeSystemOverlayStyle,
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         child: BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
           bloc: composeBloc,
           listener: _composeBlocListener,
-          child: widgetUtility.scaffold(
+          child: widgetBuilder.scaffold(
             source: LMFeedWidgetSource.createPostScreen,
             backgroundColor: feedTheme.container,
             bottomSheet: _defMediaPicker(),
@@ -410,7 +413,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   _defCancelButton(),
                   onPostValidationFailed,
                 ) ??
-                widgetUtility.composeScreenAppBar(
+                widgetBuilder.appBarBuilder(
                   context,
                   _defAppBar(),
                   onPostCreate,
@@ -443,11 +446,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                             context,
                             _defTopicSelector(state.topics),
                             composeBloc.selectedTopics) ??
-                        LMFeedCore.widgetUtility
-                            .composeScreenTopicSelectorBuilder(
-                                context,
-                                _defTopicSelector(state.topics),
-                                composeBloc.selectedTopics);
+                        widgetBuilder.composeScreenTopicSelectorBuilder(
+                            context,
+                            _defTopicSelector(state.topics),
+                            composeBloc.selectedTopics);
                   }
                   return const SizedBox.shrink();
                 },
@@ -468,7 +470,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         const SizedBox(height: 18),
                         widget.composeUserHeaderBuilder?.call(
                                 context, user!, LMFeedUserTile(user: user!)) ??
-                            widgetUtility.composeScreenUserHeaderBuilder(
+                            widgetBuilder.composeScreenUserHeaderBuilder(
                                 context, user!, LMFeedUserTile(user: user!)),
                         widget.composeContentBuilder?.call() ??
                             _defContentInput(),
@@ -581,8 +583,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             if (composeBloc.postMedia.isNotEmpty) {
               if (composeBloc.isPollAdded) {
                 return LMFeedPoll(
-                  style: feedTheme.composeScreenStyle.mediaStyle?.pollStyle
-                          ?.copyWith() ??
+                  style: style?.mediaStyle?.pollStyle?.copyWith() ??
                       LMFeedPollStyle.basic(isComposable: true).copyWith(
                         backgroundColor: feedTheme.container,
                       ),
@@ -1040,7 +1041,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       }
 
       // Validate the text if required
-      if (config!.textRequiredToCreatePost && postText.isEmpty) {
+      if (config!.setting.textRequiredToCreatePost && postText.isEmpty) {
         return LMResponse(
           success: false,
           errorMessage: "Can't create a $postTitleSmallCap without text",
@@ -1048,9 +1049,9 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
       }
 
       // Validate the topic selection if required
-      if (config!.topicRequiredToCreatePost &&
+      if (config!.setting.topicRequiredToCreatePost &&
           selectedTopics.isEmpty &&
-          config!.enableTopics) {
+          config!.setting.enableTopics) {
         return LMResponse(
           success: false,
           errorMessage: "Can't create a $postTitleSmallCap without topic",
@@ -1110,7 +1111,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           if (enableHeading)
             Column(
               children: [
-                LMFeedCore.widgetUtility.composeScreenHeadingTextfieldBuilder(
+                widgetBuilder.composeScreenHeadingTextfieldBuilder(
                   context,
                   _defHeadingTextfield(theme),
                 )
@@ -1123,11 +1124,11 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   decoration: BoxDecoration(
                     color: theme.container,
                   ),
-                  child: LMFeedCore.widgetUtility
-                      .composeScreenContentTextfieldBuilder(
-                    context,
-                    _defContentTextField(),
-                  )),
+                  child: widget.composeContentBuilder?.call() ??
+                      widgetBuilder.composeScreenContentTextfieldBuilder(
+                        context,
+                        _defContentTextField(),
+                      )),
               const SizedBox(height: 24),
             ],
           ),
@@ -1139,7 +1140,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   LMTaggingAheadTextField _defContentTextField() {
     return LMTaggingAheadTextField(
       isDown: true,
-      taggingEnabled: config!.enableTagging,
+      taggingEnabled: config!.setting.enableTagging,
       // maxLines: 200,
 
       style: LMTaggingAheadTextFieldStyle(
@@ -1151,7 +1152,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           errorBorder: InputBorder.none,
           disabledBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
-          hintText: config?.composeHint ??
+          hintText: config?.setting.composeHint ??
               (LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
                   ? "Add description"
                   : "Write something here..."),
@@ -1220,7 +1221,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
             color: theme.inActiveColor,
           ),
         ),
-        hintText: config?.headingHint ?? "Add your question here",
+        hintText: config?.setting.headingHint ?? "Add your question here",
         hintStyle: TextStyle(
           color: theme.onContainer.withOpacity(0.5),
           overflow: TextOverflow.visible,
@@ -1236,7 +1237,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   void _onTextChanged(String p0) {
-    if (!config!.enableLinkPreviews) {
+    if (!config!.setting.enableLinkPreviews) {
       return;
     }
     if (_debounce?.isActive ?? false) {
@@ -1300,7 +1301,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           height: 72,
           child: Row(
             children: [
-              if (composeBloc.documentCount == 0 && config!.enableImages)
+              if (composeBloc.documentCount == 0 &&
+                  config!.setting.enableImages)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
@@ -1322,7 +1324,8 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     composeBloc.add(LMFeedComposeAddImageEvent());
                   },
                 ),
-              if (composeBloc.documentCount == 0 && config!.enableVideos)
+              if (composeBloc.documentCount == 0 &&
+                  config!.setting.enableVideos)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
@@ -1346,7 +1349,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                 ),
               if (composeBloc.videoCount == 0 &&
                   composeBloc.imageCount == 0 &&
-                  config!.enableDocuments)
+                  config!.setting.enableDocuments)
                 LMFeedButton(
                   isActive: false,
                   style: LMFeedButtonStyle(
@@ -1368,7 +1371,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                     composeBloc.add(LMFeedComposeAddDocumentEvent());
                   },
                 ),
-              if (config!.enablePolls &&
+              if (config!.setting.enablePolls &&
                   composeBloc.videoCount == 0 &&
                   composeBloc.imageCount == 0 &&
                   composeBloc.documentCount == 0)
@@ -1399,7 +1402,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                   },
                 ),
               Spacer(),
-              composeBloc.postMedia.length > 0 && config!.showMediaCount
+              composeBloc.postMedia.length > 0 && config!.setting.showMediaCount
                   ? Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: LMFeedText(
@@ -1416,7 +1419,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
   }
 
   Widget _defTopicSelector(List<LMTopicViewData> topics) {
-    if (!config!.enableTopics) {
+    if (!config!.setting.enableTopics) {
       return const SizedBox.shrink();
     }
 
@@ -1457,7 +1460,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                         selectedTopics: composeBloc.selectedTopics,
                         isEnabled: true,
                         onTopicSelected: (updatedTopics, tappedTopic) {
-                          if (config!.multipleTopicsSelectable) {
+                          if (config!.setting.multipleTopicsSelectable) {
                             int index = composeBloc.selectedTopics.indexWhere(
                                 (element) => element.id == tappedTopic.id);
                             if (index == -1) {
@@ -1470,7 +1473,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
                             composeBloc.selectedTopics.add(tappedTopic);
                           }
 
-                          if (!config!.multipleTopicsSelectable) {
+                          if (!config!.setting.multipleTopicsSelectable) {
                             _controllerPopUp.hideMenu();
                           }
                           rebuildTopicFloatingButton.value =

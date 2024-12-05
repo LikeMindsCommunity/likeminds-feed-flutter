@@ -127,7 +127,6 @@ Future<void> _handleVideoUpload(
   String? thumbnailURL;
   String? thumbnailPath = await LMFeedVideoThumbnail.thumbnailFile(
     path: mediaFile.path,
-    quality: 8,
   );
 
   if (thumbnailPath != null) {

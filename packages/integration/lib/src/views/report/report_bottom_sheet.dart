@@ -151,7 +151,6 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
                     style: LMFeedTextStyle(
                       textStyle: TextStyle(
                         fontSize: 20,
-                        fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                       ),
@@ -193,7 +192,6 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Inter',
                   fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
@@ -216,7 +214,6 @@ class _LMFeedReportBottomSheetState extends State<LMFeedReportBottomSheet> {
           textStyle: TextStyle(
             color: Color(0xff5A6068),
             fontSize: 12,
-            fontFamily: 'Inter',
             fontWeight: FontWeight.w400,
           ),
           overflow: TextOverflow.visible,

@@ -13,6 +13,7 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 ///
 /// {@endtemplate}
 class LMFeedQnAUniversalScreen extends StatefulWidget {
+  /// {@macro lm_feed_qna_universal_screen}
   const LMFeedQnAUniversalScreen({
     super.key,
     this.appBar,
@@ -20,7 +21,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
     this.topicChipBuilder,
     this.postBuilder,
     this.floatingActionButtonBuilder,
-    this.config,
+    this.feedScreenSettings,
     this.topicBarBuilder,
     this.floatingActionButtonLocation,
     this.noItemsFoundIndicatorBuilder,
@@ -32,51 +33,63 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
     this.pendingPostBannerBuilder,
   });
 
-  // Builder for appbar
-  final LMFeedPostAppBarBuilder? appBar;
+  /// Builder for appbar
+  final LMFeedAppBarBuilder? appBar;
 
   /// Builder for custom widget on top
   final LMFeedCustomWidgetBuilder? customWidgetBuilder;
-  // Builder for topic chip [Button]
+
+  /// Builder for topic chip [Button]
   final Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
       topicChipBuilder;
 
   // Builder for post item
-  // {@macro post_widget_builder}
+  /// {@macro post_widget_builder}
   final LMFeedPostWidgetBuilder? postBuilder;
-  // Floating action button
-  // i.e. new post button
+  // /Floating action button builder
+  /// i.e. new post button
   final LMFeedContextButtonBuilder? floatingActionButtonBuilder;
-  // {@macro context_widget_builder}
-  // Builder for empty feed view
+
+  /// {@macro context_widget_builder}
+  /// Builder for empty feed view
   final LMFeedContextWidgetBuilder? noItemsFoundIndicatorBuilder;
-  // Builder for first page loader when no post are there
+
+  /// Builder for first page loader when no post are there
   final LMFeedContextWidgetBuilder? firstPageProgressIndicatorBuilder;
-  // Builder for pagination loader when more post are there
+
+  /// Builder for pagination loader when more post are there
   final LMFeedContextWidgetBuilder? newPageProgressIndicatorBuilder;
-  // Builder for widget when no more post are there
+
+  /// Builder for widget when no more post are there
   final LMFeedContextWidgetBuilder? noMoreItemsIndicatorBuilder;
-  // Builder for error view while loading a new page
+
+  /// Builder for error view while loading a new page
   final LMFeedContextWidgetBuilder? newPageErrorIndicatorBuilder;
-  // Builder for error view while loading the first page
+
+  /// Builder for error view while loading the first page
   final LMFeedContextWidgetBuilder? firstPageErrorIndicatorBuilder;
 
-  // Builder for pending post banner on feed screen above post list
+  /// Builder for pending post banner on feed screen above post list
   final Widget Function(BuildContext context, int noOfPendingPost)?
       pendingPostBannerBuilder;
 
+  /// Builder for topic bar
   final LMFeedTopicBarBuilder? topicBarBuilder;
 
+  /// Floating action button location
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
-  final LMFeedScreenConfig? config;
+  /// Settings for the feed screen
+  final LMFeedQnaScreenSetting? feedScreenSettings;
 
   @override
   State<LMFeedQnAUniversalScreen> createState() =>
       _LMFeedQnAUniversalScreenState();
 
+  /// copyWith method to update the properties of the LMFeedQnAUniversalScreen
+  /// with new values
   LMFeedQnAUniversalScreen copyWith({
-    LMFeedPostAppBarBuilder? appBar,
+    LMFeedAppBarBuilder? appBar,
     LMFeedCustomWidgetBuilder? customWidgetBuilder,
     Widget Function(BuildContext context, List<LMTopicViewData>? topic)?
         topicChipBuilder,
@@ -92,7 +105,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
         pendingPostBannerBuilder,
     LMFeedTopicBarBuilder? topicBarBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
-    LMFeedScreenConfig? config,
+    LMFeedQnaScreenSetting? settings,
   }) {
     return LMFeedQnAUniversalScreen(
       appBar: appBar ?? this.appBar,
@@ -118,7 +131,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
       topicBarBuilder: topicBarBuilder ?? this.topicBarBuilder,
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
-      config: config ?? this.config,
+      feedScreenSettings: settings ?? this.feedScreenSettings,
     );
   }
 }
@@ -154,11 +167,11 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
       LMFeedPluralizeWordAction.allSmallSingular);
 
   // Create an instance of LMFeedScreenBuilderDelegate
-  LMFeedScreenBuilderDelegate _screenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.feedScreenBuilderDelegate;
+  LMFeedQnaScreenBuilderDelegate _screenBuilderDelegate =
+      LMFeedCore.config.qnaFeedScreenConfig.builder;
 
-  LMFeedPendingPostScreenBuilderDeletegate _pendingPostScreenBuilderDelegate =
-      LMFeedCore.feedBuilderDelegate.pendingPostScreenBuilderDelegate;
+  LMFeedPendingPostScreenBuilderDelegate _pendingPostScreenBuilderDelegate =
+      LMFeedCore.config.pendingPostScreenConfig.builder;
 
   // Create an instance of LMFeedPostBloc
   LMFeedPostBloc newPostBloc = LMFeedPostBloc.instance;
@@ -166,8 +179,9 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   // Get the theme data from LMFeedCore
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
 
-  // Create an instance of LMFeedWidgetUtility
-  LMFeedWidgetUtility _widgetsBuilder = LMFeedCore.widgetUtility;
+  // Create an instance of LMFeedQnaScreenBuilderDelegate
+  LMFeedQnaScreenBuilderDelegate _widgetsBuilder =
+      LMFeedCore.config.qnaFeedScreenConfig.builder;
 
   // Set the widget source to universal feed
   LMFeedWidgetSource _widgetSource = LMFeedWidgetSource.universalFeed;
@@ -179,8 +193,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
   final ValueNotifier<bool> postUploading = ValueNotifier(false);
   bool isPostEditing = false;
 
-  LMFeedScreenConfig? config;
-  LMFeedWebConfiguration webConfig = LMFeedCore.webConfiguration;
+  LMFeedQnaScreenSetting? feedScreenSetting;
+  LMFeedWebConfiguration webConfig = LMFeedCore.config.webConfiguration;
   /* 
   * defines the height of topic feed bar
   * initialy set to 0, after fetching the topics
@@ -226,7 +240,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
     // Adds pagination listener to the feed
     _addPaginationListener();
 
-    config = widget.config ?? LMFeedCore.config.feedScreenConfig;
+    feedScreenSetting = widget.feedScreenSettings ??
+        LMFeedCore.config.qnaFeedScreenConfig.setting;
 
     // Retrieves topics from the LMFeedCore client
     getTopicsResponse = LMFeedCore.client.getTopics(
@@ -413,13 +428,15 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
     return _widgetsBuilder.scaffold(
       source: _widgetSource,
       backgroundColor: feedThemeData.backgroundColor,
-      appBar: widget.appBar?.call(context, _defAppBar()) ?? _defAppBar(),
+      appBar: widget.appBar?.call(context, _defAppBar()) ??
+          _widgetsBuilder.appBarBuilder.call(context, _defAppBar()),
       floatingActionButton: ValueListenableBuilder(
         valueListenable: rebuildPostWidget,
         builder: (context, _, __) {
           return widget.floatingActionButtonBuilder
                   ?.call(context, defFloatingActionButton(context)) ??
-              defFloatingActionButton(context);
+              _widgetsBuilder.floatingActionButtonBuilder(
+                  context, defFloatingActionButton(context));
         },
       ),
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
@@ -427,7 +444,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
-          width: min(LMFeedCore.webConfiguration.maxWidth,
+          width: min(LMFeedCore.config.webConfiguration.maxWidth,
               MediaQuery.sizeOf(context).width),
           child: RefreshIndicator.adaptive(
             onRefresh: () async {
@@ -479,13 +496,13 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                             });
                       }),
                 ),
-                SliverToBoxAdapter(
-                  child: config!.showCustomWidget
-                      ? widget.customWidgetBuilder?.call(
-                              context, _defPostSomeThingWidget(context)) ??
-                          _defPostSomeThingWidget(context)
-                      : const SizedBox(),
-                ),
+                if (feedScreenSetting?.showCustomWidget ?? false)
+                  SliverToBoxAdapter(
+                    child: widget.customWidgetBuilder
+                            ?.call(context, _defPostSomeThingWidget(context)) ??
+                        _widgetsBuilder.customWidgetBuilder(
+                            _defPostSomeThingWidget(context), context),
+                  ),
                 SliverToBoxAdapter(
                   child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
                     bloc: newPostBloc,
@@ -688,7 +705,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                 if (isDesktopWeb)
                   SliverPadding(padding: EdgeInsets.only(top: 12.0)),
                 SliverToBoxAdapter(
-                  child: config!.enableTopicFiltering
+                  child: feedScreenSetting!.enableTopicFiltering
                       ? ValueListenableBuilder(
                           valueListenable: rebuildTopicFeed,
                           builder: (context, _, __) {
@@ -760,40 +777,37 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                                   context,
                                   actionable: changeFilter(context));
                             }
-                            return _widgetsBuilder
-                                .noItemsFoundIndicatorBuilderFeed(context,
-                                    createPostButton:
-                                        createPostButton(context));
+                            return _widgetsBuilder.noItemsFoundIndicatorBuilder(
+                                context,
+                                createPostButton: createPostButton(context));
                           },
                           noMoreItemsIndicatorBuilder: (context) {
                             return widget.noMoreItemsIndicatorBuilder
                                     ?.call(context) ??
                                 _widgetsBuilder
-                                    .noMoreItemsIndicatorBuilderFeed(context);
+                                    .noMoreItemsIndicatorBuilder(context);
                           },
                           newPageProgressIndicatorBuilder: (context) {
                             return widget.newPageProgressIndicatorBuilder
                                     ?.call(context) ??
                                 _widgetsBuilder
-                                    .newPageProgressIndicatorBuilderFeed(
-                                        context);
+                                    .newPageProgressIndicatorBuilder(context);
                           },
                           firstPageProgressIndicatorBuilder: (context) =>
                               widget.firstPageProgressIndicatorBuilder
                                   ?.call(context) ??
                               _widgetsBuilder
-                                  .firstPageProgressIndicatorBuilderFeed(
-                                      context),
+                                  .firstPageProgressIndicatorBuilder(context),
                           firstPageErrorIndicatorBuilder: (context) =>
                               widget.firstPageErrorIndicatorBuilder
                                   ?.call(context) ??
                               _widgetsBuilder
-                                  .firstPageErrorIndicatorBuilderFeed(context),
+                                  .firstPageErrorIndicatorBuilder(context),
                           newPageErrorIndicatorBuilder: (context) =>
                               widget.newPageErrorIndicatorBuilder
                                   ?.call(context) ??
                               _widgetsBuilder
-                                  .newPageErrorIndicatorBuilderFeed(context),
+                                  .newPageErrorIndicatorBuilder(context),
                         ),
                       );
                     },
@@ -852,7 +866,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
           onTap: () {
             // check if the user is a guest user
             if (LMFeedUserUtils.isGuestUser()) {
-              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+              LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                  ?.call(context);
               return;
             }
             Navigator.push(
@@ -882,12 +897,13 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
             ),
           ),
         ),
-        if (config?.showNotificationFeedIcon ?? true)
+        if (feedScreenSetting?.showNotificationFeedIcon ?? true)
           LMFeedButton(
             onTap: () {
               // check if the user is a guest user
               if (LMFeedUserUtils.isGuestUser()) {
-                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
+                LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                    ?.call(context);
                 return;
               }
               Navigator.push(
@@ -963,82 +979,13 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
 
   void openTopicSelector(BuildContext context) {
     LMFeedTopicSelectionWidgetType topicSelectionWidgetType =
-        config!.topicSelectionWidgetType;
+        feedScreenSetting!.topicSelectionWidgetType;
     if (topicSelectionWidgetType ==
         LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet) {
       showTopicSelectSheet(context);
     } else if (topicSelectionWidgetType ==
         LMFeedTopicSelectionWidgetType.showTopicSelectionScreen) {
       navigateToTopicSelectScreen(context);
-    }
-  }
-
-  Widget getLoaderThumbnail(LMAttachmentViewData? media) {
-    if (media != null) {
-      if (media.attachmentType == LMMediaType.image) {
-        return Container(
-          height: 50,
-          width: 50,
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(6.0),
-          ),
-          child: LMFeedImage(
-            image: media,
-            style: const LMFeedPostImageStyle(
-              boxFit: BoxFit.contain,
-            ),
-          ),
-        );
-      } else if (media.attachmentType == LMMediaType.document) {
-        return LMFeedTheme
-                .instance.theme.mediaStyle.documentStyle.documentIcon ??
-            LMFeedIcon(
-              type: LMFeedIconType.icon,
-              icon: Icons.picture_as_pdf,
-              style: LMFeedIconStyle(
-                color: Colors.red,
-                size: 35,
-                boxPadding: 0,
-              ),
-            );
-      } else if (media.attachmentType == LMMediaType.video) {
-        return const SizedBox();
-        // TODO: add video thumbnail
-        // final thumbnailFile = VideoCompress.getFileThumbnail(
-        //   media.mediaFile!.path,
-        //   quality: 50, // default(100)
-        //   position: -1, // default(-1)
-        // );
-        // return FutureBuilder(
-        //   future: thumbnailFile,
-        //   builder: (context, snapshot) {
-        //     if (snapshot.hasData) {
-        //       return Container(
-        //         height: 50,
-        //         width: 50,
-        //         clipBehavior: Clip.hardEdge,
-        //         decoration: BoxDecoration(
-        //           color: Colors.black,
-        //           borderRadius: BorderRadius.circular(6.0),
-        //         ),
-        //         child: LMFeedImage(
-        //           imageFile: snapshot.data,
-        //           style: const LMFeedPostImageStyle(
-        //             boxFit: BoxFit.contain,
-        //           ),
-        //         ),
-        //       );
-        //     }
-        //     return LMFeedLoader();
-        //   },
-        // );
-      } else {
-        return const SizedBox.shrink();
-      }
-    } else {
-      return const SizedBox.shrink();
     }
   }
 
