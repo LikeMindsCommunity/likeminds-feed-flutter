@@ -135,7 +135,8 @@ class LMFeedMediaHandler {
                 size: pickedFile.size,
                 meta: {
                   'file_name': pickedFile.name,
-                });
+                },
+                );
 
             attachedFiles.add(documentFile);
           }
@@ -189,8 +190,11 @@ class LMFeedMediaHandler {
             errorMessage:
                 'A total of ${composeScreenConfig.setting.mediaLimit} attachments can be added to a post');
       }
+      List<LMAttachmentViewData> attachedImages = [];
+
       for (PlatformFile image in list.files) {
         int fileBytes = image.size;
+        final dimensions = await LMFeedPlatform.instance.getImageDimensions();
         double fileSize = getFileSizeInDouble(fileBytes);
         if (fileSize > sizeLimit) {
           return LMResponse(
@@ -198,30 +202,34 @@ class LMFeedMediaHandler {
               errorMessage:
                   'Max file size allowed: ${sizeLimit.toStringAsFixed(2)}MB');
         }
-      }
 
-      List<LMAttachmentViewData> attachedImages;
-
-      if (kIsWeb) {
-        attachedImages = list.files.map((e) {
-          return LMAttachmentViewData.fromMediaBytes(
-              attachmentType: LMMediaType.image,
-              bytes: e.bytes!,
-              format: 'image',
-              meta: {
-                'file_name': e.name,
-              });
-        }).toList();
-      } else {
-        attachedImages = list.files.map((e) {
-          return LMAttachmentViewData.fromMediaPath(
-              attachmentType: LMMediaType.image,
-              path: e.path!,
-              format: 'image',
-              meta: {
-                'file_name': e.name,
-              });
-        }).toList();
+        if (kIsWeb) {
+          final imageAttachment = LMAttachmentViewData.fromMediaBytes(
+            attachmentType: LMMediaType.image,
+            bytes: image.bytes!,
+            format: 'image',
+            meta: {
+              'file_name': image.name,
+            },
+            height: dimensions?.height,
+            width: dimensions?.width,
+            size: fileBytes,
+          );
+          attachedImages.add(imageAttachment);
+        } else {
+          final imageAttachment = LMAttachmentViewData.fromMediaPath(
+            attachmentType: LMMediaType.image,
+            path: image.path!,
+            format: 'image',
+            meta: {
+              'file_name': image.name,
+            },
+            height: dimensions?.height,
+            width: dimensions?.width,
+            size: fileBytes,
+          );
+          attachedImages.add(imageAttachment);
+        }
       }
 
       return LMResponse(success: true, data: attachedImages);
