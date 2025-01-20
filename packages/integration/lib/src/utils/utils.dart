@@ -24,4 +24,4 @@ export './callbacks/lm_feed_callback.dart';
 export './web/web_scroll_behavior.dart';
 
 export './media/video/video_utils.dart';
-export './media/video/video_info.dart';
+export 'media/video/video_metadata.dart';

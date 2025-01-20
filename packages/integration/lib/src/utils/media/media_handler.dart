@@ -50,6 +50,9 @@ class LMFeedMediaHandler {
         for (PlatformFile pFile in pickedFiles.files) {
           double fileSize = getFileSizeInDouble(pFile.size);
 
+          final videoInfo =
+              await LMFeedVideoUtils.getVideoMetaData(path: pFile.path);
+
           if (fileSize > sizeLimit) {
             return LMResponse(
                 success: false,
@@ -59,22 +62,28 @@ class LMFeedMediaHandler {
             LMAttachmentViewData videoFile;
             if (kIsWeb) {
               videoFile = LMAttachmentViewData.fromMediaBytes(
-                  attachmentType: LMMediaType.video,
-                  bytes: pFile.bytes!,
-                  size: fileSize.toInt(),
-                  duration: 10,
-                  meta: {
-                    'file_name': pFile.name,
-                  });
+                attachmentType: LMMediaType.video,
+                bytes: pFile.bytes!,
+                size: fileSize.toInt(),
+                duration: videoInfo?.duration?.toInt(),
+                meta: {
+                  'file_name': pFile.name,
+                },
+                height: videoInfo?.height,
+                width: videoInfo?.width,
+              );
             } else {
               videoFile = LMAttachmentViewData.fromMediaPath(
-                  attachmentType: LMMediaType.video,
-                  path: pFile.path!,
-                  size: fileSize.toInt(),
-                  duration: 10,
-                  meta: {
-                    'file_name': pFile.name,
-                  });
+                attachmentType: LMMediaType.video,
+                path: pFile.path!,
+                size: fileSize.toInt(),
+                duration: videoInfo?.duration?.toInt(),
+                meta: {
+                  'file_name': pFile.name,
+                },
+                height: videoInfo?.height,
+                width: videoInfo?.width,
+              );
             }
             videoFiles.add(videoFile);
           }
