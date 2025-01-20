@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/media/video/video_info.dart';
+import 'package:likeminds_feed_flutter_core/src/utils/media/video/video_metadata.dart';
 import 'package:video_compress/video_compress.dart';
 
 class LMFeedVideoUtils {
@@ -26,21 +26,25 @@ class LMFeedVideoUtils {
     }
   }
 
-  static Future<LMFeedVideoInfo?> getVideoInfo({
-    required String path,
+  static Future<LMFeedVideoMetaData?> getVideoMetaData({
+    required String? path,
   }) async {
+    if (path == null) return null;
     try {
       final info = await VideoCompress.getMediaInfo(
         path,
       );
-      return LMFeedVideoInfo(
-        duration: info.duration,
+      // convert duration to seconds
+      double? duration = info.duration != null ? info.duration! / 1000 : null;
+
+      return LMFeedVideoMetaData(
+        duration: duration,
         width: info.width,
         height: info.height,
         fileSize: info.filesize,
       );
     } on Exception catch (e) {
-      debugPrint("Error in getting thumbnail: $e");
+      debugPrint("Error in getting Video metadata: $e");
       return null;
     }
   }

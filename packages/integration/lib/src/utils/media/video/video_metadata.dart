@@ -1,10 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-class LMFeedVideoInfo {
+class LMFeedVideoMetaData {
   int? width;
   int? height;
   double? duration;
   int? fileSize;
-  LMFeedVideoInfo({
+  LMFeedVideoMetaData({
     this.width,
     this.height,
     this.duration,
