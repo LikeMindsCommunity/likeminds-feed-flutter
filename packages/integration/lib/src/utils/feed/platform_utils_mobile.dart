@@ -45,7 +45,7 @@ class LMFeedPlatformMobile implements LMFeedPlatform {
   }
 
   @override
-  Future<(int width, int height)?> getImageSize({
+  Future<({int width, int height})?> getImageDimensions({
     String? path,
     Uint8List? bytes,
   }) async {
@@ -61,7 +61,7 @@ class LMFeedPlatformMobile implements LMFeedPlatform {
     int width = info.width;
     int height = info.height;
 
-    return (width, height);
+    return (width: width, height: height);
   }
 }
 

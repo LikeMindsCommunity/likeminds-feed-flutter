@@ -15,7 +15,7 @@ abstract class LMFeedPlatform {
 
   bool isMacOS();
 
-  Future<(int width, int height)?> getImageSize({
+  Future<({int width, int height})?> getImageDimensions({
     String? path,
     Uint8List? bytes,
   });
