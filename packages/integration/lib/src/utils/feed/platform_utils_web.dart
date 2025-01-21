@@ -5,33 +5,42 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
+/// A web-specific implementation of the [LMFeedPlatform] interface.
 class LMFeedPlatformWeb implements LMFeedPlatform {
   @override
+  /// Returns `true` if the platform is Android.
   bool isAndroid() {
     return false;
   }
 
   @override
+  /// Returns `true` if the platform is iOS.
   bool isIOS() {
     return false;
   }
 
   @override
+  /// Returns `true` if the platform is macOS.
   bool isMacOS() {
     return false;
   }
 
   @override
+  /// Returns `true` if the platform is Mobile (either Android or iOS).
   bool isMobile() {
     return false;
   }
 
   @override
+  /// Returns `true` if the platform is Web.
   bool isWeb() {
     return kIsWeb;
   }
 
   @override
+  /// Gets the dimensions of an image from the given [path] or [bytes].
+  ///
+  /// Returns a [Future] that completes with a map containing the width and height of the image.
   Future<({int width, int height})?> getImageDimensions({
     String? path,
     Uint8List? bytes,
@@ -52,4 +61,5 @@ class LMFeedPlatformWeb implements LMFeedPlatform {
   }
 }
 
+/// Returns an instance of [LMFeedPlatformWeb].
 LMFeedPlatform getLMFeedPlatform() => LMFeedPlatformWeb();

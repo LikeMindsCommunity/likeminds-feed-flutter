@@ -6,8 +6,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
+/// A mobile-specific implementation of the [LMFeedPlatform] interface.
 class LMFeedPlatformMobile implements LMFeedPlatform {
   @override
+  /// Returns `true` if the platform is Android.
   bool isAndroid() {
     if (kIsWeb) {
       return false;
@@ -16,6 +18,7 @@ class LMFeedPlatformMobile implements LMFeedPlatform {
   }
 
   @override
+  /// Returns `true` if the platform is iOS.
   bool isIOS() {
     if (kIsWeb) {
       return false;
@@ -24,6 +27,7 @@ class LMFeedPlatformMobile implements LMFeedPlatform {
   }
 
   @override
+  /// Returns `true` if the platform is macOS.
   bool isMacOS() {
     if (kIsWeb) {
       return false;
@@ -32,6 +36,7 @@ class LMFeedPlatformMobile implements LMFeedPlatform {
   }
 
   @override
+  /// Returns `true` if the platform is Mobile (either Android or iOS).
   bool isMobile() {
     if (kIsWeb) {
       return false;
@@ -40,11 +45,15 @@ class LMFeedPlatformMobile implements LMFeedPlatform {
   }
 
   @override
+  /// Returns `true` if the platform is Web.
   bool isWeb() {
     return kIsWeb;
   }
 
   @override
+  /// Gets the dimensions of an image from the given [path] or [bytes].
+  ///
+  /// Returns a [Future] that completes with a map containing the width and height of the image.
   Future<({int width, int height})?> getImageDimensions({
     String? path,
     Uint8List? bytes,
@@ -65,4 +74,5 @@ class LMFeedPlatformMobile implements LMFeedPlatform {
   }
 }
 
+/// Returns an instance of [LMFeedPlatformMobile].
 LMFeedPlatform getLMFeedPlatform() => LMFeedPlatformMobile();
