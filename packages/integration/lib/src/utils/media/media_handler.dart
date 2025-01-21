@@ -64,7 +64,7 @@ class LMFeedMediaHandler {
               videoFile = LMAttachmentViewData.fromMediaBytes(
                 attachmentType: LMMediaType.video,
                 bytes: pFile.bytes!,
-                size: fileSize.toInt(),
+                size: pFile.size,
                 duration: videoInfo?.duration?.toInt(),
                 meta: {
                   'file_name': pFile.name,
@@ -76,7 +76,7 @@ class LMFeedMediaHandler {
               videoFile = LMAttachmentViewData.fromMediaPath(
                 attachmentType: LMMediaType.video,
                 path: pFile.path!,
-                size: fileSize.toInt(),
+                size: pFile.size,
                 duration: videoInfo?.duration?.toInt(),
                 meta: {
                   'file_name': pFile.name,
@@ -128,15 +128,15 @@ class LMFeedMediaHandler {
             LMAttachmentViewData documentFile;
 
             documentFile = LMAttachmentViewData.fromMediaBytes(
-                attachmentType: LMMediaType.document,
-                bytes: kIsWeb ? pickedFile.bytes! : null,
-                path: kIsWeb ? null : pickedFile.path!,
-                format: pickedFile.extension,
-                size: pickedFile.size,
-                meta: {
-                  'file_name': pickedFile.name,
-                },
-                );
+              attachmentType: LMMediaType.document,
+              bytes: kIsWeb ? pickedFile.bytes! : null,
+              path: kIsWeb ? null : pickedFile.path!,
+              format: pickedFile.extension,
+              size: pickedFile.size,
+              meta: {
+                'file_name': pickedFile.name,
+              },
+            );
 
             attachedFiles.add(documentFile);
           }
@@ -194,7 +194,11 @@ class LMFeedMediaHandler {
 
       for (PlatformFile image in list.files) {
         int fileBytes = image.size;
-        final dimensions = await LMFeedPlatform.instance.getImageDimensions();
+        final dimensions = await LMFeedPlatform.instance.getImageDimensions(
+          path: image.path,
+          bytes: image.bytes,
+        );
+        debugPrint('Dimensions: $dimensions');
         double fileSize = getFileSizeInDouble(fileBytes);
         if (fileSize > sizeLimit) {
           return LMResponse(

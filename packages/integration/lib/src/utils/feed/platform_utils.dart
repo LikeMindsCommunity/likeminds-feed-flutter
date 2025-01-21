@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils_mobile.dart'
     if (dart.library.html) 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils_web.dart'
     if (dart.library.io) 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils_mobile.dart';
