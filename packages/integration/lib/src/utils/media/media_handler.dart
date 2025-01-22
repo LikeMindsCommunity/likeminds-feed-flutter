@@ -5,13 +5,17 @@ import 'package:likeminds_feed_flutter_core/src/utils/feed/platform_utils.dart';
 
 LMFeedPlatform feedPlatform = LMFeedPlatform.instance;
 
+/// A class that handles media picking and processing for the LMFeed.
 class LMFeedMediaHandler {
+  /// Picks multiple video files and returns their metadata.
+  ///
+  /// [currentMediaLength] is the current number of media files already picked.
+  /// Returns a [Future] that completes with a [LMResponse] containing a list of [LMAttachmentViewData].
   static Future<LMResponse<List<LMAttachmentViewData>>> pickVideos(
       int currentMediaLength) async {
     try {
       LMFeedComposeScreenConfig composeScreenConfig =
           LMFeedCore.config.composeScreenConfig;
-      // final XFile? pickedFile =
       List<LMAttachmentViewData> videoFiles = [];
       final FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
         allowMultiple: true,
@@ -22,6 +26,7 @@ class LMFeedMediaHandler {
         return LMResponse(success: true);
       }
 
+      // Fetch community configurations for media limits
       CommunityConfigurations? config = LMFeedLocalPreference.instance
           .fetchCommunityConfiguration("media_limits");
       if (config == null || config.value?["max_video_size"] == null) {
@@ -34,6 +39,8 @@ class LMFeedMediaHandler {
           LMFeedLocalPreference.instance.storeCommunityConfiguration(config);
         }
       }
+
+      // Set size limit for video files
       final double sizeLimit;
       if (config != null && config.value?["max_video_size"] != null) {
         sizeLimit = config.value!["max_video_size"]! / 1024;
@@ -41,6 +48,7 @@ class LMFeedMediaHandler {
         sizeLimit = 100;
       }
 
+      // Check if the current media length exceeds the limit
       if (currentMediaLength >= composeScreenConfig.setting.mediaLimit) {
         return LMResponse(
             success: false,
@@ -53,6 +61,7 @@ class LMFeedMediaHandler {
           final videoInfo =
               await LMFeedVideoUtils.getVideoMetaData(path: pFile.path);
 
+          // Check if the file size exceeds the limit
           if (fileSize > sizeLimit) {
             return LMResponse(
                 success: false,
@@ -96,6 +105,10 @@ class LMFeedMediaHandler {
     }
   }
 
+  /// Picks multiple document files and returns their metadata.
+  ///
+  /// [currentMediaLength] is the current number of media files already picked.
+  /// Returns a [Future] that completes with a [LMResponse] containing a list of [LMAttachmentViewData].
   static Future<LMResponse<List<LMAttachmentViewData>>> pickDocuments(
       int currentMediaLength) async {
     try {
@@ -111,6 +124,7 @@ class LMFeedMediaHandler {
         ],
       );
       if (pickedFiles != null) {
+        // Check if the current media length exceeds the limit
         if (currentMediaLength + pickedFiles.files.length >
             composeScreenConfig.setting.documentLimit) {
           return LMResponse(
@@ -120,6 +134,7 @@ class LMFeedMediaHandler {
         }
         List<LMAttachmentViewData> attachedFiles = [];
         for (var pickedFile in pickedFiles.files) {
+          // Check if the file size exceeds the limit
           if (getFileSizeInDouble(pickedFile.size) > 100) {
             return LMResponse(
                 success: false,
@@ -153,16 +168,21 @@ class LMFeedMediaHandler {
     }
   }
 
+  /// Picks multiple image files and returns their metadata.
+  ///
+  /// [mediaCount] is the current number of media files already picked.
+  /// Returns a [Future] that completes with a [LMResponse] containing a list of [LMAttachmentViewData].
   static Future<LMResponse<List<LMAttachmentViewData>>> pickImages(
       int mediaCount) async {
     LMFeedComposeScreenConfig composeScreenConfig =
         LMFeedCore.config.composeScreenConfig;
-    // onUploading();
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.image,
       compressionQuality: 0,
     );
+
+    // Fetch community configurations for media limits
     CommunityConfigurations? config = LMFeedLocalPreference.instance
         .fetchCommunityConfiguration("media_limits");
     if (config == null || config.value?["max_image_size"] == null) {
@@ -175,6 +195,8 @@ class LMFeedMediaHandler {
         LMFeedLocalPreference.instance.storeCommunityConfiguration(config);
       }
     }
+
+    // Set size limit for image files
     final double sizeLimit;
     if (config != null && config.value?["max_image_size"] != null) {
       sizeLimit = config.value!["max_image_size"]! / 1024;
@@ -183,6 +205,7 @@ class LMFeedMediaHandler {
     }
 
     if (list != null && list.files.isNotEmpty) {
+      // Check if the current media length exceeds the limit
       if (mediaCount + list.files.length >
           composeScreenConfig.setting.mediaLimit) {
         return LMResponse(
@@ -200,6 +223,7 @@ class LMFeedMediaHandler {
         );
         debugPrint('Dimensions: $dimensions');
         double fileSize = getFileSizeInDouble(fileBytes);
+        // Check if the file size exceeds the limit
         if (fileSize > sizeLimit) {
           return LMResponse(
               success: false,
@@ -242,11 +266,16 @@ class LMFeedMediaHandler {
     }
   }
 
+  /// Picks a single image file and returns its metadata.
+  ///
+  /// Returns a [Future] that completes with a [LMResponse] containing a [LMAttachmentViewData].
   static Future<LMResponse<LMAttachmentViewData>> pickSingleImage() async {
     final FilePickerResult? list = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.image,
     );
+
+    // Fetch community configurations for media limits
     CommunityConfigurations? config = LMFeedLocalPreference.instance
         .fetchCommunityConfiguration("media_limits");
     if (config == null || config.value?["max_image_size"] == null) {
@@ -259,8 +288,9 @@ class LMFeedMediaHandler {
         LMFeedLocalPreference.instance.storeCommunityConfiguration(config);
       }
     }
-    final double sizeLimit;
 
+    // Set size limit for image files
+    final double sizeLimit;
     if (config != null && config.value?["max_image_size"] != null) {
       sizeLimit = config.value!["max_image_size"]! / 1024;
     } else {
@@ -271,6 +301,7 @@ class LMFeedMediaHandler {
       for (PlatformFile image in list.files) {
         int fileBytes = image.size;
         double fileSize = getFileSizeInDouble(fileBytes);
+        // Check if the file size exceeds the limit
         if (fileSize > sizeLimit) {
           return LMResponse(
             success: false,
