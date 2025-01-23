@@ -124,7 +124,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
 
   @override
   void dispose() {
-    _controller.dispose();
     _suggestionsBoxController.close();
     super.dispose();
   }
