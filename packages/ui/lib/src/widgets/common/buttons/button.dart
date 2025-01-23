@@ -99,6 +99,7 @@ class _LMButtonState extends State<LMFeedButton> {
           color: inStyle.backgroundColor ?? Colors.transparent,
           borderRadius: BorderRadius.circular(inStyle.borderRadius ?? 0),
           border: inStyle.border,
+          boxShadow: inStyle.boxShadow,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -193,6 +194,8 @@ class LMFeedButtonStyle {
 
   final EdgeInsets? textPadding;
 
+  final List<BoxShadow>? boxShadow; 
+
   const LMFeedButtonStyle({
     this.padding,
     this.margin,
@@ -208,6 +211,7 @@ class LMFeedButtonStyle {
     this.icon,
     this.activeIcon,
     this.textPadding,
+    this.boxShadow,
   });
 
   const factory LMFeedButtonStyle.basic() = LMFeedButtonStyle._;
@@ -227,6 +231,7 @@ class LMFeedButtonStyle {
     this.icon,
     this.activeIcon,
     this.textPadding = EdgeInsets.zero,
+    this.boxShadow,
   });
 
   LMFeedButtonStyle copyWith({
@@ -244,6 +249,7 @@ class LMFeedButtonStyle {
     LMFeedIcon? icon,
     LMFeedIcon? activeIcon,
     EdgeInsets? textPadding,
+    List<BoxShadow>? boxShadow,
   }) {
     return LMFeedButtonStyle(
       padding: padding ?? this.padding,
@@ -260,6 +266,7 @@ class LMFeedButtonStyle {
       icon: icon ?? this.icon,
       activeIcon: activeIcon ?? this.activeIcon,
       textPadding: textPadding ?? this.textPadding,
+      boxShadow: boxShadow ?? this.boxShadow,
     );
   }
 

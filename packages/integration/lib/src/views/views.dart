@@ -10,6 +10,8 @@ export 'feed/social/social_personalised_feed.dart';
 export 'feed/qna/qna_feed_screen.dart';
 export 'feed/qna/qna_universal_feed.dart';
 export 'feed/qna/qna_personalised_feed.dart';
+// video feed
+export 'feed/video_feed/video_feed_universal.dart';
 
 // legacy feed
 export 'feed/feed_screen.dart';
