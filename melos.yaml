@@ -3,6 +3,7 @@ name: likeminds_feed_flutter
 packages:
   - packages/*
   - example/
+  - example_video_feed/
 
 scripts:
   analyze:
