@@ -11,54 +11,76 @@ import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 class LMFeedTopicTile extends StatelessWidget {
   // Action to perform after tapping on the tile, required
   final Function(LMTopicViewData) onTap;
-  // Alignment of the row of the tile, defaults to
-  // MainAxisAlignment.spaceBetween
-  final MainAxisAlignment? tileRowAlignment;
-  // Background color of the tile, defaults to null
-  final Color? backgroundColor;
-  // Height of the tile, defaults to null
-  final double? height;
-  final Icon icon;
-  final Color? borderColor;
-  final double? borderWidth;
-  final EdgeInsets? padding;
-  // Whether the tile is selected or not, required
-  final bool isSelected;
-  // Text to be displayed in the tile, required
-  final LMFeedText text;
   // [LMTopicViewData], consists id, topic and isEnabled boolean, required
   final LMTopicViewData topic;
+  // Style for the tile, required
+  final LMFeedTopicTileStyle? style;
+
+  /// Main Axis Alignment for the row
+  /// Default is [MainAxisAlignment.spaceBetween]
+  /// Can be customized by passing the required value
+  final MainAxisAlignment? tileRowAlignment;
+
+  /// Boolean value to check if the tile is selected
+  final bool isSelected;
+
+  final LMFeedTextBuilder? textBuilder;
+  final LMFeedIconBuilder? iconBuilder;
 
   const LMFeedTopicTile({
-    Key? key,
+    super.key,
     required this.topic,
-    required this.icon,
-    this.tileRowAlignment,
-    this.height,
-    required this.isSelected,
     required this.onTap,
-    this.backgroundColor = Colors.transparent,
-    this.borderColor,
-    this.borderWidth,
-    this.padding,
-    required this.text,
-  }) : super(key: key);
+    this.style,
+    this.tileRowAlignment,
+    this.isSelected = false,
+    this.textBuilder,
+    this.iconBuilder,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final theme = LMFeedTheme.instance.theme;
+    return InkWell(
       onTap: () => onTap(topic),
       child: Container(
-        height: height,
-        padding: padding,
-        color: backgroundColor,
+        height: style?.height,
+        padding: style?.padding,
+        margin: style?.margin,
+        decoration: style?.decoration,
         child: Row(
           mainAxisAlignment: tileRowAlignment ?? MainAxisAlignment.spaceBetween,
           children: [
-            text,
+            textBuilder?.call(context, _defText(theme)) ?? _defText(theme),
             LikeMindsTheme.kHorizontalPaddingLarge,
-            isSelected ? icon : const SizedBox()
+            if (isSelected)
+              iconBuilder?.call(context, _defCheckIcon(theme)) ??
+                  _defCheckIcon(theme),
           ],
+        ),
+      ),
+    );
+  }
+
+  LMFeedIcon _defCheckIcon(LMFeedThemeData theme) {
+    return LMFeedIcon(
+      type: LMFeedIconType.icon,
+      icon: Icons.check_circle,
+      style: LMFeedIconStyle(
+        color: theme.primaryColor,
+        size: 24,
+      ),
+    );
+  }
+
+  LMFeedText _defText(LMFeedThemeData theme) {
+    return LMFeedText(
+      text: topic.name,
+      style: LMFeedTextStyle(
+        textStyle: TextStyle(
+          fontSize: 16,
+          color: theme.onContainer,
+          fontWeight: FontWeight.w400,
         ),
       ),
     );
@@ -68,29 +90,62 @@ class LMFeedTopicTile extends StatelessWidget {
   /// with specific single values passed
   LMFeedTopicTile copyWith({
     Function(LMTopicViewData)? onTap,
-    MainAxisAlignment? tileRowAlignment,
-    Color? backgroundColor,
-    double? height,
-    Icon? icon,
-    Color? borderColor,
-    double? borderWidth,
-    EdgeInsets? padding,
-    bool? isSelected,
-    LMFeedText? text,
     LMTopicViewData? topic,
+    LMFeedTopicTileStyle? style,
   }) {
     return LMFeedTopicTile(
       onTap: onTap ?? this.onTap,
-      tileRowAlignment: tileRowAlignment ?? this.tileRowAlignment,
-      backgroundColor: backgroundColor ?? this.backgroundColor,
-      height: height ?? this.height,
-      icon: icon ?? this.icon,
-      borderColor: borderColor ?? this.borderColor,
-      borderWidth: borderWidth ?? this.borderWidth,
-      padding: padding ?? this.padding,
-      isSelected: isSelected ?? this.isSelected,
-      text: text ?? this.text,
       topic: topic ?? this.topic,
+      style: style ?? this.style,
+    );
+  }
+}
+
+/// {@template lm_feed_topic_tile_style}
+/// Style for the [LMFeedTopicTile]
+/// {@endtemplate}
+class LMFeedTopicTileStyle {
+  final double? height;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final BoxDecoration? decoration;
+
+  const LMFeedTopicTileStyle({
+    this.height,
+    this.padding,
+    this.margin,
+    this.decoration,
+  });
+
+  /// copyWith function to get a new object of [LMFeedTopicTileStyle]
+  /// with specific single values passed
+  /// If no value is passed, the current value is used
+  /// If a value is passed, the new value is used
+  LMFeedTopicTileStyle copyWith({
+    double? height,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    BoxDecoration? decoration,
+  }) {
+    return LMFeedTopicTileStyle(
+      height: height ?? this.height,
+      padding: padding ?? this.padding,
+      margin: margin ?? this.margin,
+      decoration: decoration ?? this.decoration,
+    );
+  }
+
+  /// factory function to get the
+  /// basic style for the [LMFeedTopicTile]
+  factory LMFeedTopicTileStyle.basic({
+    Color? containerColor,
+  }) {
+    return LMFeedTopicTileStyle(
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: containerColor,
+      ),
     );
   }
 }
