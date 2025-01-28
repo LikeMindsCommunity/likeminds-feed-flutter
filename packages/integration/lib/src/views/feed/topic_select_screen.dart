@@ -13,8 +13,6 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 /// bottom sheet with a list of topics
 /// [LMFeedTopicSelectionWidgetType.showTopicSelectionScreen] to show a
 /// screen with a list of topics
-/// defaults to [LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet]
-/// if not provided
 /// {@endtemplate}
 enum LMFeedTopicSelectionWidgetType {
   showTopicSelectionBottomSheet,
@@ -139,8 +137,10 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
   @override
   void didUpdateWidget(LMFeedTopicSelectScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    selectedTopics = widget.selectedTopics;
-    topicsPagingController.refresh();
+    selectedTopics = oldWidget.selectedTopics;
+    for (LMTopicViewData topic in selectedTopics) {
+      selectedTopicId.add(topic.id);
+    }
   }
 
   @override
@@ -220,7 +220,8 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                                 LMFeedTopicTile(
                               isSelected: checkSelectedTopicExistsInList(item),
                               topic: item,
-                    style: LMFeedTopicTileStyle.basic(containerColor: feedThemeData.container),
+                              style: LMFeedTopicTileStyle.basic(
+                                  containerColor: feedThemeData.container),
                               onTap: (LMTopicViewData tappedTopic) {
                                 int index = selectedTopics.indexWhere(
                                     (element) => element.id == tappedTopic.id);
@@ -269,28 +270,38 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                     },
                   ),
                 )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Select Topic",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: feedThemeData.onContainer,
-                        fontWeight: FontWeight.w400,
+              : AnimatedSize(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                child: Column(
+                    crossAxisAlignment:  CrossAxisAlignment.start,
+                    mainAxisAlignment: selectedTopics.isNotEmpty
+                        ? MainAxisAlignment.start
+                        : MainAxisAlignment.center, 
+                    children: [
+                      Text(
+                        "Select Topic",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: feedThemeData.onContainer,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                    LikeMindsTheme.kVerticalPaddingSmall,
-                    Text(
-                      "${selectedTopics.length} selected",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: feedThemeData.secondaryColor,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )
-                  ],
-                );
+                      if(selectedTopics.isNotEmpty)
+                      ...[
+                        SizedBox(height: 2),
+                        Text(
+                          "${selectedTopics.length} selected",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: feedThemeData.secondaryColor,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        )
+                      ]
+                    ],
+                  ),
+              );
         },
       ),
       trailing: [
