@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/create_short_video/create_short_video_screen.dart';
 
 class LMFeedVideoFeedUniversalScreen extends StatefulWidget {
   const LMFeedVideoFeedUniversalScreen({super.key});
@@ -16,9 +17,38 @@ class LMFeedVideoFeedUniversalScreenState
     extends State<LMFeedVideoFeedUniversalScreen> {
   final _theme = LMFeedCore.theme;
   final _pageController = PageController();
+  final samplePost = (LMPostViewDataBuilder()
+        ..id("")
+        ..text(
+            "Hi this is a sample post, how are you doing? i guess you are doing great. this text is just to show how the post will look like in the feed.")
+        ..topics([])
+        ..communityId(0)
+        ..isPinned(false)
+        ..uuid("")
+        ..user(LMFeedLocalPreference.instance.fetchUserData()!)
+        ..likeCount(0)
+        ..commentCount(0)
+        ..isSaved(false)
+        ..isLiked(false)
+        ..menuItems([])
+        ..createdAt(DateTime.now())
+        ..updatedAt(DateTime.now())
+        ..isEdited(false)
+        ..replies([])
+        ..isDeleted(false)
+        ..isRepostedByUser(false)
+        ..repostCount(0)
+        ..widgets({})
+        ..heading("")
+        ..commentIds([])
+        ..isPendingPost(false)
+        ..isReposted(false)
+        ..postStatus(LMPostReviewStatus.approved))
+      .build();
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -58,39 +88,251 @@ class LMFeedVideoFeedUniversalScreenState
                         ),
                       ),
                     ),
+                    // user view
                     Padding(
                       padding: const EdgeInsets.only(bottom: 40),
-                      child: LMFeedPostHeader(
-                        user: LMFeedLocalPreference.instance.fetchUserData()!,
-                        isFeed: true,
-                        postViewData: (LMPostViewDataBuilder()
-                              ..id("")
-                              ..text("")
-                              ..topics([])
-                              ..communityId(0)
-                              ..isPinned(false)
-                              ..uuid("")
-                              ..user(LMFeedLocalPreference.instance
-                                  .fetchUserData()!)
-                              ..likeCount(0)
-                              ..commentCount(0)
-                              ..isSaved(false)
-                              ..isLiked(false)
-                              ..menuItems([])
-                              ..createdAt(DateTime.now())
-                              ..updatedAt(DateTime.now())
-                              ..isEdited(false)
-                              ..replies([])
-                              ..isDeleted(false)
-                              ..isRepostedByUser(false)
-                              ..repostCount(0)
-                              ..widgets({})
-                              ..heading("")
-                              ..commentIds([])
-                              ..isPendingPost(false)
-                              ..isReposted(false)
-                              ..postStatus(LMPostReviewStatus.approved))
-                            .build(),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: size.width - 68,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                LMFeedPostHeader(
+                                  createdAtBuilder: (context, text) {
+                                    return text.copyWith(
+                                        style: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: _theme.container,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.grey.withOpacity(0.1),
+                                            offset: Offset(0, 2),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
+                                      ),
+                                    ));
+                                  },
+                                  user: LMFeedLocalPreference.instance
+                                      .fetchUserData()!,
+                                  isFeed: true,
+                                  postViewData: samplePost,
+                                  postHeaderStyle:
+                                      LMFeedPostHeaderStyle.basic().copyWith(
+                                    titleTextStyle: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: _theme.container,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.grey.withOpacity(0.1),
+                                            offset: Offset(0, 2),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    subTextStyle: LMFeedTextStyle(
+                                      textStyle: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        color: _theme.container,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.grey.withOpacity(0.1),
+                                            offset: Offset(0, 2),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                LMFeedPostContent(
+                                  text: samplePost.text,
+                                  style: LMFeedPostContentStyle(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
+                                    headingSeparator:
+                                        const SizedBox(height: 0.0),
+                                    visibleLines: 2,
+                                    headingStyle: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: _theme.container,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          offset: Offset(0, 2),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                    textStyle: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: _theme.container,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          offset: Offset(0, 2),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                    expandTextStyle: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: _theme.container,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          offset: Offset(0, 2),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                LMFeedButton(
+                                  onTap: () {},
+                                  style: LMFeedButtonStyle(
+                                    gap: 0,
+                                    icon: LMFeedIcon(
+                                      type: LMFeedIconType.svg,
+                                      assetPath: lmLikeInActiveSvg,
+                                      style: LMFeedIconStyle(
+                                        size: 32,
+                                        fit: BoxFit.contain,
+                                        color: _theme.container,
+                                      ),
+                                    ),
+                                    activeIcon: LMFeedIcon(
+                                      type: LMFeedIconType.svg,
+                                      assetPath: lmLikeActiveSvg,
+                                      style: LMFeedIconStyle(
+                                        size: 32,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                    borderRadius: 100,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(
+                                          0.1,
+                                        ),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                LMFeedText(
+                                  text: '31K',
+                                  style: LMFeedTextStyle(
+                                    textStyle: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: _theme.container,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          offset: Offset(0, 2),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                LMFeedButton(
+                                  onTap: () {},
+                                  style: LMFeedButtonStyle(
+                                    gap: 0,
+                                    icon: LMFeedIcon(
+                                      type: LMFeedIconType.svg,
+                                      assetPath: lmCommentSvg,
+                                      style: LMFeedIconStyle(
+                                        size: 32,
+                                        color: _theme.container,
+                                      ),
+                                    ),
+                                    borderRadius: 100,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(
+                                          0.1,
+                                        ),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                LMFeedText(
+                                  text: '3.1K',
+                                  style: LMFeedTextStyle(
+                                    textStyle: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: _theme.container,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.grey.withOpacity(0.1),
+                                          offset: Offset(0, 2),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                LMFeedButton(
+                                  onTap: () {},
+                                  style: LMFeedButtonStyle(
+                                    gap: 0,
+                                    icon: LMFeedIcon(
+                                      type: LMFeedIconType.icon,
+                                      icon: Icons.more_horiz,
+                                      style: LMFeedIconStyle(
+                                        size: 32,
+                                        color: _theme.container,
+                                      ),
+                                    ),
+                                    borderRadius: 100,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(
+                                          0.1,
+                                        ),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
                       ),
                     ),
                   ],
@@ -123,6 +365,13 @@ class LMFeedVideoFeedUniversalScreenState
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: _theme.container,
+            shadows: [
+              Shadow(
+                color: Colors.grey.withOpacity(0.1),
+                offset: Offset(0, 2),
+                blurRadius: 4,
+              ),
+            ],
           ),
         ),
       ),
@@ -133,7 +382,16 @@ class LMFeedVideoFeedUniversalScreenState
       ),
       trailing: [
         LMFeedButton(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return LMFeedCreateShortVideoScreen();
+                },
+              ),
+            );
+          },
           text: LMFeedText(
             text: 'New post',
             style: LMFeedTextStyle(

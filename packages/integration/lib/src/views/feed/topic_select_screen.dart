@@ -27,11 +27,13 @@ class LMFeedTopicSelectScreen extends StatefulWidget {
   final Function(List<LMTopicViewData>) onTopicSelected;
   final bool? isEnabled;
   final List<LMTopicViewData> selectedTopics;
+  final bool showAllTopicsTile;
 
   const LMFeedTopicSelectScreen({
     Key? key,
     required this.onTopicSelected,
     required this.selectedTopics,
+    this.showAllTopicsTile = true,
     this.isEnabled,
   }) : super(key: key);
 
@@ -307,35 +309,34 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                 builder: (context, _, __) {
                   return Column(
                     children: [
-                      isSearching
-                          ? const SizedBox()
-                          : LMFeedTopicTile(
-                              isSelected: selectedTopics.isEmpty,
-                              height: 50,
-                              topic: allTopics,
-                              text: LMFeedText(
-                                text: allTopics.name,
-                                style: LMFeedTextStyle(
-                                  textStyle: TextStyle(
-                                    color: feedThemeData.onContainer,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                      if (!isSearching && widget.showAllTopicsTile)
+                        LMFeedTopicTile(
+                          isSelected: selectedTopics.isEmpty,
+                          height: 50,
+                          topic: allTopics,
+                          text: LMFeedText(
+                            text: allTopics.name,
+                            style: LMFeedTextStyle(
+                              textStyle: TextStyle(
+                                color: feedThemeData.onContainer,
+                                fontWeight: FontWeight.w600,
                               ),
-                              backgroundColor: feedThemeData.container,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20.0, vertical: 16.0),
-                              icon: Icon(
-                                Icons.check_circle,
-                                color: feedThemeData.primaryColor,
-                              ),
-                              onTap: (LMTopicViewData tappedTopic) {
-                                selectedTopics.clear();
-                                selectedTopicId.clear();
-                                rebuildTopicsScreen.value =
-                                    !rebuildTopicsScreen.value;
-                              },
                             ),
+                          ),
+                          backgroundColor: feedThemeData.container,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 16.0),
+                          icon: Icon(
+                            Icons.check_circle,
+                            color: feedThemeData.primaryColor,
+                          ),
+                          onTap: (LMTopicViewData tappedTopic) {
+                            selectedTopics.clear();
+                            selectedTopicId.clear();
+                            rebuildTopicsScreen.value =
+                                !rebuildTopicsScreen.value;
+                          },
+                        ),
                       Expanded(
                         child: PagedListView(
                           pagingController: topicsPagingController,
