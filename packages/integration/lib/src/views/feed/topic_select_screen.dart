@@ -189,59 +189,60 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
               }
             },
             child: ValueListenableBuilder(
-                valueListenable: rebuildTopicsScreen,
-                builder: (context, _, __) {
-                  return Column(
-                    children: [
-                      if (!isSearching && widget.showAllTopicsTile)
-                        LMFeedTopicTile(
-                          isSelected: selectedTopics.isEmpty,
-                          topic: allTopics,
-                          onTap: (LMTopicViewData tappedTopic) {
-                            selectedTopics.clear();
-                            selectedTopicId.clear();
-                            rebuildTopicsScreen.value =
-                                !rebuildTopicsScreen.value;
-                          },
-                        ),
-                      Expanded(
-                        child: PagedListView(
-                          pagingController: topicsPagingController,
-                          padding: EdgeInsets.zero,
-                          physics: const ClampingScrollPhysics(),
-                          builderDelegate:
-                              PagedChildBuilderDelegate<LMTopicViewData>(
-                            noItemsFoundIndicatorBuilder: (context) =>
-                                const Center(
-                                    child: Text(
-                              "Opps, no topics found!",
-                            )),
-                            itemBuilder: (context, item, index) =>
-                                LMFeedTopicTile(
-                              isSelected: checkSelectedTopicExistsInList(item),
-                              topic: item,
-                              style: LMFeedTopicTileStyle.basic(
-                                  containerColor: feedThemeData.container),
-                              onTap: (LMTopicViewData tappedTopic) {
-                                int index = selectedTopics.indexWhere(
-                                    (element) => element.id == tappedTopic.id);
-                                if (index != -1) {
-                                  selectedTopics.removeAt(index);
-                                  selectedTopicId.remove(tappedTopic.id);
-                                } else {
-                                  selectedTopics.add(tappedTopic);
-                                  selectedTopicId.add(tappedTopic.id);
-                                }
-                                rebuildTopicsScreen.value =
-                                    !rebuildTopicsScreen.value;
-                              },
-                            ),
+              valueListenable: rebuildTopicsScreen,
+              builder: (context, _, __) {
+                return Column(
+                  children: [
+                    if (!isSearching && widget.showAllTopicsTile)
+                      LMFeedTopicTile(
+                        isSelected: selectedTopics.isEmpty,
+                        topic: allTopics,
+                        onTap: (LMTopicViewData tappedTopic) {
+                          selectedTopics.clear();
+                          selectedTopicId.clear();
+                          rebuildTopicsScreen.value =
+                              !rebuildTopicsScreen.value;
+                        },
+                      ),
+                    Expanded(
+                      child: PagedListView(
+                        pagingController: topicsPagingController,
+                        padding: EdgeInsets.zero,
+                        physics: const ClampingScrollPhysics(),
+                        builderDelegate:
+                            PagedChildBuilderDelegate<LMTopicViewData>(
+                          noItemsFoundIndicatorBuilder: (context) =>
+                              const Center(
+                                  child: Text(
+                            "Opps, no topics found!",
+                          )),
+                          itemBuilder: (context, item, index) =>
+                              LMFeedTopicTile(
+                            isSelected: checkSelectedTopicExistsInList(item),
+                            topic: item,
+                            style: LMFeedTopicTileStyle.basic(
+                                containerColor: feedThemeData.container),
+                            onTap: (LMTopicViewData tappedTopic) {
+                              int index = selectedTopics.indexWhere(
+                                  (element) => element.id == tappedTopic.id);
+                              if (index != -1) {
+                                selectedTopics.removeAt(index);
+                                selectedTopicId.remove(tappedTopic.id);
+                              } else {
+                                selectedTopics.add(tappedTopic);
+                                selectedTopicId.add(tappedTopic.id);
+                              }
+                              rebuildTopicsScreen.value =
+                                  !rebuildTopicsScreen.value;
+                            },
                           ),
                         ),
                       ),
-                    ],
-                  );
-                }),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -270,38 +271,33 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                     },
                   ),
                 )
-              : AnimatedSize(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                child: Column(
-                    crossAxisAlignment:  CrossAxisAlignment.start,
-                    mainAxisAlignment: selectedTopics.isNotEmpty
-                        ? MainAxisAlignment.start
-                        : MainAxisAlignment.center, 
-                    children: [
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: selectedTopics.isNotEmpty
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Select Topic",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: feedThemeData.onContainer,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    if (selectedTopics.isNotEmpty) ...[
+                      SizedBox(height: 2),
                       Text(
-                        "Select Topic",
+                        "${selectedTopics.length} selected",
                         style: TextStyle(
-                          fontSize: 16,
-                          color: feedThemeData.onContainer,
+                          fontSize: 12,
+                          color: feedThemeData.secondaryColor,
                           fontWeight: FontWeight.w400,
                         ),
-                      ),
-                      if(selectedTopics.isNotEmpty)
-                      ...[
-                        SizedBox(height: 2),
-                        Text(
-                          "${selectedTopics.length} selected",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: feedThemeData.secondaryColor,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        )
-                      ]
-                    ],
-                  ),
-              );
+                      )
+                    ]
+                  ],
+                );
         },
       ),
       trailing: [
