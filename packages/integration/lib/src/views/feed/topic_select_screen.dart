@@ -104,21 +104,10 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
     for (LMTopicViewData topic in selectedTopics) {
       selectedTopicId.add(topic.id);
     }
-    if (selectedTopics.isEmpty) {
-      topicBloc.add(
-        LMFeedGetTopicEvent(
-          getTopicFeedRequest: (GetTopicsRequestBuilder()
-                ..page(_page)
-                ..isEnabled(widget.isEnabled)
-                ..pageSize(pageSize)
-                ..search(search)
-                ..searchType(searchType))
-              .build(),
-        ),
-      );
+    if (selectedTopicId.isNotEmpty) {
+      topicsPagingController.itemList = selectedTopics;
     }
     _addPaginationListener();
-    topicsPagingController.itemList = selectedTopics;
   }
 
   @override
@@ -161,6 +150,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
       source: LMFeedWidgetSource.topicSelectScreen,
       backgroundColor: feedThemeData.backgroundColor,
       floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
         onPressed: () {
           widget.onTopicSelected(selectedTopics);
           Navigator.of(context).pop();
@@ -171,113 +161,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
           color: feedThemeData.onPrimary,
         ),
       ),
-      appBar: LMFeedAppBar(
-        style: LMFeedAppBarStyle(
-          backgroundColor: feedThemeData.container,
-          height: 60,
-        ),
-        title: ValueListenableBuilder(
-          valueListenable: rebuildTopicsScreen,
-          builder: (context, _, __) {
-            return isSearching
-                ? Expanded(
-                    child: TextField(
-                      controller: searchController,
-                      focusNode: keyboardNode,
-                      cursorColor: feedThemeData.primaryColor,
-                      decoration: feedThemeData.textFieldStyle.decoration ??
-                          const InputDecoration(border: InputBorder.none),
-                      onChanged: (p0) {
-                        _onTextChanged(p0);
-                      },
-                    ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Select Topic",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: feedThemeData.onContainer,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      LikeMindsTheme.kVerticalPaddingSmall,
-                      Text(
-                        "${selectedTopics.length} selected",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: feedThemeData.onContainer,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )
-                    ],
-                  );
-          },
-        ),
-        trailing: [
-          ValueListenableBuilder(
-            valueListenable: rebuildTopicsScreen,
-            builder: (context, _, __) {
-              return GestureDetector(
-                onTap: () {
-                  if (isSearching) {
-                    if (keyboardNode.hasFocus) {
-                      keyboardNode.unfocus();
-                    }
-                    searchController.clear();
-                    search = "";
-                    searchType = "";
-                    _page = 1;
-                    topicsPagingController.itemList?.clear();
-                    topicsPagingController.itemList = selectedTopics;
-                    topicBloc.add(
-                      LMFeedGetTopicEvent(
-                        getTopicFeedRequest: (GetTopicsRequestBuilder()
-                              ..page(_page)
-                              ..isEnabled(widget.isEnabled)
-                              ..pageSize(pageSize)
-                              ..search(search)
-                              ..searchType(searchType))
-                            .build(),
-                      ),
-                    );
-                  } else {
-                    if (keyboardNode.canRequestFocus) {
-                      keyboardNode.requestFocus();
-                    }
-                  }
-                  isSearching = !isSearching;
-                  rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  padding: const EdgeInsets.all(10.0),
-                  child: Icon(
-                    isSearching ? CupertinoIcons.xmark : Icons.search,
-                    size: 18,
-                    color: feedThemeData.onContainer,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: Container(
-            color: Colors.transparent,
-            margin: const EdgeInsets.only(right: 24),
-            child: Icon(
-              Icons.arrow_back,
-              color: feedThemeData.onContainer,
-            ),
-          ),
-        ),
-      ),
+      appBar: _defAppBar(context),
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
@@ -312,24 +196,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                       if (!isSearching && widget.showAllTopicsTile)
                         LMFeedTopicTile(
                           isSelected: selectedTopics.isEmpty,
-                          height: 50,
                           topic: allTopics,
-                          text: LMFeedText(
-                            text: allTopics.name,
-                            style: LMFeedTextStyle(
-                              textStyle: TextStyle(
-                                color: feedThemeData.onContainer,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          backgroundColor: feedThemeData.container,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 16.0),
-                          icon: Icon(
-                            Icons.check_circle,
-                            color: feedThemeData.primaryColor,
-                          ),
                           onTap: (LMTopicViewData tappedTopic) {
                             selectedTopics.clear();
                             selectedTopicId.clear();
@@ -353,23 +220,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                                 LMFeedTopicTile(
                               isSelected: checkSelectedTopicExistsInList(item),
                               topic: item,
-                              height: 50,
-                              text: LMFeedText(
-                                text: item.name,
-                                style: LMFeedTextStyle(
-                                  textStyle: TextStyle(
-                                    color: feedThemeData.onContainer,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              backgroundColor: feedThemeData.container,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20.0, vertical: 16.0),
-                              icon: Icon(
-                                Icons.check_circle,
-                                color: feedThemeData.primaryColor,
-                              ),
+                    style: LMFeedTopicTileStyle.basic(containerColor: feedThemeData.container),
                               onTap: (LMTopicViewData tappedTopic) {
                                 int index = selectedTopics.indexWhere(
                                     (element) => element.id == tappedTopic.id);
@@ -390,6 +241,116 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                     ],
                   );
                 }),
+          ),
+        ),
+      ),
+    );
+  }
+
+  LMFeedAppBar _defAppBar(BuildContext context) {
+    return LMFeedAppBar(
+      style: LMFeedAppBarStyle(
+        backgroundColor: feedThemeData.container,
+        height: 60,
+      ),
+      title: ValueListenableBuilder(
+        valueListenable: rebuildTopicsScreen,
+        builder: (context, _, __) {
+          return isSearching
+              ? Expanded(
+                  child: TextField(
+                    controller: searchController,
+                    focusNode: keyboardNode,
+                    cursorColor: feedThemeData.primaryColor,
+                    decoration: feedThemeData.textFieldStyle.decoration ??
+                        const InputDecoration(border: InputBorder.none),
+                    onChanged: (p0) {
+                      _onTextChanged(p0);
+                    },
+                  ),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Select Topic",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: feedThemeData.onContainer,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    LikeMindsTheme.kVerticalPaddingSmall,
+                    Text(
+                      "${selectedTopics.length} selected",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: feedThemeData.secondaryColor,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                  ],
+                );
+        },
+      ),
+      trailing: [
+        ValueListenableBuilder(
+          valueListenable: rebuildTopicsScreen,
+          builder: (context, _, __) {
+            return GestureDetector(
+              onTap: () {
+                if (isSearching) {
+                  if (keyboardNode.hasFocus) {
+                    keyboardNode.unfocus();
+                  }
+                  searchController.clear();
+                  search = "";
+                  searchType = "";
+                  _page = 1;
+                  topicsPagingController.itemList?.clear();
+                  topicsPagingController.itemList = selectedTopics;
+                  topicBloc.add(
+                    LMFeedGetTopicEvent(
+                      getTopicFeedRequest: (GetTopicsRequestBuilder()
+                            ..page(_page)
+                            ..isEnabled(widget.isEnabled)
+                            ..pageSize(pageSize)
+                            ..search(search)
+                            ..searchType(searchType))
+                          .build(),
+                    ),
+                  );
+                } else {
+                  if (keyboardNode.canRequestFocus) {
+                    keyboardNode.requestFocus();
+                  }
+                }
+                isSearching = !isSearching;
+                rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
+              },
+              child: Container(
+                color: Colors.transparent,
+                padding: const EdgeInsets.all(10.0),
+                child: Icon(
+                  isSearching ? CupertinoIcons.xmark : Icons.search,
+                  size: 24,
+                  color: feedThemeData.onContainer,
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+      leading: GestureDetector(
+        onTap: () {
+          Navigator.of(context).pop();
+        },
+        child: Container(
+          color: Colors.transparent,
+          margin: const EdgeInsets.only(right: 24),
+          child: Icon(
+            Icons.arrow_back,
+            color: feedThemeData.onContainer,
           ),
         ),
       ),
