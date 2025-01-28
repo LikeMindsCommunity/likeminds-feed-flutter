@@ -38,3 +38,6 @@ export 'poll/poll_result_screen.dart';
 export 'poll/handler/poll_handler.dart';
 
 export 'pending_post/pending_posts_screen.dart';
+
+// create short videos
+export 'create_short_video/create_short_video_screen.dart';
