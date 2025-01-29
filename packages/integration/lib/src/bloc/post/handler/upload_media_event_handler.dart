@@ -80,7 +80,7 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
           media.attachmentMeta.url = response.data;
           attachments.add(
             Attachment(
-              attachmentType: media.mapMediaTypeToInt(),
+              attachmentType: media.attachmentType.value,
               attachmentMeta:
                   LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
                 media.attachmentMeta,

@@ -49,10 +49,10 @@ class LMAttachmentViewData {
   static const int pollMediaType = 6;
   static const int reelMediaType = 11;
 
-  @Deprecated('User [LMMediaType.values] instead')
+  @Deprecated('User [attachmentType.value] instead')
 
   /// Maps the media type to its corresponding integer value.
-  int mapMediaTypeToInt() {
+  int mapMediaTypeToInt1() {
     if (attachmentType == LMMediaType.image) {
       return imageMediaType;
     } else if (attachmentType == LMMediaType.video) {
