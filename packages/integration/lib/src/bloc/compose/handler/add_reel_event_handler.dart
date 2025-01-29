@@ -1,11 +1,7 @@
-// ignore_for_file: deprecated_member_use_from_same_package
+part of '../compose_bloc.dart';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-
-addVideoEventHandler(
-  LMFeedComposeAddVideoEvent event,
+_addReelEventHandler(
+  LMFeedComposeAddReelEvent event,
   Emitter<LMFeedComposeState> emitter,
 ) async {
   int mediaCount = LMFeedComposeBloc.instance.postMedia.length;
@@ -13,15 +9,18 @@ addVideoEventHandler(
   if (mediaCount == 0) {
     emitter(LMFeedComposeMediaLoadingState());
   }
-  debugPrint("Starting picking videos");
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
     widgetSource: LMFeedWidgetSource.createPostScreen,
-    eventProperties: {'type': 'video'},
+    eventProperties: {'type': 'reel'},
   ));
   try {
     final LMResponse<List<LMAttachmentViewData>> videos =
-        await LMFeedMediaHandler.pickVideos(currentMediaLength: mediaCount);
+        await LMFeedMediaHandler.pickVideos(
+      currentMediaLength: mediaCount,
+      allowMultiple: false,
+      isReelVideo: true,
+    );
     if (videos.success) {
       if (videos.data != null && videos.data!.isNotEmpty) {
         int countOfPickedVideos = videos.data!.length;
@@ -41,12 +40,12 @@ addVideoEventHandler(
           ),
         );
 
-        emitter(LMFeedComposeAddedVideoState());
+        emitter(LMFeedComposeAddedReelState());
       } else {
         if (LMFeedComposeBloc.instance.postMedia.isEmpty) {
           emitter(LMFeedComposeInitialState());
         } else {
-          emitter(LMFeedComposeAddedVideoState());
+          emitter(LMFeedComposeAddedReelState());
         }
       }
     } else {

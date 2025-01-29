@@ -66,7 +66,7 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
           throw Exception('Attachment file not found');
         }
 
-        if (media.attachmentType == LMMediaType.video) {
+        if (media.attachmentType == LMMediaType.video || media.attachmentType == LMMediaType.reel) {
           await _handleVideoUpload(mediaFile, media, event.user);
         }
 

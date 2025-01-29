@@ -59,6 +59,8 @@ class LMFeedComposeAddedVideoState extends LMFeedComposeState {
   List<Object> get props => [identityHashCode(this)];
 }
 
+class LMFeedComposeAddedReelState extends LMFeedComposeState {}
+
 class LMFeedComposeAddedDocumentState extends LMFeedComposeState {
   @override
   List<Object> get props => [identityHashCode(this)];

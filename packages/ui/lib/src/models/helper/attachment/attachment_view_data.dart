@@ -3,15 +3,24 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 /// Enum representing different types of media attachments.
 enum LMMediaType {
-  none,
-  video,
-  image,
-  document,
-  link,
-  widget,
-  repost,
-  poll,
-  reel
+  none(0),
+  image(1),
+  video(2),
+  document(3),
+  link(4),
+  widget(5),
+  poll(6),
+  repost(8),
+  reel(11);
+
+  final int value;
+
+  const LMMediaType(this.value);
+
+  factory LMMediaType.fromValue(int value) {
+    return LMMediaType.values.firstWhere((type) => type.value == value,
+        orElse: () => LMMediaType.none);
+  }
 }
 
 /// {@template lm_attachment_meta_view_data}
@@ -39,6 +48,8 @@ class LMAttachmentViewData {
   static const int repostMediaType = 8;
   static const int pollMediaType = 6;
   static const int reelMediaType = 11;
+
+  @Deprecated('User [LMMediaType.values] instead')
 
   /// Maps the media type to its corresponding integer value.
   int mapMediaTypeToInt() {
@@ -283,6 +294,8 @@ class LMAttachmentViewDataBuilder {
     );
   }
 }
+
+@Deprecated('Use [LMMediaType.fromValue()] instead')
 
 /// Maps an integer to its corresponding `LMMediaType`.
 LMMediaType mapIntToMediaType(int attachmentType) {

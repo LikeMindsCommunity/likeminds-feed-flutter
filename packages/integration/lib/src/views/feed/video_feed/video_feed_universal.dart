@@ -1,9 +1,7 @@
 import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/create_short_video/create_short_video_screen.dart';
 
 class LMFeedVideoFeedUniversalScreen extends StatefulWidget {
   const LMFeedVideoFeedUniversalScreen({super.key});
@@ -381,53 +379,61 @@ class LMFeedVideoFeedUniversalScreenState
         backgroundColor: Colors.transparent,
       ),
       trailing: [
-        LMFeedButton(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return LMFeedCreateShortVideoScreen();
-                },
-              ),
-            );
+        BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
+          bloc: LMFeedComposeBloc.instance,
+          listener: (context, state) {
+            // if state is added video
+            // navigate to create short video screen
+            if (state is LMFeedComposeAddedReelState) {
+              debugPrint(LMFeedComposeBloc.instance.postMedia.toString());
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return LMFeedCreateShortVideoScreen();
+              }));
+            }
           },
-          text: LMFeedText(
-            text: 'New post',
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: _theme.container,
-              ),
-            ),
-          ),
-          style: LMFeedButtonStyle(
-            backgroundColor: _theme.onContainer.withOpacity(0.1),
-            padding: EdgeInsets.symmetric(
-              horizontal: 16,
-            ),
-            borderRadius: 50,
-            gap: 6,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(
-                  0.1,
+          child: LMFeedButton(
+            onTap: () {
+              LMFeedComposeBloc.instance.add(
+                LMFeedComposeAddReelEvent(),
+              );
+            },
+            text: LMFeedText(
+              text: 'New post',
+              style: LMFeedTextStyle(
+                textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: _theme.container,
                 ),
-                offset: Offset(0, 2),
-                blurRadius: 4,
-              ),
-            ],
-            icon: LMFeedIcon(
-              type: LMFeedIconType.svg,
-              assetPath: lmCreateReelSvg,
-              style: LMFeedIconStyle(
-                color: _theme.container,
-                size: 20,
               ),
             ),
-            margin: EdgeInsets.only(
-              right: 9,
+            style: LMFeedButtonStyle(
+              backgroundColor: _theme.onContainer.withOpacity(0.1),
+              padding: EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+              borderRadius: 50,
+              gap: 6,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(
+                    0.1,
+                  ),
+                  offset: Offset(0, 2),
+                  blurRadius: 4,
+                ),
+              ],
+              icon: LMFeedIcon(
+                type: LMFeedIconType.svg,
+                assetPath: lmCreateReelSvg,
+                style: LMFeedIconStyle(
+                  color: _theme.container,
+                  size: 20,
+                ),
+              ),
+              margin: EdgeInsets.only(
+                right: 9,
+              ),
             ),
           ),
         )

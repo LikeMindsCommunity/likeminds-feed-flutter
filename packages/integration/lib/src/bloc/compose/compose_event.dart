@@ -39,6 +39,12 @@ class LMFeedComposeAddImageEvent extends LMFeedComposeEvent {}
 /// {@endtemplate}
 class LMFeedComposeAddVideoEvent extends LMFeedComposeEvent {}
 
+/// {@template lm_feed_compose_add_reel_event}
+/// [LMFeedComposeAddReelEvent] opens the reel picker and handles the flow
+/// to add the selected reel to the post
+/// {@endtemplate}
+class LMFeedComposeAddReelEvent extends LMFeedComposeEvent {}
+
 class LMFeedComposeAddDocumentEvent extends LMFeedComposeEvent {}
 
 class LMFeedComposeAddLinkPreviewEvent extends LMFeedComposeEvent {

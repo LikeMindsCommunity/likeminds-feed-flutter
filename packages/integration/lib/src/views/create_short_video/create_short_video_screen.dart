@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedCreateShortVideoScreen extends StatefulWidget {
   const LMFeedCreateShortVideoScreen({super.key});
@@ -16,11 +15,13 @@ class _LMFeedCreateShortVideoScreenState
   final FocusNode _focusNode = FocusNode();
   final _theme = LMFeedCore.theme;
   final List<LMTopicViewData> _selectedTopics = [];
+  final _composeBloc = LMFeedComposeBloc.instance;
 
   @override
   void dispose() {
     _textController.dispose();
     _focusNode.dispose();
+    _composeBloc.add(LMFeedComposeCloseEvent());
     super.dispose();
   }
 
@@ -33,21 +34,26 @@ class _LMFeedCreateShortVideoScreenState
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: 16,
+            vertical: 24,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: size.height * 0.5,
-                width: size.width,
-                color: Colors.grey,
+              Center(
                 child: Container(
-                  height: double.infinity,
-                  width: 300,
+                  clipBehavior: Clip.hardEdge,
+                  height: 420,
+                  width: size.width * 0.7,
+                  margin: const EdgeInsets.only(bottom: 64),
                   decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  alignment: Alignment.center,
+                  child: LMFeedVideo(
+                    video: _composeBloc.postMedia.first,
+                    // style: style?.mediaStyle?.videoStyle,
+                    postId:
+                        "${_composeBloc.postMedia.first.attachmentMeta.path.toString()}",
                   ),
                 ),
               ),
@@ -192,7 +198,23 @@ class _LMFeedCreateShortVideoScreenState
       ),
       trailing: [
         LMFeedButton(
-          onTap: () {},
+          onTap: () {
+            final result = _textController.text;
+            final selectedTopics = _selectedTopics;
+            final userTags = _composeBloc.userTags;
+            final user = LMFeedLocalPreference.instance.fetchUserData();
+            final heading = '';
+
+            // Add a new post event to the post bloc
+            LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
+              user: user!,
+              postText: result,
+              selectedTopicIds: selectedTopics.map((e) => e.id).toList(),
+              postMedia: [..._composeBloc.postMedia],
+              heading: heading,
+              userTagged: userTags,
+            ));
+          },
           isActive: false,
           text: const LMFeedText(
             text: 'POST',
@@ -226,12 +248,12 @@ class _LMFeedCreateShortVideoScreenState
           errorBorder: InputBorder.none,
           disabledBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
-          hintText: "Write a caption...",
+          hintText: "Write a caption and hashtags...",
           hintStyle: TextStyle(
             overflow: TextOverflow.visible,
             fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: _theme.inActiveColor,
+            fontWeight: FontWeight.w400,
+            color: _theme.secondaryColor,
           ),
         ),
       ),
