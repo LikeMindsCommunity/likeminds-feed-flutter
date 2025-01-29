@@ -60,6 +60,7 @@ class LMAttachmentViewDataConvertor {
         allowAddOption: attachmentViewData.attachmentMeta.allowAddOption,
         path: attachmentViewData.attachmentMeta.path,
         bytes: attachmentViewData.attachmentMeta.bytes,
+        name: attachmentViewData.attachmentMeta.name,
       ),
     );
   }

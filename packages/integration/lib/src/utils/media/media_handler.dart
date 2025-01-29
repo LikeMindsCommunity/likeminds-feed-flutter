@@ -82,9 +82,7 @@ class LMFeedMediaHandler {
                 bytes: pFile.bytes!,
                 size: pFile.size,
                 duration: videoInfo?.duration?.toInt(),
-                meta: {
-                  'file_name': pFile.name,
-                },
+                name: pFile.name,
                 height: videoInfo?.height,
                 width: videoInfo?.width,
               );
@@ -95,9 +93,7 @@ class LMFeedMediaHandler {
                 path: pFile.path!,
                 size: pFile.size,
                 duration: videoInfo?.duration?.toInt(),
-                meta: {
-                  'file_name': pFile.name,
-                },
+                name: pFile.name,
                 height: videoInfo?.height,
                 width: videoInfo?.width,
               );

@@ -112,6 +112,7 @@ class LMAttachmentViewData {
     List<LMPollOptionViewData>? options,
     bool? toShowResult,
     String? pollAnswerText,
+    String? name,
   }) {
     return LMAttachmentViewData._(
       attachmentType: attachmentType,
@@ -139,6 +140,7 @@ class LMAttachmentViewData {
         options: options,
         toShowResult: toShowResult,
         pollAnswerText: pollAnswerText,
+        name: name,
       ),
     );
   }
@@ -172,6 +174,7 @@ class LMAttachmentViewData {
     String? pollAnswerText,
     LMPostViewData? post,
     String? postId,
+    String? name,
   }) {
     return LMAttachmentViewData._(
       attachmentType: attachmentType,
@@ -202,6 +205,7 @@ class LMAttachmentViewData {
         options: options,
         toShowResult: toShowResult,
         pollAnswerText: pollAnswerText,
+        name: name,
       ),
     );
   }
@@ -233,6 +237,7 @@ class LMAttachmentViewData {
     List<LMPollOptionViewData>? options,
     bool? toShowResult,
     String? pollAnswerText,
+    String? name,
   }) {
     return LMAttachmentViewData._(
       attachmentType: attachmentType,
