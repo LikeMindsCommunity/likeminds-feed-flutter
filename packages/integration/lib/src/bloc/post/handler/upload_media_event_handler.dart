@@ -66,8 +66,24 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
           throw Exception('Attachment file not found');
         }
 
-        if (media.attachmentType == LMMediaType.video || media.attachmentType == LMMediaType.reel) {
-          await _handleVideoUpload(mediaFile, media, event.user);
+        if (media.attachmentType == LMMediaType.video ||
+            media.attachmentType == LMMediaType.reel) {
+          await _uploadThumbnail(mediaFile, media, event.user);
+          // if platform is not web, compress the video
+          // before uploading, assign the compressed file to mediaFile
+          if (!kIsWeb) {
+            var tempFile = await VideoCompress.compressVideo(
+              mediaFile.path,
+              deleteOrigin: false,
+              includeAudio: true,
+            );
+            if (tempFile != null && tempFile.file != null) {
+              mediaFile = tempFile.file!;
+              if (tempFile.filesize != null) {
+                media.attachmentMeta.size = tempFile.filesize;
+              }
+            }
+          }
         }
 
         final LMResponse<String> response = await LMFeedMediaService.uploadFile(
@@ -122,7 +138,7 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
   return LMResponse.success(data: attachments);
 }
 
-Future<void> _handleVideoUpload(
+Future<void> _uploadThumbnail(
     File mediaFile, LMAttachmentViewData media, LMUserViewData user) async {
   String? thumbnailURL;
   String? thumbnailPath = await LMFeedVideoUtils.getThumbnailFile(
@@ -137,15 +153,5 @@ Future<void> _handleVideoUpload(
       thumbnailURL = response.data;
       media.attachmentMeta.thumbnailUrl = thumbnailURL;
     }
-  }
-
-  if (!kIsWeb) {
-    var tempFile = await VideoCompress.compressVideo(
-      mediaFile.path,
-      deleteOrigin: false,
-      includeAudio: true,
-    );
-
-    mediaFile = tempFile!.file!;
   }
 }
