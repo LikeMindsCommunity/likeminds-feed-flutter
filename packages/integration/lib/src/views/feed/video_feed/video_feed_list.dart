@@ -13,7 +13,7 @@ class LMFeedVideoFeedListView extends StatefulWidget {
 class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
   final _theme = LMFeedCore.theme;
   final _pagingController = PagingController<int, LMPostViewData>(
-    firstPageKey: 0,
+    firstPageKey: 1,
   );
 
   // bloc to handle universal feed
@@ -54,6 +54,10 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
       } else {
         _pagingController.appendPage(listOfPosts, state.pageKey + 1);
       }
+
+      if(state.pageKey == 1) {
+        _prepareInitializationForNextIndex(0);
+      }
     } else if (state is LMFeedUniversalRefreshState) {
       // getUserFeedMeta = getUserFeedMetaFuture();
       // _rebuildAppBar.value = !_rebuildAppBar.value;
@@ -70,6 +74,29 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     if (_pagingController.itemList != null) _pagingController.itemList?.clear();
   }
 
+  void _prepareInitializationForNextIndex(int index) {
+    if (index + 1 < _pagingController.itemList!.length) {
+      final post = _pagingController.itemList![index + 1];
+      // Build the request for the video controller
+      LMFeedGetPostVideoControllerRequestBuilder requestBuilder =
+          LMFeedGetPostVideoControllerRequestBuilder();
+
+      requestBuilder.postId(post.id);
+      final attachmentUrl = post.attachments?.first.attachmentMeta.url;
+      // Set the video source based on the attachment metadata
+      if (attachmentUrl != null) {
+        requestBuilder
+          ..autoPlay(false)
+          ..videoSource(attachmentUrl)
+          ..videoType(LMFeedVideoSourceType.network)
+          ..position(0);
+      }
+      LMFeedVideoProvider.instance
+          .videoControllerProvider(requestBuilder.build());
+    }
+    ;
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
@@ -78,6 +105,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
       listener: universalBlocListener,
       child: SafeArea(
         child: PagedPageView<int, LMPostViewData>(
+          onPageChanged: _prepareInitializationForNextIndex,
           pagingController: _pagingController,
           scrollDirection: Axis.vertical,
           builderDelegate: PagedChildBuilderDelegate(
