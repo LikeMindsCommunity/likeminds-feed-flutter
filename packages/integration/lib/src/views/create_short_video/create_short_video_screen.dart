@@ -210,7 +210,7 @@ class _LMFeedCreateShortVideoScreenState
               user: user!,
               postText: result,
               selectedTopicIds: selectedTopics.map((e) => e.id).toList(),
-              postMedia: [..._composeBloc.postMedia],
+              postMedia: _composeBloc.postMedia.copy(),
               heading: heading,
               userTagged: userTags,
             ));

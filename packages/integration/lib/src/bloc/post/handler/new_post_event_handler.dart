@@ -61,7 +61,7 @@ void newPostEventHandler(
     String? headingText = event.heading;
 
     final requestBuilder = AddPostRequestBuilder()
-      ..attachments(attachments)
+      ..attachments(attachments.copy())
       ..topicIds(event.selectedTopicIds)
       ..tempId(tempId);
 
@@ -81,8 +81,17 @@ void newPostEventHandler(
       requestBuilder.isRepost(true);
     }
 
-    final AddPostResponse response =
-        await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
+    final AddPostResponse response = 
+    // AddPostResponse(
+    //   success: false,
+    //   errorMessage: 'An error occurred',
+    //   post: null,
+    //   user: null,
+    //   topics: null,
+    //   widgets: null,
+    //   repostedPosts: null,
+    // );
+    await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
 
     if (response.success) {
       Map<String, LMWidgetViewData> widgets =
