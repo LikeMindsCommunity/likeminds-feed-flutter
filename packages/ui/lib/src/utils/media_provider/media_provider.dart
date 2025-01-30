@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:async/async.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -20,6 +23,8 @@ class LMFeedVideoProvider with ChangeNotifier {
   /// The video controllers are disposed when they are removed from this map.
   /// This map is also used to check if a video controller is already in use.
   final Map<String, Map<int, VideoController>> _videoControllers = {};
+
+  final Set<String> _initPostId = {};
 
   /// This variable holds the postId of the post that is currently visible.
   /// It variable is used to pause the video when the post is not visible
@@ -76,9 +81,24 @@ class LMFeedVideoProvider with ChangeNotifier {
         _videoControllers[postId]!.containsKey(request.position)) {
       videoController = _videoControllers[postId]![request.position]!;
     } else {
-      videoController = await initialisePostVideoController(request);
-      _videoControllers[postId] ??= {};
-      _videoControllers[postId]![request.position] = videoController;
+      if (!_initPostId.contains(postId)) {
+        _initPostId.add(postId);
+        videoController = await initialisePostVideoController(request);
+        _videoControllers[postId] ??= {};
+        _videoControllers[postId]![request.position] = videoController;
+      } else {
+        // wait for the controller to be initialised and then return it
+        Completer<VideoController> completer = Completer();
+        Timer.periodic(Duration(milliseconds: 500), (timer) {
+          if (_videoControllers.containsKey(postId) &&
+              _videoControllers[postId]!.containsKey(request.position)) {
+            videoController = _videoControllers[postId]![request.position]!;
+            completer.complete(videoController);
+            timer.cancel();
+          }
+        });
+        videoController = await completer.future;
+      }
     }
 
     if (isMuted.value) {
@@ -86,7 +106,7 @@ class LMFeedVideoProvider with ChangeNotifier {
     } else {
       videoController.player.setVolume(100.0);
     }
-
+    _initPostId.remove(postId);
     return videoController;
   }
 

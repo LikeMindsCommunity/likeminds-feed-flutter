@@ -317,7 +317,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                     });
                   }
                   return VisibilityDetector(
-                    key: ObjectKey(controller!.player),
+                    key: widget.key ?? ObjectKey(controller!.player),
                     onVisibilityChanged: (visibilityInfo) {
                       if (mounted) {
                         var visiblePercentage =
