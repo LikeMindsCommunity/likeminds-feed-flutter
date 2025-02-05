@@ -182,46 +182,46 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                                                     );
                                                   },
                                                   child: Chip(
+                                                    side: BorderSide.none,
                                                     label: LMFeedText(
                                                       text: e.name,
                                                       style: LMFeedTextStyle(
-                                                        textStyle:
-                                                            const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ).copyWith(
+                                                        textStyle: TextStyle(
                                                           fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                           color: selectedTags
                                                                   .contains(
                                                                       e.id)
-                                                              ? Colors.white
-                                                              : Colors.black,
+                                                              ? theme.errorColor
+                                                              : theme
+                                                                  .secondaryColor,
                                                         ),
                                                       ),
                                                     ),
                                                     backgroundColor:
                                                         selectedTags
                                                                 .contains(e.id)
-                                                            ? theme.primaryColor
-                                                            : theme.container,
+                                                            ? theme.errorColor
+                                                                .withOpacity(
+                                                                    0.2)
+                                                            : theme
+                                                                .secondaryColor
+                                                                .withOpacity(
+                                                                    0.1),
                                                     shape:
                                                         RoundedRectangleBorder(
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              50.0),
-                                                      side: BorderSide(
-                                                        color: selectedTags
-                                                                .contains(e.id)
-                                                            ? theme.primaryColor
-                                                            : Colors.black,
-                                                      ),
+                                                              12.0),
                                                     ),
                                                     padding: const EdgeInsets
                                                         .symmetric(
-                                                        horizontal: 16.0),
+                                                      horizontal: 16.0,
+                                                      vertical: 4,
+                                                    ),
                                                     labelPadding:
-                                                        EdgeInsets.zero,
+                                                        const EdgeInsets.all(4),
                                                     elevation: 0,
                                                   ),
                                                 ),
@@ -233,41 +233,61 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                                 return const SizedBox();
                               }
                             }),
-                        // kVerticalPaddingLarge,
-                        deleteReason != null &&
-                                (deleteReason!.name.toLowerCase() == 'others' ||
-                                    deleteReason!.name.toLowerCase() == 'other')
-                            ? Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                child: TextField(
+                        if (deleteReason != null &&
+                            (deleteReason!.name.toLowerCase() == 'others' ||
+                                deleteReason!.name.toLowerCase() == 'other'))
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                LMFeedText(
+                                  text: "Reason",
+                                  style: LMFeedTextStyle(
+                                    textStyle: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.onContainer,
+                                    ),
+                                  ),
+                                ),
+                                LMFeedText(
+                                  text: "Help us understand the problem.",
+                                  style: LMFeedTextStyle(
+                                    textStyle: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                      color: theme.onContainer,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                TextField(
                                   cursorColor: Colors.black,
                                   style: const TextStyle(
                                     color: Colors.black,
                                   ),
+                                  minLines: 3,
+                                  maxLines: 5,
                                   controller: reportReasonController,
-                                  decoration: theme.textFieldStyle.decoration
-                                          ?.copyWith(
-                                        hintText: 'Reason',
-                                        hintStyle: theme.contentStyle.textStyle,
-                                        border: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                            color: theme.disabledColor,
-                                            width: 1,
-                                          ),
-                                        ),
-                                      ) ??
-                                      InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: theme.primaryColor,
-                                        focusColor: theme.primaryColor,
-                                        labelText: 'Reason',
-                                        labelStyle:
-                                            theme.contentStyle.textStyle,
-                                      ),
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    fillColor:
+                                        theme.secondaryColor.withOpacity(0.1),
+                                    focusColor: theme.primaryColor,
+                                    hintText: 'Write a message',
+                                    labelStyle: theme.contentStyle.textStyle,
+                                  ),
                                 ),
-                              )
-                            : const SizedBox()
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -277,16 +297,16 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                       horizontal: 24.0, vertical: 16.0),
                   child: LMFeedButton(
                     style: LMFeedButtonStyle(
+                      width: double.infinity,
                       height: 48,
                       padding: EdgeInsets.symmetric(horizontal: 40.0),
                       backgroundColor: selectedTags.isEmpty
                           ? theme.disabledColor
                           : theme.primaryColor,
-                      borderRadius: 50,
+                      borderRadius: 12,
                     ),
                     text: LMFeedText(
-                      text:
-                          'Report ${getEntityTitleFirstCap(singular: true, smallCap: false)}',
+                      text: 'Submit report',
                       style: LMFeedTextStyle(
                         textStyle: TextStyle(
                             color: theme.container,
@@ -363,12 +383,18 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
         shadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            spreadRadius: 0,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            blurRadius: 2,
+            offset: const Offset(0, 0.5),
           ),
         ],
         centerTitle: isIos,
+      ),
+      leading: LMFeedIcon(
+        type: LMFeedIconType.icon,
+        icon: Icons.report_outlined,
+        style: LMFeedIconStyle(
+          color: theme.secondaryColor,
+        ),
       ),
       trailing: [
         LMFeedButton(
@@ -382,7 +408,9 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
             icon: LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.close,
-              style: LMFeedIconStyle(color: theme.disabledColor),
+              style: LMFeedIconStyle(
+                color: theme.onContainer,
+              ),
             ),
           ),
         )
@@ -390,9 +418,10 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
       title: LMFeedText(
         text: 'Report Abuse',
         style: LMFeedTextStyle(
+          margin: EdgeInsets.only(left: 8),
           textStyle: TextStyle(
             fontSize: 18,
-            color: theme.errorColor,
+            color: theme.secondaryColor,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -452,7 +481,7 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
           textStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w400,
-            color: theme.onContainer,
+            color: theme.secondaryColor,
           ),
         ),
       ),
