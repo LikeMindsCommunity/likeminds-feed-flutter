@@ -21,6 +21,7 @@ class LMFeedSocialScreen extends StatefulWidget {
     this.topicBarBuilder,
     this.floatingActionButtonLocation,
     this.settings,
+    this.pageSize = 10,
   });
 
   /// [LMFeedType] for the feed.
@@ -67,6 +68,8 @@ class LMFeedSocialScreen extends StatefulWidget {
 
   final LMFeedSocialScreenSetting? settings;
 
+  final int pageSize;
+
   @override
   State<LMFeedSocialScreen> createState() => _LMFeedSocialScreenState();
 }
@@ -101,6 +104,7 @@ class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
       topicBarBuilder: widget.topicBarBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
       feedSettings: widget.settings,
+      pageSize: widget.pageSize,
     );
   }
 
@@ -120,6 +124,7 @@ class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
       pendingPostBannerBuilder: widget.pendingPostBannerBuilder,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
       feedScreenSettings: widget.settings,
+      pageSize: widget.pageSize,
     );
   }
 }

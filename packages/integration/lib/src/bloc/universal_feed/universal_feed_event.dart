@@ -8,13 +8,18 @@ abstract class LMFeedUniversalEvent extends Equatable {
 
 class LMFeedGetUniversalFeedEvent extends LMFeedUniversalEvent {
   final int pageKey;
+  final int pageSize;
   final List<String> topicsIds;
   final List<String>? widgetIds;
 
-  const LMFeedGetUniversalFeedEvent(
-      {required this.pageKey, required this.topicsIds, this.widgetIds});
+  const LMFeedGetUniversalFeedEvent({
+    required this.pageKey,
+    required this.pageSize,
+    required this.topicsIds,
+    this.widgetIds,
+  });
   @override
-  List<Object?> get props => [pageKey, topicsIds, widgetIds];
+  List<Object?> get props => [pageKey, pageSize, topicsIds, widgetIds];
 }
 
 class LMFeedUniversalRefreshEvent extends LMFeedUniversalEvent {}

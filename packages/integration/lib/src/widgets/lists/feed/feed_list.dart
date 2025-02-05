@@ -19,7 +19,7 @@ class LMFeedList extends StatefulWidget {
     this.selectedTopicIds,
     this.widgetIds,
     required this.pagingController,
-    this.pageSize = 20,
+    this.pageSize = 10,
     this.postBuilder,
     this.widgetSource = LMFeedWidgetSource.universalFeed,
   });
@@ -107,6 +107,7 @@ class _LMFeedListState extends State<LMFeedList> {
         _feedBloc.add(
           LMFeedGetUniversalFeedEvent(
             pageKey: pageKey,
+            pageSize: widget.pageSize,
             topicsIds: widget.selectedTopicIds ?? [],
             widgetIds: widget.widgetIds,
           ),
@@ -125,7 +126,7 @@ class _LMFeedListState extends State<LMFeedList> {
       _feedBloc.topics.addAll(state.topics);
       _feedBloc.widgets.addAll(state.widgets);
 
-      if (state.posts.length < 10) {
+      if (state.posts.length < widget.pageSize) {
         widget.pagingController.appendLastPage(listOfPosts);
       } else {
         widget.pagingController.appendPage(listOfPosts, state.pageKey + 1);
