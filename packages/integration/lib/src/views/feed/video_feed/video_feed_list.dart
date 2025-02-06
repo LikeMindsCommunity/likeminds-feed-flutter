@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/edit_short_video/edit_short_video_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/feed/comment_bottom_sheet.dart';
 
 class LMFeedVideoFeedListView extends StatefulWidget {
@@ -596,7 +597,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
 
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => LMFeedEditPostScreen(
+              builder: (context) => LMFeedEditShortVideoScreen(
                 postId: postViewData.id,
               ),
             ),

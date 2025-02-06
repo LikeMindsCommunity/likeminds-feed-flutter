@@ -310,7 +310,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                       LMPostMediaShimmer(
                         style: LMPostMediaShimmerStyle(
                           width: widget.style?.width ?? screenSize.width,
-                          height: widget.style?.height,
+                          height: widget.style?.height?? screenSize.height,
                         ),
                       );
                 } else if (snapshot.connectionState == ConnectionState.done) {
