@@ -294,6 +294,12 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                           url: thumbnailUrl!,
                           attachmentType: LMMediaType.image,
                         ),
+                        style: LMFeedPostImageStyle(
+                         height: screenSize.height,
+                          width: screenSize.width,
+                          borderRadius: style?.borderRadius,
+                          boxFit: BoxFit.contain,
+                        ),
                       ),
                       const Center(
                         child: LMFeedLoader(),
