@@ -81,17 +81,8 @@ void newPostEventHandler(
       requestBuilder.isRepost(true);
     }
 
-    final AddPostResponse response = 
-    // AddPostResponse(
-    //   success: false,
-    //   errorMessage: 'An error occurred',
-    //   post: null,
-    //   user: null,
-    //   topics: null,
-    //   widgets: null,
-    //   repostedPosts: null,
-    // );
-    await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
+    final AddPostResponse response =
+        await LMFeedCore.instance.lmFeedClient.addPost(requestBuilder.build());
 
     if (response.success) {
       Map<String, LMWidgetViewData> widgets =
