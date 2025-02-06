@@ -167,7 +167,7 @@ class _LMFeedCreateShortVideoScreenState
                   ),
                   style: const LMFeedButtonStyle(height: 42),
                   onTap: () {
-                    LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
+                    _composeBloc.add(LMFeedComposeCloseEvent());
                     Navigator.of(dialogContext).pop();
                     Navigator.of(context).pop();
                   },
