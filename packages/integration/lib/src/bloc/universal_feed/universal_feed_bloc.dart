@@ -56,7 +56,7 @@ class LMFeedUniversalBloc
     final universalFeedRequestBuilder = GetFeedRequestBuilder()
       ..page(event.pageKey)
       ..topicIds(event.topicsIds)
-      ..pageSize(10);
+      ..pageSize(event.pageSize);
     if (event.widgetIds != null) {
       universalFeedRequestBuilder.widgetIds(event.widgetIds!);
     }
