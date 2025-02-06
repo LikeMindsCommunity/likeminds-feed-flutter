@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:async/async.dart';
+import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart';
@@ -22,7 +22,9 @@ class LMFeedVideoProvider with ChangeNotifier {
   /// This map holds all the video controllers that are currently in use.
   /// The video controllers are disposed when they are removed from this map.
   /// This map is also used to check if a video controller is already in use.
-  final Map<String, Map<int, VideoController>> _videoControllers = {};
+  final int _maxControllers = 6;
+  final LinkedHashMap<String, Map<int, VideoController>> _videoControllers =
+      LinkedHashMap();
 
   final Set<String> _initPostId = {};
 
@@ -80,12 +82,16 @@ class LMFeedVideoProvider with ChangeNotifier {
     if (_videoControllers.containsKey(postId) &&
         _videoControllers[postId]!.containsKey(request.position)) {
       videoController = _videoControllers[postId]![request.position]!;
+      // Move the accessed controller to the end to mark it as recently used
+      _videoControllers[postId]!.remove(request.position);
+      _videoControllers[postId]![request.position] = videoController;
     } else {
       if (!_initPostId.contains(postId)) {
         _initPostId.add(postId);
         videoController = await initialisePostVideoController(request);
         _videoControllers[postId] ??= {};
         _videoControllers[postId]![request.position] = videoController;
+        _checkAndEvictControllers();
       } else {
         // wait for the controller to be initialised and then return it
         Completer<VideoController> completer = Completer();
@@ -108,6 +114,13 @@ class LMFeedVideoProvider with ChangeNotifier {
     }
     _initPostId.remove(postId);
     return videoController;
+  }
+
+  void _checkAndEvictControllers() {
+    while (_videoControllers.length > _maxControllers) {
+      String oldestPostId = _videoControllers.keys.first;
+      clearPostController(oldestPostId);
+    }
   }
 
   /// Disposes the video controller for the given postId and removes it from
