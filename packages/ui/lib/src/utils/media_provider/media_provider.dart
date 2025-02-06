@@ -26,7 +26,14 @@ class LMFeedVideoProvider with ChangeNotifier {
   final LinkedHashMap<String, Map<int, VideoController>> _videoControllers =
       LinkedHashMap();
 
-  final Set<String> _initPostId = {};
+  /// set of postId + position
+  /// that are currently in progress of being initialized.
+  /// This set is used to check if a controller is already in progress of being
+  /// initialized. If the controller is already in progress of being initialized
+  /// then the same controller is returned.
+  /// This set is also used to wait for the controller to be initialized and
+  /// then return it.
+  final Set<String> _inProgressVideoControllers = {};
 
   /// This variable holds the postId of the post that is currently visible.
   /// It variable is used to pause the video when the post is not visible
@@ -78,6 +85,11 @@ class LMFeedVideoProvider with ChangeNotifier {
   Future<VideoController> videoControllerProvider(
       LMFeedGetPostVideoControllerRequest request) async {
     String postId = request.postId;
+    // tempId is used to uniquely identify the controller according to the
+    // postId and position. it is used to check if the controller is already in
+    // progress of being initialized. If the controller is already in progress
+    // of being initialized, then the same controller is returned.
+    String tempId = postId + request.position.toString();
     VideoController videoController;
     if (_videoControllers.containsKey(postId) &&
         _videoControllers[postId]!.containsKey(request.position)) {
@@ -86,8 +98,8 @@ class LMFeedVideoProvider with ChangeNotifier {
       _videoControllers[postId]!.remove(request.position);
       _videoControllers[postId]![request.position] = videoController;
     } else {
-      if (!_initPostId.contains(postId)) {
-        _initPostId.add(postId);
+      if (!_inProgressVideoControllers.contains(tempId)) {
+        _inProgressVideoControllers.add(tempId);
         videoController = await initialisePostVideoController(request);
         _videoControllers[postId] ??= {};
         _videoControllers[postId]![request.position] = videoController;
@@ -112,7 +124,7 @@ class LMFeedVideoProvider with ChangeNotifier {
     } else {
       videoController.player.setVolume(100.0);
     }
-    _initPostId.remove(postId);
+    _inProgressVideoControllers.remove(tempId);
     return videoController;
   }
 
