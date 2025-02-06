@@ -16,6 +16,47 @@ class _LMFeedCreateShortVideoScreenState
   final _theme = LMFeedCore.theme;
   final List<LMTopicViewData> _selectedTopics = [];
   final _composeBloc = LMFeedComposeBloc.instance;
+  // Get the post title in first letter capital singular form
+  String postTitleFirstCap = LMFeedPostUtils.getPostTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalSingular);
+  // Get the post title in all small singular form
+  String postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+  final config = LMFeedCore.config.composeScreenConfig;
+  final ValueNotifier<bool> _postValidationNotifier = ValueNotifier(false);
+  bool _isPostValidationRequired = true;
+
+  LMResponse<void> validatePost() {
+    String postText = _textController.text;
+    postText = postText.trim();
+
+    // Validate the text if required
+    if (config.setting.textRequiredToCreatePost && postText.isEmpty) {
+      return LMResponse(
+        success: false,
+        errorMessage: "Can't create a $postTitleSmallCap without caption",
+      );
+    }
+
+    // Validate the topic selection if required
+    if (config.setting.topicRequiredToCreatePost && _selectedTopics.isEmpty) {
+      return LMResponse(
+        success: false,
+        errorMessage: "Can't create a $postTitleSmallCap without topics",
+      );
+    }
+
+    // return success if all validations pass
+    return LMResponse(success: true);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final postValidation = validatePost();
+    _postValidationNotifier.value = postValidation.success;
+    _isPostValidationRequired = !postValidation.success;
+  }
 
   @override
   void dispose() {
@@ -61,6 +102,80 @@ class _LMFeedCreateShortVideoScreenState
               _defContentTextField(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  _showDefaultDiscardDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => DefaultTextStyle(
+        style: const TextStyle(),
+        child: AlertDialog(
+          backgroundColor: _theme.container,
+          surfaceTintColor: Colors.transparent,
+          title: Text('Discard $postTitleFirstCap?'),
+          content: LMFeedText(
+            text:
+                'Are you sure you want to discard your reel? Any unsaved changes will be lost, and this action cannot be undone.',
+            style: LMFeedTextStyle(
+              maxLines: 10,
+              textStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: _theme.secondaryColor,
+              ),
+            ),
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actionsPadding: const EdgeInsets.only(
+            bottom: 24,
+            right: 24,
+          ),
+          actions: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                LMFeedButton(
+                  text: LMFeedText(
+                    text: "Cancel",
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        color: LMFeedCore.theme.secondaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  style: const LMFeedButtonStyle(height: 42),
+                  onTap: () {
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+                LikeMindsTheme.kHorizontalPaddingXLarge,
+                LMFeedButton(
+                  text: LMFeedText(
+                    text: "Discard",
+                    style: LMFeedTextStyle(
+                      textStyle: TextStyle(
+                        color: LMFeedCore.theme.primaryColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  style: const LMFeedButtonStyle(height: 42),
+                  onTap: () {
+                    LMFeedComposeBloc.instance.add(LMFeedComposeCloseEvent());
+                    Navigator.of(dialogContext).pop();
+                    Navigator.of(context).pop();
+                  },
+                ),
+                LikeMindsTheme.kHorizontalPaddingLarge,
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -187,6 +302,7 @@ class _LMFeedCreateShortVideoScreenState
 
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
+      leading: _defCancelButton(),
       title: const LMFeedText(
         text: 'New Reel',
         style: LMFeedTextStyle(
@@ -197,38 +313,69 @@ class _LMFeedCreateShortVideoScreenState
         ),
       ),
       trailing: [
-        LMFeedButton(
-          onTap: () {
-            final result = _textController.text;
-            final selectedTopics = _selectedTopics;
-            final userTags = _composeBloc.userTags;
-            final user = LMFeedLocalPreference.instance.fetchUserData();
-            final heading = '';
+        ValueListenableBuilder(
+            valueListenable: _postValidationNotifier,
+            builder: (context, value, child) {
+              return LMFeedButton(
+                onTap: () {
+                  final result = _textController.text;
+                  final selectedTopics = _selectedTopics;
+                  final userTags = _composeBloc.userTags;
+                  final user = LMFeedLocalPreference.instance.fetchUserData();
+                  final heading = '';
 
-            // Add a new post event to the post bloc
-            LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-              user: user!,
-              postText: result,
-              selectedTopicIds: selectedTopics.map((e) => e.id).toList(),
-              postMedia: _composeBloc.postMedia.copy(),
-              heading: heading,
-              userTagged: userTags,
-            ));
-          },
-          isActive: false,
-          text: const LMFeedText(
-            text: 'POST',
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
+                  // Add a new post event to the post bloc
+                  LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
+                    user: user!,
+                    postText: result,
+                    selectedTopicIds: selectedTopics.map((e) => e.id).toList(),
+                    postMedia: _composeBloc.postMedia.copy(),
+                    heading: heading,
+                    userTagged: userTags,
+                  ));
+                  // Pop the screen
+                  Navigator.pop(context);
+                },
+                text: LMFeedText(
+                  text: 'POST',
+                  style: LMFeedTextStyle(
+                    textStyle: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: value ? _theme.primaryColor : _theme.onContainer,
+                    ),
+                  ),
+                ),
+              );
+            }),
       ],
       style: LMFeedAppBarStyle(
         height: 56,
+      ),
+    );
+  }
+
+  // Default "Cancel" button widget creation
+  LMFeedButton _defCancelButton() {
+    return LMFeedButton(
+      // Defining the button's tap behavior
+      onTap: () {
+        // If a custom discard dialog is provided, show it
+        // Otherwise, show the default discard dialog
+
+        _showDefaultDiscardDialog(context);
+      },
+      // Applying additional style properties
+      style: LMFeedButtonStyle(
+        gap: 20.0,
+        icon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          icon: Icons.arrow_back,
+          style: LMFeedIconStyle(
+            size: 28,
+            color: _theme.onContainer,
+          ),
+        ),
       ),
     );
   }
@@ -272,7 +419,12 @@ class _LMFeedCreateShortVideoScreenState
       },
       controller: _textController,
       focusNode: _focusNode,
-      onChange: (value) {},
+      onChange: (value) {
+        if (_isPostValidationRequired) {
+          final postValidation = validatePost();
+          _postValidationNotifier.value = postValidation.success;
+        }
+      },
     );
   }
 }
