@@ -25,6 +25,7 @@ class LMFeedEmptyCommentWidget extends StatelessWidget {
     return isWeb
         ? const SizedBox.shrink()
         : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(
                 height: 60,
