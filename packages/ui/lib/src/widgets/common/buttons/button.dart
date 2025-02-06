@@ -19,7 +19,7 @@ class LMFeedButton extends StatefulWidget {
   /// Required parameter, defines whether the button is active or disabled
   final bool isActive;
 
-  /// style class to customise the look and feel of the button
+  /// style class to customize the look and feel of the button
   final LMFeedButtonStyle? style;
 
   /// Text to be displayed in the button
@@ -33,7 +33,7 @@ class LMFeedButton extends StatefulWidget {
 
   final VoidCallback? onTextTap;
 
-  /// [bool] to determine if the button should toogle
+  /// [bool] to determine if the button should toggle
   /// between active and inactive states
   /// defaults to true
   final bool isToggleEnabled;
@@ -101,7 +101,8 @@ class _LMButtonState extends State<LMFeedButton> {
           border: inStyle.border,
           boxShadow: inStyle.boxShadow,
         ),
-        child: Row(
+        child: Flex(
+          direction: inStyle.direction ?? Axis.horizontal,
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment:
               inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
@@ -115,7 +116,8 @@ class _LMButtonState extends State<LMFeedButton> {
             GestureDetector(
               onTap: inStyle.showText ? widget.onTextTap : null,
               behavior: HitTestBehavior.translucent,
-              child: Row(
+              child: Flex(
+                direction: inStyle.direction ?? Axis.horizontal,
                 children: [
                   inStyle.placement == LMFeedIconButtonPlacement.start
                       ? (inStyle.icon != null || inStyle.activeIcon != null)
@@ -194,7 +196,9 @@ class LMFeedButtonStyle {
 
   final EdgeInsets? textPadding;
 
-  final List<BoxShadow>? boxShadow; 
+  final List<BoxShadow>? boxShadow;
+
+  final Axis? direction;
 
   const LMFeedButtonStyle({
     this.padding,
@@ -212,6 +216,7 @@ class LMFeedButtonStyle {
     this.activeIcon,
     this.textPadding,
     this.boxShadow,
+    this.direction,
   });
 
   const factory LMFeedButtonStyle.basic() = LMFeedButtonStyle._;
@@ -232,6 +237,7 @@ class LMFeedButtonStyle {
     this.activeIcon,
     this.textPadding = EdgeInsets.zero,
     this.boxShadow,
+    this.direction,
   });
 
   LMFeedButtonStyle copyWith({
@@ -250,6 +256,7 @@ class LMFeedButtonStyle {
     LMFeedIcon? activeIcon,
     EdgeInsets? textPadding,
     List<BoxShadow>? boxShadow,
+    Axis? direction,
   }) {
     return LMFeedButtonStyle(
       padding: padding ?? this.padding,
@@ -267,6 +274,7 @@ class LMFeedButtonStyle {
       activeIcon: activeIcon ?? this.activeIcon,
       textPadding: textPadding ?? this.textPadding,
       boxShadow: boxShadow ?? this.boxShadow,
+      direction: direction ?? this.direction,
     );
   }
 
