@@ -183,7 +183,7 @@ class LMFeedPostHeader extends StatelessWidget {
                 style: LMFeedIconStyle.basic(),
               ),
             ),
-          postViewData.menuItems.isNotEmpty
+          postViewData.menuItems.isNotEmpty && headerStyle.showMenu
               ? menuBuilder?.call(_defMenuBuilder(feedTheme)) ??
                   _defMenuBuilder(feedTheme)
               : const SizedBox()
@@ -348,6 +348,7 @@ class LMFeedPostHeaderStyle {
   final bool showTimeStamp;
   final bool showPinnedIcon;
   final BoxDecoration? decoration;
+  final bool showMenu;
 
   const LMFeedPostHeaderStyle({
     this.padding,
@@ -364,6 +365,7 @@ class LMFeedPostHeaderStyle {
     this.menuStyle,
     this.showTimeStamp = true,
     this.decoration,
+    this.showMenu = true,
   });
 
   LMFeedPostHeaderStyle copyWith({
@@ -381,6 +383,7 @@ class LMFeedPostHeaderStyle {
     LMFeedMenuStyle? menuStyle,
     bool? showTimeStamp,
     BoxDecoration? decoration,
+    bool? showMenu,
   }) {
     return LMFeedPostHeaderStyle(
       padding: padding ?? this.padding,
@@ -397,6 +400,7 @@ class LMFeedPostHeaderStyle {
       menuStyle: menuStyle ?? this.menuStyle,
       showTimeStamp: showTimeStamp ?? this.showTimeStamp,
       decoration: decoration ?? this.decoration,
+      showMenu: showMenu ?? this.showMenu,
     );
   }
 

@@ -92,11 +92,11 @@ class LMFeedMenu extends StatelessWidget {
             splashFactory: InkRipple.splashFactory,
             child: AbsorbPointer(
               absorbing: onMenuTap != null,
-              child: (theme.headerStyle.menuStyle?.menuType ??
-                          LMFeedPostMenuType.popUp) ==
+              child: (style?.menuType ?? LMFeedPostMenuType.popUp) ==
                       LMFeedPostMenuType.popUp
                   ? SizedBox(
                       child: PopupMenuButton<int>(
+                        padding: EdgeInsets.zero,
                         onSelected: _handleMenuTap,
                         itemBuilder: (context) => menuItems
                             .map(
