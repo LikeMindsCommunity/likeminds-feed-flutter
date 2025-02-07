@@ -1,8 +1,8 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/edit_short_video/edit_short_video_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/like_list_view.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/feed/comment_bottom_sheet.dart';
 
 class LMFeedVideoFeedListView extends StatefulWidget {
@@ -97,9 +97,8 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
       List<LMPostViewData> listOfPosts = state.posts.copy();
 
       // remove post that do not have attachment type = reel
-      listOfPosts.removeWhere((element) =>
-          element.attachments?.isEmpty == true ||
-          element.attachments?.first.attachmentType != LMMediaType.reel);
+      // or they do not have any attachments.url
+      listOfPosts.removeWhere((post) => !_isPostOfReelType(post));
 
       _feedBloc.users.addAll(state.users);
       _feedBloc.topics.addAll(state.topics);
@@ -153,6 +152,28 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     ;
   }
 
+  bool _isPostOfReelType(LMPostViewData post) {
+    return post.attachments?.any(
+          (attachment) =>
+              attachment.attachmentType == LMMediaType.reel &&
+              attachment.attachmentMeta.url != null,
+        ) ??
+        false;
+  }
+
+  // This function returns the url of the first attachment
+  // that is of type reel by checking the attachment type
+  LMAttachmentViewData? _getFirstAttachmentOfTypeReel(LMPostViewData post) {
+    // check where first attachment is of type reel
+    // and has a url
+    final attachment = post.attachments?.firstWhereOrNull(
+      (element) =>
+          element.attachmentType == LMMediaType.reel &&
+          element.attachmentMeta.url != null,
+    );
+    return attachment;
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
@@ -181,6 +202,9 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
                   scrollDirection: Axis.vertical,
                   builderDelegate: PagedChildBuilderDelegate(
                     noMoreItemsIndicatorBuilder: (context) {
+                      return _defAllCaughtUpView();
+                    },
+                    noItemsFoundIndicatorBuilder: (context) {
                       return _defAllCaughtUpView();
                     },
                     itemBuilder: (context, item, index) {
@@ -244,7 +268,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
                 color: _theme.onContainer,
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -373,73 +397,124 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     }
   }
 
-  Stack _defVerticalVideoPostView(
+  Widget _defVerticalVideoPostView(
       LMPostViewData item, Size size, BuildContext context) {
-    return Stack(
-      alignment: Alignment.bottomLeft,
-      children: [
-        Container(
-          height: double.infinity,
-          color: Colors.black,
-          child: Center(
-            child: LMFeedVideo(
-              postId: item.id,
-              video: item.attachments!.first,
-              autoPlay: true,
-            ),
-          ),
-        ),
-        // user view
-        Padding(
-          padding: const EdgeInsets.only(bottom: 40),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final attachment = _getFirstAttachmentOfTypeReel(item);
+    return attachment != null
+        ? Stack(
+            alignment: Alignment.bottomLeft,
             children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: size.width - 68,
-                  maxHeight: size.height * 0.5,
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _defPostHeader(item),
-                      _defPostContent(item),
-                    ],
+              Container(
+                height: double.infinity,
+                color: Colors.black,
+                child: Center(
+                  child: LMFeedVideo(
+                    postId: item.id,
+                    video: attachment,
+                    autoPlay: true,
+                    style: LMFeedPostVideoStyle.basic().copyWith(
+                      allowMuting: false,
+                    ),
                   ),
                 ),
               ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+              // user view
+              Padding(
+                padding: const EdgeInsets.only(bottom: 40),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    BlocBuilder<LMFeedPostBloc, LMFeedPostState>(
-                      bloc: _postBloc,
-                      builder: (context, state) {
-                        return _defLikeButton(item);
-                      },
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: size.width - 68,
+                        maxHeight: size.height * 0.5,
+                      ),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _defPostHeader(item),
+                            LMFeedPostTopic(
+                              topics: item.topics,
+                              post: item,
+                              style: LMFeedPostTopicStyle.basic().copyWith(
+                                maxTopicsToShow: 3,
+                              ),
+                              onMoreTopicsTap: (context, topics) {
+                                showModalBottomSheet(
+                                  showDragHandle: true,
+                                  context: context,
+                                  builder: (context) {
+                                    return BottomSheet(
+                                      onClosing: () {},
+                                      builder: (context) {
+                                        return Column(
+                                          children: [
+                                            LMFeedText(
+                                              text: "Topics",
+                                              style: LMFeedTextStyle(
+                                                textStyle: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(height: 16),
+                                            Expanded(
+                                              child: ListView.builder(
+                                                itemCount: topics.length,
+                                                itemBuilder: (context, index) {
+                                                  return ListTile(
+                                                    title: Text(
+                                                        topics[index].name),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                            _defPostContent(item),
+                          ],
+                        ),
+                      ),
                     ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    _defCommentButton(
-                      item,
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    _defMenu(context, item),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          BlocBuilder<LMFeedPostBloc, LMFeedPostState>(
+                            bloc: _postBloc,
+                            builder: (context, state) {
+                              return _defLikeButton(item);
+                            },
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          _defCommentButton(
+                            item,
+                          ),
+                          SizedBox(
+                            height: 16,
+                          ),
+                          _defMenu(context, item),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-              )
+              ),
             ],
-          ),
-        ),
-      ],
-    );
+          )
+        : SizedBox();
   }
 
   LMFeedPostContent _defPostContent(LMPostViewData item) {
@@ -549,20 +624,31 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     return LMFeedMenu(
       menuItems: postViewData.menuItems,
       style: LMFeedMenuStyle(
-        menuType: LMFeedPostMenuType.bottomSheet,
-        showBottomSheetTitle: false,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(16),
-        ),
-        menuIcon: LMFeedIcon(
-          type: LMFeedIconType.icon,
-          icon: Icons.more_horiz,
-          style: LMFeedIconStyle(
-            size: 32,
-            color: _theme.container,
+          menuType: LMFeedPostMenuType.bottomSheet,
+          showBottomSheetTitle: false,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(16),
           ),
-        ),
-      ),
+          menuIcon: LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: Icons.more_horiz,
+            style: LMFeedIconStyle(
+              size: 32,
+              color: _theme.container,
+            ),
+          ),
+          menuTitleStyle: (menuId, titleStyle) {
+            return titleStyle?.copyWith(
+              textStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: menuId == LMFeedMenuAction.postDeleteId ||
+                        menuId == LMFeedMenuAction.postReportId
+                    ? _theme.errorColor
+                    : _theme.onContainer,
+              ),
+            );
+          }),
       removeItemIds: {},
       onMenuOpen: () {
         LMFeedAnalyticsBloc.instance.add(LMFeedFireAnalyticsEvent(
@@ -576,56 +662,92 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
         ));
       },
       action: LMFeedMenuAction(
-        onPostEdit: () {
-          // Mute all video controllers
-          // to prevent video from playing in background
-          // while editing the post
-          LMFeedVideoProvider.instance.forcePauseAllControllers();
-
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => LMFeedEditShortVideoScreen(
-                postId: postViewData.id,
-              ),
-            ),
-          );
-        },
+        onPostEdit: () => _onPostEdit(postViewData),
         onPostReport: () => LMFeedDefaultWidgets.instance
             .handlePostReportAction(postViewData, context),
         onPostUnpin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
         onPostPin: () => LMFeedPostUtils.handlePostPinAction(postViewData),
-        onPostDelete: () {
-          String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
+        onPostDelete: () => _onPostDelete(postViewData),
+      ),
+      menuItemBuilderForBottomSheet: (context, menuItem, menuData) {
+        return menuItem.copyWith(
+          leading: _getMenuIcon(menuData),
+        );
+      },
+    );
+  }
 
-          showDialog(
-            context: context,
-            builder: (childContext) => LMFeedDeleteConfirmationDialog(
-              title: 'Delete $postTitleFirstCap',
-              uuid: postCreatorUUID,
-              widgetSource: _widgetSource,
-              content:
-                  'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
-              action: (String reason) async {
-                Navigator.of(childContext).pop();
+  LMFeedIcon? _getMenuIcon(LMPopUpMenuItemViewData menuData) {
+    IconData? iconData;
+    Color iconColor = _theme.onContainer;
+    switch (menuData.id) {
+      case LMFeedMenuAction.postEditId:
+        iconData = Icons.edit_outlined;
+        break;
+      case LMFeedMenuAction.postDeleteId:
+        iconData = Icons.delete_outline;
+        iconColor = _theme.errorColor;
+        break;
+      case LMFeedMenuAction.postReportId:
+        iconData = Icons.report_outlined;
+        iconColor = _theme.errorColor;
+        break;
+    }
+    return iconData != null
+        ? LMFeedIcon(
+            type: LMFeedIconType.icon,
+            icon: iconData,
+            style: LMFeedIconStyle(
+              size: 24,
+              color: iconColor,
+            ),
+          )
+        : null;
+  }
 
-                String postType =
-                    LMFeedPostUtils.getPostType(postViewData.attachments);
+  void _onPostDelete(LMPostViewData postViewData) {
+    String postCreatorUUID = postViewData.user.sdkClientInfo.uuid;
+    showDialog(
+      context: context,
+      builder: (childContext) => LMFeedDeleteConfirmationDialog(
+        title: 'Delete $postTitleFirstCap?',
+        uuid: postCreatorUUID,
+        widgetSource: _widgetSource,
+        content:
+            'Are you sure you want to delete this $postTitleSmallCap. This action can not be reversed.',
+        action: (String reason) async {
+          Navigator.of(childContext).pop();
 
-                LMFeedPostBloc.instance.add(
-                  LMFeedDeletePostEvent(
-                    postId: postViewData.id,
-                    reason: reason,
-                    isRepost: postViewData.isRepost,
-                    postType: postType,
-                    userId: postCreatorUUID,
-                    userState: _isCm ? "CM" : "member",
-                  ),
-                );
-              },
-              actionText: 'Delete',
+          String postType =
+              LMFeedPostUtils.getPostType(postViewData.attachments);
+
+          LMFeedPostBloc.instance.add(
+            LMFeedDeletePostEvent(
+              postId: postViewData.id,
+              reason: reason,
+              isRepost: postViewData.isRepost,
+              postType: postType,
+              userId: postCreatorUUID,
+              userState: _isCm ? "CM" : "member",
             ),
           );
         },
+        actionText: 'Delete',
+      ),
+    );
+  }
+
+  void _onPostEdit(LMPostViewData postViewData) {
+    // Mute all video controllers
+    // to prevent video from playing in background
+    // while editing the post
+    LMFeedVideoProvider.instance.forcePauseAllControllers();
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => LMFeedEditShortVideoScreen(
+          postId: postViewData.id,
+        ),
       ),
     );
   }
@@ -633,7 +755,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
   LMFeedButton _defLikeButton(LMPostViewData postViewData) {
     return LMFeedButton(
       text: LMFeedText(
-        text: postViewData.likeCount.toString() + "likes",
+        text: postViewData.likeCount.toString(),
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 12,

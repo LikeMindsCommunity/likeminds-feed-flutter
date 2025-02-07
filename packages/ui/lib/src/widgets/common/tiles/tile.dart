@@ -77,14 +77,14 @@ class LMFeedTile extends StatelessWidget {
     );
   }
 
-  LMFeedTile copyWith(
+  LMFeedTile copyWith({
     Function()? onTap,
     LMFeedTileStyle? style,
     Widget? leading,
     Widget? title,
     Widget? subtitle,
     Widget? trailing,
-  ) {
+  }) {
     return LMFeedTile(
       onTap: onTap ?? this.onTap,
       style: style ?? this.style,

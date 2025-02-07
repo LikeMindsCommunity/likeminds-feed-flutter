@@ -15,41 +15,11 @@ class LMFeedVideoFeedUniversalScreenState
     extends State<LMFeedVideoFeedUniversalScreen> {
   final _theme = LMFeedCore.theme;
 
-  final samplePost = (LMPostViewDataBuilder()
-        ..id("")
-        ..text(
-            "Hi this is a sample post, how are you doing? i guess you are doing great. this text is just to show how the post will look like in the feed.")
-        ..topics([])
-        ..communityId(0)
-        ..isPinned(false)
-        ..uuid("")
-        ..user(LMFeedLocalPreference.instance.fetchUserData()!)
-        ..likeCount(0)
-        ..commentCount(0)
-        ..isSaved(false)
-        ..isLiked(false)
-        ..menuItems([])
-        ..createdAt(DateTime.now())
-        ..updatedAt(DateTime.now())
-        ..isEdited(false)
-        ..replies([])
-        ..isDeleted(false)
-        ..isRepostedByUser(false)
-        ..repostCount(0)
-        ..widgets({})
-        ..heading("")
-        ..commentIds([])
-        ..isPendingPost(false)
-        ..isReposted(false)
-        ..postStatus(LMPostReviewStatus.approved))
-      .build();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-
         child: Stack(
           children: [
             LMFeedVideoFeedListView(),

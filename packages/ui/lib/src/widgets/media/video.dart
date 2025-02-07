@@ -295,7 +295,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                           attachmentType: LMMediaType.image,
                         ),
                         style: LMFeedPostImageStyle(
-                         height: screenSize.height,
+                          height: screenSize.height,
                           width: screenSize.width,
                           borderRadius: style?.borderRadius,
                           boxFit: BoxFit.contain,
@@ -310,7 +310,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                       LMPostMediaShimmer(
                         style: LMPostMediaShimmerStyle(
                           width: widget.style?.width ?? screenSize.width,
-                          height: widget.style?.height?? screenSize.height,
+                          height: widget.style?.height ?? screenSize.height,
                         ),
                       );
                 } else if (snapshot.connectionState == ConnectionState.done) {
@@ -448,11 +448,12 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   Stack _defVideoControls(VideoState state) {
     return Stack(
       children: [
-        Positioned(
-          bottom: 2,
-          left: 2,
-          child: widget.muteButton ?? _defMuteButton(),
-        ),
+        if (style?.allowMuting ?? true)
+          Positioned(
+            bottom: 2,
+            left: 2,
+            child: widget.muteButton ?? _defMuteButton(),
+          ),
         Positioned(
           left: 0,
           bottom: 0,
