@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:collection';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,8 +12,10 @@ class LMFeedVideoFeedListView extends StatefulWidget {
   const LMFeedVideoFeedListView({
     super.key,
     this.pageSize = 10,
+    this.feedType = LMFeedType.universal,
   });
-  final pageSize;
+  final int pageSize;
+  final LMFeedType feedType;
 
   @override
   State<LMFeedVideoFeedListView> createState() =>
@@ -28,7 +33,10 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
   bool _isPostUploading = false;
   bool _isPostEditing = false;
   // bloc to handle universal feed
-  final LMFeedUniversalBloc _feedBloc = LMFeedUniversalBloc.instance;
+  final LMFeedUniversalBloc _universalFeedBloc = LMFeedUniversalBloc.instance;
+  // bloc to handle personalised feed
+  final LMFeedPersonalisedBloc _personalisedFeedBloc =
+      LMFeedPersonalisedBloc.instance;
   // bloc to handle post creation, updation, deletion, etc.
   LMFeedPostBloc _postBloc = LMFeedPostBloc.instance;
   // Get the post title in first letter capital singular form
@@ -55,6 +63,25 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
 
+  Timer? _debounceTimer;
+// function to handle scroll event with debounce
+  void _handleSwipe() {
+    if (_debounceTimer != null && _debounceTimer!.isActive) {
+      _debounceTimer!.cancel();
+    }
+    _debounceTimer = Timer(const Duration(seconds: 5), () {
+      _callSeenPostEvent();
+    });
+  }
+
+  // function to call the seen post event
+  // with the seen post ids saved in the memory
+  void _callSeenPostEvent() {
+    List<String> seenPost = _personalisedFeedBloc.seenPost.toList();
+    _personalisedFeedBloc
+        .add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPost));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -62,6 +89,20 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     _addPaginationListener();
     // Adds a feed opened event to the LMFeedAnalyticsBloc
     _addAnalyticsEvent();
+  }
+
+  // function to trigger the post seen event
+  // when the feed is opened for the first time
+  // with the seen post ids saved in the cache
+  void _triggerPostSeenEvent() {
+    LMResponse<List<String>> response =
+        LMFeedPersistence.instance.getSeenPostIDs();
+    if (response.success) {
+      List<String> seenPostIds = response.data ?? [];
+      HashSet<String> seenPost = HashSet<String>.from(seenPostIds);
+      _personalisedFeedBloc
+          .add(LMFeedPersonalisedSeenPostEvent(seenPost: seenPost.toList()));
+    }
   }
 
   void _addAnalyticsEvent() {
@@ -79,13 +120,24 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
   void _addPaginationListener() {
     _pagingController.addPageRequestListener(
       (pageKey) {
-        _feedBloc.add(
-          LMFeedGetUniversalFeedEvent(
-            pageKey: pageKey,
-            pageSize: widget.pageSize,
-            topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
-          ),
-        );
+        if (widget.feedType == LMFeedType.personalised) {
+          debugPrint('Personalised feed page key: $pageKey');
+          _personalisedFeedBloc.add(
+            LMFeedPersonalisedGetEvent(
+              pageKey: pageKey,
+              pageSize: widget.pageSize,
+            ),
+          );
+        } else {
+          _universalFeedBloc.add(
+            LMFeedGetUniversalFeedEvent(
+              pageKey: pageKey,
+              pageSize: widget.pageSize,
+              topicsIds:
+                  _universalFeedBloc.selectedTopics.map((e) => e.id).toList(),
+            ),
+          );
+        }
       },
     );
   }
@@ -100,9 +152,9 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
       // or they do not have any attachments.url
       listOfPosts.removeWhere((post) => !_isPostOfReelType(post));
 
-      _feedBloc.users.addAll(state.users);
-      _feedBloc.topics.addAll(state.topics);
-      _feedBloc.widgets.addAll(state.widgets);
+      _universalFeedBloc.users.addAll(state.users);
+      _universalFeedBloc.topics.addAll(state.topics);
+      _universalFeedBloc.widgets.addAll(state.widgets);
 
       if (state.posts.length < widget.pageSize) {
         _pagingController.appendLastPage(listOfPosts);
@@ -119,6 +171,29 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     }
   }
 
+  void _personalisedBlocListener(
+      BuildContext context, LMFeedPersonalisedState? state) {
+    if (state is LMFeedPersonalisedFeedLoadedState) {
+      List<LMPostViewData> listOfPosts = state.posts.copy();
+
+      // remove post that do not have attachment type = reel
+      // or they do not have any attachments.url
+      listOfPosts.removeWhere((post) => !_isPostOfReelType(post));
+      if (state.posts.length < widget.pageSize) {
+        _pagingController.appendLastPage(listOfPosts);
+      } else {
+        _pagingController.appendPage(listOfPosts, state.pageKey + 1);
+      }
+
+      if (state.pageKey == 1) {
+        _prepareInitializationForNextIndex(0);
+      }
+    } else if (state is LMFeedPersonalisedRefreshState) {
+      clearPagingController();
+      refresh();
+    }
+  }
+
   void refresh() => _pagingController.refresh();
 
   // This function clears the paging controller
@@ -127,6 +202,13 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     /* Clearing paging controller while changing the
      event to prevent duplication of list */
     if (_pagingController.itemList != null) _pagingController.itemList?.clear();
+  }
+
+  void _onPageChanged(int index) {
+    if (widget.feedType == LMFeedType.personalised) {
+      _handleSwipe();
+    }
+    _prepareInitializationForNextIndex(index);
   }
 
   void _prepareInitializationForNextIndex(int index) {
@@ -176,9 +258,24 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
-      bloc: _feedBloc,
-      listener: _universalBlocListener,
+    return widget.feedType == LMFeedType.universal
+        ? _buildBlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
+            _universalFeedBloc,
+            _universalBlocListener,
+          )
+        : _buildBlocListener<LMFeedPersonalisedBloc, LMFeedPersonalisedState>(
+            _personalisedFeedBloc,
+            _personalisedBlocListener,
+          );
+  }
+
+  Widget _buildBlocListener<B extends StateStreamable<S>, S>(
+    B bloc,
+    BlocWidgetListener<S> listener,
+  ) {
+    return BlocListener<B, S>(
+      bloc: bloc,
+      listener: listener,
       child: SafeArea(
         child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
           bloc: _postBloc,
@@ -193,34 +290,56 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
             return true;
           },
           builder: (context, state) {
-            return Stack(
-              alignment: AlignmentDirectional.bottomCenter,
-              children: [
-                PagedPageView<int, LMPostViewData>(
-                  onPageChanged: _prepareInitializationForNextIndex,
-                  pagingController: _pagingController,
-                  scrollDirection: Axis.vertical,
-                  builderDelegate: PagedChildBuilderDelegate(
-                    noMoreItemsIndicatorBuilder: (context) {
-                      return _defAllCaughtUpView();
-                    },
-                    noItemsFoundIndicatorBuilder: (context) {
-                      return _defAllCaughtUpView();
-                    },
-                    itemBuilder: (context, item, index) {
-                      return _defVerticalVideoPostView(
-                        item,
-                        MediaQuery.of(context).size,
-                        context,
-                      );
-                    },
-                  ),
-                ),
-                if (_isPostUploading || _isPostEditing) _defUploadingLoader()
-              ],
-            );
+            return _defBuilderView();
           },
         ),
+      ),
+    );
+  }
+
+  Stack _defBuilderView() {
+    return Stack(
+      alignment: AlignmentDirectional.bottomCenter,
+      children: [
+        RefreshIndicator.adaptive(
+          onRefresh: () async {
+            if (widget.feedType == LMFeedType.universal) {
+              _universalFeedBloc.add(LMFeedUniversalRefreshEvent());
+            } else {
+              _personalisedFeedBloc.add(LMFeedPersonalisedRefreshEvent());
+            }
+          },
+          child: _defPageView(),
+        ),
+        if (_isPostUploading || _isPostEditing) _defUploadingLoader()
+      ],
+    );
+  }
+
+  PagedPageView<int, LMPostViewData> _defPageView() {
+    return PagedPageView<int, LMPostViewData>(
+      onPageChanged: _onPageChanged,
+      pagingController: _pagingController,
+      scrollDirection: Axis.vertical,
+      builderDelegate: PagedChildBuilderDelegate(
+        noMoreItemsIndicatorBuilder: (context) {
+          return _defAllCaughtUpView();
+        },
+        noItemsFoundIndicatorBuilder: (context) {
+          return _defAllCaughtUpView();
+        },
+        itemBuilder: (context, item, index) {
+          // add the post to the seen post ids
+          // if it is a personalised feed
+          if (widget.feedType == LMFeedType.personalised) {
+            _personalisedFeedBloc.seenPost.add(item.id);
+          }
+          return _defVerticalVideoPostView(
+            item,
+            MediaQuery.of(context).size,
+            context,
+          );
+        },
       ),
     );
   }
@@ -312,7 +431,11 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
             ),
           ),
           onTap: () {
-            _feedBloc.add(LMFeedUniversalRefreshEvent());
+            if (widget.feedType == LMFeedType.universal) {
+              _universalFeedBloc.add(LMFeedUniversalRefreshEvent());
+            } else {
+              _personalisedFeedBloc.add(LMFeedPersonalisedRefreshEvent());
+            }
           },
         ),
       ],
@@ -359,8 +482,10 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
       if (index != -1) {
         feedRoomItemList![index] = item;
       }
-      _feedBloc.users.addAll(state.userData);
-      _feedBloc.topics.addAll(state.topics);
+      if (widget.feedType == LMFeedType.universal) {
+        _universalFeedBloc.users.addAll(state.userData);
+        _universalFeedBloc.topics.addAll(state.topics);
+      }
 
       LMFeedCore.showSnackBar(
           context, '$postTitleFirstCap Edited', _widgetSource);
