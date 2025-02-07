@@ -1,6 +1,7 @@
 export 'post/post_detail_screen.dart';
 export 'compose/compose_screen.dart';
 export 'likes/likes_screen.dart';
+export 'likes/widgets/like_list_view.dart';
 
 // social feed
 export 'feed/social/social_feed_screen.dart';

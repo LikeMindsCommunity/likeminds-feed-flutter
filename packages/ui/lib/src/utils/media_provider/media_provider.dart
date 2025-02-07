@@ -105,9 +105,9 @@ class LMFeedVideoProvider with ChangeNotifier {
         _videoControllers[postId]![request.position] = videoController;
         _checkAndEvictControllers();
       } else {
-        // wait for the controller to be initialised and then return it
+        // wait for the controller to be initialized and then return it
         Completer<VideoController> completer = Completer();
-        Timer.periodic(Duration(milliseconds: 500), (timer) {
+        Timer.periodic(const Duration(milliseconds: 500), (timer) {
           if (_videoControllers.containsKey(postId) &&
               _videoControllers[postId]!.containsKey(request.position)) {
             videoController = _videoControllers[postId]![request.position]!;

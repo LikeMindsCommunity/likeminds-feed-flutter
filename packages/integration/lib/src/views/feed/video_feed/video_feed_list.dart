@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/edit_short_video/edit_short_video_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/like_list_view.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/feed/comment_bottom_sheet.dart';
 
 class LMFeedVideoFeedListView extends StatefulWidget {
@@ -105,7 +106,6 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
       _feedBloc.widgets.addAll(state.widgets);
 
       if (state.posts.length < widget.pageSize) {
-        listOfPosts.add(createDummyPostViewData());
         _pagingController.appendLastPage(listOfPosts);
       } else {
         _pagingController.appendPage(listOfPosts, state.pageKey + 1);
@@ -153,33 +153,6 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     ;
   }
 
-  LMPostViewData createDummyPostViewData() {
-    return (LMPostViewDataBuilder()
-          ..id('lm_dummy_id')
-          ..text('This is a dummy post')
-          ..attachments([])
-          ..communityId(1)
-          ..isPinned(false)
-          ..uuid('dummy_uuid')
-          ..user(currentUser!)
-          ..likeCount(0)
-          ..isSaved(false)
-          ..topics([])
-          ..menuItems([])
-          ..createdAt(DateTime.now())
-          ..updatedAt(DateTime.now())
-          ..isLiked(false)
-          ..commentCount(0)
-          ..isEdited(false)
-          ..replies([])
-          ..isReposted(false)
-          ..isRepostedByUser(false)
-          ..repostCount(0)
-          ..isPendingPost(false)
-          ..postStatus(LMPostReviewStatus.approved))
-        .build();
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocListener<LMFeedUniversalBloc, LMFeedUniversalState>(
@@ -189,6 +162,15 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
         child: BlocConsumer<LMFeedPostBloc, LMFeedPostState>(
           bloc: _postBloc,
           listener: _postBlocListener,
+          buildWhen: (previous, current) {
+            if (current is LMFeedPostUpdateState) {
+              if (current.actionType == LMFeedPostActionType.like ||
+                  current.actionType == LMFeedPostActionType.unlike) {
+                return false;
+              }
+            }
+            return true;
+          },
           builder: (context, state) {
             return Stack(
               alignment: AlignmentDirectional.bottomCenter,
@@ -198,14 +180,15 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
                   pagingController: _pagingController,
                   scrollDirection: Axis.vertical,
                   builderDelegate: PagedChildBuilderDelegate(
+                    noMoreItemsIndicatorBuilder: (context) {
+                      return _defAllCaughtUpView();
+                    },
                     itemBuilder: (context, item, index) {
-                      return item.id == 'lm_dummy_id'
-                          ? _defAllCaughtUpView()
-                          : _defVerticalVideoPostView(
-                              item,
-                              MediaQuery.of(context).size,
-                              context,
-                            );
+                      return _defVerticalVideoPostView(
+                        item,
+                        MediaQuery.of(context).size,
+                        context,
+                      );
                     },
                   ),
                 ),
@@ -400,7 +383,6 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
           color: Colors.black,
           child: Center(
             child: LMFeedVideo(
-              // key: GlobalObjectKey(item.id),
               postId: item.id,
               video: item.attachments!.first,
               autoPlay: true,
@@ -434,7 +416,12 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    _defLikeButton(item),
+                    BlocBuilder<LMFeedPostBloc, LMFeedPostState>(
+                      bloc: _postBloc,
+                      builder: (context, state) {
+                        return _defLikeButton(item);
+                      },
+                    ),
                     SizedBox(
                       height: 16,
                     ),
@@ -646,7 +633,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
   LMFeedButton _defLikeButton(LMPostViewData postViewData) {
     return LMFeedButton(
       text: LMFeedText(
-        text: postViewData.likeCount.toString(),
+        text: postViewData.likeCount.toString() + "likes",
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 12,
@@ -696,24 +683,44 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
         }
       },
       onTextTap: () {
-        if (postViewData.likeCount == 0) {
-          return;
-        }
         // check if the user is a guest user
         if (LMFeedUserUtils.isGuestUser()) {
           LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
         LMFeedVideoProvider.instance.pauseCurrentVideo();
-
-        Navigator.of(context, rootNavigator: true).push(
-          MaterialPageRoute(
-            builder: (context) => LMFeedLikesScreen(
-              postId: postViewData.id,
-              widgetSource: _widgetSource,
-            ),
-          ),
-        )..then((value) => LMFeedVideoProvider.instance.playCurrentVideo());
+        showModalBottomSheet(
+          context: context,
+          showDragHandle: true,
+          builder: (context) {
+            return BottomSheet(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.sizeOf(context).height * 0.4,
+                ),
+                onClosing: () {},
+                builder: (context) {
+                  return Column(
+                    children: [
+                      LMFeedText(
+                        text: "Liked",
+                        style: LMFeedTextStyle(
+                          textStyle: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: LMFeedLikeListView(
+                          postId: postViewData.id,
+                          widgetSource: _widgetSource,
+                        ),
+                      ),
+                    ],
+                  );
+                });
+          },
+        );
       },
       style: LMFeedButtonStyle(
         direction: Axis.vertical,
