@@ -33,6 +33,7 @@ class _LMFeedEditShortVideoScreenState
   final config = LMFeedCore.config.composeScreenConfig;
   final ValueNotifier<bool> _postValidationNotifier = ValueNotifier(false);
   bool _isPostValidationRequired = true;
+  final _screenBuilder = LMFeedCore.config.editShortVideoConfig.builder;
 
   LMResponse<void> validatePost() {
     String postText = _textController.text;
@@ -103,8 +104,8 @@ class _LMFeedEditShortVideoScreenState
                   attachment.attachmentMeta.url!.isNotEmpty;
             },
           );
-          return Scaffold(
-            appBar: _defAppBar(),
+          return _screenBuilder.scaffold(
+            appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
             body: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.symmetric(

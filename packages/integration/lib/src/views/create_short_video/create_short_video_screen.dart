@@ -25,6 +25,7 @@ class _LMFeedCreateShortVideoScreenState
   final config = LMFeedCore.config.composeScreenConfig;
   final ValueNotifier<bool> _postValidationNotifier = ValueNotifier(false);
   bool _isPostValidationRequired = true;
+  final _screenBuilder = LMFeedCore.config.createShortVideoConfig.builder;
 
   LMResponse<void> validatePost() {
     String postText = _textController.text;
@@ -69,8 +70,14 @@ class _LMFeedCreateShortVideoScreenState
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    return Scaffold(
-      appBar: _defAppBar(),
+    return _screenBuilder.scaffold(
+      appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
+      canPop: false,
+      onPopInvoked: (isPop) {
+        if (isPop) {
+          _showDefaultDiscardDialog(context);
+        }
+      },
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -323,7 +330,15 @@ class _LMFeedCreateShortVideoScreenState
                   final userTags = _composeBloc.userTags;
                   final user = LMFeedLocalPreference.instance.fetchUserData();
                   final heading = '';
-
+                  final postValidation = validatePost();
+                  if (!postValidation.success) {
+                    LMFeedCore.showSnackBar(
+                      context,
+                      postValidation.errorMessage ?? "Post validation failed",
+                      LMFeedWidgetSource.createShortVideoScreen,
+                    );
+                    return;
+                  }
                   // Add a new post event to the post bloc
                   LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
                     user: user!,
