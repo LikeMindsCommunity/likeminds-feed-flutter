@@ -3,27 +3,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/video_feed_list.dart';
 
-class LMFeedVideoFeedUniversalScreen extends StatefulWidget {
-  const LMFeedVideoFeedUniversalScreen({super.key});
+class LMFeedVideoFeedScreen extends StatefulWidget {
+  const LMFeedVideoFeedScreen({super.key});
 
   @override
-  State<LMFeedVideoFeedUniversalScreen> createState() =>
-      LMFeedVideoFeedUniversalScreenState();
+  State<LMFeedVideoFeedScreen> createState() => LMFeedVideoFeedScreenState();
 }
 
-class LMFeedVideoFeedUniversalScreenState
-    extends State<LMFeedVideoFeedUniversalScreen> {
+class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
   final _theme = LMFeedCore.theme;
+  final _screenBuilder = LMFeedCore.config.videoFeedScreenConfig.builder;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return _screenBuilder.scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Stack(
           children: [
             LMFeedVideoFeedListView(),
-            _defAppBar(),
+            _screenBuilder.appBarBuilder(context, _defAppBar()),
           ],
         ),
       ),

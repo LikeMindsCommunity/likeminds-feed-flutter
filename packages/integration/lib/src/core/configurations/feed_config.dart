@@ -5,6 +5,7 @@ import 'package:likeminds_feed_flutter_core/src/views/activity/configurations/co
 import 'package:likeminds_feed_flutter_core/src/views/compose/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/configurations/config.dart';
@@ -20,6 +21,7 @@ export 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration
 export 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/compose/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
@@ -54,8 +56,6 @@ enum LMFeedThemeType {
 /// Holds configurations classes for each screen
 /// {@endtemplate}
 class LMFeedConfig {
-  // TODO: remove new flag
-  // Flag: new configs
   /// {@macro lm_feed_activity_screen_config}
   final LMFeedActivityScreenConfig activityScreenConfig;
 
@@ -66,6 +66,8 @@ class LMFeedConfig {
   final LMFeedSocialScreenConfig socialFeedScreenConfig;
 
   final LMFeedQnaScreenConfig qnaFeedScreenConfig;
+
+  final LMFeedVideoFeedScreenConfig videoFeedScreenConfig;
 
   /// {@macro lm_feedroom_screen_config}
   final LMFeedroomScreenConfig feedroomScreenConfig;
@@ -108,6 +110,7 @@ class LMFeedConfig {
   LMFeedConfig({
     this.socialFeedScreenConfig = const LMFeedSocialScreenConfig(),
     this.qnaFeedScreenConfig = const LMFeedQnaScreenConfig(),
+    this.videoFeedScreenConfig = const LMFeedVideoFeedScreenConfig(),
     this.postDetailScreenConfig = const LMFeedPostDetailScreenConfig(),
     this.pendingPostScreenConfig = const LMFeedPendingPostsScreenConfig(),
     this.feedroomScreenConfig = const LMFeedroomScreenConfig(),

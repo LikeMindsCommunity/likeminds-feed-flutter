@@ -98,7 +98,7 @@ class _LMCredScreenState extends State<LMCredScreen> {
     }
 
     // define the route
-    const Widget navigationWidget = LMFeedVideoFeedUniversalScreen();
+    const Widget navigationWidget = LMFeedVideoFeedScreen();
     // create the route
     MaterialPageRoute route = MaterialPageRoute(
       builder: (context) => navigationWidget,

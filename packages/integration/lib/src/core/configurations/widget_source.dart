@@ -4,6 +4,7 @@
 enum LMFeedWidgetSource {
   universalFeed,
   personalisedFeed,
+  videoFeed,
   feedroom,
   postDetailScreen,
   userFeed,
