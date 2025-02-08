@@ -3,6 +3,8 @@ import 'package:likeminds_feed_flutter_core/src/core/configurations/feed_builder
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 import 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/create_short_video/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/edit_short_video/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/configurations/config.dart';
@@ -23,6 +25,8 @@ export 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations
 export 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/compose/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/create_short_video/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/edit_short_video/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/media/configurations/config.dart';
@@ -62,6 +66,10 @@ class LMFeedConfig {
   // check for import
   /// {@macro lm_compose_screen_config}
   final LMFeedComposeScreenConfig composeScreenConfig;
+
+  final LMFeedCreateShortVideoConfig createShortVideoConfig;
+
+  final LMFeedEditShortVideoConfig editShortVideoConfig;
 
   final LMFeedSocialScreenConfig socialFeedScreenConfig;
 
@@ -116,6 +124,8 @@ class LMFeedConfig {
     this.feedroomScreenConfig = const LMFeedroomScreenConfig(),
     this.activityScreenConfig = const LMFeedActivityScreenConfig(),
     this.composeScreenConfig = const LMFeedComposeScreenConfig(),
+    this.createShortVideoConfig = const LMFeedCreateShortVideoConfig(),
+    this.editShortVideoConfig = const LMFeedEditShortVideoConfig(),
     this.likeScreenConfig = const LMFeedLikeScreenConfig(),
     this.mediaPreviewScreenConfig = const LMFeedMediaPreviewScreenConfig(),
     this.notificationScreenConfig = const LMFeedNotificationScreenConfig(),

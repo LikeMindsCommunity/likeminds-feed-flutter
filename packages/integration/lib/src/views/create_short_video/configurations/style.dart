@@ -1,0 +1,3 @@
+class LMFeedCreateShortVideoStyle {
+  const LMFeedCreateShortVideoStyle();
+}

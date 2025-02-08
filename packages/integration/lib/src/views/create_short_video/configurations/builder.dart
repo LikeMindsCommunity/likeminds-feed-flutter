@@ -1,0 +1,3 @@
+class LMFeedCreateShortVideoBuilderDelegate {
+  const LMFeedCreateShortVideoBuilderDelegate();
+}

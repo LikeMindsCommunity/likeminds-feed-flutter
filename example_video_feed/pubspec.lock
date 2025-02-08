@@ -633,12 +633,11 @@ packages:
     source: hosted
     version: "3.0.1"
   likeminds_feed:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: likeminds_feed
-      sha256: "59a6a7894ec7aaba1855f56f2be98e252b85ad42da7e000ed61d3cae0fbab7b0"
-      url: "https://pub.dev"
-    source: hosted
+      path: "../../LikeMinds-Flutter-Feed-SDK"
+      relative: true
+    source: path
     version: "1.17.0"
   likeminds_feed_flutter_core:
     dependency: "direct main"
