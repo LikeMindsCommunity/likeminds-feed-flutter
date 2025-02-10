@@ -22,7 +22,7 @@ class _LMFeedCreateShortVideoScreenState
   // Get the post title in all small singular form
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
-  final config = LMFeedCore.config.composeScreenConfig;
+  final config = LMFeedCore.config.createShortVideoConfig;
   final ValueNotifier<bool> _postValidationNotifier = ValueNotifier(false);
   bool _isPostValidationRequired = true;
   final _screenBuilder = LMFeedCore.config.createShortVideoConfig.builder;
@@ -125,6 +125,9 @@ class _LMFeedCreateShortVideoScreenState
               ),
               _screenBuilder.textFieldBuilder(
                   context, _defContentTextField(), _textController, _focusNode),
+              SizedBox(
+                height: 200,
+              ),
             ],
           ),
         ),
@@ -426,7 +429,7 @@ class _LMFeedCreateShortVideoScreenState
     if (!postValidation.success) {
       LMFeedCore.showSnackBar(
         context,
-        postValidation.errorMessage ?? "Post validation failed",
+        postValidation.errorMessage ?? "$postTitleFirstCap validation failed",
         LMFeedWidgetSource.createShortVideoScreen,
       );
       return;
@@ -472,11 +475,8 @@ class _LMFeedCreateShortVideoScreenState
   LMTaggingAheadTextField _defContentTextField() {
     return LMTaggingAheadTextField(
       isDown: true,
-      // taggingEnabled: config!.setting.enableTagging,
-      // maxLines: 200,
-
+      taggingEnabled: config.setting.enableTagging,
       style: LMTaggingAheadTextFieldStyle(
-        minLines: 3,
         decoration: InputDecoration(
           border: InputBorder.none,
           focusedBorder: InputBorder.none,
@@ -494,14 +494,14 @@ class _LMFeedCreateShortVideoScreenState
         ),
       ),
       onTagSelected: (tag) {
-        // composeBloc.userTags.add(tag);
+        _composeBloc.userTags.add(tag);
         LMFeedAnalyticsBloc.instance.add(
           LMFeedFireAnalyticsEvent(
             eventName: LMFeedAnalyticsKeys.userTaggedInPost,
             widgetSource: LMFeedWidgetSource.createPostScreen,
             eventProperties: {
               'tagged_user_id': tag.sdkClientInfo?.uuid ?? tag.uuid,
-              // 'tagged_user_count': composeBloc.userTags.length.toString(),
+              'tagged_user_count': _composeBloc.userTags.length.toString(),
             },
           ),
         );

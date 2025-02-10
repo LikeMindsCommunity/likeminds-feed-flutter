@@ -8,12 +8,12 @@ export 'settings.dart';
 export 'style.dart';
 
 class LMFeedEditShortVideoConfig {
-  final LMFeedEditShortVideoSettings settings;
+  final LMFeedEditShortVideoSettings setting;
   final LMFeedEditShortVideoStyle style;
   final LMFeedEditShortVideoBuilderDelegate builder;
 
   const LMFeedEditShortVideoConfig({
-    this.settings = const LMFeedEditShortVideoSettings(),
+    this.setting = const LMFeedEditShortVideoSettings(),
     this.style = const LMFeedEditShortVideoStyle(),
     this.builder = const LMFeedEditShortVideoBuilderDelegate(),
   });

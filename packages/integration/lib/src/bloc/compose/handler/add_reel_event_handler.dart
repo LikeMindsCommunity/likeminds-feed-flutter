@@ -4,11 +4,8 @@ _addReelEventHandler(
   LMFeedComposeAddReelEvent event,
   Emitter<LMFeedComposeState> emitter,
 ) async {
-  int mediaCount = LMFeedComposeBloc.instance.postMedia.length;
+  emitter(LMFeedComposeMediaLoadingState());
 
-  if (mediaCount == 0) {
-    emitter(LMFeedComposeMediaLoadingState());
-  }
   LMFeedAnalyticsBloc.instance.add(const LMFeedFireAnalyticsEvent(
     eventName: LMFeedAnalyticsKeys.clickedOnAttachment,
     widgetSource: LMFeedWidgetSource.createPostScreen,
@@ -17,7 +14,7 @@ _addReelEventHandler(
   try {
     final LMResponse<List<LMAttachmentViewData>> videos =
         await LMFeedMediaHandler.pickVideos(
-      currentMediaLength: mediaCount,
+      currentMediaLength: 0,
       allowMultiple: false,
       isReelVideo: true,
     );

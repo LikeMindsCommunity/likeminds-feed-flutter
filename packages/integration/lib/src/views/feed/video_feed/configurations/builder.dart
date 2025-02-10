@@ -82,7 +82,7 @@ class LMFeedVideoFeedScreenBuilderDelegate {
     return appBar;
   }
 
-  /// page view builder 
+  /// page view builder
   Widget pageViewBuilder(BuildContext context, PagedPageView pageView) {
     return pageView;
   }
@@ -116,12 +116,36 @@ class LMFeedVideoFeedScreenBuilderDelegate {
   }
 
   /// first page error indicator builder
-  Widget Function(BuildContext)? firstPageErrorIndicatorBuilder(BuildContext context) {
+  Widget Function(BuildContext)? firstPageErrorIndicatorBuilder(
+      BuildContext context) {
     return null;
   }
 
   /// new page error indicator builder
-  Widget Function(BuildContext)? newPageErrorIndicatorBuilder(BuildContext context) {
+  Widget Function(BuildContext)? newPageErrorIndicatorBuilder(
+      BuildContext context) {
     return null;
+  }
+
+  /// uploading post content builder
+  Widget uploadingPostContentBuilder(
+    BuildContext context,
+    Container child,
+    LMFeedLoader loader,
+    LMFeedText text,
+    bool isUploading,
+    bool isEditing,
+  ) {
+    return child;
+  }
+
+  /// text builder for uploading post
+  Widget uploadingPostTextBuilder(BuildContext context, LMFeedText text) {
+    return text;
+  }
+
+  /// loader builder for uploading post
+  Widget uploadingPostLoaderBuilder(BuildContext context, LMFeedLoader loader) {
+    return loader;
   }
 }

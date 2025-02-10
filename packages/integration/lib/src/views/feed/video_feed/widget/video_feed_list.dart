@@ -300,7 +300,15 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
             _defPageView(),
           ),
         ),
-        if (_isPostUploading || _isPostEditing) _defUploadingLoader()
+        if (_isPostUploading || _isPostEditing)
+          _screenBuilder.uploadingPostContentBuilder(
+            context,
+            _defUploadingLoader(),
+            _defLoaderForUploading(),
+            _defUploadingText(),
+            _isPostUploading,
+            _isPostEditing,
+          )
       ],
     );
   }
@@ -393,27 +401,41 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          LMFeedLoader(
-            style: LMFeedLoaderStyle(
-              strokeWidth: 3,
-              height: 24,
-              width: 24,
-            ),
+          _screenBuilder.uploadingPostLoaderBuilder(
+            context,
+            _defLoaderForUploading(),
           ),
           SizedBox(
             width: 16,
           ),
-          LMFeedText(
-            text: "${_isPostEditing ? "Saving" : "Posting"} reel",
-            style: LMFeedTextStyle(
-              textStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                color: _theme.onContainer,
-              ),
-            ),
+          _screenBuilder.uploadingPostTextBuilder(
+            context,
+            _defUploadingText(),
           ),
         ],
+      ),
+    );
+  }
+
+  LMFeedLoader _defLoaderForUploading() {
+    return LMFeedLoader(
+      style: LMFeedLoaderStyle(
+        strokeWidth: 3,
+        height: 24,
+        width: 24,
+      ),
+    );
+  }
+
+  LMFeedText _defUploadingText() {
+    return LMFeedText(
+      text: "${_isPostEditing ? "Saving" : "Posting"} reel",
+      style: LMFeedTextStyle(
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: _theme.onContainer,
+        ),
       ),
     );
   }

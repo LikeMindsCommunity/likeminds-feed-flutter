@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/like_list_view.dart';
 part 'handler/likes_screen_handler.dart';
 
 class LMFeedLikesScreen extends StatefulWidget {
@@ -140,6 +139,9 @@ class LMFeedLikeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String likeText = LMFeedPostUtils.getLikeTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural,
+    );
     if (user != null) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -166,8 +168,8 @@ class LMFeedLikeTile extends StatelessWidget {
               ),
       );
     } else {
-      return const Center(
-        child: LMFeedText(text: "No likes yet"),
+      return Center(
+        child: LMFeedText(text: "No $likeText yet"),
       );
     }
   }

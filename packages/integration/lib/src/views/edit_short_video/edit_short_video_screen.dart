@@ -30,7 +30,7 @@ class _LMFeedEditShortVideoScreenState
   // Get the post title in all small singular form
   String postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
-  final config = LMFeedCore.config.composeScreenConfig;
+  final config = LMFeedCore.config.editShortVideoConfig;
   final ValueNotifier<bool> _postValidationNotifier = ValueNotifier(false);
   bool _isPostValidationRequired = true;
   final _screenBuilder = LMFeedCore.config.editShortVideoConfig.builder;
@@ -160,7 +160,7 @@ class _LMFeedEditShortVideoScreenState
           backgroundColor: _theme.container,
           body: Center(
             child: LMFeedText(
-              text: 'Failed to load post',
+              text: 'Failed to load $postTitleSmallCap',
               style: LMFeedTextStyle(
                 textStyle: TextStyle(
                   fontSize: 16,
@@ -466,7 +466,7 @@ class _LMFeedEditShortVideoScreenState
     if (!postValidation.success) {
       LMFeedCore.showSnackBar(
         context,
-        postValidation.errorMessage ?? "Post validation failed",
+        postValidation.errorMessage ?? "$postTitleFirstCap validation failed",
         LMFeedWidgetSource.editShortVideoScreen,
       );
       return;
@@ -512,9 +512,7 @@ class _LMFeedEditShortVideoScreenState
   LMTaggingAheadTextField _defContentTextField() {
     return LMTaggingAheadTextField(
       isDown: true,
-      // taggingEnabled: config!.setting.enableTagging,
-      // maxLines: 200,
-
+      taggingEnabled: config.setting.enableTagging,
       style: LMTaggingAheadTextFieldStyle(
         minLines: 3,
         decoration: InputDecoration(
