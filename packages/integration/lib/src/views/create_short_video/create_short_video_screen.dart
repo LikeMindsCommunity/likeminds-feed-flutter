@@ -27,6 +27,17 @@ class _LMFeedCreateShortVideoScreenState
   bool _isPostValidationRequired = true;
   final _screenBuilder = LMFeedCore.config.createShortVideoConfig.builder;
 
+  LMAttachmentViewData? _getFirstReelAttachment(
+      List<LMAttachmentViewData> attachments) {
+    for (final attachment in attachments) {
+      if (attachment.attachmentType == LMMediaType.reel &&
+          attachment.attachmentMeta.path != null) {
+        return attachment;
+      }
+    }
+    return null;
+  }
+
   LMResponse<void> validatePost() {
     String postText = _textController.text;
     postText = postText.trim();
@@ -70,8 +81,17 @@ class _LMFeedCreateShortVideoScreenState
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
+    final attachment = _getFirstReelAttachment(_composeBloc.postMedia);
     return _screenBuilder.scaffold(
-      appBar: _screenBuilder.appBarBuilder(context, _defAppBar()),
+      appBar: _screenBuilder.appBarBuilder(
+        context,
+        _defAppBar(),
+        _onPostCreate,
+        validatePost,
+        _defPostButton(),
+        _defCancelButton(),
+        _onPostValidationFailed,
+      ),
       canPop: false,
       onPopInvoked: (isPop) {
         if (isPop) {
@@ -88,29 +108,53 @@ class _LMFeedCreateShortVideoScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Container(
-                  clipBehavior: Clip.hardEdge,
-                  height: 420,
-                  width: size.width * 0.7,
-                  margin: const EdgeInsets.only(bottom: 64),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  alignment: Alignment.center,
-                  child: LMFeedVideo(
-                    video: _composeBloc.postMedia.first,
-                    // style: style?.mediaStyle?.videoStyle,
-                    postId:
-                        "${_composeBloc.postMedia.first.attachmentMeta.path.toString()}",
-                  ),
-                ),
+                child: attachment != null
+                    ? _screenBuilder.videoPreviewContainerBuilder(
+                        context,
+                        _defVideoPreviewContainer(size, attachment),
+                        _defVideoPreview(attachment),
+                      )
+                    : LMFeedText(text: "No video found"),
               ),
-              _defTopicsContainer(context),
-              _defContentTextField(),
+              _screenBuilder.topicChipContainerBuilder(
+                context,
+                _defTopicsContainer(context),
+                _selectedTopics.copy(),
+                _defSelectTopicsButton(context),
+                _defEditSelectedTopicsButton(context),
+              ),
+              _screenBuilder.textFieldBuilder(
+                  context, _defContentTextField(), _textController, _focusNode),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Container _defVideoPreviewContainer(
+      Size size, LMAttachmentViewData? attachment) {
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      height: 420,
+      width: size.width * 0.7,
+      margin: const EdgeInsets.only(bottom: 64),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      alignment: Alignment.center,
+      child: _screenBuilder.videoPreviewBuilder(
+        context,
+        _defVideoPreview(attachment!),
+        attachment,
+      ),
+    );
+  }
+
+  LMFeedVideo _defVideoPreview(LMAttachmentViewData attachment) {
+    return LMFeedVideo(
+      video: attachment,
+      postId: "${_composeBloc.postMedia.first.attachmentMeta.path.toString()}",
     );
   }
 
@@ -188,14 +232,26 @@ class _LMFeedCreateShortVideoScreenState
     );
   }
 
-  Wrap _defTopicsContainer(BuildContext context) {
-    return Wrap(
-      children: [
-        for (final topic in _selectedTopics) _defTopicChip(topic),
-        _selectedTopics.isEmpty
-            ? _defSelectTopicsButton(context)
-            : _defEditSelectedTopicsButton(context),
-      ],
+  Container _defTopicsContainer(BuildContext context) {
+    return Container(
+      child: Wrap(
+        children: [
+          for (final topic in _selectedTopics)
+            _screenBuilder.topicChipBuilder(
+              context,
+              _defTopicChip(topic),
+            ),
+          _selectedTopics.isEmpty
+              ? _screenBuilder.selectTopicButtonBuilder(
+                  context,
+                  _defSelectTopicsButton(context),
+                )
+              : _screenBuilder.editTopicButtonBuilder(
+                  context,
+                  _defEditSelectedTopicsButton(context),
+                ),
+        ],
+      ),
     );
   }
 
@@ -323,51 +379,69 @@ class _LMFeedCreateShortVideoScreenState
         ValueListenableBuilder(
             valueListenable: _postValidationNotifier,
             builder: (context, value, child) {
-              return LMFeedButton(
-                onTap: () {
-                  final result = _textController.text;
-                  final selectedTopics = _selectedTopics;
-                  final userTags = _composeBloc.userTags;
-                  final user = LMFeedLocalPreference.instance.fetchUserData();
-                  final heading = '';
-                  final postValidation = validatePost();
-                  if (!postValidation.success) {
-                    LMFeedCore.showSnackBar(
-                      context,
-                      postValidation.errorMessage ?? "Post validation failed",
-                      LMFeedWidgetSource.createShortVideoScreen,
-                    );
-                    return;
-                  }
-                  // Add a new post event to the post bloc
-                  LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
-                    user: user!,
-                    postText: result,
-                    selectedTopicIds: selectedTopics.map((e) => e.id).toList(),
-                    postMedia: _composeBloc.postMedia.copy(),
-                    heading: heading,
-                    userTagged: userTags,
-                  ));
-                  // Pop the screen
-                  Navigator.pop(context);
-                },
-                text: LMFeedText(
-                  text: 'POST',
-                  style: LMFeedTextStyle(
-                    textStyle: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: value ? _theme.primaryColor : _theme.onContainer,
-                    ),
-                  ),
-                ),
-              );
+              return _defPostButton();
             }),
       ],
       style: LMFeedAppBarStyle(
         height: 56,
       ),
     );
+  }
+
+  LMFeedButton _defPostButton() {
+    return LMFeedButton(
+      onTap: _onPostCreate,
+      text: LMFeedText(
+        text: 'POST',
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: _postValidationNotifier.value
+                ? _theme.primaryColor
+                : _theme.onContainer,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onPostValidationFailed(String errorMessage) {
+    // Show a snackbar with the error message
+    LMFeedCore.showSnackBar(
+      context,
+      errorMessage,
+      LMFeedWidgetSource
+          .createShortVideoScreen, // Source of the widget, useful for tracking
+    );
+  }
+
+  void _onPostCreate() {
+    final result = _textController.text;
+    final selectedTopics = _selectedTopics;
+    final userTags = _composeBloc.userTags;
+    final user = LMFeedLocalPreference.instance.fetchUserData();
+    final heading = '';
+    final postValidation = validatePost();
+    if (!postValidation.success) {
+      LMFeedCore.showSnackBar(
+        context,
+        postValidation.errorMessage ?? "Post validation failed",
+        LMFeedWidgetSource.createShortVideoScreen,
+      );
+      return;
+    }
+    // Add a new post event to the post bloc
+    LMFeedPostBloc.instance.add(LMFeedCreateNewPostEvent(
+      user: user!,
+      postText: result,
+      selectedTopicIds: selectedTopics.map((e) => e.id).toList(),
+      postMedia: _composeBloc.postMedia.copy(),
+      heading: heading,
+      userTagged: userTags,
+    ));
+    // Pop the screen
+    Navigator.pop(context);
   }
 
   // Default "Cancel" button widget creation
