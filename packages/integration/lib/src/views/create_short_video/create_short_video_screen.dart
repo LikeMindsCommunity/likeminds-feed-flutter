@@ -94,7 +94,7 @@ class _LMFeedCreateShortVideoScreenState
       ),
       canPop: false,
       onPopInvoked: (isPop) {
-        if (isPop) {
+        if (!isPop) {
           _showDefaultDiscardDialog(context);
         }
       },
