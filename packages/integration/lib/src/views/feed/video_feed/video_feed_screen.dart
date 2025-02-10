@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/video_feed_list.dart';
+
+/// export all the required files
+export 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/widget/video_feed_list.dart';
+export 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/widget/vertical_post.dart';
 
 class LMFeedVideoFeedScreen extends StatefulWidget {
   const LMFeedVideoFeedScreen({super.key});

@@ -1,9 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/core/core.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/widget/vertical_post.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
-class LMFeedVideoFeedScreenBuilderDelegate extends LMFeedWidgetBuilderDelegate {
+class LMFeedVideoFeedScreenBuilderDelegate {
   const LMFeedVideoFeedScreenBuilderDelegate();
 
   /// Default widget builder delegate for the feed screen.
@@ -11,7 +13,6 @@ class LMFeedVideoFeedScreenBuilderDelegate extends LMFeedWidgetBuilderDelegate {
       LMFeedCore.config.widgetBuilderDelegate;
 
   // scaffold builder
-  @override
   Widget scaffold({
     Key? key,
     bool extendBody = false,
@@ -79,5 +80,48 @@ class LMFeedVideoFeedScreenBuilderDelegate extends LMFeedWidgetBuilderDelegate {
   /// Override this method to provide a custom app bar for the QnA screen.
   PreferredSizeWidget appBarBuilder(BuildContext context, LMFeedAppBar appBar) {
     return appBar;
+  }
+
+  /// page view builder 
+  Widget pageViewBuilder(BuildContext context, PagedPageView pageView) {
+    return pageView;
+  }
+
+  /// vertical post view builder
+  Widget postViewBuilder(BuildContext context,
+      LMFeedVerticalVideoPost postWidget, LMPostViewData postViewData) {
+    return postWidget;
+  }
+
+  /// no item indicator builder
+  Widget noItemIndicatorBuilder(BuildContext context, Widget child) {
+    return child;
+  }
+
+  /// no more items indicator builder
+  Widget noMoreItemsIndicatorBuilder(BuildContext context, Widget child) {
+    return child;
+  }
+
+  /// first page progress indicator builder
+  Widget firstPageProgressIndicatorBuilder(
+      BuildContext context, LMFeedLoader child) {
+    return child;
+  }
+
+  /// new page progress indicator builder
+  Widget newPageProgressIndicatorBuilder(
+      BuildContext context, LMFeedLoader child) {
+    return child;
+  }
+
+  /// first page error indicator builder
+  Widget Function(BuildContext)? firstPageErrorIndicatorBuilder(BuildContext context) {
+    return null;
+  }
+
+  /// new page error indicator builder
+  Widget Function(BuildContext)? newPageErrorIndicatorBuilder(BuildContext context) {
+    return null;
   }
 }
