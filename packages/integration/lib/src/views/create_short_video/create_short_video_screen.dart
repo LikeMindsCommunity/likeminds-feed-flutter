@@ -420,7 +420,7 @@ class _LMFeedCreateShortVideoScreenState
   }
 
   void _onPostCreate() {
-    final result = _textController.text;
+    final result = _textController.text.trim();
     final selectedTopics = _selectedTopics;
     final userTags = _composeBloc.userTags;
     final user = LMFeedLocalPreference.instance.fetchUserData();

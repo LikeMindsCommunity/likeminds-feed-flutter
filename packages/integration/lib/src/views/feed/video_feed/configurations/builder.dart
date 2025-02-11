@@ -1,9 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/core/core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/widget/vertical_post.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 class LMFeedVideoFeedScreenBuilderDelegate {
   const LMFeedVideoFeedScreenBuilderDelegate();
@@ -147,5 +144,17 @@ class LMFeedVideoFeedScreenBuilderDelegate {
   /// loader builder for uploading post
   Widget uploadingPostLoaderBuilder(BuildContext context, LMFeedLoader loader) {
     return loader;
+  }
+
+  /// retry button builder for uploading post
+  Widget uploadingPostRetryButtonBuilder(
+      BuildContext context, LMFeedButton button) {
+    return button;
+  }
+
+  /// cancel button builder for uploading post
+  Widget uploadingPostCancelButtonBuilder(
+      BuildContext context, LMFeedButton button) {
+    return button;
   }
 }

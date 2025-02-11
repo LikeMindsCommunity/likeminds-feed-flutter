@@ -19,7 +19,8 @@ class LMFeedVideoFeedListView extends StatefulWidget {
       _LMFeedVideoFeedListViewState();
 }
 
-class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> with WidgetsBindingObserver {
+class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
+    with WidgetsBindingObserver {
   final _theme = LMFeedCore.theme;
   final _screenBuilder = LMFeedCore.config.videoFeedScreenConfig.builder;
   final _pagingController = PagingController<int, LMPostViewData>(
@@ -88,9 +89,27 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> with 
     _addPaginationListener();
     // Adds a feed opened event to the LMFeedAnalyticsBloc
     _addAnalyticsEvent();
-    
-
+    WidgetsBinding.instance.addObserver(this);
     _postBloc.add(LMFeedFetchTempPostEvent());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    // play current video when app is resumed
+    if (state == AppLifecycleState.resumed) {
+      LMFeedVideoProvider.instance.playCurrentVideo();
+    } else {
+      // pause current video when app is paused
+      LMFeedVideoProvider.instance.pauseCurrentVideo();
+    }
   }
 
   // function to trigger the post seen event
@@ -208,6 +227,10 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> with 
   }
 
   void _onPageChanged(int index) {
+    // set current video id and position to media provider
+    LMFeedVideoProvider.instance.currentVisiblePostId =
+        _pagingController.itemList?[index].id;
+    LMFeedVideoProvider.instance.currentVisiblePostPosition = 0;
     if (widget.feedType == LMFeedType.personalised) {
       _handleSwipe();
     }
@@ -339,25 +362,13 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> with 
         firstPageProgressIndicatorBuilder: (context) {
           return _screenBuilder.firstPageProgressIndicatorBuilder(
             context,
-            LMFeedLoader(
-              style: LMFeedLoaderStyle(
-                strokeWidth: 3,
-                height: 56,
-                width: 56,
-              ),
-            ),
+            LMFeedLoader(),
           );
         },
         newPageProgressIndicatorBuilder: (context) {
           return _screenBuilder.newPageProgressIndicatorBuilder(
             context,
-            LMFeedLoader(
-              style: LMFeedLoaderStyle(
-                strokeWidth: 3,
-                height: 56,
-                width: 56,
-              ),
-            ),
+            LMFeedLoader(),
           );
         },
         firstPageErrorIndicatorBuilder:
@@ -420,13 +431,16 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> with 
           ),
           if (_isPostUploadingFailed) ...[
             Spacer(),
-            _defRetryButton(),
+            _screenBuilder.uploadingPostRetryButtonBuilder(
+                context, _defRetryButton()),
             SizedBox(
               width: 16,
             ),
-            _defCancelButton(
-              state,
-            )
+            _screenBuilder.uploadingPostCancelButtonBuilder(
+                context,
+                _defCancelButton(
+                  state,
+                )),
           ],
         ],
       ),

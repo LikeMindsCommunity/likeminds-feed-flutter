@@ -93,7 +93,8 @@ class LMFeedVideo extends StatefulWidget {
   }
 }
 
-class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
+class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo>
+    with WidgetsBindingObserver {
   // Notifier to rebuild the overlay
   ValueNotifier<bool> rebuildOverlay = ValueNotifier(false);
 
@@ -127,6 +128,10 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   // Future to initialize the video
   Future<void>? initialiseVideo;
 
+  bool _isBackgroundState = false;
+
+  WidgetVisibility _visibility = WidgetVisibility.VISIBLE;
+
   @override
   void dispose() async {
     // Print debug message
@@ -135,8 +140,25 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     // Cancel the timer
     _timer?.cancel();
 
+    WidgetsBinding.instance.removeObserver(this);
+
     // Call the superclass dispose method
     super.dispose();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    /// force pause the video when app goes to background
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      _isBackgroundState = true;
+      controller?.player.pause();
+    } else if (_isBackgroundState) {
+      _isBackgroundState = false;
+    }
   }
 
   @override
@@ -157,7 +179,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   @override
   void initState() {
     super.initState();
-
+    WidgetsBinding.instance.addObserver(this);
     // Set the thumbnail URL if available
     if (widget.video.attachmentMeta.thumbnailUrl != null) {
       thumbnailUrl = widget.video.attachmentMeta.thumbnailUrl;
@@ -189,6 +211,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
 
   @override
   void onVisibilityChanged(WidgetVisibility visibility) {
+    _visibility = visibility;
     // Pause the video if the widget is not visible
     if (visibility == WidgetVisibility.INVISIBLE) {
       controller?.player.pause();
@@ -331,7 +354,9 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                         if (visiblePercentage < 100) {
                           controller?.player.pause();
                         }
-                        if (visiblePercentage == 100 && widget.autoPlay) {
+                        if (visiblePercentage == 100 &&
+                            widget.autoPlay &&
+                            !_isBackgroundState) {
                           LMFeedVideoProvider.instance.currentVisiblePostId =
                               widget.postId;
                           controller?.player.play();

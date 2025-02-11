@@ -460,7 +460,7 @@ class _LMFeedEditShortVideoScreenState
   }
 
   void _onPostEdit() {
-    final result = _textController.text;
+    final result = _textController.text.trim();
     final selectedTopics = _selectedTopics;
     final postValidation = validatePost();
     if (!postValidation.success) {

@@ -61,6 +61,7 @@ class LMAttachmentViewDataConvertor {
         path: attachmentViewData.attachmentMeta.path,
         bytes: attachmentViewData.attachmentMeta.bytes,
         name: attachmentViewData.attachmentMeta.name,
+        thumbnailUrl: attachmentViewData.attachmentMeta.thumbnailUrl,
       ),
     );
   }
