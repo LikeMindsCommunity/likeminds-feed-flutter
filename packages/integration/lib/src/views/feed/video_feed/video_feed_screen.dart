@@ -16,6 +16,51 @@ class LMFeedVideoFeedScreen extends StatefulWidget {
 class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
   final _theme = LMFeedCore.theme;
   final _screenBuilder = LMFeedCore.config.videoFeedScreenConfig.builder;
+  bool _isPostUploading = false;
+  bool _isPostEditing = false;
+  final _userPostingRights = LMFeedUserUtils.checkPostCreationRights();
+  final _postTitleSmallCap =
+      LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+
+  @override
+  void initState() {
+    super.initState();
+    _addPostBlocListener();
+  }
+
+  void _addPostBlocListener() {
+    LMFeedPostBloc.instance.stream.listen((state) {
+      switch (state.runtimeType) {
+        case LMFeedNewPostUploadingState:
+          _isPostUploading = true;
+          break;
+        case LMFeedNewPostUploadedState:
+          _isPostUploading = false;
+          break;
+        case LMFeedNewPostErrorState:
+          _isPostUploading = false;
+          break;
+        case LMFeedEditPostUploadingState:
+          _isPostEditing = true;
+          break;
+        case LMFeedEditPostUploadedState:
+          _isPostEditing = false;
+          break;
+        case LMFeedEditPostErrorState:
+          _isPostEditing = false;
+          break;
+        case LMFeedMediaUploadErrorState:
+          _isPostUploading = true;
+          break;
+        case LMFeedNewPostInitiateState:
+          _isPostUploading = false;
+          _isPostEditing = false;
+          break;
+        default:
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,53 +118,92 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
               }));
             }
           },
-          child: LMFeedButton(
-            onTap: () {
-              LMFeedComposeBloc.instance.add(
-                LMFeedComposeAddReelEvent(),
-              );
-            },
-            text: LMFeedText(
-              text: 'New post',
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: _theme.container,
-                ),
-              ),
-            ),
-            style: LMFeedButtonStyle(
-              backgroundColor: _theme.onContainer.withOpacity(0.1),
-              padding: EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              borderRadius: 50,
-              gap: 6,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(
-                    0.1,
-                  ),
-                  offset: Offset(0, 2),
-                  blurRadius: 4,
-                ),
-              ],
-              icon: LMFeedIcon(
-                type: LMFeedIconType.svg,
-                assetPath: lmCreateReelSvg,
-                style: LMFeedIconStyle(
-                  color: _theme.container,
-                  size: 20,
-                ),
-              ),
-              margin: EdgeInsets.only(
-                right: 9,
-              ),
-            ),
-          ),
+          child: _defNewPostButton(),
         )
       ],
+    );
+  }
+
+  LMFeedButton _defNewPostButton() {
+    return LMFeedButton(
+      onTap: () {
+        // check if the user have posting rights
+        if (_userPostingRights) {
+          // check if the user is a guest user
+          if (LMFeedUserUtils.isGuestUser()) {
+            LMFeedCore.instance.lmFeedCoreCallback?.loginRequired
+                ?.call(context);
+            return;
+          }
+          // check if a post failed to upload
+          // and stored in the cache as temporary post
+          final value = LMFeedCore.client.getTemporaryPost();
+          if (value.success) {
+            LMFeedCore.showSnackBar(
+              context,
+              'A $_postTitleSmallCap is already uploading.',
+              LMFeedWidgetSource.videoFeed,
+            );
+            return;
+          }
+          // if no post is uploading then emit add reel event
+          if (!_isPostUploading && !_isPostEditing) {
+            LMFeedComposeBloc.instance.add(
+              LMFeedComposeAddReelEvent(),
+            );
+          } else {
+            LMFeedCore.showSnackBar(
+              context,
+              'A $_postTitleSmallCap is already uploading.',
+              LMFeedWidgetSource.videoFeed,
+            );
+          }
+        } else {
+          LMFeedCore.showSnackBar(
+            context,
+            "You do not have permission to create a $_postTitleSmallCap",
+            LMFeedWidgetSource.videoFeed,
+          );
+        }
+      },
+      text: LMFeedText(
+        text: 'New post',
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: _theme.container,
+          ),
+        ),
+      ),
+      style: LMFeedButtonStyle(
+        backgroundColor: _theme.onContainer.withOpacity(0.1),
+        padding: EdgeInsets.symmetric(
+          horizontal: 16,
+        ),
+        borderRadius: 50,
+        gap: 6,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(
+              0.1,
+            ),
+            offset: Offset(0, 2),
+            blurRadius: 4,
+          ),
+        ],
+        icon: LMFeedIcon(
+          type: LMFeedIconType.svg,
+          assetPath: lmCreateReelSvg,
+          style: LMFeedIconStyle(
+            color: _theme.container,
+            size: 20,
+          ),
+        ),
+        margin: EdgeInsets.only(
+          right: 9,
+        ),
+      ),
     );
   }
 }

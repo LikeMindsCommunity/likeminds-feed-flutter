@@ -19,7 +19,7 @@ class LMFeedVideoFeedListView extends StatefulWidget {
       _LMFeedVideoFeedListViewState();
 }
 
-class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
+class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> with WidgetsBindingObserver {
   final _theme = LMFeedCore.theme;
   final _screenBuilder = LMFeedCore.config.videoFeedScreenConfig.builder;
   final _pagingController = PagingController<int, LMPostViewData>(
@@ -29,6 +29,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
   LMUserViewData? currentUser = LMFeedLocalPreference.instance.fetchUserData();
   bool _isPostUploading = false;
   bool _isPostEditing = false;
+  bool _isPostUploadingFailed = false;
   // bloc to handle universal feed
   final LMFeedUniversalBloc _universalFeedBloc = LMFeedUniversalBloc.instance;
   // bloc to handle personalised feed
@@ -87,6 +88,9 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     _addPaginationListener();
     // Adds a feed opened event to the LMFeedAnalyticsBloc
     _addAnalyticsEvent();
+    
+
+    _postBloc.add(LMFeedFetchTempPostEvent());
   }
 
   // function to trigger the post seen event
@@ -276,14 +280,14 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
             return true;
           },
           builder: (context, state) {
-            return _defBuilderView();
+            return _defBuilderView(state);
           },
         ),
       ),
     );
   }
 
-  Stack _defBuilderView() {
+  Stack _defBuilderView(LMFeedPostState state) {
     return Stack(
       alignment: AlignmentDirectional.bottomCenter,
       children: [
@@ -303,12 +307,13 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
         if (_isPostUploading || _isPostEditing)
           _screenBuilder.uploadingPostContentBuilder(
             context,
-            _defUploadingLoader(),
+            _defUploadingLoader(state),
             _defLoaderForUploading(),
             _defUploadingText(),
             _isPostUploading,
             _isPostEditing,
-          )
+          ),
+        if (_isPostUploadingFailed) _defUploadingLoader(state),
       ],
     );
   }
@@ -377,7 +382,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
     );
   }
 
-  Container _defUploadingLoader() {
+  Container _defUploadingLoader(LMFeedPostState state) {
     return Container(
       height: 56,
       margin: EdgeInsets.symmetric(
@@ -401,10 +406,11 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          _screenBuilder.uploadingPostLoaderBuilder(
-            context,
-            _defLoaderForUploading(),
-          ),
+          if (_isPostEditing || _isPostUploading)
+            _screenBuilder.uploadingPostLoaderBuilder(
+              context,
+              _defLoaderForUploading(),
+            ),
           SizedBox(
             width: 16,
           ),
@@ -412,8 +418,62 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
             context,
             _defUploadingText(),
           ),
+          if (_isPostUploadingFailed) ...[
+            Spacer(),
+            _defRetryButton(),
+            SizedBox(
+              width: 16,
+            ),
+            _defCancelButton(
+              state,
+            )
+          ],
         ],
       ),
+    );
+  }
+
+  LMFeedButton _defRetryButton() {
+    return LMFeedButton(
+      onTap: () {
+        _isPostUploadingFailed = false;
+        _postBloc.add(LMFeedRetryPostUploadEvent());
+      },
+      text: LMFeedText(
+          text: "Retry",
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: _theme.onContainer,
+            ),
+          )),
+    );
+  }
+
+  LMFeedButton _defCancelButton(LMFeedPostState state) {
+    return LMFeedButton(
+      onTap: () async {
+        if (state is LMFeedMediaUploadErrorState) {
+          // delete the temporary post from db
+          final DeleteTemporaryPostRequest deleteTemporaryPostRequest =
+              (DeleteTemporaryPostRequestBuilder()
+                    ..temporaryPostId(state.tempId))
+                  .build();
+          await LMFeedCore.instance.lmFeedClient
+              .deleteTemporaryPost(deleteTemporaryPostRequest);
+          _postBloc.add(LMFeedPostInitiateEvent());
+        }
+      },
+      text: LMFeedText(
+          text: "Cancel",
+          style: LMFeedTextStyle(
+            textStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: _theme.onContainer,
+            ),
+          )),
     );
   }
 
@@ -429,7 +489,8 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
 
   LMFeedText _defUploadingText() {
     return LMFeedText(
-      text: "${_isPostEditing ? "Saving" : "Posting"} reel",
+      text:
+          "${_isPostEditing ? "Saving" : "Posting"} reel ${_isPostUploadingFailed ? "failed" : ""}",
       style: LMFeedTextStyle(
         textStyle: TextStyle(
           fontSize: 16,
@@ -490,10 +551,15 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
   }
 
   void _postBlocListener(BuildContext context, LMFeedPostState state) {
+    if (state is LMFeedNewPostInitiateState) {
+      _isPostUploading = false;
+      _isPostEditing = false;
+      _isPostUploadingFailed = false;
+    }
     if (state is LMFeedNewPostUploadingState) {
       _isPostUploading = true;
     }
-    if (state is LMFeedEditPostUploadedState) {
+    if (state is LMFeedEditPostUploadingState) {
       _isPostEditing = true;
     }
     if (state is LMFeedPostDeletedState) {
@@ -517,7 +583,6 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
         '$postTitleFirstCap Created',
         _widgetSource,
       );
-      // _scrollToTop();
     }
     if (state is LMFeedEditPostUploadedState) {
       _isPostEditing = false;
@@ -538,7 +603,21 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView> {
           context, '$postTitleFirstCap Edited', _widgetSource);
     }
     if (state is LMFeedNewPostErrorState) {
+      // marked it true to show the error indicator
+      _isPostUploadingFailed = true;
       _isPostUploading = false;
+      LMFeedCore.showSnackBar(
+        context,
+        state.errorMessage,
+        _widgetSource,
+      );
+    }
+    if (state is LMFeedMediaUploadErrorState) {
+      _isPostUploadingFailed = true;
+      _isPostUploading = false;
+    }
+    if (state is LMFeedEditPostErrorState) {
+      _isPostEditing = false;
       LMFeedCore.showSnackBar(
         context,
         state.errorMessage,
