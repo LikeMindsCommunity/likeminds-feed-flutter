@@ -79,27 +79,7 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
 
   LMFeedAppBar _defAppBar() {
     return LMFeedAppBar(
-      title: LMFeedText(
-        text: 'Reels',
-        onTap: () {},
-        style: LMFeedTextStyle(
-          margin: EdgeInsets.only(
-            left: 16,
-          ),
-          textStyle: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: _theme.container,
-            shadows: [
-              Shadow(
-                color: Colors.grey.withOpacity(0.1),
-                offset: Offset(0, 2),
-                blurRadius: 4,
-              ),
-            ],
-          ),
-        ),
-      ),
+      title: _screenBuilder.titleTextBuilder(context, _defTitleText()),
       leading: SizedBox(),
       style: LMFeedAppBarStyle(
         height: 56,
@@ -112,15 +92,41 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
             // if state is added video
             // navigate to create short video screen
             if (state is LMFeedComposeAddedReelState) {
-              debugPrint(LMFeedComposeBloc.instance.postMedia.toString());
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return LMFeedCreateShortVideoScreen();
               }));
             }
           },
-          child: _defNewPostButton(),
+          child: _screenBuilder.createPostButtonBuilder(
+            context,
+            _defNewPostButton(),
+          ),
         )
       ],
+    );
+  }
+
+  LMFeedText _defTitleText() {
+    return LMFeedText(
+      text: 'Reels',
+      onTap: () {},
+      style: LMFeedTextStyle(
+        margin: EdgeInsets.only(
+          left: 16,
+        ),
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: _theme.container,
+          shadows: [
+            Shadow(
+              color: Colors.grey.withOpacity(0.1),
+              offset: Offset(0, 2),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -127,7 +127,7 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                 valueListenable: reportListener,
                 builder: (context, state, child) {
                   if (state == LMFeedReportState.loading) {
-                    return _defLoader();
+                    return _widgetBuilder.loaderBuilder(context, _defLoader());
                   } else if (state == LMFeedReportState.success) {
                     return _defSuccessStateUI();
                   }

@@ -79,6 +79,16 @@ class LMFeedVideoFeedScreenBuilderDelegate {
     return appBar;
   }
 
+  /// title text builder
+  Widget titleTextBuilder(BuildContext context, LMFeedText text) {
+    return text;
+  }
+
+  /// create post button builder
+  Widget createPostButtonBuilder(BuildContext context, LMFeedButton button) {
+    return button;
+  }
+
   /// page view builder
   Widget pageViewBuilder(BuildContext context, PagedPageView pageView) {
     return pageView;

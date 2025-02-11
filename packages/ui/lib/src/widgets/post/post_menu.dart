@@ -335,16 +335,18 @@ class LMFeedMenu extends StatelessWidget {
   /// {@endtemplate}
   ///
   LMFeedMenu copyWith({
-    LMFeedIcon? menuIcon,
     List<LMPopUpMenuItemViewData>? menuItems,
     Set<int>? removeItemIds,
     LMFeedMenuAction? action,
     LMFeedMenuStyle? style,
     VoidCallback? onMenuTap,
     VoidCallback? onMenuOpen,
+    Widget Function(BuildContext context, LMFeedText menuItem,
+            LMPopUpMenuItemViewData menuItemViewData)?
+        menuItemBuilderForDialog,
     Widget Function(BuildContext context, LMFeedTile menuItem,
             LMPopUpMenuItemViewData menuItemViewData)?
-        menuItemBuilder,
+        menuItemBuilderForBottomSheet,
   }) {
     return LMFeedMenu(
       menuItems: menuItems ?? this.menuItems,
@@ -353,8 +355,10 @@ class LMFeedMenu extends StatelessWidget {
       style: style ?? this.style,
       onMenuTap: onMenuTap ?? this.onMenuTap,
       onMenuOpen: onMenuOpen ?? this.onMenuOpen,
+      menuItemBuilderForDialog:
+          menuItemBuilderForDialog ?? this.menuItemBuilderForDialog,
       menuItemBuilderForBottomSheet:
-          menuItemBuilder ?? this.menuItemBuilderForBottomSheet,
+          menuItemBuilderForBottomSheet ?? this.menuItemBuilderForBottomSheet,
     );
   }
 }

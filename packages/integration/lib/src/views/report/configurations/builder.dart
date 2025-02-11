@@ -85,4 +85,10 @@ class LMFeedReportScreenBuilderDelegate extends LMFeedWidgetBuilderDelegate {
       onPopInvoked: onPopInvoked,
     );
   }
+
+  /// Loader builder for the Report Screen
+  Widget loaderBuilder(BuildContext context, LMFeedLoader loader) {
+    return loader;
+  }
+  //TODO: Add more customisation methods here
 }
