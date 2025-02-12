@@ -669,7 +669,7 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
 
         LMFeedVideoProvider.instance.pauseCurrentVideo();
 
-        showModalBottomSheet(
+        await showModalBottomSheet(
           context: context,
           showDragHandle: true,
           isScrollControlled: true,
