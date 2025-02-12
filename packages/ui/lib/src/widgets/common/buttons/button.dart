@@ -14,6 +14,7 @@ class LMFeedButton extends StatefulWidget {
     this.style,
     this.onTextTap,
     this.isToggleEnabled = true,
+    this.child,
   });
 
   /// Required parameter, defines whether the button is active or disabled
@@ -38,6 +39,11 @@ class LMFeedButton extends StatefulWidget {
   /// defaults to true
   final bool isToggleEnabled;
 
+  /// child widget to the button
+  /// if the button has a child, the text and icon will be ignored
+  /// and the child will be displayed in the button
+  final Widget? child;
+
   @override
   State<LMFeedButton> createState() => _LMButtonState();
 
@@ -49,6 +55,7 @@ class LMFeedButton extends StatefulWidget {
     LMFeedText? activeText,
     VoidCallback? onTextTap,
     bool? isToggleEnabled,
+    Widget? child,
   }) {
     return LMFeedButton(
       isActive: isActive ?? this.isActive,
@@ -58,6 +65,7 @@ class LMFeedButton extends StatefulWidget {
       activeText: activeText ?? this.activeText,
       onTextTap: onTextTap ?? this.onTextTap,
       isToggleEnabled: isToggleEnabled ?? this.isToggleEnabled,
+      child: child ?? this.child,
     );
   }
 }
@@ -101,55 +109,56 @@ class _LMButtonState extends State<LMFeedButton> {
           border: inStyle.border,
           boxShadow: inStyle.boxShadow,
         ),
-        child: Flex(
-          direction: inStyle.direction ?? Axis.horizontal,
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment:
-              inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
-          children: [
-            inStyle.placement == LMFeedIconButtonPlacement.start
-                ? _active
-                    ? (inStyle.activeIcon ?? inStyle.icon) ??
-                        const SizedBox.shrink()
-                    : inStyle.icon ?? const SizedBox.shrink()
-                : const SizedBox.shrink(),
-            GestureDetector(
-              onTap: inStyle.showText ? widget.onTextTap : null,
-              behavior: HitTestBehavior.translucent,
-              child: Flex(
-                direction: inStyle.direction ?? Axis.horizontal,
-                children: [
-                  inStyle.placement == LMFeedIconButtonPlacement.start
-                      ? (inStyle.icon != null || inStyle.activeIcon != null)
-                          ? SizedBox(width: inStyle.gap ?? 8)
-                          : const SizedBox.shrink()
-                      : const SizedBox.shrink(),
-                  inStyle.showText
-                      ? Container(
-                          padding: inStyle.textPadding,
-                          child: _active
-                              ? widget.activeText ??
-                                  widget.text ??
-                                  const SizedBox.shrink()
-                              : widget.text ?? const SizedBox.shrink())
-                      : const SizedBox.shrink(),
-                  inStyle.placement == LMFeedIconButtonPlacement.end
-                      ? (inStyle.icon != null || inStyle.activeIcon != null)
-                          ? SizedBox(width: inStyle.gap ?? 8)
-                          : const SizedBox.shrink()
-                      : const SizedBox.shrink(),
-                ],
-              ),
+        child: widget.child ??
+            Flex(
+              direction: inStyle.direction ?? Axis.horizontal,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment:
+                  inStyle.mainAxisAlignment ?? MainAxisAlignment.center,
+              children: [
+                inStyle.placement == LMFeedIconButtonPlacement.start
+                    ? _active
+                        ? (inStyle.activeIcon ?? inStyle.icon) ??
+                            const SizedBox.shrink()
+                        : inStyle.icon ?? const SizedBox.shrink()
+                    : const SizedBox.shrink(),
+                GestureDetector(
+                  onTap: inStyle.showText ? widget.onTextTap : null,
+                  behavior: HitTestBehavior.translucent,
+                  child: Flex(
+                    direction: inStyle.direction ?? Axis.horizontal,
+                    children: [
+                      inStyle.placement == LMFeedIconButtonPlacement.start
+                          ? (inStyle.icon != null || inStyle.activeIcon != null)
+                              ? SizedBox(width: inStyle.gap ?? 8)
+                              : const SizedBox.shrink()
+                          : const SizedBox.shrink(),
+                      inStyle.showText
+                          ? Container(
+                              padding: inStyle.textPadding,
+                              child: _active
+                                  ? widget.activeText ??
+                                      widget.text ??
+                                      const SizedBox.shrink()
+                                  : widget.text ?? const SizedBox.shrink())
+                          : const SizedBox.shrink(),
+                      inStyle.placement == LMFeedIconButtonPlacement.end
+                          ? (inStyle.icon != null || inStyle.activeIcon != null)
+                              ? SizedBox(width: inStyle.gap ?? 8)
+                              : const SizedBox.shrink()
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
+                ),
+                inStyle.placement == LMFeedIconButtonPlacement.end
+                    ? _active
+                        ? inStyle.activeIcon ??
+                            inStyle.icon ??
+                            const SizedBox.shrink()
+                        : inStyle.icon ?? const SizedBox.shrink()
+                    : const SizedBox.shrink(),
+              ],
             ),
-            inStyle.placement == LMFeedIconButtonPlacement.end
-                ? _active
-                    ? inStyle.activeIcon ??
-                        inStyle.icon ??
-                        const SizedBox.shrink()
-                    : inStyle.icon ?? const SizedBox.shrink()
-                : const SizedBox.shrink(),
-          ],
-        ),
       ),
     );
   }
