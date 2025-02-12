@@ -125,7 +125,7 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
 Future<void> _handleVideoUpload(
     File mediaFile, LMAttachmentViewData media, LMUserViewData user) async {
   String? thumbnailURL;
-  String? thumbnailPath = await LMFeedVideoThumbnail.thumbnailFile(
+  String? thumbnailPath = await LMFeedVideoUtils.getThumbnailFile(
     path: mediaFile.path,
   );
 
