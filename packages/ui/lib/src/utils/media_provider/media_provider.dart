@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -19,7 +22,18 @@ class LMFeedVideoProvider with ChangeNotifier {
   /// This map holds all the video controllers that are currently in use.
   /// The video controllers are disposed when they are removed from this map.
   /// This map is also used to check if a video controller is already in use.
-  final Map<String, Map<int, VideoController>> _videoControllers = {};
+  final int _maxControllers = 6;
+  final LinkedHashMap<String, Map<int, VideoController>> _videoControllers =
+      LinkedHashMap();
+
+  /// set of postId + position
+  /// that are currently in progress of being initialized.
+  /// This set is used to check if a controller is already in progress of being
+  /// initialized. If the controller is already in progress of being initialized
+  /// then the same controller is returned.
+  /// This set is also used to wait for the controller to be initialized and
+  /// then return it.
+  final Set<String> _inProgressVideoControllers = {};
 
   /// This variable holds the postId of the post that is currently visible.
   /// It variable is used to pause the video when the post is not visible
@@ -71,14 +85,38 @@ class LMFeedVideoProvider with ChangeNotifier {
   Future<VideoController> videoControllerProvider(
       LMFeedGetPostVideoControllerRequest request) async {
     String postId = request.postId;
+    // tempId is used to uniquely identify the controller according to the
+    // postId and position. it is used to check if the controller is already in
+    // progress of being initialized. If the controller is already in progress
+    // of being initialized, then the same controller is returned.
+    String tempId = postId + request.position.toString();
     VideoController videoController;
     if (_videoControllers.containsKey(postId) &&
         _videoControllers[postId]!.containsKey(request.position)) {
       videoController = _videoControllers[postId]![request.position]!;
-    } else {
-      videoController = await initialisePostVideoController(request);
-      _videoControllers[postId] ??= {};
+      // Move the accessed controller to the end to mark it as recently used
+      _videoControllers[postId]!.remove(request.position);
       _videoControllers[postId]![request.position] = videoController;
+    } else {
+      if (!_inProgressVideoControllers.contains(tempId)) {
+        _inProgressVideoControllers.add(tempId);
+        videoController = await initialisePostVideoController(request);
+        _videoControllers[postId] ??= {};
+        _videoControllers[postId]![request.position] = videoController;
+        _checkAndEvictControllers();
+      } else {
+        // wait for the controller to be initialized and then return it
+        Completer<VideoController> completer = Completer();
+        Timer.periodic(const Duration(milliseconds: 500), (timer) {
+          if (_videoControllers.containsKey(postId) &&
+              _videoControllers[postId]!.containsKey(request.position)) {
+            videoController = _videoControllers[postId]![request.position]!;
+            completer.complete(videoController);
+            timer.cancel();
+          }
+        });
+        videoController = await completer.future;
+      }
     }
 
     if (isMuted.value) {
@@ -86,8 +124,15 @@ class LMFeedVideoProvider with ChangeNotifier {
     } else {
       videoController.player.setVolume(100.0);
     }
-
+    _inProgressVideoControllers.remove(tempId);
     return videoController;
+  }
+
+  void _checkAndEvictControllers() {
+    while (_videoControllers.length > _maxControllers) {
+      String oldestPostId = _videoControllers.keys.first;
+      clearPostController(oldestPostId);
+    }
   }
 
   /// Disposes the video controller for the given postId and removes it from
@@ -181,11 +226,11 @@ class LMFeedVideoProvider with ChangeNotifier {
   }
 
   /// This functions pause all the controller in the map.
-  void forcePauseAllControllers() {
+  Future<void> forcePauseAllControllers() async {
     for (var controller in _videoControllers.values) {
       for (var element in controller.values) {
         if (element.player.state.playing) {
-          element.player.pause();
+          await element.player.pause();
         }
       }
     }

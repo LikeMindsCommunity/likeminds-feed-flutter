@@ -95,7 +95,7 @@ class LMAttachmentMetaViewDataConvertor {
       attachmentMetaViewDataBuilder
           .pollAnswerText(widget.lmMeta?['poll_answer_text']);
     }
-
+    attachmentMetaViewDataBuilder.name(attachmentMeta.name);
     return attachmentMetaViewDataBuilder.build();
   }
 
@@ -125,6 +125,7 @@ class LMAttachmentMetaViewDataConvertor {
       allowAddOption: attachmentMetaViewData.allowAddOption,
       entityId: attachmentMetaViewData.id,
       thumbnailUrl: attachmentMetaViewData.thumbnailUrl,
+      name: attachmentMetaViewData.name,
     );
   }
 

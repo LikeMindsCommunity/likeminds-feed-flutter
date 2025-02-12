@@ -66,8 +66,35 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
           throw Exception('Attachment file not found');
         }
 
-        if (media.attachmentType == LMMediaType.video) {
-          await _handleVideoUpload(mediaFile, media, event.user);
+        if (media.attachmentType == LMMediaType.video ||
+            media.attachmentType == LMMediaType.reel) {
+          final uploadThumbnailResponse =
+              await _uploadThumbnail(mediaFile, media, event.user);
+          if (!uploadThumbnailResponse.success) {
+            emit(
+              LMFeedMediaUploadErrorState(
+                errorMessage: uploadThumbnailResponse.errorMessage ?? " ",
+                tempId: event.tempId,
+              ),
+            );
+            return LMResponse.error(
+                errorMessage: uploadThumbnailResponse.errorMessage ?? "");
+          }
+          // if platform is not web, compress the video
+          // before uploading, assign the compressed file to mediaFile
+          if (!kIsWeb) {
+            var tempFile = await VideoCompress.compressVideo(
+              mediaFile.path,
+              deleteOrigin: false,
+              includeAudio: true,
+            );
+            if (tempFile != null && tempFile.file != null) {
+              mediaFile = tempFile.file!;
+              if (tempFile.filesize != null) {
+                media.attachmentMeta.size = tempFile.filesize;
+              }
+            }
+          }
         }
 
         final LMResponse<String> response = await LMFeedMediaService.uploadFile(
@@ -80,7 +107,7 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
           media.attachmentMeta.url = response.data;
           attachments.add(
             Attachment(
-              attachmentType: media.mapMediaTypeToInt(),
+              attachmentType: media.attachmentType.value,
               attachmentMeta:
                   LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
                 media.attachmentMeta,
@@ -122,7 +149,7 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
   return LMResponse.success(data: attachments);
 }
 
-Future<void> _handleVideoUpload(
+Future<LMResponse<void>> _uploadThumbnail(
     File mediaFile, LMAttachmentViewData media, LMUserViewData user) async {
   String? thumbnailURL;
   String? thumbnailPath = await LMFeedVideoUtils.getThumbnailFile(
@@ -136,16 +163,10 @@ Future<void> _handleVideoUpload(
     if (response.success) {
       thumbnailURL = response.data;
       media.attachmentMeta.thumbnailUrl = thumbnailURL;
+      return LMResponse.success(data: null);
     }
+    return LMResponse.error(
+        errorMessage: response.errorMessage ?? "Thumbnail upload failed");
   }
-
-  if (!kIsWeb) {
-    var tempFile = await VideoCompress.compressVideo(
-      mediaFile.path,
-      deleteOrigin: false,
-      includeAudio: true,
-    );
-
-    mediaFile = tempFile!.file!;
-  }
+  return LMResponse.error(errorMessage: "No thumbnail found");
 }

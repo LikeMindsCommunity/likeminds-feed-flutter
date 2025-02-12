@@ -39,28 +39,41 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
       backgroundColor: feedTheme.container,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6.0),
+        borderRadius: BorderRadius.circular(28),
       ),
       elevation: 5,
       child: Container(
         width: min(LMFeedCore.config.webConfiguration.maxWidgetForDialog,
             screenSize.width * 0.7),
         padding: const EdgeInsets.symmetric(
-          horizontal: 20.0,
-          vertical: 20.0,
+          horizontal: 24.0,
+          vertical: 24.0,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             LMFeedText(
-                text: title,
-                style: LMFeedTextStyle(
-                    textStyle: const TextStyle(fontWeight: FontWeight.bold))),
+              text: title,
+              style: LMFeedTextStyle(
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16,
+                ),
+              ),
+            ),
             LikeMindsTheme.kVerticalPaddingLarge,
             LMFeedText(
               text: content,
-              style: LMFeedTextStyle(overflow: TextOverflow.visible),
+              style: LMFeedTextStyle(
+                overflow: TextOverflow.visible,
+                textStyle: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                  color: feedTheme.secondaryColor,
+                ),
+              ),
             ),
             currentUser.sdkClientInfo.uuid == uuid
                 ? const SizedBox.shrink()
@@ -278,7 +291,7 @@ class LMFeedDeleteConfirmationDialog extends StatelessWidget {
                             });
                       })
                     : const SizedBox.shrink(),
-            LikeMindsTheme.kVerticalPaddingSmall,
+            LikeMindsTheme.kVerticalPaddingLarge,
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[

@@ -31,7 +31,10 @@ class LMPostUploadingBanner extends StatelessWidget {
     final feedThemeData = LMFeedTheme.instance.theme;
     return Container(
       height: style?.height ?? 72,
-      color: style?.backgroundColor ?? feedThemeData.container,
+      decoration: style?.decoration ??
+          BoxDecoration(
+            color: feedThemeData.container,
+          ),
       margin: style?.margin ?? const EdgeInsets.only(bottom: 16),
       alignment: Alignment.center,
       padding: style?.padding ??
@@ -120,19 +123,40 @@ class LMPostUploadingBanner extends StatelessWidget {
 }
 
 class LMPostUploadingBannerStyle {
-  final Color? backgroundColor;
+  final BoxDecoration? decoration;
   final TextStyle? textStyle;
   final double? height;
+  final double? width;
   final EdgeInsets? margin;
   final EdgeInsets? padding;
   final LMFeedLoaderStyle? loaderStyle;
 
   const LMPostUploadingBannerStyle({
-    this.backgroundColor,
+    this.decoration,
     this.textStyle,
     this.height,
+    this.width,
     this.margin,
     this.padding,
     this.loaderStyle,
   });
+  LMPostUploadingBannerStyle copyWith({
+    BoxDecoration? decoration,
+    TextStyle? textStyle,
+    double? height,
+    double? width,
+    EdgeInsets? margin,
+    EdgeInsets? padding,
+    LMFeedLoaderStyle? loaderStyle,
+  }) {
+    return LMPostUploadingBannerStyle(
+      decoration: decoration ?? this.decoration,
+      textStyle: textStyle ?? this.textStyle,
+      height: height ?? this.height,
+      width: width ?? this.width,
+      margin: margin ?? this.margin,
+      padding: padding ?? this.padding,
+      loaderStyle: loaderStyle ?? this.loaderStyle,
+    );
+  }
 }

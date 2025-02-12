@@ -2,8 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/likes/widgets/widgets.dart';
-
 part 'handler/likes_screen_handler.dart';
 
 class LMFeedLikesScreen extends StatefulWidget {
@@ -39,17 +37,6 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
     super.initState();
     handler = LMLikesScreenHandler.instance;
     handler?.initialise(postId: widget.postId, commentId: widget.commentId);
-
-    LMFeedAnalyticsBloc.instance.add(
-      LMFeedFireAnalyticsEvent(
-        eventName: LMFeedAnalyticsKeys.likeListOpen,
-        widgetSource: widget.widgetSource,
-        eventProperties: {
-          'post_id': widget.postId,
-          'comment_id': widget.commentId,
-        },
-      ),
-    );
   }
 
   @override
@@ -75,13 +62,19 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
         return Future(() => false);
       },
       child: _widgetBuilder.scaffold(
-          source: LMFeedWidgetSource.likesScreen,
-          backgroundColor: feedTheme.container,
-          appBar: _widgetBuilder.appBarBuilder(
-            context,
-            getAppBar(),
-          ),
-          body: getLikesLoadedView()),
+        source: LMFeedWidgetSource.likesScreen,
+        backgroundColor: feedTheme.container,
+        appBar: _widgetBuilder.appBarBuilder(
+          context,
+          getAppBar(),
+        ),
+        body: LMFeedLikeListView(
+          postId: widget.postId,
+          commentId: widget.commentId,
+          isCommentLikes: widget.isCommentLikes,
+          widgetSource: widget.widgetSource,
+        ),
+      ),
     );
   }
 
@@ -126,53 +119,6 @@ class _LMFeedLikesScreenState extends State<LMFeedLikesScreen> {
       ),
     );
   }
-
-  Widget getLikesLoadedView() {
-    return SafeArea(
-      child: PagedListView<int, LMLikeViewData>(
-        padding: EdgeInsets.zero,
-        pagingController: handler!.pagingController,
-        builderDelegate: PagedChildBuilderDelegate<LMLikeViewData>(
-          noMoreItemsIndicatorBuilder: (context) =>
-              _widgetBuilder.noMoreItemsIndicatorBuilder(
-            context,
-            child: const SizedBox(
-              height: 20,
-            ),
-          ),
-          noItemsFoundIndicatorBuilder: (context) =>
-              _widgetBuilder.noItemsFoundIndicatorBuilder(
-            context,
-            child: Scaffold(
-              backgroundColor: LikeMindsTheme.whiteColor,
-              body: noItemLikesView(),
-            ),
-          ),
-          itemBuilder: (context, item, index) => _widgetBuilder.likeTileBuilder(
-            context,
-            index,
-            handler!.userData[item.uuid]!,
-            LMFeedLikeTile(user: handler!.userData[item.uuid]),
-          ),
-          firstPageProgressIndicatorBuilder: (context) =>
-              _widgetBuilder.firstPageProgressIndicatorBuilder(
-            context,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 50.0),
-              child: Column(
-                children: List.generate(5, (index) => LMFeedUserTileShimmer()),
-              ),
-            ),
-          ),
-          newPageProgressIndicatorBuilder: (context) =>
-              _widgetBuilder.newPageProgressIndicatorBuilder(
-            context,
-            child: newPageProgressLikesView(),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class LMFeedLikeTile extends StatelessWidget {
@@ -193,6 +139,9 @@ class LMFeedLikeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String likeText = LMFeedPostUtils.getLikeTitle(
+      LMFeedPluralizeWordAction.firstLetterCapitalPlural,
+    );
     if (user != null) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -219,8 +168,8 @@ class LMFeedLikeTile extends StatelessWidget {
               ),
       );
     } else {
-      return const Center(
-        child: LMFeedText(text: "No likes yet"),
+      return Center(
+        child: LMFeedText(text: "No $likeText yet"),
       );
     }
   }

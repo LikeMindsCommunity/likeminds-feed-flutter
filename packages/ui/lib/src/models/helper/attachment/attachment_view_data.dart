@@ -3,15 +3,24 @@ import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
 /// Enum representing different types of media attachments.
 enum LMMediaType {
-  none,
-  video,
-  image,
-  document,
-  link,
-  widget,
-  repost,
-  poll,
-  reel
+  none(0),
+  image(1),
+  video(2),
+  document(3),
+  link(4),
+  widget(5),
+  poll(6),
+  repost(8),
+  reel(11);
+
+  final int value;
+
+  const LMMediaType(this.value);
+
+  factory LMMediaType.fromValue(int value) {
+    return LMMediaType.values.firstWhere((type) => type.value == value,
+        orElse: () => LMMediaType.none);
+  }
 }
 
 /// {@template lm_attachment_meta_view_data}
@@ -40,8 +49,10 @@ class LMAttachmentViewData {
   static const int pollMediaType = 6;
   static const int reelMediaType = 11;
 
+  @Deprecated('User [attachmentType.value] instead')
+
   /// Maps the media type to its corresponding integer value.
-  int mapMediaTypeToInt() {
+  int mapMediaTypeToInt1() {
     if (attachmentType == LMMediaType.image) {
       return imageMediaType;
     } else if (attachmentType == LMMediaType.video) {
@@ -101,6 +112,7 @@ class LMAttachmentViewData {
     List<LMPollOptionViewData>? options,
     bool? toShowResult,
     String? pollAnswerText,
+    String? name,
   }) {
     return LMAttachmentViewData._(
       attachmentType: attachmentType,
@@ -128,6 +140,7 @@ class LMAttachmentViewData {
         options: options,
         toShowResult: toShowResult,
         pollAnswerText: pollAnswerText,
+        name: name,
       ),
     );
   }
@@ -161,6 +174,7 @@ class LMAttachmentViewData {
     String? pollAnswerText,
     LMPostViewData? post,
     String? postId,
+    String? name,
   }) {
     return LMAttachmentViewData._(
       attachmentType: attachmentType,
@@ -191,6 +205,7 @@ class LMAttachmentViewData {
         options: options,
         toShowResult: toShowResult,
         pollAnswerText: pollAnswerText,
+        name: name,
       ),
     );
   }
@@ -222,6 +237,7 @@ class LMAttachmentViewData {
     List<LMPollOptionViewData>? options,
     bool? toShowResult,
     String? pollAnswerText,
+    String? name,
   }) {
     return LMAttachmentViewData._(
       attachmentType: attachmentType,
@@ -283,6 +299,8 @@ class LMAttachmentViewDataBuilder {
     );
   }
 }
+
+@Deprecated('Use [LMMediaType.fromValue()] instead')
 
 /// Maps an integer to its corresponding `LMMediaType`.
 LMMediaType mapIntToMediaType(int attachmentType) {

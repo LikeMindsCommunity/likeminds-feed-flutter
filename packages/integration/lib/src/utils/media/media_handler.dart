@@ -7,18 +7,24 @@ LMFeedPlatform feedPlatform = LMFeedPlatform.instance;
 
 /// A class that handles media picking and processing for the LMFeed.
 class LMFeedMediaHandler {
-  /// Picks multiple video files and returns their metadata.
+  /// Picks single/multiple video files and returns their metadata.
+  /// This method is used for both picking normal video or reel video
+  /// The [allowMultiple] parameter is used to determine if multiple videos can be picked.
+  /// The [isReelVideo] parameter is used to determine if the video is a reel video.
   ///
   /// [currentMediaLength] is the current number of media files already picked.
   /// Returns a [Future] that completes with a [LMResponse] containing a list of [LMAttachmentViewData].
-  static Future<LMResponse<List<LMAttachmentViewData>>> pickVideos(
-      int currentMediaLength) async {
+  static Future<LMResponse<List<LMAttachmentViewData>>> pickVideos({
+    required int currentMediaLength,
+    bool allowMultiple = true,
+    bool isReelVideo = false,
+  }) async {
     try {
       LMFeedComposeScreenConfig composeScreenConfig =
           LMFeedCore.config.composeScreenConfig;
       List<LMAttachmentViewData> videoFiles = [];
       final FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
-        allowMultiple: true,
+        allowMultiple: allowMultiple,
         type: FileType.video,
       );
 
@@ -71,25 +77,23 @@ class LMFeedMediaHandler {
             LMAttachmentViewData videoFile;
             if (kIsWeb) {
               videoFile = LMAttachmentViewData.fromMediaBytes(
-                attachmentType: LMMediaType.video,
+                attachmentType:
+                    isReelVideo ? LMMediaType.reel : LMMediaType.video,
                 bytes: pFile.bytes!,
                 size: pFile.size,
                 duration: videoInfo?.duration?.toInt(),
-                meta: {
-                  'file_name': pFile.name,
-                },
+                name: pFile.name,
                 height: videoInfo?.height,
                 width: videoInfo?.width,
               );
             } else {
               videoFile = LMAttachmentViewData.fromMediaPath(
-                attachmentType: LMMediaType.video,
+                attachmentType:
+                    isReelVideo ? LMMediaType.reel : LMMediaType.video,
                 path: pFile.path!,
                 size: pFile.size,
                 duration: videoInfo?.duration?.toInt(),
-                meta: {
-                  'file_name': pFile.name,
-                },
+                name: pFile.name,
                 height: videoInfo?.height,
                 width: videoInfo?.width,
               );

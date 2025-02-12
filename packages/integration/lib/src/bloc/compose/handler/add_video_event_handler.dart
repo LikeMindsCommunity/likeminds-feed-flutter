@@ -21,7 +21,7 @@ addVideoEventHandler(
   ));
   try {
     final LMResponse<List<LMAttachmentViewData>> videos =
-        await LMFeedMediaHandler.pickVideos(mediaCount);
+        await LMFeedMediaHandler.pickVideos(currentMediaLength: mediaCount);
     if (videos.success) {
       if (videos.data != null && videos.data!.isNotEmpty) {
         int countOfPickedVideos = videos.data!.length;

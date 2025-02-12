@@ -65,6 +65,8 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
   Set<int> selectedTags = {};
   bool isIos = LMFeedPlatform.instance.isIOS();
   LMDeleteReasonViewData? deleteReason;
+  final ValueNotifier<LMFeedReportState> reportListener =
+      ValueNotifier<LMFeedReportState>(LMFeedReportState.initial);
 
   @override
   void initState() {
@@ -121,238 +123,331 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
             width: min(
                 screenSize.width, LMFeedCore.config.webConfiguration.maxWidth),
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: ValueListenableBuilder(
+                valueListenable: reportListener,
+                builder: (context, state, child) {
+                  if (state == LMFeedReportState.loading) {
+                    return _widgetBuilder.loaderBuilder(context, _defLoader());
+                  } else if (state == LMFeedReportState.success) {
+                    return _defSuccessStateUI();
+                  }
+                  return _defInitialStateUI(context);
+                }),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Column _defSuccessStateUI() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _widgetBuilder.successIconBuilder(context, _defReportSuccessIcon()),
+        const SizedBox(
+          height: 16,
+        ),
+        _widgetBuilder.successTextBuilder(context, _defReportSuccessText()),
+        _widgetBuilder.successSubTextBuilder(
+            context, _defReportSuccessSubText()),
+      ],
+    );
+  }
+
+  LMFeedText _defReportSuccessSubText() {
+    return LMFeedText(
+      text:
+          'We take reports seriously and after a through review, will take appropriate action.',
+      style: LMFeedTextStyle(
+        maxLines: 4,
+        textAlign: TextAlign.center,
+        textStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: theme.secondaryColor,
+        ),
+      ),
+    );
+  }
+
+  LMFeedText _defReportSuccessText() {
+    return LMFeedText(
+      text: 'Thank you for submitting a report',
+      style: LMFeedTextStyle(
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: theme.onContainer,
+        ),
+      ),
+    );
+  }
+
+  LMFeedIcon _defReportSuccessIcon() {
+    return LMFeedIcon(
+      type: LMFeedIconType.icon,
+      icon: Icons.report_outlined,
+      style: LMFeedIconStyle(
+        color: theme.errorColor,
+        size: 28,
+        backgroundColor: theme.errorColor.withOpacity(0.1),
+        boxBorderRadius: 100,
+        boxSize: 40,
+      ),
+    );
+  }
+
+  LMFeedLoader _defLoader() {
+    return LMFeedLoader(
+      style: LMFeedLoaderStyle(
+        color: theme.secondaryColor,
+        height: 30,
+        width: 30,
+        strokeWidth: 2.0,
+      ),
+    );
+  }
+
+  Column _defInitialStateUI(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        widget.reportContentBuilder
-                                ?.call(context, _defReportContentWidget()) ??
-                            _defReportContentWidget(),
-                        const SizedBox(
-                          height: 24,
-                        ),
-                        FutureBuilder<LMResponse<List<LMDeleteReasonViewData>>>(
-                            future: getReportTagsFuture,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return LMFeedLoader();
-                              } else if (snapshot.connectionState ==
-                                      ConnectionState.done &&
-                                  snapshot.hasData &&
-                                  snapshot.data!.success == true) {
-                                List<LMDeleteReasonViewData> reportTags =
-                                    snapshot.data?.data ?? [];
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
-                                  child: Wrap(
-                                      spacing: 10.0,
-                                      runSpacing: 10.0,
-                                      alignment: WrapAlignment.start,
-                                      runAlignment: WrapAlignment.start,
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.start,
-                                      children: reportTags.isNotEmpty
-                                          ? reportTags
-                                              .map(
-                                                (e) => InkWell(
-                                                  splashFactory:
-                                                      InkRipple.splashFactory,
-                                                  onTap: () {
-                                                    setState(
-                                                      () {
-                                                        if (selectedTags
-                                                            .contains(e.id)) {
-                                                          selectedTags
-                                                              .remove(e.id);
-                                                          deleteReason = null;
-                                                        } else {
-                                                          selectedTags = {e.id};
-                                                          deleteReason = e;
-                                                        }
-                                                      },
-                                                    );
-                                                  },
-                                                  child: Chip(
-                                                    label: LMFeedText(
-                                                      text: e.name,
-                                                      style: LMFeedTextStyle(
-                                                        textStyle:
-                                                            const TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ).copyWith(
-                                                          fontSize: 14,
-                                                          color: selectedTags
-                                                                  .contains(
-                                                                      e.id)
-                                                              ? Colors.white
-                                                              : Colors.black,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    backgroundColor:
-                                                        selectedTags
-                                                                .contains(e.id)
-                                                            ? theme.primaryColor
-                                                            : theme.container,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50.0),
-                                                      side: BorderSide(
-                                                        color: selectedTags
-                                                                .contains(e.id)
-                                                            ? theme.primaryColor
-                                                            : Colors.black,
-                                                      ),
-                                                    ),
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 16.0),
-                                                    labelPadding:
-                                                        EdgeInsets.zero,
-                                                    elevation: 0,
-                                                  ),
-                                                ),
-                                              )
-                                              .toList()
-                                          : []),
-                                );
-                              } else {
-                                return const SizedBox();
-                              }
-                            }),
-                        // kVerticalPaddingLarge,
-                        deleteReason != null &&
-                                (deleteReason!.name.toLowerCase() == 'others' ||
-                                    deleteReason!.name.toLowerCase() == 'other')
-                            ? Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                child: TextField(
-                                  cursorColor: Colors.black,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                  controller: reportReasonController,
-                                  decoration: theme.textFieldStyle.decoration
-                                          ?.copyWith(
-                                        hintText: 'Reason',
-                                        hintStyle: theme.contentStyle.textStyle,
-                                        border: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                            color: theme.disabledColor,
-                                            width: 1,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(
+                  height: 20,
+                ),
+                widget.reportContentBuilder
+                        ?.call(context, _defReportContentWidget()) ??
+                    _defReportContentWidget(),
+                const SizedBox(
+                  height: 24,
+                ),
+                FutureBuilder<LMResponse<List<LMDeleteReasonViewData>>>(
+                    future: getReportTagsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return LMFeedLoader(
+                          style: LMFeedLoaderStyle(
+                            color: theme.secondaryColor,
+                            height: 30,
+                            width: 30,
+                            strokeWidth: 2.0,
+                          ),
+                        );
+                      } else if (snapshot.connectionState ==
+                              ConnectionState.done &&
+                          snapshot.hasData &&
+                          snapshot.data!.success == true) {
+                        List<LMDeleteReasonViewData> reportTags =
+                            snapshot.data?.data ?? [];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Wrap(
+                              spacing: 10.0,
+                              runSpacing: 10.0,
+                              alignment: WrapAlignment.start,
+                              runAlignment: WrapAlignment.start,
+                              crossAxisAlignment: WrapCrossAlignment.start,
+                              children: reportTags.isNotEmpty
+                                  ? reportTags
+                                      .map(
+                                        (e) => InkWell(
+                                          splashFactory:
+                                              InkRipple.splashFactory,
+                                          onTap: () {
+                                            setState(
+                                              () {
+                                                if (selectedTags
+                                                    .contains(e.id)) {
+                                                  selectedTags.remove(e.id);
+                                                  deleteReason = null;
+                                                } else {
+                                                  selectedTags = {e.id};
+                                                  deleteReason = e;
+                                                }
+                                              },
+                                            );
+                                          },
+                                          child: _widgetBuilder.chipBuilder(
+                                            context,
+                                            _defChip(e),
+                                            e,
                                           ),
                                         ),
-                                      ) ??
-                                      InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: theme.primaryColor,
-                                        focusColor: theme.primaryColor,
-                                        labelText: 'Reason',
-                                        labelStyle:
-                                            theme.contentStyle.textStyle,
-                                      ),
-                                ),
-                              )
-                            : const SizedBox()
+                                      )
+                                      .toList()
+                                  : []),
+                        );
+                      } else {
+                        return const SizedBox();
+                      }
+                    }),
+                if (deleteReason != null &&
+                    (deleteReason!.name.toLowerCase() == 'others' ||
+                        deleteReason!.name.toLowerCase() == 'other'))
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LMFeedText(
+                          text: "Reason",
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: theme.onContainer,
+                            ),
+                          ),
+                        ),
+                        LMFeedText(
+                          text: "Help us understand the problem.",
+                          style: LMFeedTextStyle(
+                            textStyle: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: theme.onContainer,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        TextField(
+                          cursorColor: Colors.black,
+                          style: const TextStyle(
+                            color: Colors.black,
+                          ),
+                          minLines: 3,
+                          maxLines: 5,
+                          controller: reportReasonController,
+                          decoration: InputDecoration(
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            fillColor: theme.secondaryColor.withOpacity(0.1),
+                            focusColor: theme.primaryColor,
+                            hintText: 'Write a message',
+                            labelStyle: theme.contentStyle.textStyle,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 16.0),
-                  child: LMFeedButton(
-                    style: LMFeedButtonStyle(
-                      height: 48,
-                      padding: EdgeInsets.symmetric(horizontal: 40.0),
-                      backgroundColor: selectedTags.isEmpty
-                          ? theme.disabledColor
-                          : theme.primaryColor,
-                      borderRadius: 50,
-                    ),
-                    text: LMFeedText(
-                      text:
-                          'Report ${getEntityTitleFirstCap(singular: true, smallCap: false)}',
-                      style: LMFeedTextStyle(
-                        textStyle: TextStyle(
-                            color: theme.container,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    onTap: () async {
-                      String? reason = reportReasonController.text.trim();
-                      if (deleteReason == null) {
-                        showReasonNotSelectedSnackbar();
-                        return;
-                      }
-
-                      String deleteReasonLowerCase =
-                          deleteReason!.name.toLowerCase();
-                      if ((deleteReasonLowerCase == 'others' ||
-                          deleteReasonLowerCase == 'other')) {
-                        if (reason.isEmpty) {
-                          LMFeedCore.showSnackBar(
-                              context,
-                              'Please specify a reason for reporting',
-                              LMFeedWidgetSource.reportScreen);
-                          return;
-                        }
-                      }
-
-                      if (selectedTags.isNotEmpty) {
-                        PostReportRequest postReportRequest =
-                            (PostReportRequestBuilder()
-                                  ..entityCreatorId(widget.entityCreatorId)
-                                  ..entityId(widget.entityId)
-                                  ..entityType(widget.entityType)
-                                  ..reason(reason.isEmpty
-                                      ? deleteReason!.name
-                                      : reason)
-                                  ..tagId(deleteReason!.id))
-                                .build();
-                        PostReportResponse response = await LMFeedCore.client
-                            .postReport(postReportRequest);
-
-                        if (!response.success) {
-                          LMFeedCore.showSnackBar(
-                              context,
-                              response.errorMessage ?? 'An error occured',
-                              LMFeedWidgetSource.reportScreen);
-                        } else {
-                          LMFeedCore.showSnackBar(
-                              context,
-                              '${getEntityTitleFirstCap(singular: true, smallCap: false)} reported',
-                              LMFeedWidgetSource.reportScreen);
-                        }
-                      } else {
-                        showReasonNotSelectedSnackbar();
-                        return;
-                      }
-
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ),
               ],
             ),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: _widgetBuilder.submitButtonBuilder(
+            context,
+            _defSubmitButton(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Chip _defChip(LMDeleteReasonViewData e) {
+    return Chip(
+      side: BorderSide.none,
+      label: LMFeedText(
+        text: e.name,
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: selectedTags.contains(e.id)
+                ? theme.errorColor
+                : theme.secondaryColor,
+          ),
+        ),
       ),
+      backgroundColor: selectedTags.contains(e.id)
+          ? theme.errorColor.withOpacity(0.2)
+          : theme.secondaryColor.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 4,
+      ),
+      labelPadding: const EdgeInsets.all(4),
+      elevation: 0,
+    );
+  }
+
+  LMFeedButton _defSubmitButton(BuildContext context) {
+    return LMFeedButton(
+      style: LMFeedButtonStyle(
+        width: double.infinity,
+        height: 42,
+        padding: EdgeInsets.symmetric(horizontal: 40.0),
+        backgroundColor:
+            selectedTags.isEmpty ? theme.disabledColor : theme.primaryColor,
+        borderRadius: 12,
+      ),
+      text: LMFeedText(
+        text: 'Submit report',
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+              color: theme.container,
+              fontSize: 16,
+              fontWeight: FontWeight.w500),
+        ),
+      ),
+      onTap: () async {
+        String? reason = reportReasonController.text.trim();
+        if (deleteReason == null) {
+          showReasonNotSelectedSnackbar();
+          return;
+        }
+
+        String deleteReasonLowerCase = deleteReason!.name.toLowerCase();
+        if ((deleteReasonLowerCase == 'others' ||
+            deleteReasonLowerCase == 'other')) {
+          if (reason.isEmpty) {
+            LMFeedCore.showSnackBar(
+                context,
+                'Please specify a reason for reporting',
+                LMFeedWidgetSource.reportScreen);
+            return;
+          }
+        }
+
+        if (selectedTags.isNotEmpty) {
+          reportListener.value = LMFeedReportState.loading;
+          PostReportRequest postReportRequest = (PostReportRequestBuilder()
+                ..entityCreatorId(widget.entityCreatorId)
+                ..entityId(widget.entityId)
+                ..entityType(widget.entityType)
+                ..reason(reason.isEmpty ? deleteReason!.name : reason)
+                ..tagId(deleteReason!.id))
+              .build();
+          PostReportResponse response =
+              await LMFeedCore.client.postReport(postReportRequest);
+
+          if (!response.success) {
+            LMFeedCore.showSnackBar(
+                context,
+                response.errorMessage ?? 'An error occured',
+                LMFeedWidgetSource.reportScreen);
+          } else {
+            reportListener.value = LMFeedReportState.success;
+          }
+        } else {
+          showReasonNotSelectedSnackbar();
+          return;
+        }
+      },
     );
   }
 
@@ -363,12 +458,18 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
         shadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            spreadRadius: 0,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            blurRadius: 2,
+            offset: const Offset(0, 0.5),
           ),
         ],
         centerTitle: isIos,
+      ),
+      leading: LMFeedIcon(
+        type: LMFeedIconType.icon,
+        icon: Icons.report_outlined,
+        style: LMFeedIconStyle(
+          color: theme.secondaryColor,
+        ),
       ),
       trailing: [
         LMFeedButton(
@@ -382,7 +483,9 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
             icon: LMFeedIcon(
               type: LMFeedIconType.icon,
               icon: Icons.close,
-              style: LMFeedIconStyle(color: theme.disabledColor),
+              style: LMFeedIconStyle(
+                color: theme.onContainer,
+              ),
             ),
           ),
         )
@@ -390,9 +493,10 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
       title: LMFeedText(
         text: 'Report Abuse',
         style: LMFeedTextStyle(
+          margin: EdgeInsets.only(left: 8),
           textStyle: TextStyle(
             fontSize: 18,
-            color: theme.errorColor,
+            color: theme.secondaryColor,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -452,7 +556,7 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
           textStyle: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w400,
-            color: theme.onContainer,
+            color: theme.secondaryColor,
           ),
         ),
       ),
@@ -484,6 +588,8 @@ class LMReportScreenStyle {
 class LMReportContentWidget extends StatelessWidget {
   final String title;
   final String description;
+  final LMFeedTextBuilder? titleBuilder;
+  final LMFeedTextBuilder? descriptionBuilder;
 
   final LMReportContentWidgetStyle? style;
 
@@ -491,6 +597,8 @@ class LMReportContentWidget extends StatelessWidget {
     super.key,
     required this.title,
     required this.description,
+    this.titleBuilder,
+    this.descriptionBuilder,
     this.style,
   });
 
@@ -502,19 +610,28 @@ class LMReportContentWidget extends StatelessWidget {
             style?.crossAxisAlignment ?? CrossAxisAlignment.start,
         mainAxisAlignment: style?.mainAxisAlignment ?? MainAxisAlignment.start,
         children: <Widget>[
-          LMFeedText(
-            text: title,
-            style: style?.titleStyle,
-          ),
+          titleBuilder?.call(context, _defTitle()) ?? _defTitle(),
           SizedBox(
             height: style?.titleDescriptionSpacing ?? 8,
           ),
-          LMFeedText(
-            text: description,
-            style: style?.descriptionStyle,
-          ),
+          descriptionBuilder?.call(context, _defDescription()) ??
+              _defDescription(),
         ],
       ),
+    );
+  }
+
+  LMFeedText _defDescription() {
+    return LMFeedText(
+      text: description,
+      style: style?.descriptionStyle,
+    );
+  }
+
+  LMFeedText _defTitle() {
+    return LMFeedText(
+      text: title,
+      style: style?.titleStyle,
     );
   }
 }
@@ -534,3 +651,5 @@ class LMReportContentWidgetStyle {
     this.titleDescriptionSpacing,
   });
 }
+
+enum LMFeedReportState { initial, loading, success }

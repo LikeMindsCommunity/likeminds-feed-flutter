@@ -23,6 +23,7 @@ class LMFeedLoader extends StatelessWidget {
           width: style.width,
           child: CircularProgressIndicator.adaptive(
             backgroundColor: style.backgroundColor,
+            strokeWidth: style.strokeWidth,
             valueColor: AlwaysStoppedAnimation<Color>(
               style.color ??
                   (isPrimary
@@ -52,6 +53,7 @@ class LMFeedLoaderStyle {
   final double? height;
   final double? width;
   final EdgeInsets? padding;
+  final double strokeWidth;
 
   const LMFeedLoaderStyle({
     this.color,
@@ -59,6 +61,7 @@ class LMFeedLoaderStyle {
     this.width,
     this.height,
     this.padding,
+    this.strokeWidth = 4.0,
   });
 
   LMFeedLoaderStyle copyWith({
@@ -67,6 +70,7 @@ class LMFeedLoaderStyle {
     double? height,
     double? width,
     EdgeInsets? padding,
+    double? strokeWidth,
   }) {
     return LMFeedLoaderStyle(
       color: color ?? this.color,
@@ -74,6 +78,7 @@ class LMFeedLoaderStyle {
       width: width ?? this.width,
       height: height ?? this.height,
       padding: padding ?? this.padding,
+      strokeWidth: strokeWidth ?? this.strokeWidth,
     );
   }
 }

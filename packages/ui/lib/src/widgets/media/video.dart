@@ -35,9 +35,10 @@ class LMFeedVideo extends StatefulWidget {
     super.key,
     required this.postId,
     required this.video,
-    this.playButton,
-    this.pauseButton,
-    this.muteButton,
+    this.playPauseButtonBuilder,
+    this.playIconBuilder,
+    this.pauseIconBuilder,
+    this.muteButtonBuilder,
     this.style,
     this.onMediaTap,
     this.videoController,
@@ -53,10 +54,19 @@ class LMFeedVideo extends StatefulWidget {
   /// Post identifier
   final String postId;
 
-  /// Customizable buttons for video controls
-  final LMFeedButton? playButton;
-  final LMFeedButton? pauseButton;
-  final LMFeedButton? muteButton;
+  /// builder for play pause button
+  final Widget Function(BuildContext, LMFeedButton, bool isPlaying)?
+      playPauseButtonBuilder;
+
+  /// play button builder for video controls
+  final LMFeedIconBuilder? playIconBuilder;
+
+  /// pause button builder for video controls
+  final LMFeedIconBuilder? pauseIconBuilder;
+
+  /// mute button builder for video controls
+  final Widget Function(BuildContext, LMFeedButton, bool isMuted)?
+      muteButtonBuilder;
 
   /// Customizable style for the video widget
   final LMFeedPostVideoStyle? style;
@@ -69,31 +79,40 @@ class LMFeedVideo extends StatefulWidget {
 
   @override
   State<LMFeedVideo> createState() => _LMFeedVideoState();
-
-  LMFeedVideo copyWith(
-      {String? postId,
-      String? videoUrl,
-      String? videoPath,
-      LMFeedButton? playButton,
-      LMFeedButton? pauseButton,
-      LMFeedButton? muteButton,
-      LMFeedPostVideoStyle? style,
-      Function(int)? onMediaTap,
-      int? position}) {
+  LMFeedVideo copyWith({
+    String? postId,
+    LMAttachmentViewData? video,
+    Widget Function(BuildContext, LMFeedButton, bool isPlaying)?
+        playPauseButtonBuilder,
+    LMFeedIconBuilder? playIconBuilder,
+    LMFeedIconBuilder? pauseIconBuilder,
+    Widget Function(BuildContext, LMFeedButton, bool isMuted)?
+        muteButtonBuilder,
+    LMFeedPostVideoStyle? style,
+    Function(int)? onMediaTap,
+    VideoController? videoController,
+    int? position,
+    bool? autoPlay,
+  }) {
     return LMFeedVideo(
       postId: postId ?? this.postId,
-      video: video,
-      playButton: playButton ?? this.playButton,
-      pauseButton: pauseButton ?? this.pauseButton,
-      muteButton: muteButton ?? this.muteButton,
+      video: video ?? this.video,
+      playPauseButtonBuilder:
+          playPauseButtonBuilder ?? this.playPauseButtonBuilder,
+      playIconBuilder: playIconBuilder ?? this.playIconBuilder,
+      pauseIconBuilder: pauseIconBuilder ?? this.pauseIconBuilder,
+      muteButtonBuilder: muteButtonBuilder ?? this.muteButtonBuilder,
       style: style ?? this.style,
       onMediaTap: onMediaTap ?? this.onMediaTap,
+      videoController: videoController ?? this.videoController,
       position: position ?? this.position,
+      autoPlay: autoPlay ?? this.autoPlay,
     );
   }
 }
 
-class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
+class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo>
+    with WidgetsBindingObserver {
   // Notifier to rebuild the overlay
   ValueNotifier<bool> rebuildOverlay = ValueNotifier(false);
 
@@ -125,7 +144,9 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   LMFeedPostVideoStyle? style;
 
   // Future to initialize the video
-  Future<void>? initialiseVideo;
+  Future<void>? initializeVideo;
+
+  bool _isBackgroundState = false;
 
   @override
   void dispose() async {
@@ -135,8 +156,25 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     // Cancel the timer
     _timer?.cancel();
 
+    WidgetsBinding.instance.removeObserver(this);
+
     // Call the superclass dispose method
     super.dispose();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+
+    /// force pause the video when app goes to background
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      _isBackgroundState = true;
+      controller?.player.pause();
+    } else if (_isBackgroundState) {
+      _isBackgroundState = false;
+    }
   }
 
   @override
@@ -157,7 +195,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
   @override
   void initState() {
     super.initState();
-
+    WidgetsBinding.instance.addObserver(this);
     // Set the thumbnail URL if available
     if (widget.video.attachmentMeta.thumbnailUrl != null) {
       thumbnailUrl = widget.video.attachmentMeta.thumbnailUrl;
@@ -168,7 +206,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     isFullscreen = ValueNotifier(false);
 
     // Initialize the video controllers
-    initialiseVideo = initialiseControllers();
+    initializeVideo = initializeControllers();
   }
 
   @override
@@ -184,7 +222,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     isMuted = LMFeedVideoProvider.instance.isMuted;
 
     // Reinitialize the video controllers
-    initialiseVideo = initialiseControllers();
+    initializeVideo = initializeControllers();
   }
 
   @override
@@ -197,14 +235,14 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     } else if (visibility == WidgetVisibility.VISIBLE) {
       // Reinitialize the video controllers if needed
       if (!(controller?.player.platform?.isVideoControllerAttached ?? false)) {
-        initialiseVideo = initialiseControllers();
+        initializeVideo = initializeControllers();
         rebuildVideo.value = !rebuildVideo.value;
       }
     }
     super.onVisibilityChanged(visibility);
   }
 
-  Future<void> initialiseControllers() async {
+  Future<void> initializeControllers() async {
     // Use the provided video controller if available
     if (widget.videoController != null) {
       controller = widget.videoController;
@@ -284,7 +322,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
           valueListenable: rebuildVideo,
           builder: (context, _, __) {
             return FutureBuilder(
-              future: initialiseVideo,
+              future: initializeVideo,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   if (thumbnailUrl != null) {
@@ -293,6 +331,12 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                         image: LMAttachmentViewData.fromMediaUrl(
                           url: thumbnailUrl!,
                           attachmentType: LMMediaType.image,
+                        ),
+                        style: LMFeedPostImageStyle(
+                          height: screenSize.height,
+                          width: screenSize.width,
+                          borderRadius: style?.borderRadius,
+                          boxFit: BoxFit.contain,
                         ),
                       ),
                       const Center(
@@ -304,7 +348,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                       LMPostMediaShimmer(
                         style: LMPostMediaShimmerStyle(
                           width: widget.style?.width ?? screenSize.width,
-                          height: widget.style?.height,
+                          height: widget.style?.height ?? screenSize.height,
                         ),
                       );
                 } else if (snapshot.connectionState == ConnectionState.done) {
@@ -317,7 +361,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                     });
                   }
                   return VisibilityDetector(
-                    key: ObjectKey(controller!.player),
+                    key: widget.key ?? ObjectKey(controller!.player),
                     onVisibilityChanged: (visibilityInfo) {
                       if (mounted) {
                         var visiblePercentage =
@@ -325,7 +369,9 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                         if (visiblePercentage < 100) {
                           controller?.player.pause();
                         }
-                        if (visiblePercentage == 100 && widget.autoPlay) {
+                        if (visiblePercentage == 100 &&
+                            widget.autoPlay &&
+                            !_isBackgroundState) {
                           LMFeedVideoProvider.instance.currentVisiblePostId =
                               widget.postId;
                           controller?.player.play();
@@ -351,7 +397,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                           child: MaterialVideoControlsTheme(
                             normal: MaterialVideoControlsThemeData(
                               bottomButtonBar: [
-                                widget.muteButton ?? _defMuteButton(),
+                                _defMuteButtonBuilder(),
                                 const Spacer(),
                                 const MaterialFullscreenButton(),
                               ],
@@ -380,7 +426,7 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                               bottomButtonBar: [
                                 const MaterialPositionIndicator(),
                                 const Spacer(),
-                                widget.muteButton ?? _defMuteButton(),
+                                _defMuteButtonBuilder(),
                                 const SizedBox(width: 4),
                                 const MaterialFullscreenButton(),
                               ],
@@ -404,7 +450,6 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                             ),
                           ),
                         ),
-                        // widget.muteButton ?? _defMuteButton()
                       ],
                     ),
                   );
@@ -419,34 +464,48 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
     );
   }
 
-  _defMuteButton() {
+  Widget _defMuteButtonBuilder() {
     return ValueListenableBuilder(
       valueListenable: isMuted!,
       builder: (context, state, _) {
-        return IconButton(
-          onPressed: () {
-            LMFeedVideoProvider.instance.toggleVolumeState();
-          },
-          icon: LMFeedIcon(
-            type: LMFeedIconType.icon,
-            style: const LMFeedIconStyle(
-              color: Colors.white,
-            ),
-            icon: state ? Icons.volume_off : Icons.volume_up,
-          ),
-        );
+        return widget.muteButtonBuilder?.call(
+              context,
+              _defMuteButton(state),
+              state,
+            ) ??
+            _defMuteButton(state);
       },
+    );
+  }
+
+  LMFeedButton _defMuteButton(bool state) {
+    return LMFeedButton(
+      onTap: () {
+        LMFeedVideoProvider.instance.toggleVolumeState();
+      },
+      style: const LMFeedButtonStyle.basic().copyWith(
+        gap: 0,
+        margin: const EdgeInsets.all(8),
+        icon: LMFeedIcon(
+          type: LMFeedIconType.icon,
+          style: const LMFeedIconStyle(
+            color: Colors.white,
+          ),
+          icon: state ? Icons.volume_off : Icons.volume_up,
+        ),
+      ),
     );
   }
 
   Stack _defVideoControls(VideoState state) {
     return Stack(
       children: [
-        Positioned(
-          bottom: 2,
-          left: 2,
-          child: widget.muteButton ?? _defMuteButton(),
-        ),
+        if (style?.allowMuting ?? true)
+          Positioned(
+            bottom: 2,
+            left: 2,
+            child: _defMuteButtonBuilder(),
+          ),
         Positioned(
           left: 0,
           bottom: 0,
@@ -459,62 +518,94 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo> {
                 visible: _onTouch || !controller!.player.state.playing,
                 child: Container(
                   alignment: Alignment.center,
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      shape: const CircleBorder(
-                        side: BorderSide(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    child:
-                        controller != null && controller!.player.state.playing
-                            ? style?.pauseButton ??
-                                const Icon(
-                                  Icons.pause,
-                                  size: 28,
-                                  color: Colors.white,
-                                )
-                            : style?.playButton ??
-                                const Icon(
-                                  Icons.play_arrow,
-                                  size: 28,
-                                  color: Colors.white,
-                                ),
-                    onPressed: () async {
-                      _timer?.cancel();
-                      if (controller == null) {
-                        return;
-                      }
-
-                      if (!(controller
-                              ?.player.platform?.isVideoControllerAttached ??
-                          false)) {
-                        await initialiseControllers();
-                        rebuildVideo.value = !rebuildVideo.value;
-                      }
-
-                      controller!.player.state.playing
-                          ? state.widget.controller.player.pause()
-                          : state.widget.controller.player.play();
-                      rebuildOverlay.value = !rebuildOverlay.value;
-                      _timer = Timer.periodic(
-                        const Duration(milliseconds: 2500),
-                        (_) {
-                          _onTouch = false;
-                          rebuildOverlay.value = !rebuildOverlay.value;
-                        },
-                      );
-                      // enterFullscreen(
-                      //     context);
-                    },
-                  ),
+                  child: widget.playPauseButtonBuilder?.call(
+                        context,
+                        _defPlayPauseButton(state),
+                        state.widget.controller.player.state.playing,
+                      ) ??
+                      _defPlayPauseButton(state),
                 ),
               );
             },
           ),
         ),
       ],
+    );
+  }
+
+  LMFeedButton _defPlayPauseButton(VideoState state) {
+    return LMFeedButton(
+      style: const LMFeedButtonStyle.basic().copyWith(
+        margin: const EdgeInsets.all(8),
+        border: Border.all(
+          color: Colors.white,
+        ),
+        borderRadius: 100,
+        height: 42,
+        width: 42,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      onTap: () async {
+        _timer?.cancel();
+        if (controller == null) {
+          return;
+        }
+
+        if (!(controller?.player.platform?.isVideoControllerAttached ??
+            false)) {
+          await initializeControllers();
+          rebuildVideo.value = !rebuildVideo.value;
+        }
+
+        controller!.player.state.playing
+            ? state.widget.controller.player.pause()
+            : state.widget.controller.player.play();
+        rebuildOverlay.value = !rebuildOverlay.value;
+        _timer = Timer.periodic(
+          const Duration(milliseconds: 2500),
+          (_) {
+            _onTouch = false;
+            rebuildOverlay.value = !rebuildOverlay.value;
+          },
+        );
+        // enterFullscreen(
+        //     context);
+      },
+      child: controller != null && controller!.player.state.playing
+          ? widget.pauseIconBuilder?.call(context, _defPauseIcon()) ??
+              _defPauseIcon()
+          : widget.playIconBuilder?.call(context, _defPlayIcon()) ??
+              _defPlayIcon(),
+    );
+  }
+
+  LMFeedIcon _defPlayIcon() {
+    return const LMFeedIcon(
+      type: LMFeedIconType.icon,
+      icon: Icons.play_arrow,
+      style: LMFeedIconStyle(
+        size: 28,
+        boxSize: 28,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  LMFeedIcon _defPauseIcon() {
+    return const LMFeedIcon(
+      type: LMFeedIconType.icon,
+      icon: Icons.pause,
+      style: LMFeedIconStyle(
+        size: 28,
+        boxSize: 28,
+        color: Colors.white,
+      ),
     );
   }
 }
@@ -546,9 +637,6 @@ class LMFeedPostVideoStyle {
   final Widget? loaderWidget;
   final Widget? errorWidget;
   final Widget? shimmerWidget;
-  final LMFeedButton? playButton;
-  final LMFeedButton? pauseButton;
-  final LMFeedButton? muteButton;
   // Video functionality control variables
   final bool? showControls;
   final bool? autoPlay;
@@ -570,9 +658,6 @@ class LMFeedPostVideoStyle {
     this.loaderWidget,
     this.errorWidget,
     this.shimmerWidget,
-    this.playButton,
-    this.pauseButton,
-    this.muteButton,
     this.showControls,
     this.autoPlay,
     this.looping,
@@ -621,9 +706,6 @@ class LMFeedPostVideoStyle {
       loaderWidget: loaderWidget ?? this.loaderWidget,
       errorWidget: errorWidget ?? this.errorWidget,
       shimmerWidget: shimmerWidget ?? this.shimmerWidget,
-      playButton: playButton ?? this.playButton,
-      pauseButton: pauseButton ?? this.pauseButton,
-      muteButton: muteButton ?? this.muteButton,
       showControls: showControls ?? this.showControls,
       autoPlay: autoPlay ?? this.autoPlay,
       looping: looping ?? this.looping,

@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed_flutter_core/src/core/configurations/feed_builder.dart';
 import 'package:likeminds_feed_flutter_core/src/core/core.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/feed/add_comment.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/feed/feed_pending_post_banner.dart';
@@ -72,7 +71,7 @@ class LMFeedSocialScreenBuilderDelegate extends LMFeedWidgetBuilderDelegate {
     bool drawerEnableOpenDragGesture = true,
     bool endDrawerEnableOpenDragGesture = true,
     String? restorationId,
-    LMFeedWidgetSource source = LMFeedWidgetSource.activityScreen,
+    LMFeedWidgetSource source = LMFeedWidgetSource.universalFeed,
     bool canPop = true,
     Function(bool)? onPopInvoked,
   }) {

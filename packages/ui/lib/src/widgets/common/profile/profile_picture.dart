@@ -44,9 +44,8 @@ class LMFeedProfilePicture extends StatelessWidget {
             width: inStyle.border ?? 0,
           ),
           shape: inStyle.boxShape ?? BoxShape.rectangle,
-          color: imageUrl != null && imageUrl!.isNotEmpty
-              ? Colors.grey.shade300
-              : LMFeedTheme.instance.theme.primaryColor,
+          color: inStyle.backgroundColor ??
+              LMFeedTheme.instance.theme.primaryColor,
           image: bytes != null
               ? DecorationImage(
                   image: MemoryImage(bytes!),

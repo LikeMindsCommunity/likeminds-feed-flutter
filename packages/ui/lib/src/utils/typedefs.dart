@@ -180,3 +180,9 @@ typedef LMFeedContextBuilder = Widget Function(
 /// must return a widget, takes in [BuildContext] and [LMFeedLoader] as params
 /// {@endtemplate}
 typedef LMFeedLoaderBuilder = Widget Function(BuildContext context);
+
+/// {@template lm_feed_icon_builder}
+/// Builder function to build the icon widget.
+/// must return a widget, takes in [LMFeedIcon] as params
+/// {@endtemplate}
+typedef LMFeedIconBuilder = Widget Function(BuildContext, LMFeedIcon);
