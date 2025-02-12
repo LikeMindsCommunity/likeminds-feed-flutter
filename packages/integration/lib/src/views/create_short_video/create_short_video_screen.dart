@@ -158,6 +158,7 @@ class _LMFeedCreateShortVideoScreenState
     return LMFeedVideo(
       video: attachment,
       postId: "${_composeBloc.postMedia.first.attachmentMeta.path.toString()}",
+      style: LMFeedPostVideoStyle.basic(),
     );
   }
 

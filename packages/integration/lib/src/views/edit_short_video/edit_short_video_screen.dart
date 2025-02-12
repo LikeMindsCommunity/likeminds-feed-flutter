@@ -198,6 +198,7 @@ class _LMFeedEditShortVideoScreenState
     return LMFeedVideo(
       video: attachment,
       postId: _postViewData?.id ?? widget.postId,
+      style: LMFeedPostVideoStyle.basic(),
     );
   }
 
