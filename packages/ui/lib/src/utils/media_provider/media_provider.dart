@@ -226,11 +226,11 @@ class LMFeedVideoProvider with ChangeNotifier {
   }
 
   /// This functions pause all the controller in the map.
-  void forcePauseAllControllers() {
+  Future<void> forcePauseAllControllers() async {
     for (var controller in _videoControllers.values) {
       for (var element in controller.values) {
         if (element.player.state.playing) {
-          element.player.pause();
+          await element.player.pause();
         }
       }
     }

@@ -5,6 +5,11 @@ import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/views/edit_short_video/edit_short_video_screen.dart';
 import 'package:likeminds_feed_flutter_core/src/widgets/feed/comment_bottom_sheet.dart';
 
+/// {@template lm_feed_vertical_video_post}
+/// A widget to display a vertical video post in the feed.
+/// Contains the video, post header, post content, post topic, post menu, like button, comment button.
+/// Can be customized using the [LMFeedVerticalVideoPostStyle].
+/// {@endtemplate}
 class LMFeedVerticalVideoPost extends StatefulWidget {
   const LMFeedVerticalVideoPost({
     super.key,
@@ -33,6 +38,41 @@ class LMFeedVerticalVideoPost extends StatefulWidget {
   final List<Widget> preActionWidgets;
   final List<Widget> postActionWidgets;
   final LMFeedVerticalVideoPostStyle? style;
+
+  /// copyWith method for the [LMFeedVerticalVideoPost]
+  /// This method is used to create a copy of the [LMFeedVerticalVideoPost] with the new values
+  /// provided in the parameters.
+  LMFeedVerticalVideoPost copyWith({
+    LMPostViewData? postViewData,
+    LMFeedWidgetSource? widgetSource,
+    LMFeedVideoBuilder? videoBuilder,
+    LMFeedPostHeaderBuilder? postHeaderBuilder,
+    LMFeedPostContentBuilder? postContentBuilder,
+    LMFeedPostTopicBuilder? postTopicBuilder,
+    LMFeedPostMenuBuilder? postMenuBuilder,
+    LMFeedButtonBuilder? postLikeButtonBuilder,
+    LMFeedButtonBuilder? postCommentButtonBuilder,
+    List<Widget>? preActionWidgets,
+    List<Widget>? postActionWidgets,
+    LMFeedVerticalVideoPostStyle? style,
+  }) {
+    return LMFeedVerticalVideoPost(
+      postViewData: postViewData ?? this.postViewData,
+      widgetSource: widgetSource ?? this.widgetSource,
+      videoBuilder: videoBuilder ?? this.videoBuilder,
+      postHeaderBuilder: postHeaderBuilder ?? this.postHeaderBuilder,
+      postContentBuilder: postContentBuilder ?? this.postContentBuilder,
+      postTopicBuilder: postTopicBuilder ?? this.postTopicBuilder,
+      postMenuBuilder: postMenuBuilder ?? this.postMenuBuilder,
+      postLikeButtonBuilder:
+          postLikeButtonBuilder ?? this.postLikeButtonBuilder,
+      postCommentButtonBuilder:
+          postCommentButtonBuilder ?? this.postCommentButtonBuilder,
+      preActionWidgets: preActionWidgets ?? this.preActionWidgets,
+      postActionWidgets: postActionWidgets ?? this.postActionWidgets,
+      style: style ?? this.style,
+    );
+  }
 
   @override
   State<LMFeedVerticalVideoPost> createState() =>
@@ -69,7 +109,7 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
       alignment: _inStyle.alignment ?? Alignment.bottomLeft,
       children: [
         Container(
-          height: _inStyle.height ,
+          height: _inStyle.height,
           width: _inStyle.width,
           decoration: _inStyle.decoration,
           padding: _inStyle.padding,

@@ -85,4 +85,42 @@ class LMFeedReportScreenBuilderDelegate extends LMFeedWidgetBuilderDelegate {
       onPopInvoked: onPopInvoked,
     );
   }
+
+  /// Loader builder for the Report Screen
+  Widget loaderBuilder(BuildContext context, LMFeedLoader loader) {
+    return loader;
+  }
+
+  /// Builder for the Report Screen's Success icon
+  Widget successIconBuilder(BuildContext context, LMFeedIcon successIcon) {
+    return successIcon;
+  }
+
+  /// Builder for the Report Screen's Success text
+  Widget successTextBuilder(BuildContext context, LMFeedText successText) {
+    return successText;
+  }
+
+  /// Builder for the Report Screen's Success sub text
+  Widget successSubTextBuilder(
+      BuildContext context, LMFeedText successSubText) {
+    return successSubText;
+  }
+
+  /// Builder for the Report Screen's Content widget
+  Widget contentBuilder(BuildContext context, LMReportContentWidget content) {
+    return content;
+  }
+
+  /// Builder for submit button
+  Widget submitButtonBuilder(BuildContext context, LMFeedButton submitButton) {
+    return submitButton;
+  }
+
+  /// Builder for the Report Screen's chip
+  Widget chipBuilder(
+      BuildContext context, Chip chip, LMDeleteReasonViewData data) {
+    return chip;
+  }
+
 }

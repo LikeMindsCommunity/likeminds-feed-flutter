@@ -210,6 +210,7 @@ class LMFeedPostHeader extends StatelessWidget {
     return createdAt ??
         LMFeedText(
           text: LMFeedTimeAgo.instance.format(postViewData.createdAt),
+          style: LMFeedTextStyle.basic(),
         );
   }
 
