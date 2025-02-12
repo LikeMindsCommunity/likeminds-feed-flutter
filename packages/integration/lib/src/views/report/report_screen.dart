@@ -143,44 +143,57 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        LMFeedIcon(
-          type: LMFeedIconType.icon,
-          icon: Icons.report_outlined,
-          style: LMFeedIconStyle(
-            color: theme.errorColor,
-            size: 28,
-            backgroundColor: theme.errorColor.withOpacity(0.1),
-            boxBorderRadius: 100,
-            boxSize: 40,
-          ),
-        ),
+        _widgetBuilder.successIconBuilder(context, _defReportSuccessIcon()),
         const SizedBox(
           height: 16,
         ),
-        LMFeedText(
-          text: 'Thank you for submitting a report',
-          style: LMFeedTextStyle(
-            textStyle: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: theme.onContainer,
-            ),
-          ),
-        ),
-        LMFeedText(
-          text:
-              'We take reports seriously and after a through review, will take appropriate action.',
-          style: LMFeedTextStyle(
-            maxLines: 4,
-            textAlign: TextAlign.center,
-            textStyle: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: theme.secondaryColor,
-            ),
-          ),
-        ),
+        _widgetBuilder.successTextBuilder(context, _defReportSuccessText()),
+        _widgetBuilder.successSubTextBuilder(
+            context, _defReportSuccessSubText()),
       ],
+    );
+  }
+
+  LMFeedText _defReportSuccessSubText() {
+    return LMFeedText(
+      text:
+          'We take reports seriously and after a through review, will take appropriate action.',
+      style: LMFeedTextStyle(
+        maxLines: 4,
+        textAlign: TextAlign.center,
+        textStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: theme.secondaryColor,
+        ),
+      ),
+    );
+  }
+
+  LMFeedText _defReportSuccessText() {
+    return LMFeedText(
+      text: 'Thank you for submitting a report',
+      style: LMFeedTextStyle(
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: theme.onContainer,
+        ),
+      ),
+    );
+  }
+
+  LMFeedIcon _defReportSuccessIcon() {
+    return LMFeedIcon(
+      type: LMFeedIconType.icon,
+      icon: Icons.report_outlined,
+      style: LMFeedIconStyle(
+        color: theme.errorColor,
+        size: 28,
+        backgroundColor: theme.errorColor.withOpacity(0.1),
+        boxBorderRadius: 100,
+        boxSize: 40,
+      ),
     );
   }
 
@@ -259,38 +272,10 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                                               },
                                             );
                                           },
-                                          child: Chip(
-                                            side: BorderSide.none,
-                                            label: LMFeedText(
-                                              text: e.name,
-                                              style: LMFeedTextStyle(
-                                                textStyle: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: selectedTags
-                                                          .contains(e.id)
-                                                      ? theme.errorColor
-                                                      : theme.secondaryColor,
-                                                ),
-                                              ),
-                                            ),
-                                            backgroundColor:
-                                                selectedTags.contains(e.id)
-                                                    ? theme.errorColor
-                                                        .withOpacity(0.2)
-                                                    : theme.secondaryColor
-                                                        .withOpacity(0.1),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12.0),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0,
-                                              vertical: 4,
-                                            ),
-                                            labelPadding:
-                                                const EdgeInsets.all(4),
-                                            elevation: 0,
+                                          child: _widgetBuilder.chipBuilder(
+                                            context,
+                                            _defChip(e),
+                                            e,
                                           ),
                                         ),
                                       )
@@ -361,73 +346,108 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-          child: LMFeedButton(
-            style: LMFeedButtonStyle(
-              width: double.infinity,
-              height: 42,
-              padding: EdgeInsets.symmetric(horizontal: 40.0),
-              backgroundColor: selectedTags.isEmpty
-                  ? theme.disabledColor
-                  : theme.primaryColor,
-              borderRadius: 12,
-            ),
-            text: LMFeedText(
-              text: 'Submit report',
-              style: LMFeedTextStyle(
-                textStyle: TextStyle(
-                    color: theme.container,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500),
-              ),
-            ),
-            onTap: () async {
-              String? reason = reportReasonController.text.trim();
-              if (deleteReason == null) {
-                showReasonNotSelectedSnackbar();
-                return;
-              }
-
-              String deleteReasonLowerCase = deleteReason!.name.toLowerCase();
-              if ((deleteReasonLowerCase == 'others' ||
-                  deleteReasonLowerCase == 'other')) {
-                if (reason.isEmpty) {
-                  LMFeedCore.showSnackBar(
-                      context,
-                      'Please specify a reason for reporting',
-                      LMFeedWidgetSource.reportScreen);
-                  return;
-                }
-              }
-
-              if (selectedTags.isNotEmpty) {
-                reportListener.value = LMFeedReportState.loading;
-                PostReportRequest postReportRequest =
-                    (PostReportRequestBuilder()
-                          ..entityCreatorId(widget.entityCreatorId)
-                          ..entityId(widget.entityId)
-                          ..entityType(widget.entityType)
-                          ..reason(reason.isEmpty ? deleteReason!.name : reason)
-                          ..tagId(deleteReason!.id))
-                        .build();
-                PostReportResponse response =
-                    await LMFeedCore.client.postReport(postReportRequest);
-
-                if (!response.success) {
-                  LMFeedCore.showSnackBar(
-                      context,
-                      response.errorMessage ?? 'An error occured',
-                      LMFeedWidgetSource.reportScreen);
-                } else {
-                  reportListener.value = LMFeedReportState.success;
-                }
-              } else {
-                showReasonNotSelectedSnackbar();
-                return;
-              }
-            },
+          child: _widgetBuilder.submitButtonBuilder(
+            context,
+            _defSubmitButton(context),
           ),
         ),
       ],
+    );
+  }
+
+  Chip _defChip(LMDeleteReasonViewData e) {
+    return Chip(
+      side: BorderSide.none,
+      label: LMFeedText(
+        text: e.name,
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: selectedTags.contains(e.id)
+                ? theme.errorColor
+                : theme.secondaryColor,
+          ),
+        ),
+      ),
+      backgroundColor: selectedTags.contains(e.id)
+          ? theme.errorColor.withOpacity(0.2)
+          : theme.secondaryColor.withOpacity(0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 4,
+      ),
+      labelPadding: const EdgeInsets.all(4),
+      elevation: 0,
+    );
+  }
+
+  LMFeedButton _defSubmitButton(BuildContext context) {
+    return LMFeedButton(
+      style: LMFeedButtonStyle(
+        width: double.infinity,
+        height: 42,
+        padding: EdgeInsets.symmetric(horizontal: 40.0),
+        backgroundColor:
+            selectedTags.isEmpty ? theme.disabledColor : theme.primaryColor,
+        borderRadius: 12,
+      ),
+      text: LMFeedText(
+        text: 'Submit report',
+        style: LMFeedTextStyle(
+          textStyle: TextStyle(
+              color: theme.container,
+              fontSize: 16,
+              fontWeight: FontWeight.w500),
+        ),
+      ),
+      onTap: () async {
+        String? reason = reportReasonController.text.trim();
+        if (deleteReason == null) {
+          showReasonNotSelectedSnackbar();
+          return;
+        }
+
+        String deleteReasonLowerCase = deleteReason!.name.toLowerCase();
+        if ((deleteReasonLowerCase == 'others' ||
+            deleteReasonLowerCase == 'other')) {
+          if (reason.isEmpty) {
+            LMFeedCore.showSnackBar(
+                context,
+                'Please specify a reason for reporting',
+                LMFeedWidgetSource.reportScreen);
+            return;
+          }
+        }
+
+        if (selectedTags.isNotEmpty) {
+          reportListener.value = LMFeedReportState.loading;
+          PostReportRequest postReportRequest = (PostReportRequestBuilder()
+                ..entityCreatorId(widget.entityCreatorId)
+                ..entityId(widget.entityId)
+                ..entityType(widget.entityType)
+                ..reason(reason.isEmpty ? deleteReason!.name : reason)
+                ..tagId(deleteReason!.id))
+              .build();
+          PostReportResponse response =
+              await LMFeedCore.client.postReport(postReportRequest);
+
+          if (!response.success) {
+            LMFeedCore.showSnackBar(
+                context,
+                response.errorMessage ?? 'An error occured',
+                LMFeedWidgetSource.reportScreen);
+          } else {
+            reportListener.value = LMFeedReportState.success;
+          }
+        } else {
+          showReasonNotSelectedSnackbar();
+          return;
+        }
+      },
     );
   }
 
@@ -568,6 +588,8 @@ class LMReportScreenStyle {
 class LMReportContentWidget extends StatelessWidget {
   final String title;
   final String description;
+  final LMFeedTextBuilder? titleBuilder;
+  final LMFeedTextBuilder? descriptionBuilder;
 
   final LMReportContentWidgetStyle? style;
 
@@ -575,6 +597,8 @@ class LMReportContentWidget extends StatelessWidget {
     super.key,
     required this.title,
     required this.description,
+    this.titleBuilder,
+    this.descriptionBuilder,
     this.style,
   });
 
@@ -586,19 +610,28 @@ class LMReportContentWidget extends StatelessWidget {
             style?.crossAxisAlignment ?? CrossAxisAlignment.start,
         mainAxisAlignment: style?.mainAxisAlignment ?? MainAxisAlignment.start,
         children: <Widget>[
-          LMFeedText(
-            text: title,
-            style: style?.titleStyle,
-          ),
+          titleBuilder?.call(context, _defTitle()) ?? _defTitle(),
           SizedBox(
             height: style?.titleDescriptionSpacing ?? 8,
           ),
-          LMFeedText(
-            text: description,
-            style: style?.descriptionStyle,
-          ),
+          descriptionBuilder?.call(context, _defDescription()) ??
+              _defDescription(),
         ],
       ),
+    );
+  }
+
+  LMFeedText _defDescription() {
+    return LMFeedText(
+      text: description,
+      style: style?.descriptionStyle,
+    );
+  }
+
+  LMFeedText _defTitle() {
+    return LMFeedText(
+      text: title,
+      style: style?.titleStyle,
     );
   }
 }
