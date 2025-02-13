@@ -17,6 +17,7 @@ import 'package:likeminds_feed_flutter_core/src/views/poll/configurations/config
 import 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/report/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/search/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/select_topic/configurations/config.dart';
 
 // export all the configurations
 export 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
@@ -36,6 +37,7 @@ export 'package:likeminds_feed_flutter_core/src/views/report/configurations/conf
 export 'package:likeminds_feed_flutter_core/src/views/search/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/pending_post/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/select_topic/configurations/config.dart';
 
 /// enum to describe which type of feed to render
 enum LMFeedType {
@@ -102,6 +104,9 @@ class LMFeedConfig {
   /// {@macro lm_feed_search_screen_config}
   final LMFeedSearchScreenConfig searchScreenConfig;
 
+  /// {@macro lm_feed_topic_select_screen_config}
+  final LMFeedTopicSelectScreenConfig topicSelectScreenConfig;
+
   /// {@macro lm_feed_web_configuration}
   final LMFeedWebConfiguration webConfiguration;
 
@@ -132,6 +137,7 @@ class LMFeedConfig {
     this.pollScreenConfig = const LMFeedPollScreenConfig(),
     this.reportScreenConfig = const LMFeedReportScreenConfig(),
     this.searchScreenConfig = const LMFeedSearchScreenConfig(),
+    this.topicSelectScreenConfig = const LMFeedTopicSelectScreenConfig(),
     this.webConfiguration = const LMFeedWebConfiguration(),
     this.feedThemeType = LMFeedThemeType.social,
     this.widgetBuilderDelegate = const LMFeedWidgetBuilderDelegate(),

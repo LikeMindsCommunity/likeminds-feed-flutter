@@ -1,0 +1,3 @@
+class LMFeedTopicSelectScreenSetting {
+  const LMFeedTopicSelectScreenSetting();
+}

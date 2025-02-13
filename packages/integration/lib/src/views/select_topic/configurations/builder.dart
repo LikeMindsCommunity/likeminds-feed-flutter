@@ -1,0 +1,3 @@
+class LMFeedTopicSelectScreenBuilderDelegate {
+  const LMFeedTopicSelectScreenBuilderDelegate();
+}
