@@ -274,6 +274,7 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
       postViewData: postViewData,
       postHeaderStyle: LMFeedPostHeaderStyle.basic().copyWith(
         showMenu: false,
+        imageSize: 36,
         titleTextStyle: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 16,
@@ -674,9 +675,7 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
           showDragHandle: true,
           isScrollControlled: true,
           builder: (context) {
-            return LMFeedCommentBottomSheet(
-              postId: postViewData.id,
-            );
+            return _defCommentBottomSheet(postViewData);
           },
         );
         LMFeedVideoProvider.instance.playCurrentVideo();
@@ -684,6 +683,12 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
     );
 
     return commentButton;
+  }
+
+  LMFeedCommentBottomSheet _defCommentBottomSheet(LMPostViewData postViewData) {
+    return LMFeedCommentBottomSheet(
+      postId: postViewData.id,
+    );
   }
 }
 

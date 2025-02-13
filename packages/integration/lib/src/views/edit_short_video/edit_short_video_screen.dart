@@ -377,9 +377,10 @@ class _LMFeedEditShortVideoScreenState
       },
       style: LMFeedButtonStyle(
         borderRadius: 4,
+        gap: 4,
         padding: EdgeInsets.symmetric(
           horizontal: 8,
-          vertical: 6,
+          vertical: 4,
         ),
         margin: EdgeInsets.only(
           right: 8,
@@ -399,6 +400,7 @@ class _LMFeedEditShortVideoScreenState
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 14,
+            height: 20 / 14,
             fontWeight: FontWeight.w500,
             color: _theme.primaryColor,
           ),
