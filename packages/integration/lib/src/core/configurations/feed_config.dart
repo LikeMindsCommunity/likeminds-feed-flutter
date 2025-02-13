@@ -55,6 +55,9 @@ enum LMFeedThemeType {
 
   /// render qna theme feed
   qna,
+
+  /// render video feed theme
+  videoFeed,
 }
 
 /// {@template lm_feed_config}

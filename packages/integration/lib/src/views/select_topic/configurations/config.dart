@@ -14,12 +14,12 @@ export 'package:likeminds_feed_flutter_core/src/views/select_topic/configuration
 /// {@endtemplate}
 class LMFeedTopicSelectScreenConfig {
   final LMFeedTopicSelectScreenStyle style;
-  final LMFeedTopicSelectScreenBuilderDelegate builderDelegate;
+  final LMFeedTopicSelectScreenBuilderDelegate builder;
   final LMFeedTopicSelectScreenSetting setting;
 
   const LMFeedTopicSelectScreenConfig({
     this.style = const LMFeedTopicSelectScreenStyle(),
-    this.builderDelegate = const LMFeedTopicSelectScreenBuilderDelegate(),
+    this.builder = const LMFeedTopicSelectScreenBuilderDelegate(),
     this.setting = const LMFeedTopicSelectScreenSetting(),
   });
 }

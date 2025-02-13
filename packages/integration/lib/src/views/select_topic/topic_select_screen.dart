@@ -43,8 +43,7 @@ class LMFeedTopicSelectScreen extends StatefulWidget {
 class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
   late Size screenSize;
   LMFeedThemeData feedThemeData = LMFeedCore.theme;
-  LMFeedWidgetBuilderDelegate widgetUtility =
-      LMFeedCore.config.widgetBuilderDelegate;
+  final _screenBuilder = LMFeedCore.config.topicSelectScreenConfig.builder;
   List<LMTopicViewData> selectedTopics = [];
   FocusNode keyboardNode = FocusNode();
   Set<String> selectedTopicId = {};
@@ -146,7 +145,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
   @override
   Widget build(BuildContext context) {
     screenSize = MediaQuery.sizeOf(context);
-    return widgetUtility.scaffold(
+    return _screenBuilder.scaffold(
       source: LMFeedWidgetSource.topicSelectScreen,
       backgroundColor: feedThemeData.backgroundColor,
       floatingActionButton: FloatingActionButton(
@@ -161,7 +160,10 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
           color: feedThemeData.onPrimary,
         ),
       ),
-      appBar: _defAppBar(context),
+      appBar: _screenBuilder.appBarBuilder(
+        context,
+        _defAppBar(context),
+      ),
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
@@ -194,15 +196,11 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                 return Column(
                   children: [
                     if (!isSearching && widget.showAllTopicsTile)
-                      LMFeedTopicTile(
-                        isSelected: selectedTopics.isEmpty,
-                        topic: allTopics,
-                        onTap: (LMTopicViewData tappedTopic) {
-                          selectedTopics.clear();
-                          selectedTopicId.clear();
-                          rebuildTopicsScreen.value =
-                              !rebuildTopicsScreen.value;
-                        },
+                      _screenBuilder.topicTileBuilder(
+                        context,
+                        _defAllTopicTile(),
+                        allTopics,
+                        selectedTopics.contains(allTopics),
                       ),
                     Expanded(
                       child: PagedListView(
@@ -212,29 +210,46 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
                         builderDelegate:
                             PagedChildBuilderDelegate<LMTopicViewData>(
                           noItemsFoundIndicatorBuilder: (context) =>
-                              const Center(
-                                  child: Text(
-                            "Opps, no topics found!",
-                          )),
+                              _screenBuilder.noItemIndicatorBuilder(
+                            context,
+                            const Center(
+                              child: Text(
+                                "Oops, no topics found!",
+                              ),
+                            ),
+                          ),
+                          noMoreItemsIndicatorBuilder:
+                              _screenBuilder.noMoreItemsIndicatorBuilder(
+                            context,
+                          ),
+                          firstPageProgressIndicatorBuilder: (context) {
+                            return _screenBuilder
+                                .firstPageProgressIndicatorBuilder(
+                              context,
+                              LMFeedLoader(),
+                            );
+                          },
+                          newPageProgressIndicatorBuilder: (context) {
+                            return _screenBuilder
+                                .newPageProgressIndicatorBuilder(
+                              context,
+                              LMFeedLoader(),
+                            );
+                          },
+                          firstPageErrorIndicatorBuilder:
+                              _screenBuilder.firstPageErrorIndicatorBuilder(
+                            context,
+                          ),
+                          newPageErrorIndicatorBuilder:
+                              _screenBuilder.newPageErrorIndicatorBuilder(
+                            context,
+                          ),
                           itemBuilder: (context, item, index) =>
-                              LMFeedTopicTile(
-                            isSelected: checkSelectedTopicExistsInList(item),
-                            topic: item,
-                            style: LMFeedTopicTileStyle.basic(
-                                containerColor: feedThemeData.container),
-                            onTap: (LMTopicViewData tappedTopic) {
-                              int index = selectedTopics.indexWhere(
-                                  (element) => element.id == tappedTopic.id);
-                              if (index != -1) {
-                                selectedTopics.removeAt(index);
-                                selectedTopicId.remove(tappedTopic.id);
-                              } else {
-                                selectedTopics.add(tappedTopic);
-                                selectedTopicId.add(tappedTopic.id);
-                              }
-                              rebuildTopicsScreen.value =
-                                  !rebuildTopicsScreen.value;
-                            },
+                              _screenBuilder.topicTileBuilder(
+                            context,
+                            _defTopicTile(item),
+                            item,
+                            checkSelectedTopicExistsInList(item),
                           ),
                         ),
                       ),
@@ -246,6 +261,39 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  LMFeedTopicTile _defAllTopicTile() {
+    return LMFeedTopicTile(
+      isSelected: selectedTopics.isEmpty,
+      topic: allTopics,
+      onTap: (LMTopicViewData tappedTopic) {
+        selectedTopics.clear();
+        selectedTopicId.clear();
+        rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
+      },
+    );
+  }
+
+  LMFeedTopicTile _defTopicTile(LMTopicViewData item) {
+    return LMFeedTopicTile(
+      isSelected: checkSelectedTopicExistsInList(item),
+      topic: item,
+      style:
+          LMFeedTopicTileStyle.basic(containerColor: feedThemeData.container),
+      onTap: (LMTopicViewData tappedTopic) {
+        int index = selectedTopics
+            .indexWhere((element) => element.id == tappedTopic.id);
+        if (index != -1) {
+          selectedTopics.removeAt(index);
+          selectedTopicId.remove(tappedTopic.id);
+        } else {
+          selectedTopics.add(tappedTopic);
+          selectedTopicId.add(tappedTopic.id);
+        }
+        rebuildTopicsScreen.value = !rebuildTopicsScreen.value;
+      },
     );
   }
 
