@@ -84,6 +84,7 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
       style: LMFeedAppBarStyle(
         height: 56,
         backgroundColor: Colors.transparent,
+        border: Border()
       ),
       trailing: [
         BlocListener<LMFeedComposeBloc, LMFeedComposeState>(

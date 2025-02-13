@@ -255,9 +255,7 @@ class _LMFeedReportScreenState extends State<LMFeedReportScreen> {
                               children: reportTags.isNotEmpty
                                   ? reportTags
                                       .map(
-                                        (e) => InkWell(
-                                          splashFactory:
-                                              InkRipple.splashFactory,
+                                        (e) => GestureDetector(
                                           onTap: () {
                                             setState(
                                               () {
