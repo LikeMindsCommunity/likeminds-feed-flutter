@@ -1,9 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
-import 'package:likeminds_feed_flutter_core/src/core/core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
-import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 
 class LMFeedCreateShortVideoBuilderDelegate {
   const LMFeedCreateShortVideoBuilderDelegate();
@@ -87,6 +84,14 @@ class LMFeedCreateShortVideoBuilderDelegate {
     void Function(String) onValidationFailed,
   ) {
     return appBar;
+  }
+
+  /// create post button builder
+  Widget createPostButtonBuilder(
+    BuildContext context,
+    LMFeedButton createPostButton,
+  ) {
+    return createPostButton;
   }
 
   /// video preview builder

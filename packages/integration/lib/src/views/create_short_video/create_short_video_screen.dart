@@ -385,7 +385,10 @@ class _LMFeedCreateShortVideoScreenState
         ValueListenableBuilder(
             valueListenable: _postValidationNotifier,
             builder: (context, value, child) {
-              return _defPostButton();
+              return _screenBuilder.createPostButtonBuilder(
+                context,
+                _defPostButton(),
+              );
             }),
       ],
       style: LMFeedAppBarStyle(

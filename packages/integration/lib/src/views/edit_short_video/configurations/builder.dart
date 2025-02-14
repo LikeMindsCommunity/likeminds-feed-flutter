@@ -89,6 +89,14 @@ class LMFeedEditShortVideoBuilderDelegate {
     return appBar;
   }
 
+  /// edit button builder
+  Widget editButtonBuilder(
+    BuildContext context,
+    LMFeedButton editButton,
+  ) {
+    return editButton;
+  }
+
   /// video preview builder
   Widget videoPreviewBuilder(
     BuildContext context,
