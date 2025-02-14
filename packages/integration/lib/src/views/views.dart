@@ -43,3 +43,4 @@ export 'pending_post/pending_posts_screen.dart';
 
 // create short videos
 export 'create_short_video/create_short_video_screen.dart';
+export 'edit_short_video/edit_short_video_screen.dart';
