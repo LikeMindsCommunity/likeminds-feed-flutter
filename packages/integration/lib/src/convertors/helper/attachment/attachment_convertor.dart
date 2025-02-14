@@ -28,7 +28,7 @@ class LMAttachmentViewDataConvertor {
 
   static Attachment toAttachment(LMAttachmentViewData attachmentViewData) {
     return Attachment(
-      attachmentType: attachmentViewData.mapMediaTypeToInt(),
+      attachmentType: attachmentViewData.attachmentType.value,
       attachmentMeta: AttachmentMeta(
         url: attachmentViewData.attachmentMeta.url,
         format: attachmentViewData.attachmentMeta.format,
@@ -60,6 +60,8 @@ class LMAttachmentViewDataConvertor {
         allowAddOption: attachmentViewData.attachmentMeta.allowAddOption,
         path: attachmentViewData.attachmentMeta.path,
         bytes: attachmentViewData.attachmentMeta.bytes,
+        name: attachmentViewData.attachmentMeta.name,
+        thumbnailUrl: attachmentViewData.attachmentMeta.thumbnailUrl,
       ),
     );
   }

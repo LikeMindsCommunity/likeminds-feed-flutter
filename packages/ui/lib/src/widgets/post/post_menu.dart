@@ -38,18 +38,16 @@ class LMFeedMenu extends StatelessWidget {
   /// Constructor for `LMFeedMenu`.
   /// {@macro lm_feed_menu}
   const LMFeedMenu({
-    Key? key,
-    this.children,
+    super.key,
     required this.menuItems,
     this.removeItemIds = const {4, 7},
     this.action,
     this.style,
     this.onMenuTap,
     this.onMenuOpen,
-  }) : super(key: key);
-
-  /// A map of child widgets for each menu item. The key is the menu item ID.
-  final Map<int, Widget>? children;
+    this.menuItemBuilderForDialog,
+    this.menuItemBuilderForBottomSheet,
+  });
 
   /// A list of menu items.
   final List<LMPopUpMenuItemViewData> menuItems;
@@ -68,6 +66,16 @@ class LMFeedMenu extends StatelessWidget {
 
   /// A callback that is called when the menu is opened.
   final VoidCallback? onMenuOpen;
+
+  /// A builder that returns a widget to build the menu item when the menu type
+  /// is displayed as a dialog.
+  final Widget Function(BuildContext context, LMFeedText menuItem,
+      LMPopUpMenuItemViewData menuItemViewData)? menuItemBuilderForDialog;
+
+  /// A builder that returns a widget to build the menu item when the menu type
+  /// is a bottom sheet.
+  final Widget Function(BuildContext context, LMFeedTile menuItem,
+      LMPopUpMenuItemViewData menuItemViewData)? menuItemBuilderForBottomSheet;
 
   void removeReportIntegration() {
     menuItems.removeWhere((element) {
@@ -92,11 +100,11 @@ class LMFeedMenu extends StatelessWidget {
             splashFactory: InkRipple.splashFactory,
             child: AbsorbPointer(
               absorbing: onMenuTap != null,
-              child: (theme.headerStyle.menuStyle?.menuType ??
-                          LMFeedPostMenuType.popUp) ==
+              child: (style?.menuType ?? LMFeedPostMenuType.popUp) ==
                       LMFeedPostMenuType.popUp
                   ? SizedBox(
                       child: PopupMenuButton<int>(
+                        padding: EdgeInsets.zero,
                         onSelected: _handleMenuTap,
                         itemBuilder: (context) => menuItems
                             .map(
@@ -106,20 +114,18 @@ class LMFeedMenu extends StatelessWidget {
                                       horizontal: 12,
                                       vertical: 10,
                                     ),
-                                textStyle: style?.menuTitleStyle?.textStyle,
+                                textStyle: style?.menuTitleStyle
+                                    ?.call(element.id, null)
+                                    ?.textStyle,
                                 value: element.id,
-                                child: children?[element.id] ??
-                                    LMFeedText(
-                                      text: element.title,
-                                      style: style?.menuTitleStyle ??
-                                          LMFeedTextStyle(
-                                            textStyle: TextStyle(
-                                              color: theme.onContainer,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                    ),
+                                child: menuItemBuilderForDialog?.call(
+                                      context,
+                                      _defMenuItemForDialog(
+                                          element, style, theme),
+                                      element,
+                                    ) ??
+                                    _defMenuItemForDialog(
+                                        element, style, theme),
                               ),
                             )
                             .toList(),
@@ -146,7 +152,7 @@ class LMFeedMenu extends StatelessWidget {
                             context: context,
                             backgroundColor:
                                 style?.backgroundColor ?? theme.container,
-                            enableDrag: true,
+                            showDragHandle: true,
                             useRootNavigator: true,
                             useSafeArea: true,
                             clipBehavior: Clip.hardEdge,
@@ -156,57 +162,43 @@ class LMFeedMenu extends StatelessWidget {
                             ),
                             builder: (context) {
                               return LMFeedBottomSheet(
-                                  style: LMFeedBottomSheetStyle(
-                                    dragBarColor: theme.disabledColor,
-                                    backgroundColor: style?.backgroundColor ??
-                                        theme.container,
-                                    borderRadius: style?.borderRadius,
-                                    boxShadow: style?.boxShadow,
-                                    margin: style?.margin,
-                                    padding: style?.padding ??
-                                        const EdgeInsets.symmetric(
-                                            horizontal: 20.0),
-                                  ),
-                                  title: (style?.showBottomSheetTitle ?? true)
-                                      ? LMFeedText(
-                                          text: "Options",
-                                          style: style?.headingStyle ??
-                                              LMFeedTextStyle(
-                                                textAlign: TextAlign.left,
-                                                textStyle: TextStyle(
-                                                  color: theme.onContainer,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                        )
-                                      : null,
-                                  children: menuItems
-                                      .map(
-                                        (e) =>
-                                            children?[e.id] ??
-                                            ListTile(
-                                              contentPadding: EdgeInsets.zero,
-                                              title: LMFeedText(
-                                                text: e.title,
-                                                style: style?.menuTitleStyle ??
-                                                    LMFeedTextStyle(
-                                                      textStyle: TextStyle(
-                                                        color:
-                                                            theme.onContainer,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                onTap: () {
-                                                  Navigator.pop(context);
-                                                  _handleMenuTap(e.id);
-                                                },
+                                style: LMFeedBottomSheetStyle(
+                                  dragBar: const SizedBox(),
+                                  backgroundColor:
+                                      style?.backgroundColor ?? theme.container,
+                                  borderRadius: style?.borderRadius,
+                                  boxShadow: style?.boxShadow,
+                                  margin: style?.margin,
+                                  padding: style?.padding ??
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 20.0),
+                                ),
+                                title: (style?.showBottomSheetTitle ?? true)
+                                    ? LMFeedText(
+                                        text: "Options",
+                                        style: style?.headingStyle ??
+                                            LMFeedTextStyle(
+                                              textAlign: TextAlign.left,
+                                              textStyle: TextStyle(
+                                                color: theme.onContainer,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
                                       )
-                                      .toList());
+                                    : null,
+                                children: [
+                                  for (final menuItem in menuItems)
+                                    menuItemBuilderForBottomSheet?.call(
+                                          context,
+                                          _defMenuItemInBottomSheet(
+                                              menuItem, style, theme, context),
+                                          menuItem,
+                                        ) ??
+                                        _defMenuItemInBottomSheet(
+                                            menuItem, style, theme, context),
+                                ],
+                              );
                             });
                         // Called when the post menu is opened
                         onMenuOpen?.call();
@@ -228,6 +220,64 @@ class LMFeedMenu extends StatelessWidget {
                     ),
             ),
           );
+  }
+
+  LMFeedText _defMenuItemForDialog(LMPopUpMenuItemViewData element,
+      LMFeedMenuStyle? style, LMFeedThemeData theme) {
+    return LMFeedText(
+      text: element.title,
+      style: style?.menuTitleStyle?.call(
+            element.id,
+            LMFeedTextStyle(
+              textStyle: TextStyle(
+                color: theme.onContainer,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ) ??
+          LMFeedTextStyle(
+            textStyle: TextStyle(
+              color: theme.onContainer,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+    );
+  }
+
+  LMFeedTile _defMenuItemInBottomSheet(LMPopUpMenuItemViewData e,
+      LMFeedMenuStyle? style, LMFeedThemeData theme, BuildContext context) {
+    return LMFeedTile(
+      leading: const SizedBox(),
+      style: LMFeedTileStyle.basic().copyWith(
+        width: 1000,
+      ),
+      title: LMFeedText(
+        text: e.title,
+        style: style?.menuTitleStyle?.call(
+              e.id,
+              LMFeedTextStyle(
+                textStyle: TextStyle(
+                  color: theme.onContainer,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ) ??
+            LMFeedTextStyle(
+              textStyle: TextStyle(
+                color: theme.onContainer,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        _handleMenuTap(e.id);
+      },
+    );
   }
 
   void _handleMenuTap(int itemId) {
@@ -285,23 +335,30 @@ class LMFeedMenu extends StatelessWidget {
   /// {@endtemplate}
   ///
   LMFeedMenu copyWith({
-    Map<int, Widget>? children,
-    LMFeedIcon? menuIcon,
     List<LMPopUpMenuItemViewData>? menuItems,
     Set<int>? removeItemIds,
     LMFeedMenuAction? action,
     LMFeedMenuStyle? style,
     VoidCallback? onMenuTap,
     VoidCallback? onMenuOpen,
+    Widget Function(BuildContext context, LMFeedText menuItem,
+            LMPopUpMenuItemViewData menuItemViewData)?
+        menuItemBuilderForDialog,
+    Widget Function(BuildContext context, LMFeedTile menuItem,
+            LMPopUpMenuItemViewData menuItemViewData)?
+        menuItemBuilderForBottomSheet,
   }) {
     return LMFeedMenu(
-      children: children ?? this.children,
       menuItems: menuItems ?? this.menuItems,
       removeItemIds: removeItemIds ?? this.removeItemIds,
       action: action ?? this.action,
       style: style ?? this.style,
       onMenuTap: onMenuTap ?? this.onMenuTap,
       onMenuOpen: onMenuOpen ?? this.onMenuOpen,
+      menuItemBuilderForDialog:
+          menuItemBuilderForDialog ?? this.menuItemBuilderForDialog,
+      menuItemBuilderForBottomSheet:
+          menuItemBuilderForBottomSheet ?? this.menuItemBuilderForBottomSheet,
     );
   }
 }
@@ -378,7 +435,8 @@ class LMFeedMenuStyle {
   final LMFeedIcon? menuIcon;
   final LMFeedPostMenuType menuType;
   final LMFeedTextStyle? headingStyle;
-  final LMFeedTextStyle? menuTitleStyle;
+  final LMFeedTextStyle? Function(int id, LMFeedTextStyle? style)?
+      menuTitleStyle;
   final Color? backgroundColor;
   final List<BoxShadow>? boxShadow;
   final BorderRadius? borderRadius;
@@ -409,7 +467,7 @@ class LMFeedMenuStyle {
     LMFeedPostMenuType? menuType,
     LMFeedIcon? menuIcon,
     LMFeedTextStyle? headingStyle,
-    LMFeedTextStyle? menuTitleStyle,
+    LMFeedTextStyle Function(int id, LMFeedTextStyle? style)? menuTitleStyle,
     Color? backgroundColor,
     List<BoxShadow>? boxShadow,
     BorderRadius? borderRadius,

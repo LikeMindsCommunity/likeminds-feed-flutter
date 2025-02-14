@@ -6,3 +6,4 @@ export 'src/models/models.dart';
 export 'packages/expandable_text/expandable_text.dart';
 export 'packages/linkify/linkify.dart';
 export 'src/utils/helpers.dart';
+export 'src/utils/extensions/extensions.dart';

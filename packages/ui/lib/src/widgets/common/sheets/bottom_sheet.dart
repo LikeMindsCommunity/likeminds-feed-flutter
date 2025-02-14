@@ -46,15 +46,15 @@ class _LMBottomSheetState extends State<LMFeedBottomSheet> {
     LMFeedThemeData theme = LMFeedTheme.instance.theme;
     return Container(
       width: screenSize.width,
-      height: widget.style?.height,
+      height: widget.style?.maxHeight,
       decoration: BoxDecoration(
         color: widget.style?.backgroundColor ?? theme.container,
         borderRadius: widget.style?.borderRadius,
         boxShadow: widget.style?.boxShadow,
       ),
       constraints: BoxConstraints(
-        maxHeight: widget.style?.height ?? screenSize.height * 0.8,
-        minHeight: screenSize.height * 0.2,
+        maxHeight: widget.style?.maxHeight ?? screenSize.height * 0.8,
+        minHeight: widget.style?.minHeight ?? 0,
       ),
       margin: widget.style?.margin,
       padding:
@@ -62,20 +62,24 @@ class _LMBottomSheetState extends State<LMFeedBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 12),
           widget.style?.dragBar ??
-              Container(
-                width: 48,
-                height: 8,
-                decoration: ShapeDecoration(
-                  color: widget.style?.dragBarColor ?? theme.disabledColor
-                    ..withAlpha(200),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(99),
+              Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 48,
+                    height: 8,
+                    decoration: ShapeDecoration(
+                      color: widget.style?.dragBarColor ??
+                          theme.disabledColor.withAlpha(200),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 24),
+                ],
               ),
-          const SizedBox(height: 24),
           widget.title != null
               ? Container(
                   alignment: Alignment.topLeft,
@@ -101,7 +105,8 @@ class LMFeedBottomSheetStyle {
   final LMFeedTextStyle? titleStyle;
   final Color? backgroundColor;
   final BorderRadiusGeometry? borderRadius;
-  final double? height;
+  final double? maxHeight;
+  final double? minHeight;
   final double? elevation;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
@@ -113,7 +118,8 @@ class LMFeedBottomSheetStyle {
     this.titleStyle,
     this.backgroundColor,
     this.borderRadius,
-    this.height,
+    this.maxHeight,
+    this.minHeight,
     this.elevation,
     this.padding,
     this.margin,
@@ -125,7 +131,8 @@ class LMFeedBottomSheetStyle {
   LMFeedBottomSheetStyle copyWith({
     Color? backgroundColor,
     BorderRadiusGeometry? borderRadius,
-    double? height,
+    double? maxHeight,
+    double? minHeight,
     double? elevation,
     EdgeInsets? padding,
     EdgeInsets? margin,
@@ -138,7 +145,8 @@ class LMFeedBottomSheetStyle {
       titleStyle: titleStyle ?? this.titleStyle,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       borderRadius: borderRadius ?? this.borderRadius,
-      height: height ?? this.height,
+      maxHeight: maxHeight ?? this.maxHeight,
+      minHeight: minHeight ?? this.minHeight,
       elevation: elevation ?? this.elevation,
       padding: padding ?? this.padding,
       margin: margin ?? this.margin,

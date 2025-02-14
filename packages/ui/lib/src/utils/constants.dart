@@ -41,3 +41,5 @@ const String lmUpvoteFilledSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/upvote_filled.svg";
 const String lmAddQuestionSvg =
     "packages/likeminds_feed_flutter_ui/assets/icons/add_question.svg";
+const String lmCreateReelSvg =
+    "packages/likeminds_feed_flutter_ui/assets/icons/add_reel.svg";

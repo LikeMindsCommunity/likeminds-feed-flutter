@@ -1,0 +1,3 @@
+class LMFeedVideoFeedScreenStyle {
+  const LMFeedVideoFeedScreenStyle();
+}

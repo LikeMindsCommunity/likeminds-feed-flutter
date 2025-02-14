@@ -10,7 +10,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
   final bool isDown;
 
   /// The focus node for the text field.
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
   /// A list of user tags to be displayed as suggestions.
   final List<LMUserTagViewData>? userTags;
@@ -45,8 +45,8 @@ class LMTaggingAheadTextField extends StatefulWidget {
     required this.isDown,
     required this.onTagSelected,
     required this.controller,
-    required this.focusNode,
-    required this.onChange,
+    this.focusNode,
+    this.onChange,
     this.onEditingComplete,
     this.onSubmitted,
     this.taggingEnabled = true,
@@ -70,6 +70,7 @@ class LMTaggingAheadTextField extends StatefulWidget {
     List<LMUserTagViewData>? userTags,
     VoidCallback? onEditingComplete,
     Function(String)? onSubmitted,
+    LMTaggingAheadTextFieldStyle? style,
   }) {
     return LMTaggingAheadTextField(
       isDown: isDown ?? this.isDown,
@@ -79,9 +80,10 @@ class LMTaggingAheadTextField extends StatefulWidget {
       onChange: onChange ?? this.onChange,
       taggingEnabled: taggingEnabled ?? this.taggingEnabled,
       enabled: enabled ?? this.enabled,
+      userTags: userTags ?? this.userTags,
       onEditingComplete: onEditingComplete ?? this.onEditingComplete,
       onSubmitted: onSubmitted ?? this.onSubmitted,
-      userTags: userTags ?? this.userTags,
+      style: style ?? this.style,
     );
   }
 }
@@ -124,7 +126,6 @@ class _TaggingAheadTextFieldState extends State<LMTaggingAheadTextField> {
 
   @override
   void dispose() {
-    _controller.dispose();
     _suggestionsBoxController.close();
     super.dispose();
   }

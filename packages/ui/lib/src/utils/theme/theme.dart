@@ -268,7 +268,7 @@ class LMFeedThemeData {
 class LikeMindsTheme {
   static const Color backgroundColor = Color.fromRGBO(208, 216, 226, 1);
   static const Color primaryColor = Color.fromRGBO(80, 70, 229, 1);
-  static const Color secondaryColor = Color.fromRGBO(72, 79, 103, 1);
+  static const Color secondaryColor = Color.fromRGBO(102, 112, 133, 1);
   static const Color shadowColor = Color.fromRGBO(0, 0, 0, 0.239);
   static const Color disabledColor = Color.fromRGBO(208, 216, 226, 1);
   static const Color errorColor = Color.fromRGBO(251, 22, 9, 1);

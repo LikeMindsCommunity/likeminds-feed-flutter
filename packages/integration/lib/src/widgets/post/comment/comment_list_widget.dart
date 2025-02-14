@@ -178,7 +178,7 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
         listener: _handleBlocListeners,
         buildWhen: _handleBuildWhen,
         builder: (context, state) {
-          return PagedSliverList.separated(
+          return PagedSliverList(
             pagingController: _commentListPagingController,
             builderDelegate: PagedChildBuilderDelegate<LMCommentViewData>(
               firstPageProgressIndicatorBuilder:
@@ -248,12 +248,6 @@ class _LMFeedCommentListState extends State<LMFeedCommentList> {
                 );
               },
             ),
-            separatorBuilder: (context, index) =>
-                widget.commentSeparatorBuilder?.call(context) ??
-                const Divider(
-                  thickness: 0.2,
-                  height: 0,
-                ),
           );
         });
   }

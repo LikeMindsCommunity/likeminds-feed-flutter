@@ -95,6 +95,9 @@ class LMAttachmentMetaViewData {
   /// The text of the poll answer (if applicable).
   String? pollAnswerText;
 
+  /// Name of the file
+  String? name;
+
   /// Private constructor for the class.
   LMAttachmentMetaViewData._({
     this.url,
@@ -125,6 +128,7 @@ class LMAttachmentMetaViewData {
     this.post,
     this.postId,
     this.thumbnailUrl,
+    this.name,
   });
 
   /// copyWith method
@@ -157,6 +161,7 @@ class LMAttachmentMetaViewData {
     LMPostViewData? post,
     String? postId,
     String? thumbnailUrl,
+    String? name,
   }) {
     return LMAttachmentMetaViewData._(
       url: url ?? this.url,
@@ -187,6 +192,7 @@ class LMAttachmentMetaViewData {
       post: post ?? this.post,
       postId: postId ?? this.postId,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      name: name ?? this.name,
     );
   }
 
@@ -218,6 +224,7 @@ class LMAttachmentMetaViewData {
     LMPostViewData? post,
     String? postId,
     String? thumbnailUrl,
+    String? name,
   }) {
     return LMAttachmentMetaViewData._(
       bytes: bytes,
@@ -247,6 +254,7 @@ class LMAttachmentMetaViewData {
       post: post,
       postId: postId,
       thumbnailUrl: thumbnailUrl,
+      name: name,
     );
   }
 
@@ -278,6 +286,7 @@ class LMAttachmentMetaViewData {
     LMPostViewData? post,
     String? postId,
     String? thumbnailUrl,
+    String? name,
   }) {
     return LMAttachmentMetaViewData._(
       path: path,
@@ -307,6 +316,7 @@ class LMAttachmentMetaViewData {
       post: post,
       postId: postId,
       thumbnailUrl: thumbnailUrl,
+      name: name,
     );
   }
 
@@ -337,6 +347,7 @@ class LMAttachmentMetaViewData {
     LMPostViewData? post,
     String? postId,
     String? thumbnailUrl,
+    String? name,
   }) {
     return LMAttachmentMetaViewData._(
       url: url,
@@ -365,13 +376,14 @@ class LMAttachmentMetaViewData {
       post: post,
       postId: postId,
       thumbnailUrl: thumbnailUrl,
+      name: name,
     );
   }
 
   @override
   String toString() {
     // ignore: lines_longer_than_80_chars
-    return 'LMAttachmentMetaViewData(url: $url, format: $format, size: $size, duration: $duration, pageCount: $pageCount, ogTags: $ogTags, height: $height, width: $width, aspectRatio: $aspectRatio, meta: $meta, repost: $repost, pollQuestion: $pollQuestion, expiryTime: $expiryTime, pollOptions: $pollOptions, multiSelectState: $multiSelectState, pollType: $pollType, multiSelectNo: $multiSelectNo, isAnonymous: $isAnonymous, allowAddOption: $allowAddOption, options: $options, toShowResult: $toShowResult, pollAnswerText: $pollAnswerText, postId: $postId, post: $post, thumbnailUrl: $thumbnailUrl)';
+    return 'LMAttachmentMetaViewData(url: $url, format: $format, size: $size, duration: $duration, pageCount: $pageCount, ogTags: $ogTags, height: $height, width: $width, aspectRatio: $aspectRatio, meta: $meta, repost: $repost, pollQuestion: $pollQuestion, expiryTime: $expiryTime, pollOptions: $pollOptions, multiSelectState: $multiSelectState, pollType: $pollType, multiSelectNo: $multiSelectNo, isAnonymous: $isAnonymous, allowAddOption: $allowAddOption, options: $options, toShowResult: $toShowResult, pollAnswerText: $pollAnswerText, postId: $postId, post: $post, thumbnailUrl: $thumbnailUrl, path: $path, bytes: $bytes, name: $name)';
   }
 
   /// Returns a new builder instance for [LMAttachmentMetaViewData].
@@ -409,6 +421,7 @@ class LMAttachmentMetaViewDataBuilder {
   String? _thumbnailUrl;
   String? _path;
   Uint8List? _bytes;
+  String? _name;
 
   void url(String url) {
     _url = url;
@@ -522,6 +535,10 @@ class LMAttachmentMetaViewDataBuilder {
     _bytes = bytes;
   }
 
+  void name(String? name) {
+    _name = name;
+  }
+
   LMAttachmentMetaViewData build() {
     return LMAttachmentMetaViewData._(
       url: _url,
@@ -552,6 +569,7 @@ class LMAttachmentMetaViewDataBuilder {
       thumbnailUrl: _thumbnailUrl,
       path: _path,
       bytes: _bytes,
+      name: _name,
     );
   }
 }

@@ -31,6 +31,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
     this.firstPageErrorIndicatorBuilder,
     this.newPageErrorIndicatorBuilder,
     this.pendingPostBannerBuilder,
+    this.pageSize = 10,
   });
 
   /// Builder for appbar
@@ -82,6 +83,9 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
   /// Settings for the feed screen
   final LMFeedQnaScreenSetting? feedScreenSettings;
 
+  /// Page size for pagination
+  final int pageSize;
+
   @override
   State<LMFeedQnAUniversalScreen> createState() =>
       _LMFeedQnAUniversalScreenState();
@@ -106,6 +110,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
     LMFeedTopicBarBuilder? topicBarBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
     LMFeedQnaScreenSetting? settings,
+    int? pageSize,
   }) {
     return LMFeedQnAUniversalScreen(
       appBar: appBar ?? this.appBar,
@@ -132,6 +137,7 @@ class LMFeedQnAUniversalScreen extends StatefulWidget {
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
       feedScreenSettings: settings ?? this.feedScreenSettings,
+      pageSize: pageSize ?? this.pageSize,
     );
   }
 }
@@ -302,6 +308,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
     _feedBloc.add(
       LMFeedGetUniversalFeedEvent(
         pageKey: 1,
+        pageSize: widget.pageSize,
         topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
       ),
     );
@@ -328,6 +335,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
         _feedBloc.add(
           LMFeedGetUniversalFeedEvent(
             pageKey: pageKey,
+            pageSize: widget.pageSize,
             topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
           ),
         );
@@ -346,7 +354,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
       _feedBloc.topics.addAll(state.topics);
       _feedBloc.widgets.addAll(state.widgets);
 
-      if (state.posts.length < 10) {
+      if (state.posts.length < widget.pageSize) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
         _pagingController.appendPage(listOfPosts, state.pageKey + 1);
@@ -599,7 +607,7 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
                           feedRoomItemList.add(item);
                         }
                         if (feedRoomItemList.isNotEmpty &&
-                            feedRoomItemList.length > 10) {
+                            feedRoomItemList.length > widget.pageSize) {
                           feedRoomItemList.removeLast();
                         }
                         _feedBloc.users.addAll(curr.userData);

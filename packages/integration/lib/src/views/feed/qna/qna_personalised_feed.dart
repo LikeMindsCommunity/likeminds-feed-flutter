@@ -34,6 +34,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
     this.firstPageErrorIndicatorBuilder,
     this.newPageErrorIndicatorBuilder,
     this.pendingPostBannerBuilder,
+    this.pageSize = 10,
   });
 
   // Builder for appbar
@@ -68,6 +69,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
   final FloatingActionButtonLocation? floatingActionButtonLocation;
 
   final LMFeedQnaScreenSetting? config;
+  final int pageSize;
 
   @override
   State<LMFeedQnAPersonalisedScreen> createState() =>
@@ -88,6 +90,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
         pendingPostBannerBuilder,
     FloatingActionButtonLocation? floatingActionButtonLocation,
     LMFeedQnaScreenSetting? config,
+    int? pageSize,
   }) {
     return LMFeedQnAPersonalisedScreen(
       appBar: appBar ?? this.appBar,
@@ -112,6 +115,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
       floatingActionButtonLocation:
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
       config: config ?? this.config,
+      pageSize: pageSize ?? this.pageSize,
     );
   }
 }
@@ -326,7 +330,7 @@ class _LMFeedQnAPersonalisedScreenState
         _feedBloc.add(
           LMFeedPersonalisedGetEvent(
             pageKey: pageKey,
-            pageSize: 10,
+            pageSize: widget.pageSize,
           ),
         );
       },
@@ -343,7 +347,7 @@ class _LMFeedQnAPersonalisedScreenState
         _handleScroll();
       }
       List<LMPostViewData> listOfPosts = state.posts;
-      if (state.posts.length < 10) {
+      if (state.posts.length < widget.pageSize) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
         _pagingController.appendPage(listOfPosts, state.pageKey + 1);
@@ -560,7 +564,7 @@ class _LMFeedQnAPersonalisedScreenState
                           feedRoomItemList.add(item);
                         }
                         if (feedRoomItemList.isNotEmpty &&
-                            feedRoomItemList.length > 10) {
+                            feedRoomItemList.length > widget.pageSize) {
                           feedRoomItemList.removeLast();
                         }
                         _pagingController.itemList = feedRoomItemList;

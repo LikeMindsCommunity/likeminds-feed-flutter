@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 
 @Deprecated(
     'Use [LMFeedSocialScreen()] instead for default feed screen, This [LMFeedScreen] will be removed from version 1.14.0')

@@ -3,8 +3,11 @@ import 'package:likeminds_feed_flutter_core/src/core/configurations/feed_builder
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 import 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/compose/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/create_short_video/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/edit_short_video/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/media/configurations/config.dart';
@@ -14,13 +17,17 @@ import 'package:likeminds_feed_flutter_core/src/views/poll/configurations/config
 import 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/report/configurations/config.dart';
 import 'package:likeminds_feed_flutter_core/src/views/search/configurations/config.dart';
+import 'package:likeminds_feed_flutter_core/src/views/select_topic/configurations/config.dart';
 
 // export all the configurations
 export 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 export 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/social/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feed/qna/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/compose/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/create_short_video/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/edit_short_video/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/feedroom/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/likes/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/media/configurations/config.dart';
@@ -30,6 +37,7 @@ export 'package:likeminds_feed_flutter_core/src/views/report/configurations/conf
 export 'package:likeminds_feed_flutter_core/src/views/search/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/pending_post/configurations/config.dart';
 export 'package:likeminds_feed_flutter_core/src/views/post/configurations/config.dart';
+export 'package:likeminds_feed_flutter_core/src/views/select_topic/configurations/config.dart';
 
 /// enum to describe which type of feed to render
 enum LMFeedType {
@@ -47,6 +55,9 @@ enum LMFeedThemeType {
 
   /// render qna theme feed
   qna,
+
+  /// render video feed theme
+  videoFeed,
 }
 
 /// {@template lm_feed_config}
@@ -54,8 +65,6 @@ enum LMFeedThemeType {
 /// Holds configurations classes for each screen
 /// {@endtemplate}
 class LMFeedConfig {
-  // TODO: remove new flag
-  // Flag: new configs
   /// {@macro lm_feed_activity_screen_config}
   final LMFeedActivityScreenConfig activityScreenConfig;
 
@@ -63,9 +72,15 @@ class LMFeedConfig {
   /// {@macro lm_compose_screen_config}
   final LMFeedComposeScreenConfig composeScreenConfig;
 
+  final LMFeedCreateShortVideoConfig createShortVideoConfig;
+
+  final LMFeedEditShortVideoConfig editShortVideoConfig;
+
   final LMFeedSocialScreenConfig socialFeedScreenConfig;
 
   final LMFeedQnaScreenConfig qnaFeedScreenConfig;
+
+  final LMFeedVideoFeedScreenConfig videoFeedScreenConfig;
 
   /// {@macro lm_feedroom_screen_config}
   final LMFeedroomScreenConfig feedroomScreenConfig;
@@ -92,6 +107,9 @@ class LMFeedConfig {
   /// {@macro lm_feed_search_screen_config}
   final LMFeedSearchScreenConfig searchScreenConfig;
 
+  /// {@macro lm_feed_topic_select_screen_config}
+  final LMFeedTopicSelectScreenConfig topicSelectScreenConfig;
+
   /// {@macro lm_feed_web_configuration}
   final LMFeedWebConfiguration webConfiguration;
 
@@ -108,17 +126,21 @@ class LMFeedConfig {
   LMFeedConfig({
     this.socialFeedScreenConfig = const LMFeedSocialScreenConfig(),
     this.qnaFeedScreenConfig = const LMFeedQnaScreenConfig(),
+    this.videoFeedScreenConfig = const LMFeedVideoFeedScreenConfig(),
     this.postDetailScreenConfig = const LMFeedPostDetailScreenConfig(),
     this.pendingPostScreenConfig = const LMFeedPendingPostsScreenConfig(),
     this.feedroomScreenConfig = const LMFeedroomScreenConfig(),
     this.activityScreenConfig = const LMFeedActivityScreenConfig(),
     this.composeScreenConfig = const LMFeedComposeScreenConfig(),
+    this.createShortVideoConfig = const LMFeedCreateShortVideoConfig(),
+    this.editShortVideoConfig = const LMFeedEditShortVideoConfig(),
     this.likeScreenConfig = const LMFeedLikeScreenConfig(),
     this.mediaPreviewScreenConfig = const LMFeedMediaPreviewScreenConfig(),
     this.notificationScreenConfig = const LMFeedNotificationScreenConfig(),
     this.pollScreenConfig = const LMFeedPollScreenConfig(),
     this.reportScreenConfig = const LMFeedReportScreenConfig(),
     this.searchScreenConfig = const LMFeedSearchScreenConfig(),
+    this.topicSelectScreenConfig = const LMFeedTopicSelectScreenConfig(),
     this.webConfiguration = const LMFeedWebConfiguration(),
     this.feedThemeType = LMFeedThemeType.social,
     this.widgetBuilderDelegate = const LMFeedWidgetBuilderDelegate(),

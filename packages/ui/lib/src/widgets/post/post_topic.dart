@@ -5,8 +5,9 @@ class LMFeedPostTopic extends StatelessWidget {
   final LMPostViewData post;
   final List<LMTopicViewData> topics;
   final Function(BuildContext, LMTopicViewData)? onTopicTap;
-
   final Widget Function(BuildContext, LMFeedTopicChip)? topicChipBuilder;
+  final void Function(BuildContext context, List<LMTopicViewData> topics)?
+      onMoreTopicsTap;
 
   final LMFeedPostTopicStyle? style;
 
@@ -17,21 +18,36 @@ class LMFeedPostTopic extends StatelessWidget {
     this.topicChipBuilder,
     this.onTopicTap,
     this.style,
+    this.onMoreTopicsTap,
   });
 
   @override
   Widget build(BuildContext context) {
     LMFeedPostTopicStyle topicStyle =
         style ?? LMFeedTheme.instance.theme.topicStyle;
+    int maxTopicsToShow = style?.maxTopicsToShow ?? post.topics.length;
     return Container(
       margin: topicStyle.margin,
       padding: topicStyle.padding,
       child: Wrap(
-        children: post.topics
-            .map((e) =>
-                topicChipBuilder?.call(context, defTopicChip(e, topicStyle)) ??
-                defTopicChip(e, topicStyle))
-            .toList(),
+        children: [
+          for (final topic in post.topics.take(maxTopicsToShow))
+            topicChipBuilder?.call(context, defTopicChip(topic, topicStyle)) ??
+                defTopicChip(topic, topicStyle),
+          if (post.topics.length > maxTopicsToShow)
+            LMFeedTopicChip(
+              topic: (LMTopicViewDataBuilder()
+                    ..name('+${post.topics.length - maxTopicsToShow}')
+                    ..id('more-topics')
+                    ..isEnabled(true))
+                  .build(),
+              style: topicStyle.activeChipStyle,
+              isSelected: false,
+              onTap: (context, topic) {
+                onMoreTopicsTap?.call(context, post.topics);
+              },
+            ),
+        ],
       ),
     );
   }
@@ -67,12 +83,14 @@ class LMFeedPostTopicStyle {
   final EdgeInsets? padding;
   final LMFeedTopicChipStyle? activeChipStyle;
   final LMFeedTopicChipStyle? inactiveChipStyle;
+  final int? maxTopicsToShow;
 
   const LMFeedPostTopicStyle({
     this.margin,
     this.padding,
     this.activeChipStyle,
     this.inactiveChipStyle,
+    this.maxTopicsToShow,
   });
 
   LMFeedPostTopicStyle copyWith({
@@ -80,12 +98,14 @@ class LMFeedPostTopicStyle {
     EdgeInsets? padding,
     LMFeedTopicChipStyle? activeChipStyle,
     LMFeedTopicChipStyle? inactiveChipStyle,
+    int? maxTopicsToShow,
   }) {
     return LMFeedPostTopicStyle(
       margin: margin ?? this.margin,
       padding: padding ?? this.padding,
       activeChipStyle: activeChipStyle ?? this.activeChipStyle,
       inactiveChipStyle: inactiveChipStyle ?? this.inactiveChipStyle,
+      maxTopicsToShow: maxTopicsToShow ?? this.maxTopicsToShow,
     );
   }
 

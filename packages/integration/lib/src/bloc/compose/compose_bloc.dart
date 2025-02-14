@@ -11,6 +11,7 @@ import 'package:equatable/equatable.dart';
 import 'handler/compose_topic_event_handler.dart';
 import 'handler/add_image_event_handler.dart';
 part 'handler/add_poll_event_handler.dart';
+part 'handler/add_reel_event_handler.dart';
 
 part 'compose_event.dart';
 part 'compose_state.dart';
@@ -92,5 +93,6 @@ class LMFeedComposeBloc extends Bloc<LMFeedComposeEvent, LMFeedComposeState> {
         emitter,
       ),
     );
+    on<LMFeedComposeAddReelEvent>(_addReelEventHandler);
   }
 }

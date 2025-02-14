@@ -61,7 +61,7 @@ void newPostEventHandler(
     String? headingText = event.heading;
 
     final requestBuilder = AddPostRequestBuilder()
-      ..attachments(attachments)
+      ..attachments(attachments.copy())
       ..topicIds(event.selectedTopicIds)
       ..tempId(tempId);
 

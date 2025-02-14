@@ -8,19 +8,19 @@ Widget noItemLikesView() => Center(
         children: <Widget>[
           SizedBox(height: 12),
           Text(
-            "No likes to show",
+            "No likes yet",
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
           SizedBox(height: 12),
           Text(
-            "Be the first one to like this ${LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular)}",
+            "Be the first one to like",
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w300,
-              color: LikeMindsTheme.greyColor,
+              color: LMFeedTheme.instance.theme.textSecondary,
             ),
           ),
           SizedBox(height: 28),
