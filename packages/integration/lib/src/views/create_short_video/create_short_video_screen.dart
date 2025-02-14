@@ -360,7 +360,6 @@ class _LMFeedCreateShortVideoScreenState
         style: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 14,
-            height: 20 / 14,
             fontWeight: FontWeight.w500,
             color: _theme.primaryColor,
           ),
