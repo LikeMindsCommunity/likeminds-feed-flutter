@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:likeminds_feed_flutter_core/src/views/feed/topic_select_screen.dart';
+import 'package:likeminds_feed_flutter_core/src/views/select_topic/topic_select_screen.dart';
 
 /// {@template lm_feedroom_screen_setting}
 /// Setting configuration for Feedroom Screen

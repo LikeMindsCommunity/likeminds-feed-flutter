@@ -74,7 +74,7 @@ class _LMFeedCommentBottomSheetState extends State<LMFeedCommentBottomSheet>
                   _defTitle(),
             ),
             SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.45,
+              height: MediaQuery.sizeOf(context).height * 0.40,
               child: CustomScrollView(
                 slivers: [
                   widget.commentListBuilder?.call(
@@ -91,21 +91,24 @@ class _LMFeedCommentBottomSheetState extends State<LMFeedCommentBottomSheet>
             ),
             widget.bottomTextFieldBuilder?.call(
                   context,
-                  LMFeedBottomTextField(
-                    postId: widget.postId,
-                    focusNode: _commentFocusNode,
-                    controller: _commentController,
-                  ),
+                  _defBottomTextField(),
                   _commentController,
                   _commentFocusNode,
                 ) ??
-                LMFeedBottomTextField(
-                  postId: widget.postId,
-                  focusNode: _commentFocusNode,
-                  controller: _commentController,
-                ),
+                _defBottomTextField(),
           ],
         ),
+      ),
+    );
+  }
+
+  LMFeedBottomTextField _defBottomTextField() {
+    return LMFeedBottomTextField(
+      postId: widget.postId,
+      focusNode: _commentFocusNode,
+      controller: _commentController,
+      style: LMFeedBottomTextFieldStyle(
+        maxLines: 3,
       ),
     );
   }

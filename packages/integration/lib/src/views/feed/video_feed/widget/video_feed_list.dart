@@ -227,6 +227,10 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
   }
 
   void _onPageChanged(int index) {
+    // check if index is in the range of the list
+    if (index < 0 || index >= (_pagingController.itemList?.length ?? 0)) {
+      return;
+    }
     // set current video id and position to media provider
     LMFeedVideoProvider.instance.currentVisiblePostId =
         _pagingController.itemList?[index].id;

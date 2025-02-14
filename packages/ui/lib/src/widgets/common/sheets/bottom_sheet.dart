@@ -62,20 +62,24 @@ class _LMBottomSheetState extends State<LMFeedBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 12),
           widget.style?.dragBar ??
-              Container(
-                width: 48,
-                height: 8,
-                decoration: ShapeDecoration(
-                  color: widget.style?.dragBarColor ?? theme.disabledColor
-                    ..withAlpha(200),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(99),
+              Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 48,
+                    height: 8,
+                    decoration: ShapeDecoration(
+                      color: widget.style?.dragBarColor ??
+                          theme.disabledColor.withAlpha(200),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 24),
+                ],
               ),
-          const SizedBox(height: 24),
           widget.title != null
               ? Container(
                   alignment: Alignment.topLeft,

@@ -152,7 +152,7 @@ class LMFeedMenu extends StatelessWidget {
                             context: context,
                             backgroundColor:
                                 style?.backgroundColor ?? theme.container,
-                            enableDrag: true,
+                            showDragHandle: true,
                             useRootNavigator: true,
                             useSafeArea: true,
                             clipBehavior: Clip.hardEdge,
@@ -163,7 +163,7 @@ class LMFeedMenu extends StatelessWidget {
                             builder: (context) {
                               return LMFeedBottomSheet(
                                 style: LMFeedBottomSheetStyle(
-                                  dragBarColor: theme.disabledColor,
+                                  dragBar: const SizedBox(),
                                   backgroundColor:
                                       style?.backgroundColor ?? theme.container,
                                   borderRadius: style?.borderRadius,

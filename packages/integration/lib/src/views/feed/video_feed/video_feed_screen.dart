@@ -84,6 +84,7 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
       style: LMFeedAppBarStyle(
         height: 56,
         backgroundColor: Colors.transparent,
+        border: Border(),
       ),
       trailing: [
         BlocListener<LMFeedComposeBloc, LMFeedComposeState>(
@@ -185,10 +186,11 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
       style: LMFeedButtonStyle(
         backgroundColor: _theme.onContainer.withOpacity(0.1),
         padding: EdgeInsets.symmetric(
-          horizontal: 16,
+          horizontal: 12,
+          vertical: 8,
         ),
         borderRadius: 50,
-        gap: 6,
+        gap: 4,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(
@@ -203,7 +205,7 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
           assetPath: lmCreateReelSvg,
           style: LMFeedIconStyle(
             color: _theme.container,
-            size: 20,
+            size: 16,
           ),
         ),
         margin: EdgeInsets.only(

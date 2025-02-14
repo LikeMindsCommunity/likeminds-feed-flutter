@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.14.0]
+
+- Added video feed theme
+- Added customization to activity feed
+
 ## [1.13.0]
 
 - Add builders, style, settings and config to each screen

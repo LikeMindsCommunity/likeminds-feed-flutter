@@ -337,9 +337,10 @@ class _LMFeedCreateShortVideoScreenState
       },
       style: LMFeedButtonStyle(
         borderRadius: 4,
+        gap: 4,
         padding: EdgeInsets.symmetric(
           horizontal: 8,
-          vertical: 6,
+          vertical: 4,
         ),
         margin: EdgeInsets.only(
           right: 8,
@@ -383,7 +384,10 @@ class _LMFeedCreateShortVideoScreenState
         ValueListenableBuilder(
             valueListenable: _postValidationNotifier,
             builder: (context, value, child) {
-              return _defPostButton();
+              return _screenBuilder.createPostButtonBuilder(
+                context,
+                _defPostButton(),
+              );
             }),
       ],
       style: LMFeedAppBarStyle(

@@ -1,18 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:likeminds_feed/likeminds_feed.dart';
 import 'package:likeminds_feed_flutter_core/src/core/core.dart';
-import 'package:likeminds_feed_flutter_core/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 
-class LMFeedEditShortVideoBuilderDelegate {
-  const LMFeedEditShortVideoBuilderDelegate();
+class LMFeedTopicSelectScreenBuilderDelegate {
+  const LMFeedTopicSelectScreenBuilderDelegate();
 
-  /// Default widget builder delegate for the feed screen.
   static final LMFeedWidgetBuilderDelegate _widgetBuilderDelegate =
       LMFeedCore.config.widgetBuilderDelegate;
 
-  // scaffold builder
+  /// scaffold builder for the Topic Select Screen
   Widget scaffold({
     Key? key,
     bool extendBody = false,
@@ -40,7 +37,7 @@ class LMFeedEditShortVideoBuilderDelegate {
     bool drawerEnableOpenDragGesture = true,
     bool endDrawerEnableOpenDragGesture = true,
     String? restorationId,
-    LMFeedWidgetSource source = LMFeedWidgetSource.createShortVideoScreen,
+    LMFeedWidgetSource source = LMFeedWidgetSource.topicSelectScreen,
     bool canPop = true,
     Function(bool)? onPopInvoked,
   }) {
@@ -76,88 +73,53 @@ class LMFeedEditShortVideoBuilderDelegate {
     );
   }
 
-  /// app bar builder
-  PreferredSizeWidget appBarBuilder(
-    BuildContext context,
-    LMFeedAppBar appBar,
-    VoidCallback onPostCreate,
-    LMResponse<void> Function() validatePost,
-    LMFeedButton createPostButton,
-    LMFeedButton cancelButton,
-    void Function(String) onValidationFailed,
-  ) {
+  /// app bar builder for the Topic Select Screen
+  PreferredSizeWidget appBarBuilder(BuildContext context, LMFeedAppBar appBar) {
     return appBar;
   }
 
-  /// edit button builder
-  Widget editButtonBuilder(
+  /// builder for the Topic tile
+  Widget topicTileBuilder(
     BuildContext context,
-    LMFeedButton editButton,
+    LMFeedTopicTile topicTile,
+    LMTopicViewData topic,
+    bool isSelected,
   ) {
-    return editButton;
+    return topicTile;
   }
 
-  /// video preview builder
-  Widget videoPreviewBuilder(
-    BuildContext context,
-    LMFeedVideo videoPreviewWidget,
-    LMAttachmentViewData attachmentViewData,
-  ) {
-    return videoPreviewWidget;
+  /// no item indicator builder
+  Widget noItemIndicatorBuilder(BuildContext context, Widget child) {
+    return child;
   }
 
-  /// video preview container builder
-  Widget videoPreviewContainerBuilder(
-    BuildContext context,
-    Container videoPreviewContainer,
-    Widget videoPreviewWidget,
-  ) {
-    return videoPreviewContainer;
+  /// no more items indicator builder
+  Widget Function(BuildContext)? noMoreItemsIndicatorBuilder(
+      BuildContext context) {
+    return null;
   }
 
-  /// select topic button builder
-  Widget selectTopicButtonBuilder(
-    BuildContext context,
-    LMFeedButton selectTopicButton,
-  ) {
-    return selectTopicButton;
+  /// first page progress indicator builder
+  Widget firstPageProgressIndicatorBuilder(
+      BuildContext context, LMFeedLoader child) {
+    return child;
   }
 
-  /// edit topic button builder
-  Widget editTopicButtonBuilder(
-    BuildContext context,
-    LMFeedButton editTopicButton,
-  ) {
-    return editTopicButton;
+  /// new page progress indicator builder
+  Widget newPageProgressIndicatorBuilder(
+      BuildContext context, LMFeedLoader child) {
+    return child;
   }
 
-  /// topic chip builder
-  Widget topicChipBuilder(
-    BuildContext context,
-    LMFeedTopicChip topicChip,
-  ) {
-    return topicChip;
+  /// first page error indicator builder
+  Widget Function(BuildContext)? firstPageErrorIndicatorBuilder(
+      BuildContext context) {
+    return null;
   }
 
-  /// topic chip container builder
-  /// This is the container that holds the topic chips
-  Widget topicChipContainerBuilder(
-    BuildContext context,
-    Container topicChipContainer,
-    List<LMTopicViewData> selectedTopics,
-    LMFeedButton selectTopicButton,
-    LMFeedButton editTopicButton,
-  ) {
-    return topicChipContainer;
-  }
-
-  /// text field builder
-  Widget textFieldBuilder(
-    BuildContext context,
-    LMTaggingAheadTextField textField,
-    TextEditingController controller,
-    FocusNode focusNode,
-  ) {
-    return textField;
+  /// new page error indicator builder
+  Widget Function(BuildContext)? newPageErrorIndicatorBuilder(
+      BuildContext context) {
+    return null;
   }
 }

@@ -545,9 +545,9 @@ class _LMFeedVideoState extends VisibilityAwareState<LMFeedVideo>
         width: 42,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: const Offset(2, 2),
           ),
         ],
       ),

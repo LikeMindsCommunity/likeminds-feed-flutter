@@ -26,17 +26,41 @@ class LMFeedVerticalVideoPost extends StatefulWidget {
     this.postActionWidgets = const [],
     this.style,
   });
+
+  /// The post view data to display in the post.
   final LMPostViewData postViewData;
+
+  /// The source of the widget.
   final LMFeedWidgetSource widgetSource;
+
+  ///  The builder for the video widget.
   final LMFeedVideoBuilder? videoBuilder;
+
+  /// The builder for the post header widget.
   final LMFeedPostHeaderBuilder? postHeaderBuilder;
+
+  /// The builder for the post content widget.
   final LMFeedPostContentBuilder? postContentBuilder;
+
+  /// The builder for the post topic widget.
   final LMFeedPostTopicBuilder? postTopicBuilder;
+
+  ///  The builder for the post menu widget.
   final LMFeedPostMenuBuilder? postMenuBuilder;
+
+  /// The builder for the post like button widget.
   final LMFeedButtonBuilder? postLikeButtonBuilder;
+
+  /// The builder for the post comment button widget.
   final LMFeedButtonBuilder? postCommentButtonBuilder;
+
+  /// The list of widgets to display before the action buttons.
   final List<Widget> preActionWidgets;
+
+  /// The list of widgets to display after the action buttons.
   final List<Widget> postActionWidgets;
+
+  /// The style for the vertical video post.
   final LMFeedVerticalVideoPostStyle? style;
 
   /// copyWith method for the [LMFeedVerticalVideoPost]
@@ -274,6 +298,7 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
       postViewData: postViewData,
       postHeaderStyle: LMFeedPostHeaderStyle.basic().copyWith(
         showMenu: false,
+        imageSize: 36,
         titleTextStyle: LMFeedTextStyle(
           textStyle: TextStyle(
             fontSize: 16,
@@ -674,9 +699,7 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
           showDragHandle: true,
           isScrollControlled: true,
           builder: (context) {
-            return LMFeedCommentBottomSheet(
-              postId: postViewData.id,
-            );
+            return _defCommentBottomSheet(postViewData);
           },
         );
         LMFeedVideoProvider.instance.playCurrentVideo();
@@ -684,6 +707,12 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
     );
 
     return commentButton;
+  }
+
+  LMFeedCommentBottomSheet _defCommentBottomSheet(LMPostViewData postViewData) {
+    return LMFeedCommentBottomSheet(
+      postId: postViewData.id,
+    );
   }
 }
 

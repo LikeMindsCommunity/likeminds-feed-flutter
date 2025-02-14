@@ -16,7 +16,8 @@ export 'feed/video_feed/video_feed_screen.dart';
 
 // legacy feed
 export 'feed/feed_screen.dart';
-export 'feed/topic_select_screen.dart';
+
+export 'select_topic/topic_select_screen.dart';
 
 export 'report/report_bottom_sheet.dart';
 export 'report/report_screen.dart';
@@ -32,7 +33,7 @@ export 'post/bottom_textfield.dart';
 export 'post/bottom_textfield_banner.dart';
 
 export 'feedroom/feedroom_list_screen.dart';
-export 'feedroom/feedroom_screen.dart' hide LMFeedTopicSelectionWidgetType;
+export 'feedroom/feedroom_screen.dart';
 
 export 'poll/create_poll_screen.dart';
 export 'poll/poll_result_screen.dart';
