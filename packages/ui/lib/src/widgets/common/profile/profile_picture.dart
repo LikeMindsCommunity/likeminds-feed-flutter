@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:likeminds_feed_flutter_ui/likeminds_feed_flutter_ui.dart';
 import 'package:likeminds_feed_flutter_ui/src/utils/index.dart';
 import 'package:likeminds_feed_flutter_ui/src/widgets/widgets.dart';
 
@@ -123,12 +124,12 @@ class LMFeedProfilePictureStyle {
   });
 
   factory LMFeedProfilePictureStyle.basic() {
-    return const LMFeedProfilePictureStyle(
-      backgroundColor: Colors.blue,
+    return  LMFeedProfilePictureStyle(
+      backgroundColor: LMFeedTheme.instance.theme.primaryColor,
       boxShape: BoxShape.circle,
       fallbackTextStyle: LMFeedTextStyle(
         textStyle: TextStyle(
-          color: Colors.white,
+          color:  LMFeedTheme.instance.theme.onContainer,
           fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
