@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.14.1]
+- Fixed null user issue in post detail screen
+
 ## [1.14.0]
 
 - Added video feed theme

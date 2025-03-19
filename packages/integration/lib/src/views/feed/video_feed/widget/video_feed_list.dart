@@ -61,6 +61,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
   // Get the comment title in all small singular form
   String commentTitleSmallCapSingular = LMFeedPostUtils.getCommentTitle(
       LMFeedPluralizeWordAction.allSmallSingular);
+  final _currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
   Timer? _debounceTimer;
 
@@ -239,6 +240,18 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
       _handleSwipe();
     }
     _prepareInitializationForNextIndex(index);
+
+    // fire analytics event for reel swiped
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.reelSwiped,
+        widgetSource: LMFeedWidgetSource.videoFeed,
+        eventProperties: {
+          'uuid': _currentUser?.uuid,
+          'previous_reel_id': _pagingController.itemList?[index].id,
+        },
+      ),
+    );
   }
 
   void _prepareInitializationForNextIndex(int index) {
@@ -520,6 +533,17 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
   }
 
   Column _defAllCaughtUpView() {
+    // add analytics event for no more reels shown
+    // add analytics event
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.noMoreReelsShown,
+        widgetSource: LMFeedWidgetSource.videoFeed,
+        eventProperties: {
+          'uuid': _currentUser?.uuid,
+        },
+      ),
+    );
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
