@@ -125,6 +125,8 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
     );
   }
 
+  final _currentUser = LMFeedLocalPreference.instance.fetchUserData();
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
@@ -276,6 +278,16 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
 
   LMFeedPostHeader _defPostHeader(LMPostViewData postViewData) {
     return LMFeedPostHeader(
+      onProfileNameTap: () => LMFeedPostUtils.handlePostProfileTap(
+          context,
+          postViewData,
+          LMFeedAnalyticsKeys.postProfileName,
+          widget.widgetSource),
+      onProfilePictureTap: () => LMFeedPostUtils.handlePostProfileTap(
+          context,
+          postViewData,
+          LMFeedAnalyticsKeys.postProfilePicture,
+          widget.widgetSource),
       createdAtBuilder: (context, text) {
         return text.copyWith(
             style: LMFeedTextStyle(
@@ -548,6 +560,19 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
           LMFeedCore.instance.lmFeedCoreCallback?.loginRequired?.call(context);
           return;
         }
+        // add analytics event
+        LMFeedAnalyticsBloc.instance.add(
+          LMFeedFireAnalyticsEvent(
+            eventName: postViewData.isLiked
+                ? LMFeedAnalyticsKeys.reelUnliked
+                : LMFeedAnalyticsKeys.reelLiked,
+            widgetSource: LMFeedWidgetSource.videoFeed,
+            eventProperties: {
+              'uuid': _currentUser?.uuid,
+              'reel_id': postViewData.id,
+            },
+          ),
+        );
         _postBloc.add(LMFeedUpdatePostEvent(
           actionType: postViewData.isLiked
               ? LMFeedPostActionType.unlike

@@ -790,21 +790,21 @@ packages:
       path: "../../LikeMinds-Flutter-Feed-SDK"
       relative: true
     source: path
-    version: "1.17.0"
+    version: "1.18.0"
   likeminds_feed_flutter_core:
     dependency: "direct main"
     description:
       path: "../packages/integration"
       relative: true
     source: path
-    version: "1.13.0"
+    version: "1.14.1"
   likeminds_feed_flutter_ui:
     dependency: "direct overridden"
     description:
       path: "../packages/ui"
       relative: true
     source: path
-    version: "1.13.0"
+    version: "1.14.1"
   lints:
     dependency: transitive
     description:

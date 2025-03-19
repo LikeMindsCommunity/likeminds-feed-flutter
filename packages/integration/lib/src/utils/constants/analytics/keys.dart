@@ -87,4 +87,12 @@ class LMFeedAnalyticsKeys {
   static const String commentIdKey = 'comment_id';
   // Reply Related Keys
   static const String replyIdKey = 'reply_id';
+  // video feed related keys
+  static const String exploreReelOpened = 'explore_reel_opened';
+  static const String reelViewed = 'reel_viewed';
+  static const String reelSwiped = 'reel_swiped';
+  static const String reelLiked = 'reel_liked';
+  static const String reelUnliked = 'reel_unliked';
+  static const String reelReported = 'reel_reported';
+  static const String noMoreReelsShown = 'no_more_reels_shown';
 }
