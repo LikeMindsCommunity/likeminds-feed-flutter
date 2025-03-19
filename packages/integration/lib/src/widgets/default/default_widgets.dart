@@ -62,7 +62,7 @@ class LMFeedDefaultWidgets {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: _feedBloc.users[post.uuid]!,
+              user: post.user,
               position: index,
             ),
           ),
@@ -301,7 +301,7 @@ class LMFeedDefaultWidgets {
             builder: (context) => LMFeedMediaPreviewScreen(
               postAttachments: post.attachments ?? [],
               post: post,
-              user: _feedBloc.users[post.uuid]!,
+              user: post.user,
               position: index,
             ),
           ),
