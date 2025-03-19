@@ -21,11 +21,21 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
   final _userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   final _postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
+  final _currentUser =  LMFeedLocalPreference.instance.fetchUserData();
 
   @override
   void initState() {
     super.initState();
     _addPostBlocListener();
+    LMFeedAnalyticsBloc.instance.add(
+      LMFeedFireAnalyticsEvent(
+        eventName: LMFeedAnalyticsKeys.exploreReelOpened,
+        widgetSource: LMFeedWidgetSource.videoFeed,
+        eventProperties: {
+          'uuid': _currentUser?.uuid,
+        },
+      ),
+    );
   }
 
   void _addPostBlocListener() {
