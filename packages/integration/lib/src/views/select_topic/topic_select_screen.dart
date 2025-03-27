@@ -268,6 +268,7 @@ class _LMFeedTopicSelectScreenState extends State<LMFeedTopicSelectScreen> {
     return LMFeedTopicTile(
       isSelected: selectedTopics.isEmpty,
       topic: allTopics,
+      style: LMFeedTopicTileStyle.basic(containerColor: feedThemeData.container),
       onTap: (LMTopicViewData tappedTopic) {
         selectedTopics.clear();
         selectedTopicId.clear();

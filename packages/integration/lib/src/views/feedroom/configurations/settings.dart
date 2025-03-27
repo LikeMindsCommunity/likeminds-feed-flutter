@@ -10,7 +10,7 @@ class LMFeedroomScreenSetting {
       {this.composeSystemOverlayStyle = SystemUiOverlayStyle.dark,
       this.enableTopicFiltering = true,
       this.topicSelectionWidgetType =
-          LMFeedTopicSelectionWidgetType.showTopicSelectionBottomSheet,
+          LMFeedTopicSelectionWidgetType.showTopicSelectionScreen,
       this.showCustomWidget = false});
 
   /// The [SystemUiOVerlayStyle] for the [LMFeedComposeScreen]

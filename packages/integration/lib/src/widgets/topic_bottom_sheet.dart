@@ -193,32 +193,31 @@ class _TopicBottomSheetState extends State<LMFeedTopicBottomSheet> {
                                             ?.map((e) {
                                           bool isTopicSelected =
                                               selectedTopicId.contains(e.id);
-                                          return GestureDetector(
-                                            onTap: () {
-                                              if (isTopicSelected) {
-                                                selectedTopicId.remove(e.id);
-                                                selectedTopics.removeWhere(
-                                                    (element) =>
-                                                        element.id == e.id);
-                                              } else {
-                                                selectedTopicId.add(e.id);
-                                                selectedTopics.add(e);
-                                              }
-                                              isTopicSelected =
-                                                  !isTopicSelected;
-                                              rebuildTopicsScreen.value =
-                                                  !rebuildTopicsScreen.value;
-                                              widget.onTopicSelected(
-                                                  selectedTopics, e);
-                                            },
-                                            child: Container(
-                                              margin: const EdgeInsets.only(
-                                                  right: 8.0, bottom: 8.0),
-                                              child: LMFeedTopicChip(
+                                          return Container(
+                                            margin: const EdgeInsets.only(
+                                                right: 8.0, bottom: 8.0),
+                                            child: LMFeedTopicChip(
                                                 topic: e,
                                                 isSelected: isTopicSelected,
-                                              ),
-                                            ),
+                                                onTap: (context, topic) {
+                                                  if (isTopicSelected) {
+                                                    selectedTopicId
+                                                        .remove(e.id);
+                                                    selectedTopics.removeWhere(
+                                                        (element) =>
+                                                            element.id == e.id);
+                                                  } else {
+                                                    selectedTopicId.add(e.id);
+                                                    selectedTopics.add(e);
+                                                  }
+                                                  isTopicSelected =
+                                                      !isTopicSelected;
+                                                  rebuildTopicsScreen.value =
+                                                      !rebuildTopicsScreen
+                                                          .value;
+                                                  widget.onTopicSelected(
+                                                      selectedTopics, e);
+                                                }),
                                           );
                                         }).toList() ??
                                         [],

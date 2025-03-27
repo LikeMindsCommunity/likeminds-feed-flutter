@@ -39,7 +39,8 @@ class LMFeedImage extends StatelessWidget {
     LMFeedPostImageStyle inStyle =
         style ?? LMFeedTheme.instance.theme.mediaStyle.imageStyle;
 
-    if (image.attachmentMeta.url != null) {
+    if (image.attachmentMeta.url != null &&
+        image.attachmentMeta.url!.isNotEmpty) {
       return _LMFeedCloudImage(
         image: image,
         onError: onError,
@@ -49,8 +50,10 @@ class LMFeedImage extends StatelessWidget {
       );
     }
 
-    if (image.attachmentMeta.path != null ||
-        image.attachmentMeta.bytes != null) {
+    if ((image.attachmentMeta.path != null &&
+            image.attachmentMeta.path!.isNotEmpty) ||
+        (image.attachmentMeta.bytes != null &&
+            image.attachmentMeta.bytes!.isNotEmpty)) {
       return _LMFeedLocalImage(
         image: image,
         style: inStyle,

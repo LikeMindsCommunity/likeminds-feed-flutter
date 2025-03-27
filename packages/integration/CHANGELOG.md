@@ -1,6 +1,11 @@
 # Changelog
 
+## [1.14.2]
+
+- Fixed feedroom id not being sent to create post screen
+
 ## [1.14.1]
+
 - Fixed null user issue in post detail screen
 
 ## [1.14.0]

@@ -713,10 +713,24 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
   LMFeedTopicBar _defTopicBar() {
     return LMFeedTopicBar(
       selectedTopics: _feedBloc.selectedTopics,
+      clearAllSelection: () {
+        updateSelectedTopics([]);
+      },
+      removeTopicFromSelection: (topic) {
+        List<LMTopicViewData> updatedTopics = [..._feedBloc.selectedTopics];
+        updatedTopics.removeWhere((element) => element.id == topic.id);
+        updateSelectedTopics(updatedTopics);
+      },
       openTopicSelector: openTopicSelector,
-      style: const LMFeedTopicBarStyle(
-        height: 60,
-      ),
+      style: LMFeedTopicBarStyle(
+          height: 60,
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          border: Border.symmetric(
+            horizontal: BorderSide(
+              color: LMFeedCore.theme.onContainer,
+              width: 0.1,
+            ),
+          )),
     );
   }
 
@@ -863,6 +877,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           context,
           _widgetSource,
           postUploading,
+          feedRoomId: feedroom?.id,
         );
       },
     );
@@ -904,6 +919,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             context,
             _widgetSource,
             postUploading,
+            feedRoomId: feedroom?.id,
           );
         },
       );
