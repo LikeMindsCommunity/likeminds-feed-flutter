@@ -73,6 +73,7 @@ class LMFeedPostContent extends StatelessWidget {
                     },
                     onTextTap: onHeadingTap,
                     expandText: contentStyle.expandText ?? "see more",
+                    collapseText: contentStyle.collapseText ?? "view less",
                     animation: contentStyle.animation ?? true,
                     maxLines: contentStyle.visibleLines ?? 4,
                     expanded: expanded,
@@ -155,6 +156,7 @@ class LMFeedPostContentStyle {
   final TextStyle? expandTextStyle;
   final TextAlign? textAlign;
   final String? expandText;
+  final String? collapseText;
   final bool? animation;
   final int? headingVisibleLines;
   final int? visibleLines;
@@ -169,6 +171,7 @@ class LMFeedPostContentStyle {
     this.linkStyle,
     this.expandTextStyle,
     this.expandText,
+    this.collapseText,
     this.animation,
     this.visibleLines,
     this.textAlign,
@@ -187,6 +190,7 @@ class LMFeedPostContentStyle {
     TextStyle? expandTextStyle,
     TextAlign? textAlign,
     String? expandText,
+    String? collapseText,
     bool? animation,
     int? visibleLines,
     int? headingVisibleLines,
@@ -202,6 +206,7 @@ class LMFeedPostContentStyle {
       linkStyle: linkStyle ?? this.linkStyle,
       expandTextStyle: expandTextStyle ?? this.expandTextStyle,
       expandText: expandText ?? this.expandText,
+      collapseText: collapseText ?? this.collapseText,
       animation: animation ?? this.animation,
       visibleLines: visibleLines ?? this.visibleLines,
       textAlign: textAlign ?? this.textAlign,

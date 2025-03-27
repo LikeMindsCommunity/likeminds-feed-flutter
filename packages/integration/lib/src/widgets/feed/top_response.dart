@@ -174,7 +174,8 @@ class _LMFeedTopResponseWidgetState extends State<LMFeedTopResponseWidget> {
   LMFeedExpandableText _defCommentText(BuildContext context) {
     return LMFeedExpandableText(
       widget.comment.text,
-      expandText: "See More",
+      expandText: "see more",
+      collapseText: "view less",
       prefixStyle: const TextStyle(
         fontWeight: FontWeight.w600,
         fontSize: 12,

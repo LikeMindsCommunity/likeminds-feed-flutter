@@ -271,6 +271,7 @@ class _LMCommentTileState extends State<LMFeedCommentWidget> {
       widget.comment.text,
       onTagTap: widget.onTagTap,
       expandText: style!.expandText ?? "see more",
+      collapseText: style!.collapseText ?? "view less",
       animation: true,
       maxLines: 4,
       prefixStyle: style!.expandTextStyle,
@@ -440,6 +441,7 @@ class LMFeedCommentStyle {
 
   final TextStyle? expandTextStyle;
   final String? expandText;
+  final String? collapseText;
 
   final bool? showTimestamp;
 
@@ -468,6 +470,7 @@ class LMFeedCommentStyle {
     this.showMenu = true,
     this.expandTextStyle,
     this.expandText,
+    this.collapseText,
   });
 
   LMFeedCommentStyle copyWith({
@@ -495,6 +498,7 @@ class LMFeedCommentStyle {
     TextStyle? expandTextStyle,
     String? expandText,
     bool? showMenu,
+    String? collapseText,
   }) {
     return LMFeedCommentStyle(
       textStyle: textStyle ?? this.textStyle,
@@ -524,6 +528,7 @@ class LMFeedCommentStyle {
       expandText: expandText ?? this.expandText,
       expandTextStyle: expandTextStyle ?? this.expandTextStyle,
       showMenu: showMenu ?? this.showMenu,
+      collapseText: collapseText ?? this.collapseText,
     );
   }
 
