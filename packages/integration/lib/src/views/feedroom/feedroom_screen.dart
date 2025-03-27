@@ -863,6 +863,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
           context,
           _widgetSource,
           postUploading,
+          feedRoomId: feedroom?.id,
         );
       },
     );
@@ -904,6 +905,7 @@ class _LMFeedRoomScreenState extends State<LMFeedRoomScreen> {
             context,
             _widgetSource,
             postUploading,
+            feedRoomId: feedroom?.id,
           );
         },
       );
