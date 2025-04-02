@@ -167,4 +167,22 @@ class LMFeedVideoFeedScreenBuilderDelegate {
       BuildContext context, LMFeedButton button) {
     return button;
   }
+
+  /// Build the bottom sheet for comments.
+  Widget commentBottomSheetBuilder(
+    BuildContext context,
+    LMFeedCommentBottomSheet commentBottomSheet,
+    String postId,
+  ) {
+    return commentBottomSheet;
+  }
+
+  /// Build the bottom sheet for likes.
+  Widget likeListBottomSheetBuilder(
+    BuildContext context,
+    LMFeedLikeListBottomSheet likeBottomSheet,
+    String postId,
+  ) {
+    return likeBottomSheet;
+  }
 }

@@ -21,3 +21,10 @@ export 'post/post_approval_dialog.dart';
 export 'post/comment/comment_list_widget.dart';
 export 'post/comment/comment_reply_widget.dart';
 export 'post/comment/default_empty_comment_widget.dart';
+
+// feed widgets
+export 'feed/add_comment.dart';
+export 'feed/comment_bottom_sheet.dart';
+export 'feed/qna_footer.dart';
+export 'feed/top_response.dart';
+export 'feed/like_bottom_sheet.dart';
