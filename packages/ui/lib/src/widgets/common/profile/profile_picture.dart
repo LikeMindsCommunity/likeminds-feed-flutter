@@ -129,7 +129,7 @@ class LMFeedProfilePictureStyle {
       boxShape: BoxShape.circle,
       fallbackTextStyle: LMFeedTextStyle(
         textStyle: TextStyle(
-          color:  LMFeedTheme.instance.theme.onContainer,
+          color:  LMFeedTheme.instance.theme.container,
           fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
