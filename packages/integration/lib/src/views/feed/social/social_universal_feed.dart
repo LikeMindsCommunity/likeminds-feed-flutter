@@ -34,6 +34,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
     this.newPageErrorIndicatorBuilder,
     this.pendingPostBannerBuilder,
     this.pageSize = 10,
+    this.startFeedWithPostIds,
   });
 
   // Builder for appbar
@@ -78,6 +79,9 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
   /// The number of posts to fetch in a single page
   final int pageSize;
 
+  /// ids of the post to start the feed with
+  final List<String>? startFeedWithPostIds;
+
   @override
   State<LMFeedSocialUniversalScreen> createState() =>
       _LMFeedSocialUniversalScreenState();
@@ -101,6 +105,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
     FloatingActionButtonLocation? floatingActionButtonLocation,
     LMFeedSocialScreenSetting? config,
     int? pageSize,
+    List<String>? startFeedWithPostIds,
   }) {
     return LMFeedSocialUniversalScreen(
       appBar: appBar ?? this.appBar,
@@ -128,6 +133,7 @@ class LMFeedSocialUniversalScreen extends StatefulWidget {
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
       feedSettings: config ?? this.feedSettings,
       pageSize: pageSize ?? this.pageSize,
+      startFeedWithPostIds: startFeedWithPostIds ?? this.startFeedWithPostIds,
     );
   }
 }
@@ -324,6 +330,7 @@ class _LMFeedSocialUniversalScreenState
             pageKey: pageKey,
             pageSize: widget.pageSize,
             topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
+            startFeedWithPostIds: widget.startFeedWithPostIds,
           ),
         );
       },
@@ -335,11 +342,24 @@ class _LMFeedSocialUniversalScreenState
   // This function updates the paging controller based on the state changes
   void updatePagingControllers(LMFeedUniversalState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
-      List<LMPostViewData> listOfPosts = state.posts;
+      List<LMPostViewData> listOfPosts = state.posts.copy();
 
       _feedBloc.users.addAll(state.users);
       _feedBloc.topics.addAll(state.topics);
       _feedBloc.widgets.addAll(state.widgets);
+
+      // check if the post is in same ordered as the [startFeedWithPostIds]
+      // if not show a snackbar
+      if (widget.startFeedWithPostIds != null &&
+          widget.startFeedWithPostIds!.isNotEmpty) {
+        LMFeedPostUtils.checkForPostDeletionErrorState(
+          context,
+          postTitleFirstCap,
+          listOfPosts,
+          widget.startFeedWithPostIds!,
+          _widgetSource,
+        );
+      }
 
       if (state.posts.length < widget.pageSize) {
         _pagingController.appendLastPage(listOfPosts);
