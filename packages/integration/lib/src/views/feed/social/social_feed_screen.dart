@@ -22,6 +22,7 @@ class LMFeedSocialScreen extends StatefulWidget {
     this.floatingActionButtonLocation,
     this.settings,
     this.pageSize = 10,
+    this.startFeedWithPostIds,
   });
 
   /// [LMFeedType] for the feed.
@@ -70,6 +71,9 @@ class LMFeedSocialScreen extends StatefulWidget {
 
   final int pageSize;
 
+  /// ids of the post to start the feed with
+  final List<String>? startFeedWithPostIds;
+
   @override
   State<LMFeedSocialScreen> createState() => _LMFeedSocialScreenState();
 }
@@ -105,6 +109,7 @@ class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
       feedSettings: widget.settings,
       pageSize: widget.pageSize,
+      startFeedWithPostIds: widget.startFeedWithPostIds,
     );
   }
 
@@ -125,6 +130,7 @@ class _LMFeedSocialScreenState extends State<LMFeedSocialScreen> {
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
       feedScreenSettings: widget.settings,
       pageSize: widget.pageSize,
+      startFeedWithPostIds: widget.startFeedWithPostIds,
     );
   }
 }

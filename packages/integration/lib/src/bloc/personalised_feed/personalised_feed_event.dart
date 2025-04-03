@@ -15,14 +15,16 @@ sealed class LMFeedPersonalisedEvent extends Equatable {
 final class LMFeedPersonalisedGetEvent extends LMFeedPersonalisedEvent {
   final int pageKey;
   final int pageSize;
+  final List<String>? startFeedWithPostIds;
 
   const LMFeedPersonalisedGetEvent({
     required this.pageKey,
     required this.pageSize,
+    this.startFeedWithPostIds,
   });
 
   @override
-  List<Object?> get props => [pageKey, pageSize];
+  List<Object?> get props => [pageKey, pageSize, startFeedWithPostIds];
 }
 
 /// {@template lm_feed_personalised_refresh_event}

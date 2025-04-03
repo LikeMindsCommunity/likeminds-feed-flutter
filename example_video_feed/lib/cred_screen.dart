@@ -12,6 +12,7 @@ class _LMCredScreenState extends State<LMCredScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _uuidController = TextEditingController();
   final TextEditingController _apiKeyController = TextEditingController();
+  final TextEditingController _postIdController = TextEditingController();
 
   @override
   void initState() {
@@ -71,6 +72,8 @@ class _LMCredScreenState extends State<LMCredScreen> {
     String uuid = _uuidController.text;
     String userName = _usernameController.text;
     String apiKey = _apiKeyController.text;
+    List<String> postIds =
+        _postIdController.text.split(',').map((e) => e.trim()).toList();
     if (apiKey.isEmpty) {
       _showSnackBar("API Key cannot be empty");
       return;
@@ -98,7 +101,9 @@ class _LMCredScreenState extends State<LMCredScreen> {
     }
 
     // define the route
-    const Widget navigationWidget = LMFeedVideoFeedScreen();
+    Widget navigationWidget = LMFeedVideoFeedScreen(
+      startFeedWithPostIds: postIds,
+    );
     // create the route
     MaterialPageRoute route = MaterialPageRoute(
       builder: (context) => navigationWidget,
@@ -168,6 +173,16 @@ class _LMCredScreenState extends State<LMCredScreen> {
                   labelText: 'User ID',
                 ),
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _postIdController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'Post Ids to start feed with separated by comma',
+                ),
+              ),
               const SizedBox(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -184,6 +199,8 @@ class _LMCredScreenState extends State<LMCredScreen> {
                       _usernameController.clear();
                       _uuidController.clear();
                       _apiKeyController.clear();
+                      _postIdController.clear();
+                      _showSnackBar("Cleared all data");
 
                       setState(() {});
                     },

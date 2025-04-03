@@ -60,6 +60,11 @@ class LMFeedUniversalBloc
     if (event.widgetIds != null) {
       universalFeedRequestBuilder.widgetIds(event.widgetIds!);
     }
+    if(event.startFeedWithPostIds != null) {
+      universalFeedRequestBuilder.startFeedWithPostIds(
+        event.startFeedWithPostIds!,
+      );
+    }
     GetFeedResponse response =
         await LMFeedCore.instance.lmFeedClient.getUniversalFeed(
       universalFeedRequestBuilder.build(),

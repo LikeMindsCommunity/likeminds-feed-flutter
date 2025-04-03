@@ -710,6 +710,7 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
 
         await showModalBottomSheet(
           context: context,
+          isScrollControlled: true,
           builder: (context) {
             return _screenBuilder.commentBottomSheetBuilder.call(
               context,

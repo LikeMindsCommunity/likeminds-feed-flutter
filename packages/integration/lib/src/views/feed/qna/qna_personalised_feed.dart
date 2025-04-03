@@ -35,6 +35,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
     this.newPageErrorIndicatorBuilder,
     this.pendingPostBannerBuilder,
     this.pageSize = 10,
+    this.startFeedWithPostIds,
   });
 
   // Builder for appbar
@@ -71,6 +72,9 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
   final LMFeedQnaScreenSetting? config;
   final int pageSize;
 
+  /// ids of the post to start the feed with
+  final List<String>? startFeedWithPostIds;
+
   @override
   State<LMFeedQnAPersonalisedScreen> createState() =>
       _LMFeedQnAPersonalisedScreenState();
@@ -91,6 +95,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
     FloatingActionButtonLocation? floatingActionButtonLocation,
     LMFeedQnaScreenSetting? config,
     int? pageSize,
+    List<String>? startFeedWithPostIds,
   }) {
     return LMFeedQnAPersonalisedScreen(
       appBar: appBar ?? this.appBar,
@@ -116,6 +121,7 @@ class LMFeedQnAPersonalisedScreen extends StatefulWidget {
           floatingActionButtonLocation ?? this.floatingActionButtonLocation,
       config: config ?? this.config,
       pageSize: pageSize ?? this.pageSize,
+      startFeedWithPostIds: startFeedWithPostIds ?? this.startFeedWithPostIds,
     );
   }
 }
@@ -331,6 +337,7 @@ class _LMFeedQnAPersonalisedScreenState
           LMFeedPersonalisedGetEvent(
             pageKey: pageKey,
             pageSize: widget.pageSize,
+            startFeedWithPostIds: widget.startFeedWithPostIds,
           ),
         );
       },
@@ -346,7 +353,20 @@ class _LMFeedQnAPersonalisedScreenState
       if (state.pageKey == 1) {
         _handleScroll();
       }
-      List<LMPostViewData> listOfPosts = state.posts;
+      List<LMPostViewData> listOfPosts = state.posts.copy();
+      // check if the post is in same ordered as the [startFeedWithPostIds]
+      // if not show a snackbar
+      if (state.pageKey == 1 &&
+          widget.startFeedWithPostIds != null &&
+          widget.startFeedWithPostIds!.isNotEmpty) {
+        LMFeedPostUtils.checkForPostDeletionErrorState(
+          context,
+          postTitleFirstCap,
+          listOfPosts,
+          widget.startFeedWithPostIds!,
+          _widgetSource,
+        );
+      }
       if (state.posts.length < widget.pageSize) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
