@@ -23,6 +23,9 @@ class LMFeedPollStyle {
   /// [String] for poll question expanded text
   final String? pollQuestionExpandedText;
 
+  /// [String] for poll question collapsed text
+  final String? pollQuestionCollapsedText;
+
   ///[LMFeedTextStyle] for poll info text
   final LMFeedTextStyle? pollInfoStyles;
 
@@ -55,6 +58,7 @@ class LMFeedPollStyle {
     this.backgroundColor,
     this.pollQuestionStyle,
     this.pollQuestionExpandedText,
+    this.pollQuestionCollapsedText,
     this.pollInfoStyles,
     this.pollAnswerStyle,
     this.timeStampStyle,
@@ -98,6 +102,7 @@ class LMFeedPollStyle {
     Color? backgroundColor,
     TextStyle? pollQuestionStyle,
     String? pollQuestionExpandedText,
+    String? pollQuestionCollapsedText,
     LMFeedTextStyle? pollInfoStyles,
     LMFeedTextStyle? pollAnswerStyle,
     LMFeedTextStyle? timeStampStyle,
@@ -117,6 +122,8 @@ class LMFeedPollStyle {
       pollQuestionStyle: pollQuestionStyle ?? this.pollQuestionStyle,
       pollQuestionExpandedText:
           pollQuestionExpandedText ?? this.pollQuestionExpandedText,
+      pollQuestionCollapsedText:
+          pollQuestionCollapsedText ?? this.pollQuestionCollapsedText,
       pollInfoStyles: pollInfoStyles ?? this.pollInfoStyles,
       pollAnswerStyle: pollAnswerStyle ?? this.pollAnswerStyle,
       timeStampStyle: timeStampStyle ?? this.timeStampStyle,

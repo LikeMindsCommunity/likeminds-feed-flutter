@@ -797,14 +797,14 @@ packages:
       path: "../packages/integration"
       relative: true
     source: path
-    version: "1.14.1"
+    version: "1.14.2"
   likeminds_feed_flutter_ui:
     dependency: "direct overridden"
     description:
       path: "../packages/ui"
       relative: true
     source: path
-    version: "1.14.1"
+    version: "1.14.2"
   lints:
     dependency: transitive
     description:

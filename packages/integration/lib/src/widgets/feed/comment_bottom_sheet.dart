@@ -32,6 +32,33 @@ class LMFeedCommentBottomSheet extends StatefulWidget {
   )? bottomTextFieldBuilder;
   final LMFeedCommentListBuilder? commentListBuilder;
 
+  /// Creates a copy of this [LMFeedCommentBottomSheet] but with the given fields
+  /// replaced with the new values.
+  ///
+  /// This method allows you to create a new instance of [LMFeedCommentBottomSheet]
+  /// with some properties modified while keeping the rest unchanged.
+  LMFeedCommentBottomSheet copyWith({
+    String? postId,
+    LMFeedCommentBottomSheetStyle? style,
+    LMFeedTextBuilder? titleBuilder,
+    Widget Function(
+      BuildContext context,
+      LMFeedBottomTextField bottomTextField,
+      TextEditingController controller,
+      FocusNode focusNode,
+    )? bottomTextFieldBuilder,
+    LMFeedCommentListBuilder? commentListBuilder,
+  }) {
+    return LMFeedCommentBottomSheet(
+      postId: postId ?? this.postId,
+      style: style ?? this.style,
+      titleBuilder: titleBuilder ?? this.titleBuilder,
+      bottomTextFieldBuilder:
+          bottomTextFieldBuilder ?? this.bottomTextFieldBuilder,
+      commentListBuilder: commentListBuilder ?? this.commentListBuilder,
+    );
+  }
+
   @override
   State<LMFeedCommentBottomSheet> createState() =>
       _LMFeedCommentBottomSheetState();
