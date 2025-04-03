@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.15.0]
+
+- Added support for initializing the feed with a specific post using postId in both Universal Feed and Personalized Feed.
+- Fixed customization issues in video feed
+
 ## [1.14.2]
 
 - Fixed feedroom id not being sent to create post screen
