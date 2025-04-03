@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
@@ -10,9 +11,11 @@ class LMFeedVideoFeedListView extends StatefulWidget {
     super.key,
     this.pageSize = 10,
     this.feedType = LMFeedType.universal,
+    this.startFeedWithPostIds,
   });
   final int pageSize;
   final LMFeedType feedType;
+  final List<String>? startFeedWithPostIds;
 
   @override
   State<LMFeedVideoFeedListView> createState() =>
@@ -148,6 +151,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
             LMFeedPersonalisedGetEvent(
               pageKey: pageKey,
               pageSize: widget.pageSize,
+              startFeedWithPostIds: widget.startFeedWithPostIds,
             ),
           );
         } else {
@@ -157,6 +161,7 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
               pageSize: widget.pageSize,
               topicsIds:
                   _universalFeedBloc.selectedTopics.map((e) => e.id).toList(),
+              startFeedWithPostIds: widget.startFeedWithPostIds,
             ),
           );
         }
@@ -169,6 +174,19 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
       BuildContext context, LMFeedUniversalState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts.copy();
+
+      // check if the post is in same ordered as the [startFeedWithPostIds]
+      // if not show a snackbar
+      if (widget.startFeedWithPostIds != null &&
+          widget.startFeedWithPostIds!.isNotEmpty) {
+        LMFeedPostUtils.checkForPostDeletionErrorState(
+          context,
+          postTitleFirstCap,
+          listOfPosts,
+          widget.startFeedWithPostIds!,
+          _widgetSource,
+        );
+      }
 
       // remove post that do not have attachment type = reel
       // or they do not have any attachments.url
@@ -198,6 +216,19 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
       BuildContext context, LMFeedPersonalisedState? state) {
     if (state is LMFeedPersonalisedFeedLoadedState) {
       List<LMPostViewData> listOfPosts = state.posts.copy();
+
+      // check if the post is in same ordered as the [startFeedWithPostIds]
+      // if not show a snackbar
+      if (widget.startFeedWithPostIds != null &&
+          widget.startFeedWithPostIds!.isNotEmpty) {
+        LMFeedPostUtils.checkForPostDeletionErrorState(
+          context,
+          postTitleFirstCap,
+          listOfPosts,
+          widget.startFeedWithPostIds!,
+          _widgetSource,
+        );
+      }
 
       // remove post that do not have attachment type = reel
       // or they do not have any attachments.url
