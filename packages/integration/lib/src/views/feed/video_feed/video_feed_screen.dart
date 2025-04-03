@@ -10,11 +10,18 @@ class LMFeedVideoFeedScreen extends StatefulWidget {
   const LMFeedVideoFeedScreen({
     super.key,
     this.startFeedWithPostIds,
+    this.feedType = LMFeedType.universal,
   });
 
   /// ids of the post to start the feed with
   /// if not provided, the feed will start with the latest posts or personalised posts
   final List<String>? startFeedWithPostIds;
+
+  /// type of the feed
+  /// [LMFeedType] is used to determine the type of feed to be displayed
+  /// [LMFeedType] can be either [LMFeedType.personalised] or [LMFeedType.universal]
+  /// if not provided, the feed will be displayed as [LMFeedType.universal]
+  final LMFeedType feedType;
 
   @override
   State<LMFeedVideoFeedScreen> createState() => LMFeedVideoFeedScreenState();
@@ -88,6 +95,7 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
           children: [
             LMFeedVideoFeedListView(
               startFeedWithPostIds: widget.startFeedWithPostIds,
+              feedType: widget.feedType,
             ),
             _screenBuilder.appBarBuilder(context, _defAppBar()),
           ],
