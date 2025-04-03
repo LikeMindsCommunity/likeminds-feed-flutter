@@ -363,7 +363,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
 
       // check if the post is in same ordered as the [startFeedWithPostIds]
       // if not show a snackbar
-      if (widget.startFeedWithPostIds != null &&
+      if (state.pageKey == 1 &&
+          widget.startFeedWithPostIds != null &&
           widget.startFeedWithPostIds!.isNotEmpty) {
         LMFeedPostUtils.checkForPostDeletionErrorState(
           context,
