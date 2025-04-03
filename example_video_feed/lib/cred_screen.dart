@@ -72,8 +72,8 @@ class _LMCredScreenState extends State<LMCredScreen> {
     String uuid = _uuidController.text;
     String userName = _usernameController.text;
     String apiKey = _apiKeyController.text;
-    List<String> postIds =
-        _postIdController.text.split(',').map((e) => e.trim()).toList();
+   List<String> postIds = _postIdController.text.isNotEmpty?
+        _postIdController.text.split(','):[];
     if (apiKey.isEmpty) {
       _showSnackBar("API Key cannot be empty");
       return;
@@ -102,6 +102,7 @@ class _LMCredScreenState extends State<LMCredScreen> {
 
     // define the route
     Widget navigationWidget = LMFeedVideoFeedScreen(
+      // feedType: LMFeedType.personalised,
       startFeedWithPostIds: postIds,
     );
     // create the route
