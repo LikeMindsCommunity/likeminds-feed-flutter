@@ -2,8 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
-import 'package:likeminds_feed_flutter_core/src/views/edit_short_video/edit_short_video_screen.dart';
-import 'package:likeminds_feed_flutter_core/src/widgets/feed/comment_bottom_sheet.dart';
 
 /// {@template lm_feed_vertical_video_post}
 /// A widget to display a vertical video post in the feed.
@@ -126,6 +124,7 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
   }
 
   final _currentUser = LMFeedLocalPreference.instance.fetchUserData();
+  final _screenBuilder = LMFeedCore.config.videoFeedScreenConfig.builder;
 
   @override
   Widget build(BuildContext context) {
@@ -607,34 +606,12 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
         LMFeedVideoProvider.instance.pauseCurrentVideo();
         showModalBottomSheet(
           context: context,
-          showDragHandle: true,
           builder: (context) {
-            return BottomSheet(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.sizeOf(context).height * 0.4,
-                ),
-                onClosing: () {},
-                builder: (context) {
-                  return Column(
-                    children: [
-                      LMFeedText(
-                        text: "Liked",
-                        style: LMFeedTextStyle(
-                          textStyle: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: LMFeedLikeListView(
-                          postId: postViewData.id,
-                          widgetSource: widget.widgetSource,
-                        ),
-                      ),
-                    ],
-                  );
-                });
+            return _screenBuilder.likeListBottomSheetBuilder.call(
+              context,
+              _defLikeBottomSheet(context, postViewData),
+              widget.postViewData.id,
+            );
           },
         );
       },
@@ -668,6 +645,18 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
             blurRadius: 4,
           ),
         ],
+      ),
+    );
+  }
+
+  LMFeedLikeListBottomSheet _defLikeBottomSheet(
+      BuildContext context, LMPostViewData postViewData) {
+    return LMFeedLikeListBottomSheet(
+      postViewData: postViewData,
+      widgetSource: widget.widgetSource,
+      style: LMFeedLikeListBottomSheetStyle(
+        enableDrag: true,
+        showDragHandle: true,
       ),
     );
   }
@@ -721,10 +710,13 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
 
         await showModalBottomSheet(
           context: context,
-          showDragHandle: true,
           isScrollControlled: true,
           builder: (context) {
-            return _defCommentBottomSheet(postViewData);
+            return _screenBuilder.commentBottomSheetBuilder.call(
+              context,
+              _defCommentBottomSheet(postViewData),
+              widget.postViewData.id,
+            );
           },
         );
         LMFeedVideoProvider.instance.playCurrentVideo();
@@ -737,6 +729,10 @@ class _LMFeedVerticalVideoPostState extends State<LMFeedVerticalVideoPost> {
   LMFeedCommentBottomSheet _defCommentBottomSheet(LMPostViewData postViewData) {
     return LMFeedCommentBottomSheet(
       postId: postViewData.id,
+      style: LMFeedCommentBottomSheetStyle(
+        showDragHandle: true,
+        enableDrag: true,
+      ),
     );
   }
 }

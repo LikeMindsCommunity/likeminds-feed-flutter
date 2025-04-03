@@ -7,7 +7,21 @@ export 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/widget/vid
 export 'package:likeminds_feed_flutter_core/src/views/feed/video_feed/widget/vertical_post.dart';
 
 class LMFeedVideoFeedScreen extends StatefulWidget {
-  const LMFeedVideoFeedScreen({super.key});
+  const LMFeedVideoFeedScreen({
+    super.key,
+    this.startFeedWithPostIds,
+    this.feedType = LMFeedType.universal,
+  });
+
+  /// ids of the post to start the feed with
+  /// if not provided, the feed will start with the latest posts or personalised posts
+  final List<String>? startFeedWithPostIds;
+
+  /// type of the feed
+  /// [LMFeedType] is used to determine the type of feed to be displayed
+  /// [LMFeedType] can be either [LMFeedType.personalised] or [LMFeedType.universal]
+  /// if not provided, the feed will be displayed as [LMFeedType.universal]
+  final LMFeedType feedType;
 
   @override
   State<LMFeedVideoFeedScreen> createState() => LMFeedVideoFeedScreenState();
@@ -21,7 +35,7 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
   final _userPostingRights = LMFeedUserUtils.checkPostCreationRights();
   final _postTitleSmallCap =
       LMFeedPostUtils.getPostTitle(LMFeedPluralizeWordAction.allSmallSingular);
-  final _currentUser =  LMFeedLocalPreference.instance.fetchUserData();
+  final _currentUser = LMFeedLocalPreference.instance.fetchUserData();
 
   @override
   void initState() {
@@ -79,7 +93,10 @@ class LMFeedVideoFeedScreenState extends State<LMFeedVideoFeedScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            LMFeedVideoFeedListView(),
+            LMFeedVideoFeedListView(
+              startFeedWithPostIds: widget.startFeedWithPostIds,
+              feedType: widget.feedType,
+            ),
             _screenBuilder.appBarBuilder(context, _defAppBar()),
           ],
         ),

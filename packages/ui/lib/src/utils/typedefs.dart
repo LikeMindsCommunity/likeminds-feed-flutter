@@ -155,7 +155,8 @@ typedef LMFeedRoomTileBuilder = Widget Function(
 /// Builder function to build the text widget.
 /// must return a widget, takes in [BuildContext] and [LMFeedText] as params
 /// {@endtemplate}
-typedef LMFeedTextBuilder = Widget Function(BuildContext, LMFeedText);
+typedef LMFeedTextBuilder = Widget Function(
+    BuildContext context, LMFeedText text);
 
 /// {@template lm_feed_profile_picture_builder}
 /// Builder function to build the profile picture widget.

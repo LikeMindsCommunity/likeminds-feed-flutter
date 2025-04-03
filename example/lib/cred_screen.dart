@@ -23,6 +23,7 @@ class _CredScreenState extends State<CredScreen> {
   final TextEditingController _uuidController = TextEditingController();
   final TextEditingController _apiKeyController = TextEditingController();
   final TextEditingController _feedRoomController = TextEditingController();
+  final TextEditingController _postIdController = TextEditingController();
   final ValueNotifier<bool> _isFeedRoomTheme = ValueNotifier(false);
   StreamSubscription? _streamSubscription;
   String? uuid;
@@ -153,6 +154,16 @@ class _CredScreenState extends State<CredScreen> {
                 ),
               ),
               const SizedBox(height: 12),
+              TextField(
+                controller: _postIdController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  labelText: 'Post Ids to start feed with separated by comma',
+                ),
+              ),
+              const SizedBox(height: 12),
               ValueListenableBuilder(
                   valueListenable: _isFeedRoomTheme,
                   builder: (context, value, child) {
@@ -278,6 +289,8 @@ class _CredScreenState extends State<CredScreen> {
     String uuid = _uuidController.text;
     String userName = _usernameController.text;
     String apiKey = _apiKeyController.text;
+    List<String> postIds = _postIdController.text.isNotEmpty?
+        _postIdController.text.split(','):[];
     globalApiKey = apiKey;
     if (apiKey.isEmpty) {
       _showSnackBar("API Key cannot be empty");
@@ -307,7 +320,7 @@ class _CredScreenState extends State<CredScreen> {
     }
 
     // define the route
-    Widget? navigationWidget = _getNavigationWidget(selectedTheme, uuid);
+    Widget? navigationWidget = _getNavigationWidget(selectedTheme, uuid, postIds);
     if (navigationWidget == null) {
       Navigator.pop(context);
       return;
@@ -341,13 +354,17 @@ class _CredScreenState extends State<CredScreen> {
     }
   }
 
-  Widget? _getNavigationWidget(LMFeedFlavor selectedTheme, String uuid) {
+  Widget? _getNavigationWidget(
+      LMFeedFlavor selectedTheme, String uuid, List<String> postIds) {
     switch (selectedTheme) {
       case LMFeedFlavor.social:
         {
           return ExampleTabScreen(
             uuid: uuid,
-            feedWidget: const LMFeedSocialScreen(),
+            feedWidget: LMFeedSocialScreen(
+              startFeedWithPostIds: postIds,
+              feedType: LMFeedType.personalised,
+            ),
           );
         }
       case LMFeedFlavor.socialFeedRoom:
@@ -368,7 +385,10 @@ class _CredScreenState extends State<CredScreen> {
         }
       case LMFeedFlavor.qna:
         {
-          return const LMFeedQnAScreen();
+          return LMFeedQnAScreen(
+            startFeedWithPostIds: postIds,
+             feedType: LMFeedType.personalised,
+          );
         }
       case LMFeedFlavor.socialDark:
         {
