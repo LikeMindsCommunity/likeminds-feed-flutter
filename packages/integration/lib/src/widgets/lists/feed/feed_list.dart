@@ -14,6 +14,9 @@ class LMFeedList extends StatefulWidget {
 
   final LMFeedPostWidgetBuilder? postBuilder;
 
+  /// ids of the post to start the feed with
+  final List<String>? startFeedWithPostIds;
+
   const LMFeedList({
     super.key,
     this.selectedTopicIds,
@@ -22,6 +25,7 @@ class LMFeedList extends StatefulWidget {
     this.pageSize = 10,
     this.postBuilder,
     this.widgetSource = LMFeedWidgetSource.universalFeed,
+    this.startFeedWithPostIds,
   });
 
   @override
@@ -110,6 +114,7 @@ class _LMFeedListState extends State<LMFeedList> {
             pageSize: widget.pageSize,
             topicsIds: widget.selectedTopicIds ?? [],
             widgetIds: widget.widgetIds,
+            startFeedWithPostIds: widget.startFeedWithPostIds,
           ),
         );
       },
@@ -120,11 +125,24 @@ class _LMFeedListState extends State<LMFeedList> {
 
   void updatePagingControllers(_, LMFeedUniversalState? state) {
     if (state is LMFeedUniversalFeedLoadedState) {
-      List<LMPostViewData> listOfPosts = state.posts;
+      List<LMPostViewData> listOfPosts = state.posts.copy();
 
       _feedBloc.users.addAll(state.users);
       _feedBloc.topics.addAll(state.topics);
       _feedBloc.widgets.addAll(state.widgets);
+
+      // check if the post is in same ordered as the [startFeedWithPostIds]
+      // if not show a snackbar
+      if (widget.startFeedWithPostIds != null &&
+          widget.startFeedWithPostIds!.isNotEmpty) {
+        LMFeedPostUtils.checkForPostDeletionErrorState(
+          context,
+          postTitleFirstCap,
+          listOfPosts,
+          widget.startFeedWithPostIds!,
+          widget.widgetSource,
+        );
+      }
 
       if (state.posts.length < widget.pageSize) {
         widget.pagingController.appendLastPage(listOfPosts);

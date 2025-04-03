@@ -565,6 +565,32 @@ class LMFeedPostUtils {
         return LMPostReviewStatus.approved;
     }
   }
+
+  /// A utility function to check if the post is deleted or not
+  /// and show a snackbar if the post is not available
+  /// used in every feed screen
+  static void checkForPostDeletionErrorState(
+    BuildContext context,
+    String postTitleFirstCap,
+    List<LMPostViewData> listOfPosts,
+    List<String> startFeedWithPostIds,
+    LMFeedWidgetSource _widgetSource,
+  ) {
+    // check if the post is in same ordered as the [startFeedWithPostIds]
+    // if not show a snackbar
+    if (startFeedWithPostIds.isNotEmpty) {
+      for (int i = 0; i < startFeedWithPostIds.length; i++) {
+        if (listOfPosts[i].id != startFeedWithPostIds[i]) {
+          LMFeedCore.showSnackBar(
+            context,
+            '$postTitleFirstCap is deleted or not available',
+            _widgetSource,
+          );
+          break;
+        }
+      }
+    }
+  }
 }
 
 extension PostReviewToKey on LMPostReviewStatus {
