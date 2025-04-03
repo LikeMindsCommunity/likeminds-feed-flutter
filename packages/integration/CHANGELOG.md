@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.15.1]
+
+- patch update for `likeminds_feed: ^1.19.0`
+
 ## [1.15.0]
 
 - Added support for initializing the feed with a specific post using postId in both Universal Feed and Personalized Feed.
