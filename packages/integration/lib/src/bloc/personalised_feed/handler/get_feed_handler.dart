@@ -23,6 +23,11 @@ Future<void> _getPersonalisedFeedHandler(
       ..shouldReorder(true);
   }
 
+  // if startFeedWithPostIds is not null then add it to the request
+  if (event.startFeedWithPostIds != null) {
+    requestBuilder.startFeedWithPostIds(event.startFeedWithPostIds!);
+  }
+
   // get personalised feed
   LMResponse<GetPersonalisedFeedResponse> response =
       await LMFeedCore.instance.lmFeedClient.getPersonalisedFeed(
