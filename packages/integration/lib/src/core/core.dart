@@ -105,6 +105,7 @@ class LMFeedCore {
     Function(LMFeedProfileState)? profileListener,
     LMFeedCoreCallback? lmFeedCallback,
     SystemUiOverlayStyle? systemUiOverlayStyle,
+    InitiateLoggerRequest? loggingRequest,
   }) async {
     try {
       // set the system ui overlay style
@@ -120,6 +121,28 @@ class LMFeedCore {
       this.lmFeedSdkCallback =
           LMSDKCallbackImplementation(lmFeedCallback: lmFeedCallback);
       clientBuilder.sdkCallback(this.lmFeedSdkCallback);
+
+      // initilize loggin request
+      if (loggingRequest != null) {
+        InitiateLoggerRequestBuilder _loggerRequestBuilder =
+            (InitiateLoggerRequestBuilder()
+              ..coreVersion(LMFeedStringConstants.coreVersion)
+              ..errorHandler(loggingRequest.onErrorHandler)
+              ..logLevel(loggingRequest.logLevel)
+              ..shareLogsWithLM(loggingRequest.shareLogsWithLM));
+
+        clientBuilder.initiateLoggerRequest(loggingRequest);
+      } else {
+        // using defualt loggin
+        InitiateLoggerRequestBuilder _defaultLoggerRequestBuilder =
+            (InitiateLoggerRequestBuilder()
+              ..coreVersion(LMFeedStringConstants.coreVersion)
+              ..errorHandler((e, _) {})
+              ..logLevel(Severity.ERROR)
+              ..shareLogsWithLM(true));
+        clientBuilder
+            .initiateLoggerRequest(_defaultLoggerRequestBuilder.build());
+      }
 
       this.lmFeedClient = clientBuilder.build();
 
@@ -171,21 +194,14 @@ class LMFeedCore {
   Future<LMResponse> logout() async {
     // create a logout request builder
     final LogoutRequestBuilder requestBuilder = LogoutRequestBuilder();
-    // get the refresh token from the local preference
-    final String? refreshToken = LMFeedLocalPreference.instance
-        .fetchCache(LMFeedStringConstants.refreshToken)
-        ?.value;
     // get the device id from the notification handler
     final String? deviceId = LMNotificationHandler.instance.deviceId;
     // set the refresh token and device id in the request builder
-    if (refreshToken != null) {
-      requestBuilder.refreshToken(refreshToken);
-    }
     if (deviceId != null) {
       requestBuilder.deviceId(deviceId);
     }
     // call the logout function from the client
-    LogoutResponse response = await lmFeedClient.logout(requestBuilder.build());
+    LMResponse response = await lmFeedClient.logout(requestBuilder.build());
     return LMResponse(
         success: response.success, errorMessage: response.errorMessage);
   }
@@ -198,19 +214,6 @@ class LMFeedCore {
     String? accessToken,
     String? refreshToken,
   }) async {
-    // setting up the logger
-    InitiateLoggerRequestBuilder initiateLoggerRequestBuilder =
-        (InitiateLoggerRequestBuilder()
-          ..coreVersion(LMFeedStringConstants.coreVersion)
-          ..errorHandler((e, _) {})
-          ..logLevel(Severity.ERROR)
-          ..shareLogsWithLM(true));
-
-    await LMFeedPersistence.instance
-        .init(request: initiateLoggerRequestBuilder.build());
-    await LMFeedPersistence.instance.flushLogs();
-    //end of logger setup
-
     String? newAccessToken;
     String? newRefreshToken;
     if (accessToken == null || refreshToken == null) {
@@ -262,7 +265,8 @@ class LMFeedCore {
       return LMResponse(
           success: false, errorMessage: validateUserResponse.errorMessage);
     }
-
+    // flushing the logs
+    await LMFeedPersistence.instance.flushLogs();
     return LMResponse(success: true, data: validateUserResponse);
   }
 
@@ -375,12 +379,15 @@ class LMFeedCore {
         );
         // Call member state and community configurations and store them in local preference
         LMResponse initialiseFeedResponse = await initialiseFeed();
+
         if (!initialiseFeedResponse.success) {
           return LMResponse(
               success: false,
               errorMessage: initialiseFeedResponse.errorMessage);
         }
       }
+      // flushing the logs
+      await LMFeedPersistence.instance.flushLogs();
 
       return initiateUserResponse;
     } else {
