@@ -228,14 +228,17 @@ class _LMFeedActivityWidgetState extends State<LMFeedActivityWidget> {
         final activity = activityResponse.activities![index];
         final LMPostViewData postData =
             convertPostData(activityResponse, activity);
-
         late final VideoPlayerController controller;
         late final Future<void> futureValue;
-        if (postData.attachments!.isNotEmpty &&
-            postData.attachments![0].attachmentType == LMMediaType.video) {
-          controller = VideoPlayerController.networkUrl(
-              Uri.parse(postData.attachments![0].attachmentMeta.url!));
-          futureValue = controller.initialize();
+        try {
+          if (postData.attachments!.isNotEmpty &&
+              postData.attachments![0].attachmentType == LMMediaType.video) {
+            controller = VideoPlayerController.networkUrl(
+                Uri.parse(postData.attachments![0].attachmentMeta.url!));
+            futureValue = controller.initialize();
+          }
+        } on Exception catch (e, stackTrace) {
+          LMFeedPersistence.instance.handleException(e, stackTrace);
         }
 
         return Padding(

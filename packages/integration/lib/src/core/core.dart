@@ -198,6 +198,19 @@ class LMFeedCore {
     String? accessToken,
     String? refreshToken,
   }) async {
+    // setting up the logger
+    InitiateLoggerRequestBuilder initiateLoggerRequestBuilder =
+        (InitiateLoggerRequestBuilder()
+          ..coreVersion(LMFeedStringConstants.coreVersion)
+          ..errorHandler((e, _) {})
+          ..logLevel(Severity.ERROR)
+          ..shareLogsWithLM(true));
+
+    await LMFeedPersistence.instance
+        .init(request: initiateLoggerRequestBuilder.build());
+    await LMFeedPersistence.instance.flushLogs();
+    //end of logger setup
+
     String? newAccessToken;
     String? newRefreshToken;
     if (accessToken == null || refreshToken == null) {
@@ -300,6 +313,22 @@ class LMFeedCore {
   }) async {
     String? newAccessToken;
     String? newRefreshToken;
+
+    // setting up the logger
+
+    InitiateLoggerRequestBuilder initiateLoggerRequestBuilder =
+        (InitiateLoggerRequestBuilder()
+          ..coreVersion(LMFeedStringConstants.coreVersion)
+          ..errorHandler((e, _) {})
+          ..logLevel(Severity.ERROR)
+          ..shareLogsWithLM(true));
+
+    await LMFeedPersistence.instance
+        .init(request: initiateLoggerRequestBuilder.build());
+
+    await LMFeedPersistence.instance.flushLogs();
+
+    //end of logger setup
 
     newAccessToken = LMFeedLocalPreference.instance
         .fetchCache(LMFeedStringConstants.accessToken)

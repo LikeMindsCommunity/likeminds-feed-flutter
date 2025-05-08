@@ -159,7 +159,11 @@ class LMNotificationHandler {
       showSimpleNotification(
         GestureDetector(
           onTap: () {
-            routeNotification(message, navigatorKey);
+            try {
+              routeNotification(message, navigatorKey);
+            } on Exception catch (e, stackTrace) {
+              LMFeedPersistence.instance.handleException(e, stackTrace);
+            }
           },
           behavior: HitTestBehavior.opaque,
           child: Column(
