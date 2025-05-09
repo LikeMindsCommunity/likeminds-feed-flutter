@@ -22,4 +22,6 @@ class LMFeedStringConstants {
   static const String underReviewKey = 'under_review';
   static const String rejectedKey = 'rejected';
   static const String postApprovalNeeded = 'post_approval_needed';
+
+  static const String coreVersion = '1.15.1';
 }
