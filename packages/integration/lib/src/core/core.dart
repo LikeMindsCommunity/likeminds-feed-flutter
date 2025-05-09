@@ -97,6 +97,8 @@ class LMFeedCore {
   /// This function is used to initialize the feed, It is the starting point of the feed.
   /// Essentially, It is used to setup the feed with the configurations, theme, analytics listener, profile listener, system ui overlay style, etc.
   /// It must be executed before displaying the feed screen or accessing any other [LMFeedCore] widgets, screens and functions.
+  ///
+  /// [InitiateLoggerRequest] is used to initilize logging req, if not initilized by user, a defualt logger will be used
   Future<LMResponse<void>> initialize({
     String? domain,
     LMFeedConfig? config,
@@ -124,12 +126,10 @@ class LMFeedCore {
 
       // initilize loggin request
       if (loggingRequest != null) {
-        InitiateLoggerRequestBuilder _loggerRequestBuilder =
-            (InitiateLoggerRequestBuilder()
-              ..coreVersion(LMFeedStringConstants.coreVersion)
-              ..errorHandler(loggingRequest.onErrorHandler)
-              ..logLevel(loggingRequest.logLevel)
-              ..shareLogsWithLM(loggingRequest.shareLogsWithLM));
+        if (loggingRequest.coreVersion == null) {
+          loggingRequest = loggingRequest.copyWith(
+              coreVersion: LMFeedStringConstants.coreVersion);
+        }
 
         clientBuilder.initiateLoggerRequest(loggingRequest);
       } else {
@@ -317,22 +317,6 @@ class LMFeedCore {
   }) async {
     String? newAccessToken;
     String? newRefreshToken;
-
-    // setting up the logger
-
-    InitiateLoggerRequestBuilder initiateLoggerRequestBuilder =
-        (InitiateLoggerRequestBuilder()
-          ..coreVersion(LMFeedStringConstants.coreVersion)
-          ..errorHandler((e, _) {})
-          ..logLevel(Severity.ERROR)
-          ..shareLogsWithLM(true));
-
-    await LMFeedPersistence.instance
-        .init(request: initiateLoggerRequestBuilder.build());
-
-    await LMFeedPersistence.instance.flushLogs();
-
-    //end of logger setup
 
     newAccessToken = LMFeedLocalPreference.instance
         .fetchCache(LMFeedStringConstants.accessToken)
