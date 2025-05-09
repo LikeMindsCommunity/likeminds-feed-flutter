@@ -99,6 +99,8 @@ class LMFeedCore {
   /// It must be executed before displaying the feed screen or accessing any other [LMFeedCore] widgets, screens and functions.
   ///
   /// [InitiateLoggerRequest] is used to initilize logging req, if not initilized by user, a defualt logger will be used
+  /// [InitiateLoggerRequest] conatins [coreVersion] An optional string representing the core version of LikeMinds SDK,
+  /// it is auotmatically set while initializing, don't set [coreVersion] unless explicitly needed.
   Future<LMResponse<void>> initialize({
     String? domain,
     LMFeedConfig? config,
