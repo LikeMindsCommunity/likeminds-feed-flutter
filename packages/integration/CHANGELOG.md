@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.16.0]
+
+- Added error logging and logout
+
 ## [1.15.1]
 
 - patch update for `likeminds_feed: ^1.19.0`
