@@ -2,7 +2,7 @@
 
 ## [1.16.0]
 
-- Addede error logging and logout
+- Added error logging and logout
 
 ## [1.15.1]
 
