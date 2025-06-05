@@ -115,6 +115,7 @@ class _LMFeedListState extends State<LMFeedList> {
             topicsIds: widget.selectedTopicIds ?? [],
             widgetIds: widget.widgetIds,
             startFeedWithPostIds: widget.startFeedWithPostIds,
+            feedThemeType: LMFeedCore.config.feedThemeType,
           ),
         );
       },

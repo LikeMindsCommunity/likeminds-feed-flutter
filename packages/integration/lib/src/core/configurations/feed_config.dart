@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_flutter_core/src/core/configurations/feed_builder.dart';
 import 'package:likeminds_feed_flutter_core/src/utils/web/feed_web_configuration.dart';
 import 'package:likeminds_feed_flutter_core/src/views/activity/configurations/config.dart';
@@ -46,18 +47,6 @@ enum LMFeedType {
 
   /// render personalised feed
   personalised
-}
-
-/// enum to describe which feed theme to render
-enum LMFeedThemeType {
-  /// render social theme feed
-  social,
-
-  /// render qna theme feed
-  qna,
-
-  /// render video feed theme
-  videoFeed,
 }
 
 /// {@template lm_feed_config}
@@ -114,7 +103,7 @@ class LMFeedConfig {
   final LMFeedWebConfiguration webConfiguration;
 
   /// feed theme type
-  final LMFeedThemeType feedThemeType;
+  final LMFeedThemeType? feedThemeType;
 
   /// {@macro lm_feed_widget_builder_delegate}
   final LMFeedWidgetBuilderDelegate widgetBuilderDelegate;
@@ -142,7 +131,7 @@ class LMFeedConfig {
     this.searchScreenConfig = const LMFeedSearchScreenConfig(),
     this.topicSelectScreenConfig = const LMFeedTopicSelectScreenConfig(),
     this.webConfiguration = const LMFeedWebConfiguration(),
-    this.feedThemeType = LMFeedThemeType.social,
+    this.feedThemeType,
     this.widgetBuilderDelegate = const LMFeedWidgetBuilderDelegate(),
     this.globalSystemOverlayStyle,
   });

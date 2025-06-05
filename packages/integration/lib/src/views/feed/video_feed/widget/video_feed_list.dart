@@ -156,12 +156,13 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
         } else {
           _universalFeedBloc.add(
             LMFeedGetUniversalFeedEvent(
-              pageKey: pageKey,
-              pageSize: widget.pageSize,
-              topicsIds:
-                  _universalFeedBloc.selectedTopics.map((e) => e.id).toList(),
-              startFeedWithPostIds: widget.startFeedWithPostIds,
-            ),
+                pageKey: pageKey,
+                pageSize: widget.pageSize,
+                topicsIds:
+                    _universalFeedBloc.selectedTopics.map((e) => e.id).toList(),
+                startFeedWithPostIds: widget.startFeedWithPostIds,
+                feedThemeType: LMFeedCore.config.feedThemeType ??
+                    LMFeedThemeType.videoFeed),
           );
         }
       },

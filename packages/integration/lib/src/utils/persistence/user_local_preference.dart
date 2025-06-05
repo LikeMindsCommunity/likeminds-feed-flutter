@@ -88,8 +88,8 @@ class LMFeedLocalPreference {
   }
 
   String getPostVariable() {
-    LMFeedThemeType themeType = LMFeedCore.config.feedThemeType;
-    String postVar = themeType == LMFeedThemeType.qna ? "Question" : "Post";
+    LMFeedThemeType? themeType = LMFeedCore.config.feedThemeType;
+    String postVar = themeType == LMFeedThemeType.qnaFeed ? "Question" : "Post";
 
     LMCache? postCache = fetchCache("lm-feed-post-var");
 
@@ -111,8 +111,9 @@ class LMFeedLocalPreference {
   }
 
   String getCommentVariable() {
-    LMFeedThemeType themeType = LMFeedCore.config.feedThemeType;
-    String commentVar = themeType == LMFeedThemeType.qna ? "Answer" : "Comment";
+    LMFeedThemeType? themeType = LMFeedCore.config.feedThemeType;
+    String commentVar =
+        themeType == LMFeedThemeType.qnaFeed ? "Answer" : "Comment";
 
     LMCache? commentCache = fetchCache("lm-feed-comment-var");
 
@@ -135,8 +136,8 @@ class LMFeedLocalPreference {
 
   // get like variable
   String getLikeVariable() {
-    LMFeedThemeType themeType = LMFeedCore.config.feedThemeType;
-    String likeVar = themeType == LMFeedThemeType.qna ? "Upvote" : "Like";
+    LMFeedThemeType? themeType = LMFeedCore.config.feedThemeType;
+    String likeVar = themeType == LMFeedThemeType.qnaFeed ? "Upvote" : "Like";
 
     CommunityConfigurations? communityConfigurations =
         fetchCommunityConfiguration("feed_metadata");

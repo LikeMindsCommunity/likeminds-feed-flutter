@@ -303,6 +303,8 @@ class _LMFeedSocialUniversalScreenState
         pageKey: 1,
         pageSize: widget.pageSize,
         topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
+        feedThemeType:
+            LMFeedCore.config.feedThemeType ?? LMFeedThemeType.socialFeed,
       ),
     );
   }
@@ -331,6 +333,8 @@ class _LMFeedSocialUniversalScreenState
             pageSize: widget.pageSize,
             topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
             startFeedWithPostIds: widget.startFeedWithPostIds,
+            feedThemeType:
+                LMFeedCore.config.feedThemeType ?? LMFeedThemeType.socialFeed,
           ),
         );
       },
