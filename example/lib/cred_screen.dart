@@ -289,8 +289,9 @@ class _CredScreenState extends State<CredScreen> {
     String uuid = _uuidController.text;
     String userName = _usernameController.text;
     String apiKey = _apiKeyController.text;
-    List<String> postIds = _postIdController.text.isNotEmpty?
-        _postIdController.text.split(','):[];
+    List<String> postIds = _postIdController.text.isNotEmpty
+        ? _postIdController.text.split(',')
+        : [];
     globalApiKey = apiKey;
     if (apiKey.isEmpty) {
       _showSnackBar("API Key cannot be empty");
@@ -320,7 +321,8 @@ class _CredScreenState extends State<CredScreen> {
     }
 
     // define the route
-    Widget? navigationWidget = _getNavigationWidget(selectedTheme, uuid, postIds);
+    Widget? navigationWidget =
+        _getNavigationWidget(selectedTheme, uuid, postIds);
     if (navigationWidget == null) {
       Navigator.pop(context);
       return;
@@ -363,7 +365,7 @@ class _CredScreenState extends State<CredScreen> {
             uuid: uuid,
             feedWidget: LMFeedSocialScreen(
               startFeedWithPostIds: postIds,
-              feedType: LMFeedType.personalised,
+              feedType: LMFeedType.universal,
             ),
           );
         }
@@ -387,7 +389,7 @@ class _CredScreenState extends State<CredScreen> {
         {
           return LMFeedQnAScreen(
             startFeedWithPostIds: postIds,
-             feedType: LMFeedType.personalised,
+            feedType: LMFeedType.personalised,
           );
         }
       case LMFeedFlavor.socialDark:
@@ -413,7 +415,7 @@ class _CredScreenState extends State<CredScreen> {
       case LMFeedFlavor.qna:
         {
           LMFeedCore.config = LMFeedConfig(
-            feedThemeType: LMFeedThemeType.qna,
+            feedThemeType: LMFeedThemeType.qnaFeed,
           );
         }
         break;

@@ -117,10 +117,10 @@ class _LMFeedEditPostScreenState extends State<LMFeedEditPostScreen> {
     // If the widget does not have a config, then set the config
     // from the core
     config = widget.config ?? LMFeedCore.config.composeScreenConfig;
-    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? true
         : config?.setting.enableHeading ?? false;
-    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? true
         : config?.setting.headingRequiredToCreatePost ?? false;
     _headingController = enableHeading ? TextEditingController() : null;

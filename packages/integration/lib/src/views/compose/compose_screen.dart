@@ -304,10 +304,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     config = widget.config ?? LMFeedCore.config.composeScreenConfig;
     style = widget.style ?? config?.style;
     _checkForRepost();
-    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? true
         : config?.setting.enableHeading ?? false;
-    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? true
         : config?.setting.headingRequiredToCreatePost ?? false;
     _headingController = enableHeading ? TextEditingController() : null;
@@ -327,10 +327,10 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
     config = widget.config ?? LMFeedCore.config.composeScreenConfig;
     style = widget.style ?? config?.style;
     _checkForRepost();
-    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    enableHeading = LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? true
         : config?.setting.enableHeading ?? false;
-    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    headingRequired = LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? true
         : config?.setting.headingRequiredToCreatePost ?? false;
     _headingController = enableHeading ? TextEditingController() : null;
@@ -971,7 +971,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
 // Function to build the default app bar
   LMFeedAppBar _defAppBar() {
     final String postPrefix =
-        LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
             ? "Ask"
             : "Create";
     final theme = LMFeedCore.theme;
@@ -1152,7 +1152,7 @@ class _LMFeedComposeScreenState extends State<LMFeedComposeScreen> {
           disabledBorder: InputBorder.none,
           focusedErrorBorder: InputBorder.none,
           hintText: config?.setting.composeHint ??
-              (LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+              (LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
                   ? "Add description"
                   : "Write something here..."),
           hintStyle: TextStyle(

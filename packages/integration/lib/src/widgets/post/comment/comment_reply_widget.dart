@@ -585,7 +585,7 @@ class _CommentReplyWidgetState extends State<LMFeedCommentReplyWidget> {
       isActive: commentViewData.isLiked,
     );
 
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? likeButton.copyWith(
             style: likeButton.style?.copyWith(
               gap: likeButton.style?.showText == true ? 4 : 0,

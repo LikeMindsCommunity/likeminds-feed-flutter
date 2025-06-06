@@ -452,7 +452,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       ),
     );
 
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? qnaFeedFooter
         : socialFeedFooter;
   }
@@ -820,7 +820,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       ),
     );
 
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? qnaLikeButton
         : socialLikeButton;
   }
@@ -881,7 +881,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       ),
     );
 
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? qnaCommentButton
         : commentButton;
   }
@@ -1095,7 +1095,7 @@ class _LMFeedActivityScreenState extends State<LMFeedActivityScreen> {
       },
       isActive: commentViewData.isLiked,
     );
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? likeButton.copyWith(
             style: likeButton.style?.copyWith(
               gap: likeButton.style?.showText == true ? 4 : 0,

@@ -316,6 +316,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
         pageKey: 1,
         pageSize: widget.pageSize,
         topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
+        feedThemeType:
+            LMFeedCore.config.feedThemeType ?? LMFeedThemeType.qnaFeed,
       ),
     );
   }
@@ -344,6 +346,8 @@ class _LMFeedQnAUniversalScreenState extends State<LMFeedQnAUniversalScreen> {
             pageSize: widget.pageSize,
             topicsIds: _feedBloc.selectedTopics.map((e) => e.id).toList(),
             startFeedWithPostIds: widget.startFeedWithPostIds,
+            feedThemeType:
+                LMFeedCore.config.feedThemeType ?? LMFeedThemeType.qnaFeed,
           ),
         );
       },

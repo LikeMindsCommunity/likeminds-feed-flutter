@@ -156,12 +156,12 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
         } else {
           _universalFeedBloc.add(
             LMFeedGetUniversalFeedEvent(
-              pageKey: pageKey,
-              pageSize: widget.pageSize,
-              topicsIds:
-                  _universalFeedBloc.selectedTopics.map((e) => e.id).toList(),
-              startFeedWithPostIds: widget.startFeedWithPostIds,
-            ),
+                pageKey: pageKey,
+                pageSize: widget.pageSize,
+                topicsIds:
+                    _universalFeedBloc.selectedTopics.map((e) => e.id).toList(),
+                startFeedWithPostIds: widget.startFeedWithPostIds,
+                feedThemeType: LMFeedThemeType.videoFeed),
           );
         }
       },
@@ -187,10 +187,6 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
           _widgetSource,
         );
       }
-
-      // remove post that do not have attachment type = reel
-      // or they do not have any attachments.url
-      listOfPosts.removeWhere((post) => !_isPostOfReelType(post));
 
       _universalFeedBloc.users.addAll(state.users);
       _universalFeedBloc.topics.addAll(state.topics);
@@ -231,9 +227,6 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
         );
       }
 
-      // remove post that do not have attachment type = reel
-      // or they do not have any attachments.url
-      listOfPosts.removeWhere((post) => !_isPostOfReelType(post));
       if (state.posts.length < widget.pageSize) {
         _pagingController.appendLastPage(listOfPosts);
       } else {
@@ -307,15 +300,6 @@ class _LMFeedVideoFeedListViewState extends State<LMFeedVideoFeedListView>
           .videoControllerProvider(requestBuilder.build());
     }
     ;
-  }
-
-  bool _isPostOfReelType(LMPostViewData post) {
-    return post.attachments?.any(
-          (attachment) =>
-              attachment.attachmentType == LMMediaType.reel &&
-              attachment.attachmentMeta.url != null,
-        ) ??
-        false;
   }
 
   @override
