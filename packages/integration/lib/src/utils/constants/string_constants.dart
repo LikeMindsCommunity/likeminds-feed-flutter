@@ -23,5 +23,5 @@ class LMFeedStringConstants {
   static const String rejectedKey = 'rejected';
   static const String postApprovalNeeded = 'post_approval_needed';
 
-  static const String coreVersion = '1.16.0';
+  static const String coreVersion = '1.17.0';
 }

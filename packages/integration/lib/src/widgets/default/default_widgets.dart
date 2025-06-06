@@ -182,7 +182,7 @@ class LMFeedDefaultWidgets {
       ),
     );
 
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? qnaFeedFooter
         : socialFeedFooter;
   }
@@ -556,7 +556,7 @@ class LMFeedDefaultWidgets {
       ),
     );
 
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? qnaLikeButton
         : socialLikeButton;
   }
@@ -619,7 +619,7 @@ class LMFeedDefaultWidgets {
       ),
     );
 
-    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+    return LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
         ? qnaCommentButton
         : commentButton;
   }

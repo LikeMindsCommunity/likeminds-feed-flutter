@@ -12,6 +12,7 @@ class LMFeedGetUniversalFeedEvent extends LMFeedUniversalEvent {
   final List<String> topicsIds;
   final List<String>? widgetIds;
   final List<String>? startFeedWithPostIds;
+  final LMFeedThemeType? feedThemeType;
 
   const LMFeedGetUniversalFeedEvent({
     required this.pageKey,
@@ -19,10 +20,17 @@ class LMFeedGetUniversalFeedEvent extends LMFeedUniversalEvent {
     required this.topicsIds,
     this.widgetIds,
     this.startFeedWithPostIds,
+    this.feedThemeType,
   });
   @override
-  List<Object?> get props =>
-      [pageKey, pageSize, topicsIds, widgetIds, startFeedWithPostIds];
+  List<Object?> get props => [
+        pageKey,
+        pageSize,
+        topicsIds,
+        widgetIds,
+        startFeedWithPostIds,
+        feedThemeType,
+      ];
 }
 
 class LMFeedUniversalRefreshEvent extends LMFeedUniversalEvent {}

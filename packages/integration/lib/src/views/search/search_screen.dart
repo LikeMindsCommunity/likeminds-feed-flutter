@@ -180,7 +180,7 @@ class LMFeedSearchScreenState extends State<LMFeedSearchScreen> {
         query: value,
         page: page,
         pageSize: pageSize,
-        type: LMFeedCore.config.feedThemeType == LMFeedThemeType.qna
+        type: LMFeedCore.config.feedThemeType == LMFeedThemeType.qnaFeed
             ? 'heading'
             : 'text',
       ),
