@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.17.1]
+
+- Fixed fail to upload post with client's S3 service
+
 ## [1.17.0]
 
 - Added Separation of Video Feed and Social Feed

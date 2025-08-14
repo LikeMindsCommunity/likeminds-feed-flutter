@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:likeminds_feed_sample/app.dart';
 import 'package:likeminds_feed_flutter_core/likeminds_feed_core.dart';
 import 'package:likeminds_feed_sample/firebase_options.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:likeminds_feed_sample/globals.dart';
 
 /// First level notification handler
@@ -23,8 +22,6 @@ Future<void> _handleNotification(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Loading .env file
-  await dotenv.load(fileName: ".env");
   LMResponse response = await LMFeedCore.instance.initialize(
   );
 
