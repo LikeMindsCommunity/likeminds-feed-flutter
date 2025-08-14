@@ -34,9 +34,7 @@ void newPostEventHandler(
     }
 
     // Handle media upload if media exists
-    if (event.postMedia != null &&
-        event.postMedia!.isNotEmpty &&
-        event.postMedia!.first.attachmentMeta.url == null) {
+    if (event.postMedia != null && event.postMedia!.isNotEmpty) {
       final uploadAttachmentResponse = await uploadMediaEventHandler(
         LMFeedUploadMediaEvent(
           postMedia: event.postMedia!,
@@ -50,8 +48,13 @@ void newPostEventHandler(
           uploadAttachmentResponse.data == null) {
         return;
       }
-
       attachments = uploadAttachmentResponse.data!;
+
+      // Delete temporary post if media upload is successful
+      final DeleteTemporaryPostRequest deleteTemporaryPostRequest =
+          (DeleteTemporaryPostRequestBuilder()..temporaryPostId(tempId))
+              .build();
+      await LMFeedCore.client.deleteTemporaryPost(deleteTemporaryPostRequest);
     }
     // emit the uploading state
     emit(LMFeedNewPostUploadingState(progress: progress.stream));

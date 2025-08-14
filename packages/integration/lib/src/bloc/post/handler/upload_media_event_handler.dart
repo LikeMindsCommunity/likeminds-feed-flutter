@@ -56,6 +56,16 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
                 media.attachmentMeta),
           ),
         );
+      } else if (media.attachmentMeta.url != null &&
+          media.attachmentMeta.url!.isNotEmpty) {
+        attachments.add(
+          Attachment(
+            attachmentType: media.attachmentType.value,
+            attachmentMeta: LMAttachmentMetaViewDataConvertor.toAttachmentMeta(
+              media.attachmentMeta,
+            ),
+          ),
+        );
       } else {
         late File mediaFile;
         if (media.attachmentMeta.bytes != null) {
@@ -139,13 +149,7 @@ Future<LMResponse<List<Attachment>>> uploadMediaEventHandler(
             ))
         .toList(),
   ));
-
-  // Delete temporary post if media upload is successful
-  final DeleteTemporaryPostRequest deleteTemporaryPostRequest =
-      (DeleteTemporaryPostRequestBuilder()..temporaryPostId(event.tempId))
-          .build();
-  await LMFeedCore.client.deleteTemporaryPost(deleteTemporaryPostRequest);
-
+  
   return LMResponse.success(data: attachments);
 }
 
