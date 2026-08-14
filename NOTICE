@@ -1,0 +1,8 @@
+LikeMinds Feed SDK for Flutter
+Copyright 2026 LikeMinds
+
+This product includes software developed by LikeMinds (https://docs.likeminds.io/).
+
+This product bundles flutter_typeahead, which is available under the
+BSD 2-Clause License. Copyright (c) 2018, AbdulRahmanAlHamali.
+See packages/integration/lib/packages/flutter_typeahead/LICENSE for details.
